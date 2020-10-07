@@ -1,0 +1,768 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2020, The Monero Project.
+
+#include <stdexcept>
+#include <QDir>
+#include <QStandardPaths>
+#include <QMessageBox>
+#include <QClipboard>
+#include <QDesktopWidget>
+
+#include "appcontext.h"
+#include "utils/tails.h"
+#include "utils/whonix.h"
+#include "utils/utils.h"
+#include "utils/prices.h"
+#include "utils/networktype.h"
+#include "utils/wsclient.h"
+
+// libwalletqt
+#include "libwalletqt/WalletManager.h"
+#include "libwalletqt/Wallet.h"
+#include "libwalletqt/TransactionHistory.h"
+#include "libwalletqt/SubaddressAccount.h"
+#include "libwalletqt/Subaddress.h"
+#include "libwalletqt/Coins.h"
+#include "model/TransactionHistoryModel.h"
+#include "model/SubaddressAccountModel.h"
+#include "model/SubaddressModel.h"
+#include "utils/keysfiles.h"
+#include "utils/networktype.h"
+#include "utils/config.h"
+
+
+Prices *AppContext::prices = nullptr;
+WalletKeysFilesModel *AppContext::wallets = nullptr;
+TxFiatHistory *AppContext::txFiatHistory = nullptr;
+double AppContext::balance = 0;
+QMap<QString, QString> AppContext::txDescriptionCache;
+
+AppContext::AppContext(QCommandLineParser *cmdargs) {
+    this->network = new QNetworkAccessManager();
+    this->networkClearnet = new QNetworkAccessManager();
+    this->cmdargs = cmdargs;
+
+#if defined(Q_OS_MAC)
+    this->isTorSocks = qgetenv("DYLD_INSERT_LIBRARIES").indexOf("libtorsocks") >= 0;
+#elif defined(Q_OS_LINUX)
+    this->isTorSocks = qgetenv("LD_PRELOAD").indexOf("libtorsocks") >= 0;
+#elif defined(Q_OS_WIN)
+    this->isTorSocks = false;
+#endif
+
+    this->isTails = TailsOS::detect();
+    this->isWhonix = WhonixOS::detect();
+
+    //Paths
+    this->configRoot = QDir::homePath();
+    if (isTails) { // #if defined(PORTABLE)
+        QString portablePath = []{
+            QString appImagePath = qgetenv("APPIMAGE");
+            if (appImagePath.isEmpty()) {
+                qDebug() << "Not an appimage, using currentPath()";
+                return QDir::currentPath() + "/.feather";
+            }
+
+            QFileInfo appImageDir(appImagePath);
+            return appImageDir.absoluteDir().path() + "/.feather";
+        }();
+
+
+        if (QDir().mkpath(portablePath)) {
+            this->configRoot = portablePath;
+        } else {
+            qCritical() << "Unable to create portable directory: " << portablePath;
+        }
+    }
+
+    this->accountName = Utils::getUnixAccountName();
+    this->homeDir = QDir::homePath();
+
+#if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
+    this->defaultWalletDir = QString("%1/Monero/wallets").arg(this->configRoot);
+    this->defaultWalletDirRoot = QString("%1/Monero").arg(this->configRoot);
+#elif defined(Q_OS_WIN)
+    // @TODO
+#endif
+
+    // Create ~/Monero/wallets if it does not exist yet
+    if (!QDir().mkpath(defaultWalletDir))
+        qCritical() << "Unable to create dir: " << defaultWalletDir;
+
+    this->configDirectory = QString("%1/.config/feather/").arg(this->configRoot);
+#if defined(Q_OS_UNIX)
+    if(!this->configDirectory.endsWith('/'))
+        this->configDirectory = QString("%1/").arg(this->configDirectory);
+#endif
+    this->sorry();
+
+    // Config
+    createConfigDirectory(this->configDirectory);
+
+    if(this->cmdargs->isSet("stagenet"))
+        this->networkType = NetworkType::STAGENET;
+    else if(this->cmdargs->isSet("testnet"))
+        this->networkType = NetworkType::TESTNET;
+    else
+        this->networkType = NetworkType::MAINNET;
+
+//    auto nodeSourceUInt = config()->get(Config::nodeSource).toUInt();
+//    AppContext::nodeSource = static_cast<NodeSource>(nodeSourceUInt);
+    this->nodes = new Nodes(this, this->networkClearnet);
+    connect(this, &AppContext::nodeSourceChanged, this->nodes, &Nodes::onNodeSourceChanged);
+    connect(this, &AppContext::setCustomNodes, this->nodes, &Nodes::setCustomNodes);
+    connect(this, &AppContext::walletClosing, this->nodes, &Nodes::onWalletClosing);
+
+    // Tor & socks proxy
+    this->ws = new WSClient(this, m_wsUrl);
+    connect(this->ws, &WSClient::WSMessage, this, &AppContext::onWSMessage);
+
+    // timers
+    m_storeTimer->setSingleShot(true);
+    connect(this->m_storeTimer, &QTimer::timeout, [this](){
+        if (!this->currentWallet)
+            return;
+        qDebug() << "Storing wallet";
+        this->currentWallet->store();
+    });
+
+    // restore height lookup
+    this->initRestoreHeights();
+
+    // price history lookup
+    auto genesis_timestamp = this->restoreHeights[NetworkType::Type::MAINNET]->data.firstKey();
+    AppContext::txFiatHistory = new TxFiatHistory(genesis_timestamp, this->configDirectory);
+    connect(this->ws, &WSClient::connectionEstablished, AppContext::txFiatHistory, &TxFiatHistory::onUpdateDatabase);
+    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYear, [=](unsigned int year){
+        QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1}})").arg(year).toUtf8();
+        this->ws->sendMsg(data);
+    });
+    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYearMonth, [=](unsigned int year, unsigned int month) {
+        QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1, "month": %2}})").arg(year).arg(month).toUtf8();
+        this->ws->sendMsg(data);
+    });
+
+    // fiat/crypto lookup
+    AppContext::prices = new Prices();
+
+    // xmr.to
+#if defined(XMRTO)
+    this->XMRTo = new XmrTo(this);
+#endif
+
+    this->walletManager = WalletManager::instance();
+    QString logPath = QString("%1/daemon.log").arg(configDirectory);
+    Monero::Utils::onStartup();
+    Monero::Wallet::init("", "feather", logPath.toStdString(), true);
+
+    bool logLevelFromEnv;
+    int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
+    if(this->cmdargs->isSet("quiet"))
+        this->walletManager->setLogLevel(-1);
+    else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max)
+        Monero::WalletManagerFactory::setLogLevel(logLevel);
+
+    connect(this, &AppContext::createTransactionError, this, &AppContext::onCreateTransactionError);
+
+    // libwallet connects
+    connect(this->walletManager, &WalletManager::walletOpened, this, &AppContext::onWalletOpened);
+}
+
+void AppContext::initTor() {
+    this->tor = new Tor(this);
+    this->tor->start();
+
+    if (!(isTails || isWhonix)) {
+        auto networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
+        this->network->setProxy(*networkProxy);
+        if (m_wsUrl.host().endsWith(".onion"))
+            this->ws->webSocket.setProxy(*networkProxy);
+    }
+
+}
+
+void AppContext::initWS() {
+    this->ws->start();
+}
+
+void AppContext::onCancelTransaction(PendingTransaction *tx, const QString &address) {
+    // tx cancelled by user
+    double amount = tx->amount() / AppContext::cdiv;
+    emit createTransactionCancelled(address, amount);
+    this->currentWallet->disposeTransaction(tx);
+}
+
+void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const {
+    if(this->currentWallet == nullptr){
+        qCritical() << "Cannot create transaction; no wallet loaded";
+        return;
+    }
+
+    if (churn) {
+        address = this->currentWallet->address(0, 0); // primary address
+    }
+
+    qCritical() << "Creating transaction";
+    this->currentWallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
+}
+
+void AppContext::onCreateTransaction(XmrToOrder *order) {
+    // tx creation via xmr.to
+    const QString description = QString("XmrTo order %1").arg(order->uuid);
+    this->onCreateTransaction(order->receiving_subaddress, order->incoming_amount_total, description, false);
+}
+
+void AppContext::onCreateTransaction(const QString &address, const double amount, const QString &description, bool all) {
+    // tx creation
+    this->tmpTxDescription = description;
+
+    if(this->currentWallet == nullptr) {
+        emit createTransactionError("Cannot create transaction; no wallet loaded");
+        return;
+    }
+
+    if (!all && amount <= 0) {
+        emit createTransactionError("Cannot send nothing");
+        return;
+    }
+
+    auto balance = this->currentWallet->balance() / AppContext::cdiv;
+    auto unlocked_balance = this->currentWallet->unlockedBalance() / AppContext::cdiv;
+    if(!all && amount > unlocked_balance) {
+        emit createTransactionError("Not enough money to spend");
+        return;
+    } else if(unlocked_balance == 0) {
+        emit createTransactionError("No money to spend");
+        return;
+    }
+
+    auto amount_num = static_cast<quint64>(amount * AppContext::cdiv);
+    qDebug() << "creating tx";
+    if(all || amount == balance)
+        this->currentWallet->createTransactionAllAsync(address, "", this->tx_mixin, this->tx_priority);
+    else
+        this->currentWallet->createTransactionAsync(address, "", amount_num, this->tx_mixin, this->tx_priority);
+
+    emit initiateTransaction();
+}
+
+void AppContext::onCreateTransactionError(const QString &msg) {
+    this->tmpTxDescription = "";
+    emit endTransaction();
+}
+
+void AppContext::walletClose(bool emitClosedSignal) {
+    this->nodes->stopTimer();
+    if(this->currentWallet == nullptr) return;
+    emit walletClosing();
+    //ctx->currentWallet->store();  @TODO: uncomment to store on wallet close
+    this->currentWallet->disconnect();
+    this->walletManager->closeWallet();
+    if(this->currentWallet != nullptr)
+        this->currentWallet = nullptr;
+    if(emitClosedSignal)
+        emit walletClosed();
+}
+
+void AppContext::onOpenWallet(const QString &path, const QString &password){
+    if(this->currentWallet != nullptr){
+        emit walletOpenedError("There is an active wallet opened.");
+        return;
+    }
+
+    if(!Utils::fileExists(path)) {
+        emit walletOpenedError(QString("Wallet not found: %1").arg(path));
+        return;
+    }
+
+    config()->set(Config::firstRun, false);
+
+    this->walletPath = path;
+    this->walletManager->openWalletAsync(path, password, this->networkType, 1);
+}
+
+void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
+    if(this->currentWallet) {
+        auto *model = this->currentWallet->transactionHistoryModel();
+        if(model != nullptr) {
+            model->preferredFiatSign = AppContext::prices->fiat[symbol];
+            model->preferredFiatSymbol = symbol;
+        }
+    }
+}
+
+void AppContext::onWalletOpened(Wallet *wallet) {
+    auto state = wallet->status();
+    if (state != Wallet::Status_Ok) {
+        auto errMsg = wallet->errorString();
+        if(errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
+            qCritical() << errMsg;
+            this->walletManager->clearWalletCache(this->walletPath);
+            errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
+            this->walletClose(false);
+            emit walletOpenedError(errMsg);
+        } else if(errMsg.contains("wallet cannot be opened as")) {
+            this->walletClose(false);
+            emit walletOpenedError(errMsg);
+        } else if(errMsg.contains("is opened by another wallet program")) {
+            this->walletClose(false);
+            emit walletOpenedError(errMsg);
+        } else {
+            this->walletClose(false);
+            emit walletOpenPasswordNeeded(this->walletPassword.isEmpty());
+        }
+        return;
+    }
+
+    this->currentWallet = wallet;
+    this->walletPath = this->currentWallet->path() + ".keys";
+    config()->set(Config::walletPath, this->walletPath);
+
+    connect(this->currentWallet, &Wallet::moneySpent, this, &AppContext::onMoneySpent);
+    connect(this->currentWallet, &Wallet::moneyReceived, this, &AppContext::onMoneyReceived);
+    connect(this->currentWallet, &Wallet::unconfirmedMoneyReceived, this, &AppContext::onUnconfirmedMoneyReceived);
+    connect(this->currentWallet, &Wallet::newBlock, this, &AppContext::onWalletNewBlock);
+    connect(this->currentWallet, &Wallet::updated, this, &AppContext::onWalletUpdate);
+    connect(this->currentWallet, &Wallet::refreshed, this, &AppContext::onWalletRefreshed);
+    connect(this->currentWallet, &Wallet::transactionCommitted, this, &AppContext::onTransactionCommitted);
+    connect(this->currentWallet, &Wallet::heightRefreshed, this, &AppContext::onHeightRefreshed);
+    connect(this->currentWallet, &Wallet::transactionCreated, this, &AppContext::onTransactionCreated);
+    connect(this->currentWallet, &Wallet::connectionStatusChanged, this, &AppContext::onConnectionStatusChanged);
+
+    this->nodes->connectToNode();
+
+    emit walletOpened();
+    this->updateBalance();
+
+#ifdef DONATE_BEG
+    this->donateBeg();
+#endif
+
+    // force trigger preferredFiat signal for history model
+    this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
+}
+
+void AppContext::onWSMessage(const QJsonObject &msg) {
+    QString cmd = msg.value("cmd").toString();
+
+    if(cmd == "blockheights") {
+        auto heights = msg.value("data").toObject();
+        auto mainnet = heights.value("mainnet").toInt();
+        auto stagenet = heights.value("stagenet").toInt();
+        auto changed = false;
+
+        if(!this->heights.contains("mainnet")) {
+            this->heights["mainnet"] = (unsigned int) mainnet;
+            changed = true;
+        }
+        else {
+            if (mainnet > this->heights["mainnet"]) {
+                this->heights["mainnet"] = (unsigned int) mainnet;
+                changed = true;
+            }
+        }
+        if(!this->heights.contains("stagenet")) {
+            this->heights["stagenet"] = (unsigned int) stagenet;
+            changed = true;
+        }
+        else {
+            if (stagenet > this->heights["stagenet"]) {
+                this->heights["stagenet"] = (unsigned int) stagenet;
+                changed = true;
+            }
+        }
+
+        if(changed)
+            emit blockHeightWSUpdated(this->heights);
+    }
+
+    else if(cmd == "nodes") {
+        this->onWSNodes(msg.value("data").toArray());
+    }
+
+    else if(cmd == "crypto_rates") {
+        QJsonArray crypto_rates = msg.value("data").toArray();
+        AppContext::prices->cryptoPricesReceived(crypto_rates);
+    }
+
+    else if(cmd == "fiat_rates") {
+        QJsonObject fiat_rates = msg.value("data").toObject();
+        AppContext::prices->fiatPricesReceived(fiat_rates);
+    }
+#if defined(XMRTO)
+    else if(cmd == "xmrto_rates") {
+        auto xmr_rates = msg.value("data").toObject();
+        this->XMRTo->onRatesReceived(xmr_rates);
+    }
+#endif
+    else if(cmd == "reddit") {
+        QJsonArray reddit_data = msg.value("data").toArray();
+        this->onWSReddit(reddit_data);
+    }
+
+    else if(cmd == "ccs") {
+        auto ccs_data = msg.value("data").toArray();
+        this->onWSCCS(ccs_data);
+    }
+
+    else if(cmd == "txFiatHistory") {
+        auto txFiatHistory_data = msg.value("data").toObject();
+        AppContext::txFiatHistory->onWSData(txFiatHistory_data);
+    }
+}
+
+void AppContext::onWSNodes(const QJsonArray &nodes) {
+    QList<QSharedPointer<FeatherNode>> l;
+    for (auto &&entry: nodes) {
+        auto obj = entry.toObject();
+        auto nettype = obj.value("nettype");
+        auto type = obj.value("type");
+
+        // filter remote node network types
+        if(nettype == "mainnet" && this->networkType != NetworkType::MAINNET)
+            continue;
+        if(nettype == "stagenet" && this->networkType != NetworkType::STAGENET)
+            continue;
+        if(nettype == "testnet" && this->networkType != NetworkType::TESTNET)
+            continue;
+
+        if(type == "clearnet" && (this->isTails || this->isWhonix || this->isTorSocks))
+            continue;
+        if(type == "tor" && (!(this->isTails || this->isWhonix || this->isTorSocks)))
+            continue;
+
+        auto node = new FeatherNode(
+                obj.value("address").toString(),
+                (unsigned int)obj.value("height").toInt(),
+                obj.value("online").toBool());
+        QSharedPointer<FeatherNode> r = QSharedPointer<FeatherNode>(node);
+        l.append(r);
+    }
+    this->nodes->onWSNodesReceived(l);
+}
+
+void AppContext::onWSReddit(const QJsonArray& reddit_data) {
+    QList<QSharedPointer<RedditPost>> l;
+
+    for (auto &&entry: reddit_data) {
+        auto obj = entry.toObject();
+        auto redditPost = new RedditPost(
+                obj.value("title").toString(),
+                obj.value("author").toString(),
+                obj.value("url").toString(),
+                obj.value("comments").toInt());
+        QSharedPointer<RedditPost> r = QSharedPointer<RedditPost>(redditPost);
+        l.append(r);
+    }
+
+    emit redditUpdated(l);
+}
+
+void AppContext::onWSCCS(const QJsonArray &ccs_data) {
+    QList<QSharedPointer<CCSEntry>> l;
+
+
+    QStringList fonts = {"state", "address", "author", "date",
+                         "title", "target_amount", "raised_amount",
+                         "percentage_funded", "contributions"};
+
+    for (auto &&entry: ccs_data) {
+        auto obj = entry.toObject();
+        auto c = QSharedPointer<CCSEntry>(new CCSEntry());
+
+        if (obj.value("state").toString() != "FUNDING-REQUIRED")
+            continue;
+
+        c->state = obj.value("state").toString();
+        c->address = obj.value("address").toString();
+        c->author = obj.value("author").toString();
+        c->date = obj.value("date").toString();
+        c->title = obj.value("title").toString();
+        c->url = obj.value("url").toString();
+        c->target_amount = obj.value("target_amount").toDouble();
+        c->raised_amount = obj.value("raised_amount").toDouble();
+        c->percentage_funded = obj.value("percentage_funded").toDouble();
+        c->contributions = obj.value("contributions").toInt();
+        l.append(c);
+    }
+
+    if(l.count() == 0)
+        emit ccsEmpty();
+
+    emit ccsUpdated(l);
+}
+
+void AppContext::createConfigDirectory(const QString &dir) {
+    if(!Utils::dirExists(dir)) {
+        qDebug() << QString("Creating directory: %1").arg(dir);
+        if(!QDir().mkpath(dir))
+            throw std::runtime_error("Could not create directory " + dir.toStdString());
+    }
+
+    QString config_dir_tor = QString("%1%2").arg(dir).arg("tor");
+    if(!Utils::dirExists(config_dir_tor)) {
+        qDebug() << QString("Creating directory: %1").arg(config_dir_tor);
+        if (!QDir().mkpath(config_dir_tor))
+            throw std::runtime_error("Could not create directory " + config_dir_tor.toStdString());
+    }
+
+    QString config_dir_tordata = QString("%1%2").arg(dir).arg("tor/data");
+    if(!Utils::dirExists(config_dir_tordata)) {
+        qDebug() << QString("Creating directory: %1").arg(config_dir_tordata);
+        if (!QDir().mkpath(config_dir_tordata))
+            throw std::runtime_error("Could not create directory " + config_dir_tordata.toStdString());
+    }
+
+    QString config_dir_torsocks = QString("%1%2").arg(dir).arg("torsocks");
+    if(!Utils::dirExists(config_dir_torsocks)) {
+        qDebug() << QString("Creating directory: %1").arg(config_dir_torsocks);
+        if (!QDir().mkpath(config_dir_torsocks))
+            throw std::runtime_error("Could not create directory " + config_dir_torsocks.toStdString());
+    }
+}
+
+void AppContext::createWallet(FeatherSeed seed, const QString &path, const QString &password) {
+    if(Utils::fileExists(path)) {
+        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    this->currentWallet = seed.writeWallet(this->walletManager, this->networkType, path, password, this->kdfRounds);
+    if(this->currentWallet == nullptr) {
+        emit walletCreatedError("Failed to write wallet");
+        return;
+    }
+
+    this->currentWallet->setPassword(password);
+    this->currentWallet->store();
+    this->walletPassword = password;
+    emit walletCreated(this->currentWallet);
+}
+
+void AppContext::initRestoreHeights() {
+    restoreHeights[NetworkType::TESTNET] = new RestoreHeightLookup(NetworkType::TESTNET);
+    restoreHeights[NetworkType::STAGENET] = RestoreHeightLookup::fromFile(":/assets/restore_heights_monero_stagenet.txt", NetworkType::STAGENET);
+    restoreHeights[NetworkType::MAINNET] = RestoreHeightLookup::fromFile(":/assets/restore_heights_monero_mainnet.txt", NetworkType::MAINNET);
+}
+
+void AppContext::onSetRestoreHeight(unsigned int height){
+    auto seed = this->currentWallet->getCacheAttribute("feather.seed");
+    if(!seed.isEmpty()) {
+        const auto msg = "This wallet has a 14 word mnemonic seed which has the restore height embedded.";
+        emit setRestoreHeightError(msg);
+        return;
+    }
+
+    this->currentWallet->setWalletCreationHeight(height);
+    this->currentWallet->setPassword(this->walletPassword);  // trigger .keys write
+
+    // nuke wallet cache
+    const auto fn = this->currentWallet->path();
+    this->walletManager->clearWalletCache(fn);
+
+    emit customRestoreHeightSet(height);
+}
+
+void AppContext::onOpenAliasResolve(const QString &openAlias) {
+    // @TODO: calling this freezes for about 1-2 seconds :/
+    const auto result = this->walletManager->resolveOpenAlias(openAlias);
+    const auto spl = result.split("|");
+    auto msg = QString("");
+    if(spl.count() != 2) {
+        msg = "Internal error";
+        emit openAliasResolveError(msg);
+        return;
+    }
+
+    const auto &status = spl.at(0);
+    const auto &address = spl.at(1);
+    const auto valid = this->walletManager->addressValid(address, this->networkType);
+    if(status == "false"){
+        if(valid){
+            msg = "Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed";
+            emit openAliasResolveError(msg);
+            return;
+        } else {
+            msg = "No valid address found at this OpenAlias address, but the DNSSEC signatures could not be verified, so this may be spoofed";
+            emit openAliasResolveError(msg);
+            return;
+        }
+    } else if(status != "true") {
+        msg = "Internal error";
+        emit openAliasResolveError(msg);
+        return;
+    }
+
+    if(valid){
+        emit openAliasResolved(address, openAlias);
+        return;
+    }
+
+    msg = QString("Address validation error.");
+    if(!address.isEmpty())
+        msg += QString(" Perhaps it is of the wrong network type."
+                       "\n\nOpenAlias: %1\nAddress: %2").arg(openAlias).arg(address);
+    emit openAliasResolveError(msg);
+}
+
+void AppContext::donateBeg() {
+    if(this->networkType != NetworkType::Type::MAINNET)
+        return;
+
+    auto donationCounter = config()->get(Config::donateBeg).toInt();
+    if(donationCounter == -1)
+        return;  // previously donated
+
+    donationCounter += 1;
+    if (donationCounter % m_donationBoundary == 0)
+        emit donationNag();
+    config()->set(Config::donateBeg, donationCounter);
+}
+
+void AppContext::sorry() {
+    auto msg = "Unable to start Feather, error code 0xd34db33f. If this problem "
+               "persists, please contact Technical Support.";
+    QStringList paths = {"C:\\ProgramData\\ryo", this->homeDir + "/.ryo"};
+    for(const QString &ryo: paths)
+        if(Utils::dirExists(ryo))
+            throw std::runtime_error(msg);
+}
+
+AppContext::~AppContext() {
+    this->walletClose(false);
+}
+
+// ############################################## LIBWALLET QT #########################################################
+
+void AppContext::onMoneySpent(const QString &txId, quint64 amount) {
+    auto amount_num = amount / AppContext::cdiv;
+    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+}
+
+void AppContext::onMoneyReceived(const QString &txId, quint64 amount) {
+    // Incoming tx included in a block.
+    auto amount_num = amount / AppContext::cdiv;
+    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+}
+
+void AppContext::onUnconfirmedMoneyReceived(const QString &txId, quint64 amount) {
+    // Incoming transaction in pool
+    auto amount_num = amount / AppContext::cdiv;
+    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+
+    if(this->currentWallet->synchronized()) {
+        auto notify = QString("%1 XMR (pending)").arg(amount_num);
+        Utils::desktopNotify("Payment received", notify, 5000);
+    }
+}
+
+void AppContext::onWalletUpdate() {
+    if (this->currentWallet->synchronized()) {
+        this->refreshModels();
+    }
+
+    this->updateBalance();
+    this->storeWallet();
+}
+
+void AppContext::onWalletRefreshed() {
+    if (!this->refreshed) {
+        refreshModels();
+        this->refreshed = true;
+        this->storeWallet();
+    }
+
+    this->currentWallet->refreshHeightAsync();
+}
+
+void AppContext::onWalletNewBlock(quint64 blockheight, quint64 targetHeight) {
+    this->syncStatusUpdated(blockheight, targetHeight);
+
+    if (this->currentWallet->synchronized()) {
+        this->currentWallet->coins()->refreshUnlocked();
+        this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
+        // Todo: only refresh tx confirmations
+    }
+}
+
+void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) {
+    qDebug() << Q_FUNC_INFO << walletHeight << daemonHeight << targetHeight;
+
+    if (!this->currentWallet->connected())
+        return;
+
+    if (daemonHeight < targetHeight) {
+        emit blockchainSync(daemonHeight, targetHeight);
+    }
+    else {
+        this->syncStatusUpdated(walletHeight, daemonHeight);
+    }
+}
+
+void AppContext::onTransactionCreated(PendingTransaction *tx, const QString &address, const QString &paymentId, quint32 mixin) {
+    if(address == this->featherDonationAddress)
+        this->featherDonationSending = true;
+
+    // tx created, but not sent yet. ask user to verify first.
+    emit createTransactionSuccess(tx, address, mixin);
+    emit endTransaction();
+}
+
+void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
+    this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
+    this->currentWallet->coins()->refresh(this->currentWallet->currentSubaddressAccount());
+    this->storeWallet();
+    emit transactionCommitted(status, tx, txid);
+
+    // this tx was a donation to Feather, stop our nagging
+    if(this->featherDonationSending) {
+        this->featherDonationSending = false;
+        config()->set(Config::donateBeg, -1);
+    }
+}
+
+void AppContext::onConnectionStatusChanged(int status) {
+
+}
+
+void AppContext::storeWallet() {
+    if (m_storeTimer->isActive())
+        return;
+
+    m_storeTimer->start(60000);
+}
+
+void AppContext::updateBalance() {
+    if(!this->currentWallet)
+        throw std::runtime_error("this should not happen, ever");
+
+    AppContext::balance = this->currentWallet->balance() / AppContext::cdiv;
+    auto balance_str = QString::number(balance);
+
+    double unlocked = this->currentWallet->unlockedBalance() / AppContext::cdiv;
+    auto unlocked_str = QString::number(unlocked);
+
+    emit balanceUpdated(balance, unlocked, balance_str, unlocked_str);
+}
+
+void AppContext::syncStatusUpdated(quint64 height, quint64 target) {
+    if (height < (target - 1)) {
+        emit refreshSync(height, target);
+    }
+    else {
+        this->updateBalance();
+        emit synchronized();
+    }
+}
+
+void AppContext::refreshModels() {
+    if (!this->currentWallet)
+        return;
+
+    this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
+    this->currentWallet->subaddress()->refresh(this->currentWallet->currentSubaddressAccount());
+    this->currentWallet->coins()->refresh(this->currentWallet->currentSubaddressAccount());
+    // Todo: set timer for refreshes
+}

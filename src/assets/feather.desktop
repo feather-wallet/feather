@@ -1,0 +1,14 @@
+[Desktop Entry]
+Comment=Lightweight Monero Wallet
+Exec=feather
+GenericName[en_US]=Monero Wallet
+GenericName=Monero Wallet
+Icon=feather
+Name[en_US]=Feather
+Name=Feather
+Categories=Finance;Network;
+StartupNotify=false
+StartupWMClass=feather
+Terminal=false
+Type=Application
+MimeType=x-scheme-handler/monero;

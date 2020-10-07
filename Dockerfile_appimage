@@ -1,0 +1,18 @@
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt clean && apt update
+RUN apt install -y golang git build-essential wget curl ngrep unzip file squashfs-tools desktop-file-utils patchelf libxkbcommon-x11-dev
+
+RUN go get github.com/probonopd/go-appimage/src/appimagetool
+RUN go build -trimpath -ldflags="-s -w" github.com/probonopd/go-appimage/src/appimagetool
+RUN chmod +x appimagetool
+
+RUN cd /usr/bin && \
+    wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh -O uploadtool && \
+    chmod +x uploadtool
+
+RUN cd / && \
+    wget -c https://github.com/AppImage/AppImageKit/releases/download/continuous/runtime-x86_64 && \
+    chmod +x runtime-x86_64

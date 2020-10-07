@@ -1,0 +1,160 @@
+---
+kind: pipeline
+type: docker
+name: linux-release
+
+steps:
+  - name: build
+    image: feather:linux
+    volumes:
+    - name: ccache_linux_release
+      path: /root/.ccache
+    - name: files_linux_release
+      path: /files
+    commands:
+    - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
+    - git config --global url."http://gitea:3000/".insteadOf https://github.com/
+    - git submodule update --init --depth 50 contrib/tor
+    - git submodule update --init --depth 50 contrib/torsocks
+    - git submodule update --init --depth 120 monero
+    - git submodule update --init --depth 120 --recursive monero
+    - make -j8 release-static
+    environment:
+      OPENSSL_ROOT_DIR: /usr/local/openssl/
+      CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
+  - name: deploy
+    image: feather:linux
+    volumes:
+    - name: ccache_linux_release
+      path: /root/.ccache
+    - name: files_linux_release
+      path: /files
+    commands:
+    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - strip -s build/bin/feather
+    - zip -j "$TARGET_DIR/$FN" build/feather.log build/bin/feather
+    - echo "[*] written to https://build.featherwallet.org/files/linux-release/$DRONE_SOURCE_BRANCH/$FN"
+
+volumes:
+- name: ccache_linux_release
+  host:
+    path: /var/drone/ccache_linux_release/
+- name: files_linux_release
+  host:
+    path: /mnt/storage1/feather_files/files/linux-release/
+
+---
+
+kind: pipeline
+type: docker
+name: linux-release-appimage
+
+steps:
+  - name: build
+    image: feather:appimage
+    commands:
+    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export BRANCH="$DRONE_SOURCE_BRANCH"
+    - bash ./contrib/build-appimage.sh
+  - name: deploy
+    image: feather:appimage
+    volumes:
+      - name: files_linux_appimage
+        path: /files
+    commands:
+    - export FN="feather-`git rev-parse --short HEAD`.AppImage"
+    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - mv "Feather-1.0-x86_64.AppImage" "$TARGET_DIR/$FN"
+    - echo "[*] written to https://build.featherwallet.org/files/linux-release-appimage/$DRONE_SOURCE_BRANCH/$FN"
+
+volumes:
+  - name: files_linux_appimage
+    host:
+      path: /mnt/storage1/feather_files/files/linux-release-appimage/
+
+---
+
+kind: pipeline
+type: docker
+name: windows-mxe-release
+
+steps:
+  - name: build
+    image: feather:win
+    volumes:
+    - name: ccache_win_release
+      path: /root/.ccache
+    - name: files_win_release
+      path: /files
+    commands:
+    - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
+    - git config --global url."http://gitea:3000/".insteadOf https://github.com/
+    - git submodule update --init --depth 50 contrib/tor
+    - git submodule update --init --depth 50 contrib/torsocks
+    - git submodule update --init --depth 120 monero
+    - git submodule update --init --depth 120 --recursive monero
+    - PATH=/mxe/usr/bin/:$PATH make -j8 windows-mxe-release
+    environment:
+      CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
+  - name: deploy
+    image: feather:win
+    volumes:
+    - name: ccache_win_release
+      path: /root/.ccache
+    - name: files_win_release
+      path: /files
+    commands:
+    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - zip -j "$TARGET_DIR/$FN" build/feather.log build/bin/feather.exe
+    - echo "[*] written to https://build.featherwallet.org/files/windows-mxe-release/$DRONE_SOURCE_BRANCH/$FN"
+
+volumes:
+- name: ccache_win_release
+  host:
+    path: /var/drone/ccache_win_release/
+- name: files_win_release
+  host:
+    path: /mnt/storage1/feather_files/files/windows-mxe-release/
+
+---
+
+kind: pipeline
+type: docker
+name: mac-release
+
+steps:
+  - name: build
+    image: feather:mac
+    volumes:
+    - name: files_mac_release
+      path: /files
+    commands:
+    - mkdir -p build
+    - scp -P22 utils/build_macos.sh administrator@steve.jobs.xmr.pm:build_macos.sh
+    - ssh administrator@steve.jobs.xmr.pm "chmod +x build_macos.sh && PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin ~/build_macos.sh $DRONE_COMMIT_SHA"
+    - scp -P22 administrator@steve.jobs.xmr.pm:feather.zip build/feather.zip
+  - name: deploy
+    image: feather:mac
+    volumes:
+    - name: files_mac_release
+      path: /files
+    commands:
+    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - mv build/feather.zip "$TARGET_DIR/$FN"
+    - echo "[*] written to https://build.featherwallet.org/files/mac-release/$DRONE_SOURCE_BRANCH/$FN"
+
+volumes:
+- name: files_mac_release
+  host:
+    path: /mnt/storage1/feather_files/files/mac-release/

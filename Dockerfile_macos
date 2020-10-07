@@ -1,0 +1,13 @@
+# this image is used internally for the buildbot
+FROM ubuntu:20.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+
+RUN apt clean && apt update
+RUN apt install -y git build-essential wget curl ngrep unzip file ssh zip
+
+RUN cat /dev/zero | ssh-keygen -q -N ""
+
+RUN cat ~/.ssh/id_rsa.pub
+
+RUN printf "Host *\n    StrictHostKeyChecking no" > ~/.ssh/config

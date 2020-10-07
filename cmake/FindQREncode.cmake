@@ -1,0 +1,7 @@
+find_path(QRENCODE_INCLUDE_DIR qrencode.h)
+find_library(QRENCODE_LIBRARY qrencode)
+
+mark_as_advanced(QRENCODE_LIBRARY QRENCODE_INCLUDE_DIR)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(QREncode DEFAULT_MSG QRENCODE_LIBRARY QRENCODE_INCLUDE_DIR)

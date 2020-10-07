@@ -1,0 +1,9 @@
+[submodule "monero"]
+	path = monero
+	url = https://git.wownero.com/feather/monero.git
+[submodule "contrib/torsocks"]
+	path = contrib/torsocks
+	url = https://git.torproject.org/torsocks.git
+[submodule "contrib/tor"]
+	path = contrib/tor
+	url = https://git.torproject.org/tor.git

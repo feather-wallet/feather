@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>894</width>
+    <height>496</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>Feather</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="assets.qrc">
+    <normaloff>:/assets/images/appicons/64x64.png</normaloff>:/assets/images/appicons/64x64.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="horizontalSpacing">
+     <number>12</number>
+    </property>
+    <item row="1" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+      <widget class="QWidget" name="tabHome">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/tab_home.png</normaloff>:/assets/images/tab_home.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Home</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_3">
+        <property name="bottomMargin">
+         <number>5</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <item>
+           <layout class="QHBoxLayout" name="tickerLayout"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="fiatTickerLayout"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="homeLine">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QHBoxLayout" name="coolLayout">
+          <property name="spacing">
+           <number>9</number>
+          </property>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabHistory">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/history.png</normaloff>:/assets/images/history.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>History</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <property name="verticalSpacing">
+         <number>9</number>
+        </property>
+        <item row="1" column="0">
+         <widget class="HistoryWidget" name="historyWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabSend">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/tab_send.png</normaloff>:/assets/images/tab_send.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Send</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <property name="spacing">
+         <number>11</number>
+        </property>
+        <property name="topMargin">
+         <number>11</number>
+        </property>
+        <item>
+         <widget class="SendWidget" name="sendWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>100</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true"/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line_3">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="ContactsWidget" name="contactWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabReceive">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/coins.png</normaloff>:/assets/images/coins.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Receive</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_5">
+        <item row="0" column="0">
+         <widget class="ReceiveWidget" name="receiveWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabCoins">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/tab_coins.png</normaloff>:/assets/images/tab_coins.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Coins</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="CoinsWidget" name="coinsWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabXmrTo">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/xmrto.png</normaloff>:/assets/images/xmrto.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>xmr.to</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_4">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>1</number>
+        </property>
+        <item>
+         <widget class="XMRToWidget" name="xmrToWidget" native="true"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Preferred</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tabCalc">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/coldcard.png</normaloff>:/assets/images/coldcard.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Calc</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="CalcWidget" name="conversionWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>894</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionOpen"/>
+    <addaction name="actionClose"/>
+    <addaction name="actionQuit"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
+   </widget>
+   <widget class="QMenu" name="menuWallet">
+    <property name="title">
+     <string>Wallet</string>
+    </property>
+    <widget class="QMenu" name="menuHistory">
+     <property name="title">
+      <string>History</string>
+     </property>
+     <addaction name="actionExport_CSV"/>
+    </widget>
+    <widget class="QMenu" name="menuContacts">
+     <property name="title">
+      <string>Contacts</string>
+     </property>
+     <addaction name="actionExportContactsCSV"/>
+    </widget>
+    <widget class="QMenu" name="menuAdvanced">
+     <property name="title">
+      <string>Advanced</string>
+     </property>
+     <addaction name="actionStore_wallet"/>
+     <addaction name="actionUpdate_balance"/>
+     <addaction name="actionRefresh_tabs"/>
+     <addaction name="actionChange_restore_height"/>
+    </widget>
+    <addaction name="actionInformation"/>
+    <addaction name="menuAdvanced"/>
+    <addaction name="separator"/>
+    <addaction name="actionPassword"/>
+    <addaction name="actionSeed"/>
+    <addaction name="actionKeys"/>
+    <addaction name="separator"/>
+    <addaction name="menuHistory"/>
+    <addaction name="menuContacts"/>
+   </widget>
+   <widget class="QMenu" name="menuTools">
+    <property name="title">
+     <string>Tools</string>
+    </property>
+    <addaction name="actionSignVerify"/>
+    <addaction name="actionVerifyTxProof"/>
+    <addaction name="separator"/>
+    <addaction name="actionCalculator"/>
+    <addaction name="actionCreateDesktopEntry"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionAbout"/>
+    <addaction name="actionAbout_Qt"/>
+    <addaction name="actionOfficialWebsite"/>
+    <addaction name="actionDonate_to_Feather"/>
+    <addaction name="separator"/>
+    <addaction name="actionReport_bug"/>
+    <addaction name="actionShow_debug_info"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionShow_Coins"/>
+    <addaction name="actionShow_xmr_to"/>
+    <addaction name="actionShow_calc"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuWallet"/>
+   <addaction name="menuView"/>
+   <addaction name="menuTools"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open wallet</string>
+   </property>
+  </action>
+  <action name="actionQuit">
+   <property name="text">
+    <string>Quit application</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>Network</string>
+   </property>
+  </action>
+  <action name="actionSignVerify">
+   <property name="text">
+    <string>Sign/verify message</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionOfficialWebsite">
+   <property name="text">
+    <string>Official website</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionCalculator">
+   <property name="text">
+    <string>Calculator</string>
+   </property>
+  </action>
+  <action name="actionInformation">
+   <property name="text">
+    <string>Information</string>
+   </property>
+  </action>
+  <action name="actionPassword">
+   <property name="text">
+    <string>Password</string>
+   </property>
+  </action>
+  <action name="actionSeed">
+   <property name="text">
+    <string>Seed</string>
+   </property>
+  </action>
+  <action name="actionReport_bug">
+   <property name="text">
+    <string>Report bug</string>
+   </property>
+  </action>
+  <action name="actionDonate_to_Feather">
+   <property name="text">
+    <string>Donate to Feather</string>
+   </property>
+  </action>
+  <action name="actionExport_CSV">
+   <property name="text">
+    <string>Export CSV</string>
+   </property>
+  </action>
+  <action name="actionShow_Coins">
+   <property name="text">
+    <string>Show Coins</string>
+   </property>
+  </action>
+  <action name="actionShow_xmr_to">
+   <property name="text">
+    <string>Show Xmr.To</string>
+   </property>
+  </action>
+  <action name="actionShow_calc">
+   <property name="text">
+    <string>Show Calc</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close current wallet</string>
+   </property>
+  </action>
+  <action name="actionVerifyTxProof">
+   <property name="text">
+    <string>Verify transaction proof</string>
+   </property>
+  </action>
+  <action name="actionStore_wallet">
+   <property name="text">
+    <string>Save wallet</string>
+   </property>
+  </action>
+  <action name="actionUpdate_balance">
+   <property name="text">
+    <string>Update balance</string>
+   </property>
+  </action>
+  <action name="actionRefresh_tabs">
+   <property name="text">
+    <string>Refresh models</string>
+   </property>
+  </action>
+  <action name="actionExportContactsCSV">
+   <property name="text">
+    <string>Export CSV</string>
+   </property>
+  </action>
+  <action name="actionChange_restore_height">
+   <property name="text">
+    <string>Change restore height</string>
+   </property>
+  </action>
+  <action name="actionKeys">
+   <property name="text">
+    <string>Keys</string>
+   </property>
+  </action>
+  <action name="actionAbout_Qt">
+   <property name="text">
+    <string>About Qt</string>
+   </property>
+  </action>
+  <action name="actionCreateDesktopEntry">
+   <property name="text">
+    <string>Create desktop entry</string>
+   </property>
+  </action>
+  <action name="actionShow_debug_info">
+   <property name="text">
+    <string>Debug info</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>SendWidget</class>
+   <extends>QWidget</extends>
+   <header>sendwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ContactsWidget</class>
+   <extends>QWidget</extends>
+   <header>contactswidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ReceiveWidget</class>
+   <extends>QWidget</extends>
+   <header>receivewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CoinsWidget</class>
+   <extends>QWidget</extends>
+   <header>coinswidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>HistoryWidget</class>
+   <extends>QWidget</extends>
+   <header>historywidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>XMRToWidget</class>
+   <extends>QWidget</extends>
+   <header>xmrtowidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>CalcWidget</class>
+   <extends>QWidget</extends>
+   <header>calcwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
+ <connections/>
+ <slots>
+  <slot>donateButtonClicked()</slot>
+  <slot>calcButtonClicked()</slot>
+ </slots>
+</ui>

@@ -1,0 +1,15 @@
+.DS_Store
+lib/*
+cmake-build-debug/*
+.idea
+*.user
+*.stash
+build/*
+CMakeCache.txt
+CMakeFiles
+cmake_install.cmake
+feather_autogen/
+feather.cbp
+src/tor/*
+!src/tor/.gitkeep
+src/config-feather.h
