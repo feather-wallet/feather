@@ -119,7 +119,7 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
     make -j$THREADS && \
     make -j$THREADS install
 
-RUN git clone -b VER-2-10-2 --depth 1 https://git.sv.nongnu.org/r/freetype/freetype2.git && \
+RUN git clone -b VER-2-10-2 https://git.sv.nongnu.org/r/freetype/freetype2.git && \
     cd freetype2 && \
     git reset --hard 132f19b779828b194b3fede187cee719785db4d8 && \
     ./autogen.sh && \
@@ -164,7 +164,7 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz && \
     sha256sum -c hashsum.txt && \
     tar -xzf openssl-1.1.1g.tar.gz && \
     cd openssl-1.1.1g && \
-    CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./config no-asm no-shared no-zlib-dynamic --prefix=/usr/local/openssl && \
+    CFLAGS='-fPIC' CXXFLAGS='-fPIC' ./config no-shared no-zlib-dynamic --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make -j$THREADS install
 
