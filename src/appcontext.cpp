@@ -82,10 +82,11 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     this->defaultWalletDir = QString("%1/Monero/wallets").arg(this->configRoot);
     this->defaultWalletDirRoot = QString("%1/Monero").arg(this->configRoot);
 #elif defined(Q_OS_WIN)
-    // @TODO
+    this->defaultWalletDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/Monero";
+    this->defaultWalletDirRoot = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
 #endif
 
-    // Create ~/Monero/wallets if it does not exist yet
+    // Create wallet dirs
     if (!QDir().mkpath(defaultWalletDir))
         qCritical() << "Unable to create dir: " << defaultWalletDir;
 
