@@ -104,7 +104,9 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
             switch(index.column()) {
                 case Column::Date:
                 {
-                    if (tInfo.confirmations() < tInfo.confirmationsRequired())
+                    if (tInfo.isFailed())
+                        result = "Transaction failed";
+                    else if (tInfo.confirmations() < tInfo.confirmationsRequired())
                         result = QString("%1/%2 confirmations").arg(QString::number(tInfo.confirmations()), QString::number(tInfo.confirmationsRequired()));
                     else
                         result = QString("%1 confirmations").arg(QString::number(tInfo.confirmations()));
