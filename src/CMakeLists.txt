@@ -42,7 +42,7 @@ file(GLOB SOURCE_FILES
         "dialog/*.cpp"
         )
 
-if(APPLE AND BUILD_TOR)
+if((APPLE AND BUILD_TOR) OR (APPLE AND "$ENV{DRONE}" STREQUAL "true"))
     set(ASSETS_OS "assets_macos_tor.qrc")
 elseif(UNIX AND NOT APPLE AND BUILD_TOR)
     set(ASSETS_OS "assets_linux_tor.qrc")
@@ -136,6 +136,10 @@ endif()
 
 if(STATIC)
     target_compile_definitions(feather PRIVATE STATIC=1)
+endif()
+
+if("$ENV{DRONE}" STREQUAL "true")
+    target_compile_definitions(feather PRIVATE DRONE=1)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
