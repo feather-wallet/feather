@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>655</width>
-    <height>232</height>
+    <height>248</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,6 +46,9 @@
          <property name="text">
           <string>address</string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -60,6 +63,9 @@
          <property name="text">
           <string>amount</string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
        <item row="2" column="0">
@@ -73,6 +79,9 @@
         <widget class="QLabel" name="label_fee">
          <property name="text">
           <string>fee</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -94,6 +103,9 @@
         <widget class="QLabel" name="label_total">
          <property name="text">
           <string>total</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
