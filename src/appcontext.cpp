@@ -169,7 +169,7 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 }
 
 void AppContext::initTor() {
-    this->tor = new Tor(this);
+    this->tor = new Tor(this, this);
     this->tor->start();
 
     if (!(isTails || isWhonix)) {

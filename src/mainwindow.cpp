@@ -932,6 +932,8 @@ void MainWindow::homeWidgetChanged(const QString &widgetName) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+    m_ctx->tor->stop();
+
     this->saveGeo();
     if(m_wizard != nullptr)
         m_wizard->close();
