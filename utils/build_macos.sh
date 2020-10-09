@@ -3,11 +3,12 @@
 HASH="$1"
 echo "[+] hash: $HASH"
 
+export DRONE=true
 echo "[+] Building"
 
 rm ~/feather.zip 2>&1 >/dev/null
 cd ~/feather
-git fetch
+git fetch --all
 git reset --hard "$HASH"
 git submodule update --init --depth 50 contrib/tor
 git submodule update --init --depth 50 contrib/torsocks

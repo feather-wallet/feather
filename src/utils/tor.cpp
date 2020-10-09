@@ -174,6 +174,22 @@ void Tor::handleProcessError(QProcess::ProcessError error) {
 
 bool Tor::unpackBins() {
     QString torFile;
+
+    // @TODO: refactor for Mac OS - should compile Tor statically.
+#if defined(Q_OS_MAC) && defined(DRONE)
+    // Tor on Mac requires libevent.dylib, borrowed the executable from
+    // the official Tor Browser release for now.
+    QString libEvent = ":/tor/libevent-2.1.7.dylib";
+    if (Utils::fileExists(libEvent)) {
+        QFile e(libEvent);
+        QFileInfo eventInfo(e);
+        auto libEventPath = QDir(this->torDir).filePath(eventInfo.fileName());
+        qDebug() << libEventPath;
+        e.copy(libEventPath);
+        e.close();
+    }
+#endif
+
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
     torFile = ":/tor/tor";
 #elif defined(Q_OS_WIN)

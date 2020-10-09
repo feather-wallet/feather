@@ -172,12 +172,23 @@ endif()
 # Tor/torsocks
 set(TOR_TAG "tor-0.4.3.5")
 set(TOR_DIR "${CMAKE_SOURCE_DIR}/contrib/tor")
+
+if(BUILD_TOR AND APPLE)
+    execute_process(COMMAND bash -c "touch ${CMAKE_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
+ENDIF()
+
 if(UNIX AND NOT APPLE)
     set(TOR_LIB "libtorsocks.so")
 elseif(APPLE)
     set(TOR_LIB "libtorsocks.dylib")
 endif()
-if("$ENV{DRONE}" STREQUAL "true" AND STATIC AND BUILD_TOR)
+
+if("$ENV{DRONE}" STREQUAL "true" AND APPLE)
+    message(STATUS "We are inside a static compile with Drone CI")
+    # @TODO: taken from Tor Browser official release for now
+    execute_process(COMMAND bash -c "cp ~/tor/libevent-2.1.7.dylib ${CMAKE_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
+    execute_process(COMMAND bash -c "cp ~/tor/tor ${CMAKE_SOURCE_DIR}/src/tor/tor")
+elseif("$ENV{DRONE}" STREQUAL "true" AND BUILD_TOR)
     message(STATUS "We are inside a static compile with Drone CI")
     if(MINGW)
         execute_process(COMMAND bash -c "cp /mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe ${CMAKE_SOURCE_DIR}/src/tor/tor.exe")
