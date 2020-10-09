@@ -589,7 +589,7 @@ void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString
     qDebug() << Q_FUNC_INFO;
     auto label_str = QString("Balance: %1 XMR").arg(unlocked_str);
     if(balance > unlocked)
-        label_str += QString(" (+%1 XMR unconfirmed)").arg(balance - unlocked);
+        label_str += QString(" (+%1 XMR unconfirmed)").arg(QString::number(balance - unlocked, 'f'));
     m_statusLabelBalance->setText(label_str);
 }
 

@@ -740,10 +740,10 @@ void AppContext::updateBalance() {
         throw std::runtime_error("this should not happen, ever");
 
     AppContext::balance = this->currentWallet->balance() / AppContext::cdiv;
-    auto balance_str = QString::number(balance);
+    auto balance_str = QString::number(balance, 'f');
 
     double unlocked = this->currentWallet->unlockedBalance() / AppContext::cdiv;
-    auto unlocked_str = QString::number(unlocked);
+    auto unlocked_str = QString::number(unlocked, 'f');
 
     emit balanceUpdated(balance, unlocked, balance_str, unlocked_str);
 }
