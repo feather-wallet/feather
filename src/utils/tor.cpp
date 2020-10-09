@@ -50,6 +50,13 @@ Tor::Tor(AppContext *ctx, QObject *parent)
         return;
     }
 
+    // Don't spawn Tor on default port to avoid conflicts
+    Tor::torPort = 19450;
+    if (Utils::portOpen(Tor::torHost, Tor::torPort)) {
+        this->localTor = true;
+        return;
+    }
+
     qDebug() << "Using embedded tor instance";
     m_process.setProcessChannelMode(QProcess::MergedChannels);
 
@@ -58,15 +65,16 @@ Tor::Tor(AppContext *ctx, QObject *parent)
     connect(&m_process, &QProcess::stateChanged, this, &Tor::stateChanged);
 }
 
+void Tor::stop() {
+    m_process.kill();
+}
+
 void Tor::start() {
     if (this->localTor) {
         this->checkConnection();
         m_checkConnectionTimer->start(5000);
         return;
     }
-
-    // Don't spawn Tor on default port to avoid conflicts
-    Tor::torPort = 19450;
 
     auto state = m_process.state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
@@ -99,10 +107,6 @@ void Tor::start() {
     qDebug() << QString("%1 %2").arg(this->torPath, arguments.join(" "));
 
     m_process.start(this->torPath, arguments);
-}
-
-void Tor::stop() {
-    m_process.terminate();
 }
 
 void Tor::checkConnection() {
