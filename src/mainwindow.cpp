@@ -1050,7 +1050,7 @@ void MainWindow::showNodeExhaustedMessage() {
 
 void MainWindow::showWSNodeExhaustedMessage() {
     auto msg = "Feather is in 'automatic node connection mode' but the "
-               "websocket server returned none available nodes. Please go to Settings->Node "
+               "websocket server returned no available nodes. Please go to Settings->Node "
                "and enter a node manually.";
     QMessageBox::warning(this, "Could not connect to a node", msg);
 }
