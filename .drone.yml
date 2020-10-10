@@ -158,3 +158,8 @@ volumes:
 - name: files_mac_release
   host:
     path: /mnt/storage1/feather_files/files/mac-release/
+---
+kind: signature
+hmac: 91e773a27d27f29ea62f5df500664b733df641b7c31202c8e5558174fd046fba
+
+...
