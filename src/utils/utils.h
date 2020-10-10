@@ -49,8 +49,8 @@ struct xdgDesktopEntryPaths {
 };
 
 const xdgDesktopEntryPaths xdgPaths = {
-    QString("%1/monero-gui.desktop").arg(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)),
-    QString("%1/.local/share/icons/monero.png").arg(QDir::homePath()),
+    QString("%1/feather.desktop").arg(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation)),
+    QString("%1/.local/share/icons/feather.png").arg(QDir::homePath()),
     QString("/")
 };
 
