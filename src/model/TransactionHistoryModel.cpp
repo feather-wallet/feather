@@ -164,7 +164,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
                 return QVariant("?");
 
             double usd_amount = usd_price * tInfo.amount();
-            if(this->preferredFiatSign != "$")
+            if(this->preferredFiatSymbol != "USD")
                 usd_amount = AppContext::prices->convert("USD", this->preferredFiatSymbol, usd_amount);
             double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
 
