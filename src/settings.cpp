@@ -12,10 +12,9 @@ Settings::Settings(QWidget *parent) :
         ui(new Ui::Settings)
 {
     ui->setupUi(this);
-    this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
+    m_ctx = MainWindow::getContext();
 
-    if(m_ctx == nullptr)
-        m_ctx = MainWindow::getContext();
+    this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
 
     ui->tabWidget->setTabVisible(2, false);
     ui->tabWidget->setTabVisible(4, false);

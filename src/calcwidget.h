@@ -31,7 +31,7 @@ public slots:
 
 private:
     Ui::CalcWidget *ui;
-    AppContext *m_ctx = nullptr;
+    AppContext *m_ctx;
     bool m_comboBoxInit = false;
     void initComboBox();
     bool m_changing = false;

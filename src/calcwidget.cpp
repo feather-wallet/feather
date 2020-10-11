@@ -13,6 +13,7 @@ CalcWidget::CalcWidget(QWidget *parent) :
         ui(new Ui::CalcWidget)
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     ui->imageExchange->setBackgroundRole(QPalette::Base);
     QPixmap pm(":/assets/images/exchange.png");
@@ -106,21 +107,15 @@ void CalcWidget::toComboChanged(const QString &data) {
 }
 
 void CalcWidget::initCrypto() {
-    if (this->m_ctx == nullptr)
-        this->m_ctx = MainWindow::getContext();
-
     this->initComboBox();
 }
 
 void CalcWidget::initFiat() {
-    if(this->m_ctx == nullptr)
-        this->m_ctx = MainWindow::getContext();
-
     this->initComboBox();
 }
 
 void CalcWidget::initComboBox() {
-    if(m_comboBoxInit || this->m_ctx == nullptr) return;
+    if(m_comboBoxInit) return;
     QList<QString> marketsKeys = AppContext::prices->markets.keys();
     QList<QString> ratesKeys = AppContext::prices->rates.keys();
     if(marketsKeys.count() <= 0 || ratesKeys.count() <= 0) return;
