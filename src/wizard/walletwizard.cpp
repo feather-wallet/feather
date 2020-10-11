@@ -53,7 +53,8 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
 }
 
 void WalletWizard::createWallet() {
-    auto mnemonicSeed = this->field("mnemonicSeed").toString();
+    auto mnemonicRestoredSeed = this->field("mnemonicRestoredSeed").toString();
+    auto mnemonicSeed = mnemonicRestoredSeed.isEmpty() ? this->field("mnemonicSeed").toString() : mnemonicRestoredSeed;
     const auto walletPath = this->field("walletPath").toString();
     const auto walletPasswd = this->field("walletPasswd").toString();
     auto restoreHeight = this->field("restoreHeight").toUInt();
