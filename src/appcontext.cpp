@@ -530,6 +530,11 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
         return;
     }
 
+    if(seed.mnemonicSeed.isEmpty()) {
+        emit walletCreatedError("Mnemonic seed error. Failed to write wallet.");
+        return;
+    }
+
     this->currentWallet = seed.writeWallet(this->walletManager, this->networkType, path, password, this->kdfRounds);
     if(this->currentWallet == nullptr) {
         emit walletCreatedError("Failed to write wallet");
