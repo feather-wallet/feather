@@ -42,7 +42,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QTreeView" name="addresses">
+      <widget class="SubaddressView" name="addresses">
        <property name="horizontalScrollBarPolicy">
         <enum>Qt::ScrollBarAsNeeded</enum>
        </property>
@@ -100,6 +100,11 @@
    <class>ClickableLabel</class>
    <extends>QLabel</extends>
    <header>components.h</header>
+  </customwidget>
+  <customwidget>
+   <class>SubaddressView</class>
+   <extends>QTreeView</extends>
+   <header>model/SubaddressView.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
