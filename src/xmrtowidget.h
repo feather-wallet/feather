@@ -51,7 +51,8 @@ private:
     Ui::XMRToWidget *ui;
     AppContext *m_ctx;
     bool m_ratesDisplayed = false;
-    const QString m_regionBlockMessage = "Beware that XMR.To region blocks certain IPs, which can be problematic in combination with Tor. Use the clearnet option if this is a problem.";
+    const QString m_regionBlockMessage = "Beware that XMR.To region blocks certain IPs, which can be problematic in combination with Tor. "
+                                         "Wait a few minutes for the circuit to switch, or disable the option to relay over Tor if the problem persists.";
     double m_unlockedBalance = 0;
     XmrToModel *tableModel;
 
