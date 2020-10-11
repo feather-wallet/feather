@@ -42,8 +42,6 @@ private:
     QString m_mnemonic;
     unsigned int m_restoreHeight;
 
-    int m_seedFontSize;
-    QString m_seedFontFamily;
     bool m_roulette = false;
     int m_rouletteSpin = 15;
 };
