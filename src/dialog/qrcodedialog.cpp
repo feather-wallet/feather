@@ -41,7 +41,7 @@ void QrCodeDialog::copyImage() {
 }
 
 void QrCodeDialog::saveImage() {
-    QString filename = QFileDialog::getSaveFileName(this, "Select where to save file", "qrcode.png");
+    QString filename = QFileDialog::getSaveFileName(this, "Select where to save file", QDir::current().filePath("qrcode.png"));
     if (filename.isEmpty()) {
         return;
     }
