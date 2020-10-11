@@ -35,6 +35,14 @@ HistoryWidget::HistoryWidget(QWidget *parent)
         }
     });
     connect(ui->search, &QLineEdit::textChanged, this, &HistoryWidget::setSearchFilter);
+
+    connect(ui->history, &QTreeView::doubleClicked, [this](QModelIndex index){
+        if (m_model == nullptr) return;
+        if (!(m_model->flags(index) & Qt::ItemIsEditable)) {
+            this->showTxDetails();
+        }
+    });
+
 }
 
 void HistoryWidget::setModel(Coins *coins, TransactionHistoryProxyModel *model, TransactionHistory *txHistory)

@@ -34,12 +34,7 @@ XMRToWidget::XMRToWidget(QWidget *parent) :
     m_showDetailsAction = m_contextMenu->addAction("Details");
     m_viewOnXmrToAction = m_contextMenu->addAction("View order on XMR.to");
     m_viewOnXmrToAction->setIcon(QIcon(":/assets/images/xmrto.png"));
-    connect(m_showDetailsAction, &QAction::triggered, [&](){
-        QModelIndex index = ui->historyTable->currentIndex();
-        XmrToOrder *order = this->tableModel->orders->at(index.row());
-        auto * dialog = new XmrToInfoDialog(order, this);
-        dialog->exec();
-    });
+    connect(m_showDetailsAction, &QAction::triggered, this, &XMRToWidget::showInfoDialog);
     connect(m_viewOnXmrToAction, &QAction::triggered, [&](){
         QModelIndex index = ui->historyTable->currentIndex();
         XmrToOrder *order = this->tableModel->orders->at(index.row());
@@ -67,6 +62,8 @@ XMRToWidget::XMRToWidget(QWidget *parent) :
     if (m_ctx->isTails || m_ctx->isWhonix) {
         ui->torCheckBox->setDisabled(true);
     }
+
+    connect(ui->historyTable, &QTreeView::doubleClicked, this, &XMRToWidget::showInfoDialog);
 }
 
 void XMRToWidget::setHistoryModel(XmrToModel *model) {
@@ -182,6 +179,14 @@ void XMRToWidget::onInitiateTransaction() {
 
 void XMRToWidget::onEndTransaction() {
     ui->btnCreate->setEnabled(true);
+}
+
+void XMRToWidget::showInfoDialog() {
+    QModelIndex index = ui->historyTable->currentIndex();
+    XmrToOrder *order = this->tableModel->orders->at(index.row());
+    auto *dialog = new XmrToInfoDialog(order, this);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 XMRToWidget::~XMRToWidget() {
