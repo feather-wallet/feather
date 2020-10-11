@@ -47,7 +47,7 @@ private:
 private:
     void setupSkinCombobox();
 
-    AppContext *m_ctx = nullptr;
+    AppContext *m_ctx;
     Ui::Settings *ui;
 };
 

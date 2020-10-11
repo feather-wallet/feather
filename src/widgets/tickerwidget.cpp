@@ -15,6 +15,7 @@ TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool 
     m_convertBalance(convertBalance)
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     // default values before API data
     if (title == "") title = m_symbol;
@@ -29,7 +30,7 @@ TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool 
     connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
     connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
     if (convertBalance)
-        connect(MainWindow::getContext(), &AppContext::balanceUpdated, this, &TickerWidget::init);
+        connect(m_ctx, &AppContext::balanceUpdated, this, &TickerWidget::init);
 }
 
 void TickerWidget::init() {

@@ -34,6 +34,7 @@ private:
     Ui::TickerWidget *ui;
     QString m_symbol;
     bool m_convertBalance;
+    AppContext *m_ctx;
 };
 
 #endif // TICKERWIDGET_H

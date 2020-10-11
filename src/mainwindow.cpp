@@ -37,14 +37,14 @@ MainWindow * MainWindow::pMainWindow = nullptr;
 MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow),
-    m_ctx(ctx),
-    m_aboutDialog(new AboutDialog(this)),
-    m_windowCalc(new CalcWindow(this))
+    m_ctx(ctx)
 {
     pMainWindow = this;
     ui->setupUi(this);
 
     m_windowSettings = new Settings(this);
+    m_aboutDialog = new AboutDialog(this);
+    m_windowCalc = new CalcWindow(this);
 
     // light/dark theme
     m_skins.insert("Native", "");
