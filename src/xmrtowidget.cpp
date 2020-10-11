@@ -15,6 +15,7 @@ XMRToWidget::XMRToWidget(QWidget *parent) :
         ui(new Ui::XMRToWidget)
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     QString amount_rx = R"(^\d*\.\d*$)";
     QRegExp rx;
@@ -62,6 +63,10 @@ XMRToWidget::XMRToWidget(QWidget *parent) :
             m_contextMenu->popup(ui->historyTable->viewport()->mapToGlobal(point));
         }
     });
+
+    if (m_ctx->isTails || m_ctx->isWhonix) {
+        ui->torCheckBox->setDisabled(true);
+    }
 }
 
 void XMRToWidget::setHistoryModel(XmrToModel *model) {
@@ -81,8 +86,6 @@ void XMRToWidget::onWalletClosed() {
 
 void XMRToWidget::onCreateOrder() {
     // @TODO: regex verify
-    if(m_ctx == nullptr)
-        this->m_ctx = MainWindow::getContext();
 
     auto amount = ui->lineAmount->text();
     if(amount.isEmpty()) {
@@ -123,9 +126,6 @@ void XMRToWidget::onTorCheckBoxToggled(int state) {
 }
 
 void XMRToWidget::updateConversionLabel() {
-    if(m_ctx == nullptr)
-        this->m_ctx = MainWindow::getContext();
-
     QString amount = ui->lineAmount->text();
 
     int curIndex = ui->comboBox_currency->currentIndex();
