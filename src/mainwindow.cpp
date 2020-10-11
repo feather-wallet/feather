@@ -710,6 +710,11 @@ void MainWindow::onCreateTransactionError(const QString &message) {
 }
 
 void MainWindow::create_status_bar() {
+#if defined(Q_OS_WIN)
+    // No seperators between statusbar widgets
+    this->statusBar()->setStyleSheet("QStatusBar::item {border: None;}");
+#endif
+
     this->statusBar()->setFixedHeight(30);
 
     m_statusLabelStatus = new QLabel("Idle", this);
