@@ -55,6 +55,11 @@
          </item>
          <item>
           <property name="text">
+           <string>AUD</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>CAD</string>
           </property>
          </item>
