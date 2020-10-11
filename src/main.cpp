@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
     }
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_DisableWindowContextHelpButton);
     QApplication::setDesktopSettingsAware(true); // use system font
     QApplication::setApplicationVersion(FEATHER_VERSION);
 
