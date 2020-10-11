@@ -22,11 +22,7 @@ CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
     this->registerField("mnemonicSeed", ui->hiddenMnemonicSeed);
     ui->hiddenMnemonicSeed->hide();
 
-    auto fontApp = QApplication::font();
-    auto fontFamily = fontApp.family();
-    auto fontSize = fontApp.pointSize() + 2;
-    m_seedFontFamily = fontFamily;
-    m_seedFontSize = fontSize;
+    ui->seed->setFont(Utils::relativeFont(1));
 
     connect(ui->btnRoulette, &QPushButton::clicked, [=]{
         this->seedRoulette(0);
@@ -52,8 +48,7 @@ void CreateWalletSeedPage::seedRoulette(int count) {
 }
 
 void CreateWalletSeedPage::displaySeed(const QString &seed){
-    auto html = R"(<html><head><meta name="qrichtext" content="1" /></head><body style="font-family:'%1'; font-size:%2pt; font-weight:400; font-style:normal;"><p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">%3</p></body></html>)";
-    ui->seed->setText(QString(html).arg(m_seedFontFamily).arg(m_seedFontSize).arg(seed));
+    ui->seed->setPlainText(seed);
 }
 
 int CreateWalletSeedPage::nextId() const {

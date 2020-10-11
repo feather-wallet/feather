@@ -20,15 +20,15 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
         m_ctx(ctx) {
     this->setWindowTitle("Welcome to feather");
     this->setWindowIcon(QIcon(":/assets/images/appicons/64x64.png"));
-    auto openWalletPage = new OpenWalletPage(m_ctx);
-    auto createWallet = new CreateWalletPage(m_ctx);
-    auto createWalletSeed = new CreateWalletSeedPage(m_ctx);
-    setPage(Page_Menu, new MenuPage(m_ctx));
+    auto openWalletPage = new OpenWalletPage(m_ctx, this);
+    auto createWallet = new CreateWalletPage(m_ctx, this);
+    auto createWalletSeed = new CreateWalletSeedPage(m_ctx, this);
+    setPage(Page_Menu, new MenuPage(m_ctx, this));
     setPage(Page_CreateWallet, createWallet);
     setPage(Page_OpenWallet, openWalletPage);
     setPage(Page_CreateWalletSeed, createWalletSeed);
-    setPage(Page_Network, new NetworkPage(m_ctx));
-    setPage(Page_Restore, new RestorePage(m_ctx));
+    setPage(Page_Network, new NetworkPage(m_ctx, this));
+    setPage(Page_Restore, new RestorePage(m_ctx, this));
 
     if(config()->get(Config::firstRun).toUInt())
         setStartId(Page_Network);
