@@ -43,6 +43,8 @@ signals:
     void viewOrder(const QString &orderId);
 
 private:
+    void showInfoDialog();
+
     QMap<QString, TickerWidget*> m_tickerWidgets;
     QMenu *m_contextMenu;
     QAction *m_viewOnXmrToAction;

@@ -57,6 +57,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
     connect(m_thawAllSelectedAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
 
     connect(ui->coins, &QTreeView::customContextMenuRequested, this, &CoinsWidget::showContextMenu);
+    connect(ui->coins, &QTreeView::doubleClicked, this, &CoinsWidget::viewOutput);
 }
 
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
