@@ -27,6 +27,7 @@ Prices::Prices(QObject *parent) : QObject(parent) {
     fiat["CHF"] = "Fr";
     fiat["CNY"] = "¥";
     fiat["CZK"] = "Kč";
+    fiat["AUD"] = "$";
 }
 
 void Prices::cryptoPricesReceived(const QJsonArray &data) {
