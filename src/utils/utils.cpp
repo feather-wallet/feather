@@ -98,7 +98,7 @@ bool Utils::readJsonFile(QIODevice &device, QSettings::SettingsMap &map) {
 }
 
 bool Utils::writeJsonFile(QIODevice &device, const QSettings::SettingsMap &map) {
-    device.write(QJsonDocument(QJsonObject::fromVariantMap(map)).toJson());
+    device.write(QJsonDocument(QJsonObject::fromVariantMap(map)).toJson(QJsonDocument::Indented));
     return true;
 }
 
