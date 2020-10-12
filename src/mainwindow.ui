@@ -291,7 +291,7 @@
      <x>0</x>
      <y>0</y>
      <width>894</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -335,6 +335,7 @@
     <addaction name="actionPassword"/>
     <addaction name="actionSeed"/>
     <addaction name="actionKeys"/>
+    <addaction name="actionViewOnly"/>
     <addaction name="separator"/>
     <addaction name="menuHistory"/>
     <addaction name="menuContacts"/>
@@ -516,6 +517,21 @@
   <action name="actionShow_debug_info">
    <property name="text">
     <string>Debug info</string>
+   </property>
+  </action>
+  <action name="actionCreate_view_only_details">
+   <property name="text">
+    <string>Details</string>
+   </property>
+  </action>
+  <action name="actionCreate_view_only_wallet_file">
+   <property name="text">
+    <string>Export wallet file</string>
+   </property>
+  </action>
+  <action name="actionViewOnly">
+   <property name="text">
+    <string>View-Only</string>
    </property>
   </action>
  </widget>

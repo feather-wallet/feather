@@ -130,7 +130,7 @@ bool RestorePage::validatePage() {
             }
         }
 
-        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], "monero", seed.toStdString());
+        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, seed.toStdString());
         restoreHeight = _seed.restoreHeight;
 
         this->setField("restoreHeight", restoreHeight);
@@ -153,7 +153,7 @@ bool RestorePage::validatePage() {
             }
         }
 
-        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], "monero", seed.toStdString());
+        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, seed.toStdString());
         _seed.setRestoreHeight(restoreHeight);
         this->setField("restoreHeight", restoreHeight);
         this->setField("mnemonicSeed", seed);

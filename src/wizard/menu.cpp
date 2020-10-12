@@ -28,6 +28,8 @@ int MenuPage::nextId() const {
         return WalletWizard::Page_CreateWallet;
     if(ui->radioSeed->isChecked())
         return WalletWizard::Page_Restore;
+    if(ui->radioViewOnly->isChecked())
+        return WalletWizard::Page_ViewOnly;
     return 0;
 }
 

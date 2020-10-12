@@ -9,9 +9,11 @@
 #include "wizard/network.h"
 #include "wizard/createwalletseed.h"
 #include "wizard/restorewallet.h"
+#include "wizard/viewonlywallet.h"
 
 #include <QStyle>
 #include <QLabel>
+#include <QLineEdit>
 #include <QVBoxLayout>
 #include <QScreen>
 #include <QApplication>
@@ -29,6 +31,7 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     setPage(Page_CreateWalletSeed, createWalletSeed);
     setPage(Page_Network, new NetworkPage(m_ctx, this));
     setPage(Page_Restore, new RestorePage(m_ctx, this));
+    setPage(Page_ViewOnly, new ViewOnlyPage(m_ctx, this));
 
     if(config()->get(Config::firstRun).toUInt())
         setStartId(Page_Network);
@@ -58,8 +61,20 @@ void WalletWizard::createWallet() {
     const auto walletPath = this->field("walletPath").toString();
     const auto walletPasswd = this->field("walletPasswd").toString();
     auto restoreHeight = this->field("restoreHeight").toUInt();
+    auto viewKey = this->field("viewOnlyViewKey").toString();
+    auto spendKey = this->field("viewOnlySpendKey").toString();
+    auto viewAddress = this->field("viewOnlyAddress").toString();
 
-    auto seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), mnemonicSeed.toStdString());
+    if(!viewKey.isEmpty() && !viewAddress.isEmpty()) {
+        auto viewHeight = this->field("viewOnlyHeight").toUInt();
+        m_ctx->createWalletViewOnly(walletPath,
+                                    walletPasswd,
+                                    viewAddress,
+                                    viewKey, spendKey, viewHeight);
+        return;
+    }
+
+    auto seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, mnemonicSeed.toStdString());
     if(restoreHeight > 0)
         seed.setRestoreHeight(restoreHeight);
     m_ctx->createWallet(seed, walletPath, walletPasswd);

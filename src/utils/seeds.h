@@ -84,16 +84,16 @@ struct FeatherSeed {
     time_t time = 0;
     unsigned int restoreHeight = 0;
     RestoreHeightLookup *lookup = nullptr;
-    QString language = "English";
+    QString language;
     std::string coinName;
-    explicit FeatherSeed(RestoreHeightLookup *lookup, const std::string &coinName = "monero") : lookup(lookup), coinName(coinName) {}
+    explicit FeatherSeed(RestoreHeightLookup *lookup, const std::string &coinName = "monero", const QString &language = "English") : lookup(lookup), coinName(coinName), language(language) {}
 
     static FeatherSeed fromSeed(RestoreHeightLookup *lookup,
                                 const std::string &coinName,
+                                const QString &seedLanguage,
                                 const std::string &mnemonicSeed) {
 
-        auto rtn = FeatherSeed(lookup, coinName);
-        rtn.coinName = coinName;
+        auto rtn = FeatherSeed(lookup, coinName, seedLanguage);
         rtn.lookup = lookup;
         rtn.mnemonicSeed = QString::fromStdString(mnemonicSeed);
 
@@ -108,8 +108,8 @@ struct FeatherSeed {
         return rtn;
     }
 
-    static FeatherSeed generate(RestoreHeightLookup *lookup, const std::string &coinName) {
-        auto rtn = FeatherSeed(lookup, coinName);
+    static FeatherSeed generate(RestoreHeightLookup *lookup, const std::string &coinName, const QString &language) {
+        auto rtn = FeatherSeed(lookup, coinName, language);
         time_t _time = std::time(nullptr);
         monero_seed seed(_time, coinName);
 
@@ -130,7 +130,7 @@ struct FeatherSeed {
         if(this->lookup == nullptr) return wallet;
         if(this->mnemonicSeed.split(" ").count() == 14) {
             if(this->spendKey.isEmpty()) {
-                auto _seed = FeatherSeed::fromSeed(this->lookup, this->coinName, this->mnemonicSeed.toStdString());
+                auto _seed = FeatherSeed::fromSeed(this->lookup, this->coinName, this->language, this->mnemonicSeed.toStdString());
                 _seed.setRestoreHeight();
                 this->time = _seed.time;
                 this->restoreHeight = _seed.restoreHeight;
