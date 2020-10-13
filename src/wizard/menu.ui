@@ -49,6 +49,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QRadioButton" name="radioViewOnly">
+     <property name="text">
+      <string>Import from keys</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

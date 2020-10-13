@@ -16,6 +16,7 @@
 #include "dialog/debuginfodialog.h"
 #include "dialog/walletinfodialog.h"
 #include "dialog/torinfodialog.h"
+#include "dialog/viewonlydialog.h"
 #include "utils/utils.h"
 #include "utils/config.h"
 #include "components.h"
@@ -325,6 +326,10 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx, &AppContext::walletClosing, [=]{
         ui->tabWidget->setCurrentIndex(0);
     });
+
+    // window title
+    connect(m_ctx, &AppContext::setTitle, this, &QMainWindow::setWindowTitle);
+
     // setup some UI
     this->initMain();
     this->initWidgets();
@@ -389,6 +394,7 @@ void MainWindow::initMenu() {
     connect(ui->actionSeed, &QAction::triggered, this, &MainWindow::showSeedDialog);
     connect(ui->actionPassword, &QAction::triggered, this, &MainWindow::showPasswordDialog);
     connect(ui->actionKeys, &QAction::triggered, this, &MainWindow::showKeysDialog);
+    connect(ui->actionViewOnly, &QAction::triggered, this, &MainWindow::showViewOnlyDialog);
     connect(ui->actionStore_wallet, &QAction::triggered, [&]{
         m_ctx->currentWallet->store();
     });
@@ -412,7 +418,8 @@ void MainWindow::initMenu() {
     connect(ui->actionExport_CSV, &QAction::triggered, [=]{
         if(m_ctx->currentWallet == nullptr) return;
         QString fn = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
-        if(!fn.startsWith(".csv")) fn += ".csv";
+        if(fn.isEmpty()) return;
+        if(!fn.endsWith(".csv")) fn += ".csv";
         m_ctx->currentWallet->history()->writeCSV(fn);
         Utils::showMessageBox("CSV export", QString("Transaction history exported to %1").arg(fn), false);
     });
@@ -542,10 +549,6 @@ void MainWindow::onWalletOpened() {
         m_statusLabelStatus->setText("Wallet opened - Starting Tor (may take a while)");
     else
         m_statusLabelStatus->setText("Wallet opened - Searching for node");
-
-    // window title as wallet name
-    QFileInfo fileInfo(m_ctx->walletPath);
-    this->setWindowTitle(QString("Feather - [%1]").arg(fileInfo.fileName()));
 
     connect(m_ctx->currentWallet, &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
 
@@ -846,6 +849,12 @@ void MainWindow::showRestoreHeightDialog() {
 
 void MainWindow::showKeysDialog() {
     auto *dialog = new KeysDialog(m_ctx, this);
+    dialog->exec();
+    dialog->deleteLater();
+}
+
+void MainWindow::showViewOnlyDialog() {
+    auto *dialog = new ViewOnlyDialog(m_ctx, this);
     dialog->exec();
     dialog->deleteLater();
 }

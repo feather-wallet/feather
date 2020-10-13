@@ -341,6 +341,13 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 
     // force trigger preferredFiat signal for history model
     this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
+
+    // (window) title
+    QFileInfo fileInfo(this->walletPath);
+    auto title = QString("Feather - [%1]").arg(fileInfo.fileName());
+    if(this->currentWallet->viewOnly())
+        title += " [view-only]";
+    emit setTitle(title);
 }
 
 void AppContext::onWSMessage(const QJsonObject &msg) {
@@ -541,6 +548,43 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
         return;
     }
 
+    this->createWalletFinish(password);
+}
+
+void AppContext::createWalletViewOnly(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight) {
+    if(Utils::fileExists(path)) {
+        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    if(!this->walletManager->addressValid(address, this->networkType)) {
+        auto err = QString("Failed to create wallet. Invalid address provided.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    if(!this->walletManager->keyValid(viewkey, address, true, this->networkType)) {
+        auto err = QString("Failed to create wallet. Invalid viewkey provided.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    if(!spendkey.isEmpty() && !this->walletManager->keyValid(spendkey, address, false, this->networkType)) {
+        auto err = QString("Failed to create wallet. Invalid spendkey provided.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    this->currentWallet = this->walletManager->createWalletFromKeys(path, this->seedLanguage, this->networkType, address, viewkey, spendkey, restoreHeight);
+    this->createWalletFinish(password);
+}
+
+void AppContext::createWalletFinish(const QString &password) {
     this->currentWallet->setPassword(password);
     this->currentWallet->store();
     this->walletPassword = password;
@@ -614,8 +658,9 @@ void AppContext::onOpenAliasResolve(const QString &openAlias) {
 }
 
 void AppContext::donateBeg() {
-    if(this->networkType != NetworkType::Type::MAINNET)
-        return;
+    if(this->currentWallet == nullptr) return;
+    if(this->networkType != NetworkType::Type::MAINNET) return;
+    if(this->currentWallet->viewOnly()) return;
 
     auto donationCounter = config()->get(Config::donateBeg).toInt();
     if(donationCounter == -1)

@@ -79,6 +79,7 @@ public slots:
     void showConnectionStatusDialog();
     void showPasswordDialog();
     void showKeysDialog();
+    void showViewOnlyDialog();
     void donateButtonClicked();
     void showCalcWindow();
     void showSendTab();

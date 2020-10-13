@@ -82,7 +82,12 @@ bool CreateWalletPage::validateWidgets(){
 
 int CreateWalletPage::nextId() const {
     auto restoredSeed = this->field("mnemonicRestoredSeed").toString();
-    return restoredSeed.isEmpty() ? WalletWizard::Page_CreateWalletSeed : -1;
+    auto restoredViewOnlyKey = this->field("viewOnlyViewKey").toString();
+
+    if(!restoredSeed.isEmpty() || !restoredViewOnlyKey.isEmpty())
+        return -1;
+
+    return WalletWizard::Page_CreateWalletSeed;
 }
 
 bool CreateWalletPage::validatePage() {
@@ -93,6 +98,7 @@ bool CreateWalletPage::validatePage() {
     ui->walletName->setStyleSheet("");
 
     auto restoredSeed = this->field("mnemonicRestoredSeed").toString();
-    if(!restoredSeed.isEmpty()) emit createWallet();
+    auto restoredViewOnlyKey = this->field("viewOnlyViewKey").toString();
+    if(!restoredSeed.isEmpty() || !restoredViewOnlyKey.isEmpty()) emit createWallet();
     return true;
 }

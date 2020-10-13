@@ -68,6 +68,7 @@ public:
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
     quint32 tx_mixin = static_cast<const quint32 &>(10);
     static constexpr const double cdiv = 1e12;
+    QString seedLanguage = "English";  // 14 word `monero-seed` only has English
 
     QNetworkAccessManager *network;
     QNetworkAccessManager *networkClearnet;
@@ -89,6 +90,8 @@ public:
     WalletManager *walletManager;
     Wallet *currentWallet = nullptr;
     void createWallet(FeatherSeed seed, const QString &path, const QString &password);
+    void createWalletViewOnly(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight);
+    void createWalletFinish(const QString &password);
     void syncStatusUpdated(quint64 height, quint64 target);
     void updateBalance();
     void initTor();
@@ -160,6 +163,7 @@ signals:
     void initiateTransaction();
     void endTransaction();
     void walletClosing();
+    void setTitle(const QString &title); // set window title
 
 private:
     void sorry();
