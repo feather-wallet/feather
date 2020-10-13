@@ -940,8 +940,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     m_ctx->tor->stop();
 
     this->saveGeo();
-    if(m_wizard != nullptr)
-        m_wizard->close();
 
     QWidget::closeEvent(event);
 }
