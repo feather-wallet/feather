@@ -8,8 +8,8 @@
 NodeModel::NodeModel(unsigned int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)
         , m_nodeSource(nodeSource)
-        , m_offline(QIcon(":/assets/images/expired.png"))
-        , m_online(QIcon(":/assets/images/confirmed.png"))
+        , m_offline(QIcon(":/assets/images/expired_icon.png"))
+        , m_online(QIcon(":/assets/images/confirmed_icon.png"))
 {
 }
 

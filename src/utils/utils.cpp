@@ -334,15 +334,15 @@ int Utils::showMessageBox(const QString &windowTitle, const QString &body, bool 
     msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
     msgBox.setDefaultButton(QMessageBox::Ok);
 
-    QPixmap iconWarning = QPixmap(":/assets/images/ghost.png")
-            .scaled(QSize(48,48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-    QPixmap iconInfo = QPixmap(":/assets/images/info.png")
-            .scaled(QSize(48,48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-    if(warning)
+    if(warning) {
+        QPixmap iconWarning = QPixmap(":/assets/images/ghost_icon.png");
         msgBox.setIconPixmap(iconWarning);
-    else
+    }
+    else {
+        QPixmap iconInfo = QPixmap(":/assets/images/info.png")
+                .scaled(QSize(48,48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
         msgBox.setIconPixmap(iconInfo);
+    }
 
     return msgBox.exec();
 }
