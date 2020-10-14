@@ -192,8 +192,12 @@ public:
     Q_INVOKABLE void refreshHeightAsync();
 
     //! export/import key images
-    Q_INVOKABLE bool exportKeyImages(const QString& path);
+    Q_INVOKABLE bool exportKeyImages(const QString& path, bool all = false);
     Q_INVOKABLE bool importKeyImages(const QString& path);
+
+    //! export/import outputs
+    Q_INVOKABLE bool exportOutputs(const QString& path, bool all = false);
+    Q_INVOKABLE bool importOutputs(const QString& path);
 
     //! refreshes the wallet
     Q_INVOKABLE bool refresh(bool historyAndSubaddresses = true);

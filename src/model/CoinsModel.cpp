@@ -168,6 +168,8 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
 {
     switch (column)
     {
+        case KeyImageKnown:
+            return "";
         case PubKey:
             return cInfo.pubKey().mid(0,8);
         case OutputPoint:
