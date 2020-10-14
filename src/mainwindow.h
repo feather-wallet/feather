@@ -100,6 +100,11 @@ public slots:
     void onAddContact(const QString &address, const QString &name);
     void showRestoreHeightDialog();
 
+    void exportKeyImages();
+    void importKeyImages();
+    void exportOutputs();
+    void importOutputs();
+
     // libwalletqt
     void onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str);
     void onSynchronized();

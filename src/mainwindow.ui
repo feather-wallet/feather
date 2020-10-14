@@ -291,7 +291,7 @@
      <x>0</x>
      <y>0</y>
      <width>894</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -324,10 +324,27 @@
      <property name="title">
       <string>Advanced</string>
      </property>
+     <widget class="QMenu" name="menuExport">
+      <property name="title">
+       <string>Export</string>
+      </property>
+      <addaction name="actionExportOutputs"/>
+      <addaction name="actionExportKeyImages"/>
+     </widget>
+     <widget class="QMenu" name="menuImport">
+      <property name="title">
+       <string>Import</string>
+      </property>
+      <addaction name="actionImportOutputs"/>
+      <addaction name="actionImportKeyImages"/>
+     </widget>
      <addaction name="actionStore_wallet"/>
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
+     <addaction name="separator"/>
      <addaction name="actionChange_restore_height"/>
+     <addaction name="menuExport"/>
+     <addaction name="menuImport"/>
     </widget>
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
@@ -532,6 +549,46 @@
   <action name="actionViewOnly">
    <property name="text">
     <string>View-Only</string>
+   </property>
+  </action>
+  <action name="actionExport_key_images">
+   <property name="text">
+    <string>Export key images</string>
+   </property>
+  </action>
+  <action name="actionImport_key_images">
+   <property name="text">
+    <string>Import key images</string>
+   </property>
+  </action>
+  <action name="actionExport_outputs">
+   <property name="text">
+    <string>Export outputs</string>
+   </property>
+  </action>
+  <action name="actionImport_outputs">
+   <property name="text">
+    <string>Import outputs</string>
+   </property>
+  </action>
+  <action name="actionExportKeyImages">
+   <property name="text">
+    <string>Key Images</string>
+   </property>
+  </action>
+  <action name="actionExportOutputs">
+   <property name="text">
+    <string>Outputs</string>
+   </property>
+  </action>
+  <action name="actionImportKeyImages">
+   <property name="text">
+    <string>Key images</string>
+   </property>
+  </action>
+  <action name="actionImportOutputs">
+   <property name="text">
+    <string>Outputs</string>
    </property>
   </action>
  </widget>

@@ -404,6 +404,10 @@ void MainWindow::initMenu() {
     connect(ui->actionUpdate_balance, &QAction::triggered, [&]{
         m_ctx->updateBalance();
     });
+    connect(ui->actionExportKeyImages, &QAction::triggered, this, &MainWindow::exportKeyImages);
+    connect(ui->actionImportKeyImages, &QAction::triggered, this, &MainWindow::importKeyImages);
+    connect(ui->actionExportOutputs, &QAction::triggered, this, &MainWindow::exportOutputs);
+    connect(ui->actionImportOutputs, &QAction::triggered, this, &MainWindow::importOutputs);
 
     // set restore height
     connect(ui->actionChange_restore_height, &QAction::triggered, this, &MainWindow::showRestoreHeightDialog);
@@ -1065,6 +1069,58 @@ void MainWindow::showWSNodeExhaustedMessage() {
                "websocket server returned no available nodes. Please go to Settings->Node "
                "and enter a node manually.";
     QMessageBox::warning(this, "Could not connect to a node", msg);
+}
+
+void MainWindow::exportKeyImages() {
+    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QDir::homePath(), "Key Images (*_keyImages)");
+    if (fn.isEmpty()) return;
+    if (!fn.endsWith("_keyImages")) fn += "_keyImages";
+    m_ctx->currentWallet->exportKeyImages(fn, true);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(err));
+    } else {
+        QMessageBox::information(this, "Key image export", "Successfully exported key images.");
+    }
+}
+
+void MainWindow::importKeyImages() {
+    QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages)");
+    if (fn.isEmpty()) return;
+    m_ctx->currentWallet->importKeyImages(fn);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(err));
+    } else {
+        QMessageBox::information(this, "Key image import", "Successfully imported key images");
+        m_ctx->refreshModels();
+    }
+}
+
+void MainWindow::exportOutputs() {
+    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QDir::homePath(), "Outputs (*_outputs)");
+    if (fn.isEmpty()) return;
+    if (!fn.endsWith("_outputs")) fn += "_outputs";
+    m_ctx->currentWallet->exportOutputs(fn, true);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(err));
+    } else {
+        QMessageBox::information(this, "Outputs export", "Successfully exported outputs.");
+    }
+}
+
+void MainWindow::importOutputs() {
+    QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs)");
+    if (fn.isEmpty()) return;
+    m_ctx->currentWallet->importOutputs(fn);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(err));
+    } else {
+        QMessageBox::information(this, "Outputs import", "Successfully imported outputs");
+        m_ctx->refreshModels();
+    }
 }
 
 MainWindow::~MainWindow() {
