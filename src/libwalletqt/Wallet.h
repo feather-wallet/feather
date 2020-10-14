@@ -8,7 +8,6 @@
 #include <QObject>
 #include <QMutex>
 #include <QList>
-//#include <QJSValue>
 #include <QtConcurrent/QtConcurrent>
 
 #include "wallet/api/wallet2_api.h" // we need to have an access to the Monero::Wallet::Status enum here;
@@ -20,14 +19,13 @@
 #include "WalletListenerImpl.h"
 
 namespace Monero {
-struct Wallet; // forward declaration
+    struct Wallet; // forward declaration
 }
 
 
 class TransactionHistory;
 class TransactionHistoryModel;
 class TransactionHistoryProxyModel;
-class TransactionHistorySortFilterModel;
 class AddressBook;
 class AddressBookModel;
 class Subaddress;
@@ -50,13 +48,14 @@ struct TxProofResult {
 
 class Wallet : public QObject, public PassprasePrompter
 {
-    Q_OBJECT
+Q_OBJECT
     Q_PROPERTY(bool disconnected READ disconnected NOTIFY disconnectedChanged)
+    Q_PROPERTY(bool refreshing READ refreshing NOTIFY refreshingChanged)
     Q_PROPERTY(QString seed READ getSeed)
     Q_PROPERTY(QString seedLanguage READ getSeedLanguage)
     Q_PROPERTY(Status status READ status)
     Q_PROPERTY(NetworkType::Type nettype READ nettype)
-    Q_PROPERTY(ConnectionStatus connected READ connected)
+//    Q_PROPERTY(ConnectionStatus connected READ connected)
     Q_PROPERTY(quint32 currentSubaddressAccount READ currentSubaddressAccount NOTIFY currentSubaddressAccountChanged)
     Q_PROPERTY(bool synchronized READ synchronized)
     Q_PROPERTY(QString errorString READ errorString)
@@ -76,6 +75,7 @@ class Wallet : public QObject, public PassprasePrompter
     Q_PROPERTY(QString secretSpendKey READ getSecretSpendKey)
     Q_PROPERTY(QString publicSpendKey READ getPublicSpendKey)
     Q_PROPERTY(QString daemonLogPath READ getDaemonLogPath CONSTANT)
+    Q_PROPERTY(QString proxyAddress READ getProxyAddress WRITE setProxyAddress NOTIFY proxyAddressChanged)
     Q_PROPERTY(quint64 walletCreationHeight READ getWalletCreationHeight WRITE setWalletCreationHeight NOTIFY walletCreationHeightChanged)
 
 public:
@@ -120,6 +120,7 @@ public:
     //! returns true if wallet was ever synchronized
     bool synchronized() const;
 
+
     //! returns last operation's error message
     QString errorString() const;
 
@@ -138,7 +139,14 @@ public:
    // Q_INVOKABLE void storeAsync(const QJSValue &callback, const QString &path = "");
 
     //! initializes wallet asynchronously
-    Q_INVOKABLE void initAsync(const QString &daemonAddress, bool trustedDaemon = false, quint64 upperTransactionLimit = 0, bool isRecovering = false, bool isRecoveringFromDevice = false, quint64 restoreHeight = 0);
+    Q_INVOKABLE void initAsync(
+            const QString &daemonAddress,
+            bool trustedDaemon = false,
+            quint64 upperTransactionLimit = 0,
+            bool isRecovering = false,
+            bool isRecoveringFromDevice = false,
+            quint64 restoreHeight = 0,
+            const QString &proxyAddress = "");
 
     // Set daemon rpc user/pass
     Q_INVOKABLE void setDaemonLogin(const QString &daemonUsername = "", const QString &daemonPassword = "");
@@ -188,20 +196,11 @@ public:
     Q_INVOKABLE bool importKeyImages(const QString& path);
 
     //! refreshes the wallet
-    Q_INVOKABLE bool refresh();
-
-    //! refreshes the wallet asynchronously
-    Q_INVOKABLE void refreshAsync();
-
-    //! setup auto-refresh interval in seconds
-    Q_INVOKABLE void setAutoRefreshInterval(int seconds);
-
-    //! return auto-refresh interval in seconds
-    Q_INVOKABLE int autoRefreshInterval() const;
+    Q_INVOKABLE bool refresh(bool historyAndSubaddresses = true);
 
     // pause/resume refresh
-    Q_INVOKABLE void startRefresh() const;
-    Q_INVOKABLE void pauseRefresh() const;
+    Q_INVOKABLE void startRefresh();
+    Q_INVOKABLE void pauseRefresh();
 
     //! returns current wallet's block height
     //! (can be less than daemon's blockchain height when wallet sync in progress)
@@ -225,7 +224,7 @@ public:
 
     //! creates transaction with all outputs
     Q_INVOKABLE PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
-                                                       quint32 mixin_count, PendingTransaction::Priority priority);
+                                                          quint32 mixin_count, PendingTransaction::Priority priority);
 
     //! creates async transaction with all outputs
     Q_INVOKABLE void createTransactionAllAsync(const QString &dst_addr, const QString &payment_id,
@@ -402,6 +401,8 @@ signals:
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;
     void disconnectedChanged() const;
+    void proxyAddressChanged() const;
+    void refreshingChanged() const;
 
 private:
     Wallet(QObject * parent = nullptr);
@@ -409,10 +410,22 @@ private:
     ~Wallet();
 
     //! initializes wallet
-    bool init(const QString &daemonAddress, bool trustedDaemon, quint64 upperTransactionLimit, bool isRecovering, bool isRecoveringFromDevice, quint64 restoreHeight);
+    bool init(
+            const QString &daemonAddress,
+            bool trustedDaemon,
+            quint64 upperTransactionLimit,
+            bool isRecovering,
+            bool isRecoveringFromDevice,
+            quint64 restoreHeight,
+            const QString& proxyAddress);
 
     bool disconnected() const;
+    bool refreshing() const;
+    void refreshingSet(bool value);
     void setConnectionStatus(ConnectionStatus value);
+    QString getProxyAddress() const;
+    void setProxyAddress(QString address);
+    void startRefreshThread();
 
 private:
     friend class WalletManager;
@@ -445,13 +458,17 @@ private:
     mutable SubaddressAccountModel * m_subaddressAccountModel;
     Coins * m_coins;
     mutable CoinsModel * m_coinsModel;
+    QMutex m_asyncMutex;
     QMutex m_connectionStatusMutex;
     bool m_connectionStatusRunning;
     QString m_daemonUsername;
     QString m_daemonPassword;
+    QString m_proxyAddress;
+    mutable QMutex m_proxyMutex;
+    std::atomic<bool> m_refreshEnabled;
+    std::atomic<bool> m_refreshing;
     WalletListenerImpl *m_walletListener;
     FutureScheduler m_scheduler;
-    QMutex m_storeMutex;
 };
 
 
