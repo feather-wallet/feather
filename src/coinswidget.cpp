@@ -7,6 +7,7 @@
 #include "utils/utils.h"
 #include "dialog/outputinfodialog.h"
 #include "dialog/outputsweepdialog.h"
+#include "mainwindow.h"
 
 #include <QClipboard>
 #include <QDebug>
@@ -21,6 +22,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
         , m_copyMenu(new QMenu("Copy",this))
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     // header context menu
     ui->coins->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -69,6 +71,12 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     ui->coins->setColumnHidden(CoinsModel::Spent, true);
     ui->coins->setColumnHidden(CoinsModel::SpentHeight, true);
     ui->coins->setColumnHidden(CoinsModel::Frozen, true);
+
+    if (!m_ctx->currentWallet->viewOnly()) {
+        ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, true);
+    } else {
+        ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, false);
+    }
 
     ui->coins->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->coins->header()->setSectionResizeMode(CoinsModel::AddressLabel, QHeaderView::Stretch);

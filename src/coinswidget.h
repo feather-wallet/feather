@@ -67,6 +67,7 @@ private:
     Coins *m_coins;
     CoinsModel * m_model;
     CoinsProxyModel * m_proxyModel;
+    AppContext *m_ctx;
 
     void showContextMenu(const QPoint & point);
     void copy(copyField field);

@@ -19,6 +19,9 @@ CoinsModel::CoinsModel(QObject *parent, Coins *coins)
 {
     connect(m_coins, &Coins::refreshStarted, this, &CoinsModel::startReset);
     connect(m_coins, &Coins::refreshFinished, this, &CoinsModel::endReset);
+
+    m_eye = QIcon(":/assets/images/eye1.png");
+    m_eyeBlind = QIcon(":/assets/images/eye_blind.png");
 }
 
 void CoinsModel::startReset(){
@@ -82,6 +85,19 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
                     result = Qt::AlignRight;
             }
         }
+        else if (role == Qt::DecorationRole) {
+            switch (index.column()) {
+                case KeyImageKnown:
+                {
+                    if (cInfo.keyImageKnown()) {
+                        result = QVariant(m_eye);
+                    }
+                    else {
+                        result = QVariant(m_eyeBlind);
+                    }
+                }
+            }
+        }
         else if (role == Qt::FontRole) {
             switch(index.column()) {
                 case PubKey:
@@ -91,6 +107,16 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             }
         }
         else if (role == Qt::ToolTipRole) {
+            switch(index.column()) {
+                case KeyImageKnown:
+                {
+                    if (cInfo.keyImageKnown()) {
+                        result = "Key image known";
+                    } else {
+                        result = "Key image unknown. Outgoing transactions that include this output will not be detected.";
+                    }
+                }
+            }
             if (cInfo.frozen()) {
                 result = "Output is frozen.";
             }
