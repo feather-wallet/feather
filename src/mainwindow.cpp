@@ -946,6 +946,7 @@ void MainWindow::homeWidgetChanged(const QString &widgetName) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
+    m_ctx->walletManager->closeWallet();
     m_ctx->tor->stop();
 
     this->saveGeo();
