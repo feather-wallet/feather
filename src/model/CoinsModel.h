@@ -9,6 +9,7 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 #include <QDebug>
+#include <QIcon>
 
 class Coins;
 class CoinsInfo;
@@ -20,7 +21,8 @@ Q_OBJECT
 public:
     enum ModelColumn
     {
-        PubKey = 0,
+        KeyImageKnown = 0,
+        PubKey,
         OutputPoint,
         Address,
         AddressLabel,
@@ -49,6 +51,8 @@ private:
     QVariant parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const;
 
     Coins *m_coins;
+    QIcon m_eye;
+    QIcon m_eyeBlind;
 };
 
 #endif //FEATHER_COINSMODEL_H
