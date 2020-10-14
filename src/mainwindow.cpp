@@ -12,6 +12,7 @@
 #include "mainwindow.h"
 #include "widgets/ccswidget.h"
 #include "widgets/redditwidget.h"
+#include "widgets/xmrigwidget.h"
 #include "dialog/txconfdialog.h"
 #include "dialog/debuginfodialog.h"
 #include "dialog/walletinfodialog.h"
@@ -165,6 +166,13 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // Nodes
     connect(m_ctx->nodes, &Nodes::nodeExhausted, this, &MainWindow::showNodeExhaustedMessage);
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
+
+    // XMRig
+    connect(m_ctx, &AppContext::XMRigDownloads, ui->xmrigWidget, &XMRigWidget::onDownloads);
+    connect(m_ctx, &AppContext::walletClosed, ui->xmrigWidget, &XMRigWidget::onStopClicked);
+    connect(m_ctx, &AppContext::walletClosed, ui->xmrigWidget, &XMRigWidget::onClearClicked);
+    connect(ui->xmrigWidget, &XMRigWidget::miningStarted, [=]{ m_ctx->setWindowTitle(true); });
+    connect(ui->xmrigWidget, &XMRigWidget::miningEnded, [=]{ m_ctx->setWindowTitle(false); });
 
     // CCS/Reddit widget
     m_ccsWidget = new CCSWidget(this);
@@ -377,6 +385,14 @@ void MainWindow::initMenu() {
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_xmr_to, "XMRto");
 #else
     ui->actionShow_xmr_to->setVisible(false);
+#endif
+
+#if defined(MINING)
+    connect(ui->actionShow_XMRig, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["XMRig"] = new ToggleTab(ui->tabXmrRig, "XMRig", "XMRig", ui->actionShow_XMRig, Config::showTabXMRig);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_XMRig, "XMRig");
+#else
+    ui->actionShow_XMRig->setVisible(false);
 #endif
     connect(ui->actionShow_calc, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);

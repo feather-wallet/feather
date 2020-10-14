@@ -56,6 +56,7 @@ public:
 
     QString walletPath;
     QString walletPassword = "";
+    bool walletViewOnly = false;
     NetworkType::Type networkType;
 
     QString applicationPath;
@@ -101,6 +102,7 @@ public:
     void walletClose(bool emitClosedSignal = true);
     void storeWallet();
     void refreshModels();
+    void setWindowTitle(bool mining = false);
 
 public slots:
     void onOpenWallet(const QString& path, const QString &password);
@@ -152,6 +154,7 @@ signals:
     void nodesUpdated(QList<QSharedPointer<FeatherNode>> &nodes);
     void ccsUpdated(QList<QSharedPointer<CCSEntry>> &entries);
     void nodeSourceChanged(NodeSource nodeSource);
+    void XMRigDownloads(const QJsonObject &data);
     void setCustomNodes(QList<FeatherNode> nodes);
     void ccsEmpty();
     void openAliasResolveError(const QString &msg);

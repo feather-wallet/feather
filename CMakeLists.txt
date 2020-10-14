@@ -11,6 +11,7 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
 option(XMRTO "Include Xmr.To module" ON)
+option(XMRig "Include XMRig module" ON)
 option(BUILD_TOR "Build Tor" OFF)
 option(STATIC "Link libraries statically, requires static Qt")
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)

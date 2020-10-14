@@ -130,6 +130,10 @@ if(XMRTO)
     target_compile_definitions(feather PRIVATE XMRTO=1)
 endif()
 
+if(XMRig)
+    target_compile_definitions(feather PRIVATE MINING=1)
+endif()
+
 if(HAVE_SYS_PRCTL_H)
     target_compile_definitions(feather PRIVATE HAVE_SYS_PRCTL_H=1)
 endif()
