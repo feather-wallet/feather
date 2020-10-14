@@ -13,6 +13,7 @@ public:
     static bool detect();
     static bool detectDataPersistence();
     static bool detectDotPersistence();
+    static QString version();
 
     static void showDataPersistenceDisabledWarning();
     static void askPersistence();
