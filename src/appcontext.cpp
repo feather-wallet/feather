@@ -330,9 +330,9 @@ void AppContext::onWalletOpened(Wallet *wallet) {
     connect(this->currentWallet, &Wallet::transactionCreated, this, &AppContext::onTransactionCreated);
     connect(this->currentWallet, &Wallet::connectionStatusChanged, this, &AppContext::onConnectionStatusChanged);
 
-    this->nodes->connectToNode();
-
     emit walletOpened();
+
+    this->nodes->connectToNode();
     this->updateBalance();
 
 #ifdef DONATE_BEG
