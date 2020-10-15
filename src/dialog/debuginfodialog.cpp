@@ -43,7 +43,11 @@ DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
     ui->label_seedType->setText(ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty() ? "25 word" : "14 word");
     ui->label_viewOnly->setText(ctx->currentWallet->viewOnly() ? "True" : "False");
 
-    ui->label_OS->setText(QSysInfo::prettyProductName());
+    QString os = QSysInfo::prettyProductName();
+    if (ctx->isTails) {
+        os = QString("Tails %1").arg(TailsOS::version());
+    }
+    ui->label_OS->setText(os);
     ui->label_timestamp->setText(QString::number(QDateTime::currentSecsSinceEpoch()));
 
     connect(ui->btn_Copy, &QPushButton::clicked, this, &DebugInfoDialog::copyToClipboad);

@@ -38,6 +38,20 @@ bool TailsOS::detectDotPersistence()
     return QDir(tailsPathData + "dotfiles").exists();
 }
 
+QString TailsOS::version()
+{
+    if (!Utils::fileExists("/etc/os-release"))
+        return "";
+
+    QByteArray data = Utils::fileOpen("/etc/os-release");
+    QRegExp re(R"(TAILS_VERSION_ID="(\d+.\d+))");
+    int pos = re.indexIn(data);
+    if (pos >= 0) {
+        return re.cap(1);
+    }
+    return "";
+}
+
 void TailsOS::showDataPersistenceDisabledWarning()
 {
     QMessageBox msgBox;
