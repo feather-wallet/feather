@@ -256,6 +256,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
         connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, tickerWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx, &AppContext::onPreferredFiatCurrencyChanged);
+    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, ui->sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
 
     // CCS/Reddit widget
     connect(m_windowSettings, &Settings::homeWidgetChanged, this, &MainWindow::homeWidgetChanged);

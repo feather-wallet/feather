@@ -27,8 +27,8 @@ SendWidget::SendWidget(QWidget *parent) :
     connect(ui->lineAmount, &QLineEdit::textEdited, this, &SendWidget::amountEdited);
     connect(ui->lineAddress, &QLineEdit::textEdited, this, &SendWidget::addressEdited);
     connect(ui->btn_openAlias, &QPushButton::clicked, this, &SendWidget::aliasClicked);
-    ui->label_xmrAmount->setText("");
-    ui->label_xmrAmount->hide();
+    ui->label_conversionAmount->setText("");
+    ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
 }
 
@@ -120,18 +120,26 @@ void SendWidget::btnMaxClicked() {
 void SendWidget::updateConversionLabel() {
     auto amount = this->amount();
     if(amount == -1) return;
-    ui->label_xmrAmount->setText("");
+    ui->label_conversionAmount->setText("");
     if(amount <= 0) {
-        ui->label_xmrAmount->hide();
+        ui->label_conversionAmount->hide();
         return;
     }
 
-    QString currency = ui->comboCurrencySelection->currentText();
-    if (currency != "XMR") {
-        QString xmr_str = QString("%1 XMR").arg(QString::number(this->conversionAmount()));
-        ui->label_xmrAmount->setText(xmr_str);
-        ui->label_xmrAmount->show();
-    }
+    QString conversionAmountStr = [this]{
+        QString currency = ui->comboCurrencySelection->currentText();
+        if (currency != "XMR") {
+            return QString("~%1 XMR").arg(QString::number(this->conversionAmount(), 'f'));
+
+        } else {
+            auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+            double conversionAmount = AppContext::prices->convert("XMR", preferredFiatCurrency, this->amount());
+            return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
+        };
+    }();
+
+    ui->label_conversionAmount->setText(conversionAmountStr);
+    ui->label_conversionAmount->show();
 }
 
 double SendWidget::conversionAmount() {
@@ -163,7 +171,7 @@ void SendWidget::clearFields() {
     ui->lineAddress->clear();
     ui->lineAmount->clear();
     ui->lineDescription->clear();
-    ui->label_xmrAmount->clear();
+    ui->label_conversionAmount->clear();
 }
 
 void SendWidget::onWalletClosed() {
@@ -176,6 +184,10 @@ void SendWidget::onInitiateTransaction() {
 
 void SendWidget::onEndTransaction() {
     ui->btnSend->setEnabled(true);
+}
+
+void SendWidget::onPreferredFiatCurrencyChanged() {
+    this->updateConversionLabel();
 }
 
 SendWidget::~SendWidget() {
