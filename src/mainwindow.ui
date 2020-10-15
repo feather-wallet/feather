@@ -280,6 +280,20 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabXmrRig">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/xmrig.ico</normaloff>:/assets/images/xmrig.ico</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>XmrRig</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="XMRigWidget" name="xmrigWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -386,6 +400,7 @@
     <addaction name="actionShow_Coins"/>
     <addaction name="actionShow_xmr_to"/>
     <addaction name="actionShow_calc"/>
+    <addaction name="actionShow_XMRig"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWallet"/>
@@ -591,6 +606,11 @@
     <string>Outputs</string>
    </property>
   </action>
+  <action name="actionShow_XMRig">
+   <property name="text">
+    <string>Show XMRig</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -633,6 +653,12 @@
    <class>CalcWidget</class>
    <extends>QWidget</extends>
    <header>calcwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>XMRigWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/xmrigwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

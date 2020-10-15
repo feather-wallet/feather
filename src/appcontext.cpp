@@ -317,6 +317,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 
     this->currentWallet = wallet;
     this->walletPath = this->currentWallet->path() + ".keys";
+    this->walletViewOnly = this->currentWallet->viewOnly();
     config()->set(Config::walletPath, this->walletPath);
 
     connect(this->currentWallet, &Wallet::moneySpent, this, &AppContext::onMoneySpent);
@@ -341,12 +342,17 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 
     // force trigger preferredFiat signal for history model
     this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
+    this->setWindowTitle();
+}
 
-    // (window) title
+void AppContext::setWindowTitle(bool mining) {
     QFileInfo fileInfo(this->walletPath);
     auto title = QString("Feather - [%1]").arg(fileInfo.fileName());
-    if(this->currentWallet->viewOnly())
+    if(this->walletViewOnly)
         title += " [view-only]";
+    if(mining)
+        title += " [mining]";
+
     emit setTitle(title);
 }
 
@@ -387,7 +393,11 @@ void AppContext::onWSMessage(const QJsonObject &msg) {
     else if(cmd == "nodes") {
         this->onWSNodes(msg.value("data").toArray());
     }
-
+#if defined(MINING)
+    else if(cmd == "xmrig") {
+        this->XMRigDownloads(msg.value("data").toObject());
+    }
+#endif
     else if(cmd == "crypto_rates") {
         QJsonArray crypto_rates = msg.value("data").toArray();
         AppContext::prices->cryptoPricesReceived(crypto_rates);

@@ -32,6 +32,8 @@ public:
         blockExplorer,
         walletDirectory,
         walletPath,
+        xmrigPath,
+        xmrigPool,
         nodes,
         websocketEnabled,
         nodeSource,
@@ -39,6 +41,7 @@ public:
         showTabCoins,
         showTabXMRto,
         showTabCalc,
+        showTabXMRig,
         geometry,
         windowState,
         firstRun
