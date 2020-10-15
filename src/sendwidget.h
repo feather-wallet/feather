@@ -38,6 +38,7 @@ public slots:
     void onOpenAliasResolveError(const QString &err);
     void onOpenAliasResolved(const QString &address, const QString &openAlias);
     void onWalletClosed();
+    void onPreferredFiatCurrencyChanged();
 
     void onInitiateTransaction();
     void onEndTransaction();

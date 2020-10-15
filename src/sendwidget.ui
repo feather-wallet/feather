@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>500</width>
-    <height>148</height>
+    <width>603</width>
+    <height>175</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -153,12 +153,12 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_xmrAmount">
+      <widget class="QLabel" name="label_conversionAmount">
        <property name="enabled">
         <bool>true</bool>
        </property>
        <property name="text">
-        <string>xmrAmount</string>
+        <string>conversionAmount</string>
        </property>
       </widget>
      </item>
