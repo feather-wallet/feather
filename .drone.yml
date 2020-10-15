@@ -30,7 +30,7 @@ steps:
     - name: files_linux_release
       path: /files
     commands:
-    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
     - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
@@ -56,7 +56,7 @@ steps:
   - name: build
     image: feather:appimage
     commands:
-    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
     - export BRANCH="$DRONE_SOURCE_BRANCH"
     - bash ./contrib/build-appimage.sh
   - name: deploy
@@ -109,7 +109,7 @@ steps:
     - name: files_win_release
       path: /files
     commands:
-    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
     - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
@@ -147,7 +147,7 @@ steps:
     - name: files_mac_release
       path: /files
     commands:
-    - export FN="feather-`git rev-parse --short HEAD`.zip"
+    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
     - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
