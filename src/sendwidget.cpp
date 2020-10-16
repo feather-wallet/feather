@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020, The Monero Project.
 
-
 #include <QMessageBox>
 #include "sendwidget.h"
 #include "widgets/ccswidget.h"

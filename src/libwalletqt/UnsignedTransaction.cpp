@@ -83,6 +83,21 @@ void UnsignedTransaction::setFilename(const QString &fileName)
     m_fileName = fileName;
 }
 
+ConstructionInfo * UnsignedTransaction::constructionInfo(int index) const {
+    return m_construction_info[index];
+}
+
+void UnsignedTransaction::refresh()
+{
+    qDeleteAll(m_construction_info);
+    m_construction_info.clear();
+
+    m_pimpl->refresh();
+    for (const auto i : m_pimpl->getAll()) {
+        m_construction_info.append(new ConstructionInfo(i, this));
+    }
+}
+
 UnsignedTransaction::UnsignedTransaction(Monero::UnsignedTransaction *pt, Monero::Wallet *walletImpl, QObject *parent)
     : QObject(parent), m_pimpl(pt), m_walletImpl(walletImpl)
 {

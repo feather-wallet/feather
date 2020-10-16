@@ -85,6 +85,7 @@ public:
     static QStandardItem *qStandardItem(const QString &text);
     static QStandardItem *qStandardItem(const QString &text, QFont &font);
     static void copyToClipboard(const QString &string);
+    static QString copyFromClipboard();
     static QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid);
     static QString getUnixAccountName();
     static QString xdgDesktopEntry();

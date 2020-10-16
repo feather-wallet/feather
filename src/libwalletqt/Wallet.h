@@ -250,6 +250,12 @@ public:
     //! Sign a transfer from file
     Q_INVOKABLE UnsignedTransaction * loadTxFile(const QString &fileName);
 
+    //! Load an unsigned transaction from a base64 encoded string
+    Q_INVOKABLE UnsignedTransaction * loadTxFromBase64Str(const QString &unsigned_tx);
+
+    //! Load a signed transaction from file
+    Q_INVOKABLE PendingTransaction * loadSignedTxFile(const QString &fileName);
+
     //! Submit a transfer from file
     Q_INVOKABLE bool submitTxFile(const QString &fileName) const;
 

@@ -68,7 +68,7 @@ QByteArray Utils::fileOpenQRC(const QString &path) {
 bool Utils::fileWrite(const QString &path, const QString &data) {
     QFile file(path);
     if(file.open(QIODevice::WriteOnly)){
-        QTextStream out(&file); out << data << endl;
+        QTextStream out(&file); out << data << Qt::endl;
         file.close();
         return true;
     }
@@ -360,6 +360,15 @@ void Utils::copyToClipboard(const QString &string){
 #if defined(Q_OS_LINUX)
     QThread::msleep(1);
 #endif
+}
+
+QString Utils::copyFromClipboard() {
+    QClipboard * clipboard = QApplication::clipboard();
+    if (!clipboard) {
+        qWarning() << "Unable to access clipboard";
+        return "";
+    }
+    return clipboard->text();
 }
 
 QString Utils::blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid) {
