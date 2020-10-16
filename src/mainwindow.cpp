@@ -505,7 +505,11 @@ WalletWizard *MainWindow::createWizard(WalletWizard::Page startPage){
 
 void MainWindow::showWizard(WalletWizard::Page startPage) {
     this->setEnabled(false);
-    m_wizard = this->createWizard(startPage);
+    if (m_wizard == nullptr)
+        m_wizard = this->createWizard(startPage);
+    m_wizard->setStartId(startPage);
+    m_wizard->restart();
+    m_wizard->setEnabled(true);
     m_wizard->show();
 }
 
@@ -558,8 +562,6 @@ void MainWindow::onWalletOpened() {
     qDebug() << Q_FUNC_INFO;
     if(m_wizard != nullptr) {
         m_wizard->hide();
-        m_wizard->disconnect();
-        m_wizard->deleteLater();
     }
 
     this->raise();
