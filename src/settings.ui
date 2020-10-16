@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>754</width>
-    <height>278</height>
+    <width>1019</width>
+    <height>358</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -91,6 +91,11 @@
          <item>
           <property name="text">
            <string>MXN</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>NZD</string>
           </property>
          </item>
          <item>

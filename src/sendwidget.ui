@@ -128,17 +128,22 @@
          </item>
          <item>
           <property name="text">
+           <string>AUD</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>JPY</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>RMB</string>
+           <string>NZD</string>
           </property>
          </item>
          <item>
           <property name="text">
-           <string>AUD</string>
+           <string>RMB</string>
           </property>
          </item>
         </widget>
