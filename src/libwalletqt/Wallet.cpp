@@ -3,10 +3,6 @@
 
 #include "Wallet.h"
 
-#include <chrono>
-#include <stdexcept>
-#include <thread>
-
 #include "PendingTransaction.h"
 #include "UnsignedTransaction.h"
 #include "TransactionHistory.h"
@@ -31,8 +27,6 @@
 #include <QList>
 #include <QVector>
 #include <QMutexLocker>
-
-#include "utils/ScopeGuard.h"
 
 namespace {
     static const int DAEMON_BLOCKCHAIN_HEIGHT_CACHE_TTL_SECONDS = 5;
@@ -105,19 +99,6 @@ Wallet::ConnectionStatus Wallet::connected(bool forceCheck)
 bool Wallet::disconnected() const
 {
     return m_disconnected;
-}
-
-bool Wallet::refreshing() const
-{
-    return m_refreshing;
-}
-
-void Wallet::refreshingSet(bool value)
-{
-    if (m_refreshing.exchange(value) != value)
-    {
-        emit refreshingChanged();
-    }
 }
 
 void Wallet::setConnectionStatus(ConnectionStatus value)
@@ -264,7 +245,7 @@ void Wallet::initAsync(
             emit walletCreationHeightChanged();
             qDebug() << "init async finished - starting refresh";
             connected(true);
-            startRefresh();
+            m_walletImpl->startRefresh();
         }
     });
     if (future.first)
@@ -475,36 +456,20 @@ bool Wallet::importOutputs(const QString& path) {
     return m_walletImpl->importOutputs(path.toStdString());
 }
 
-bool Wallet::refresh(bool historyAndSubaddresses /* = true */)
+bool Wallet::refresh()
 {
-    refreshingSet(true);
-    const auto cleanup = sg::make_scope_guard([this]() noexcept {
-        refreshingSet(false);
-    });
-
-    {
-        QMutexLocker locker(&m_asyncMutex);
-
-        bool result = m_walletImpl->refresh();
-        if (historyAndSubaddresses)
-        {
-            m_history->refresh(currentSubaddressAccount());
-            m_subaddress->refresh(currentSubaddressAccount());
-            m_subaddressAccount->getAll();
-        }
-
-        return result;
-    }
+    qDebug() << "refresh async";
+    m_walletImpl->refreshAsync();
 }
 
-void Wallet::startRefresh()
+void Wallet::startRefresh() const
 {
-    m_refreshEnabled = true;
+    m_walletImpl->startRefresh();
 }
 
-void Wallet::pauseRefresh()
+void Wallet::pauseRefresh() const
 {
-    m_refreshEnabled = false;
+    m_walletImpl->pauseRefresh();
 }
 
 PendingTransaction *Wallet::createTransaction(const QString &dst_addr, const QString &payment_id,
@@ -1083,8 +1048,6 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
         , m_subaddressAccount(nullptr)
         , m_subaddressAccountModel(nullptr)
         , m_coinsModel(nullptr)
-        , m_refreshEnabled(false)
-        , m_refreshing(false)
         , m_scheduler(this)
 {
     m_history = new TransactionHistory(m_walletImpl->history(), this);
@@ -1103,8 +1066,6 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
     m_connectionStatusRunning = false;
     m_daemonUsername = "";
     m_daemonPassword = "";
-
-    startRefreshThread();
 }
 
 Wallet::~Wallet()
@@ -1129,42 +1090,14 @@ Wallet::~Wallet()
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if(status() == Status_Critical)
         qDebug("Not storing wallet cache");
-    else if( m_walletImpl->store(""))
-        qDebug("Wallet cache stored successfully");
-    else
-        qDebug("Error storing wallet cache");
+    // Don't store on wallet close for now
+//    else if( m_walletImpl->store(""))
+//        qDebug("Wallet cache stored successfully");
+//    else
+//        qDebug("Error storing wallet cache");
     delete m_walletImpl;
     m_walletImpl = NULL;
     delete m_walletListener;
     m_walletListener = NULL;
     qDebug("m_walletImpl deleted");
-}
-
-void Wallet::startRefreshThread()
-{
-    const auto future = m_scheduler.run([this] {
-        static constexpr const size_t refreshIntervalSec = 10;
-        static constexpr const size_t intervalResolutionMs = 100;
-
-        auto last = std::chrono::steady_clock::now();
-        while (!m_scheduler.stopping())
-        {
-            if (m_refreshEnabled)
-            {
-                const auto now = std::chrono::steady_clock::now();
-                const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - last).count();
-                if (elapsed >= refreshIntervalSec)
-                {
-                    refresh(false);
-                    last = std::chrono::steady_clock::now();
-                }
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(intervalResolutionMs));
-        }
-    });
-    if (!future.first)
-    {
-        throw std::runtime_error("failed to start auto refresh thread");
-    }
 }
