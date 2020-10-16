@@ -10,6 +10,7 @@
 
 #include "utils/xmrig.h"
 #include "utils/config.h"
+#include "appcontext.h"
 
 namespace Ui {
     class XMRigWidget;
@@ -20,11 +21,13 @@ class XMRigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit XMRigWidget(QWidget *parent = nullptr);
+    explicit XMRigWidget(AppContext *ctx, QWidget *parent = nullptr);
     ~XMRigWidget();
     QStandardItemModel *model();
 
 public slots:
+    void onWalletClosed();
+    void onWalletOpened();
     void onStartClicked();
     void onStopClicked();
     void onClearClicked();
@@ -46,12 +49,13 @@ signals:
 private:
     void showContextMenu(const QPoint &pos);
 
+    AppContext *m_ctx;
     Ui::XMRigWidget *ui;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
     unsigned int m_threads;
     QStringList m_urls;
-    QStringList m_pools{"pool.xmr.pt:5555", "pool.supportxmr.com:3333", "mine.xmrpool.net:3333", "xmrpool.eu:5555", "xmr-eu1.nanopool.org:14444", "pool.minexmr.com:4444", "monerohash.com:2222"};
+    QStringList m_pools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999"};
     XMRig *m_rig;
 };
 

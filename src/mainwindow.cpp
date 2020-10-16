@@ -12,7 +12,6 @@
 #include "mainwindow.h"
 #include "widgets/ccswidget.h"
 #include "widgets/redditwidget.h"
-#include "widgets/xmrigwidget.h"
 #include "dialog/txconfdialog.h"
 #include "dialog/debuginfodialog.h"
 #include "dialog/walletinfodialog.h"
@@ -168,11 +167,13 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
 
     // XMRig
-    connect(m_ctx, &AppContext::XMRigDownloads, ui->xmrigWidget, &XMRigWidget::onDownloads);
-    connect(m_ctx, &AppContext::walletClosed, ui->xmrigWidget, &XMRigWidget::onStopClicked);
-    connect(m_ctx, &AppContext::walletClosed, ui->xmrigWidget, &XMRigWidget::onClearClicked);
-    connect(ui->xmrigWidget, &XMRigWidget::miningStarted, [=]{ m_ctx->setWindowTitle(true); });
-    connect(ui->xmrigWidget, &XMRigWidget::miningEnded, [=]{ m_ctx->setWindowTitle(false); });
+    m_xmrig = new XMRigWidget(m_ctx, this);
+    ui->xmrRigLayout->addWidget(m_xmrig);
+    connect(m_ctx, &AppContext::walletOpened, m_xmrig, &XMRigWidget::onWalletOpened);
+    connect(m_ctx, &AppContext::XMRigDownloads, m_xmrig, &XMRigWidget::onDownloads);
+    connect(m_ctx, &AppContext::walletClosed, m_xmrig, &XMRigWidget::onWalletClosed);
+    connect(m_xmrig, &XMRigWidget::miningStarted, [=]{ m_ctx->setWindowTitle(true); });
+    connect(m_xmrig, &XMRigWidget::miningEnded, [=]{ m_ctx->setWindowTitle(false); });
 
     // CCS/Reddit widget
     m_ccsWidget = new CCSWidget(this);

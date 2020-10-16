@@ -22,7 +22,7 @@ Q_OBJECT
 public:
     explicit XMRig(QObject *parent = nullptr);
 
-    void start(unsigned int threads, const QString &pool_name, const QString &receiving_address, bool tor = false);
+    void start(unsigned int threads, const QString &pool_name, const QString &username, const QString &password, bool tor = false, bool tls = true);
     void stop();
     void terminate();
 

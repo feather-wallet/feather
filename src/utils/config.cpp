@@ -35,7 +35,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::autoOpenWalletPath,{QS("autoOpenWalletPath"), ""}},
         {Config::walletPath,{QS("walletPath"), ""}},
         {Config::xmrigPath,{QS("xmrigPath"), ""}},
-        {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:5555"}},
+        {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
         {Config::nodes,{QS("nodes"), "{}"}},
         {Config::websocketEnabled,{QS("websocketEnabled"), true}},
         {Config::nodeSource,{QS("nodeSource"), 0}},

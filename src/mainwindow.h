@@ -19,6 +19,7 @@
 #include "widgets/ccswidget.h"
 #include "widgets/redditwidget.h"
 #include "widgets/tickerwidget.h"
+#include "widgets/xmrigwidget.h"
 #include "utils/networking.h"
 #include "appcontext.h"
 #include "utils/config.h"
@@ -144,6 +145,7 @@ private:
     SignVerifyDialog *m_windowSignVerify = nullptr;
     RestoreDialog *m_restoreDialog = nullptr;
     AboutDialog *m_aboutDialog = nullptr;
+    XMRigWidget *m_xmrig = nullptr;
 
     bool m_windowSpawned = false;
 
