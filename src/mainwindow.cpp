@@ -894,6 +894,8 @@ void MainWindow::menuNewRestoreClicked() {
 }
 
 void MainWindow::menuQuitClicked() {
+    cleanupBeforeClose();
+
     QCoreApplication::quit();
 }
 
@@ -967,10 +969,7 @@ void MainWindow::homeWidgetChanged(const QString &widgetName) {
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-    m_ctx->walletManager->closeWallet();
-    m_ctx->tor->stop();
-
-    this->saveGeo();
+    cleanupBeforeClose();
 
     QWidget::closeEvent(event);
 }
@@ -1139,6 +1138,13 @@ void MainWindow::importOutputs() {
         QMessageBox::information(this, "Outputs import", "Successfully imported outputs");
         m_ctx->refreshModels();
     }
+}
+
+void MainWindow::cleanupBeforeClose() {
+    m_ctx->walletManager->closeWallet();
+    m_ctx->tor->stop();
+
+    this->saveGeo();
 }
 
 MainWindow::~MainWindow() {

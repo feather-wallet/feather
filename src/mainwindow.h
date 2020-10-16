@@ -125,6 +125,7 @@ private:
 
     static MainWindow * pMainWindow;
     void closeEvent(QCloseEvent *event) override;
+    void cleanupBeforeClose();
     void create_status_bar();
     void initMain();
     void loadSkins();
