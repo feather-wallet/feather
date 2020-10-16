@@ -15,9 +15,10 @@
 #include "ui_xmrigwidget.h"
 #include "utils/utils.h"
 
-XMRigWidget::XMRigWidget(QWidget *parent) :
+XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     QWidget(parent),
     ui(new Ui::XMRigWidget),
+    m_ctx(ctx),
     m_model(new QStandardItemModel(this)),
     m_contextMenu(new QMenu(this))
 {
@@ -56,8 +57,10 @@ XMRigWidget::XMRigWidget(QWidget *parent) :
     // defaults
     ui->btn_stop->setEnabled(false);
     ui->check_autoscroll->setChecked(true);
-    ui->relayTor->setChecked(true);
+    ui->relayTor->setChecked(false);
+    ui->check_tls->setChecked(true);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
+
     // XMRig binary
     auto path = config()->get(Config::xmrigPath).toString();
     ui->lineEdit_path->setText(path);
@@ -79,6 +82,40 @@ XMRigWidget::XMRigWidget(QWidget *parent) :
     else
         ui->console->appendPlainText(QString("XMRig path set to %1").arg(path));
     ui->console->appendPlainText("Ready to mine.");
+
+    // username/password
+    connect(ui->lineEdit_password, &QLineEdit::editingFinished, [=]() {
+        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+        m_ctx->currentWallet->store();
+    });
+
+    connect(ui->lineEdit_address, &QLineEdit::editingFinished, [=]() {
+        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
+        m_ctx->currentWallet->store();
+    });
+}
+
+void XMRigWidget::onWalletClosed() {
+    this->onStopClicked();
+    this->onClearClicked();
+    ui->lineEdit_password->setText("");
+    ui->lineEdit_address->setText("");
+}
+
+void XMRigWidget::onWalletOpened(){
+    // Xmrig username
+    auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
+    if(!username.isEmpty())
+        ui->lineEdit_address->setText(username);
+
+    // Xmrig passwd
+    auto password = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_password");
+    if(!password.isEmpty()) {
+        ui->lineEdit_password->setText(password);
+    } else {
+        ui->lineEdit_password->setText("featherwallet");
+        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+    }
 }
 
 void XMRigWidget::onThreadsValueChanged(int threads) {
@@ -104,13 +141,22 @@ void XMRigWidget::onClearClicked() {
 
 void XMRigWidget::onStartClicked() {
     auto pool_name = config()->get(Config::xmrigPool).toString();
-    auto addy = ui->lineEdit_address->text();
-    if(addy.isEmpty()) {
+
+    // fix error in config
+    if(!m_pools.contains(pool_name)) {
+        pool_name = m_pools.at(0);
+        config()->set(Config::xmrigPool, pool_name);
+    }
+
+    auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
+    auto password = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_password");
+
+    if(username.isEmpty()) {
         Utils::showMessageBox("Error", "Please specify a receiving address on the Settings screen", true);
         return;
     }
 
-    m_rig->start(m_threads, pool_name, addy, ui->relayTor->isChecked());
+    m_rig->start(m_threads, pool_name, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
     ui->btn_start->setEnabled(false);
     ui->btn_stop->setEnabled(true);
     emit miningStarted();

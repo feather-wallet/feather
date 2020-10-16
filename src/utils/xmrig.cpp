@@ -33,7 +33,11 @@ void XMRig::terminate() {
         m_process.terminate();
 }
 
-void XMRig::start(unsigned int threads, const QString &pool_name, const QString &receiving_address, bool tor) {
+void XMRig::start(unsigned int threads,
+                  const QString &pool_name,
+                  const QString &username,
+                  const QString &password,
+                  bool tor, bool tls) {
     auto state = m_process.state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
         emit error("Can't start XMRig, already running or starting");
@@ -54,12 +58,14 @@ void XMRig::start(unsigned int threads, const QString &pool_name, const QString 
     QStringList arguments;
     arguments << "-o" << pool_name;
     arguments << "-a" << "rx/0";
-    arguments << "-u" << receiving_address;
-    arguments << "-p" << "featherwallet";
+    arguments << "-u" << username;
+    arguments << "-p" << password;
     arguments << "--no-color";
     arguments << "-t" << QString::number(threads);
     if(tor)
         arguments << "-x" << QString("%1:%2").arg(Tor::torHost).arg(Tor::torPort);
+    if(tls)
+        arguments << "--tls";
 
     QString cmd = QString("%1 %2").arg(path, arguments.join(" "));
     emit output(cmd.toUtf8());

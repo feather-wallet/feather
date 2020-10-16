@@ -290,7 +290,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
-         <widget class="XMRigWidget" name="xmrigWidget" native="true"/>
+         <layout class="QGridLayout" name="xmrRigLayout"/>
         </item>
        </layout>
       </widget>
@@ -305,7 +305,7 @@
      <x>0</x>
      <y>0</y>
      <width>894</width>
-     <height>30</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -653,12 +653,6 @@
    <class>CalcWidget</class>
    <extends>QWidget</extends>
    <header>calcwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>XMRigWidget</class>
-   <extends>QWidget</extends>
-   <header>widgets/xmrigwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
