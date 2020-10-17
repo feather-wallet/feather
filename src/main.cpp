@@ -22,12 +22,14 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(assets);
 
-#if defined(Q_OS_MAC) && defined(BUILD_TOR)
-    Q_INIT_RESOURCE(assets_macos_tor);
-#elif defined(Q_OS_LINUX) && defined(BUILD_TOR)
-    Q_INIT_RESOURCE(assets_linux_tor);
-#elif defined(Q_OS_WIN) && defined(BUILD_TOR)
-    Q_INIT_RESOURCE(assets_windows_tor);
+#if defined(Q_OS_MAC) && defined(HAS_TOR)
+    Q_INIT_RESOURCE(assets_tor_macos);
+#elif defined(HAS_TOR)
+    Q_INIT_RESOURCE(assets_tor);
+#endif
+
+#if defined(HAS_XMRIG)
+    Q_INIT_RESOURCE(assets_mining);
 #endif
 
     QStringList argv_;

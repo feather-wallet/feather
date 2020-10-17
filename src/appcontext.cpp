@@ -147,8 +147,15 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     AppContext::prices = new Prices();
 
     // xmr.to
-#if defined(XMRTO)
+#ifdef XMRTO
     this->XMRTo = new XmrTo(this);
+#endif
+
+    // XMRig
+#ifdef HAS_XMRIG
+    this->XMRig = new XmRig(this->configDirectory, this);
+    if(!this->isTails)
+        this->XMRig->prepare();
 #endif
 
     this->walletManager = WalletManager::instance();
@@ -393,7 +400,7 @@ void AppContext::onWSMessage(const QJsonObject &msg) {
     else if(cmd == "nodes") {
         this->onWSNodes(msg.value("data").toArray());
     }
-#if defined(MINING)
+#if defined(HAS_XMRIG)
     else if(cmd == "xmrig") {
         this->XMRigDownloads(msg.value("data").toObject());
     }
@@ -511,31 +518,17 @@ void AppContext::onWSCCS(const QJsonArray &ccs_data) {
 }
 
 void AppContext::createConfigDirectory(const QString &dir) {
-    if(!Utils::dirExists(dir)) {
-        qDebug() << QString("Creating directory: %1").arg(dir);
-        if(!QDir().mkpath(dir))
-            throw std::runtime_error("Could not create directory " + dir.toStdString());
-    }
-
     QString config_dir_tor = QString("%1%2").arg(dir).arg("tor");
-    if(!Utils::dirExists(config_dir_tor)) {
-        qDebug() << QString("Creating directory: %1").arg(config_dir_tor);
-        if (!QDir().mkpath(config_dir_tor))
-            throw std::runtime_error("Could not create directory " + config_dir_tor.toStdString());
-    }
-
     QString config_dir_tordata = QString("%1%2").arg(dir).arg("tor/data");
-    if(!Utils::dirExists(config_dir_tordata)) {
-        qDebug() << QString("Creating directory: %1").arg(config_dir_tordata);
-        if (!QDir().mkpath(config_dir_tordata))
-            throw std::runtime_error("Could not create directory " + config_dir_tordata.toStdString());
-    }
+    QString config_dir_xmrig = QString("%1%2").arg(dir).arg("xmrig");
 
-    QString config_dir_torsocks = QString("%1%2").arg(dir).arg("torsocks");
-    if(!Utils::dirExists(config_dir_torsocks)) {
-        qDebug() << QString("Creating directory: %1").arg(config_dir_torsocks);
-        if (!QDir().mkpath(config_dir_torsocks))
-            throw std::runtime_error("Could not create directory " + config_dir_torsocks.toStdString());
+    QStringList createDirs({dir, config_dir_tor, config_dir_tordata, config_dir_xmrig});
+    for(const auto &d: createDirs) {
+        if(!Utils::dirExists(d)) {
+            qDebug() << QString("Creating directory: %1").arg(d);
+            if (!QDir().mkpath(d))
+                throw std::runtime_error("Could not create directory " + d.toStdString());
+        }
     }
 }
 

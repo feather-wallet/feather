@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/">
+        <file>assets/exec/tor</file>
+        <file>assets/exec/libevent-2.1.7.dylib</file>
+    </qresource>
+</RCC>

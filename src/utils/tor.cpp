@@ -43,9 +43,15 @@ Tor::Tor(AppContext *ctx, QObject *parent)
         return;
     }
 
+#ifndef HAS_TOR
+    qCritical() << "Feather built without embedded Tor. Assuming --use-local-tor";
+    this->localTor = true;
+    return;
+#endif
+
     bool unpacked = this->unpackBins();
     if (!unpacked) {
-        qCritical() << "Feather built without embedded Tor. Assuming --use-local-tor";
+        qCritical() << "Error unpacking embedded Tor. Assuming --use-local-tor";
         this->localTor = true;
         return;
     }
@@ -175,11 +181,9 @@ void Tor::handleProcessError(QProcess::ProcessError error) {
 bool Tor::unpackBins() {
     QString torFile;
 
-    // @TODO: refactor for Mac OS - should compile Tor statically.
-#if defined(Q_OS_MAC) && defined(DRONE)
-    // Tor on Mac requires libevent.dylib, borrowed the executable from
-    // the official Tor Browser release for now.
-    QString libEvent = ":/tor/libevent-2.1.7.dylib";
+    // On MacOS write libevent to disk
+#if defined(Q_OS_MAC)
+    QString libEvent = ":/assets/exec/libevent-2.1.7.dylib";
     if (Utils::fileExists(libEvent)) {
         QFile e(libEvent);
         QFileInfo eventInfo(e);
@@ -190,18 +194,15 @@ bool Tor::unpackBins() {
     }
 #endif
 
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-    torFile = ":/tor/tor";
-#elif defined(Q_OS_WIN)
-    torFile = ":/tor/tor.exe";
-#endif
-
+    torFile = ":/assets/exec/tor";
     if (!Utils::fileExists(torFile))
         return false;
+
+    // write to disk
     QFile f(torFile);
     QFileInfo fileInfo(f);
     this->torPath = QDir(this->torDir).filePath(fileInfo.fileName());
-    qDebug() << this->torPath;
+    qDebug() << "Writing Tor executable to " << this->torPath;
     f.copy(torPath);
     f.close();
 
@@ -209,7 +210,6 @@ bool Tor::unpackBins() {
     QFile torBin(this->torPath);
     torBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
 #endif
-
     return true;
 }
 
