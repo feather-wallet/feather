@@ -14,6 +14,7 @@
 #include "utils/networking.h"
 #include "utils/tor.h"
 #include "utils/xmrto.h"
+#include "utils/xmrig.h"
 #include "utils/wsclient.h"
 #include "utils/txfiathistory.h"
 #include "widgets/RedditPost.h"
@@ -78,6 +79,7 @@ public:
     Tor *tor;
     WSClient *ws;
     XmrTo *XMRTo;
+    XmRig *XMRig;
     Nodes *nodes;
     static Prices *prices;
     static WalletKeysFilesModel *wallets;

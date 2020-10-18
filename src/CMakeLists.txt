@@ -42,14 +42,16 @@ file(GLOB SOURCE_FILES
         "dialog/*.cpp"
         )
 
-if((APPLE AND BUILD_TOR) OR (APPLE AND "$ENV{DRONE}" STREQUAL "true"))
-    set(ASSETS_OS "assets_macos_tor.qrc")
-elseif(UNIX AND NOT APPLE AND BUILD_TOR)
-    set(ASSETS_OS "assets_linux_tor.qrc")
-elseif(MINGW AND BUILD_TOR)
-    set(ASSETS_OS "assets_windows_tor.qrc")
-else()
-    message(STATUS "Building without embedded Tor")
+if(TOR)
+    if(APPLE)
+        set(ASSETS_TOR "assets_tor_macos.qrc")
+    else()
+        set(ASSETS_TOR "assets_tor.qrc")
+    endif()
+endif()
+
+if(XMRIG)
+    set(ASSETS_XMRIG "assets_mining.qrc")
 endif()
 
 set(EXECUTABLE_FLAG)
@@ -74,7 +76,8 @@ endif()
 add_executable(feather ${EXECUTABLE_FLAG} main.cpp
         ${SOURCE_FILES}
         ${RESOURCES}
-        ${ASSETS_OS}
+        ${ASSETS_TOR}
+        ${ASSETS_XMRIG}
         )
 
 # mac os bundle
@@ -122,16 +125,16 @@ if(DONATE_BEG)
     target_compile_definitions(feather PRIVATE DONATE_BEG=1)
 endif()
 
-if(BUILD_TOR)
-    target_compile_definitions(feather PRIVATE BUILD_TOR=1)
-endif()
-
 if(XMRTO)
     target_compile_definitions(feather PRIVATE XMRTO=1)
 endif()
 
-if(XMRig)
-    target_compile_definitions(feather PRIVATE MINING=1)
+if(TOR)
+    target_compile_definitions(feather PRIVATE HAS_TOR=1)
+endif()
+
+if(XMRIG)
+    target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
 if(HAVE_SYS_PRCTL_H)

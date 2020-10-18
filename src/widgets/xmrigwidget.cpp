@@ -33,12 +33,6 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &XMRigWidget::showContextMenu);
     connect(ui->tableView, &QTableView::doubleClicked, this, &XMRigWidget::linkClicked);
 
-    // XMRig core
-    m_rig = new XMRig(this);
-    connect(m_rig, &XMRig::output, this, &XMRigWidget::onProcessOutput);
-    connect(m_rig, &XMRig::error, this, &XMRigWidget::onProcessError);
-    connect(m_rig, &XMRig::hashrate, this, &XMRigWidget::onHashrate);
-
     // threads
     ui->threadSlider->setMinimum(1);
     int threads = QThread::idealThreadCount();
@@ -60,19 +54,29 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     ui->relayTor->setChecked(false);
     ui->check_tls->setChecked(true);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    ui->label_status->hide();
+    ui->pathFrame->hide();
+    ui->soloFrame->hide();
+    ui->poolFrame->hide();
 
     // XMRig binary
     auto path = config()->get(Config::xmrigPath).toString();
-    ui->lineEdit_path->setText(path);
-    ui->label_status->hide();
-    if(path.isEmpty())
-        ui->tabWidget->setCurrentIndex(1);
+    if(!path.isEmpty()) {
+        ui->pathFrame->show();
+        ui->check_custompath->setChecked(true);
+        ui->lineEdit_path->setText(path);
+    }
 
     // pools
+    ui->poolFrame->show();
     ui->combo_pools->insertItems(0, m_pools);
     auto preferredPool = config()->get(Config::xmrigPool).toString();
     if (m_pools.contains(preferredPool))
         ui->combo_pools->setCurrentIndex(m_pools.indexOf(preferredPool));
+    else {
+        preferredPool = m_pools.at(0);
+        config()->set(Config::xmrigPool, preferredPool);
+    }
     connect(ui->combo_pools, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XMRigWidget::onPoolChanged);
 
     // info
@@ -81,18 +85,26 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
         ui->console->appendPlainText("Invalid path to XMRig binary detected. Please reconfigure on the Settings tab.");
     else
         ui->console->appendPlainText(QString("XMRig path set to %1").arg(path));
-    ui->console->appendPlainText("Ready to mine.");
+    if(m_ctx->isTails) {
+        ui->console->appendPlainText("Mining not available on Tails.");
+        ui->btn_start->setEnabled(false);
+    }
+    else
+        ui->console->appendPlainText("Ready to mine.");
 
     // username/password
     connect(ui->lineEdit_password, &QLineEdit::editingFinished, [=]() {
         m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
         m_ctx->currentWallet->store();
     });
-
     connect(ui->lineEdit_address, &QLineEdit::editingFinished, [=]() {
         m_ctx->currentWallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
         m_ctx->currentWallet->store();
     });
+
+    // checkbox connects
+    connect(ui->check_custompath, &QCheckBox::stateChanged, this, &XMRigWidget::onCustomPathChecked);
+    connect(ui->check_solo, &QCheckBox::stateChanged, this, &XMRigWidget::onSoloChecked);
 }
 
 void XMRigWidget::onWalletClosed() {
@@ -140,30 +152,40 @@ void XMRigWidget::onClearClicked() {
 }
 
 void XMRigWidget::onStartClicked() {
-    auto pool_name = config()->get(Config::xmrigPool).toString();
+    QString xmrigPath;
+    bool solo = ui->check_solo->isChecked();
+    bool customBinary = ui->check_custompath->isChecked();
 
-    // fix error in config
-    if(!m_pools.contains(pool_name)) {
-        pool_name = m_pools.at(0);
-        config()->set(Config::xmrigPool, pool_name);
-    }
+    if(customBinary)
+        xmrigPath = config()->get(Config::xmrigPath).toString();
+    else
+        xmrigPath = m_ctx->XMRig->rigPath;
 
+    // username is receiving address usually
     auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
     auto password = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_password");
 
     if(username.isEmpty()) {
-        Utils::showMessageBox("Error", "Please specify a receiving address on the Settings screen", true);
+        QString err = "Please specify a receiving address on the Settings screen";
+        ui->console->appendPlainText(err);
+        Utils::showMessageBox("Error", err, true);
         return;
     }
 
-    m_rig->start(m_threads, pool_name, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
+    QString address;
+    if(solo)
+        address = ui->lineEdit_solo->text().trimmed();
+    else
+        address = config()->get(Config::xmrigPool).toString();
+
+    m_ctx->XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
     ui->btn_start->setEnabled(false);
     ui->btn_stop->setEnabled(true);
     emit miningStarted();
 }
 
 void XMRigWidget::onStopClicked() {
-    m_rig->terminate();
+    m_ctx->XMRig->terminate();
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
     ui->label_status->hide();
@@ -255,6 +277,28 @@ void XMRigWidget::showContextMenu(const QPoint &pos) {
         return;
     }
     m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
+}
+
+void XMRigWidget::onCustomPathChecked(int state) {
+    if(state == 2) {
+        ui->pathFrame->show();
+    } else {
+        ui->lineEdit_path->setText("");
+        config()->set(Config::xmrigPath, "");
+        ui->pathFrame->hide();
+    }
+}
+
+void XMRigWidget::onSoloChecked(int state) {
+    if(state == 2) {
+        ui->poolFrame->hide();
+        ui->soloFrame->show();
+        ui->check_tls->setChecked(false);
+    }
+    else {
+        ui->poolFrame->show();
+        ui->soloFrame->hide();
+    }
 }
 
 void XMRigWidget::linkClicked() {

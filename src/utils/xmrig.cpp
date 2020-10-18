@@ -13,28 +13,37 @@
 #include "appcontext.h"
 
 
-XMRig::XMRig(QObject *parent) : QObject(parent)
-{
-    qDebug() << "Using embedded tor instance";
-    m_process.setProcessChannelMode(QProcess::MergedChannels);
-
-    connect(&m_process, &QProcess::readyReadStandardOutput, this, &XMRig::handleProcessOutput);
-    connect(&m_process, &QProcess::errorOccurred, this, &XMRig::handleProcessError);
-    connect(&m_process, &QProcess::stateChanged, this, &XMRig::stateChanged);
+XmRig::XmRig(const QString &configDir, QObject *parent) : QObject(parent) {
+    this->rigDir = QDir(configDir).filePath("xmrig");
 }
 
-void XMRig::stop() {
+void XmRig::prepare() {
+    // unpack and set process signals
+
+    if(!this->unpackBins()) {
+        qCritical() << "failed to write XMRig to config directory";
+        return;
+    }
+
+    m_process.setProcessChannelMode(QProcess::MergedChannels);
+    connect(&m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
+    connect(&m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
+    connect(&m_process, &QProcess::stateChanged, this, &XmRig::stateChanged);
+}
+
+void XmRig::stop() {
     if(m_process.state() == QProcess::Running)
         m_process.kill();
 }
 
-void XMRig::terminate() {
+void XmRig::terminate() {
     if(m_process.state() == QProcess::Running)
         m_process.terminate();
 }
 
-void XMRig::start(unsigned int threads,
-                  const QString &pool_name,
+void XmRig::start(const QString &path,
+                  unsigned int threads,
+                  const QString &address,
                   const QString &username,
                   const QString &password,
                   bool tor, bool tls) {
@@ -44,22 +53,22 @@ void XMRig::start(unsigned int threads,
         return;
     }
 
-    auto path = config()->get(Config::xmrigPath).toString();
     if(path.isEmpty()) {
-        emit error("Please set path to XMRig binary before starting.");
+        emit error("XmRig->Start path parameter missing.");
         return;
     }
 
     if(!Utils::fileExists(path)) {
-        emit error("Path to XMRig binary invalid; file does not exist.");
+        emit error(QString("Path to XMRig binary invalid; file does not exist: %1").arg(path));
         return;
     }
 
     QStringList arguments;
-    arguments << "-o" << pool_name;
+    arguments << "-o" << address;
     arguments << "-a" << "rx/0";
     arguments << "-u" << username;
-    arguments << "-p" << password;
+    if(!password.isEmpty())
+        arguments << "-p" << password;
     arguments << "--no-color";
     arguments << "-t" << QString::number(threads);
     if(tor)
@@ -72,14 +81,14 @@ void XMRig::start(unsigned int threads,
     m_process.start(path, arguments);
 }
 
-void XMRig::stateChanged(QProcess::ProcessState state) {
+void XmRig::stateChanged(QProcess::ProcessState state) {
     if(state == QProcess::ProcessState::Running)
         emit output("XMRig started");
     else if (state == QProcess::ProcessState::NotRunning)
         emit output("XMRig stopped");
 }
 
-void XMRig::handleProcessOutput() {
+void XmRig::handleProcessOutput() {
     QByteArray _output = m_process.readAllStandardOutput();
     if(_output.contains("miner") && _output.contains("speed")) {
         // detect hashrate
@@ -93,7 +102,7 @@ void XMRig::handleProcessOutput() {
     emit output(_output);
 }
 
-void XMRig::handleProcessError(QProcess::ProcessError err) {
+void XmRig::handleProcessError(QProcess::ProcessError err) {
     if (err == QProcess::ProcessError::Crashed)
         emit error("XMRig crashed or killed");
     else if (err == QProcess::ProcessError::FailedToStart) {
@@ -102,3 +111,24 @@ void XMRig::handleProcessError(QProcess::ProcessError err) {
     }
 }
 
+bool XmRig::unpackBins() {
+    QString rigFile;
+
+    rigFile = ":/assets/exec/xmrig";
+    if (!Utils::fileExists(rigFile))
+        return false;
+
+    // write to disk
+    QFile f(rigFile);
+    QFileInfo fileInfo(f);
+    this->rigPath = QDir(this->rigDir).filePath(fileInfo.fileName());
+    qDebug() << "Writing XMRig executable to " << this->rigPath;
+    f.copy(rigPath);
+    f.close();
+
+#if defined(Q_OS_UNIX)
+    QFile torBin(this->rigPath);
+    torBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
+#endif
+    return true;
+}

@@ -35,7 +35,7 @@ Note: You only need to build the base image once.
 #### 3. Build
 
 ```bash
-docker run --rm -it -v /tmp/ccache:/root/.ccache -v /root/feather:/feather -w /feather feather:win /bin/bash -c 'PATH=/mxe/usr/bin/:$PATH make windows-mxe-release -j8'
+docker run --rm -it -v /tmp/ccache:/root/.ccache -v /root/feather:/feather -w /feather feather:win /bin/bash -c 'PATH="/mxe/usr/bin/:$PATH" TOR="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" XMRIG="/xmrig/xmrig.exe" make windows-mxe-release -j8'
 ```
 
 Replace `PATH_TO_FEATHER` with the absolute path to Feather locally. 
@@ -68,7 +68,7 @@ Note: You only need to build the base image once.
 #### 3. Build
 
 ```bash
-docker run --env OPENSSL_ROOT_DIR=/usr/local/openssl/ --rm -it -v /tmp/ccache:/root/.ccache -v PATH_TO_FEATHER:/feather -w /feather feather:linux sh -c 'make release-static -j8'
+docker run --env OPENSSL_ROOT_DIR=/usr/local/openssl/ --rm -it -v /tmp/ccache:/root/.ccache -v PATH_TO_FEATHER:/feather -w /feather feather:linux sh -c 'TOR="/usr/local/tor/bin/tor" XMRIG="/xmrig/xmrig" make release-static -j8'
 ```
 
 Replace `PATH_TO_FEATHER` with the absolute path to Feather locally.
@@ -98,4 +98,4 @@ Build Feather.
 CMAKE_PREFIX_PATH=~/Qt5.15.1/5.15.1/clang_64 make mac-release
 ```
 
-The resulting Mac OS application can be found `build/bin/feather.app`.
+The resulting Mac OS application can be found `build/bin/feather.app` and will **not** have Tor embedded.

@@ -167,13 +167,20 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
 
     // XMRig
+#ifdef HAS_XMRIG
     m_xmrig = new XMRigWidget(m_ctx, this);
     ui->xmrRigLayout->addWidget(m_xmrig);
+    connect(m_ctx->XMRig, &XmRig::output, m_xmrig, &XMRigWidget::onProcessOutput);
+    connect(m_ctx->XMRig, &XmRig::error, m_xmrig, &XMRigWidget::onProcessError);
+    connect(m_ctx->XMRig, &XmRig::hashrate, m_xmrig, &XMRigWidget::onHashrate);
+
+    connect(m_ctx, &AppContext::walletClosed, m_xmrig, &XMRigWidget::onWalletClosed);
     connect(m_ctx, &AppContext::walletOpened, m_xmrig, &XMRigWidget::onWalletOpened);
     connect(m_ctx, &AppContext::XMRigDownloads, m_xmrig, &XMRigWidget::onDownloads);
-    connect(m_ctx, &AppContext::walletClosed, m_xmrig, &XMRigWidget::onWalletClosed);
+
     connect(m_xmrig, &XMRigWidget::miningStarted, [=]{ m_ctx->setWindowTitle(true); });
     connect(m_xmrig, &XMRigWidget::miningEnded, [=]{ m_ctx->setWindowTitle(false); });
+#endif
 
     // CCS/Reddit widget
     m_ccsWidget = new CCSWidget(this);
@@ -388,7 +395,7 @@ void MainWindow::initMenu() {
     ui->actionShow_xmr_to->setVisible(false);
 #endif
 
-#if defined(MINING)
+#if defined(HAS_XMRIG)
     connect(ui->actionShow_XMRig, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["XMRig"] = new ToggleTab(ui->tabXmrRig, "XMRig", "XMRig", ui->actionShow_XMRig, Config::showTabXMRig);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_XMRig, "XMRig");

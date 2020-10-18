@@ -14,11 +14,9 @@ steps:
     commands:
     - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
     - git config --global url."http://gitea:3000/".insteadOf https://github.com/
-    - git submodule update --init --depth 50 contrib/tor
-    - git submodule update --init --depth 50 contrib/torsocks
     - git submodule update --init --depth 120 monero
     - git submodule update --init --depth 120 --recursive monero
-    - make -j8 release-static
+    - TOR="/usr/local/tor/bin/tor" XMRIG="/xmrig/xmrig" make -j6 release-static
     environment:
       OPENSSL_ROOT_DIR: /usr/local/openssl/
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
@@ -44,7 +42,7 @@ volumes:
     path: /var/drone/ccache_linux_release/
 - name: files_linux_release
   host:
-    path: /mnt/storage1/feather_files/files/linux-release/
+    path: /build/feather_files/files/linux-release/
 
 ---
 
@@ -75,7 +73,7 @@ steps:
 volumes:
   - name: files_linux_appimage
     host:
-      path: /mnt/storage1/feather_files/files/linux-release-appimage/
+      path: /build/feather_files/files/linux-release-appimage/
 
 ---
 
@@ -94,11 +92,9 @@ steps:
     commands:
     - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
     - git config --global url."http://gitea:3000/".insteadOf https://github.com/
-    - git submodule update --init --depth 50 contrib/tor
-    - git submodule update --init --depth 50 contrib/torsocks
     - git submodule update --init --depth 120 monero
     - git submodule update --init --depth 120 --recursive monero
-    - PATH=/mxe/usr/bin/:$PATH make -j8 windows-mxe-release
+    - PATH="/mxe/usr/bin/:$PATH" TOR="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" XMRIG="/xmrig/xmrig.exe" make -j6 windows-mxe-release
     environment:
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
   - name: deploy
@@ -122,7 +118,7 @@ volumes:
     path: /var/drone/ccache_win_release/
 - name: files_win_release
   host:
-    path: /mnt/storage1/feather_files/files/windows-mxe-release/
+    path: /build/feather_files/files/windows-mxe-release/
 
 ---
 
@@ -157,9 +153,9 @@ steps:
 volumes:
 - name: files_mac_release
   host:
-    path: /mnt/storage1/feather_files/files/mac-release/
+    path: /build/feather_files/files/mac-release/
 ---
 kind: signature
-hmac: 91e773a27d27f29ea62f5df500664b733df641b7c31202c8e5558174fd046fba
+hmac: 527d334190a8a824b3b781a05ae4c7d87f4fa2bc37ebc53a96db91f925fa4a52
 
 ...

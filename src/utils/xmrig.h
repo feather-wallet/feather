@@ -15,16 +15,21 @@
 
 #include "utils/childproc.h"
 
-class XMRig : public QObject
+class XmRig : public QObject
 {
 Q_OBJECT
 
 public:
-    explicit XMRig(QObject *parent = nullptr);
+    explicit XmRig(const QString &configDir, QObject *parent = nullptr);
+    void prepare();
 
-    void start(unsigned int threads, const QString &pool_name, const QString &username, const QString &password, bool tor = false, bool tls = true);
+    void start(const QString &path, unsigned int threads, const QString &address, const QString &username, const QString &password, bool tor = false, bool tls = true);
     void stop();
     void terminate();
+    bool unpackBins();
+
+    QString rigDir;
+    QString rigPath;
 
 signals:
     void error(const QString &msg);

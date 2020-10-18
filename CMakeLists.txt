@@ -11,8 +11,9 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
 option(XMRTO "Include Xmr.To module" ON)
-option(XMRig "Include XMRig module" ON)
-option(BUILD_TOR "Build Tor" OFF)
+option(XMRIG "Path to XMRig binary to embed inside Feather" OFF)
+option(TOR "Path to Tor binary to embed inside Feather" OFF)
+option(TOR_VERSION "Optional git hash or tag of embedded Tor version" "tor-0.4.3.5")
 option(STATIC "Link libraries statically, requires static Qt")
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
@@ -175,47 +176,48 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-# Tor/torsocks
-set(TOR_TAG "tor-0.4.3.5")
-set(TOR_DIR "${CMAKE_SOURCE_DIR}/contrib/tor")
-
-if(BUILD_TOR AND APPLE)
-    execute_process(COMMAND bash -c "touch ${CMAKE_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
-ENDIF()
-
-if(UNIX AND NOT APPLE)
-    set(TOR_LIB "libtorsocks.so")
-elseif(APPLE)
-    set(TOR_LIB "libtorsocks.dylib")
+if("$ENV{DRONE}" STREQUAL "true")
+    message(STATUS "We are inside a static compile with Drone CI")
 endif()
 
-if("$ENV{DRONE}" STREQUAL "true" AND APPLE)
-    message(STATUS "We are inside a static compile with Drone CI")
-    # @TODO: taken from Tor Browser official release for now
-    execute_process(COMMAND bash -c "cp ~/tor/libevent-2.1.7.dylib ${CMAKE_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
-    execute_process(COMMAND bash -c "cp ~/tor/tor ${CMAKE_SOURCE_DIR}/src/tor/tor")
-elseif("$ENV{DRONE}" STREQUAL "true" AND BUILD_TOR)
-    message(STATUS "We are inside a static compile with Drone CI")
-    if(MINGW)
-        execute_process(COMMAND bash -c "cp /mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe ${CMAKE_SOURCE_DIR}/src/tor/tor.exe")
-    elseif(UNIX AND NOT APPLE)
-        execute_process(COMMAND bash -c "cp /usr/local/tor/bin/tor ${CMAKE_SOURCE_DIR}/src/tor/tor")
-        execute_process(COMMAND bash -c "cp /usr/local/torsocks/lib/torsocks/* ${CMAKE_SOURCE_DIR}/src/tor/")
+# To build Feather with embedded (and static) Tor, pass CMake -DTOR=/path/to/tor
+if(TOR)
+    if(APPLE)
+        execute_process(COMMAND bash -c "touch ${CMAKE_CURRENT_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
     endif()
+
+    # on the buildbot Tor is baked into the image
+    # - linux: See `Dockerfile`
+    # - windows: https://github.com/mxe/mxe/blob/1024dc7d2db5eb7d5d3c64a2c12b5f592572f1ce/plugins/apps/tor.mk
+    # - macos: taken from Tor Browser official release
+    set(TOR_COPY_CMD "cp ${TOR} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    message(STATUS "${TOR_COPY_CMD}")
+    execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
+    if(ret EQUAL "1")
+        message(FATAL_ERROR "Tor copy failure: ${TOR_COPY_CMD}")
+    endif()
+
+    message(STATUS "Embedding Tor binary at ${TOR}")
 else()
-    if(BUILD_TOR)
-        if(UNIX OR APPLE)
-            execute_process(COMMAND bash -c "ls -al src/tor/${TOR_LIB} 2>/dev/null" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR} OUTPUT_VARIABLE TOR_FOUND OUTPUT_STRIP_TRAILING_WHITESPACE)
-            if(TOR_FOUND)
-                message(STATUS "${TOR_LIB} found, skipping Tor build")
-            else()
-                message(STATUS "${TOR_LIB} not found, building Tor")
-                execute_process(COMMAND bash -c "bash build_tor.sh ${TOR_TAG} ${CMAKE_SOURCE_DIR} 'ON'" WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/contrib)
-            endif()
-        endif()
-    else()
-        message(STATUS "Skipping Tor build because -DBUILD_TOR=OFF")
+    message(STATUS "Skipping Tor inclusion because -DTOR=Off")
+endif()
+
+# To build Feather with embedded (and static) XMRig, pass CMake -DXMRIG=/path/to/xmrig
+if(XMRIG)
+    # on the buildbot XMRig is baked into the image
+    # - linux: See `Dockerfile`
+    # - windows: See `Dockerfile_windows`
+    # - macos: manually downloaded an official release
+    set(XMRIG_COPY_CMD "cp ${XMRIG} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/xmrig")
+    message(STATUS "${XMRIG_COPY_CMD}")
+    execute_process(COMMAND bash -c "${XMRIG_COPY_CMD}" RESULT_VARIABLE ret)
+    if(ret EQUAL "1")
+        message(FATAL_ERROR "XMRig copy failure: ${XMRIG_COPY_CMD}")
     endif()
+
+    message(STATUS "Embedding XMRig binary at ${XMRIG}")
+else()
+    message(STATUS "Skipping XMRig inclusion because -DXMRIG=Off")
 endif()
 
 if(MINGW)
