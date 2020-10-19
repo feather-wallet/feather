@@ -375,8 +375,25 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <widget class="QMenu" name="menuLoad_transaction">
+     <property name="title">
+      <string>Load unsigned transaction</string>
+     </property>
+     <addaction name="actionLoadUnsignedTxFromFile"/>
+     <addaction name="actionLoadUnsignedTxFromClipboard"/>
+    </widget>
+    <widget class="QMenu" name="menuLoad_signed_transaction">
+     <property name="title">
+      <string>Broadcast transaction</string>
+     </property>
+     <addaction name="actionLoadSignedTxFromFile"/>
+     <addaction name="actionLoadSignedTxFromText"/>
+    </widget>
     <addaction name="actionSignVerify"/>
     <addaction name="actionVerifyTxProof"/>
+    <addaction name="separator"/>
+    <addaction name="menuLoad_transaction"/>
+    <addaction name="menuLoad_signed_transaction"/>
     <addaction name="separator"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionCreateDesktopEntry"/>
@@ -609,6 +626,36 @@
   <action name="actionShow_XMRig">
    <property name="text">
     <string>Show XMRig</string>
+   </property>
+  </action>
+  <action name="actionImportTransaction">
+   <property name="text">
+    <string>Transaction</string>
+   </property>
+  </action>
+  <action name="actionSubmitTransaction">
+   <property name="text">
+    <string>Submit transaction file</string>
+   </property>
+  </action>
+  <action name="actionLoadUnsignedTxFromFile">
+   <property name="text">
+    <string>From file</string>
+   </property>
+  </action>
+  <action name="actionLoadSignedTxFromFile">
+   <property name="text">
+    <string>From file</string>
+   </property>
+  </action>
+  <action name="actionLoadUnsignedTxFromClipboard">
+   <property name="text">
+    <string>From clipboard</string>
+   </property>
+  </action>
+  <action name="actionLoadSignedTxFromText">
+   <property name="text">
+    <string>From text</string>
    </property>
   </action>
  </widget>

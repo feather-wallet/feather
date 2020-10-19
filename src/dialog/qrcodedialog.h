@@ -16,15 +16,15 @@ class QrCodeDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit QrCodeDialog(QWidget *parent, const QString &text, const QString &title = "Qr Code");
+    explicit QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString &title = "Qr Code");
     ~QrCodeDialog() override;
+    void setQrCode(const QrCode &qrCode);
 
 private:
     void copyImage();
     void saveImage();
 
     Ui::QrCodeDialog *ui;
-    QrCode *m_qrc;
     QPixmap m_pixmap;
 };
 

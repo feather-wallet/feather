@@ -141,7 +141,8 @@ void ReceiveWidget::setQrCode(const QString &address){
 void ReceiveWidget::showQrCodeDialog() {
     QModelIndex index = ui->addresses->currentIndex();
     QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
-    auto *dialog = new QrCodeDialog(this, address, "Address");
+    QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
+    auto *dialog = new QrCodeDialog(this, qr, "Address");
     dialog->exec();
     dialog->deleteLater();
 }

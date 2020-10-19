@@ -16,10 +16,12 @@ QString PendingTransaction::errorString() const
 
 bool PendingTransaction::commit()
 {
-    // Save transaction to file if fileName is set.
-    if(!m_fileName.isEmpty())
-        return m_pimpl->commit(m_fileName.toStdString());
-    return m_pimpl->commit(m_fileName.toStdString());
+    return m_pimpl->commit();
+}
+
+bool PendingTransaction::saveToFile(const QString &fileName)
+{
+    return m_pimpl->commit(fileName.toStdString());
 }
 
 quint64 PendingTransaction::amount() const
@@ -36,7 +38,6 @@ quint64 PendingTransaction::fee() const
 {
     return m_pimpl->fee();
 }
-
 
 QStringList PendingTransaction::txid() const
 {
@@ -63,9 +64,33 @@ QList<QVariant> PendingTransaction::subaddrIndices() const
     return result;
 }
 
-void PendingTransaction::setFilename(const QString &fileName)
+QByteArray PendingTransaction::unsignedTxToBin() const {
+    return QByteArray::fromStdString(m_pimpl->unsignedTxToBin());
+}
+
+QString PendingTransaction::unsignedTxToBase64() const
 {
-    m_fileName = fileName;
+    return QString::fromStdString(m_pimpl->unsignedTxToBase64());
+}
+
+QString PendingTransaction::signedTxToHex(int index) const
+{
+    return QString::fromStdString(m_pimpl->signedTxToHex(index));
+}
+
+PendingTransactionInfo * PendingTransaction::transaction(int index) const {
+    return m_pending_tx_info[index];
+}
+
+void PendingTransaction::refresh()
+{
+    qDeleteAll(m_pending_tx_info);
+    m_pending_tx_info.clear();
+
+    m_pimpl->refresh();
+    for (const auto i : m_pimpl->getAll()) {
+        m_pending_tx_info.append(new PendingTransactionInfo(i, this));
+    }
 }
 
 PendingTransaction::PendingTransaction(Monero::PendingTransaction *pt, QObject *parent)

@@ -9,15 +9,14 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-QrCodeDialog::QrCodeDialog(QWidget *parent, const QString &text, const QString &title)
+QrCodeDialog::QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString &title)
         : QDialog(parent)
         , ui(new Ui::QrCodeDialog)
 {
     ui->setupUi(this);
     this->setWindowTitle(title);
 
-    m_qrc = new QrCode(text, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
-    m_pixmap = m_qrc->toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
+    m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
     ui->QrCode->setPixmap(m_pixmap);
 
     connect(ui->btn_CopyImage, &QPushButton::clicked, this, &QrCodeDialog::copyImage);
@@ -32,7 +31,11 @@ QrCodeDialog::QrCodeDialog(QWidget *parent, const QString &text, const QString &
 QrCodeDialog::~QrCodeDialog()
 {
     delete ui;
-    delete m_qrc;
+}
+
+void QrCodeDialog::setQrCode(const QrCode &qrCode) {
+    m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
+    ui->QrCode->setPixmap(m_pixmap);
 }
 
 void QrCodeDialog::copyImage() {

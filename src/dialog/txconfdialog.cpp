@@ -6,12 +6,15 @@
 #include "appcontext.h"
 #include "utils/config.h"
 #include "model/ModelUtils.h"
+#include "libwalletqt/WalletManager.h"
+#include "txconfadvdialog.h"
 
 #include <QMessageBox>
 
-TxConfDialog::TxConfDialog(PendingTransaction *tx, const QString &address, const QString &description, int mixin, QWidget *parent)
+TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, int mixin, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TxConfDialog)
+        , m_ctx(ctx)
         , m_tx(tx)
         , m_address(address)
         , m_description(description)
@@ -43,29 +46,16 @@ TxConfDialog::TxConfDialog(PendingTransaction *tx, const QString &address, const
     ui->label_address->setFont(ModelUtils::getMonospaceFont());
     ui->label_address->setToolTip(address);
 
-    connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::showAdvanced);
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");
+
+    connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
     this->adjustSize();
 }
 
-void TxConfDialog::showAdvanced() {
-    const auto amount = m_tx->amount() / AppContext::cdiv;
-    const auto fee = m_tx->fee() / AppContext::cdiv;
-
-    QString body = QString("Address: %2\n").arg(m_address.left(60));
-    body += m_address.mid(60) + "\n";
-    if(!m_description.isEmpty())
-        body = QString("%1Description: %2\n").arg(body, m_description);
-    body = QString("%1Amount: %2 XMR\n").arg(body, QString::number(amount));
-    body = QString("%1Fee: %2 XMR\n").arg(body, QString::number(fee));
-    body = QString("%1Ringsize: %2").arg(body, QString::number(m_mixin + 1));
-
-    auto subaddrIndices = m_tx->subaddrIndices();
-    for (int i = 0; i < subaddrIndices.count(); ++i){
-        body = QString("%1\nSpending address index: %2").arg(body, QString::number(subaddrIndices.at(i).toInt()));
-    }
-
-    QMessageBox::information(this, "Transaction information", body);
+void TxConfDialog::setShowAdvanced() {
+    this->showAdvanced = true;
+    QDialog::reject();
 }
 
 TxConfDialog::~TxConfDialog() {

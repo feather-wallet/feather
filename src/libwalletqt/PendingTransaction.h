@@ -9,6 +9,8 @@
 #include <QVariant>
 
 #include <wallet/api/wallet2_api.h>
+#include "PendingTransactionInfo.h"
+
 
 //namespace Monero {
 //class PendingTransaction;
@@ -30,7 +32,7 @@ public:
     enum Status {
         Status_Ok       = Monero::PendingTransaction::Status_Ok,
         Status_Error    = Monero::PendingTransaction::Status_Error,
-        Status_Critical    = Monero::PendingTransaction::Status_Critical
+        Status_Critical = Monero::PendingTransaction::Status_Critical
     };
     Q_ENUM(Status)
 
@@ -45,21 +47,27 @@ public:
     Status status() const;
     QString errorString() const;
     Q_INVOKABLE bool commit();
+    bool saveToFile(const QString &fileName);
     quint64 amount() const;
     quint64 dust() const;
     quint64 fee() const;
     QStringList txid() const;
     quint64 txCount() const;
     QList<QVariant> subaddrIndices() const;
-    Q_INVOKABLE void setFilename(const QString &fileName);
+    QByteArray unsignedTxToBin() const;
+    QString unsignedTxToBase64() const;
+    QString signedTxToHex(int index) const;
+    void refresh();
+
+    PendingTransactionInfo * transaction(int index) const;
 
 private:
-    explicit PendingTransaction(Monero::PendingTransaction * pt, QObject *parent = 0);
+    explicit PendingTransaction(Monero::PendingTransaction * pt, QObject *parent = nullptr);
 
 private:
     friend class Wallet;
     Monero::PendingTransaction * m_pimpl;
-    QString m_fileName;
+    mutable QList<PendingTransactionInfo*> m_pending_tx_info;
 };
 
 #endif // PENDINGTRANSACTION_H

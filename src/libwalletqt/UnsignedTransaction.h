@@ -7,14 +7,13 @@
 #include <QObject>
 
 #include <wallet/api/wallet2_api.h>
+#include "libwalletqt/PendingTransactionInfo.h"
 
 class UnsignedTransaction : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Status status READ status)
     Q_PROPERTY(QString errorString READ errorString)
-  //  Q_PROPERTY(QList<qulonglong> amount READ amount)
-  //  Q_PROPERTY(QList<qulonglong> fee READ fee)
     Q_PROPERTY(quint64 txCount READ txCount)
     Q_PROPERTY(QString confirmationMessage READ confirmationMessage)
     Q_PROPERTY(QStringList recipientAddress READ recipientAddress)
@@ -41,15 +40,19 @@ public:
     quint64 minMixinCount() const;
     Q_INVOKABLE bool sign(const QString &fileName) const;
     Q_INVOKABLE void setFilename(const QString &fileName);
+    void refresh();
+
+    ConstructionInfo * constructionInfo(int index) const;
 
 private:
-    explicit UnsignedTransaction(Monero::UnsignedTransaction * pt, Monero::Wallet *walletImpl, QObject *parent = 0);
+    explicit UnsignedTransaction(Monero::UnsignedTransaction * pt, Monero::Wallet *walletImpl, QObject *parent = nullptr);
     ~UnsignedTransaction();
 private:
     friend class Wallet;
     Monero::UnsignedTransaction * m_pimpl;
     QString m_fileName;
     Monero::Wallet * m_walletImpl;
+    mutable QList<ConstructionInfo*> m_construction_info;
 };
 
 #endif // UNSIGNEDTRANSACTION_H

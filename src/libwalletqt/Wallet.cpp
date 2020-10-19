@@ -529,7 +529,7 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
 {
     m_scheduler.run([this, key_image, dst_addr, outputs, priority] {
         PendingTransaction *tx = createTransactionSingle(key_image, dst_addr, outputs, priority);
-        emit transactionCreated(tx, dst_addr, "", 0); // todo: return true mixincount
+        emit transactionCreated(tx, dst_addr, "", 10); // todo: return true mixincount
     });
 }
 
@@ -553,6 +553,21 @@ UnsignedTransaction * Wallet::loadTxFile(const QString &fileName)
     qDebug() << "Trying to sign " << fileName;
     Monero::UnsignedTransaction * ptImpl = m_walletImpl->loadUnsignedTx(fileName.toStdString());
     UnsignedTransaction * result = new UnsignedTransaction(ptImpl, m_walletImpl, this);
+    return result;
+}
+
+UnsignedTransaction * Wallet::loadTxFromBase64Str(const QString &unsigned_tx)
+{
+    Monero::UnsignedTransaction * ptImpl = m_walletImpl->loadUnsignedTxFromBase64Str(unsigned_tx.toStdString());
+    UnsignedTransaction * result = new UnsignedTransaction(ptImpl, m_walletImpl, this);
+    return result;
+}
+
+PendingTransaction * Wallet::loadSignedTxFile(const QString &fileName)
+{
+    qDebug() << "Tying to load " << fileName;
+    Monero::PendingTransaction * ptImpl = m_walletImpl->loadSignedTx(fileName.toStdString());
+    PendingTransaction * result = new PendingTransaction(ptImpl, this);
     return result;
 }
 

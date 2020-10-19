@@ -13,12 +13,15 @@
 #include "widgets/ccswidget.h"
 #include "widgets/redditwidget.h"
 #include "dialog/txconfdialog.h"
+#include "dialog/txconfadvdialog.h"
 #include "dialog/debuginfodialog.h"
 #include "dialog/walletinfodialog.h"
 #include "dialog/torinfodialog.h"
 #include "dialog/viewonlydialog.h"
+#include "dialog/broadcasttxdialog.h"
 #include "utils/utils.h"
 #include "utils/config.h"
+#include "utils/daemonrpc.h"
 #include "components.h"
 #include "calcwindow.h"
 #include "ui_mainwindow.h"
@@ -474,6 +477,10 @@ void MainWindow::initMenu() {
     // Tools
     connect(ui->actionSignVerify, &QAction::triggered, this, &MainWindow::menuSignVerifyClicked);
     connect(ui->actionVerifyTxProof, &QAction::triggered, this, &MainWindow::menuVerifyTxProof);
+    connect(ui->actionLoadUnsignedTxFromFile, &QAction::triggered, this, &MainWindow::loadUnsignedTx);
+    connect(ui->actionLoadUnsignedTxFromClipboard, &QAction::triggered, this, &MainWindow::loadUnsignedTxFromClipboard);
+    connect(ui->actionLoadSignedTxFromFile, &QAction::triggered, this, &MainWindow::loadSignedTx);
+    connect(ui->actionLoadSignedTxFromText, &QAction::triggered, this, &MainWindow::loadSignedTxFromText);
 
     // About screen
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::menuAboutClicked);
@@ -702,15 +709,26 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QStrin
     } else {
         const auto &description = m_ctx->tmpTxDescription;
 
-        auto *dialog = new TxConfDialog(tx, address, description, mixin, this);
+        auto *dialog = new TxConfDialog(m_ctx, tx, address, description, mixin, this);
         switch (dialog->exec()) {
             case QDialog::Rejected:
-                m_ctx->onCancelTransaction(tx, address);
+            {
+                if (!dialog->showAdvanced)
+                    m_ctx->onCancelTransaction(tx, address);
                 break;
+            }
             case QDialog::Accepted:
                 m_ctx->currentWallet->commitTransactionAsync(tx);
                 break;
         }
+
+        if (dialog->showAdvanced) {
+            auto *dialog_adv = new TxConfAdvDialog(m_ctx, description, this);
+            dialog_adv->setTransaction(tx);
+            dialog_adv->exec();
+            dialog_adv->deleteLater();
+        }
+        dialog->deleteLater();
     }
 }
 
@@ -1155,6 +1173,64 @@ void MainWindow::cleanupBeforeClose() {
     m_ctx->tor->stop();
 
     this->saveGeo();
+}
+
+void MainWindow::loadUnsignedTx() {
+    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx)");
+    if (fn.isEmpty()) return;
+    UnsignedTransaction *tx = m_ctx->currentWallet->loadTxFile(fn);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Load transaction from file", QString("Failed to load transaction.\n\n%1").arg(err));
+        return;
+    }
+
+    this->createUnsignedTxDialog(tx);
+}
+
+void MainWindow::loadUnsignedTxFromClipboard() {
+    QString unsigned_tx = Utils::copyFromClipboard();
+    if (unsigned_tx.isEmpty()) {
+        QMessageBox::warning(this, "Load unsigned transaction from clipboard", "Clipboard is empty");
+        return;
+    }
+    UnsignedTransaction *tx = m_ctx->currentWallet->loadTxFromBase64Str(unsigned_tx);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Load unsigned transaction from clipboard", QString("Failed to load transaction.\n\n%1").arg(err));
+        return;
+    }
+
+    this->createUnsignedTxDialog(tx);
+}
+
+void MainWindow::loadSignedTx() {
+    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*signed_monero_tx)");
+    if (fn.isEmpty()) return;
+    PendingTransaction *tx = m_ctx->currentWallet->loadSignedTxFile(fn);
+    auto err = m_ctx->currentWallet->errorString();
+    if (!err.isEmpty()) {
+        QMessageBox::warning(this, "Load signed transaction from file", err);
+        return;
+    }
+
+    auto *dialog = new TxConfAdvDialog(m_ctx, "", this);
+    dialog->setTransaction(tx);
+    dialog->exec();
+    dialog->deleteLater();
+}
+
+void MainWindow::loadSignedTxFromText() {
+    auto dialog = new BroadcastTxDialog(this, m_ctx);
+    dialog->exec();
+    dialog->deleteLater();
+}
+
+void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
+    auto *dialog = new TxConfAdvDialog(m_ctx, "", this);
+    dialog->setUnsignedTransaction(tx);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 MainWindow::~MainWindow() {

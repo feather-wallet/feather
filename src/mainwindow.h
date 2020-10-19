@@ -101,10 +101,15 @@ public slots:
     void onAddContact(const QString &address, const QString &name);
     void showRestoreHeightDialog();
 
+    // offline tx signing
     void exportKeyImages();
     void importKeyImages();
     void exportOutputs();
     void importOutputs();
+    void loadUnsignedTx();
+    void loadUnsignedTxFromClipboard();
+    void loadSignedTx();
+    void loadSignedTxFromText();
 
     // libwalletqt
     void onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str);
@@ -136,6 +141,7 @@ private:
     void showDebugInfo();
     void showNodeExhaustedMessage();
     void showWSNodeExhaustedMessage();
+    void createUnsignedTxDialog(UnsignedTransaction *tx);
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 

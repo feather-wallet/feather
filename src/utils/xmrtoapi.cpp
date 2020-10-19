@@ -41,7 +41,6 @@ void XmrToApi::getOrderStatus(const QString &uuid) {
 void XmrToApi::onResponse(QNetworkReply *reply, Endpoint endpoint) {
     const auto ok = reply->error() == QNetworkReply::NoError;
     const auto err = reply->errorString();
-    reply->deleteLater();
 
     QByteArray data = reply->readAll();
     QJsonObject obj;
@@ -64,6 +63,7 @@ void XmrToApi::onResponse(QNetworkReply *reply, Endpoint endpoint) {
         return;
     }
 
+    reply->deleteLater();
     emit ApiResponse(XmrToResponse(true, endpoint, "", obj));
 }
 
