@@ -45,11 +45,11 @@ HistoryWidget::HistoryWidget(QWidget *parent)
 
 }
 
-void HistoryWidget::setModel(Coins *coins, TransactionHistoryProxyModel *model, TransactionHistory *txHistory)
+void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet)
 {
-    m_coins = coins;
     m_model = model;
-    m_txHistory = txHistory;
+    m_wallet = wallet;
+    m_txHistory = m_wallet->history();
     ui->history->setModel(m_model);
 
     ui->history->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -66,7 +66,7 @@ void HistoryWidget::showTxDetails() {
     });
 
     if (i != nullptr) {
-        auto * dialog = new TransactionInfoDialog(m_coins, i, this);
+        auto * dialog = new TransactionInfoDialog(m_wallet, i, this);
         dialog->exec();
     }
 }

@@ -7,6 +7,7 @@
 #include "model/TransactionHistoryModel.h"
 #include "model/TransactionHistoryProxyModel.h"
 #include "libwalletqt/Coins.h"
+#include "libwalletqt/Wallet.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -21,7 +22,7 @@ Q_OBJECT
 
 public:
     explicit HistoryWidget(QWidget *parent = nullptr);
-    void setModel(Coins * coins, TransactionHistoryProxyModel * model, TransactionHistory * txHistory);
+    void setModel(TransactionHistoryProxyModel *model, Wallet *wallet);
     ~HistoryWidget() override;
 
 public slots:
@@ -51,7 +52,7 @@ private:
     QMenu *m_copyMenu;
     TransactionHistory *m_txHistory;
     TransactionHistoryProxyModel *m_model;
-    Coins *m_coins;
+    Wallet *m_wallet = nullptr;
 };
 
 #endif //FEATHER_HISTORYWIDGET_H

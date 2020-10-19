@@ -604,7 +604,7 @@ void MainWindow::onWalletOpened() {
 
     // history page
     m_ctx->currentWallet->history()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
-    ui->historyWidget->setModel(m_ctx->currentWallet->coins(), m_ctx->currentWallet->historyModel(), m_ctx->currentWallet->history());
+    ui->historyWidget->setModel(m_ctx->currentWallet->historyModel(), m_ctx->currentWallet);
     connect(m_ctx->currentWallet->history(), &TransactionHistory::txNoteChanged, [this]{
         m_ctx->storeWallet();
     });

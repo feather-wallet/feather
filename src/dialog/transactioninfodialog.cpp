@@ -8,16 +8,23 @@
 #include "libwalletqt/WalletManager.h"
 #include <QDebug>
 
-TransactionInfoDialog::TransactionInfoDialog(Coins *coins, TransactionInfo *txInfo, QWidget *parent)
+TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TransactionInfoDialog)
-        , m_coins(coins)
+        , m_wallet(wallet)
         , m_txInfo(txInfo)
 {
     ui->setupUi(this);
 
-    ui->txid->setText(QString(txInfo->hash()));
-    ui->txid->setCursorPosition(0);
+    ui->label_txid->setText(QString(txInfo->hash()));
+
+    if (txInfo->direction() == TransactionInfo::Direction_In) {
+        ui->txKey->hide();
+    } else {
+        QString txKey = m_wallet->getTxKey(txInfo->hash());
+        txKey = txKey.isEmpty() ? "unknown" : txKey;
+        ui->label_txKey->setText(txKey);
+    }
 
     ui->label_status->setText(QString("Status: %1 confirmations").arg(txInfo->confirmations()));
     ui->label_date->setText(QString("Date: %1").arg(txInfo->timestamp().toString("yyyy-MM-dd HH:mm")));
@@ -30,7 +37,7 @@ TransactionInfoDialog::TransactionInfoDialog(Coins *coins, TransactionInfo *txIn
     ui->label_fee->setText(QString("Fee: %1").arg(txInfo->isCoinbase() ? WalletManager::displayAmount(0) : fee));
     ui->label_unlockTime->setText(QString("Unlock time: %1 (height)").arg(txInfo->unlockTime()));
 
-    qDebug() << m_coins->coins_from_txid(txInfo->hash());
+    qDebug() << m_wallet->coins()->coins_from_txid(txInfo->hash());
 
     QString destinations = txInfo->destinations_formatted();
     if (destinations.isEmpty()) {
