@@ -191,7 +191,7 @@ RUN cd /qt-everywhere-src-5.15.0 && \
     -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtserialport -skip qtspeech -skip qttools \
     -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel -skip qtwebengine -skip qtwebview \
     -skip qtwinextras -skip qtx11extras -skip gamepad -skip serialbus -skip location -skip webengine \
-    -skip qtdeclarative -skip qtmultimedia \
+    -skip qtdeclarative \
     -no-feature-cups -no-feature-ftp -no-feature-pdf -no-feature-animation \
     -nomake examples -nomake tests -nomake tools
 
