@@ -545,12 +545,13 @@ void MainWindow::onWalletCreatedError(const QString &err) {
     this->showWizard(WalletWizard::Page_CreateWallet);
 }
 
-void MainWindow::onWalletOpenPasswordRequired(bool invalidPassword) {
+void MainWindow::onWalletOpenPasswordRequired(bool invalidPassword, const QString &path) {
+    QFileInfo fileInfo(path);
     QInputDialog passwordDialog(this);
     passwordDialog.setInputMode(QInputDialog::TextInput);
     passwordDialog.setTextEchoMode(QLineEdit::Password);
     passwordDialog.setWindowTitle("Password required");
-    passwordDialog.setLabelText("Please enter wallet password.");
+    passwordDialog.setLabelText(QString("Please enter %1 wallet password.").arg(fileInfo.fileName()));
     passwordDialog.resize(300, 100);
     if(!(bool)passwordDialog.exec())
         return this->showWizard(WalletWizard::Page_OpenWallet);

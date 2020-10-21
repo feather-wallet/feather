@@ -147,7 +147,7 @@ signals:
     void walletCreatedError(const QString &msg);
     void walletCreated(Wallet *wallet);
     void walletOpenedError(QString msg);
-    void walletOpenPasswordNeeded(bool invalidPassword);
+    void walletOpenPasswordNeeded(bool invalidPassword, QString path);
     void transactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
     void createTransactionError(QString message);
     void createTransactionCancelled(QString address, double amount);

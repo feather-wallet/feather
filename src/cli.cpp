@@ -58,7 +58,7 @@ void CLI::onWalletOpenedError(const QString &err) {
         return this->finishedError(err);
 }
 
-void CLI::onWalletOpenPasswordRequired(bool invalidPassword) {
+void CLI::onWalletOpenPasswordRequired(bool invalidPassword, const QString &path) {
     if(mode == CLIMode::CLIModeExportContacts ||
        mode == CLIMode::CLIModeExportTxHistory)
         return this->finishedError("invalid password");
