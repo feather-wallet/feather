@@ -75,7 +75,7 @@ void XmRig::start(const QString &path,
         arguments << "-x" << QString("%1:%2").arg(Tor::torHost).arg(Tor::torPort);
     if(tls)
         arguments << "--tls";
-
+    arguments << "--donate-level" << "1";
     QString cmd = QString("%1 %2").arg(path, arguments.join(" "));
     emit output(cmd.toUtf8());
     m_process.start(path, arguments);
