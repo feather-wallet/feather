@@ -224,13 +224,27 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabCalc">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/coldcard.png</normaloff>:/assets/images/coldcard.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>Calc</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="0">
+         <widget class="CalcWidget" name="conversionWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabXmrTo">
        <attribute name="icon">
         <iconset resource="assets.qrc">
          <normaloff>:/assets/images/xmrto.png</normaloff>:/assets/images/xmrto.png</iconset>
        </attribute>
        <attribute name="title">
-        <string>xmr.to</string>
+        <string>XMR.to</string>
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_4">
         <property name="leftMargin">
@@ -266,27 +280,13 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabCalc">
-       <attribute name="icon">
-        <iconset resource="assets.qrc">
-         <normaloff>:/assets/images/coldcard.png</normaloff>:/assets/images/coldcard.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>Calc</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="CalcWidget" name="conversionWidget" native="true"/>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="tabXmrRig">
        <attribute name="icon">
         <iconset resource="assets.qrc">
          <normaloff>:/assets/images/xmrig.ico</normaloff>:/assets/images/xmrig.ico</iconset>
        </attribute>
        <attribute name="title">
-        <string>XmrRig</string>
+        <string>XMRig</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -305,7 +305,7 @@
      <x>0</x>
      <y>0</y>
      <width>894</width>
-     <height>22</height>
+     <height>30</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -416,8 +416,8 @@
      <string>View</string>
     </property>
     <addaction name="actionShow_Coins"/>
-    <addaction name="actionShow_xmr_to"/>
     <addaction name="actionShow_calc"/>
+    <addaction name="actionShow_xmr_to"/>
     <addaction name="actionShow_XMRig"/>
    </widget>
    <addaction name="menuFile"/>
@@ -506,7 +506,7 @@
   </action>
   <action name="actionShow_xmr_to">
    <property name="text">
-    <string>Show Xmr.To</string>
+    <string>Show XMR.to</string>
    </property>
   </action>
   <action name="actionShow_calc">
