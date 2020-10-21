@@ -185,7 +185,7 @@ void XMRigWidget::onStartClicked() {
 }
 
 void XMRigWidget::onStopClicked() {
-    m_ctx->XMRig->terminate();
+    m_ctx->XMRig->stop();
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
     ui->label_status->hide();
