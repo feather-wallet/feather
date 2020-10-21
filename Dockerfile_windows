@@ -50,7 +50,7 @@ RUN apt install -y \
 
 RUN git clone -b feather-patch --depth 1 https://git.wownero.com/feather/mxe.git && \
     cd mxe && \
-    make -j$THREADS MXE_TARGETS='x86_64-w64-mingw32.static' gcc libqrencode pkgconf libgpg_error libgcrypt cmake libsodium lzma readline libzmq boost qtbase qtsvg qtwebsockets qtimageformats
+    make -j$THREADS MXE_TARGETS='x86_64-w64-mingw32.static' gcc libqrencode pkgconf libgpg_error libgcrypt cmake libsodium lzma readline libzmq boost qtbase qtsvg qtwebsockets qtimageformats qtmultimedia
 
 # plugins
 RUN cd mxe && make -j$THREADS MXE_PLUGIN_DIRS='/mxe/plugins/apps/' MXE_TARGETS='x86_64-w64-mingw32.static' tor
