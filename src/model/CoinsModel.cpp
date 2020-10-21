@@ -6,6 +6,7 @@
 #include "Coins.h"
 #include <wallet/api/wallet2_api.h>
 #include "ModelUtils.h"
+#include "globals.h"
 
 #include <QDebug>
 #include <QHash>
@@ -190,10 +191,14 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case SpentHeight:
             return cInfo.spentHeight();
         case Amount:
-            return QString::number(cInfo.amount() / 1e12, 'f', 12);
+        {
+            if (role == Qt::UserRole) {
+                return cInfo.amount() / globals::cdiv;
+            }
+            return QString::number(cInfo.amount() / globals::cdiv, 'f', 12);
+        }
         case Frozen:
             return cInfo.frozen();
-
         default:
         {
             qCritical() << "Unimplemented role";
