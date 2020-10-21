@@ -7,6 +7,7 @@
 
 #include "libwalletqt/Wallet.h"
 #include "appcontext.h"
+#include "globals.h"
 #include "utils/xmrto.h"
 
 XmrToOrder::XmrToOrder(AppContext *ctx, UtilsNetworking *network, QString baseUrl, bool clearnet, XmrToRates *rates, QObject *parent) :
@@ -38,7 +39,7 @@ void XmrToOrder::onTransactionCancelled(const QString &address, double amount) {
 void XmrToOrder::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid) {
     // listener for all outgoing transactions - will try to match the exact amount to this order.
     if(this->state == OrderState::Status_OrderUnpaid){
-        if(tx->amount() / AppContext::cdiv == this->incoming_amount_total) {
+        if(tx->amount() / globals::cdiv == this->incoming_amount_total) {
             if(!status) {
                 this->errorMsg = "TX failed to commit";
                 this->changeState(OrderState::Status_OrderFailed);
@@ -221,7 +222,7 @@ void XmrToOrder::changeState(OrderState _state) {
         case OrderState::Status_OrderUnpaid:
             // need to send Monero
             if(!m_paymentRequested) {
-                auto unlocked_balance = m_ctx->currentWallet->unlockedBalance() / AppContext::cdiv;
+                auto unlocked_balance = m_ctx->currentWallet->unlockedBalance() / globals::cdiv;
                 if (this->incoming_amount_total >= unlocked_balance) {
                     this->state = OrderState::Status_OrderFailed;
                     emit orderFailed(this);

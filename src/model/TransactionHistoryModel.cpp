@@ -4,6 +4,7 @@
 #include "TransactionHistoryModel.h"
 #include "TransactionHistory.h"
 #include "TransactionInfo.h"
+#include "globals.h"
 
 #include <QDateTime>
 #include <QDebug>
@@ -151,7 +152,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
         }
         case Column::Amount:
         {
-            QString amount = QString::number(tInfo.atomicAmount() / 1e12, 'f', 4);
+            QString amount = QString::number(tInfo.atomicAmount() / globals::cdiv, 'f', 4);
             amount = (tInfo.direction() == TransactionInfo::Direction_Out && tInfo.amount() > 0) ? "-" + amount : "+" + amount;
             return amount;
         }

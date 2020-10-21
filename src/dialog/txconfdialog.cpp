@@ -8,6 +8,7 @@
 #include "model/ModelUtils.h"
 #include "libwalletqt/WalletManager.h"
 #include "txconfadvdialog.h"
+#include "globals.h"
 
 #include <QMessageBox>
 
@@ -31,15 +32,15 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     };
 
     QString amount = WalletManager::displayAmount(tx->amount());
-    QString amount_fiat = convert(tx->amount() / AppContext::cdiv);
+    QString amount_fiat = convert(tx->amount() / globals::cdiv);
     ui->label_amount->setText(QString("%1 (%2 %3)").arg(amount, amount_fiat, preferredCur));
 
     QString fee = WalletManager::displayAmount(tx->fee());
-    QString fee_fiat = convert(tx->fee() / AppContext::cdiv);
+    QString fee_fiat = convert(tx->fee() / globals::cdiv);
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(fee, fee_fiat, preferredCur));
 
     QString total = WalletManager::displayAmount(tx->amount() + tx->fee());
-    QString total_fiat = convert((tx->amount() + tx->fee()) / AppContext::cdiv);
+    QString total_fiat = convert((tx->amount() + tx->fee()) / globals::cdiv);
     ui->label_total->setText(QString("%1 (%2 %3)").arg(total, total_fiat, preferredCur));
 
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));
