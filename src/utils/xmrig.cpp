@@ -122,13 +122,17 @@ bool XmRig::unpackBins() {
     QFile f(rigFile);
     QFileInfo fileInfo(f);
     this->rigPath = QDir(this->rigDir).filePath(fileInfo.fileName());
+#if defined(Q_OS_WIN)
+    if(!this->rigPath.endsWith(".exe"))
+        this->rigPath += ".exe";
+#endif
     qDebug() << "Writing XMRig executable to " << this->rigPath;
     f.copy(rigPath);
     f.close();
 
 #if defined(Q_OS_UNIX)
-    QFile torBin(this->rigPath);
-    torBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
+    QFile rigBin(this->rigPath);
+    rigBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
 #endif
     return true;
 }

@@ -202,6 +202,10 @@ bool Tor::unpackBins() {
     QFile f(torFile);
     QFileInfo fileInfo(f);
     this->torPath = QDir(this->torDir).filePath(fileInfo.fileName());
+#if defined(Q_OS_WIN)
+    if(!this->torPath.endsWith(".exe"))
+        this->torPath += ".exe";
+#endif
     qDebug() << "Writing Tor executable to " << this->torPath;
     f.copy(torPath);
     f.close();
