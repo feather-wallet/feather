@@ -111,10 +111,15 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
 
         if (!isSpent) {
             isFrozen ? menu->addAction(m_thawOutputAction) : menu->addAction(m_freezeOutputAction);
-        }
-        if (!isFrozen && isUnlocked) {
+
             menu->addAction(m_sweepOutputAction);
+            if (isFrozen || !isUnlocked) {
+                m_sweepOutputAction->setDisabled(true);
+            } else {
+                m_sweepOutputAction->setEnabled(true);
+            }
         }
+
         menu->addAction(m_viewOutputAction);
     }
 
