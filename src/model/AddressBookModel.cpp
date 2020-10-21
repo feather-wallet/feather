@@ -182,12 +182,17 @@ QMap<QString, QString> AddressBookModel::readCSV(const QString &path) {
     QString csv = Utils::barrayToString(Utils::fileOpen(path));
     QTextStream stream(&csv);
     QMap<QString, QString> map;
+
     while(!stream.atEnd()) {
         QStringList line = stream.readLine().split(",");
-        QString name = line.at(0);
-        QString address = line.at(1);
-        if(!name.isEmpty() && !address.isEmpty()) {
-            map[name] = address;
+        if(line.length() != 2) {
+            continue;
+        }
+        QString address = line.at(0);
+        QString description = line.at(1);
+        description = description.replace("\"", "");
+        if(!description.isEmpty() && !address.isEmpty()) {
+            map[description] = address;
         }
     }
     return map;
