@@ -26,7 +26,7 @@ public slots:
     //libwalletqt
     void onWalletOpened();
     void onWalletOpenedError(const QString& err);
-    void onWalletOpenPasswordRequired(bool invalidPassword);
+    void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
 
 private:
     AppContext *ctx;

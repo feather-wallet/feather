@@ -96,7 +96,7 @@ public slots:
     void onWalletCreated(Wallet *wallet);
     void menuWalletCloseClicked();
     void menuWalletOpenClicked();
-    void onWalletOpenPasswordRequired(bool invalidPassword);
+    void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
     void onViewOnBlockExplorer(const QString &txid);
     void onAddContact(const QString &address, const QString &name);
     void importContacts();

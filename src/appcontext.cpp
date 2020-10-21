@@ -317,7 +317,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
             emit walletOpenedError(errMsg);
         } else {
             this->walletClose(false);
-            emit walletOpenPasswordNeeded(this->walletPassword.isEmpty());
+            emit walletOpenPasswordNeeded(this->walletPassword.isEmpty(), wallet->path());
         }
         return;
     }
