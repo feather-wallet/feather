@@ -36,6 +36,7 @@ public:
     bool isShowFullAddresses() const;
     void setShowFullAddresses(bool show);
     bool writeCSV(const QString &path);
+    QMap<QString, QString> readCSV(const QString &path);
 
 public slots:
     void startReset();

@@ -474,6 +474,8 @@ void MainWindow::initMenu() {
             Utils::showMessageBox("Address book exported", QString("Address book exported to %1").arg(fn), false);
     });
 
+    connect(ui->actionImportContactsCSV, &QAction::triggered, this, &MainWindow::importContacts);
+
     // Tools
     connect(ui->actionSignVerify, &QAction::triggered, this, &MainWindow::menuSignVerifyClicked);
     connect(ui->actionVerifyTxProof, &QAction::triggered, this, &MainWindow::menuVerifyTxProof);
@@ -1043,6 +1045,29 @@ void MainWindow::onAddContact(const QString &address, const QString &name) {
         m_ctx->currentWallet->addressBook()->addRow(address, "", name);
         m_ctx->storeWallet();
     }
+}
+
+void MainWindow::importContacts() {
+    const QString targetFile = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
+    if(targetFile.isEmpty()) return;
+
+    auto *model = m_ctx->currentWallet->addressBookModel();
+    QMapIterator<QString, QString> i(model->readCSV(targetFile));
+    int inserts = 0;
+    while (i.hasNext()) {
+        i.next();
+        bool addressValid = WalletManager::addressValid(i.value(), m_ctx->currentWallet->nettype());
+        if(addressValid) {
+            m_ctx->currentWallet->addressBook()->addRow(i.value(), "", i.key());
+            inserts++;
+        }
+    }
+
+    if(inserts > 0) {
+        m_ctx->storeWallet();
+    }
+
+    QMessageBox::information(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
 }
 
 MainWindow *MainWindow::getInstance() {

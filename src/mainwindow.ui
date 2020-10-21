@@ -333,6 +333,7 @@
       <string>Contacts</string>
      </property>
      <addaction name="actionExportContactsCSV"/>
+     <addaction name="actionImportContactsCSV"/>
     </widget>
     <widget class="QMenu" name="menuAdvanced">
      <property name="title">
@@ -536,6 +537,11 @@
   <action name="actionRefresh_tabs">
    <property name="text">
     <string>Refresh models</string>
+   </property>
+  </action>
+  <action name="actionImportContactsCSV">
+   <property name="text">
+    <string>Import CSV</string>
    </property>
   </action>
   <action name="actionExportContactsCSV">

@@ -174,3 +174,26 @@ bool AddressBookModel::writeCSV(const QString &path) {
     csv = QString("address,description\n%1").arg(csv);
     return Utils::fileWrite(path, csv);
 }
+
+QMap<QString, QString> AddressBookModel::readCSV(const QString &path) {
+    if(!Utils::fileExists(path)) {
+        return QMap<QString, QString>();
+    }
+    QString csv = Utils::barrayToString(Utils::fileOpen(path));
+    QTextStream stream(&csv);
+    QMap<QString, QString> map;
+
+    while(!stream.atEnd()) {
+        QStringList line = stream.readLine().split(",");
+        if(line.length() != 2) {
+            continue;
+        }
+        QString address = line.at(0);
+        QString description = line.at(1);
+        description = description.replace("\"", "");
+        if(!description.isEmpty() && !address.isEmpty()) {
+            map[description] = address;
+        }
+    }
+    return map;
+}
