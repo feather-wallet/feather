@@ -32,13 +32,13 @@ void XmRig::prepare() {
 }
 
 void XmRig::stop() {
-    if(m_process.state() == QProcess::Running)
-        m_process.kill();
-}
-
-void XmRig::terminate() {
-    if(m_process.state() == QProcess::Running)
+    if(m_process.state() == QProcess::Running) {
+#if defined(Q_OS_WIN)
+        m_process.kill(); // https://doc.qt.io/qt-5/qprocess.html#terminate
+#else
         m_process.terminate();
+#endif
+    }
 }
 
 void XmRig::start(const QString &path,

@@ -25,7 +25,6 @@ public:
 
     void start(const QString &path, unsigned int threads, const QString &address, const QString &username, const QString &password, bool tor = false, bool tls = true);
     void stop();
-    void terminate();
     bool unpackBins();
 
     QString rigDir;
