@@ -99,6 +99,7 @@ public slots:
     void onWalletOpenPasswordRequired(bool invalidPassword);
     void onViewOnBlockExplorer(const QString &txid);
     void onAddContact(const QString &address, const QString &name);
+    void importContacts();
     void showRestoreHeightDialog();
 
     // offline tx signing
