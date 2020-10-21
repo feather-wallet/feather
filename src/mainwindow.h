@@ -65,6 +65,17 @@ public:
     qreal screenDpiPhysical;
     qreal screenRatio;
 
+    enum Tabs {
+        HOME = 0,
+        HISTORY,
+        SEND,
+        RECEIVE,
+        COINS,
+        CALC,
+        XMR_TO,
+        XMRIG
+    };
+
 public slots:
     void initWidgets();
     void initMenu();

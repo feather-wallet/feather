@@ -118,9 +118,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(url); });
     ui->xmrToWidget->setHistoryModel(m_ctx->XMRTo->tableModel);
 #else
-    ui->tabWidget->setTabVisible(5, false);
+    ui->tabWidget->setTabVisible(Tabs::XMR_TO, false);
 #endif
-
 
 #if defined(Q_OS_LINUX)
     // system tray
@@ -183,6 +182,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
 
     connect(m_xmrig, &XMRigWidget::miningStarted, [=]{ m_ctx->setWindowTitle(true); });
     connect(m_xmrig, &XMRigWidget::miningEnded, [=]{ m_ctx->setWindowTitle(false); });
+#else
+    ui->tabWidget->setTabVisible(Tabs::XMRIG, false);
 #endif
 
     // CCS/Reddit widget
@@ -296,7 +297,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     });
     connect(ui->receiveWidget, &ReceiveWidget::showTransactions, [this](const QString &text) {
         ui->historyWidget->setSearchText(text);
-        ui->tabWidget->setCurrentIndex(1); //history
+        ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
     });
 
     // History
@@ -344,7 +345,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->coinsWidget, &CoinsWidget::sweepOutput, m_ctx, &AppContext::onSweepOutput);
 
     connect(m_ctx, &AppContext::walletClosing, [=]{
-        ui->tabWidget->setCurrentIndex(0);
+        ui->tabWidget->setCurrentIndex(Tabs::HOME);
     });
 
     // window title
@@ -390,9 +391,14 @@ void MainWindow::initMenu() {
     connect(ui->actionShow_Coins, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins, Config::showTabCoins);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Coins, "Coins");
+
+    connect(ui->actionShow_calc, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
+
 #if defined(XMRTO)
     connect(ui->actionShow_xmr_to, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["XMRto"] = new ToggleTab(ui->tabXmrTo, "XMRto", "xmr.to", ui->actionShow_xmr_to, Config::showTabXMRto);
+    m_tabShowHideMapper["XMRto"] = new ToggleTab(ui->tabXmrTo, "XMRto", "XMR.to", ui->actionShow_xmr_to, Config::showTabXMRto);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_xmr_to, "XMRto");
 #else
     ui->actionShow_xmr_to->setVisible(false);
@@ -405,9 +411,6 @@ void MainWindow::initMenu() {
 #else
     ui->actionShow_XMRig->setVisible(false);
 #endif
-    connect(ui->actionShow_calc, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
     for (const auto &key: m_tabShowHideMapper.keys()) {
         const auto toggleTab = m_tabShowHideMapper.value(key);
@@ -1008,17 +1011,17 @@ void MainWindow::donateButtonClicked() {
         donation = 1.337;
 
     ui->sendWidget->fill(m_ctx->featherDonationAddress, "Donation to the Feather development team", donation);
-    ui->tabWidget->setCurrentIndex(2);
+    ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
 void MainWindow::showHistoryTab() {
     this->raise();
-    ui->tabWidget->setCurrentIndex(1);
+    ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
 }
 
 void MainWindow::showSendTab() {
     this->raise();
-    ui->tabWidget->setCurrentIndex(2);
+    ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
 void MainWindow::showCalcWindow() {
@@ -1027,7 +1030,7 @@ void MainWindow::showCalcWindow() {
 
 void MainWindow::showSendScreen(const CCSEntry &entry) {
     ui->sendWidget->fill(entry);
-    ui->tabWidget->setCurrentIndex(2);
+    ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
