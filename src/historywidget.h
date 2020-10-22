@@ -46,6 +46,7 @@ private:
     };
 
     void copy(copyField field);
+    void showContextMenu(const QPoint &point);
 
     Ui::HistoryWidget *ui;
     QMenu *m_contextMenu;
