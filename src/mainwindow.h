@@ -4,6 +4,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#ifdef Q_OS_MAC
+#include "src/kdmactouchbar.h"
+#endif
+
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QScreen>
@@ -154,6 +158,8 @@ private:
     void showNodeExhaustedMessage();
     void showWSNodeExhaustedMessage();
     void createUnsignedTxDialog(UnsignedTransaction *tx);
+    void touchbarShowWizard();
+    void touchbarShowWallet();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
@@ -192,7 +198,12 @@ private:
     SubaddressProxyModel *subaddressProxyModel;
     TransactionHistoryModel *txHistModel;
     CoinsModel *coinsModel;
-
+#ifdef Q_OS_MAC
+    QAction *m_touchbarActionWelcome;
+    KDMacTouchBar *m_touchbar;
+    QList<QAction *> m_touchbarWalletItems;
+    QList<QAction *> m_touchbarWizardItems;
+#endif
     QSignalMapper *m_tabShowHideSignalMapper;
     QMap<QString, ToggleTab*> m_tabShowHideMapper;
     WalletWizard *m_wizard = nullptr;

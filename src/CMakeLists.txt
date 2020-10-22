@@ -201,6 +201,14 @@ target_link_libraries(feather
         ${QRENCODE_LIBRARY}
         )
 
+if(APPLE)
+    target_link_libraries(feather
+            KDMacTouchBar
+            )
+    target_include_directories(feather
+            PUBLIC ../contrib/KDMacTouchBar)
+endif()
+
 if(NOT APPLE)
     target_link_libraries(feather
             Qt5::QSvgIconPlugin

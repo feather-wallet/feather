@@ -351,6 +351,14 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // window title
     connect(m_ctx, &AppContext::setTitle, this, &QMainWindow::setWindowTitle);
 
+    // init touchbar
+#ifdef Q_OS_MAC
+    m_touchbar = new KDMacTouchBar(this);
+    m_touchbarActionWelcome = new QAction(QIcon(":/assets/images/feather.png"), "Welcome to Feather!");
+    m_touchbarWalletItems = {ui->actionSettings, ui->actionCalculator, ui->actionKeys, ui->actionDonate_to_Feather};
+    m_touchbarWizardItems = {m_touchbarActionWelcome};
+#endif
+
     // setup some UI
     this->initMain();
     this->initWidgets();
@@ -382,6 +390,7 @@ void MainWindow::initMain() {
     this->show();
     m_wizard = this->createWizard(WalletWizard::Page_Menu);
     m_wizard->show();
+    this->touchbarShowWizard();
 }
 
 void MainWindow::initMenu() {
@@ -545,6 +554,20 @@ void MainWindow::onWalletClosed(WalletWizard::Page page) {
     this->showWizard(page);
 }
 
+void MainWindow::touchbarShowWizard() {
+#ifdef Q_OS_MAC
+    m_touchbar->clear();
+    for(auto* action: m_touchbarWizardItems) m_touchbar->addAction(action);
+#endif
+}
+
+void MainWindow::touchbarShowWallet() {
+#ifdef Q_OS_MAC
+    m_touchbar->clear();
+    for(auto* action: m_touchbarWalletItems) m_touchbar->addAction(action);
+#endif
+}
+
 void MainWindow::onWalletCreatedError(const QString &err) {
     Utils::showMessageBox("Wallet creation error", err, true);
     this->showWizard(WalletWizard::Page_CreateWallet);
@@ -571,6 +594,7 @@ void MainWindow::onWalletOpenedError(const QString &err) {
     QMessageBox::warning(this, "Wallet open error", err);
     this->setWindowTitle("Feather");
     this->showWizard(WalletWizard::Page_OpenWallet);
+    this->touchbarShowWizard();
 }
 
 void MainWindow::onWalletCreated(Wallet *wallet) {
@@ -630,6 +654,8 @@ void MainWindow::onWalletOpened() {
     connect(m_ctx->currentWallet->coins(), &Coins::coinThawed, [this]{
         m_ctx->storeWallet();
     });
+
+    this->touchbarShowWallet();
 }
 
 void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
