@@ -66,6 +66,10 @@ int OpenWalletPage::nextId() const {
 
 bool OpenWalletPage::validatePage() {
     QModelIndex index = ui->walletTable->currentIndex();
+    if(!index.isValid()) {
+        Utils::showMessageBox("Wallet not selected", "Please select a wallet from the list.", true);
+        return false;
+    }
     QString walletPath = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::ModelColumns::Path), Qt::UserRole).toString();
 
     auto autoWallet = ui->openOnStartup->isChecked() ? QString("%1%2").arg(m_ctx->networkType).arg(walletPath) : "";
