@@ -25,6 +25,9 @@ struct FeatherNode {
     FeatherNode(QString _address, unsigned int height, bool online) : height(height), online(online){
         // wonky ipv4/host parsing, should be fine(tm)(c).
         if(_address.isEmpty()) return;
+        if(_address.contains("https://")) {
+            this->isHttps = true;
+        }
         _address = _address.replace("https://", "");
         _address = _address.replace("http://", "");
         if(_address.contains("@")){  // authentication, user/pass
@@ -56,6 +59,7 @@ struct FeatherNode {
     bool tor = false;
     bool isConnecting = false;
     bool isActive = false;
+    bool isHttps = false;
 
     QString generateFull() {
         QString auth;
@@ -65,7 +69,7 @@ struct FeatherNode {
     }
 
     QString as_url() {
-        return QString("http://%1/get_info").arg(this->full);
+        return QString("%1://%2/get_info").arg(this->isHttps ? "https": "http",this->full);
     }
 
     bool operator == (const FeatherNode &other) const {
