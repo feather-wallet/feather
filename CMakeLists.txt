@@ -365,4 +365,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${C_SECURITY_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${CXX_SECURITY_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LD_SECURITY_FLAGS} ${STATIC_FLAGS}")
 
+if(APPLE)
+    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/contrib/KDMacTouchBar")
+endif()
+
 add_subdirectory(src)
