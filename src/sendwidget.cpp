@@ -74,7 +74,7 @@ void SendWidget::fillAddress(const QString &address) {
 void SendWidget::sendClicked() {
     double amount = 0.0;
     QString currency = ui->comboCurrencySelection->currentText();
-    QString recipient = ui->lineAddress->text();  // @TODO: regex
+    QString recipient = ui->lineAddress->text().simplified().remove(' ');
     QString description = ui->lineDescription->text();
     if(recipient.isEmpty()) {
         QMessageBox::warning(this, "Malformed recipient", "The recipient address was not correct");
