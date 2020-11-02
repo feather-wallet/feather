@@ -54,13 +54,13 @@ QWidget
     outline: 0;
 }
 
-QWidget:item:hover
+QWidget::item:hover
 {
     background-color: #33A4DF;
     color: #31363B;
 }
 
-QWidget:item:selected
+QWidget::item:selected
 {
     background-color: #33A4DF;
 }
@@ -567,7 +567,7 @@ QMainWindow::separator:hover
     color: white;
     padding-left: 0.4ex;
     border: 0.1ex solid #BAB9B8;
-    spacing: 0.2x;
+    spacing: 0.2ex;
 }
 
 QMenu::separator
@@ -1659,12 +1659,14 @@ QPushButton:flat {
     border: none;
 }
 
-QScrollBar::handle:vertical
+QScrollBar::handle:vertical,
+QScrollBar::handle:horizontal
 {
     background-color: #BAB9B8;
 }
 
-QScrollBar:vertical
+QScrollBar:vertical,
+QScrollBar:horizontal
 {
     background-color: #eff0f1;
     border: 0.1ex transparent #eff0f1;

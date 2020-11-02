@@ -57,13 +57,13 @@ QWidget
     outline: 0;
 }
 
-QWidget:item:hover
+QWidget::item:hover
 {
     background-color: #3daee9;
     color: #eff0f1;
 }
 
-QWidget:item:selected
+QWidget::item:selected
 {
     background-color: #3daee9;
 }
@@ -525,7 +525,7 @@ QTextEdit
 
 QPlainTextEdit
 {
-    background-color: #232629;;
+    background-color: #232629;
     color: #eff0f1;
     border-radius: 0.2ex;
     border: 0.1ex solid #76797c;
