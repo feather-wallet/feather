@@ -660,10 +660,18 @@ void MainWindow::onWalletOpened() {
 
 void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
     qDebug() << Q_FUNC_INFO;
+    bool hide = config()->get(Config::hideBalance).toBool();
+
     auto label_str = QString("Balance: %1 XMR").arg(unlocked_str);
     if(balance > unlocked)
         label_str += QString(" (+%1 XMR unconfirmed)").arg(QString::number(balance - unlocked, 'f'));
+
+    if (hide) {
+        label_str = "Balance: HIDDEN";
+    }
+
     m_statusLabelBalance->setText(label_str);
+    m_balanceWidget->setHidden(hide);
 }
 
 void MainWindow::onSynchronized() {

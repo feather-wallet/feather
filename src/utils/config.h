@@ -44,7 +44,8 @@ public:
         showTabXMRig,
         geometry,
         windowState,
-        firstRun
+        firstRun,
+        hideBalance
     };
 
     ~Config() override;

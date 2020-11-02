@@ -47,6 +47,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::geometry, {QS("geometry"), {}}},
         {Config::windowState, {QS("windowState"), {}}},
         {Config::firstRun,{QS("firstRun"), false}},
+        {Config::hideBalance, {QS("hideBalance"), false}}
 };
 
 
