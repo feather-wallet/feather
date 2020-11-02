@@ -382,6 +382,11 @@ QString Utils::blockExplorerLink(const QString &blockExplorer, NetworkType::Type
             return QString("https://moneroblocks.info/tx/%1").arg(txid);
         }
     }
+    else if (blockExplorer == "blockchair.com") {
+        if (nettype == NetworkType::MAINNET) {
+            return QString("https://blockchair.com/monero/transaction/%1").arg(txid);
+        }
+    }
 
     switch (nettype) {
         case NetworkType::MAINNET:
