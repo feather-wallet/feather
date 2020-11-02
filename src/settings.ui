@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1019</width>
-    <height>358</height>
+    <height>396</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -193,6 +193,13 @@
         <widget class="QCheckBox" name="checkBox_externalLink">
          <property name="text">
           <string>Warn before opening external link</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="checkBox_hideBalance">
+         <property name="text">
+          <string>Hide balance</string>
          </property>
         </widget>
        </item>

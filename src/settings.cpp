@@ -22,6 +22,11 @@ Settings::Settings(QWidget *parent) :
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
     connect(ui->checkBox_checkForAppUpdates, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
     connect(ui->checkBox_externalLink, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
+    connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
+        config()->set(Config::hideBalance, toggled);
+        m_ctx->updateBalance();
+    });
+
     connect(ui->closeButton, &QDialogButtonBox::accepted, this, &Settings::close);
 
     // nodes
@@ -32,6 +37,7 @@ Settings::Settings(QWidget *parent) :
     // setup checkboxes
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
     ui->checkBox_checkForAppUpdates->setChecked(config()->get(Config::checkForAppUpdates).toBool());
+    ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
 
     // setup comboboxes
     auto settingsHomeWidget = config()->get(Config::homeWidget).toString();
