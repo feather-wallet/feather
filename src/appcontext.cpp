@@ -791,7 +791,7 @@ void AppContext::storeWallet() {
 
 void AppContext::updateBalance() {
     if(!this->currentWallet)
-        throw std::runtime_error("this should not happen, ever");
+        return;
 
     AppContext::balance = this->currentWallet->balance() / globals::cdiv;
     auto balance_str = QString::number(balance, 'f');
