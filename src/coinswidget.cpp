@@ -42,14 +42,14 @@ CoinsWidget::CoinsWidget(QWidget *parent)
     // context menu
     ui->coins->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    m_thawOutputAction = new QAction("Thaw output");
-    m_freezeOutputAction = new QAction("Freeze output");
+    m_thawOutputAction = new QAction("Thaw output", this);
+    m_freezeOutputAction = new QAction("Freeze output", this);
 
-    m_freezeAllSelectedAction = new QAction("Freeze selected");
-    m_thawAllSelectedAction = new QAction("Thaw selected");
+    m_freezeAllSelectedAction = new QAction("Freeze selected", this);
+    m_thawAllSelectedAction = new QAction("Thaw selected", this);
 
-    m_viewOutputAction = new QAction(QIcon(":/assets/images/info.png"), "Details");
-    m_sweepOutputAction = new QAction("Sweep output");
+    m_viewOutputAction = new QAction(QIcon(":/assets/images/info.png"), "Details", this);
+    m_sweepOutputAction = new QAction("Sweep output", this);
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
@@ -65,7 +65,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     m_coins = coins;
     m_model = model;
-    m_proxyModel = new CoinsProxyModel;
+    m_proxyModel = new CoinsProxyModel(this);
     m_proxyModel->setSourceModel(m_model);
     ui->coins->setModel(m_proxyModel);
     ui->coins->setColumnHidden(CoinsModel::Spent, true);
@@ -207,6 +207,7 @@ void CoinsWidget::onSweepOutput() {
     qCritical() << "key image: " << keyImage;
 
     emit sweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
+    dialog->deleteLater();
 }
 
 void CoinsWidget::copy(copyField field) {

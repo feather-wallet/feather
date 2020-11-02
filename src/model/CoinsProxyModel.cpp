@@ -7,6 +7,7 @@
 CoinsProxyModel::CoinsProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
+    setSortRole(Qt::UserRole);
 }
 
 bool CoinsProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const

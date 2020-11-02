@@ -9,12 +9,14 @@
 #include <QDesktopWidget>
 
 #include "appcontext.h"
+#include "globals.h"
 #include "utils/tails.h"
 #include "utils/whonix.h"
 #include "utils/utils.h"
 #include "utils/prices.h"
 #include "utils/networktype.h"
 #include "utils/wsclient.h"
+#include "utils/config.h"
 
 // libwalletqt
 #include "libwalletqt/WalletManager.h"
@@ -28,7 +30,6 @@
 #include "model/SubaddressModel.h"
 #include "utils/keysfiles.h"
 #include "utils/networktype.h"
-#include "utils/config.h"
 
 
 Prices *AppContext::prices = nullptr;
@@ -195,7 +196,7 @@ void AppContext::initWS() {
 
 void AppContext::onCancelTransaction(PendingTransaction *tx, const QString &address) {
     // tx cancelled by user
-    double amount = tx->amount() / AppContext::cdiv;
+    double amount = tx->amount() / globals::cdiv;
     emit createTransactionCancelled(address, amount);
     this->currentWallet->disposeTransaction(tx);
 }
@@ -234,8 +235,8 @@ void AppContext::onCreateTransaction(const QString &address, const double amount
         return;
     }
 
-    auto balance = this->currentWallet->balance() / AppContext::cdiv;
-    auto unlocked_balance = this->currentWallet->unlockedBalance() / AppContext::cdiv;
+    auto balance = this->currentWallet->balance() / globals::cdiv;
+    auto unlocked_balance = this->currentWallet->unlockedBalance() / globals::cdiv;
     if(!all && amount > unlocked_balance) {
         emit createTransactionError("Not enough money to spend");
         return;
@@ -244,7 +245,7 @@ void AppContext::onCreateTransaction(const QString &address, const double amount
         return;
     }
 
-    auto amount_num = static_cast<quint64>(amount * AppContext::cdiv);
+    auto amount_num = static_cast<quint64>(amount * globals::cdiv);
     qDebug() << "creating tx";
     if(all || amount == balance)
         this->currentWallet->createTransactionAllAsync(address, "", this->tx_mixin, this->tx_priority);
@@ -691,19 +692,19 @@ AppContext::~AppContext() {
 // ############################################## LIBWALLET QT #########################################################
 
 void AppContext::onMoneySpent(const QString &txId, quint64 amount) {
-    auto amount_num = amount / AppContext::cdiv;
+    auto amount_num = amount / globals::cdiv;
     qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
 }
 
 void AppContext::onMoneyReceived(const QString &txId, quint64 amount) {
     // Incoming tx included in a block.
-    auto amount_num = amount / AppContext::cdiv;
+    auto amount_num = amount / globals::cdiv;
     qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
 }
 
 void AppContext::onUnconfirmedMoneyReceived(const QString &txId, quint64 amount) {
     // Incoming transaction in pool
-    auto amount_num = amount / AppContext::cdiv;
+    auto amount_num = amount / globals::cdiv;
     qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
 
     if(this->currentWallet->synchronized()) {
@@ -792,10 +793,10 @@ void AppContext::updateBalance() {
     if(!this->currentWallet)
         throw std::runtime_error("this should not happen, ever");
 
-    AppContext::balance = this->currentWallet->balance() / AppContext::cdiv;
+    AppContext::balance = this->currentWallet->balance() / globals::cdiv;
     auto balance_str = QString::number(balance, 'f');
 
-    double unlocked = this->currentWallet->unlockedBalance() / AppContext::cdiv;
+    double unlocked = this->currentWallet->unlockedBalance() / globals::cdiv;
     auto unlocked_str = QString::number(unlocked, 'f');
 
     emit balanceUpdated(balance, unlocked, balance_str, unlocked_str);

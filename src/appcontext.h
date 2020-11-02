@@ -69,7 +69,6 @@ public:
     const unsigned int kdfRounds = 1;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
     quint32 tx_mixin = static_cast<const quint32 &>(10);
-    static constexpr const double cdiv = 1e12;
     QString seedLanguage = "English";  // 14 word `monero-seed` only has English
 
     QNetworkAccessManager *network;
