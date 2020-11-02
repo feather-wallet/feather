@@ -59,7 +59,7 @@
         <bool>false</bool>
        </property>
        <property name="text">
-        <string>Powered by css.getmonero.org</string>
+        <string>Powered by ccs.getmonero.org</string>
        </property>
        <property name="alignment">
         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>

@@ -8,9 +8,9 @@
 #include <QDesktopServices>
 
 #include "ccswidget.h"
-#include "ui_csswidget.h"
+#include "ui_ccswidget.h"
 #include "utils/utils.h"
-#include "cssprogressdelegate.h"
+#include "ccsprogressdelegate.h"
 
 CCSWidget::CCSWidget(QWidget *parent) :
         QWidget(parent),
