@@ -178,6 +178,11 @@ void XMRigWidget::onStartClicked() {
     else
         address = config()->get(Config::xmrigPool).toString();
 
+    if(address.contains("cryptonote.social") && !username.contains(".")) {
+        // cryptonote social requires <addr>.<username>, we'll just grab a few chars from primary addy
+        username = QString("%1.%2").arg(username, m_ctx->currentWallet->address(0, 0).mid(0, 6));
+    }
+
     m_ctx->XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
     ui->btn_start->setEnabled(false);
     ui->btn_stop->setEnabled(true);
