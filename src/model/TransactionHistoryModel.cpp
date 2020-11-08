@@ -119,7 +119,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                 case Column::FiatAmount:
                 case Column::Amount:
                 {
-                    if (tInfo.direction() == TransactionInfo::Direction_Out && tInfo.amount() > 0) {
+                    if (tInfo.direction() == TransactionInfo::Direction_Out) {
                         result = QVariant(QColor("#BC1E1E"));
                     }
                 }
@@ -152,8 +152,8 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
         }
         case Column::Amount:
         {
-            QString amount = QString::number(tInfo.atomicAmount() / globals::cdiv, 'f', 4);
-            amount = (tInfo.direction() == TransactionInfo::Direction_Out && tInfo.amount() > 0) ? "-" + amount : "+" + amount;
+            QString amount = QString::number(tInfo.balanceDelta() / globals::cdiv, 'f', 4);
+            amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
         case Column::TxID:
@@ -164,7 +164,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (usd_price == 0.0)
                 return QVariant("?");
 
-            double usd_amount = usd_price * tInfo.amount();
+            double usd_amount = usd_price * (tInfo.balanceDelta() / globals::cdiv);
             if(this->preferredFiatSymbol != "USD")
                 usd_amount = AppContext::prices->convert("USD", this->preferredFiatSymbol, usd_amount);
             double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;

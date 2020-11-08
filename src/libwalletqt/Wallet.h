@@ -22,6 +22,13 @@ namespace Monero {
     struct Wallet; // forward declaration
 }
 
+struct TxProof {
+    TxProof(QString proof, QString error = "")
+        : proof(std::move(proof)), error(std::move(error)){}
+
+    QString proof;
+    QString error;
+};
 
 class TransactionHistory;
 class TransactionHistoryModel;
@@ -336,11 +343,11 @@ public:
     Q_INVOKABLE QString getTxKey(const QString &txid) const;
     //Q_INVOKABLE void getTxKeyAsync(const QString &txid, const QJSValue &callback);
     Q_INVOKABLE QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
-    Q_INVOKABLE QString getTxProof(const QString &txid, const QString &address, const QString &message) const;
+    Q_INVOKABLE TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
    // Q_INVOKABLE void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
     //Q_INVOKABLE QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
     Q_INVOKABLE TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    Q_INVOKABLE QString getSpendProof(const QString &txid, const QString &message) const;
+    Q_INVOKABLE TxProof getSpendProof(const QString &txid, const QString &message) const;
    // Q_INVOKABLE void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
     Q_INVOKABLE QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
     // Rescan spent outputs

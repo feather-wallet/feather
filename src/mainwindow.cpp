@@ -302,8 +302,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
 
     // History
     connect(ui->historyWidget, &HistoryWidget::spendProof, [&](const QString &txid){
-        QString spendProof = m_ctx->currentWallet->getSpendProof(txid, "");
-        Utils::copyToClipboard(spendProof);
+        TxProof txproof = m_ctx->currentWallet->getSpendProof(txid, "");
+        Utils::copyToClipboard(txproof.proof);
     });
     connect(ui->historyWidget, &HistoryWidget::viewOnBlockExplorer, this, &MainWindow::onViewOnBlockExplorer);
 

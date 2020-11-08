@@ -6,7 +6,9 @@
 
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/WalletManager.h"
-#include <QDebug>
+#include "utils.h"
+
+#include <QMessageBox>
 
 TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
         : QDialog(parent)
@@ -15,6 +17,8 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
         , m_txInfo(txInfo)
 {
     ui->setupUi(this);
+
+    m_txProofWidget = new TxProofWidget(this, wallet, txInfo);
 
     ui->label_txid->setText(QString(txInfo->hash()));
 
@@ -47,6 +51,8 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
     } else {
         ui->destinations->setText(destinations);
     }
+
+    ui->txProofWidget->addWidget(m_txProofWidget);
 
     this->adjustSize();
 }
