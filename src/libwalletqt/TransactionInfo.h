@@ -52,10 +52,12 @@ public:
     bool isPending() const;
     bool isFailed() const;
     bool isCoinbase() const;
+    quint64 balanceDelta() const;
     double amount() const;
     quint64 atomicAmount() const;
     QString displayAmount() const;
     QString fee() const;
+    quint64 atomicFee() const;
     quint64 blockHeight() const;
     QString description() const;
     QSet<quint32> subaddrIndex() const;
@@ -72,6 +74,7 @@ public:
     QString paymentId() const;
     //! only applicable for output transactions
     //! used in tx details popup
+    QList<QString> destinations() const;
     QString destinations_formatted() const;
     QString rings_formatted() const;
 

@@ -792,12 +792,10 @@ QString Wallet::checkTxKey(const QString &txid, const QString &tx_key, const QSt
     return QString::fromStdString(result);
 }
 
-QString Wallet::getTxProof(const QString &txid, const QString &address, const QString &message) const
+TxProof Wallet::getTxProof(const QString &txid, const QString &address, const QString &message) const
 {
     std::string result = m_walletImpl->getTxProof(txid.toStdString(), address.toStdString(), message.toStdString());
-    if (result.empty())
-        result = "error|" + m_walletImpl->errorString();
-    return QString::fromStdString(result);
+    return TxProof(QString::fromStdString(result), QString::fromStdString(m_walletImpl->errorString()));
 }
 
 //void Wallet::getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback)
@@ -817,12 +815,10 @@ TxProofResult Wallet::checkTxProof(const QString &txid, const QString &address, 
     return {success, good, received, in_pool, confirmations};
 }
 
-Q_INVOKABLE QString Wallet::getSpendProof(const QString &txid, const QString &message) const
+Q_INVOKABLE TxProof Wallet::getSpendProof(const QString &txid, const QString &message) const
 {
     std::string result = m_walletImpl->getSpendProof(txid.toStdString(), message.toStdString());
-    if (result.empty())
-        result = "error|" + m_walletImpl->errorString();
-    return QString::fromStdString(result);
+    return TxProof(QString::fromStdString(result), QString::fromStdString(m_walletImpl->errorString()));
 }
 
 //void Wallet::getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback)

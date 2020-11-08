@@ -28,6 +28,11 @@ bool TransactionInfo::isCoinbase() const
     return m_coinbase;
 }
 
+quint64 TransactionInfo::balanceDelta() const
+{
+    return m_amount + m_fee;
+}
+
 double TransactionInfo::amount() const
 {
     // there's no unsigned uint64 for JS, so better use double
@@ -42,6 +47,11 @@ quint64 TransactionInfo::atomicAmount() const
 QString TransactionInfo::displayAmount() const
 {
     return WalletManager::displayAmount(m_amount);
+}
+
+quint64 TransactionInfo::atomicFee() const
+{
+    return m_fee;
 }
 
 QString TransactionInfo::fee() const
@@ -125,6 +135,15 @@ QString TransactionInfo::destinations_formatted() const
         destinations +=  WalletManager::displayAmount(t->amount()) + ": " + t->address();
     }
     return destinations;
+}
+
+QList<QString> TransactionInfo::destinations() const
+{
+    QList<QString> dests;
+    for (auto const& t: m_transfers) {
+        dests.append(t->address());
+    }
+    return dests;
 }
 
 QString TransactionInfo::rings_formatted() const
