@@ -25,12 +25,17 @@ HistoryWidget::HistoryWidget(QWidget *parent)
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
     m_copyMenu->addAction("Amount", this, [this]{copy(copyField::Amount);});
-    m_copyMenu->addAction("Spend proof", this, &HistoryWidget::getSpendProof);
+    auto spendProof = m_copyMenu->addAction("Spend proof", this, &HistoryWidget::getSpendProof);
 
     ui->history->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->history, &QTreeView::customContextMenuRequested, [=](const QPoint & point){
         QModelIndex index = ui->history->indexAt(point);
         if (index.isValid()) {
+            TransactionInfo::Direction direction;
+            m_txHistory->transaction(m_model->mapToSource(index).row(), [&direction](TransactionInfo &tInfo) {
+                direction = tInfo.direction();
+            });
+            spendProof->setVisible(direction == TransactionInfo::Direction_Out);
             m_contextMenu->exec(ui->history->viewport()->mapToGlobal(point));
         }
     });
