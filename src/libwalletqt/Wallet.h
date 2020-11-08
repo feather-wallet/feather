@@ -50,6 +50,7 @@ class Wallet : public QObject, public PassprasePrompter
 {
 Q_OBJECT
     Q_PROPERTY(bool disconnected READ disconnected NOTIFY disconnectedChanged)
+    Q_PROPERTY(bool refreshing READ refreshing NOTIFY refreshingChanged)
     Q_PROPERTY(QString seed READ getSeed)
     Q_PROPERTY(QString seedLanguage READ getSeedLanguage)
     Q_PROPERTY(Status status READ status)
@@ -199,11 +200,11 @@ public:
     Q_INVOKABLE bool importOutputs(const QString& path);
 
     //! refreshes the wallet
-    Q_INVOKABLE bool refresh();
+    Q_INVOKABLE bool refresh(bool historyAndSubaddresses = false);
 
     // pause/resume refresh
-    Q_INVOKABLE void startRefresh() const;
-    Q_INVOKABLE void pauseRefresh() const;
+    Q_INVOKABLE void startRefresh();
+    Q_INVOKABLE void pauseRefresh();
 
     //! returns current wallet's block height
     //! (can be less than daemon's blockchain height when wallet sync in progress)
@@ -411,6 +412,7 @@ signals:
     void currentSubaddressAccountChanged() const;
     void disconnectedChanged() const;
     void proxyAddressChanged() const;
+    void refreshingChanged() const;
 
 private:
     Wallet(QObject * parent = nullptr);
@@ -428,9 +430,13 @@ private:
             const QString& proxyAddress);
 
     bool disconnected() const;
+    bool refreshing() const;
+    void refreshingSet(bool value);
+
     void setConnectionStatus(ConnectionStatus value);
     QString getProxyAddress() const;
     void setProxyAddress(QString address);
+    void startRefreshThread();
 
 private:
     friend class WalletManager;
