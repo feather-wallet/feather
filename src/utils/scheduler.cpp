@@ -3,9 +3,17 @@
 
 #include "scheduler.h"
 
+#include <mutex>
+
+#include <QThreadPool>
+
 FutureScheduler::FutureScheduler(QObject *parent)
     : QObject(parent), Alive(0), Stopping(false)
 {
+    static std::once_flag once;
+    std::call_once(once, []() {
+        QThreadPool::globalInstance()->setMaxThreadCount(4);
+    });
 }
 
 FutureScheduler::~FutureScheduler()
