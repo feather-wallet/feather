@@ -19,6 +19,7 @@
 #include "dialog/torinfodialog.h"
 #include "dialog/viewonlydialog.h"
 #include "dialog/broadcasttxdialog.h"
+#include "dialog/tximportdialog.h"
 #include "utils/utils.h"
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
@@ -495,6 +496,7 @@ void MainWindow::initMenu() {
     connect(ui->actionLoadUnsignedTxFromClipboard, &QAction::triggered, this, &MainWindow::loadUnsignedTxFromClipboard);
     connect(ui->actionLoadSignedTxFromFile, &QAction::triggered, this, &MainWindow::loadSignedTx);
     connect(ui->actionLoadSignedTxFromText, &QAction::triggered, this, &MainWindow::loadSignedTxFromText);
+    connect(ui->actionImport_transaction, &QAction::triggered, this, &MainWindow::importTransaction);
 
     // About screen
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::menuAboutClicked);
@@ -1294,6 +1296,19 @@ void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
     dialog->setUnsignedTransaction(tx);
     dialog->exec();
     dialog->deleteLater();
+}
+
+void MainWindow::importTransaction() {
+
+    auto result = QMessageBox::warning(this, "Warning", "Using this feature may allow a remote node to associate the transaction with your IP address.\n"
+                                          "\n"
+                                          "Connect to a trusted node or run Feather over Tor if network level metadata leakage is included in your threat model.",
+                                          QMessageBox::Ok | QMessageBox::Cancel);
+    if (result == QMessageBox::Ok) {
+        auto *dialog = new TxImportDialog(this, m_ctx);
+        dialog->exec();
+        dialog->deleteLater();
+    }
 }
 
 MainWindow::~MainWindow() {

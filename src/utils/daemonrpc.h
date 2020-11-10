@@ -13,7 +13,8 @@ class DaemonRpc : public QObject {
 
 public:
     enum Endpoint {
-        SEND_RAW_TRANSACTION = 0
+        SEND_RAW_TRANSACTION = 0,
+        GET_TRANSACTIONS
     };
 
     struct DaemonResponse {
@@ -29,6 +30,7 @@ public:
     explicit DaemonRpc(QObject *parent, UtilsNetworking *network, QString daemonAddress);
 
     void sendRawTransaction(const QString &tx_as_hex, bool do_not_relay = false, bool do_sanity_checks = true);
+    void getTransactions(const QStringList &txs_hashes, bool decode_as_json = false, bool prune = false);
 
     void setDaemonAddress(const QString &daemonAddress);
     void setNetwork(UtilsNetworking *network);

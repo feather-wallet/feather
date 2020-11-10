@@ -23,6 +23,17 @@ void DaemonRpc::sendRawTransaction(const QString &tx_as_hex, bool do_not_relay, 
     connect(reply, &QNetworkReply::finished, std::bind(&DaemonRpc::onResponse, this, reply, Endpoint::SEND_RAW_TRANSACTION));
 }
 
+void DaemonRpc::getTransactions(const QStringList &txs_hashes, bool decode_as_json, bool prune) {
+    QJsonObject req;
+    req["txs_hashes"] = QJsonArray::fromStringList(txs_hashes);
+    req["decode_as_json"] = decode_as_json;
+    req["prune"] = prune;
+
+    QString url = QString("%1/get_transactions").arg(m_daemonAddress);
+    QNetworkReply *reply = m_network->postJson(url, req);
+    connect(reply, &QNetworkReply::finished, std::bind(&DaemonRpc::onResponse, this, reply, Endpoint::GET_TRANSACTIONS));
+}
+
 void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
     const auto ok = reply->error() == QNetworkReply::NoError;
     const auto err = reply->errorString();
