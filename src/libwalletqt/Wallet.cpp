@@ -476,6 +476,23 @@ bool Wallet::importOutputs(const QString& path) {
     return m_walletImpl->importOutputs(path.toStdString());
 }
 
+bool Wallet::importTransaction(const QString& txid, const QVector<quint64>& output_indeces, quint64 height, quint64 timestamp, bool miner_tx, bool pool, bool double_spend_seen) {
+    std::vector<uint64_t> o_indeces;
+    for (const auto &o : output_indeces) {
+        o_indeces.push_back(o);
+    }
+
+    return m_walletImpl->importTransaction(
+            txid.toStdString(),
+            o_indeces,
+            height,
+            17, // todo: get actual block_version
+            timestamp,
+            miner_tx,
+            pool,
+            double_spend_seen);
+}
+
 void Wallet::startRefresh()
 {
     m_refreshEnabled = true;

@@ -395,6 +395,7 @@
     <addaction name="separator"/>
     <addaction name="menuLoad_transaction"/>
     <addaction name="menuLoad_signed_transaction"/>
+    <addaction name="actionImport_transaction"/>
     <addaction name="separator"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionCreateDesktopEntry"/>
@@ -662,6 +663,11 @@
   <action name="actionLoadSignedTxFromText">
    <property name="text">
     <string>From text</string>
+   </property>
+  </action>
+  <action name="actionImport_transaction">
+   <property name="text">
+    <string>Import transaction</string>
    </property>
   </action>
  </widget>

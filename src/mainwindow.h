@@ -116,6 +116,7 @@ public slots:
     void onAddContact(const QString &address, const QString &name);
     void importContacts();
     void showRestoreHeightDialog();
+    void importTransaction();
 
     // offline tx signing
     void exportKeyImages();
