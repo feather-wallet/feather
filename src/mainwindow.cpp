@@ -122,6 +122,10 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     ui->tabWidget->setTabVisible(Tabs::XMR_TO, false);
 #endif
 
+#ifndef HAS_MORPHTOKEN
+    ui->tabWidget->setTabVisible(Tabs::MORPHTOKEN, false);
+#endif
+
 #if defined(Q_OS_LINUX)
     // system tray
     m_trayIcon = new QSystemTrayIcon(QIcon(":/assets/images/appicons/64x64.png"));
@@ -406,9 +410,13 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
+#if defined(HAS_MORPHTOKEN)
     connect(ui->actionShow_MorphToken, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["MorphToken"] = new ToggleTab(ui->tabMorphToken, "MorphToken", "MorphToken", ui->actionShow_MorphToken, Config::showTabMorphToken);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_MorphToken, "MorphToken");
+#else
+    ui->actionShow_MorphToken->setVisible(false);
+#endif
 
 #if defined(XMRTO)
     connect(ui->actionShow_xmr_to, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
