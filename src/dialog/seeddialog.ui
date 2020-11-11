@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>542</width>
-    <height>244</height>
+    <height>259</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,6 +56,13 @@
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="check_toggleSeedType">
+     <property name="text">
+      <string>Show 25 word seed</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="label_warning">
