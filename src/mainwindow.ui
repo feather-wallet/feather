@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>894</width>
+    <width>1156</width>
     <height>496</height>
    </rect>
   </property>
@@ -238,6 +238,20 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="tabMorphToken">
+       <attribute name="icon">
+        <iconset resource="assets.qrc">
+         <normaloff>:/assets/images/morphtoken.png</normaloff>:/assets/images/morphtoken.png</iconset>
+       </attribute>
+       <attribute name="title">
+        <string>MorphToken</string>
+       </attribute>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <widget class="MorphTokenWidget" name="morphtokenWidget" native="true"/>
+        </item>
+       </layout>
+      </widget>
       <widget class="QWidget" name="tabXmrTo">
        <attribute name="icon">
         <iconset resource="assets.qrc">
@@ -304,7 +318,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>894</width>
+     <width>1156</width>
      <height>30</height>
     </rect>
    </property>
@@ -418,6 +432,7 @@
     </property>
     <addaction name="actionShow_Coins"/>
     <addaction name="actionShow_calc"/>
+    <addaction name="actionShow_MorphToken"/>
     <addaction name="actionShow_xmr_to"/>
     <addaction name="actionShow_XMRig"/>
    </widget>
@@ -670,6 +685,11 @@
     <string>Import transaction</string>
    </property>
   </action>
+  <action name="actionShow_MorphToken">
+   <property name="text">
+    <string>Show MorphToken</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -712,6 +732,12 @@
    <class>CalcWidget</class>
    <extends>QWidget</extends>
    <header>calcwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>MorphTokenWidget</class>
+   <extends>QWidget</extends>
+   <header>MorphTokenWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

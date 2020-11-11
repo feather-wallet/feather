@@ -406,6 +406,10 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
+    connect(ui->actionShow_MorphToken, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["MorphToken"] = new ToggleTab(ui->tabMorphToken, "MorphToken", "MorphToken", ui->actionShow_MorphToken, Config::showTabMorphToken);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_MorphToken, "MorphToken");
+
 #if defined(XMRTO)
     connect(ui->actionShow_xmr_to, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["XMRto"] = new ToggleTab(ui->tabXmrTo, "XMRto", "XMR.to", ui->actionShow_xmr_to, Config::showTabXMRto);
