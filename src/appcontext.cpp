@@ -181,7 +181,7 @@ void AppContext::initTor() {
     this->tor = new Tor(this, this);
     this->tor->start();
 
-    if (!(isTails || isWhonix)) {
+    if (!(isWhonix)) {
         auto networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
         this->network->setProxy(*networkProxy);
         if (m_wsUrl.host().endsWith(".onion"))

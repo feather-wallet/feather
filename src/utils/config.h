@@ -39,6 +39,7 @@ public:
         nodeSource,
         useOnionNodes,
         showTabCoins,
+        showTabMorphToken,
         showTabXMRto,
         showTabCalc,
         showTabXMRig,

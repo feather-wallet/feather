@@ -76,6 +76,7 @@ public:
         RECEIVE,
         COINS,
         CALC,
+        MORPHTOKEN,
         XMR_TO,
         XMRIG
     };
