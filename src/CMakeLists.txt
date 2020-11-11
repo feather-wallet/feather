@@ -129,6 +129,10 @@ if(XMRTO)
     target_compile_definitions(feather PRIVATE XMRTO=1)
 endif()
 
+if(MORPHTOKEN)
+    target_compile_definitions(feather PRIVATE HAS_MORPHTOKEN=1)
+endif()
+
 if(TOR)
     target_compile_definitions(feather PRIVATE HAS_TOR=1)
 endif()

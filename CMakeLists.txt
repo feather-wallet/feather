@@ -11,6 +11,7 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
 option(XMRTO "Include Xmr.To module" ON)
+option(MORPHTOKEN "Include MorphToken module" ON)
 option(XMRIG "Path to XMRig binary to embed inside Feather" OFF)
 option(TOR "Path to Tor binary to embed inside Feather" OFF)
 option(TOR_VERSION "Optional git hash or tag of embedded Tor version" "tor-0.4.3.5")
