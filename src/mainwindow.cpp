@@ -859,12 +859,7 @@ void MainWindow::showWalletInfoDialog() {
 }
 
 void MainWindow::showSeedDialog() {
-    QString seed = m_ctx->currentWallet->getCacheAttribute("feather.seed");
-    if (seed.isEmpty()) {
-        seed = m_ctx->currentWallet->getSeed();
-    }
-
-    auto *dialog = new SeedDialog(seed, this);
+    auto *dialog = new SeedDialog(m_ctx->currentWallet, this);
     dialog->exec();
     dialog->deleteLater();
 }
