@@ -41,7 +41,7 @@ struct FeatherNode {
             _address = spl.at(1);
         }
         if(!_address.contains(":"))
-            _address += ":18089";
+            _address += ":18081";
         this->address = _address;
         if(this->address.contains(".onion"))
             tor = true;

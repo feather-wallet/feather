@@ -124,7 +124,7 @@ void Nodes::connectToNode(FeatherNode node) {
     qInfo() << msg;
     activityLog.append(msg);
 
-    if(!node.username.isEmpty() && !node.password.isEmpty())
+    if (!node.username.isEmpty() && !node.password.isEmpty())
         m_ctx->currentWallet->setDaemonLogin(node.username, node.password);
     m_ctx->currentWallet->initAsync(node.address, true, 0, false, false, 0);
     m_connectionAttemptTime = std::time(nullptr);
@@ -149,10 +149,10 @@ void Nodes::onConnectionTimer() {
     QString msg;
     Wallet::ConnectionStatus status = m_ctx->currentWallet->connected(true);
     NodeSource nodeSource = this->source();
-    auto wsMode = nodeSource == NodeSource::websocket;
+    auto wsMode = (nodeSource == NodeSource::websocket);
     auto nodes = wsMode ? m_customNodes : m_websocketNodes;
 
-    if(wsMode && !m_wsNodesReceived && m_websocketNodes.count() == 0) {
+    if (wsMode && !m_wsNodesReceived && m_websocketNodes.count() == 0) {
         // this situation should rarely occur due to the usage of the websocket node cache on startup.
         msg = QString("Feather is in websocket connection mode but was not able to receive any nodes (yet).");
         qInfo() << msg;
@@ -160,13 +160,13 @@ void Nodes::onConnectionTimer() {
         return;
     }
 
-    if(status == Wallet::ConnectionStatus::ConnectionStatus_Disconnected) {
+    if (status == Wallet::ConnectionStatus::ConnectionStatus_Disconnected) {
         // try a connect
         auto node = this->pickEligibleNode();
         this->connectToNode(node);
         return;
-    } else if(status == Wallet::ConnectionStatus::ConnectionStatus_Connecting){
-        if(!m_connection.isConnecting) {
+    } else if (status == Wallet::ConnectionStatus::ConnectionStatus_Connecting){
+        if (!m_connection.isConnecting) {
             // Weirdly enough, status == connecting directly after a wallet is opened.
             auto node = this->pickEligibleNode();
             this->connectToNode(node);
@@ -219,14 +219,44 @@ FeatherNode Nodes::pickEligibleNode() {
     auto wsMode = nodeSource == NodeSource::websocket;
     auto nodes = wsMode ? m_websocketNodes : m_customNodes;
 
-    if(nodes.count() == 0) {
+    if (nodes.count() == 0) {
         this->exhausted();
         return rtn;
     }
 
+    QVector<int> heights;
+    for (const auto &node: nodes) {
+        heights.push_back(node.height);
+    }
+
+    std::sort(heights.begin(), heights.end());
+
+    // Calculate mode of node heights
+    int max_count = 1, mode_height = heights[0], count = 1;
+    for (int i = 1; i < heights.count(); i++) {
+        if (heights[i] == 0) { // Don't consider 0 height nodes
+            continue;
+        }
+
+        if (heights[i] == heights[i - 1])
+            count++;
+        else {
+            if (count > max_count) {
+                max_count = count;
+                mode_height = heights[i - 1];
+            }
+            count = 1;
+        }
+    }
+    if (count > max_count)
+    {
+        max_count = count;
+        mode_height = heights[heights.count() - 1];
+    }
+
     while(true) {
         // keep track of nodes we have previously tried to connect to
-        if(m_connectionAttempts.count() == nodes.count()) {
+        if (m_connectionAttempts.count() == nodes.count()) {
             this->exhausted();
             m_connectionTimer->stop();
             return rtn;
@@ -234,12 +264,17 @@ FeatherNode Nodes::pickEligibleNode() {
 
         int random = QRandomGenerator::global()->bounded(nodes.count());
         FeatherNode node = nodes.at(random);
-        if(m_connectionAttempts.contains(node.full))
+        if (m_connectionAttempts.contains(node.full))
             continue;
         m_connectionAttempts.append(node.full);
 
-        if(wsMode && !node.online)
+        if (wsMode && !node.online)
             continue;
+
+        // Ignore nodes that are more than 25 blocks behind mode
+        if (wsMode && node.height < (mode_height - 25))
+            continue;
+
         return node;
     }
 }
