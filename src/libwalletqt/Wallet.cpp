@@ -179,6 +179,11 @@ bool Wallet::setPassword(const QString &password)
     return m_walletImpl->setPassword(password.toStdString());
 }
 
+QString Wallet::getPassword()
+{
+    return QString::fromStdString(m_walletImpl->getPassword());
+}
+
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const
 {
     return QString::fromStdString(m_walletImpl->address(accountIndex, addressIndex));

@@ -610,7 +610,7 @@ void AppContext::onSetRestoreHeight(unsigned int height){
     }
 
     this->currentWallet->setWalletCreationHeight(height);
-    this->currentWallet->setPassword(this->walletPassword);  // trigger .keys write
+    this->currentWallet->setPassword(this->currentWallet->getPassword());  // trigger .keys write
 
     // nuke wallet cache
     const auto fn = this->currentWallet->path();

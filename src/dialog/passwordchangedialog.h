@@ -5,6 +5,7 @@
 #define FEATHER_PASSWORDCHANGEDIALOG_H
 
 #include <QDialog>
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class PasswordChangeDialog;
@@ -15,16 +16,15 @@ class PasswordChangeDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit PasswordChangeDialog(QWidget *parent = nullptr);
+    explicit PasswordChangeDialog(QWidget *parent, Wallet *wallet);
     ~PasswordChangeDialog() override;
-
-    QString getCurrentPassword();
-    QString getNewPassword();
 
 private:
     Ui::PasswordChangeDialog *ui;
+    Wallet *m_wallet;
 
     void passwordsMatch();
+    void setPassword();
 };
 
 #endif //FEATHER_PASSWORDCHANGEDIALOG_H

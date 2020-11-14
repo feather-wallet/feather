@@ -670,6 +670,7 @@ void MainWindow::onWalletOpened() {
     });
 
     this->touchbarShowWallet();
+    this->updatePasswordIcon();
 }
 
 void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
@@ -896,28 +897,15 @@ void MainWindow::showConnectionStatusDialog() {
 }
 
 void MainWindow::showPasswordDialog() {
-    auto *pdialog = new PasswordChangeDialog(this);
-    int ret = pdialog->exec();
-    if (!ret) return;
-
-    QApplication::setActiveWindow(this);
-
-    QString currentPassword = pdialog->getCurrentPassword();
-    QString newPassword = pdialog->getNewPassword();
-
-    if (currentPassword != m_ctx->walletPassword) {
-        QMessageBox::warning(this, "Error", "Incorrect password");
-        return;
-    }
-
-    if (m_ctx->currentWallet->setPassword(newPassword)) {
-        QMessageBox::information(this, "Information", "Password changed successfully");
-    }
-    else {
-        QMessageBox::warning(this, "Error", QString("Error: %1").arg(m_ctx->currentWallet->errorString()));
-    }
-
+    auto *pdialog = new PasswordChangeDialog(this, m_ctx->currentWallet);
+    pdialog->exec();
     pdialog->deleteLater();
+    this->updatePasswordIcon();
+}
+
+void MainWindow::updatePasswordIcon() {
+    QIcon icon = m_ctx->currentWallet->getPassword().isEmpty() ? QIcon(":/assets/images/unlock.svg") : QIcon(":/assets/images/lock.svg");
+    m_statusBtnPassword->setIcon(icon);
 }
 
 void MainWindow::showRestoreHeightDialog() {
