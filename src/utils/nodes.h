@@ -22,7 +22,8 @@ enum NodeSource {
 };
 
 struct FeatherNode {
-    FeatherNode(QString _address, unsigned int height, bool online) : height(height), online(online){
+    explicit FeatherNode(QString _address = "", int height = 0, int target_height = 0, bool online = false)
+            : height(height), target_height(target_height), online(online){
         // wonky ipv4/host parsing, should be fine(tm)(c).
         if(_address.isEmpty()) return;
         if(_address.contains("https://")) {
@@ -50,7 +51,8 @@ struct FeatherNode {
 
     QString address;
     QString full;
-    unsigned int height;
+    int height;
+    int target_height;
     bool online = false;
     QString username;
     QString password;

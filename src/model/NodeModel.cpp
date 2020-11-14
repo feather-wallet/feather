@@ -97,7 +97,7 @@ QVariant NodeModel::headerData(int section, Qt::Orientation orientation, int rol
 FeatherNode NodeModel::node(int row) {
     if (row < 0 || row >= m_nodes.size()) {
         qCritical("%s: no reddit post for index %d", __FUNCTION__, row);
-        return FeatherNode("", 0, false);
+        return FeatherNode();
     }
     return m_nodes.at(row);
 }
