@@ -134,6 +134,9 @@ public:
     //! changes the password using existing parameters (path, seed, seed lang)
     Q_INVOKABLE bool setPassword(const QString &password);
 
+    //! get current wallet password
+    Q_INVOKABLE QString getPassword();
+
     //! returns wallet's public address
     Q_INVOKABLE QString address(quint32 accountIndex, quint32 addressIndex) const;
 

@@ -162,6 +162,7 @@ private:
     void createUnsignedTxDialog(UnsignedTransaction *tx);
     void touchbarShowWizard();
     void touchbarShowWallet();
+    void updatePasswordIcon();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
