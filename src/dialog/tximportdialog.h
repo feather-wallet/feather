@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2020, The Monero Project.
+
 #ifndef FEATHER_TXIMPORTDIALOG_H
 #define FEATHER_TXIMPORTDIALOG_H
 
