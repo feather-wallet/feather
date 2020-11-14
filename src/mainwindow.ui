@@ -419,7 +419,6 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
-    <addaction name="actionAbout_Qt"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionDonate_to_Feather"/>
     <addaction name="separator"/>
@@ -573,11 +572,6 @@
   <action name="actionKeys">
    <property name="text">
     <string>Keys</string>
-   </property>
-  </action>
-  <action name="actionAbout_Qt">
-   <property name="text">
-    <string>About Qt</string>
    </property>
   </action>
   <action name="actionCreateDesktopEntry">

@@ -104,8 +104,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     });
     connect(ui->actionShow_debug_info, &QAction::triggered, this, &MainWindow::showDebugInfo);
     connect(ui->actionOfficialWebsite, &QAction::triggered, [=] { Utils::externalLinkWarning("https://featherwallet.org"); });
-    connect(ui->actionAbout_Qt, &QAction::triggered, [=] { QApplication::aboutQt(); });
-
 
 #if defined(XMRTO)
     // xmr.to connects/widget
