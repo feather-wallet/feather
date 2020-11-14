@@ -633,8 +633,7 @@ bool Wallet::refresh(bool historyAndSubaddresses /* = true */)
             m_subaddress->refresh(currentSubaddressAccount());
             m_subaddressAccount->getAll();
         }
-        if (result)
-                emit updated();
+
         return result;
     }
 }
