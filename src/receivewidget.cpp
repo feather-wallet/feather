@@ -51,15 +51,12 @@ void ReceiveWidget::setModel(SubaddressModel * model, Subaddress * subaddress) {
     ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::ResizeToContents);
     ui->addresses->header()->setMinimumSectionSize(200);
 
-    connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentRowChanged, [=](QModelIndex current, QModelIndex prev){
-        if (current.isValid())
-            this->setQrCode(current.model()->data(current.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString());
-        else
-            ui->qrCode->clear();
+    connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentChanged, [=](QModelIndex current, QModelIndex prev){
+        this->updateQrCode();
     });
-//    connect(m_model, &SubaddressModel::modelReset, [this](){
-//        ui->btn_generateSubaddress->setEnabled(m_model->unusedLookahead() < SUBADDRESS_LOOKAHEAD_MINOR);
-//    });
+    connect(m_model, &SubaddressModel::modelReset, [this](){
+        this->updateQrCode();
+    });
 }
 
 void ReceiveWidget::copyAddress() {
@@ -129,7 +126,14 @@ void ReceiveWidget::showHeaderMenu(const QPoint& position)
     m_headerMenu->exec(QCursor::pos());
 }
 
-void ReceiveWidget::setQrCode(const QString &address){
+void ReceiveWidget::updateQrCode(){
+    QModelIndex index = ui->addresses->currentIndex();
+    if (!index.isValid()) {
+        ui->qrCode->clear();
+        return;
+    }
+
+    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
     const QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::MEDIUM);
 
     int width = ui->qrCode->width() - 4;
@@ -140,6 +144,9 @@ void ReceiveWidget::setQrCode(const QString &address){
 
 void ReceiveWidget::showQrCodeDialog() {
     QModelIndex index = ui->addresses->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
     QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
     QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
     auto *dialog = new QrCodeDialog(this, qr, "Address");

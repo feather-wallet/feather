@@ -54,7 +54,7 @@ private:
     SubaddressModel * m_model;
     SubaddressProxyModel * m_proxyModel;
 
-    void setQrCode(const QString &address);
+    void updateQrCode();
     void showQrCodeDialog();
 };
 
