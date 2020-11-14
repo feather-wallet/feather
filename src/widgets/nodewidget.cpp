@@ -176,7 +176,7 @@ void NodeWidget::onCustomAddClicked(){
         if(newNodeText.isEmpty())
             continue;
 
-        auto node = FeatherNode(newNodeText, 0, false);
+        auto node = FeatherNode(newNodeText);
         node.custom = true;
         nodesList.append(node);
     }

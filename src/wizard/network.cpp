@@ -65,7 +65,7 @@ bool NetworkPage::validatePage() {
         auto nodeText = ui->lineEdit_customNode->text().trimmed();
         if(!nodeText.isEmpty()) {
             auto customNodes = m_ctx->nodes->customNodes();
-            auto node = FeatherNode(nodeText, 0, false);
+            auto node = FeatherNode(nodeText);
             customNodes.append(node);
             m_ctx->setCustomNodes(customNodes);
         }

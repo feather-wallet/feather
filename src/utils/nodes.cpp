@@ -15,7 +15,7 @@ Nodes::Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObje
         QObject(parent),
         m_ctx(ctx),
         m_networkAccessManager(networkAccessManager),
-        m_connection(FeatherNode("", 0, false)),
+        m_connection(FeatherNode()),
         modelWebsocket(new NodeModel(NodeSource::websocket, this)),
         modelCustom(new NodeModel(NodeSource::custom, this)) {
     this->loadConfig();
@@ -47,7 +47,7 @@ void Nodes::loadConfig() {
     // load custom nodes
     auto nodes = obj.value("custom").toArray();
     foreach (const QJsonValue &value, nodes) {
-        auto customNode = FeatherNode(value.toString(), 0, false);
+        auto customNode = FeatherNode(value.toString());
         customNode.custom = true;
 
         if(m_connection == customNode) {
@@ -63,7 +63,7 @@ void Nodes::loadConfig() {
     // load cached websocket nodes
     auto ws = obj.value("ws").toArray();
     foreach (const QJsonValue &value, ws) {
-        auto wsNode = FeatherNode(value.toString(), 0, false);
+        auto wsNode = FeatherNode(value.toString());
         wsNode.custom = false;
         wsNode.online = true;  // assume online
 
@@ -214,7 +214,7 @@ void Nodes::onConnectionTimer() {
 
 FeatherNode Nodes::pickEligibleNode() {
     // Pick a node at random to connect to
-    FeatherNode rtn("", 0, false);
+    auto rtn = FeatherNode();
     NodeSource nodeSource = this->source();
     auto wsMode = nodeSource == NodeSource::websocket;
     auto nodes = wsMode ? m_websocketNodes : m_customNodes;
@@ -268,12 +268,19 @@ FeatherNode Nodes::pickEligibleNode() {
             continue;
         m_connectionAttempts.append(node.full);
 
-        if (wsMode && !node.online)
-            continue;
+        if (wsMode) {
+            // Ignore offline nodes
+            if (!node.online)
+                continue;
 
-        // Ignore nodes that are more than 25 blocks behind mode
-        if (wsMode && node.height < (mode_height - 25))
-            continue;
+            // Ignore nodes that are more than 25 blocks behind mode
+            if (node.height < (mode_height - 25))
+                continue;
+
+            // Ignore nodes that say they aren't synchronized
+            if (node.target_height > node.height)
+                continue;
+        }
 
         return node;
     }

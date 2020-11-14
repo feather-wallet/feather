@@ -174,7 +174,7 @@ private:
     const unsigned int m_donationBoundary = 15;
     UtilsNetworking *m_utilsNetworkingNodes;
     QTimer *m_storeTimer = new QTimer(this);
-    QUrl m_wsUrl = QUrl(QStringLiteral("ws://dtg2clrd6iand4mwp2x6nhbqd3nqbxlbiw65f6vkwmmutxy2sijsnjyd.onion/ws"));
+    QUrl m_wsUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
 };
 
 #endif //FEATHER_APPCONTEXT_H

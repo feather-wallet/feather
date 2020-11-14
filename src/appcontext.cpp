@@ -459,7 +459,8 @@ void AppContext::onWSNodes(const QJsonArray &nodes) {
 
         auto node = new FeatherNode(
                 obj.value("address").toString(),
-                (unsigned int)obj.value("height").toInt(),
+                 obj.value("height").toInt(),
+                 obj.value("target_height").toInt(),
                 obj.value("online").toBool());
         QSharedPointer<FeatherNode> r = QSharedPointer<FeatherNode>(node);
         l.append(r);
