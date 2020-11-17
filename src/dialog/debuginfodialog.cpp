@@ -30,6 +30,7 @@ DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
 
     ui->label_walletHeight->setText(QString::number(ctx->currentWallet->blockChainHeight()));
     ui->label_daemonHeight->setText(QString::number(ctx->currentWallet->daemonBlockChainHeight()));
+    ui->label_targetHeight->setText(QString::number(ctx->currentWallet->daemonBlockChainTargetHeight()));
     ui->label_restoreHeight->setText(QString::number(ctx->currentWallet->getWalletCreationHeight()));
     ui->label_synchronized->setText(ctx->currentWallet->synchronized() ? "True" : "False");
 
@@ -77,6 +78,7 @@ void DebugInfoDialog::copyToClipboad() {
 
     text += QString("Wallet height: %1\n").arg(ui->label_walletHeight->text());
     text += QString("Daemon height: %1\n").arg(ui->label_daemonHeight->text());
+    text += QString("Target height: %1\n").arg(ui->label_targetHeight->text());
     text += QString("Restore height: %1\n").arg(ui->label_restoreHeight->text());
     text += QString("Synchronized: %1\n").arg(ui->label_synchronized->text());
 
