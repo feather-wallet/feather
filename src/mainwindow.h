@@ -163,6 +163,7 @@ private:
     void touchbarShowWizard();
     void touchbarShowWallet();
     void updatePasswordIcon();
+    void updateNetStats();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
@@ -192,6 +193,7 @@ private:
     // lower status bar
     QLabel *m_statusLabelBalance;
     QLabel *m_statusLabelStatus;
+    QLabel *m_statusLabelNetStats;
     StatusBarButton *m_statusBtnConnectionStatusIndicator;
     StatusBarButton *m_statusBtnPassword;
     StatusBarButton *m_statusBtnPreferences;
@@ -212,6 +214,8 @@ private:
     WalletWizard *m_wizard = nullptr;
 
     QMap<QString, QString> m_skins;
+
+    QTimer m_updateBytes;
 
 private slots:
     void menuToggleTabVisible(const QString &key);

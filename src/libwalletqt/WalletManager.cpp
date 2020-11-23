@@ -26,7 +26,7 @@ public:
     virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
     virtual void newBlock(uint64_t height) override { (void) height; };
     virtual void updated() override {};
-    virtual void refreshed() override {};
+    virtual void refreshed(bool success) override {};
 
     virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override
     {
@@ -335,7 +335,7 @@ bool WalletManager::isMining() const
 {
     {
         QMutexLocker locker(&m_mutex);
-        if (m_currentWallet == nullptr || !m_currentWallet->connected())
+        if (m_currentWallet == nullptr || !m_currentWallet->connectionStatus())
         {
             return false;
         }

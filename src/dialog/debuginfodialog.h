@@ -23,6 +23,10 @@ public:
 private:
     QString statusToString(Wallet::ConnectionStatus status);
     void copyToClipboad();
+    void updateInfo();
+
+    QTimer m_updateTimer;
+    AppContext *m_ctx;
 
     Ui::DebugInfoDialog *ui;
 };

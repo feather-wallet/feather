@@ -366,6 +366,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     this->initMain();
     this->initWidgets();
     this->initMenu();
+
+    connect(&m_updateBytes, &QTimer::timeout, this, &MainWindow::updateNetStats);
 }
 
 void MainWindow::initMain() {
@@ -669,6 +671,8 @@ void MainWindow::onWalletOpened() {
 
     this->touchbarShowWallet();
     this->updatePasswordIcon();
+
+    m_updateBytes.start(1000);
 }
 
 void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
@@ -688,6 +692,7 @@ void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString
 }
 
 void MainWindow::onSynchronized() {
+    this->updateNetStats();
     m_statusLabelStatus->setText("Synchronized");
     this->onConnectionStatusChanged(Wallet::ConnectionStatus_Connected);
 }
@@ -700,11 +705,12 @@ void MainWindow::onBlockchainSync(int height, int target) {
 void MainWindow::onRefreshSync(int height, int target) {
     QString heightText = QString("Wallet refresh: %1/%2").arg(height).arg(target);
     m_statusLabelStatus->setText(heightText);
+    this->updateNetStats();
 }
 
 void MainWindow::onConnectionStatusChanged(int status)
 {
-    qDebug() << "Wallet connection status changed " << status;
+    qDebug() << "Wallet connection status changed " << Utils::QtEnumToString(static_cast<Wallet::ConnectionStatus>(status));
 
     // Update connection info in status bar.
 
@@ -746,7 +752,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QStrin
         auto tx_err = tx->errorString();
         qCritical() << tx_err;
 
-        if(m_ctx->currentWallet->connected() == Wallet::ConnectionStatus_WrongVersion)
+        if (m_ctx->currentWallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
             err = QString("%1 Wrong daemon version: %2").arg(err).arg(tx_err);
         else
             err = QString("%1 %2").arg(err).arg(tx_err);
@@ -826,6 +832,10 @@ void MainWindow::create_status_bar() {
     m_statusLabelStatus->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addWidget(m_statusLabelStatus);
 
+    m_statusLabelNetStats = new QLabel("", this);
+    m_statusLabelNetStats->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    this->statusBar()->addWidget(m_statusLabelNetStats);
+
     m_statusLabelBalance = new QLabel("Balance: 0.00 XMR", this);
     m_statusLabelBalance->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addPermanentWidget(m_statusLabelBalance);
@@ -864,7 +874,7 @@ void MainWindow::showSeedDialog() {
 }
 
 void MainWindow::showConnectionStatusDialog() {
-    auto status = m_ctx->currentWallet->connected(true);
+    auto status = m_ctx->currentWallet->connectionStatus();
     bool synchronized = m_ctx->currentWallet->synchronized();
 
     QString statusMsg;
@@ -890,6 +900,9 @@ void MainWindow::showConnectionStatusDialog() {
         default:
             statusMsg = "Unknown connection status (this should never happen).";
     }
+
+    statusMsg += QString("\n\nTx: %1, Rx: %2").arg(Utils::formatBytes(m_ctx->currentWallet->getBytesSent()),
+                                                   Utils::formatBytes(m_ctx->currentWallet->getBytesReceived()));
 
     QMessageBox::information(this, "Connection Status", statusMsg);
 }
@@ -1302,6 +1315,20 @@ void MainWindow::importTransaction() {
         dialog->exec();
         dialog->deleteLater();
     }
+}
+
+void MainWindow::updateNetStats() {
+    if (!m_ctx->currentWallet) {
+        m_statusLabelNetStats->setText("");
+        return;
+    }
+
+    if (m_ctx->currentWallet->connectionStatus() == Wallet::ConnectionStatus_Connected && m_ctx->currentWallet->synchronized()) {
+        m_statusLabelNetStats->setText("");
+        return;
+    }
+
+    m_statusLabelNetStats->setText(QString("(D: %1)").arg(Utils::formatBytes(m_ctx->currentWallet->getBytesReceived())));
 }
 
 MainWindow::~MainWindow() {

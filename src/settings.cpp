@@ -32,7 +32,7 @@ Settings::Settings(QWidget *parent) :
     // nodes
     ui->nodeWidget->setupUI(m_ctx);
     connect(ui->nodeWidget, &NodeWidget::nodeSourceChanged, m_ctx->nodes, &Nodes::onNodeSourceChanged);
-    connect(ui->nodeWidget, &NodeWidget::connectToNode, m_ctx->nodes, QOverload<FeatherNode>::of(&Nodes::connectToNode));
+    connect(ui->nodeWidget, &NodeWidget::connectToNode, m_ctx->nodes, QOverload<const FeatherNode&>::of(&Nodes::connectToNode));
 
     // setup checkboxes
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());

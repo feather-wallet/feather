@@ -25,7 +25,7 @@ public:
     virtual void updated() override;
 
     // called when wallet refreshed by background thread or explicitly
-    virtual void refreshed() override;
+    virtual void refreshed(bool success) override;
 
     virtual void onDeviceButtonRequest(uint64_t code) override;
 

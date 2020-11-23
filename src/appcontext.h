@@ -126,7 +126,7 @@ private slots:
     void onMoneyReceived(const QString &txId, quint64 amount);
     void onUnconfirmedMoneyReceived(const QString &txId, quint64 amount);
     void onWalletUpdate();
-    void onWalletRefreshed();
+    void onWalletRefreshed(bool success);
     void onWalletOpened(Wallet *wallet);
     void onWalletNewBlock(quint64 blockheight, quint64 targetHeight);
     void onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight);

@@ -1831,12 +1831,14 @@ QColumnView:selected {
   color: #32414B;
 }
 
+
 QTreeView:hover,
 QListView:hover,
 QTableView:hover,
 QColumnView:hover {
   background-color: #19232D;
 }
+
 
 QTreeView::item:pressed,
 QListView::item:pressed,

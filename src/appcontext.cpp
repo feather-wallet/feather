@@ -113,7 +113,6 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     this->nodes = new Nodes(this, this->networkClearnet);
     connect(this, &AppContext::nodeSourceChanged, this->nodes, &Nodes::onNodeSourceChanged);
     connect(this, &AppContext::setCustomNodes, this->nodes, &Nodes::setCustomNodes);
-    connect(this, &AppContext::walletClosing, this->nodes, &Nodes::onWalletClosing);
 
     // Tor & socks proxy
     this->ws = new WSClient(this, m_wsUrl);
@@ -261,7 +260,6 @@ void AppContext::onCreateTransactionError(const QString &msg) {
 }
 
 void AppContext::walletClose(bool emitClosedSignal) {
-    this->nodes->stopTimer();
     if(this->currentWallet == nullptr) return;
     emit walletClosing();
     //ctx->currentWallet->store();  @TODO: uncomment to store on wallet close
@@ -341,6 +339,9 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 
     emit walletOpened();
 
+    connect(this->currentWallet, &Wallet::connectionStatusChanged, [this]{
+        this->nodes->autoConnect();
+    });
     this->nodes->connectToNode();
     this->updateBalance();
 
@@ -723,12 +724,14 @@ void AppContext::onWalletUpdate() {
     this->storeWallet();
 }
 
-void AppContext::onWalletRefreshed() {
+void AppContext::onWalletRefreshed(bool success) {
     if (!this->refreshed) {
         refreshModels();
         this->refreshed = true;
         this->storeWallet();
     }
+
+    qDebug() << "Wallet refresh status: " << success;
 
     this->currentWallet->refreshHeightAsync();
 }
@@ -746,7 +749,7 @@ void AppContext::onWalletNewBlock(quint64 blockheight, quint64 targetHeight) {
 void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) {
     qDebug() << Q_FUNC_INFO << walletHeight << daemonHeight << targetHeight;
 
-    if (!this->currentWallet->connected())
+    if (this->currentWallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected)
         return;
 
     if (daemonHeight < targetHeight) {

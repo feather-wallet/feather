@@ -95,6 +95,8 @@ public:
     static bool pixmapWrite(const QString &path, const QPixmap &pixmap);
     static QFont relativeFont(int delta);
     static double roundSignificant(double N, double n);
+    static QString formatBytes(quint64 bytes);
+
     static QStringList randomHTTPAgents;
 
     template<typename QEnum>

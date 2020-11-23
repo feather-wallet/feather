@@ -541,9 +541,8 @@ QFont Utils::relativeFont(int delta) {
 double Utils::roundSignificant(double N, double n)
 {
     int h;
-    double l, a, b, c, d, e, i, j, m, f, g;
+    double b, d, e, i, j, m, f;
     b = N;
-    c = floor(N);
 
     for (i = 0; b >= 1; ++i)
         b = b / 10;
@@ -563,4 +562,23 @@ double Utils::roundSignificant(double N, double n)
     m = pow(10, d);
     j = j / m;
     return j;
+}
+
+QString Utils::formatBytes(quint64 bytes)
+{
+    QVector<QString> sizes = { "B", "KB", "MB", "GB", "TB" };
+
+    int i;
+    double _data;
+    for (i = 0; i < sizes.count() && bytes >= 1000; i++, bytes /= 1000)
+        _data = bytes / 1000.0;
+
+    if (_data < 0)
+        _data = 0;
+
+    // unrealistic
+    if (_data > 1000)
+        _data = 0;
+
+    return QString("%1 %2").arg(QString::number(_data, 'f', 1), sizes[i]);
 }

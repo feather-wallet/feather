@@ -4,11 +4,9 @@
 #include <QtCore>
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QNetworkReply>
 
 #include "nodes.h"
 #include "utils/utils.h"
-#include "utils/networking.h"
 #include "appcontext.h"
 
 Nodes::Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObject *parent) :
@@ -19,23 +17,20 @@ Nodes::Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObje
         modelWebsocket(new NodeModel(NodeSource::websocket, this)),
         modelCustom(new NodeModel(NodeSource::custom, this)) {
     this->loadConfig();
-
-    connect(m_connectionTimer, &QTimer::timeout, this, &Nodes::onConnectionTimer);
 }
 
 void Nodes::loadConfig() {
-    QString msg;
     auto configNodes = config()->get(Config::nodes).toByteArray();
     auto key = QString::number(m_ctx->networkType);
     if (!Utils::validateJSON(configNodes)) {
         m_configJson[key] = QJsonObject();
-        qCritical() << "fixed malformed config key \"nodes\"";
+        qCritical() << "Fixed malformed config key \"nodes\"";
     }
 
     QJsonDocument doc = QJsonDocument::fromJson(configNodes);
     m_configJson = doc.object();
 
-    if(!m_configJson.contains(key))
+    if (!m_configJson.contains(key))
         m_configJson[key] = QJsonObject();
 
     auto obj = m_configJson.value(key).toObject();
@@ -46,7 +41,7 @@ void Nodes::loadConfig() {
 
     // load custom nodes
     auto nodes = obj.value("custom").toArray();
-    foreach (const QJsonValue &value, nodes) {
+    for (auto value: nodes) {
         auto customNode = FeatherNode(value.toString());
         customNode.custom = true;
 
@@ -62,15 +57,15 @@ void Nodes::loadConfig() {
 
     // load cached websocket nodes
     auto ws = obj.value("ws").toArray();
-    foreach (const QJsonValue &value, ws) {
+    for (auto value: ws) {
         auto wsNode = FeatherNode(value.toString());
         wsNode.custom = false;
         wsNode.online = true;  // assume online
 
-        if(m_connection == wsNode) {
-            if(m_connection.isActive)
+        if (m_connection == wsNode) {
+            if (m_connection.isActive)
                 wsNode.isActive = true;
-            else if(m_connection.isConnecting)
+            else if (m_connection.isConnecting)
                 wsNode.isConnecting = true;
         }
 
@@ -81,14 +76,12 @@ void Nodes::loadConfig() {
         obj["source"] = NodeSource::websocket;
     m_source = static_cast<NodeSource>(obj.value("source").toInt());
 
-    if(m_websocketNodes.count() > 0){
-        msg = QString("Loaded %1 cached websocket nodes from config").arg(m_websocketNodes.count());
-        activityLog.append(msg);
+    if (m_websocketNodes.count() > 0) {
+        qDebug() << QString("Loaded %1 cached websocket nodes from config").arg(m_websocketNodes.count());
     }
 
-    if(m_customNodes.count() > 0){
-        msg = QString("Loaded %1 custom nodes from config").arg(m_customNodes.count());
-        activityLog.append(msg);
+    if (m_customNodes.count() > 0) {
+        qDebug() << QString("Loaded %1 custom nodes from config").arg(m_customNodes.count());
     }
 
     m_configJson[key] = obj;
@@ -101,33 +94,30 @@ void Nodes::writeConfig() {
     QString output(doc.toJson(QJsonDocument::Compact));
     config()->set(Config::nodes, output);
 
-    auto msg = QString("Saved node config.");
-    activityLog.append(msg);
+    qDebug() << "Saved node config.";
 }
 
 void Nodes::connectToNode() {
     // auto connect
-    m_connectionAttempts.clear();
     m_wsExhaustedWarningEmitted = false;
     m_customExhaustedWarningEmitted = false;
-    m_connectionTimer->start(2000);
-    this->onConnectionTimer();
+    this->autoConnect();
 }
 
-void Nodes::connectToNode(FeatherNode node) {
-    if(node.address.isEmpty())
+void Nodes::connectToNode(const FeatherNode &node) {
+    if (node.address.isEmpty())
         return;
 
     emit updateStatus(QString("Connecting to %1").arg(node.address));
-    auto msg = QString("Attempting to connect to %1 (%2)")
-            .arg(node.address).arg(node.custom ? "custom" : "ws");
-    qInfo() << msg;
-    activityLog.append(msg);
+    qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.address).arg(node.custom ? "custom" : "ws");
 
     if (!node.username.isEmpty() && !node.password.isEmpty())
         m_ctx->currentWallet->setDaemonLogin(node.username, node.password);
+
+    // Don't use SSL over Tor
+    m_ctx->currentWallet->setUseSSL(!node.tor);
+
     m_ctx->currentWallet->initAsync(node.address, true, 0, false, false, 0);
-    m_connectionAttemptTime = std::time(nullptr);
 
     m_connection = node;
     m_connection.isActive = false;
@@ -135,88 +125,55 @@ void Nodes::connectToNode(FeatherNode node) {
 
     this->resetLocalState();
     this->updateModels();
-
-    m_connectionTimer->start(1000);
 }
 
-void Nodes::onConnectionTimer() {
+void Nodes::autoConnect(bool forceReconnect) {
     // this function is responsible for automatically connecting to a daemon.
-    if (m_ctx->currentWallet == nullptr) {
-        m_connectionTimer->stop();
+    if (m_ctx->currentWallet == nullptr || !m_enableAutoconnect) {
         return;
     }
 
-    QString msg;
-    Wallet::ConnectionStatus status = m_ctx->currentWallet->connected(true);
-    NodeSource nodeSource = this->source();
-    auto wsMode = (nodeSource == NodeSource::websocket);
+    Wallet::ConnectionStatus status = m_ctx->currentWallet->connectionStatus();
+    bool wsMode = (this->source() == NodeSource::websocket);
     auto nodes = wsMode ? m_customNodes : m_websocketNodes;
 
     if (wsMode && !m_wsNodesReceived && m_websocketNodes.count() == 0) {
         // this situation should rarely occur due to the usage of the websocket node cache on startup.
-        msg = QString("Feather is in websocket connection mode but was not able to receive any nodes (yet).");
-        qInfo() << msg;
-        activityLog.append(msg);
+        qInfo() << "Feather is in websocket connection mode but was not able to receive any nodes (yet).";
         return;
     }
 
-    if (status == Wallet::ConnectionStatus::ConnectionStatus_Disconnected) {
+    if (status == Wallet::ConnectionStatus_Disconnected || forceReconnect) {
+        if (!m_connection.address.isEmpty() && !forceReconnect) {
+            m_recentFailures << m_connection.address;
+        }
+
         // try a connect
         auto node = this->pickEligibleNode();
         this->connectToNode(node);
         return;
-    } else if (status == Wallet::ConnectionStatus::ConnectionStatus_Connecting){
-        if (!m_connection.isConnecting) {
-            // Weirdly enough, status == connecting directly after a wallet is opened.
-            auto node = this->pickEligibleNode();
-            this->connectToNode(node);
-            return;
-        }
-
-        // determine timeout
-        unsigned int nodeConnectionTimeout = 6;
-        if(m_connection.tor)
-            nodeConnectionTimeout = 25;
-
-        auto connectionTimeout = static_cast<unsigned int>(std::time(nullptr) - m_connectionAttemptTime);
-        if(connectionTimeout < nodeConnectionTimeout)
-            return; // timeout not reached yet
-
-        msg = QString("Node connection attempt stale after %1 seconds, picking new node").arg(nodeConnectionTimeout);
-        activityLog.append(msg);
-        qInfo() << msg;
-
-        auto newNode = this->pickEligibleNode();
-        this->connectToNode(newNode);
-        return;
-    } else if(status == Wallet::ConnectionStatus::ConnectionStatus_Connected) {
-        // wallet is connected to daemon successfully, poll status every 3 seconds
-        if(!m_connection.isConnecting)
-            return;
-
-        msg = QString("Node connected to %1").arg(m_connection.address);
-        qInfo() << msg;
-        activityLog.append(msg);
+    }
+    else if (status == Wallet::ConnectionStatus_Connected && m_connection.isConnecting) {
+        qInfo() << QString("Node connected to %1").arg(m_connection.address);
 
         // set current connection object
         m_connection.isConnecting = false;
         m_connection.isActive = true;
-        this->resetLocalState();
-        this->updateModels();
 
         // reset node exhaustion state
-        m_connectionAttempts.clear();
         m_wsExhaustedWarningEmitted = false;
         m_customExhaustedWarningEmitted = false;
-        m_connectionTimer->setInterval(3000);
+        m_recentFailures.clear();
     }
+
+    this->resetLocalState();
+    this->updateModels();
 }
 
 FeatherNode Nodes::pickEligibleNode() {
     // Pick a node at random to connect to
     auto rtn = FeatherNode();
-    NodeSource nodeSource = this->source();
-    auto wsMode = nodeSource == NodeSource::websocket;
+    auto wsMode = (this->source() == NodeSource::websocket);
     auto nodes = wsMode ? m_websocketNodes : m_customNodes;
 
     if (nodes.count() == 0) {
@@ -224,51 +181,23 @@ FeatherNode Nodes::pickEligibleNode() {
         return rtn;
     }
 
-    QVector<int> heights;
+    QVector<int> node_indeces;
+    int i = 0;
     for (const auto &node: nodes) {
-        heights.push_back(node.height);
+        node_indeces.push_back(i);
+        i++;
     }
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(node_indeces.begin(), node_indeces.end(), std::default_random_engine(seed));
 
-    std::sort(heights.begin(), heights.end());
+    // Pick random eligible node
+    int mode_height = this->modeHeight(nodes);
+    for (int index : node_indeces) {
+        const FeatherNode &node = nodes.at(index);
 
-    // Calculate mode of node heights
-    int max_count = 1, mode_height = heights[0], count = 1;
-    for (int i = 1; i < heights.count(); i++) {
-        if (heights[i] == 0) { // Don't consider 0 height nodes
-            continue;
-        }
-
-        if (heights[i] == heights[i - 1])
-            count++;
-        else {
-            if (count > max_count) {
-                max_count = count;
-                mode_height = heights[i - 1];
-            }
-            count = 1;
-        }
-    }
-    if (count > max_count)
-    {
-        max_count = count;
-        mode_height = heights[heights.count() - 1];
-    }
-
-    while(true) {
-        // keep track of nodes we have previously tried to connect to
-        if (m_connectionAttempts.count() == nodes.count()) {
-            this->exhausted();
-            m_connectionTimer->stop();
-            return rtn;
-        }
-
-        int random = QRandomGenerator::global()->bounded(nodes.count());
-        FeatherNode node = nodes.at(random);
-        if (m_connectionAttempts.contains(node.full))
-            continue;
-        m_connectionAttempts.append(node.full);
-
-        if (wsMode) {
+        // This may fail to detect bad nodes if cached nodes are used
+        // Todo: wait on websocket before connecting, only use cache if websocket is unavailable
+        if (wsMode && m_wsNodesReceived) {
             // Ignore offline nodes
             if (!node.online)
                 continue;
@@ -282,19 +211,28 @@ FeatherNode Nodes::pickEligibleNode() {
                 continue;
         }
 
+        // Don't connect to nodes that failed to connect recently
+        if (m_recentFailures.contains(node.address)) {
+            continue;
+        }
+
         return node;
     }
+
+    // All nodes tried, and none eligible
+    this->exhausted();
+    return rtn;
 }
 
 void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
     m_websocketNodes.clear();
     m_wsNodesReceived = true;
 
-    for(auto &node: nodes) {
-        if(m_connection == *node) {
-            if(m_connection.isActive)
+    for (auto &node: nodes) {
+        if (m_connection == *node) {
+            if (m_connection.isActive)
                 node->isActive = true;
-            else if(m_connection.isConnecting)
+            else if (m_connection.isConnecting)
                 node->isConnecting = true;
         }
         m_websocketNodes.push_back(*node);
@@ -304,7 +242,7 @@ void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
     auto key = QString::number(m_ctx->networkType);
     auto obj = m_configJson.value(key).toObject();
     auto ws = QJsonArray();
-    for(auto const &node: m_websocketNodes)
+    for (auto const &node: m_websocketNodes)
         ws.push_back(node.address);
 
     obj["ws"] = ws;
@@ -315,7 +253,10 @@ void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
 }
 
 void Nodes::onNodeSourceChanged(NodeSource nodeSource) {
-    if(nodeSource == this->source()) return;
+    if (nodeSource == this->source())
+        return;
+    m_source = nodeSource;
+
     auto key = QString::number(m_ctx->networkType);
     auto obj = m_configJson.value(key).toObject();
     obj["source"] = nodeSource;
@@ -324,16 +265,18 @@ void Nodes::onNodeSourceChanged(NodeSource nodeSource) {
     this->writeConfig();
     this->resetLocalState();
     this->updateModels();
+
+    this->autoConnect(true);
 }
 
-void Nodes::setCustomNodes(QList<FeatherNode> nodes) {
+void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
     m_customNodes.clear();
     auto key = QString::number(m_ctx->networkType);
     auto obj = m_configJson.value(key).toObject();
 
     QStringList nodesList;
-    for(auto const &node: nodes) {
-        if(nodesList.contains(node.full)) continue;
+    for (auto const &node: nodes) {
+        if (nodesList.contains(node.full)) continue;
         nodesList.append(node.full);
         m_customNodes.append(node);
     }
@@ -352,56 +295,47 @@ void Nodes::updateModels() {
 }
 
 void Nodes::resetLocalState() {
-    QList<QList<FeatherNode>*> models = {&m_customNodes, &m_websocketNodes};
+    auto resetState = [this](QList<FeatherNode> *model){
+        for (auto&& node: *model) {
+            node.isConnecting = false;
+            node.isActive = false;
 
-    for(QList<FeatherNode> *model: models) {
-        for (FeatherNode &_node: *model) {
-            _node.isConnecting = false;
-            _node.isActive = false;
-
-            if (_node == m_connection) {
-                _node.isActive = m_connection.isActive;
-                _node.isConnecting = m_connection.isConnecting;
+            if (node == m_connection) {
+                node.isActive = m_connection.isActive;
+                node.isConnecting = m_connection.isConnecting;
             }
         }
-    }
+    };
+
+    resetState(&m_customNodes);
+    resetState(&m_websocketNodes);
 }
 
 void Nodes::exhausted() {
-    NodeSource nodeSource = this->source();
-    auto wsMode = nodeSource == NodeSource::websocket;
-    if(wsMode)
+    bool wsMode = (this->source() == NodeSource::websocket);
+
+    if (wsMode)
         this->WSNodeExhaustedWarning();
     else
         this->nodeExhaustedWarning();
 }
 
 void Nodes::nodeExhaustedWarning(){
-    if(m_customExhaustedWarningEmitted) return;
+    if (m_customExhaustedWarningEmitted)
+        return;
+
     emit nodeExhausted();
-
-    auto msg = QString("Could not find an eligible custom node to connect to.");
-    qWarning() << msg;
-    activityLog.append(msg);
-
+    qWarning() << "Could not find an eligible custom node to connect to.";
     m_customExhaustedWarningEmitted = true;
-    this->m_connectionTimer->stop();
 }
 
 void Nodes::WSNodeExhaustedWarning() {
-    if(m_wsExhaustedWarningEmitted) return;
+    if (m_wsExhaustedWarningEmitted)
+        return;
+
     emit WSNodeExhausted();
-
-    auto msg = QString("Could not find an eligible websocket node to connect to.");
-    qWarning() << msg;
-    activityLog.append(msg);
-
+    qWarning() << "Could not find an eligible websocket node to connect to.";
     m_wsExhaustedWarningEmitted = true;
-    this->m_connectionTimer->stop();
-}
-
-void Nodes::onWalletClosing() {
-    m_connectionTimer->stop();
 }
 
 QList<FeatherNode> Nodes::customNodes() {
@@ -412,10 +346,38 @@ FeatherNode Nodes::connection() {
     return m_connection;
 }
 
-void Nodes::stopTimer(){
-    m_connectionTimer->stop();
-}
-
 NodeSource Nodes::source() {
     return m_source;
+}
+
+int Nodes::modeHeight(const QList<FeatherNode> &nodes) {
+    QVector<int> heights;
+    for (const auto &node: nodes) {
+        heights.push_back(node.height);
+    }
+
+    std::sort(heights.begin(), heights.end());
+
+    int max_count = 1, mode_height = heights[0], count = 1;
+    for (int i = 1; i < heights.count(); i++) {
+        if (heights[i] == 0) { // Don't consider 0 height nodes
+            continue;
+        }
+
+        if (heights[i] == heights[i - 1])
+            count++;
+        else {
+            if (count > max_count) {
+                max_count = count;
+                mode_height = heights[i - 1];
+            }
+            count = 1;
+        }
+    }
+    if (count > max_count)
+    {
+        mode_height = heights[heights.count() - 1];
+    }
+
+    return mode_height;
 }

@@ -70,9 +70,9 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     }
     else if(role == Qt::BackgroundRole) {
         if (node.isConnecting)
-            return QBrush(QColor(186, 247, 255));
+            return QBrush(QColor("#A9DEF9"));
         else if (node.isActive)
-            return QBrush(QColor(158, 250, 158));
+            return QBrush(QColor("#78BC61"));
     }
     return QVariant();
 }
