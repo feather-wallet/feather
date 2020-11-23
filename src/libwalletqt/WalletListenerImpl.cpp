@@ -41,10 +41,11 @@ void WalletListenerImpl::updated()
 }
 
 // called when wallet refreshed by background thread or explicitly
-void WalletListenerImpl::refreshed()
+void WalletListenerImpl::refreshed(bool success)
 {
     qDebug() << __FUNCTION__;
-    emit m_wallet->refreshed();
+    m_wallet->onRefreshed(success);
+    emit m_wallet->refreshed(success);
 }
 
 void WalletListenerImpl::onDeviceButtonRequest(uint64_t code)

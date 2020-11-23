@@ -86,7 +86,6 @@ public:
     explicit Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObject *parent = nullptr);
     void loadConfig();
     void writeConfig();
-    void stopTimer();
 
     NodeSource source();
     FeatherNode connection();
@@ -95,18 +94,13 @@ public:
     NodeModel *modelWebsocket;
     NodeModel *modelCustom;
 
-    QStringList activityLog;
-
 public slots:
-    void onWalletClosing();
     void connectToNode();
-    void connectToNode(FeatherNode node);
+    void connectToNode(const FeatherNode &node);
     void onWSNodesReceived(const QList<QSharedPointer<FeatherNode>>& nodes);
     void onNodeSourceChanged(NodeSource nodeSource);
-    void setCustomNodes(QList<FeatherNode> nodes);
-
-private slots:
-    void onConnectionTimer();
+    void setCustomNodes(const QList<FeatherNode>& nodes);
+    void autoConnect(bool forceReconnect = false);
 
 signals:
     void WSNodeExhausted();
@@ -119,18 +113,17 @@ private:
     QNetworkAccessManager *m_networkAccessManager = nullptr;
     QJsonObject m_configJson;
 
+    QStringList m_recentFailures;
+
     QList<FeatherNode> m_customNodes;
     QList<FeatherNode> m_websocketNodes;
 
     FeatherNode m_connection;  // current active connection, if any
-    QTimer *m_connectionTimer = new QTimer(this);
-    time_t m_connectionAttemptTime = 0;
-    QStringList m_connectionAttempts;
 
     bool m_wsNodesReceived = false;
-
     bool m_wsExhaustedWarningEmitted = true;
     bool m_customExhaustedWarningEmitted = true;
+    bool m_enableAutoconnect = true;
 
     FeatherNode pickEligibleNode();
 
@@ -139,6 +132,7 @@ private:
     void exhausted();
     void WSNodeExhaustedWarning();
     void nodeExhaustedWarning();
+    int modeHeight(const QList<FeatherNode> &nodes);
 };
 
 #endif //FEATHER_NODES_H

@@ -47,6 +47,11 @@ Wallet::Wallet(QObject * parent)
 {
 }
 
+Wallet::ConnectionStatus Wallet::connectionStatus() const
+{
+    return m_connectionStatus;
+}
+
 QString Wallet::getSeed() const
 {
     return QString::fromStdString(m_walletImpl->seed());
@@ -72,36 +77,6 @@ NetworkType::Type Wallet::nettype() const
     return static_cast<NetworkType::Type>(m_walletImpl->nettype());
 }
 
-
-void Wallet::updateConnectionStatusAsync()
-{
-    m_scheduler.run([this] {
-        if (m_connectionStatus == Wallet::ConnectionStatus_Disconnected)
-        {
-            setConnectionStatus(ConnectionStatus_Connecting);
-        }
-        ConnectionStatus newStatus = static_cast<ConnectionStatus>(m_walletImpl->connected());
-        if (newStatus != m_connectionStatus || !m_initialized) {
-            m_initialized = true;
-            setConnectionStatus(newStatus);
-        }
-        // Release lock
-        m_connectionStatusRunning = false;
-    });
-}
-
-Wallet::ConnectionStatus Wallet::connected(bool forceCheck)
-{
-    // cache connection status
-    if (forceCheck || !m_initialized || (m_connectionStatusTime.elapsed() / 1000 > m_connectionStatusTtl && !m_connectionStatusRunning) || m_connectionStatusTime.elapsed() > 30000) {
-        m_connectionStatusRunning = true;
-        m_connectionStatusTime.restart();
-        updateConnectionStatusAsync();
-    }
-
-    return m_connectionStatus;
-}
-
 bool Wallet::disconnected() const
 {
     return m_disconnected;
@@ -120,6 +95,9 @@ void Wallet::refreshingSet(bool value)
     }
 }
 
+void Wallet::setConnectionTimeout(int timeout) {
+    m_connectionTimeout = timeout;
+}
 
 void Wallet::setConnectionStatus(ConnectionStatus value)
 {
@@ -232,16 +210,16 @@ bool Wallet::init(const QString &daemonAddress, bool trustedDaemon, quint64 uppe
     {
         QMutexLocker locker(&m_proxyMutex);
 
-        if (!m_walletImpl->init(daemonAddress.toStdString(), upperTransactionLimit, m_daemonUsername.toStdString(), m_daemonPassword.toStdString(), false, false, proxyAddress.toStdString()))
+        if (!m_walletImpl->init(daemonAddress.toStdString(), upperTransactionLimit, m_daemonUsername.toStdString(), m_daemonPassword.toStdString(), m_useSSL, false, proxyAddress.toStdString()))
         {
             return false;
         }
-
 
         m_proxyAddress = proxyAddress;
     }
     emit proxyAddressChanged();
 
+    setTrustedDaemon(trustedDaemon);
     setTrustedDaemon(trustedDaemon);
     return true;
 }
@@ -269,7 +247,7 @@ void Wallet::initAsync(
         {
             emit walletCreationHeightChanged();
             qDebug() << "init async finished - starting refresh";
-            connected(true);
+            refreshHeightAsync();
             startRefresh();
         }
     });
@@ -311,6 +289,11 @@ bool Wallet::connectToDaemon()
 void Wallet::setTrustedDaemon(bool arg)
 {
     m_walletImpl->setTrustedDaemon(arg);
+}
+
+void Wallet::setUseSSL(bool ssl)
+{
+    m_useSSL = ssl;
 }
 
 bool Wallet::viewOnly() const
@@ -425,6 +408,8 @@ void Wallet::refreshHeightAsync()
         daemonHeightFuture.second.waitForFinished();
         targetHeightFuture.second.waitForFinished();
 
+        setConnectionStatus(ConnectionStatus_Connected);
+
         emit heightRefreshed(walletHeight, daemonHeight, targetHeight);
     });
 }
@@ -439,7 +424,8 @@ quint64 Wallet::daemonBlockChainHeight() const
     // cache daemon blockchain height for some time (60 seconds by default)
 
     if (m_daemonBlockChainHeight == 0
-        || m_daemonBlockChainHeightTime.elapsed() / 1000 > m_daemonBlockChainHeightTtl) {
+        || m_daemonBlockChainHeightTime.elapsed() / 1000 > m_daemonBlockChainHeightTtl)
+    {
         m_daemonBlockChainHeight = m_walletImpl->daemonBlockChainHeight();
         m_daemonBlockChainHeightTime.restart();
     }
@@ -449,7 +435,8 @@ quint64 Wallet::daemonBlockChainHeight() const
 quint64 Wallet::daemonBlockChainTargetHeight() const
 {
     if (m_daemonBlockChainTargetHeight <= 1
-        || m_daemonBlockChainTargetHeightTime.elapsed() / 1000 > m_daemonBlockChainTargetHeightTtl) {
+        || m_daemonBlockChainTargetHeightTime.elapsed() / 1000 > m_daemonBlockChainTargetHeightTtl)
+    {
         m_daemonBlockChainTargetHeight = m_walletImpl->daemonBlockChainTargetHeight();
 
         // Target height is set to 0 if daemon is synced.
@@ -501,6 +488,7 @@ bool Wallet::importTransaction(const QString& txid, const QVector<quint64>& outp
 void Wallet::startRefresh()
 {
     m_refreshEnabled = true;
+    m_refreshNow = true;
 }
 
 void Wallet::pauseRefresh()
@@ -1089,6 +1077,14 @@ void Wallet::onWalletPassphraseNeeded(bool on_device)
     emit this->walletPassphraseNeeded(on_device);
 }
 
+quint64 Wallet::getBytesReceived() const {
+    return m_walletImpl->getBytesReceived();
+}
+
+quint64 Wallet::getBytesSent() const {
+    return m_walletImpl->getBytesSent();
+}
+
 void Wallet::onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort)
 {
     if (m_walletListener != nullptr)
@@ -1117,9 +1113,11 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
         , m_subaddressAccount(nullptr)
         , m_subaddressAccountModel(nullptr)
         , m_coinsModel(nullptr)
+        , m_refreshNow(false)
         , m_refreshEnabled(false)
         , m_refreshing(false)
         , m_scheduler(this)
+        , m_useSSL(true)
 {
     m_history = new TransactionHistory(m_walletImpl->history(), this);
     m_addressBook = new AddressBook(m_walletImpl->addressBook(), this);
@@ -1191,8 +1189,9 @@ void Wallet::startRefreshThread()
             {
                 const auto now = std::chrono::steady_clock::now();
                 const auto elapsed = now - last;
-                if (elapsed >= refreshInterval)
+                if (elapsed >= refreshInterval || m_refreshNow)
                 {
+                    m_refreshNow = false;
                     refresh(false);
                     last = std::chrono::steady_clock::now();
                 }
@@ -1204,5 +1203,13 @@ void Wallet::startRefreshThread()
     if (!future.first)
     {
         throw std::runtime_error("failed to start auto refresh thread");
+    }
+}
+
+void Wallet::onRefreshed(bool success) {
+    if (success) {
+        setConnectionStatus(ConnectionStatus_Connected);
+    } else {
+        setConnectionStatus(ConnectionStatus_Disconnected);
     }
 }

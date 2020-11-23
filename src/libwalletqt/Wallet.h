@@ -62,7 +62,7 @@ Q_OBJECT
     Q_PROPERTY(QString seedLanguage READ getSeedLanguage)
     Q_PROPERTY(Status status READ status)
     Q_PROPERTY(NetworkType::Type nettype READ nettype)
-//    Q_PROPERTY(ConnectionStatus connected READ connected)
+    Q_PROPERTY(ConnectionStatus connectionStatus READ connectionStatus)
     Q_PROPERTY(quint32 currentSubaddressAccount READ currentSubaddressAccount NOTIFY currentSubaddressAccountChanged)
     Q_PROPERTY(bool synchronized READ synchronized)
     Q_PROPERTY(QString errorString READ errorString)
@@ -105,6 +105,9 @@ public:
 
     Q_ENUM(ConnectionStatus)
 
+    //! return connection status
+    ConnectionStatus connectionStatus() const;
+
     //! returns mnemonic seed
     QString getSeed() const;
 
@@ -119,10 +122,6 @@ public:
 
     //! returns network type of the wallet.
     NetworkType::Type nettype() const;
-
-    //! returns whether the wallet is connected, and version status
-    Q_INVOKABLE ConnectionStatus connected(bool forceCheck = false);
-    void updateConnectionStatusAsync();
 
     //! returns true if wallet was ever synchronized
     bool synchronized() const;
@@ -167,8 +166,14 @@ public:
     //! connects to daemon
     Q_INVOKABLE bool connectToDaemon();
 
-    //! indicates id daemon is trusted
+    //! set connect to daemon timeout
+    Q_INVOKABLE void setConnectionTimeout(int timeout);
+
+    //! indicates if daemon is trusted
     Q_INVOKABLE void setTrustedDaemon(bool arg);
+
+    //! indicates if ssl should be used to connect to daemon
+    Q_INVOKABLE void setUseSSL(bool ssl);
 
     //! returns balance
     Q_INVOKABLE quint64 balance() const;
@@ -394,6 +399,9 @@ public:
     Q_INVOKABLE void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
     virtual void onWalletPassphraseNeeded(bool on_device) override;
 
+    Q_INVOKABLE quint64 getBytesReceived() const;
+    Q_INVOKABLE quint64 getBytesSent() const;
+
     // TODO: setListenter() when it implemented in API
 signals:
     // emitted on every event happened with wallet
@@ -402,7 +410,7 @@ signals:
 
     // emitted when refresh process finished (could take a long time)
     // signalling only after we
-    void refreshed();
+    void refreshed(bool success);
 
     void moneySpent(const QString &txId, quint64 amount);
     void moneyReceived(const QString &txId, quint64 amount);
@@ -445,6 +453,7 @@ private:
     bool disconnected() const;
     bool refreshing() const;
     void refreshingSet(bool value);
+    void onRefreshed(bool success);
 
     void setConnectionStatus(ConnectionStatus value);
     QString getProxyAddress() const;
@@ -489,10 +498,13 @@ private:
     QString m_daemonPassword;
     QString m_proxyAddress;
     mutable QMutex m_proxyMutex;
+    std::atomic<bool> m_refreshNow;
     std::atomic<bool> m_refreshEnabled;
     std::atomic<bool> m_refreshing;
     WalletListenerImpl *m_walletListener;
     FutureScheduler m_scheduler;
+    int m_connectionTimeout = 30;
+    bool m_useSSL;
 };
 
 
