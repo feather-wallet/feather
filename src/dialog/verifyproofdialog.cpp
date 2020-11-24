@@ -16,32 +16,48 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->btn_verifySpendProof, &QPushButton::clicked, this, &VerifyProofDialog::checkSpendProof);
-    connect(ui->btn_verifyOutProof, &QPushButton::clicked, this, &VerifyProofDialog::checkOutProof);
-    connect(ui->btn_verifyInProof, &QPushButton::clicked, this, &VerifyProofDialog::checkInProof);
+    connect(ui->btn_verify, &QPushButton::clicked, this, &VerifyProofDialog::checkProof);
 
-    connect(ui->btn_spendClear, &QPushButton::clicked, [this](){
-       ui->lineEdit_spendTxID->clear();
-       ui->lineEdit_spendMessage->clear();
-       ui->input_SpendProof->clear();
-    });
-    connect(ui->btn_outClear, &QPushButton::clicked, [this](){
-        ui->lineEdit_outTxID->clear();
-        ui->lineEdit_outAddress->clear();
-        ui->lineEdit_outMessage->clear();
-        ui->input_OutProof->clear();
-    });
-    connect(ui->btn_inClear, &QPushButton::clicked, [this](){
-        ui->lineEdit_inTxID->clear();
-        ui->lineEdit_inAddress->clear();
-        ui->lineEdit_inMessage->clear();
-        ui->input_InProof->clear();
+    connect(ui->btn_clear, &QPushButton::clicked, [this]{
+        switch (ui->tabWidget->currentIndex()) {
+            case 0:
+                ui->lineEdit_spendTxID->clear();
+                ui->lineEdit_spendMessage->clear();
+                ui->input_SpendProof->clear();
+                break;
+            case 1:
+                ui->lineEdit_outTxID->clear();
+                ui->lineEdit_outAddress->clear();
+                ui->lineEdit_outMessage->clear();
+                ui->input_OutProof->clear();
+                break;
+            case 2:
+                ui->lineEdit_inTxID->clear();
+                ui->lineEdit_inAddress->clear();
+                ui->lineEdit_inMessage->clear();
+                ui->input_InProof->clear();
+                break;
+        }
     });
 }
 
 VerifyProofDialog::~VerifyProofDialog()
 {
     delete ui;
+}
+
+void VerifyProofDialog::checkProof() {
+    switch (ui->tabWidget->currentIndex()) {
+        case 0:
+            this->checkSpendProof();
+            break;
+        case 1:
+            this->checkOutProof();
+            break;
+        case 2:
+            this->checkInProof();
+            break;
+    }
 }
 
 void VerifyProofDialog::checkSpendProof() {
