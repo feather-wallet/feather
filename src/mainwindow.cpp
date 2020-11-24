@@ -20,6 +20,7 @@
 #include "dialog/viewonlydialog.h"
 #include "dialog/broadcasttxdialog.h"
 #include "dialog/tximportdialog.h"
+#include "dialog/passworddialog.h"
 #include "utils/utils.h"
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
@@ -589,18 +590,20 @@ void MainWindow::onWalletCreatedError(const QString &err) {
 
 void MainWindow::onWalletOpenPasswordRequired(bool invalidPassword, const QString &path) {
     QFileInfo fileInfo(path);
-    QInputDialog passwordDialog(this);
-    passwordDialog.setInputMode(QInputDialog::TextInput);
-    passwordDialog.setTextEchoMode(QLineEdit::Password);
-    passwordDialog.setWindowTitle("Password required");
-    passwordDialog.setLabelText(QString("Please enter %1 wallet password.").arg(fileInfo.fileName()));
-    passwordDialog.resize(300, 100);
-    if(!(bool)passwordDialog.exec())
-        return this->showWizard(WalletWizard::Page_OpenWallet);
 
-    const auto passwd = passwordDialog.textValue();
-    m_ctx->walletPassword = passwd;
+    auto dialog = new PasswordDialog(this, fileInfo.fileName(), invalidPassword);
+    switch (dialog->exec()) {
+        case QDialog::Rejected:
+        {
+            this->showWizard(WalletWizard::Page_OpenWallet);
+            return;
+        }
+    }
+
+    m_ctx->walletPassword = dialog->password;
     m_ctx->onOpenWallet(m_ctx->walletPath, m_ctx->walletPassword);
+
+    dialog->deleteLater();
 }
 
 void MainWindow::onWalletOpenedError(const QString &err) {

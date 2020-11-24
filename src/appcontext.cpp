@@ -282,6 +282,10 @@ void AppContext::onOpenWallet(const QString &path, const QString &password){
         return;
     }
 
+    if (password.isEmpty()) {
+        this->walletPassword = "";
+    }
+
     config()->set(Config::firstRun, false);
 
     this->walletPath = path;
@@ -316,7 +320,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
             emit walletOpenedError(errMsg);
         } else {
             this->walletClose(false);
-            emit walletOpenPasswordNeeded(this->walletPassword.isEmpty(), wallet->path());
+            emit walletOpenPasswordNeeded(!this->walletPassword.isEmpty(), wallet->path());
         }
         return;
     }
