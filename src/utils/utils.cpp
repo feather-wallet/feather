@@ -582,3 +582,18 @@ QString Utils::formatBytes(quint64 bytes)
 
     return QString("%1 %2").arg(QString::number(_data, 'f', 1), sizes[i]);
 }
+
+QString Utils::amountToCurrencyString(double amount, const QString &currencyCode) {
+    QLocale locale;
+    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
+    for (const auto& locale_: allLocales) {
+        if (locale_.currencySymbol(QLocale::CurrencyIsoCode) == currencyCode) {
+            locale = locale_;
+        }
+    }
+
+    if (currencyCode == "USD")
+        return locale.toCurrencyString(amount, "$");
+
+    return locale.toCurrencyString(amount);
+}
