@@ -1011,7 +1011,9 @@ void MainWindow::menuAboutClicked() {
 }
 
 void MainWindow::menuSettingsClicked() {
+    m_windowSettings->raise();
     m_windowSettings->show();
+    m_windowSettings->activateWindow();
 }
 
 void MainWindow::menuSignVerifyClicked() {
