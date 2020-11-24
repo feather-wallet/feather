@@ -29,6 +29,8 @@ SendWidget::SendWidget(QWidget *parent) :
     ui->label_conversionAmount->setText("");
     ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
+
+    this->setupComboBox();
 }
 
 void SendWidget::currencyComboChanged(int index) {
@@ -185,8 +187,23 @@ void SendWidget::onEndTransaction() {
     ui->btnSend->setEnabled(true);
 }
 
+void SendWidget::setupComboBox() {
+    ui->comboCurrencySelection->clear();
+
+    QStringList defaultCurrencies = {"XMR", "USD", "EUR", "CNY", "JPY", "GBP"};
+    QString preferredCurrency = config()->get(Config::preferredFiatCurrency).toString();
+
+    if (defaultCurrencies.contains(preferredCurrency)) {
+        defaultCurrencies.removeOne(preferredCurrency);
+    }
+
+    ui->comboCurrencySelection->insertItems(0, defaultCurrencies);
+    ui->comboCurrencySelection->insertItem(1, preferredCurrency);
+}
+
 void SendWidget::onPreferredFiatCurrencyChanged() {
     this->updateConversionLabel();
+    this->setupComboBox();
 }
 
 SendWidget::~SendWidget() {

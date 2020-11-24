@@ -105,48 +105,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QComboBox" name="comboCurrencySelection">
-         <item>
-          <property name="text">
-           <string>XMR</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>EUR</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>USD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>GBP</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>AUD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>JPY</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>NZD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>RMB</string>
-          </property>
-         </item>
-        </widget>
+        <widget class="QComboBox" name="comboCurrencySelection"/>
        </item>
       </layout>
      </item>
