@@ -31,7 +31,7 @@ WalletInfoDialog::WalletInfoDialog(AppContext *ctx, QWidget *parent)
 void WalletInfoDialog::openWalletDir() {
     QFileInfo file(m_ctx->walletPath);
 
-    QDesktopServices::openUrl(file.absolutePath());
+    QDesktopServices::openUrl(QUrl(QString("file://%1").arg(file.absolutePath()), QUrl::TolerantMode));
 }
 
 WalletInfoDialog::~WalletInfoDialog() {
