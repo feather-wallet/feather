@@ -48,6 +48,8 @@ signals:
     void createTransaction(const QString &address, double amount, const QString &description, bool all);
 
 private:
+    void setupComboBox();
+
     Ui::SendWidget *ui;
     AppContext *m_ctx;
     double amount();
