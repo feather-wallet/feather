@@ -25,7 +25,7 @@ TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool 
 
     this->setFontSizes();
     this->setPctText(defaultPct, true);
-    this->setFiatText(defaultFiat, 0.0, true);
+    this->setFiatText(defaultFiat, 0.0);
 
     connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
     connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
@@ -56,19 +56,11 @@ void TickerWidget::init() {
     auto pct24hText = QString::number(pct24h, 'f', 2);
 
     this->setPctText(pct24hText, pct24h >= 0.0);
-    this->setFiatText(fiatCurrency, conversion, true);
+    this->setFiatText(fiatCurrency, conversion);
 }
 
-void TickerWidget::setFiatText(QString &fiatCurrency, double amount, bool round) {
-    QString number;
-    if(round)
-        number = QString::number(amount, 'f', 2);
-    else
-        number = QString::number(amount);
-
-    auto conversionText = QString("%1 %2")\
-            .arg(number)
-            .arg(fiatCurrency);
+void TickerWidget::setFiatText(QString &fiatCurrency, double amount) {
+    QString conversionText = Utils::amountToCurrencyString(amount, fiatCurrency);
     ui->tickerFiat->setText(conversionText);
 }
 

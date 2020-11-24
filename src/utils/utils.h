@@ -96,6 +96,7 @@ public:
     static QFont relativeFont(int delta);
     static double roundSignificant(double N, double n);
     static QString formatBytes(quint64 bytes);
+    static QString amountToCurrencyString(double amount, const QString &currencyCode);
 
     static QStringList randomHTTPAgents;
 
