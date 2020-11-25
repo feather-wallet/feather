@@ -34,7 +34,6 @@ signals:
 public slots:
     void copyToClipboard();
     void checkboxExternalLinkWarn();
-    void checkboxCheckForAppUpdates();
     void fiatCurrencySelected(int index);
     void comboBox_homeWidgetChanged(int pos);
     void comboBox_skinChanged(int pos);
