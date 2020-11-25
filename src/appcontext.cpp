@@ -154,8 +154,7 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     // XMRig
 #ifdef HAS_XMRIG
     this->XMRig = new XmRig(this->configDirectory, this);
-    if(!this->isTails)
-        this->XMRig->prepare();
+    this->XMRig->prepare();
 #endif
 
     this->walletManager = WalletManager::instance();
