@@ -68,9 +68,7 @@ HelpLabel::HelpLabel(QWidget *parent) : QLabel(parent)
 void HelpLabel::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
-    QMessageBox msgBox(QApplication::activeWindow());
-    msgBox.setText(this->help_text);
-    msgBox.exec();
+    QMessageBox::information(this, "Help", this->help_text);
 }
 
 void HelpLabel::enterEvent(QEvent *event)
