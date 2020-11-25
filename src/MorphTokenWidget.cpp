@@ -4,6 +4,8 @@
 #include "MorphTokenWidget.h"
 #include "ui_MorphTokenWidget.h"
 #include "mainwindow.h"
+#include "qrcode/QrCode.h"
+#include "dialog/qrcodedialog.h"
 
 #include <QMessageBox>
 
@@ -54,6 +56,10 @@ MorphTokenWidget::MorphTokenWidget(QWidget *parent) :
         ui->label_rate->setVisible(false);
     });
 
+    ui->qrCode->setVisible(false);
+    ui->label_depositAddress->setVisible(false);
+    connect(ui->qrCode, &ClickableLabel::clicked, this, &MorphTokenWidget::showQrCodeDialog);
+
     ui->tabWidget->setTabVisible(2, false);
 }
 
@@ -86,6 +92,10 @@ void MorphTokenWidget::onApiResponse(const MorphTokenApi::MorphTokenResponse &re
 
     ui->debugInfo->setPlainText(QJsonDocument(resp.obj).toJson(QJsonDocument::Indented));
 
+    bool shouldShowQr = (resp.endpoint == MorphTokenApi::Endpoint::CREATE_TRADE || resp.endpoint == MorphTokenApi::Endpoint::GET_TRADE);
+    ui->qrCode->setVisible(shouldShowQr);
+    ui->label_depositAddress->setVisible(shouldShowQr);
+
     if (resp.endpoint == MorphTokenApi::Endpoint::CREATE_TRADE || resp.endpoint == MorphTokenApi::Endpoint::GET_TRADE) {
         ui->tabWidget->setCurrentIndex(1);
         ui->line_Id->setText(resp.obj.value("id").toString());
@@ -112,6 +122,14 @@ void MorphTokenWidget::onApiResponse(const MorphTokenApi::MorphTokenResponse &re
             statusText += QString("  Maximum amount accepted: %1 %2\n").arg(formatAmount(input["asset"].toString(), input["limits"].toObject()["max"].toDouble()),
                                                                             input["asset"].toString());
             statusText += QString("\nSend a single deposit. If the amount is outside the limits, a refund will happen.");
+
+            m_depositAddress = input["deposit_address"].toString();
+
+            const QrCode qrc(m_depositAddress, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::MEDIUM);
+            int width = ui->qrCode->width();
+            if (qrc.isValid()) {
+                ui->qrCode->setPixmap(qrc.toPixmap(1).scaled(width, width, Qt::KeepAspectRatio));
+            }
         } else if (state == "PROCESSING" || state == "TRADING" || state == "CONFIRMING") {
             if (state == "CONFIRMING") {
                 statusText += QString("Waiting for confirmations\n");
@@ -178,6 +196,13 @@ void MorphTokenWidget::displayRate() {
 
     QString rateStr = QString("1 %1 -> %2 %3").arg(inputAsset, outputRate, outputAsset);
     ui->label_rate->setText(rateStr);
+}
+
+void MorphTokenWidget::showQrCodeDialog() {
+    QrCode qr(m_depositAddress, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
+    auto *dialog = new QrCodeDialog(this, qr, "Deposit address");
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 QString MorphTokenWidget::formatAmount(const QString &asset, double amount) {

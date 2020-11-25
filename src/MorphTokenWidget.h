@@ -28,6 +28,7 @@ private:
 
     void onCountdown();
     void displayRate();
+    void showQrCodeDialog();
 
     QString formatAmount(const QString &asset, double amount);
 
@@ -40,6 +41,7 @@ private:
     int m_countdown = 30;
     QJsonObject m_rates;
     QTimer m_ratesTimer;
+    QString m_depositAddress;
 };
 
 #endif //FEATHER_MORPHTOKENWIDGET_H
