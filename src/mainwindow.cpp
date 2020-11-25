@@ -400,6 +400,13 @@ void MainWindow::initMain() {
 }
 
 void MainWindow::initMenu() {
+    // setup shortcuts
+    ui->actionStore_wallet->setShortcut(QKeySequence("Ctrl+S"));
+    ui->actionRefresh_tabs->setShortcut(QKeySequence("Ctrl+R"));
+    ui->actionClose->setShortcut(QKeySequence("Ctrl+W"));
+    ui->actionShow_debug_info->setShortcut(QKeySequence("Ctrl+D"));
+    ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
+
     // hide/show tabs
     m_tabShowHideSignalMapper = new QSignalMapper(this);
 
