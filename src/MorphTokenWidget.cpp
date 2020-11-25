@@ -19,13 +19,16 @@ MorphTokenWidget::MorphTokenWidget(QWidget *parent) :
 
     connect(ui->btnCreateTrade, &QPushButton::clicked, this, &MorphTokenWidget::createTrade);
     connect(ui->btn_lookupTrade, &QPushButton::clicked, this, &MorphTokenWidget::lookupTrade);
+    connect(ui->btn_getRates, &QPushButton::clicked, this, &MorphTokenWidget::getRates);
 
     connect(m_api, &MorphTokenApi::ApiResponse, this, &MorphTokenWidget::onApiResponse);
 
     connect(ui->combo_From, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
+        this->displayRate();
         ui->label_refundAddress->setText(QString("Refund address (%1):").arg(ui->combo_From->currentText()));
     });
     connect(ui->combo_To, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
+        this->displayRate();
         ui->label_destinationAddress->setText(QString("Destination address (%1):").arg(ui->combo_To->currentText()));
     });
 
@@ -45,6 +48,12 @@ MorphTokenWidget::MorphTokenWidget(QWidget *parent) :
     ui->combo_From->setCurrentIndex(1);
     ui->combo_To->setCurrentIndex(0);
 
+    ui->label_rate->setVisible(false);
+    m_ratesTimer.setSingleShot(true);
+    connect(&m_ratesTimer, &QTimer::timeout, [this]{
+        ui->label_rate->setVisible(false);
+    });
+
     ui->tabWidget->setTabVisible(2, false);
 }
 
@@ -62,6 +71,10 @@ void MorphTokenWidget::lookupTrade() {
 
     if (!morphId.isEmpty())
         m_api->getTrade(morphId);
+}
+
+void MorphTokenWidget::getRates() {
+    m_api->getRates();
 }
 
 void MorphTokenWidget::onApiResponse(const MorphTokenApi::MorphTokenResponse &resp) {
@@ -136,6 +149,11 @@ void MorphTokenWidget::onApiResponse(const MorphTokenApi::MorphTokenResponse &re
         }
 
         ui->label_status->setText(statusText);
+    } else if (resp.endpoint == MorphTokenApi::Endpoint::GET_RATES) {
+        m_rates = resp.obj.value("data").toObject();
+        this->displayRate();
+        ui->label_rate->setVisible(true);
+        m_ratesTimer.start(120 * 1000);
     }
 
     if (resp.endpoint == MorphTokenApi::Endpoint::CREATE_TRADE) {
@@ -151,6 +169,15 @@ void MorphTokenWidget::onCountdown() {
         m_countdown = 30;
     }
     ui->check_autorefresh->setText(QString("Autorefresh (%1)").arg(m_countdown));
+}
+
+void MorphTokenWidget::displayRate() {
+    QString inputAsset = ui->combo_From->currentText();
+    QString outputAsset = ui->combo_To->currentText();
+    QString outputRate = m_rates.value(inputAsset).toObject().value(outputAsset).toString("1");
+
+    QString rateStr = QString("1 %1 -> %2 %3").arg(inputAsset, outputRate, outputAsset);
+    ui->label_rate->setText(rateStr);
 }
 
 QString MorphTokenWidget::formatAmount(const QString &asset, double amount) {
