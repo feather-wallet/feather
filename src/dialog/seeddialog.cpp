@@ -11,6 +11,8 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
     ui->setupUi(this);
     ui->label_seedIcon->setPixmap(QPixmap(":/assets/images/seed.png").scaledToWidth(64, Qt::SmoothTransformation));
 
+    ui->label_restoreHeight->setText(QString::number(wallet->getWalletCreationHeight()));
+
     QString seed_14_words = wallet->getCacheAttribute("feather.seed");
     QString seed_25_words = wallet->getSeed();
 
@@ -19,10 +21,16 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
         this->setSeed(seed_25_words);
     } else {
         this->setSeed(seed_14_words);
-        connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed_14_words](bool toggled){
-            this->setSeed(toggled ? seed_25_words : seed_14_words);
-        });
+        ui->widgetRestoreHeight->setVisible(false);
     }
+
+    connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed_14_words](bool toggled){
+        this->setSeed(toggled ? seed_25_words : seed_14_words);
+        ui->widgetRestoreHeight->setVisible(toggled);
+    });
+
+    ui->label_restoreHeightHelp->setHelpText("Should you restore your wallet in the future, "
+                                             "specifying this block number will recover your wallet quicker.");
 
     this->adjustSize();
 }
