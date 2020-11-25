@@ -77,7 +77,7 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
                 result = QBrush(QColor(173, 216, 230));
             }
             else if (!cInfo.unlocked()) {
-                result = QBrush(QColor("#BFFF00"));
+                result = QBrush(QColor("#60993E"));
             }
         }
         else if (role == Qt::TextAlignmentRole) {
