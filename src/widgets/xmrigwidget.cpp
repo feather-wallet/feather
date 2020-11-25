@@ -85,12 +85,8 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
         ui->console->appendPlainText("Invalid path to XMRig binary detected. Please reconfigure on the Settings tab.");
     else
         ui->console->appendPlainText(QString("XMRig path set to %1").arg(path));
-    if(m_ctx->isTails) {
-        ui->console->appendPlainText("Mining not available on Tails.");
-        ui->btn_start->setEnabled(false);
-    }
-    else
-        ui->console->appendPlainText("Ready to mine.");
+
+    ui->console->appendPlainText("Ready to mine.");
 
     // username/password
     connect(ui->lineEdit_password, &QLineEdit::editingFinished, [=]() {
