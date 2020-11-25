@@ -145,6 +145,13 @@
            </property>
           </spacer>
          </item>
+         <item>
+          <widget class="QLabel" name="label_rate">
+           <property name="text">
+            <string>rate</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>
@@ -195,6 +202,13 @@
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btn_getRates">
+           <property name="text">
+            <string>Get Rates</string>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QPushButton" name="btnCreateTrade">

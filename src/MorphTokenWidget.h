@@ -23,9 +23,11 @@ public:
 private:
     void createTrade();
     void lookupTrade();
+    void getRates();
     void onApiResponse(const MorphTokenApi::MorphTokenResponse &resp);
 
     void onCountdown();
+    void displayRate();
 
     QString formatAmount(const QString &asset, double amount);
 
@@ -36,6 +38,8 @@ private:
     UtilsNetworking *m_network;
     QTimer m_countdownTimer;
     int m_countdown = 30;
+    QJsonObject m_rates;
+    QTimer m_ratesTimer;
 };
 
 #endif //FEATHER_MORPHTOKENWIDGET_H
