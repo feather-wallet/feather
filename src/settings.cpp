@@ -20,7 +20,6 @@ Settings::Settings(QWidget *parent) :
     ui->tabWidget->setTabVisible(4, false);
 
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
-    connect(ui->checkBox_checkForAppUpdates, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
     connect(ui->checkBox_externalLink, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
         config()->set(Config::hideBalance, toggled);
@@ -36,7 +35,6 @@ Settings::Settings(QWidget *parent) :
 
     // setup checkboxes
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
-    ui->checkBox_checkForAppUpdates->setChecked(config()->get(Config::checkForAppUpdates).toBool());
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
 
     // setup comboboxes
@@ -79,11 +77,6 @@ void Settings::fiatCurrencySelected(int index) {
     QString selection = ui->comboBox_fiatCurrency->itemText(index);
     config()->set(Config::preferredFiatCurrency, selection);
     emit preferredFiatCurrencyChanged(selection);
-}
-
-void Settings::checkboxCheckForAppUpdates() {
-    bool state = ui->checkBox_checkForAppUpdates->isChecked();
-    config()->set(Config::checkForAppUpdates, state);
 }
 
 void Settings::comboBox_skinChanged(int pos) {
