@@ -73,7 +73,6 @@ QWidget::item:selected {
 }
 
 QWidget::item:hover {
-  background-color: #148CD2;
   color: #32414B;
 }
 
@@ -1831,28 +1830,17 @@ QColumnView:selected {
   color: #32414B;
 }
 
-
-QTreeView:hover,
-QListView:hover,
-QTableView:hover,
-QColumnView:hover {
-  background-color: #19232D;
-}
-
-
 QTreeView::item:pressed,
 QListView::item:pressed,
 QTableView::item:pressed,
 QColumnView::item:pressed {
   color: #FFFFFF;
-  background-color: #1464A0;
 }
 
 QTreeView::item:selected:hover,
 QListView::item:selected:hover,
 QTableView::item:selected:hover,
 QColumnView::item:selected:hover {
-  background: #1464A0;
   color: #FFFFFF;
 }
 
@@ -1870,7 +1858,6 @@ QTableView::item:!selected:hover,
 QColumnView::item:!selected:hover {
   outline: 0;
   color: #FFFFFF;
-  background-color: #19232D;
 }
 
 QTableCornerButton::section {
