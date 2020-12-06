@@ -9,7 +9,10 @@ ENV CXXFLAGS="-fPIC"
 ENV SOURCE_DATE_EPOCH=1397818193
 
 RUN apt-get update
-RUN apt-get install -y nano vim ccache
+RUN apt-get install -y nano vim ccache software-properties-common
+
+RUN add-apt-repository ppa:git-core/ppa
+RUN apt-get update
 
 RUN apt install -y automake git pkg-config python xutils-dev && \
     git clone -b xorgproto-2020.1 --depth 1 https://gitlab.freedesktop.org/xorg/proto/xorgproto && \
