@@ -406,6 +406,7 @@ void MainWindow::initMenu() {
     ui->actionClose->setShortcut(QKeySequence("Ctrl+W"));
     ui->actionShow_debug_info->setShortcut(QKeySequence("Ctrl+D"));
     ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
+    ui->actionUpdate_balance->setShortcut(QKeySequence("Ctrl+U"));
 
     // hide/show tabs
     m_tabShowHideSignalMapper = new QSignalMapper(this);
