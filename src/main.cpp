@@ -14,6 +14,10 @@
 
 #include <QtPlugin>
 
+#if defined(Q_OS_WIN)
+#include <windows.h>
+#endif
+
 #if defined(Q_OS_LINUX) && defined(STATIC)
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
 #endif
@@ -30,6 +34,13 @@ int main(int argc, char *argv[])
 
 #if defined(HAS_XMRIG)
     Q_INIT_RESOURCE(assets_mining);
+#endif
+
+#ifdef _WIN32
+if (AttachConsole(ATTACH_PARENT_PROCESS)) {
+    freopen("CONOUT$", "w", stdout);
+    freopen("CONOUT$", "w", stderr);
+}
 #endif
 
     QStringList argv_;
