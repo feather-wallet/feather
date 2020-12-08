@@ -122,3 +122,41 @@ volumes:
 - name: files_win_release
   host:
     path: /build/feather_files/files/windows-mxe-release/
+
+---
+kind: pipeline
+type: docker
+name: mac-release
+
+steps:
+  - name: build
+    image: feather:mac
+    volumes:
+    - name: files_mac_release
+      path: /files
+    commands:
+    - mkdir -p build
+    - ssh administrator@steve.jobs.xmr.pm "chmod +x build_macos.sh && PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin ~/build_macos.sh $DRONE_COMMIT_SHA"
+    - scp -P22 administrator@steve.jobs.xmr.pm:feather.zip build/feather.zip
+  - name: deploy
+    image: feather:mac
+    volumes:
+    - name: files_mac_release
+      path: /files
+    commands:
+    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
+    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - mv build/feather.zip "$TARGET_DIR/$FN"
+    - echo "[*] written to https://build.featherwallet.org/files/mac-release/$DRONE_SOURCE_BRANCH/$FN"
+
+volumes:
+- name: files_mac_release
+  host:
+    path: /build/feather_files/files/mac-release/
+---
+kind: signature
+hmac: e864c0961f9c9901959368945a83723e282ec748489ea9b0dad728c39e338ed2
+
+...
