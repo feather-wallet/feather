@@ -268,9 +268,9 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     }
 
     if(config()->get(Config::warnOnAlpha).toBool()) {
-        auto alphaWarning = "Feather wallet is currently in alpha. Bugs are to be expected and "
-                            "can be reported on our Git repository or on IRC.";
-        Utils::showMessageBox("Warning", alphaWarning, true);
+        QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
+                          "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
+        QMessageBox::warning(this, "Beta Warning", warning);
         config()->set(Config::warnOnAlpha, false);
     }
 
