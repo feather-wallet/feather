@@ -38,16 +38,11 @@ Settings::Settings(QWidget *parent) :
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
 
     // setup comboboxes
-    auto settingsHomeWidget = config()->get(Config::homeWidget).toString();
-    if (m_homeWidgets.contains(settingsHomeWidget))
-        ui->comboBox_homeWidget->setCurrentIndex(m_homeWidgets.indexOf(settingsHomeWidget));
-
     this->setupSkinCombobox();
     auto settingsSkin = config()->get(Config::skin).toString();
     if (m_skins.contains(settingsSkin))
         ui->comboBox_skin->setCurrentIndex(m_skins.indexOf(settingsSkin));
 
-    connect(ui->comboBox_homeWidget, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_homeWidgetChanged);
     connect(ui->comboBox_skin, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_skinChanged);
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
 
@@ -81,12 +76,6 @@ void Settings::fiatCurrencySelected(int index) {
 
 void Settings::comboBox_skinChanged(int pos) {
     emit skinChanged(m_skins.at(pos));
-}
-
-void Settings::comboBox_homeWidgetChanged(int pos) {
-    config()->set(Config::homeWidget, m_homeWidgets.at(pos));
-
-    emit homeWidgetChanged(m_homeWidgets.at(pos));
 }
 
 void Settings::comboBox_blockExplorerChanged(int pos) {
