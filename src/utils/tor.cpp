@@ -43,7 +43,7 @@ Tor::Tor(AppContext *ctx, QObject *parent)
         return;
     }
 
-#ifndef HAS_TOR
+#ifndef HAS_TOR_BIN
     qCritical() << "Feather built without embedded Tor. Assuming --use-local-tor";
     this->localTor = true;
     return;

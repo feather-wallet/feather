@@ -42,16 +42,12 @@ file(GLOB SOURCE_FILES
         "dialog/*.cpp"
         )
 
-if(TOR)
+if(TOR_BIN)
     if(APPLE)
         set(ASSETS_TOR "assets_tor_macos.qrc")
     else()
         set(ASSETS_TOR "assets_tor.qrc")
     endif()
-endif()
-
-if(XMRIG)
-    set(ASSETS_XMRIG "assets_mining.qrc")
 endif()
 
 set(EXECUTABLE_FLAG)
@@ -77,8 +73,7 @@ add_executable(feather ${EXECUTABLE_FLAG} main.cpp
         ${SOURCE_FILES}
         ${RESOURCES}
         ${ASSETS_TOR}
-        ${ASSETS_XMRIG}
-        )
+)
 
 # mac os bundle
 set_target_properties(feather PROPERTIES
@@ -133,8 +128,8 @@ if(MORPHTOKEN)
     target_compile_definitions(feather PRIVATE HAS_MORPHTOKEN=1)
 endif()
 
-if(TOR)
-    target_compile_definitions(feather PRIVATE HAS_TOR=1)
+if(TOR_BIN)
+    target_compile_definitions(feather PRIVATE HAS_TOR_BIN=1)
 endif()
 
 if(XMRIG)

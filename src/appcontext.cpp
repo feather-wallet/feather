@@ -526,9 +526,8 @@ void AppContext::onWSCCS(const QJsonArray &ccs_data) {
 void AppContext::createConfigDirectory(const QString &dir) {
     QString config_dir_tor = QString("%1%2").arg(dir).arg("tor");
     QString config_dir_tordata = QString("%1%2").arg(dir).arg("tor/data");
-    QString config_dir_xmrig = QString("%1%2").arg(dir).arg("xmrig");
 
-    QStringList createDirs({dir, config_dir_tor, config_dir_tordata, config_dir_xmrig});
+    QStringList createDirs({dir, config_dir_tor, config_dir_tordata});
     for(const auto &d: createDirs) {
         if(!Utils::dirExists(d)) {
             qDebug() << QString("Creating directory: %1").arg(d);

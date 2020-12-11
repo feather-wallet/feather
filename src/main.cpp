@@ -26,14 +26,10 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(assets);
 
-#if defined(Q_OS_MAC) && defined(HAS_TOR)
+#if defined(Q_OS_MAC) && defined(HAS_TOR_BIN)
     Q_INIT_RESOURCE(assets_tor_macos);
-#elif defined(HAS_TOR)
+#elif defined(HAS_TOR_BIN)
     Q_INIT_RESOURCE(assets_tor);
-#endif
-
-#if defined(HAS_XMRIG)
-    Q_INIT_RESOURCE(assets_mining);
 #endif
 
 #ifdef _WIN32

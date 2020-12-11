@@ -22,7 +22,7 @@ class XMRigWidget : public QWidget
 
 public:
     explicit XMRigWidget(AppContext *ctx, QWidget *parent = nullptr);
-    ~XMRigWidget();
+    ~XMRigWidget() override;
     QStandardItemModel *model();
 
 public slots:
@@ -36,7 +36,6 @@ public slots:
     void onProcessError(const QString &msg);
     void onProcessOutput(const QByteArray &msg);
     void onHashrate(const QString &hashrate);
-    void onCustomPathChecked(int state);
     void onSoloChecked(int state);
 
 private slots:
@@ -55,7 +54,7 @@ private:
     Ui::XMRigWidget *ui;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
-    unsigned int m_threads;
+    int m_threads;
     QStringList m_urls;
     QStringList m_pools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};
 };

@@ -30,10 +30,10 @@ CMAKEFLAGS = \
 	-DARCH=x86_64 \
 	-DBUILD_64=On \
 	-DBUILD_TESTS=Off \
-	-DXMRTO=ON \
-	-DMORPHTOKEN=ON \
-	-DXMRIG=Off \
-	-DTOR=Off \
+	-DXMRTO=On \
+	-DMORPHTOKEN=On \
+	-DXMRIG=On \
+	-DTOR_BIN=Off \
 	-DCMAKE_CXX_STANDARD=11 \
 	-DCMAKE_VERBOSE_MAKEFILE=On \
 	-DINSTALL_VENDORED_LIBUNBOUND=Off \
@@ -43,32 +43,28 @@ CMAKEFLAGS = \
 	$(CMAKEFLAGS_EXTRA)
 
 release-static: CMAKEFLAGS += -DBUILD_TAG="linux-x64"
-release-static: CMAKEFLAGS += -DTOR=$(or ${TOR},OFF)
-release-static: CMAKEFLAGS += -DXMRIG=$(or ${XMRIG},OFF)
+release-static: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 release-static: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
 release-static:
 	cmake -Bbuild $(CMAKEFLAGS)
 	$(MAKE) -Cbuild
 
 windows-mxe-release: CMAKEFLAGS += -DBUILD_TAG="win-x64"
-windows-mxe-release: CMAKEFLAGS += -DTOR=$(or ${TOR},OFF)
-windows-mxe-release: CMAKEFLAGS += -DXMRIG=$(or ${XMRIG},OFF)
+windows-mxe-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 windows-mxe-release: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
 windows-mxe-release:
 	cmake -Bbuild $(CMAKEFLAGS)
 	$(MAKE) -Cbuild
 
 windows-mxe-debug: CMAKEFLAGS += -DBUILD_TAG="win-x64"
-windows-mxe-debug: CMAKEFLAGS += -DTOR=$(or ${TOR},OFF)
-windows-mxe-debug: CMAKEFLAGS += -DXMRIG=$(or ${XMRIG},OFF)
+windows-mxe-debug: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 windows-mxe-debug: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Debug
 windows-mxe-debug:
 	cmake -Bbuild $(CMAKEFLAGS)
 	$(MAKE) -Cbuild
 
 mac-release: CMAKEFLAGS += -DSTATIC=Off
-mac-release: CMAKEFLAGS += -DTOR=$(or ${TOR},OFF)
-mac-release: CMAKEFLAGS += -DXMRIG=$(or ${XMRIG},OFF)
+mac-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 mac-release: CMAKEFLAGS += -DBUILD_TAG="mac-x64"
 mac-release: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
 mac-release:

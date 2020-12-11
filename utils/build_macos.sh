@@ -14,7 +14,7 @@ git submodule update --init --depth 120 monero
 git submodule update --init --depth 120 --recursive monero
 
 cp "/Users/administrator/tor/libevent-2.1.7.dylib" "/Users/administrator/feather/src/assets/exec/libevent-2.1.7.dylib"
-CMAKE_PREFIX_PATH="~/Qt/5.15.1/clang_64" TOR="/Users/administrator/tor/tor" XMRIG="/Users/administrator/xmrig/xmrig" make -j3 mac-release
+CMAKE_PREFIX_PATH="~/Qt/5.15.1/clang_64" TOR_BIN="/Users/administrator/tor/tor" make -j3 mac-release
 
 if [[ $? -eq 0 ]]; then
     echo "[+] Feather built OK"
