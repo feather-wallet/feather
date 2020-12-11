@@ -190,26 +190,13 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     ui->tabWidget->setTabVisible(Tabs::XMRIG, false);
 #endif
 
-    // CCS/Reddit widget
-    m_ccsWidget = new CCSWidget(this);
-    m_redditWidget = new RedditWidget(this);
+    connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
+    connect(m_ctx, &AppContext::ccsUpdated, ui->ccsWidget->model(), &CCSModel::updateEntries);
+    connect(m_ctx, &AppContext::redditUpdated, ui->redditWidget->model(), &RedditModel::updatePosts);
 
-    m_ccsWidget->hide();
-    m_redditWidget->hide();
-
-    ui->coolLayout->addWidget(m_ccsWidget);
-    ui->coolLayout->addWidget(m_redditWidget);
-
-    connect(m_ctx, &AppContext::ccsEmpty, [=] {
-        if(m_ccsWidget->isVisible()) {
-            // display Reddit widget instead
-            m_ccsWidget->show();
-            m_redditWidget->show();
-        }
+    connect(ui->tabHomeWidget, &QTabWidget::currentChanged, [](int index){
+        config()->set(Config::homeWidget, TabsHome(index));
     });
-    connect(m_ctx, &AppContext::ccsUpdated, m_ccsWidget->model(), &CCSModel::updateEntries);
-    connect(m_ctx, &AppContext::redditUpdated, m_redditWidget->model(), &RedditModel::updatePosts);
-    connect(m_ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
 
     connect(m_ctx, &AppContext::donationNag, [=]{
         auto msg = "Feather is a 100% community-sponsored endeavor. Please consider supporting "
@@ -281,9 +268,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx, &AppContext::onPreferredFiatCurrencyChanged);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, ui->sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
-
-    // CCS/Reddit widget
-    connect(m_windowSettings, &Settings::homeWidgetChanged, this, &MainWindow::homeWidgetChanged);
 
     // Skin
     connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
@@ -538,15 +522,8 @@ void MainWindow::menuToggleTabVisible(const QString &key){
 }
 
 void MainWindow::initWidgets() {
-    auto homeWidget = config()->get(Config::homeWidget).toString();
-    if(homeWidget == QString("ccs")) {
-        m_ccsWidget->show();
-    } else if (homeWidget == "reddit") {
-        m_redditWidget->show();
-    } else {
-        config()->set(Config::homeWidget, "ccs");
-        m_ccsWidget->show();
-    }
+    int homeWidget = config()->get(Config::homeWidget).toInt();
+    ui->tabHomeWidget->setCurrentIndex(TabsHome(homeWidget));
 }
 
 WalletWizard *MainWindow::createWizard(WalletWizard::Page startPage){
@@ -1045,16 +1022,6 @@ void MainWindow::skinChanged(const QString &skinName) {
     config()->set(Config::skin, skinName);
     qApp->setStyleSheet(m_skins[skinName]);
     qDebug() << QString("Skin changed to %1").arg(skinName);
-}
-
-void MainWindow::homeWidgetChanged(const QString &widgetName) {
-    if(widgetName == "ccs"){
-        m_ccsWidget->show();
-        m_redditWidget->hide();
-    } else if(widgetName == "reddit") {
-        m_ccsWidget->hide();
-        m_redditWidget->show();
-    }
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

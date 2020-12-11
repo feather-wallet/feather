@@ -26,7 +26,6 @@ public:
 signals:
     void closed();
     void preferredFiatCurrencyChanged(QString currency);
-    void homeWidgetChanged(QString widgetName);
     void skinChanged(QString skinName);
     void showHomeCCS(bool);
     void blockExplorerChanged(QString blockExplorer);
@@ -35,12 +34,10 @@ public slots:
     void copyToClipboard();
     void checkboxExternalLinkWarn();
     void fiatCurrencySelected(int index);
-    void comboBox_homeWidgetChanged(int pos);
     void comboBox_skinChanged(int pos);
     void comboBox_blockExplorerChanged(int post);
 
 private:
-    const QStringList m_homeWidgets{"ccs", "reddit"};
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};
 
 private:

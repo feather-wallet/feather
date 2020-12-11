@@ -81,6 +81,11 @@ public:
         XMRIG
     };
 
+    enum TabsHome {
+        CCS,
+        REDDIT
+    };
+
 public slots:
     void initWidgets();
     void initMenu();
@@ -102,7 +107,6 @@ public slots:
     void showSendTab();
     void showHistoryTab();
     void showSendScreen(const CCSEntry &entry);
-    void homeWidgetChanged(const QString &widgetName);
     void skinChanged(const QString &skinName);
     void menuTorClicked();
     void onBlockchainSync(int height, int target);
@@ -176,9 +180,6 @@ private:
     XMRigWidget *m_xmrig = nullptr;
 
     bool m_windowSpawned = false;
-
-    CCSWidget *m_ccsWidget = nullptr;
-    RedditWidget *m_redditWidget = nullptr;
 
     QSystemTrayIcon *m_trayIcon;
     QMenu m_trayMenu;
