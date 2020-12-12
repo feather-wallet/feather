@@ -121,7 +121,7 @@ if(DONATE_BEG)
 endif()
 
 if(XMRTO)
-    target_compile_definitions(feather PRIVATE XMRTO=1)
+    target_compile_definitions(feather PRIVATE HAS_XMRTO=1)
 endif()
 
 if(MORPHTOKEN)

@@ -106,7 +106,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->actionShow_debug_info, &QAction::triggered, this, &MainWindow::showDebugInfo);
     connect(ui->actionOfficialWebsite, &QAction::triggered, [=] { Utils::externalLinkWarning("https://featherwallet.org"); });
 
-#if defined(XMRTO)
+#if defined(HAS_XMRTO)
     // xmr.to connects/widget
     connect(ui->xmrToWidget, &XMRToWidget::viewOrder, m_ctx->XMRTo, &XmrTo::onViewOrder);
     connect(ui->xmrToWidget, &XMRToWidget::getRates, m_ctx->XMRTo, &XmrTo::onGetRates);
@@ -118,11 +118,11 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(url); });
     ui->xmrToWidget->setHistoryModel(m_ctx->XMRTo->tableModel);
 #else
-    ui->tabWidget->setTabVisible(Tabs::XMR_TO, false);
+    ui->tabExchanges->setTabVisible(0, false);
 #endif
 
 #ifndef HAS_MORPHTOKEN
-    ui->tabWidget->setTabVisible(Tabs::MORPHTOKEN, false);
+    ui->tabExchanges->setTabVisible(1, false);
 #endif
 
 #if defined(Q_OS_LINUX)
@@ -403,20 +403,12 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
-#if defined(HAS_MORPHTOKEN)
-    connect(ui->actionShow_MorphToken, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["MorphToken"] = new ToggleTab(ui->tabMorphToken, "MorphToken", "MorphToken", ui->actionShow_MorphToken, Config::showTabMorphToken);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_MorphToken, "MorphToken");
+#if defined(HAS_XMRTO) || defined(HAS_MORPHTOKEN)
+    connect(ui->actionShow_Exchange, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["Exchange"] = new ToggleTab(ui->tabExchange, "Exchange", "Exchange", ui->actionShow_Exchange, Config::showTabExchange);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Exchange, "Exchange");
 #else
-    ui->actionShow_MorphToken->setVisible(false);
-#endif
-
-#if defined(XMRTO)
-    connect(ui->actionShow_xmr_to, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["XMRto"] = new ToggleTab(ui->tabXmrTo, "XMRto", "XMR.to", ui->actionShow_xmr_to, Config::showTabXMRto);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_xmr_to, "XMRto");
-#else
-    ui->actionShow_xmr_to->setVisible(false);
+    ui->actionShow_Exchanges->setVisible(false);
 #endif
 
 #if defined(HAS_XMRIG)
