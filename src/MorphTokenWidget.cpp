@@ -164,6 +164,10 @@ void MorphTokenWidget::onApiResponse(const MorphTokenApi::MorphTokenResponse &re
             }
         } else if (state == "COMPLETE_WITHOUT_REFUND") {
             statusText += "Deposit amount below network fee, too small to refund.";
+        } else if (state == "PROCESSING_DELAY") {
+            statusText += "Please enter in contact with support.\n\ncontact@morphtoken.com";
+        } else if (state == "CANCELLED") {
+            statusText += "The trade was cancelled. If this is unexpected, please contact support at contact@morphtoken.com";
         }
 
         ui->label_status->setText(statusText);
