@@ -16,7 +16,7 @@ steps:
     - git config --global url."http://gitea:3000/".insteadOf https://github.com/
     - git config --global url."http://gitea:3000/".insteadOf https://git.wownero.com/
     - git submodule update --init monero
-    - git submodule update --init --recursive monero
+    - git submodule update --init --depth 1 --recursive monero
     - TOR_BIN="/usr/local/tor/bin/tor" make -j8 release-static
     environment:
       OPENSSL_ROOT_DIR: /usr/local/openssl/
@@ -97,7 +97,7 @@ steps:
     - git config --global url."http://gitea:3000/".insteadOf https://github.com/
     - git config --global url."http://gitea:3000/".insteadOf https://git.wownero.com/
     - git submodule update --init monero
-    - git submodule update --init --recursive monero
+    - git submodule update --init --depth 1 --recursive monero
     - PATH="/mxe/usr/bin/:$PATH" TOR_BIN="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" make -j8 windows-mxe-release
     environment:
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
