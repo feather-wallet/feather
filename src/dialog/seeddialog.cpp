@@ -21,12 +21,12 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
         this->setSeed(seed_25_words);
     } else {
         this->setSeed(seed_14_words);
-        ui->widgetRestoreHeight->setVisible(false);
+        ui->frameRestoreHeight->setVisible(false);
     }
 
     connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed_14_words](bool toggled){
         this->setSeed(toggled ? seed_25_words : seed_14_words);
-        ui->widgetRestoreHeight->setVisible(toggled);
+        ui->frameRestoreHeight->setVisible(toggled);
     });
 
     ui->label_restoreHeightHelp->setHelpText("Should you restore your wallet in the future, "
