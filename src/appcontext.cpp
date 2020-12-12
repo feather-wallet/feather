@@ -96,7 +96,6 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     if(!this->configDirectory.endsWith('/'))
         this->configDirectory = QString("%1/").arg(this->configDirectory);
 #endif
-    this->sorry();
 
     // Config
     createConfigDirectory(this->configDirectory);
@@ -678,15 +677,6 @@ void AppContext::donateBeg() {
     if (donationCounter % m_donationBoundary == 0)
         emit donationNag();
     config()->set(Config::donateBeg, donationCounter);
-}
-
-void AppContext::sorry() {
-    auto msg = "Unable to start Feather, error code 0xd34db33f. If this problem "
-               "persists, please contact Technical Support.";
-    QStringList paths = {"C:\\ProgramData\\ryo", this->homeDir + "/.ryo"};
-    for(const QString &ryo: paths)
-        if(Utils::dirExists(ryo))
-            throw std::runtime_error(msg);
 }
 
 AppContext::~AppContext() {
