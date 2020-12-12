@@ -96,7 +96,7 @@
         <item>
          <widget class="QTabWidget" name="tabHomeWidget">
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <property name="documentMode">
            <bool>true</bool>
@@ -272,29 +272,15 @@
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tabMorphToken">
+      <widget class="QWidget" name="tabExchange">
        <attribute name="icon">
         <iconset resource="assets.qrc">
-         <normaloff>:/assets/images/morphtoken.png</normaloff>:/assets/images/morphtoken.png</iconset>
+         <normaloff>:/assets/images/update.png</normaloff>:/assets/images/update.png</iconset>
        </attribute>
        <attribute name="title">
-        <string>MorphToken</string>
+        <string>Exchange</string>
        </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_5">
-        <item>
-         <widget class="MorphTokenWidget" name="morphtokenWidget" native="true"/>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="tabXmrTo">
-       <attribute name="icon">
-        <iconset resource="assets.qrc">
-         <normaloff>:/assets/images/xmrto.png</normaloff>:/assets/images/xmrto.png</iconset>
-       </attribute>
-       <attribute name="title">
-        <string>XMR.to</string>
-       </attribute>
-       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <layout class="QVBoxLayout" name="verticalLayout_8">
         <property name="leftMargin">
          <number>0</number>
         </property>
@@ -305,26 +291,66 @@
          <number>0</number>
         </property>
         <property name="bottomMargin">
-         <number>1</number>
+         <number>0</number>
         </property>
         <item>
-         <widget class="XMRToWidget" name="xmrToWidget" native="true"/>
-        </item>
-        <item>
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
+         <widget class="QTabWidget" name="tabExchanges">
+          <property name="currentIndex">
+           <number>0</number>
           </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Preferred</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>0</height>
-           </size>
-          </property>
-         </spacer>
+          <widget class="QWidget" name="tabXMRto">
+           <attribute name="icon">
+            <iconset resource="assets.qrc">
+             <normaloff>:/assets/images/xmrto.png</normaloff>:/assets/images/xmrto.png</iconset>
+           </attribute>
+           <attribute name="title">
+            <string>XMR.to</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_10">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="XMRToWidget" name="xmrToWidget" native="true"/>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="tabMorphToken">
+           <attribute name="icon">
+            <iconset resource="assets.qrc">
+             <normaloff>:/assets/images/morphtoken.png</normaloff>:/assets/images/morphtoken.png</iconset>
+           </attribute>
+           <attribute name="title">
+            <string>MorphToken</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_9">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="MorphTokenWidget" name="morphtokenWidget" native="true"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -465,8 +491,7 @@
     </property>
     <addaction name="actionShow_Coins"/>
     <addaction name="actionShow_calc"/>
-    <addaction name="actionShow_MorphToken"/>
-    <addaction name="actionShow_xmr_to"/>
+    <addaction name="actionShow_Exchange"/>
     <addaction name="actionShow_XMRig"/>
    </widget>
    <addaction name="menuFile"/>
@@ -713,9 +738,9 @@
     <string>Import transaction</string>
    </property>
   </action>
-  <action name="actionShow_MorphToken">
+  <action name="actionShow_Exchange">
    <property name="text">
-    <string>Show MorphToken</string>
+    <string>Show Exchange</string>
    </property>
   </action>
  </widget>

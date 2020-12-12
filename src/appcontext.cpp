@@ -147,7 +147,7 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     AppContext::prices = new Prices();
 
     // xmr.to
-#ifdef XMRTO
+#ifdef HAS_XMRTO
     this->XMRTo = new XmrTo(this);
 #endif
 
@@ -419,7 +419,7 @@ void AppContext::onWSMessage(const QJsonObject &msg) {
         QJsonObject fiat_rates = msg.value("data").toObject();
         AppContext::prices->fiatPricesReceived(fiat_rates);
     }
-#if defined(XMRTO)
+#if defined(HAS_XMRTO)
     else if(cmd == "xmrto_rates") {
         auto xmr_rates = msg.value("data").toObject();
         this->XMRTo->onRatesReceived(xmr_rates);
