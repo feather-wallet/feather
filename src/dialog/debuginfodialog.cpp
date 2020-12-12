@@ -27,7 +27,15 @@ DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
 
 void DebugInfoDialog::updateInfo() {
     QString torStatus;
-    if(m_ctx->isTorSocks)
+
+    // Special case for Tails because we know the status of the daemon by polling tails-tor-has-bootstrapped.target
+    if(m_ctx->isTails) {
+        if(m_ctx->tor->torConnected)
+            torStatus = "Connected";
+        else
+            torStatus = "Disconnected";
+    }
+    else if(m_ctx->isTorSocks)
         torStatus = "Torsocks";
     else if(m_ctx->tor->localTor)
         torStatus = "Local (assumed to be running)";
