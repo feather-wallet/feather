@@ -72,10 +72,3 @@ RUN git clone https://git.wownero.com/feather/monero-seed.git && \
     cmake -DCMAKE_BUILD_TYPE=Release -Bbuild && \
     make -Cbuild -j$THREADS && \
     make -Cbuild install
-
-RUN apt install -y curl && \
-    curl -LO "https://github.com/xmrig/xmrig/releases/download/v6.3.5/xmrig-6.3.5-gcc-win64.zip" && \
-    echo "e45915ada7e6e30f6ab40abf33831056449d5914307d7706bb0ad439b6d64c12 xmrig-6.3.5-gcc-win64.zip" > hashsum.txt && \
-    sha256sum -c hashsum.txt && \
-    unzip -q xmrig-6.3.5-gcc-win64.zip -d /xmrig && \
-    mv /xmrig/xmrig-6.3.5/* /xmrig/

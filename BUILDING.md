@@ -35,7 +35,7 @@ Building the base image takes a while. You only need to build the base image onc
 #### 3. Build
 
 ```bash
-docker run --rm -it -v $PWD:/feather --env OPENSSL_ROOT_DIR=/usr/local/openssl/ -w /feather feather:linux sh -c 'TOR="/usr/local/tor/bin/tor" XMRIG="/xmrig/xmrig" make release-static -j4'
+docker run --rm -it -v $PWD:/feather --env OPENSSL_ROOT_DIR=/usr/local/openssl/ -w /feather feather:linux sh -c 'TOR_BIN="/usr/local/tor/bin/tor" make release-static -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.
@@ -73,7 +73,7 @@ Note: You only need to build the base image once.
 #### 3. Build
 
 ```bash
-docker run --rm -it -v /tmp/ccache:/root/.ccache -v /root/feather:/feather -w /feather feather:win /bin/bash -c 'PATH="/mxe/usr/bin/:$PATH" TOR="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" XMRIG="/xmrig/xmrig.exe" make windows-mxe-release -j8'
+docker run --rm -it -v /tmp/ccache:/root/.ccache -v PATH_TO_FEATHER:/feather -w /feather feather:win /bin/bash -c 'PATH="/mxe/usr/bin/:$PATH" TOR_BIN="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" make windows-mxe-release -j8'
 ```
 
 Replace `PATH_TO_FEATHER` with the absolute path to Feather locally.

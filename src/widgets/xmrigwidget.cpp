@@ -36,7 +36,7 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     // threads
     ui->threadSlider->setMinimum(1);
     int threads = QThread::idealThreadCount();
-    m_threads = (unsigned int) threads / 2;
+    m_threads = threads / 2;
     ui->threadSlider->setMaximum(threads);
     ui->threadSlider->setValue(m_threads);
     ui->label_threads->setText(QString("CPU threads: %1").arg(m_threads));
@@ -55,15 +55,12 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     ui->check_tls->setChecked(true);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
     ui->label_status->hide();
-    ui->pathFrame->hide();
     ui->soloFrame->hide();
     ui->poolFrame->hide();
 
     // XMRig binary
     auto path = config()->get(Config::xmrigPath).toString();
     if(!path.isEmpty()) {
-        ui->pathFrame->show();
-        ui->check_custompath->setChecked(true);
         ui->lineEdit_path->setText(path);
     }
 
@@ -99,7 +96,6 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     });
 
     // checkbox connects
-    connect(ui->check_custompath, &QCheckBox::stateChanged, this, &XMRigWidget::onCustomPathChecked);
     connect(ui->check_solo, &QCheckBox::stateChanged, this, &XMRigWidget::onSoloChecked);
 }
 
@@ -127,7 +123,7 @@ void XMRigWidget::onWalletOpened(){
 }
 
 void XMRigWidget::onThreadsValueChanged(int threads) {
-    m_threads = (unsigned int) threads;
+    m_threads = threads;
     ui->label_threads->setText(QString("CPU threads: %1").arg(m_threads));
 }
 
@@ -150,12 +146,7 @@ void XMRigWidget::onClearClicked() {
 void XMRigWidget::onStartClicked() {
     QString xmrigPath;
     bool solo = ui->check_solo->isChecked();
-    bool customBinary = ui->check_custompath->isChecked();
-
-    if(customBinary)
-        xmrigPath = config()->get(Config::xmrigPath).toString();
-    else
-        xmrigPath = m_ctx->XMRig->rigPath;
+    xmrigPath = config()->get(Config::xmrigPath).toString();
 
     // username is receiving address usually
     auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
@@ -245,7 +236,7 @@ void XMRigWidget::onDownloads(const QJsonObject &data) {
         os_assets = const_cast<QJsonArray *>(&_linux);
     }
 
-    unsigned int i = 0;
+    int i = 0;
     for(const auto &entry: *os_assets) {
         auto _obj = entry.toObject();
         auto _name = _obj.value("name").toString();
@@ -278,16 +269,6 @@ void XMRigWidget::showContextMenu(const QPoint &pos) {
         return;
     }
     m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
-}
-
-void XMRigWidget::onCustomPathChecked(int state) {
-    if(state == 2) {
-        ui->pathFrame->show();
-    } else {
-        ui->lineEdit_path->setText("");
-        config()->set(Config::xmrigPath, "");
-        ui->pathFrame->hide();
-    }
 }
 
 void XMRigWidget::onSoloChecked(int state) {

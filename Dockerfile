@@ -346,8 +346,3 @@ RUN git clone https://git.wownero.com/feather/monero-seed.git && \
     make -Cbuild -j$THREADS && \
     make -Cbuild install && \
     rm -rf $(pwd)
-
-RUN apt install -y curl && \
-    curl -LO "https://github.com/xmrig/xmrig/releases/download/v6.3.5/xmrig-6.3.5-linux-static-x64.tar.gz" && \
-    echo "24d4f07cf5850f00ab513b228f95769a5a5ed68d35808d98f9959b58d97985a0 xmrig-6.3.5-linux-static-x64.tar.gz" | sha256sum -c && \
-    tar xvf xmrig-6.3.5-linux-static-x64.tar.gz --one-top-level=/xmrig --strip 1

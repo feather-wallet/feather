@@ -9,22 +9,13 @@
 
 #include "utils/utils.h"
 #include "utils/xmrig.h"
-
 #include "appcontext.h"
-
 
 XmRig::XmRig(const QString &configDir, QObject *parent) : QObject(parent) {
     this->rigDir = QDir(configDir).filePath("xmrig");
 }
 
 void XmRig::prepare() {
-    // unpack and set process signals
-
-    if(!this->unpackBins()) {
-        qCritical() << "failed to write XMRig to config directory";
-        return;
-    }
-
     m_process.setProcessChannelMode(QProcess::MergedChannels);
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
     connect(&m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
@@ -109,30 +100,4 @@ void XmRig::handleProcessError(QProcess::ProcessError err) {
         auto path = config()->get(Config::xmrigPath).toString();
         emit error(QString("XMRig binary failed to start: %1").arg(path));
     }
-}
-
-bool XmRig::unpackBins() {
-    QString rigFile;
-
-    rigFile = ":/assets/exec/xmrig";
-    if (!Utils::fileExists(rigFile))
-        return false;
-
-    // write to disk
-    QFile f(rigFile);
-    QFileInfo fileInfo(f);
-    this->rigPath = QDir(this->rigDir).filePath(fileInfo.fileName());
-#if defined(Q_OS_WIN)
-    if(!this->rigPath.endsWith(".exe"))
-        this->rigPath += ".exe";
-#endif
-    qDebug() << "Writing XMRig executable to " << this->rigPath;
-    f.copy(rigPath);
-    f.close();
-
-#if defined(Q_OS_UNIX)
-    QFile rigBin(this->rigPath);
-    rigBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
-#endif
-    return true;
 }
