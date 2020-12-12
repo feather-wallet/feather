@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>556</height>
+    <width>1329</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -161,31 +161,7 @@
                </property>
                <property name="sizeHint" stdset="0">
                 <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
-             <item>
-              <widget class="QCheckBox" name="check_solo">
-               <property name="text">
-                <string>Solo mine</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_7">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
+                 <width>0</width>
                  <height>20</height>
                 </size>
                </property>
@@ -214,26 +190,46 @@
               <property name="bottomMargin">
                <number>0</number>
               </property>
-              <item row="0" column="0">
-               <layout class="QHBoxLayout" name="horizontalLayout_5">
-                <item>
-                 <widget class="QLineEdit" name="lineEdit_path">
-                  <property name="placeholderText">
-                   <string>/path/to/xmrig</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="btn_browse">
-                  <property name="text">
-                   <string>Browse</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
              </layout>
             </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout">
+             <item>
+              <widget class="QCheckBox" name="check_tls">
+               <property name="text">
+                <string>TLS</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="relayTor">
+               <property name="text">
+                <string>Tor</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="check_solo">
+               <property name="text">
+                <string>Solo mine</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <spacer name="horizontalSpacer">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>40</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+            </layout>
            </item>
            <item>
             <layout class="QHBoxLayout" name="horizontalLayout_12">
@@ -261,14 +257,14 @@
                 <item row="0" column="0">
                  <layout class="QVBoxLayout" name="verticalLayout_4">
                   <item>
-                   <widget class="QLabel" name="label_4">
-                    <property name="text">
-                     <string>Pool</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_4">
+                    <item>
+                     <widget class="QLabel" name="label_4">
+                      <property name="text">
+                       <string>Pool</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item>
                      <widget class="QComboBox" name="combo_pools">
                       <property name="sizePolicy">
@@ -323,14 +319,14 @@
                 <item row="0" column="0">
                  <layout class="QVBoxLayout" name="verticalLayout_8">
                   <item>
-                   <widget class="QLabel" name="label_3">
-                    <property name="text">
-                     <string>Node address</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_8">
+                    <item>
+                     <widget class="QLabel" name="label_3">
+                      <property name="text">
+                       <string>Node address</string>
+                      </property>
+                     </widget>
+                    </item>
                     <item>
                      <widget class="QLineEdit" name="lineEdit_solo">
                       <property name="text">
@@ -361,77 +357,51 @@
             </layout>
            </item>
            <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Receiving address</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="lineEdit_address"/>
-           </item>
-           <item>
-            <layout class="QVBoxLayout" name="verticalLayout_7">
-             <item>
+            <layout class="QFormLayout" name="formLayout">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_2">
+               <property name="text">
+                <string>Receiving address</string>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLineEdit" name="lineEdit_address"/>
+             </item>
+             <item row="1" column="0">
               <widget class="QLabel" name="label_5">
                <property name="text">
                 <string>Password (optional)</string>
                </property>
               </widget>
              </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_10">
+             <item row="1" column="1">
+              <widget class="QLineEdit" name="lineEdit_password"/>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>XMRig executable</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
                <item>
-                <widget class="QLineEdit" name="lineEdit_password"/>
+                <widget class="QLineEdit" name="lineEdit_path">
+                 <property name="placeholderText">
+                  <string>/path/to/xmrig</string>
+                 </property>
+                </widget>
                </item>
                <item>
-                <spacer name="horizontalSpacer_6">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                <widget class="QPushButton" name="btn_browse">
+                 <property name="text">
+                  <string>Browse</string>
                  </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::Maximum</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>60</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
+                </widget>
                </item>
               </layout>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_13">
-             <item>
-              <widget class="QCheckBox" name="check_tls">
-               <property name="text">
-                <string>TLS</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="relayTor">
-               <property name="text">
-                <string>Tor</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_9">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>40</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
              </item>
             </layout>
            </item>
@@ -487,7 +457,7 @@
          <property name="sizeHint" stdset="0">
           <size>
            <width>20</width>
-           <height>2000</height>
+           <height>0</height>
           </size>
          </property>
         </spacer>
