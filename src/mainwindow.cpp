@@ -499,9 +499,8 @@ void MainWindow::initMenu() {
     connect(ui->actionAbout, &QAction::triggered, this, &MainWindow::menuAboutClicked);
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
 
-    // Close / Open
+    // Close wallet
     connect(ui->actionClose, &QAction::triggered, this, &MainWindow::menuWalletCloseClicked);
-    connect(ui->actionOpen, &QAction::triggered, this, &MainWindow::menuWalletOpenClicked);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){

@@ -386,7 +386,6 @@
     <property name="title">
      <string>File</string>
     </property>
-    <addaction name="actionOpen"/>
     <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
     <addaction name="separator"/>
@@ -500,14 +499,6 @@
    <addaction name="menuTools"/>
    <addaction name="menuHelp"/>
   </widget>
-  <action name="actionOpen">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
-   <property name="text">
-    <string>Open wallet</string>
-   </property>
-  </action>
   <action name="actionQuit">
    <property name="text">
     <string>Quit application</string>
