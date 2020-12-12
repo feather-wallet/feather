@@ -261,7 +261,7 @@
       <widget class="QWidget" name="tabCalc">
        <attribute name="icon">
         <iconset resource="assets.qrc">
-         <normaloff>:/assets/images/coldcard.png</normaloff>:/assets/images/coldcard.png</iconset>
+         <normaloff>:/assets/images/gnome-calc.png</normaloff>:/assets/images/gnome-calc.png</iconset>
        </attribute>
        <attribute name="title">
         <string>Calc</string>
