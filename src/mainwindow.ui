@@ -43,7 +43,7 @@
     <item row="1" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>7</number>
       </property>
       <property name="iconSize">
        <size>
@@ -357,10 +357,10 @@
       <widget class="QWidget" name="tabXmrRig">
        <attribute name="icon">
         <iconset resource="assets.qrc">
-         <normaloff>:/assets/images/xmrig.ico</normaloff>:/assets/images/xmrig.ico</iconset>
+         <normaloff>:/assets/images/mining.png</normaloff>:/assets/images/mining.png</iconset>
        </attribute>
        <attribute name="title">
-        <string>XMRig</string>
+        <string>Mining</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="0">
@@ -700,7 +700,7 @@
   </action>
   <action name="actionShow_XMRig">
    <property name="text">
-    <string>Show XMRig</string>
+    <string>Show Mining</string>
    </property>
   </action>
   <action name="actionImportTransaction">
