@@ -413,8 +413,8 @@ void MainWindow::initMenu() {
 
 #if defined(HAS_XMRIG)
     connect(ui->actionShow_XMRig, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["XMRig"] = new ToggleTab(ui->tabXmrRig, "XMRig", "XMRig", ui->actionShow_XMRig, Config::showTabXMRig);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_XMRig, "XMRig");
+    m_tabShowHideMapper["Mining"] = new ToggleTab(ui->tabXmrRig, "Mining", "Mining", ui->actionShow_XMRig, Config::showTabXMRig);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_XMRig, "Mining");
 #else
     ui->actionShow_XMRig->setVisible(false);
 #endif
