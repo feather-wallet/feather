@@ -8,11 +8,12 @@
 #include "utils/config.h"
 #include "mainwindow.h"
 
-TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool convertBalance) :
+TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool convertBalance, bool hidePercent) :
     QWidget(parent),
     ui(new Ui::TickerWidget),
     m_symbol(std::move(symbol)),
-    m_convertBalance(convertBalance)
+    m_convertBalance(convertBalance),
+    m_hidePercent(hidePercent)
 {
     ui->setupUi(this);
     m_ctx = MainWindow::getContext();
@@ -26,6 +27,8 @@ TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool 
     this->setFontSizes();
     this->setPctText(defaultPct, true);
     this->setFiatText(defaultFiat, 0.0);
+
+    ui->tickerPct->setHidden(hidePercent);
 
     connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
     connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
@@ -47,7 +50,7 @@ void TickerWidget::init() {
     double amount = m_convertBalance ? AppContext::balance : 1.0;
     double conversion = AppContext::prices->convert(m_symbol, fiatCurrency, amount);
     if (conversion < 0) return;
-    setPercentHidden(conversion == 0);
+    ui->tickerPct->setHidden(conversion == 0 || m_hidePercent);
 
     auto markets = AppContext::prices->markets;
     if(!markets.contains(m_symbol)) return;
@@ -83,10 +86,6 @@ void TickerWidget::setFontSizes() {
 
 void TickerWidget::removePctContainer() {
     ui->tickerPct->deleteLater();
-}
-
-void TickerWidget::setPercentHidden(bool hidden) {
-    ui->tickerPct->setVisible(!hidden);
 }
 
 TickerWidget::~TickerWidget() {

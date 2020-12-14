@@ -17,7 +17,7 @@ class TickerWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit TickerWidget(QWidget *parent, QString symbol, QString title = "", bool convertBalance = false);
+    explicit TickerWidget(QWidget *parent, QString symbol, QString title = "", bool convertBalance = false, bool hidePercent = false);
     void removePctContainer();
     void setFiatText(QString &fiatCurrency, double amount);
     void setPctText(QString &text, bool positive);
@@ -29,11 +29,10 @@ public slots:
     void init();
 
 private:
-    void setPercentHidden(bool hidden);
-
     Ui::TickerWidget *ui;
     QString m_symbol;
     bool m_convertBalance;
+    bool m_hidePercent;
     AppContext *m_ctx;
 };
 
