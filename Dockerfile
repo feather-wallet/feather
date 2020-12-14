@@ -174,11 +174,11 @@ RUN apt install -y wget && \
     ./b2 --with-atomic --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex --with-serialization --with-program_options --with-locale variant=release link=static runtime-link=static cflags="${CFLAGS}" cxxflags="${CXXFLAGS}" install -a --prefix=/usr && \
     rm -rf $(pwd)
 
-RUN wget https://www.openssl.org/source/openssl-1.1.1g.tar.gz && \
-    echo "ddb04774f1e32f0c49751e21b67216ac87852ceb056b75209af2443400636d46 openssl-1.1.1g.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.1.1g.tar.gz && \
-    rm openssl-1.1.1g.tar.gz && \
-    cd openssl-1.1.1g && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
+    echo "e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 openssl-1.1.1i.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1i.tar.gz && \
+    rm openssl-1.1.1i.tar.gz && \
+    cd openssl-1.1.1i && \
     ./config no-shared no-zlib-dynamic --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make -j$THREADS install && \
