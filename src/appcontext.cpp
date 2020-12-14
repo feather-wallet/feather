@@ -37,6 +37,7 @@ WalletKeysFilesModel *AppContext::wallets = nullptr;
 TxFiatHistory *AppContext::txFiatHistory = nullptr;
 double AppContext::balance = 0;
 QMap<QString, QString> AppContext::txDescriptionCache;
+QMap<QString, QString> AppContext::txCache;
 
 AppContext::AppContext(QCommandLineParser *cmdargs) {
     this->network = new QNetworkAccessManager();

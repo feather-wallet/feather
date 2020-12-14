@@ -86,6 +86,7 @@ public:
     static WalletKeysFilesModel *wallets;
     static double balance;
     static QMap<QString, QString> txDescriptionCache;
+    static QMap<QString, QString> txCache;
     static TxFiatHistory *txFiatHistory;
 
     // libwalletqt
@@ -172,7 +173,6 @@ signals:
     void setTitle(const QString &title); // set window title
 
 private:
-    void sorry();
     const unsigned int m_donationBoundary = 15;
     UtilsNetworking *m_utilsNetworkingNodes;
     QTimer *m_storeTimer = new QTimer(this);

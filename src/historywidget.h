@@ -29,14 +29,14 @@ public slots:
     void setSearchText(const QString &text);
 
 signals:
-    void spendProof(QString txid);
     void viewOnBlockExplorer(QString txid);
+    void resendTransaction(QString txid);
 
 private slots:
     void showTxDetails();
     void onViewOnBlockExplorer();
-    void getSpendProof();
     void setSearchFilter(const QString &filter);
+    void onResendTransaction();
 
 private:
     enum copyField {
@@ -46,6 +46,7 @@ private:
     };
 
     void copy(copyField field);
+    void showContextMenu(const QPoint &point);
 
     Ui::HistoryWidget *ui;
     QMenu *m_contextMenu;
