@@ -167,6 +167,7 @@ private:
     void touchbarShowWallet();
     void updatePasswordIcon();
     void updateNetStats();
+    void rescanSpent();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
