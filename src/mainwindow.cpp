@@ -104,7 +104,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
                                  "Try to explain not only what the bug is, but how it occurs.</body>");
     });
     connect(ui->actionShow_debug_info, &QAction::triggered, this, &MainWindow::showDebugInfo);
-    connect(ui->actionOfficialWebsite, &QAction::triggered, [=] { Utils::externalLinkWarning("https://featherwallet.org"); });
+    connect(ui->actionOfficialWebsite, &QAction::triggered, [=] { Utils::externalLinkWarning(this, "https://featherwallet.org"); });
 
 #if defined(HAS_XMRTO)
     // xmr.to connects/widget
@@ -115,7 +115,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->XMRTo, &XmrTo::connectionError, ui->xmrToWidget, &XMRToWidget::onConnectionError);
     connect(m_ctx->XMRTo, &XmrTo::connectionSuccess, ui->xmrToWidget, &XMRToWidget::onConnectionSuccess);
     connect(m_ctx, &AppContext::balanceUpdated, ui->xmrToWidget, &XMRToWidget::onBalanceUpdated);
-    connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(url); });
+    connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(this, url); });
     ui->xmrToWidget->setHistoryModel(m_ctx->XMRTo->tableModel);
 #else
     ui->tabExchanges->setTabVisible(0, false);
@@ -243,13 +243,13 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
                                     "for developers only. Your coins are WORTHLESS.");
     if(m_ctx->networkType == NetworkType::STAGENET) {
         if (config()->get(Config::warnOnStagenet).toBool()) {
-            Utils::showMessageBox("Warning", worthlessWarning.arg("stagenet"), true);
+            QMessageBox::warning(this, "Warning", worthlessWarning.arg("stagenet"));
             config()->set(Config::warnOnStagenet, false);
         }
     }
     else if(m_ctx->networkType == NetworkType::TESTNET){
         if (config()->get(Config::warnOnTestnet).toBool()) {
-            Utils::showMessageBox("Warning", worthlessWarning.arg("testnet"), true);
+            QMessageBox::warning(this, "Warning", worthlessWarning.arg("testnet"));
             config()->set(Config::warnOnTestnet, false);
         }
     }
@@ -463,7 +463,7 @@ void MainWindow::initMenu() {
         if(fn.isEmpty()) return;
         if(!fn.endsWith(".csv")) fn += ".csv";
         m_ctx->currentWallet->history()->writeCSV(fn);
-        Utils::showMessageBox("CSV export", QString("Transaction history exported to %1").arg(fn), false);
+        QMessageBox::information(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
     });
 
     // Contact widget
@@ -471,7 +471,7 @@ void MainWindow::initMenu() {
         if(m_ctx->currentWallet == nullptr) return;
         auto *model = m_ctx->currentWallet->addressBookModel();
         if (model->rowCount() <= 0){
-            Utils::showMessageBox("Error", "Addressbook empty", true);
+            QMessageBox::warning(this, "Error", "Addressbook empty");
             return;
         }
 
@@ -481,7 +481,7 @@ void MainWindow::initMenu() {
         qint64 now = QDateTime::currentDateTime().currentMSecsSinceEpoch();
         QString fn = QString("%1/monero-contacts_%2.csv").arg(targetDir, QString::number(now / 1000));
         if(model->writeCSV(fn))
-            Utils::showMessageBox("Address book exported", QString("Address book exported to %1").arg(fn), false);
+            QMessageBox::information(this, "Address book exported", QString("Address book exported to %1").arg(fn));
     });
 
     connect(ui->actionImportContactsCSV, &QAction::triggered, this, &MainWindow::importContacts);
@@ -560,7 +560,7 @@ void MainWindow::touchbarShowWallet() {
 }
 
 void MainWindow::onWalletCreatedError(const QString &err) {
-    Utils::showMessageBox("Wallet creation error", err, true);
+    QMessageBox::warning(this, "Wallet creation error", err);
     this->showWizard(WalletWizard::Page_CreateWallet);
 }
 
@@ -737,12 +737,12 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QStrin
             err = QString("%1 %2").arg(err).arg(tx_err);
 
         qDebug() << Q_FUNC_INFO << err;
-        Utils::showMessageBox("Transaction error", err, true);
+        QMessageBox::warning(this, "Transactions error", err);
         m_ctx->currentWallet->disposeTransaction(tx);
     } else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
-        Utils::showMessageBox("Transaction error", err, true);
+        QMessageBox::warning(this, "Transaction error", err);
         m_ctx->currentWallet->disposeTransaction(tx);
     } else {
         const auto &description = m_ctx->tmpTxDescription;
@@ -968,12 +968,12 @@ void MainWindow::menuWalletOpenClicked() {
 
     QFileInfo infoPath(path);
     if(!infoPath.isReadable()) {
-        Utils::showMessageBox("Cannot read wallet file", "Permission error.", true);
+        QMessageBox::warning(this, "Cannot read wallet file", "Permission error.");
         return;
     }
 
     if(path == m_ctx->walletPath) {
-        Utils::showMessageBox("Wallet already opened", "Please open another wallet.", true);
+        QMessageBox::warning(this, "Wallet already opened", "Please open another wallet.");
         return;
     }
 
@@ -1051,7 +1051,7 @@ void MainWindow::showSendScreen(const CCSEntry &entry) {
 
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
     QString blockExplorerLink = Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), m_ctx->networkType, txid);
-    Utils::externalLinkWarning(blockExplorerLink);
+    Utils::externalLinkWarning(this, blockExplorerLink);
 }
 
 void MainWindow::onAddContact(const QString &address, const QString &name) {

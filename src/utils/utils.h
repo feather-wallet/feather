@@ -75,8 +75,7 @@ public:
     static QStringList readJsonStringToQStringList(const QString &input);
     static void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
     static void openWindow(QWidget *w);
-    static void externalLinkWarning(const QString &url);
-    static int showMessageBox(const QString &windowTitle, const QString &body, bool warning);
+    static void externalLinkWarning(QWidget *parent, const QString &url);
     static QList<processStruct> procList();
     static bool dirExists(const QString &path);
     static QString barrayToString(const QByteArray &data);
@@ -97,8 +96,6 @@ public:
     static double roundSignificant(double N, double n);
     static QString formatBytes(quint64 bytes);
     static QString amountToCurrencyString(double amount, const QString &currencyCode);
-
-    static QStringList randomHTTPAgents;
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)

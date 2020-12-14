@@ -14,6 +14,7 @@
 #include <QKeyEvent>
 #include <QMenu>
 #include <QAction>
+#include <QMessageBox>
 
 CoinsWidget::CoinsWidget(QWidget *parent)
         : QWidget(parent)
@@ -197,7 +198,7 @@ void CoinsWidget::onSweepOutput() {
     qCritical() << "key image: " << keyImage;
 
     if (!keyImageKnown) {
-        Utils::showMessageBox("Unable to sweep output", "Unable to sweep output: key image unknown", true);
+        QMessageBox::warning(this, "Unable to sweep output", "Unable to sweep output: key image unknown");
         return;
     }
 
