@@ -276,7 +276,7 @@ bool Utils::testSocks5(const QString &host, quint16 port){
     return false;
 }
 
-void Utils::externalLinkWarning(const QString &url){
+void Utils::externalLinkWarning(QWidget *parent, const QString &url){
     if(!config()->get(Config::warnOnExternalLink).toBool()) {
         QDesktopServices::openUrl(QUrl(url));
         return;
@@ -286,7 +286,7 @@ void Utils::externalLinkWarning(const QString &url){
     body += QString("%1\n\n").arg(url);
     body += "You will NOT be using Tor.";
 
-    switch (Utils::showMessageBox("External link warning", body, true)) {
+    switch (QMessageBox::warning(parent, "External link warning", body, QMessageBox::Cancel|QMessageBox::Ok)) {
         case QMessageBox::Cancel:
             break;
         default:
@@ -325,26 +325,6 @@ bool Utils::walletExists(QString name, const QString &path) {
     name = name.replace(".keys", "");
     auto walletPath = QDir(path).filePath(name + ".keys");
     return Utils::fileExists(walletPath);
-}
-
-int Utils::showMessageBox(const QString &windowTitle, const QString &body, bool warning){
-    QMessageBox msgBox(QApplication::activeWindow());
-    msgBox.setWindowTitle(windowTitle);
-    msgBox.setText(body);
-    msgBox.setStandardButtons(QMessageBox::Ok | QMessageBox::Cancel);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-
-    if(warning) {
-        QPixmap iconWarning = QPixmap(":/assets/images/ghost_icon.png");
-        msgBox.setIconPixmap(iconWarning);
-    }
-    else {
-        QPixmap iconInfo = QPixmap(":/assets/images/info.png")
-                .scaled(QSize(48,48), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        msgBox.setIconPixmap(iconInfo);
-    }
-
-    return msgBox.exec();
 }
 
 void Utils::copyToClipboard(const QString &string){

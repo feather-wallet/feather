@@ -37,7 +37,7 @@ void RedditWidget::linkClicked() {
     auto post = m_model->post(index.row());
 
     if (post) {
-        Utils::externalLinkWarning(post->url);
+        Utils::externalLinkWarning(this, post->url);
     }
 }
 

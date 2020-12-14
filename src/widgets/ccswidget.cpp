@@ -42,7 +42,7 @@ void CCSWidget::linkClicked() {
     auto entry = m_model->entry(index.row());
 
     if (entry)
-        Utils::externalLinkWarning(entry->url);
+        Utils::externalLinkWarning(this, entry->url);
 }
 
 void CCSWidget::donateClicked() {

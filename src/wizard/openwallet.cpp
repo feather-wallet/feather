@@ -8,6 +8,7 @@
 
 #include <QPushButton>
 #include <QFileDialog>
+#include <QMessageBox>
 
 // @TODO: rescan wallet dir on wizard open
 
@@ -27,7 +28,7 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
 
         QFileInfo infoPath(path);
         if(!infoPath.isReadable()) {
-            Utils::showMessageBox("Cannot read wallet file", "Permission error.", true);
+            QMessageBox::warning(this, "Cannot read wallet file", "Permission error.");
             return;
         }
 
@@ -67,7 +68,7 @@ int OpenWalletPage::nextId() const {
 bool OpenWalletPage::validatePage() {
     QModelIndex index = ui->walletTable->currentIndex();
     if(!index.isValid()) {
-        Utils::showMessageBox("Wallet not selected", "Please select a wallet from the list.", true);
+        QMessageBox::warning(this, "Wallet not selected", "Please select a wallet from the list.");
         return false;
     }
     QString walletPath = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::ModelColumns::Path), Qt::UserRole).toString();

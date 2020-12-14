@@ -113,14 +113,14 @@ void NodeWidget::onContextWSStatusURL() {
     QModelIndex index = ui->wsView->currentIndex();
     if (!index.isValid()) return;
     FeatherNode node = m_wsModel->node(index.row());
-    Utils::externalLinkWarning(node.as_url());
+    Utils::externalLinkWarning(this, node.as_url());
 }
 
 void NodeWidget::onContextCustomStatusURL() {
     QModelIndex index = ui->customView->currentIndex();
     if (!index.isValid()) return;
     FeatherNode node = m_customModel->node(index.row());
-    Utils::externalLinkWarning(node.as_url());
+    Utils::externalLinkWarning(this, node.as_url());
 }
 
 void NodeWidget::onContextDisconnect() {

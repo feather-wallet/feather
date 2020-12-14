@@ -155,7 +155,7 @@ void XMRigWidget::onStartClicked() {
     if(username.isEmpty()) {
         QString err = "Please specify a receiving address on the Settings screen";
         ui->console->appendPlainText(err);
-        Utils::showMessageBox("Error", err, true);
+        QMessageBox::warning(this, "Error", err);
         return;
     }
 
@@ -286,7 +286,7 @@ void XMRigWidget::onSoloChecked(int state) {
 void XMRigWidget::linkClicked() {
     QModelIndex index = ui->tableView->currentIndex();
     auto download_link = m_urls.at(index.row());
-    Utils::externalLinkWarning(download_link);
+    Utils::externalLinkWarning(this, download_link);
 }
 
 QStandardItemModel *XMRigWidget::model() {

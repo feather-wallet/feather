@@ -86,7 +86,7 @@ void XMRToWidget::onCreateOrder() {
 
     auto amount = ui->lineAmount->text();
     if(amount.isEmpty()) {
-        Utils::showMessageBox("Cannot create XMR.To order", "Invalid amount", false);
+        QMessageBox::warning(this, "Cannot create XMR.To order", "Invalid amount");
         return;
     }
 
@@ -99,7 +99,7 @@ void XMRToWidget::onCreateOrder() {
 
     auto available = m_unlockedBalance;
     if(amount_xmr > available){
-        Utils::showMessageBox("Cannot create XMR.To order", "Not enough Monero to create order.", false);
+        QMessageBox::warning(this, "Cannot create XMR.To order", "Not enough Monero to create order.");
         return;
     }
 
