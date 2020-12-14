@@ -433,15 +433,16 @@ void MainWindow::initMenu() {
     connect(ui->actionPassword, &QAction::triggered, this, &MainWindow::showPasswordDialog);
     connect(ui->actionKeys, &QAction::triggered, this, &MainWindow::showKeysDialog);
     connect(ui->actionViewOnly, &QAction::triggered, this, &MainWindow::showViewOnlyDialog);
-    connect(ui->actionStore_wallet, &QAction::triggered, [&]{
+    connect(ui->actionStore_wallet, &QAction::triggered, [this]{
         m_ctx->currentWallet->store();
     });
-    connect(ui->actionRefresh_tabs, &QAction::triggered, [&]{
+    connect(ui->actionRefresh_tabs, &QAction::triggered, [this]{
         m_ctx->refreshModels();
     });
-    connect(ui->actionUpdate_balance, &QAction::triggered, [&]{
+    connect(ui->actionUpdate_balance, &QAction::triggered, [this]{
         m_ctx->updateBalance();
     });
+    connect(ui->actionRescan_spent, &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionExportKeyImages, &QAction::triggered, this, &MainWindow::exportKeyImages);
     connect(ui->actionImportKeyImages, &QAction::triggered, this, &MainWindow::importKeyImages);
     connect(ui->actionExportOutputs, &QAction::triggered, this, &MainWindow::exportOutputs);
@@ -1300,6 +1301,14 @@ void MainWindow::updateNetStats() {
     }
 
     m_statusLabelNetStats->setText(QString("(D: %1)").arg(Utils::formatBytes(m_ctx->currentWallet->getBytesReceived())));
+}
+
+void MainWindow::rescanSpent() {
+    if (!m_ctx->currentWallet->rescanSpent()) {
+        QMessageBox::warning(this, "Rescan spent", m_ctx->currentWallet->errorString());
+    } else {
+        QMessageBox::information(this, "Rescan spent", "Successfully rescanned spent outputs.");
+    }
 }
 
 MainWindow::~MainWindow() {

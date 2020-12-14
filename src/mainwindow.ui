@@ -429,6 +429,7 @@
      <addaction name="actionStore_wallet"/>
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
+     <addaction name="actionRescan_spent"/>
      <addaction name="separator"/>
      <addaction name="actionChange_restore_height"/>
      <addaction name="menuExport"/>
@@ -732,6 +733,11 @@
   <action name="actionShow_Exchange">
    <property name="text">
     <string>Show Exchange</string>
+   </property>
+  </action>
+  <action name="actionRescan_spent">
+   <property name="text">
+    <string>Rescan spent</string>
    </property>
   </action>
  </widget>
