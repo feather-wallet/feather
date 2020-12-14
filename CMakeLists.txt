@@ -7,7 +7,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
-set(VERSION "beta-1")
+set(VERSION "beta-2")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
 option(XMRTO "Include Xmr.To module" ON)
