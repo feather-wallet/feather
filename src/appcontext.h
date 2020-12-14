@@ -39,9 +39,11 @@ public:
     bool isTails = false;
     bool isWhonix = false;
     bool isDebug = false;
-    const QString featherDonationAddress = "47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f";
-    const int featherDonationAmount = 50;  // euro
-    bool featherDonationSending = false;
+
+    // Donation config
+    const QString donationAddress = "47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f";
+    const int donationAmount = 25;  // euro
+    bool donationSending = false;
 
     QCommandLineParser *cmdargs;
 
