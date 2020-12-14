@@ -180,12 +180,7 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case Address:
             return ModelUtils::displayAddress(cInfo.address(), 1, "");
         case AddressLabel:
-        {
-            if (cInfo.subaddrIndex() == 0) {
-                return cInfo.coinbase() ? "Coinbase" : "Change";
-            }
             return cInfo.addressLabel();
-        }
         case Spent:
             return cInfo.spent();
         case SpentHeight:

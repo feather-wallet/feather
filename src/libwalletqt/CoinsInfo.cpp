@@ -76,6 +76,10 @@ QString CoinsInfo::address() const {
 }
 
 QString CoinsInfo::addressLabel() const {
+    if (m_subaddrIndex == 0) {
+        return m_coinbase ? "Coinbase" : "Change";
+    }
+
     return m_addressLabel;
 }
 

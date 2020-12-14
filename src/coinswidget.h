@@ -48,6 +48,7 @@ private:
         KeyImage,
         TxID,
         Address,
+        Label,
         Height,
         Amount
     };
