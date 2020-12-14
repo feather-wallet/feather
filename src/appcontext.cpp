@@ -764,7 +764,10 @@ void AppContext::onTransactionCreated(PendingTransaction *tx, const QString &add
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
     this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
     this->currentWallet->coins()->refresh(this->currentWallet->currentSubaddressAccount());
-    this->storeWallet();
+
+    // Store wallet immediately so we don't risk losing tx key if wallet crashes
+    this->currentWallet->store();
+
     emit transactionCommitted(status, tx, txid);
 
     // this tx was a donation to Feather, stop our nagging
