@@ -30,9 +30,13 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
         ui->label_txKey->setText(txKey);
     }
 
+    QString blockHeight = QString::number(txInfo->blockHeight());
+    if (blockHeight == "0")
+        blockHeight = "Unconfirmed";
+
     ui->label_status->setText(QString("Status: %1 confirmations").arg(txInfo->confirmations()));
     ui->label_date->setText(QString("Date: %1").arg(txInfo->timestamp().toString("yyyy-MM-dd HH:mm")));
-    ui->label_blockHeight->setText(QString("Block height: %1").arg(txInfo->blockHeight()));
+    ui->label_blockHeight->setText(QString("Block height: %1").arg(blockHeight));
 
     QString direction = txInfo->direction() == TransactionInfo::Direction_In ? "received" : "sent";
     ui->label_amount->setText(QString("Amount %1: %2").arg(direction, txInfo->displayAmount()));
