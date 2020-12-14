@@ -55,17 +55,13 @@ void SendWidget::fill(double amount) {
     ui->lineAmount->setText(QString::number(amount));
 }
 
-void SendWidget::fill(const QString &address, const QString& description){
-    ui->lineDescription->setText(description);
-    ui->lineAddress->setText(address);
-    ui->lineAddress->setCursorPosition(0);
-}
-
 void SendWidget::fill(const QString &address, const QString &description, double amount) {
     ui->lineDescription->setText(description);
-    ui->lineAmount->setText(QString::number(amount));
     ui->lineAddress->setText(address);
     ui->lineAddress->setCursorPosition(0);
+    if (amount > 0)
+        ui->lineAmount->setText(QString::number(amount));
+    this->updateConversionLabel();
 }
 
 void SendWidget::fillAddress(const QString &address) {
@@ -74,7 +70,7 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::sendClicked() {
-    double amount = 0.0;
+    double amount;
     QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
     QString description = ui->lineDescription->text();

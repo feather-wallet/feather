@@ -1022,11 +1022,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::donateButtonClicked() {
-    double donation = AppContext::prices->convert("EUR", "XMR", m_ctx->featherDonationAmount);
-    if(donation <= 0)
-        donation = 1.337;
+    double donation = AppContext::prices->convert("EUR", "XMR", m_ctx->donationAmount);
+    if (donation <= 0)
+        donation = 0.1337;
 
-    ui->sendWidget->fill(m_ctx->featherDonationAddress, "Donation to the Feather development team", donation);
+    ui->sendWidget->fill(m_ctx->donationAddress, "Donation to the Feather development team", donation);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 

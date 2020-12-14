@@ -753,8 +753,8 @@ void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, q
 }
 
 void AppContext::onTransactionCreated(PendingTransaction *tx, const QString &address, const QString &paymentId, quint32 mixin) {
-    if(address == this->featherDonationAddress)
-        this->featherDonationSending = true;
+    if(address == this->donationAddress)
+        this->donationSending = true;
 
     // tx created, but not sent yet. ask user to verify first.
     emit createTransactionSuccess(tx, address, mixin);
@@ -768,8 +768,8 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
     emit transactionCommitted(status, tx, txid);
 
     // this tx was a donation to Feather, stop our nagging
-    if(this->featherDonationSending) {
-        this->featherDonationSending = false;
+    if(this->donationSending) {
+        this->donationSending = false;
         config()->set(Config::donateBeg, -1);
     }
 }

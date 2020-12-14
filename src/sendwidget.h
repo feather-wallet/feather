@@ -19,8 +19,7 @@ Q_OBJECT
 public:
     explicit SendWidget(QWidget *parent = nullptr);
     void fill(const CCSEntry &entry);
-    void fill(const QString &address, const QString& description);
-    void fill(const QString &address, const QString& description, double amount);
+    void fill(const QString &address, const QString& description, double amount = 0);
     void fill(double amount);
     void clearFields();
     ~SendWidget() override;
