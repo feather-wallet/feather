@@ -162,7 +162,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
         ui->tickerLayout->addWidget(tickerWidget);
     }
 
-    m_balanceWidget = new TickerWidget(this, "XMR", "Balance", true);
+    m_balanceWidget = new TickerWidget(this, "XMR", "Balance", true, true);
     ui->fiatTickerLayout->addWidget(m_balanceWidget);
 
     // Send widget
