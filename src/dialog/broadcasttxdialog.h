@@ -17,7 +17,7 @@ class BroadcastTxDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit BroadcastTxDialog(QWidget *parent, AppContext *ctx);
+    explicit BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QString &transactionHex = "");
     ~BroadcastTxDialog() override;
 
 private slots:

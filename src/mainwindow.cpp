@@ -289,11 +289,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     });
 
     // History
-    connect(ui->historyWidget, &HistoryWidget::spendProof, [&](const QString &txid){
-        TxProof txproof = m_ctx->currentWallet->getSpendProof(txid, "");
-        Utils::copyToClipboard(txproof.proof);
-    });
     connect(ui->historyWidget, &HistoryWidget::viewOnBlockExplorer, this, &MainWindow::onViewOnBlockExplorer);
+    connect(ui->historyWidget, &HistoryWidget::resendTransaction, this, &MainWindow::onResendTransaction);
 
     // Contacts
     connect(ui->contactWidget, &ContactsWidget::addContact, this, &MainWindow::onAddContact);
@@ -1053,6 +1050,20 @@ void MainWindow::showSendScreen(const CCSEntry &entry) {
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
     QString blockExplorerLink = Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), m_ctx->networkType, txid);
     Utils::externalLinkWarning(this, blockExplorerLink);
+}
+
+void MainWindow::onResendTransaction(const QString &txid) {
+    if (!AppContext::txCache.contains(txid)) {
+        QMessageBox::warning(this, "Unable to resend transaction", "Transaction was not found in transaction cache. Unable to resend.");
+        return;
+    }
+
+    // Connect to a different node so chances of successful relay are higher
+    m_ctx->nodes->autoConnect(true);
+
+    auto dialog = new BroadcastTxDialog(this, m_ctx, AppContext::txCache[txid]);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 void MainWindow::onAddContact(const QString &address, const QString &name) {

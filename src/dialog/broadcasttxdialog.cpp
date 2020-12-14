@@ -3,10 +3,11 @@
 
 #include "broadcasttxdialog.h"
 #include "ui_broadcasttxdialog.h"
+#include "utils/nodes.h"
 
 #include <QMessageBox>
 
-BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx)
+BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QString &transactionHex)
         : QDialog(parent)
         , m_ctx(ctx)
         , ui(new Ui::BroadcastTxDialog)
@@ -23,6 +24,10 @@ BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx)
 
     connect(m_rpc, &DaemonRpc::ApiResponse, this, &BroadcastTxDialog::onApiResponse);
 
+    if (!transactionHex.isEmpty()) {
+        ui->transaction->setPlainText(transactionHex);
+    }
+
     this->adjustSize();
 }
 
@@ -33,7 +38,7 @@ void BroadcastTxDialog::broadcastTx() {
         QString node;
         if (ui->radio_useCustom->isChecked())
             node = ui->customNode->text();
-        else
+        else if (ui->radio_useDefault->isChecked())
             node = m_ctx->nodes->connection().full;
 
         if (!node.startsWith("http://"))

@@ -51,6 +51,7 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
+    AppContext::txCache[tx->txid()[0]] = tx->signedTxToHex(0);
     this->adjustSize();
 }
 

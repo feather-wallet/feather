@@ -25,20 +25,9 @@ HistoryWidget::HistoryWidget(QWidget *parent)
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
     m_copyMenu->addAction("Amount", this, [this]{copy(copyField::Amount);});
-    auto spendProof = m_copyMenu->addAction("Spend proof", this, &HistoryWidget::getSpendProof);
 
     ui->history->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->history, &QTreeView::customContextMenuRequested, [=](const QPoint & point){
-        QModelIndex index = ui->history->indexAt(point);
-        if (index.isValid()) {
-            TransactionInfo::Direction direction;
-            m_txHistory->transaction(m_model->mapToSource(index).row(), [&direction](TransactionInfo &tInfo) {
-                direction = tInfo.direction();
-            });
-            spendProof->setVisible(direction == TransactionInfo::Direction_Out);
-            m_contextMenu->exec(ui->history->viewport()->mapToGlobal(point));
-        }
-    });
+    connect(ui->history, &QTreeView::customContextMenuRequested, this, &HistoryWidget::showContextMenu);
     connect(ui->search, &QLineEdit::textChanged, this, &HistoryWidget::setSearchFilter);
 
     connect(ui->history, &QTreeView::doubleClicked, [this](QModelIndex index){
@@ -48,6 +37,43 @@ HistoryWidget::HistoryWidget(QWidget *parent)
         }
     });
 
+}
+
+void HistoryWidget::showContextMenu(const QPoint &point) {
+    QModelIndex index = ui->history->indexAt(point);
+    if (!index.isValid()) {
+        return;
+    }
+
+    QMenu menu(this);
+    TransactionInfo::Direction direction;
+    QString txid;
+    bool unconfirmed;
+    m_txHistory->transaction(m_model->mapToSource(index).row(), [&direction, &txid, &unconfirmed](TransactionInfo &tInfo) {
+        direction = tInfo.direction();
+        txid = tInfo.hash();
+        unconfirmed = tInfo.isFailed() || tInfo.isPending();
+    });
+
+    if (AppContext::txCache.contains(txid) && unconfirmed) {
+        menu.addAction(QIcon(":/assets/images/info.png"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
+    }
+
+    menu.addMenu(m_copyMenu);
+    menu.addAction(QIcon(":/assets/images/info.png"), "Show details", this, &HistoryWidget::showTxDetails);
+    menu.addAction(QIcon(":/assets/images/network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+
+    menu.exec(ui->history->viewport()->mapToGlobal(point));
+}
+
+void HistoryWidget::onResendTransaction() {
+    QModelIndex index = ui->history->currentIndex();
+    QString txid;
+    m_txHistory->transaction(m_model->mapToSource(index).row(), [&txid](TransactionInfo &tInfo) {
+        txid = tInfo.hash();
+    });
+
+    emit resendTransaction(txid);
 }
 
 void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet)
@@ -84,14 +110,6 @@ void HistoryWidget::onViewOnBlockExplorer() {
         txid = tInfo.hash();
     });
     emit viewOnBlockExplorer(txid);
-}
-
-void HistoryWidget::getSpendProof() {
-    QModelIndex index = ui->history->currentIndex();
-
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [this](TransactionInfo &tInfo) {
-        emit spendProof(tInfo.hash());
-    });
 }
 
 void HistoryWidget::setSearchText(const QString &text) {
