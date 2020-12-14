@@ -36,6 +36,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
     m_copyMenu->addAction("Key Image", this, [this]{copy(copyField::KeyImage);});
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Address", this, [this]{copy(copyField::Address);});
+    m_copyMenu->addAction("Label", this, [this]{copy(copyField::Label);});
     m_copyMenu->addAction("Height", this, [this]{copy(copyField::Height);});
     m_copyMenu->addAction("Amount", this, [this]{copy(copyField::Amount);});
 
@@ -228,6 +229,9 @@ void CoinsWidget::copy(copyField field) {
                 break;
             case Address:
                 data = c.address();
+                break;
+            case Label:
+                data = c.addressLabel();
                 break;
             case Height:
                 data = QString::number(c.blockHeight());
