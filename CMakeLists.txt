@@ -191,7 +191,7 @@ if(TOR_BIN)
     # - linux: See `Dockerfile`
     # - windows: https://github.com/mxe/mxe/blob/1024dc7d2db5eb7d5d3c64a2c12b5f592572f1ce/plugins/apps/tor.mk
     # - macos: taken from Tor Browser official release
-    set(TOR_COPY_CMD "cp ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    set(TOR_COPY_CMD "cp -u ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
     message(STATUS "${TOR_COPY_CMD}")
     execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
     if(ret EQUAL "1")
