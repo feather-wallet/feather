@@ -20,7 +20,7 @@
 
 WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidget *parent) : QWizard(parent),
         m_ctx(ctx) {
-    this->setWindowTitle("Welcome to feather");
+    this->setWindowTitle("Welcome to Feather Wallet");
     this->setWindowIcon(QIcon(":/assets/images/appicons/64x64.png"));
     auto openWalletPage = new OpenWalletPage(m_ctx, this);
     auto createWallet = new CreateWalletPage(m_ctx, this);
