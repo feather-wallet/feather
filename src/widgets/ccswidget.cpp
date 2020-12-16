@@ -31,6 +31,8 @@ CCSWidget::CCSWidget(QWidget *parent) :
     connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &CCSWidget::showContextMenu);
 
     connect(ui->tableView, &QTableView::doubleClicked, this, &CCSWidget::linkClicked);
+
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 CCSModel* CCSWidget::model() {

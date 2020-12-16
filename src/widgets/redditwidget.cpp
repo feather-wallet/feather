@@ -26,6 +26,8 @@ RedditWidget::RedditWidget(QWidget *parent) :
     connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &RedditWidget::showContextMenu);
 
     connect(ui->tableView, &QTableView::doubleClicked, this, &RedditWidget::linkClicked);
+
+    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
 RedditModel* RedditWidget::model() {
