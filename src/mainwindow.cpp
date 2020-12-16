@@ -675,12 +675,12 @@ void MainWindow::onSynchronized() {
 }
 
 void MainWindow::onBlockchainSync(int height, int target) {
-    QString heightText = QString("Blockchain sync: %1/%2").arg(height).arg(target);
+    QString heightText = QString("Blockchain sync: %1 blocks remaining").arg(target - height);
     m_statusLabelStatus->setText(heightText);
 }
 
 void MainWindow::onRefreshSync(int height, int target) {
-    QString heightText = QString("Wallet refresh: %1/%2").arg(height).arg(target);
+    QString heightText = QString("Wallet refresh: %1 blocks remaining").arg(target - height);
     m_statusLabelStatus->setText(heightText);
     this->updateNetStats();
 }
