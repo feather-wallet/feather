@@ -49,9 +49,7 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
 
     QString destinations = txInfo->destinations_formatted();
     if (destinations.isEmpty()) {
-        ui->destinations->setHidden(true);
-        ui->label_destinations->setHidden(true);
-        ui->line_2->setHidden(true);
+        ui->frameDestinations->hide();
     } else {
         ui->destinations->setText(destinations);
     }
