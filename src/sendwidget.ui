@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>603</width>
+    <width>647</width>
     <height>175</height>
    </rect>
   </property>
@@ -39,7 +39,7 @@
     <number>0</number>
    </property>
    <item row="0" column="0">
-    <widget class="QLabel" name="label_2">
+    <widget class="HelpLabel" name="label_PayTo">
      <property name="text">
       <string>Pay to</string>
      </property>
@@ -53,7 +53,7 @@
     </widget>
    </item>
    <item row="1" column="0">
-    <widget class="QLabel" name="label">
+    <widget class="HelpLabel" name="label_Description">
      <property name="text">
       <string>Description</string>
      </property>
@@ -63,7 +63,7 @@
     <widget class="QLineEdit" name="lineDescription"/>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
+    <widget class="HelpLabel" name="label_Amount">
      <property name="text">
       <string>Amount</string>
      </property>
@@ -184,6 +184,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HelpLabel</class>
+   <extends>QLabel</extends>
+   <header>components.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
  <slots>

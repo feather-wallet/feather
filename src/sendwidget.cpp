@@ -30,6 +30,16 @@ SendWidget::SendWidget(QWidget *parent) :
     ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
 
+    ui->label_PayTo->setHelpText("Recipient of the funds.\n\n"
+                                 "You may enter a Monero address, or an alias (email-like address that forwards to a Monero address)");
+    ui->label_Description->setHelpText("Description of the transaction (optional).\n\n"
+                                       "The description is not sent to the recipient of the funds. It is stored in your wallet cache, "
+                                       "and displayed in the 'History' tab.");
+    ui->label_Amount->setHelpText("Amount to be sent.\n\nThis is the exact amount the recipient will receive. "
+                                  "In addition to this amount a transaction fee will be subtracted from your balance. "
+                                  "You will be able to review the transaction fee before the transaction is broadcast.\n\n"
+                                  "To send all your balance, click the Max button to the right.");
+
     this->setupComboBox();
 }
 
