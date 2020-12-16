@@ -57,7 +57,7 @@ void DebugInfoDialog::updateInfo() {
     ui->label_remoteNode->setText(node.full);
     ui->label_walletStatus->setText(this->statusToString(m_ctx->currentWallet->connectionStatus()));
     ui->label_torStatus->setText(torStatus);
-    ui->label_websocketStatus->setText(Utils::QtEnumToString(m_ctx->ws->webSocket.state()));
+    ui->label_websocketStatus->setText(Utils::QtEnumToString(m_ctx->ws->webSocket.state()).remove("State"));
 
     ui->label_netType->setText(Utils::QtEnumToString(m_ctx->currentWallet->nettype()));
     ui->label_seedType->setText(m_ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty() ? "25 word" : "14 word");
