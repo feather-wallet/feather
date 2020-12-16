@@ -32,16 +32,22 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     };
 
     QString amount = WalletManager::displayAmount(tx->amount());
-    QString amount_fiat = convert(tx->amount() / globals::cdiv);
-    ui->label_amount->setText(QString("%1 (%2 %3)").arg(amount, amount_fiat, preferredCur));
-
     QString fee = WalletManager::displayAmount(tx->fee());
-    QString fee_fiat = convert(tx->fee() / globals::cdiv);
-    ui->label_fee->setText(QString("%1 (%2 %3)").arg(fee, fee_fiat, preferredCur));
-
     QString total = WalletManager::displayAmount(tx->amount() + tx->fee());
+    QVector<QString> amounts = {amount, fee, total};
+    int maxLength = Utils::maxLength(amounts);
+    std::for_each(amounts.begin(), amounts.end(), [maxLength](QString& amount){amount = amount.rightJustified(maxLength, ' ');});
+
+    QString amount_fiat = convert(tx->amount() / globals::cdiv);
+    QString fee_fiat = convert(tx->fee() / globals::cdiv);
     QString total_fiat = convert((tx->amount() + tx->fee()) / globals::cdiv);
-    ui->label_total->setText(QString("%1 (%2 %3)").arg(total, total_fiat, preferredCur));
+    QVector<QString> amounts_fiat = {amount_fiat, fee_fiat, total_fiat};
+    int maxLengthFiat = Utils::maxLength(amounts_fiat);
+    std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
+
+    ui->label_amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
+    ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
+    ui->label_total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));
     ui->label_address->setFont(ModelUtils::getMonospaceFont());
