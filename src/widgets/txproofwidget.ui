@@ -48,7 +48,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="HelpLabel" name="label_SpendProof">
        <property name="text">
         <string>SpendProof</string>
        </property>
@@ -72,7 +72,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="HelpLabel" name="label_InOutProof">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -98,6 +98,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HelpLabel</class>
+   <extends>QLabel</extends>
+   <header>components.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
