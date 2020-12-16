@@ -32,6 +32,11 @@ TxProofWidget::TxProofWidget(QWidget *parent, Wallet *wallet, TransactionInfo *t
 
     connect(ui->btn_copySpendProof, &QPushButton::clicked, this, &TxProofWidget::copySpendProof);
     connect(ui->btn_copyTxProof, &QPushButton::clicked, this, &TxProofWidget::copyTxProof);
+
+    ui->label_SpendProof->setHelpText("A SpendProof proves authorship of a transaction.\n\n"
+                                            "SpendProofs do not prove that a particular amount was sent to an address, for that use OutProofs.");
+    ui->label_InOutProof->setHelpText("An InProof proves ownership of an output.\n"
+                                            "An OutProof shows the prover sent an output to an address.");
 }
 
 void TxProofWidget::copySpendProof() {
