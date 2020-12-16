@@ -16,7 +16,6 @@ MenuPage::MenuPage(AppContext *ctx, QWidget *parent) :
         ui(new Ui::MenuPage),
         m_ctx(ctx) {
     ui->setupUi(this);
-    this->setTitle("Welcome to feather");
     this->setButtonText(QWizard::FinishButton, "Open recent wallet");
     ui->radioCreate->setChecked(true);
 }
