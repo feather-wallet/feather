@@ -566,19 +566,33 @@ QString Utils::formatBytes(quint64 bytes)
     return QString("%1 %2").arg(QString::number(_data, 'f', 1), sizes[i]);
 }
 
-QString Utils::amountToCurrencyString(double amount, const QString &currencyCode) {
+
+QMap<QString, QLocale> Utils::localeCache = {};
+
+QLocale Utils::getCurrencyLocale(const QString &currencyCode) {
     QLocale locale;
-    QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
-    for (const auto& locale_: allLocales) {
-        if (locale_.currencySymbol(QLocale::CurrencyIsoCode) == currencyCode) {
-            locale = locale_;
+    if (localeCache.contains(currencyCode)) {
+        locale = localeCache[currencyCode];
+    } else {
+        QList<QLocale> allLocales = QLocale::matchingLocales(QLocale::AnyLanguage, QLocale::AnyScript, QLocale::AnyCountry);
+        for (const auto& locale_: allLocales) {
+            if (locale_.currencySymbol(QLocale::CurrencyIsoCode) == currencyCode) {
+                locale = locale_;
+            }
         }
+        localeCache[currencyCode] = locale;
     }
+    return locale;
+}
 
+QString Utils::amountToCurrencyString(double amount, const QString &currencyCode) {
+    QLocale locale = getCurrencyLocale(currencyCode);
+
+    // \xC2\xA0 = UTF-8 non-breaking space, it looks off.
     if (currencyCode == "USD")
-        return locale.toCurrencyString(amount, "$");
+        return locale.toCurrencyString(amount, "$").remove("\xC2\xA0");
 
-    return locale.toCurrencyString(amount);
+    return locale.toCurrencyString(amount).remove("\xC2\xA0");
 }
 
 int Utils::maxLength(const QVector<QString> &array) {
