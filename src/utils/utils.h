@@ -95,8 +95,10 @@ public:
     static QFont relativeFont(int delta);
     static double roundSignificant(double N, double n);
     static QString formatBytes(quint64 bytes);
+    static QLocale getCurrencyLocale(const QString &currencyCode);
     static QString amountToCurrencyString(double amount, const QString &currencyCode);
     static int maxLength(const QVector<QString> &array);
+    static QMap<QString, QLocale> localeCache;
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)
