@@ -22,6 +22,7 @@
 #include "utils.h"
 #include "utils/config.h"
 #include "utils/tails.h"
+#include "utils/whonix.h"
 
 // Application log for current session
 QVector<logMessage> applicationLog = QVector<logMessage>(); // todo: replace with ring buffer
@@ -284,7 +285,9 @@ void Utils::externalLinkWarning(QWidget *parent, const QString &url){
 
     QString body = "You are about to open the following link:\n\n";
     body += QString("%1\n\n").arg(url);
-    body += "You will NOT be using Tor.";
+
+    if (!(TailsOS::detect() || WhonixOS::detect()))
+        body += "You will NOT be using Tor.";
 
     switch (QMessageBox::warning(parent, "External link warning", body, QMessageBox::Cancel|QMessageBox::Ok)) {
         case QMessageBox::Cancel:
