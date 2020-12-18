@@ -28,6 +28,8 @@ signals:
     void openWallet(QString path);
 
 private:
+    void updatePath();
+
     AppContext *m_ctx;
     WalletKeysFilesModel *walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;

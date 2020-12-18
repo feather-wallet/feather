@@ -19,7 +19,7 @@
 using namespace std::chrono;
 
 
-WalletKeysFiles::WalletKeysFiles(const QFileInfo &info, quint8 networkType, QString address) :
+WalletKeysFiles::WalletKeysFiles(const QFileInfo &info, int networkType, QString address) :
         m_fileName(info.fileName()),
         m_modified(info.lastModified().toSecsSinceEpoch()),
         m_path(QDir::toNativeSeparators(info.absoluteFilePath())),
@@ -42,7 +42,7 @@ QString WalletKeysFiles::path() const {
     return m_path;
 }
 
-quint8 WalletKeysFiles::networkType() const {
+int WalletKeysFiles::networkType() const {
     return m_networkType;
 }
 
@@ -133,7 +133,7 @@ int WalletKeysFilesModel::rowCount(const QModelIndex & parent) const {
 }
 
 int WalletKeysFilesModel::columnCount(const QModelIndex &) const {
-    return 3;
+    return 4;
 }
 
 QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
@@ -162,13 +162,15 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
 #endif
                 return fp;
             }
+            case ModelColumns::Modified:
+                return walletKeyFile.modified();
             default:
                 break;
         }
     } else if(role == Qt::UserRole) {
         switch(index.column()) {
             case ModelColumns::NetworkType:
-                return static_cast<uint>(walletKeyFile.networkType());
+                return static_cast<int>(walletKeyFile.networkType());
             case ModelColumns::FileName:
                 return walletKeyFile.fileName();
             case ModelColumns::Modified:
@@ -201,9 +203,15 @@ QVariant WalletKeysFilesModel::headerData(int section, Qt::Orientation orientati
     return QVariant();
 }
 
-WalletKeysFilesProxyModel::WalletKeysFilesProxyModel(QObject *parent) :
-        QSortFilterProxyModel(parent) {}
+WalletKeysFilesProxyModel::WalletKeysFilesProxyModel(QObject *parent, NetworkType::Type nettype)
+    : QSortFilterProxyModel(parent)
+    , m_nettype(nettype)
+{
+}
 
 bool WalletKeysFilesProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const {
-    return true;
+    QModelIndex nettypeIndex = sourceModel()->index(sourceRow, WalletKeysFilesModel::NetworkType, sourceParent);
+    NetworkType::Type nettype = static_cast<NetworkType::Type>(sourceModel()->data(nettypeIndex, Qt::UserRole).toInt());
+
+    return (m_nettype == nettype);
 }
