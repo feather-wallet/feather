@@ -721,7 +721,8 @@ void AppContext::onWalletRefreshed(bool success) {
     if (!this->refreshed) {
         refreshModels();
         this->refreshed = true;
-        this->storeWallet();
+        // store wallet immediately upon finishing synchronization
+        this->currentWallet->store();
     }
 
     qDebug() << "Wallet refresh status: " << success;
