@@ -577,3 +577,14 @@ QString Utils::amountToCurrencyString(double amount, const QString &currencyCode
 
     return locale.toCurrencyString(amount);
 }
+
+int Utils::maxLength(const QVector<QString> &array) {
+    int maxLength = 0;
+    for (const auto &str: array) {
+        auto length = str.length();
+        if (length > maxLength) {
+            maxLength = length;
+        }
+    }
+    return maxLength;
+}

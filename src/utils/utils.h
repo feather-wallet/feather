@@ -96,6 +96,7 @@ public:
     static double roundSignificant(double N, double n);
     static QString formatBytes(quint64 bytes);
     static QString amountToCurrencyString(double amount, const QString &currencyCode);
+    static int maxLength(const QVector<QString> &array);
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)
