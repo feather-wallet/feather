@@ -49,11 +49,12 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
     this->walletKeysFilesModel = new WalletKeysFilesModel(m_ctx);
     this->walletKeysFilesModel->refresh();
 
-    m_keysProxy = new WalletKeysFilesProxyModel();
+    m_keysProxy = new WalletKeysFilesProxyModel(this, m_ctx->networkType);
     m_keysProxy->setSourceModel(this->walletKeysFilesModel);
     m_keysProxy->setSortRole(Qt::UserRole);
 
     ui->walletTable->setModel(m_keysProxy);
+    ui->walletTable->hideColumn(WalletKeysFilesModel::NetworkType);
     ui->walletTable->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->walletTable->header()->setSectionResizeMode(WalletKeysFilesModel::Path, QHeaderView::Stretch);
     ui->walletTable->setSortingEnabled(true);

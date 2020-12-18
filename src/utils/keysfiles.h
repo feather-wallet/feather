@@ -12,19 +12,19 @@
 class WalletKeysFiles
 {
 public:
-    WalletKeysFiles(const QFileInfo &info, quint8 networkType, QString address);
+    WalletKeysFiles(const QFileInfo &info, int networkType, QString address);
 
     QString fileName() const;
     qint64 modified() const;
     QString path() const;
-    quint8 networkType() const;
+    int networkType() const;
     QString address() const;
 
 private:
     QString m_fileName;
     qint64 m_modified;
     QString m_path;
-    quint8 m_networkType;
+    int m_networkType;
     QString m_address;
 };
 
@@ -64,8 +64,11 @@ class WalletKeysFilesProxyModel : public QSortFilterProxyModel
 {
 Q_OBJECT
 public:
-    explicit WalletKeysFilesProxyModel(QObject *parent = nullptr);
+    explicit WalletKeysFilesProxyModel(QObject *parent, NetworkType::Type nettype);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
+
+private:
+    NetworkType::Type m_nettype;
 };
 
 #endif // KEYSFILES_H
