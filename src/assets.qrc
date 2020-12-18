@@ -11,6 +11,9 @@
     <file>assets/images/appicons/128x128.png</file>
     <file>assets/images/appicons/256x256.png</file>
     <file>assets/images/arrow.svg</file>
+    <file>assets/images/banners/1.png</file>
+    <file>assets/images/banners/2.png</file>
+    <file>assets/images/banners/3.png</file>
     <file>assets/images/bitcoin.png</file>
     <file>assets/images/camera_dark.png</file>
     <file>assets/images/camera_white.png</file>
@@ -52,7 +55,6 @@
     <file>assets/images/network.png</file>
     <file>assets/images/offline_tx.png</file>
     <file>assets/images/person.svg</file>
-    <file>assets/images/photos/1.png</file>
     <file>assets/images/preferences.png</file>
     <file>assets/images/preferences.svg</file>
     <file>assets/images/qrcode.png</file>
