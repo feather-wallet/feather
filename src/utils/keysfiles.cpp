@@ -133,7 +133,7 @@ int WalletKeysFilesModel::rowCount(const QModelIndex & parent) const {
 }
 
 int WalletKeysFilesModel::columnCount(const QModelIndex &) const {
-    return 3;
+    return 4;
 }
 
 QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
@@ -162,6 +162,8 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
 #endif
                 return fp;
             }
+            case ModelColumns::Modified:
+                return walletKeyFile.modified();
             default:
                 break;
         }

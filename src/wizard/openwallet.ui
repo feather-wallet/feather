@@ -55,6 +55,13 @@
      </item>
     </layout>
    </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="labelPath">
+     <property name="text">
+      <string>path</string>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>

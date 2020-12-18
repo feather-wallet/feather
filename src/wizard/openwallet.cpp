@@ -55,11 +55,27 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
 
     ui->walletTable->setModel(m_keysProxy);
     ui->walletTable->hideColumn(WalletKeysFilesModel::NetworkType);
-    ui->walletTable->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->walletTable->header()->setSectionResizeMode(WalletKeysFilesModel::Path, QHeaderView::Stretch);
+    ui->walletTable->hideColumn(WalletKeysFilesModel::Path);
+    ui->walletTable->hideColumn(WalletKeysFilesModel::Modified);
+    ui->walletTable->header()->setSectionResizeMode(WalletKeysFilesModel::FileName, QHeaderView::Stretch);
     ui->walletTable->setSortingEnabled(true);
-    ui->walletTable->sortByColumn(WalletKeysFilesModel::Modified, Qt::AscendingOrder); // @TODO: this does not work
+    ui->walletTable->sortByColumn(WalletKeysFilesModel::Modified, Qt::DescendingOrder);
     ui->walletTable->show();
+
+    connect(ui->walletTable->selectionModel(), &QItemSelectionModel::currentRowChanged, [this](QModelIndex current, QModelIndex prev){
+        this->updatePath();
+    });
+}
+
+void OpenWalletPage::updatePath() {
+    QModelIndex index = ui->walletTable->currentIndex();
+    if (!index.isValid()) {
+        ui->labelPath->clear();
+        return;
+    }
+
+    QString path = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Path), Qt::DisplayRole).toString();
+    ui->labelPath->setText(path);
 }
 
 int OpenWalletPage::nextId() const {
