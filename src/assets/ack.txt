@@ -1,8 +1,10 @@
+The wallet UI is heavily inspired by Electrum. We would like to recognize Thomas Voegtlin for his pioneering work on Bitcoin.
+
 Feather uses monero-seed written by Tevador, for 14 word mnemonic seeds.
 
-Initial CMake support for the Monero GUI was coded by TheCharlatan/xiphon.
+Wizard banner art was adapted from a paper wallet design by the themonera (themonera.art).
 
-The wallet UI is heavily inspired by Electrum. We would like to recognize Thomas Voegtlin for his pioneering work on Bitcoin.
+Initial CMake support for the Monero GUI was coded by TheCharlatan/xiphon.
 
 Huge thanks to nioc, fluffypony, wowario, thrmo for help during development.
 

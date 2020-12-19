@@ -38,7 +38,7 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     else
         setStartId(Page_Menu);
 
-    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/assets/images/photos/1.png"));
+    setPixmap(QWizard::WatermarkPixmap, QPixmap(":/assets/images/banners/3.png"));
     setWizardStyle(WizardStyle::ModernStyle);
     setOption(QWizard::NoBackButtonOnStartPage);
 
