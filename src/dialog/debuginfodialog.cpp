@@ -62,6 +62,7 @@ void DebugInfoDialog::updateInfo() {
     ui->label_netType->setText(Utils::QtEnumToString(m_ctx->currentWallet->nettype()));
     ui->label_seedType->setText(m_ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty() ? "25 word" : "14 word");
     ui->label_viewOnly->setText(m_ctx->currentWallet->viewOnly() ? "True" : "False");
+    ui->label_primaryOnly->setText(m_ctx->currentWallet->balance(0) == m_ctx->currentWallet->balanceAll() ? "True" : "False");
 
     QString os = QSysInfo::prettyProductName();
     if (m_ctx->isTails) {
