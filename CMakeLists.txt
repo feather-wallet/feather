@@ -11,7 +11,6 @@ set(VERSION "beta-2")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
 option(XMRTO "Include Xmr.To module" ON)
-option(MORPHTOKEN "Include MorphToken module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
 

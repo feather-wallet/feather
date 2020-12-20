@@ -324,32 +324,6 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="tabMorphToken">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/morphtoken.png</normaloff>:/assets/images/morphtoken.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>MorphToken</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_9">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="MorphTokenWidget" name="morphtokenWidget" native="true"/>
-            </item>
-           </layout>
-          </widget>
          </widget>
         </item>
        </layout>
@@ -782,12 +756,6 @@
    <class>CalcWidget</class>
    <extends>QWidget</extends>
    <header>calcwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>MorphTokenWidget</class>
-   <extends>QWidget</extends>
-   <header>MorphTokenWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
