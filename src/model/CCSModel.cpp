@@ -22,8 +22,6 @@ void CCSModel::updateEntries(const QList<QSharedPointer<CCSEntry>>& entries) {
 
     m_entries.clear();
     for (const auto& entry : entries) {
-        if (entry->raised_amount > entry->target_amount)
-            continue;
         m_entries.push_back(entry);
     }
 
