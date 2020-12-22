@@ -101,7 +101,7 @@ void Nodes::connectToNode() {
     // auto connect
     m_wsExhaustedWarningEmitted = false;
     m_customExhaustedWarningEmitted = false;
-    this->autoConnect();
+    this->autoConnect(true);
 }
 
 void Nodes::connectToNode(const FeatherNode &node) {
