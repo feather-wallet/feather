@@ -183,6 +183,7 @@ void SendWidget::clearFields() {
 
 void SendWidget::onWalletClosed() {
     this->clearFields();
+    ui->btnSend->setEnabled(true);
 }
 
 void SendWidget::onInitiateTransaction() {
