@@ -12,6 +12,7 @@ SendWidget::SendWidget(QWidget *parent) :
         ui(new Ui::SendWidget)
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     QString amount_rx = R"(^\d{0,8}[\.,]\d{0,12}|(all)$)";
     QRegExp rx;
@@ -80,6 +81,13 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::sendClicked() {
+    if (m_ctx->currentWallet->connectionStatus() != Wallet::ConnectionStatus_Connected) {
+        QMessageBox::warning(this, "Error", "Unable to create transaction:\n\n"
+                                            "Wallet is not connected to a node.\n"
+                                            "Go to File -> Settings -> Node to manually connect to a node.");
+        return;
+    }
+
     double amount;
     QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
