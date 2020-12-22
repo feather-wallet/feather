@@ -21,6 +21,14 @@ WSClient::WSClient(AppContext *ctx, const QUrl &url, QObject *parent) :
     connect(&this->webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WSClient::onError);
 
     m_tor = url.host().endsWith(".onion");
+
+    // Keep websocket connection alive
+    connect(&m_pingTimer, &QTimer::timeout, [this]{
+        if (this->webSocket.state() == QAbstractSocket::ConnectedState)
+            this->webSocket.ping();
+    });
+    m_pingTimer.setInterval(30 * 1000);
+    m_pingTimer.start();
 }
 
 void WSClient::sendMsg(const QByteArray &data) {

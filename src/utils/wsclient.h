@@ -33,6 +33,7 @@ private slots:
 
 private:
     QTimer m_connectionTimer;
+    QTimer m_pingTimer;
     AppContext *m_ctx;
     bool m_tor = true;
 };
