@@ -55,7 +55,7 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
         unconfirmed = tInfo.isFailed() || tInfo.isPending();
     });
 
-    if (AppContext::txCache.contains(txid) && unconfirmed) {
+    if (AppContext::txCache.contains(txid) && unconfirmed && direction != TransactionInfo::Direction_In) {
         menu.addAction(QIcon(":/assets/images/info.png"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
