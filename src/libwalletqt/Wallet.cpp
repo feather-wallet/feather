@@ -39,7 +39,7 @@ namespace {
     static const int DAEMON_BLOCKCHAIN_TARGET_HEIGHT_CACHE_TTL_SECONDS = 30;
     static const int WALLET_CONNECTION_STATUS_CACHE_TTL_SECONDS = 5;
 
-    static constexpr char ATTRIBUTE_SUBADDRESS_ACCOUNT[] ="gui.subaddress_account";
+    static constexpr char ATTRIBUTE_SUBADDRESS_ACCOUNT[] = "feather.subaddress_account";
 }
 
 Wallet::Wallet(QObject * parent)
