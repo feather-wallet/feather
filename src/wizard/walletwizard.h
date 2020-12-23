@@ -25,6 +25,8 @@ signals:
 
 private:
     AppContext *m_ctx;
+    WalletKeysFilesModel *m_walletKeysFilesModel;
+
     void createWallet();
 };
 

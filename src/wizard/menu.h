@@ -19,13 +19,14 @@ class MenuPage : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit MenuPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit MenuPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
 private:
     AppContext *m_ctx;
-    QLabel *topLabel;
+    WalletKeysFilesModel *m_walletKeysFilesModel;
     Ui::MenuPage *ui;
 };
 

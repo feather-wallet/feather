@@ -20,7 +20,8 @@ class OpenWalletPage : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit OpenWalletPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
@@ -31,10 +32,8 @@ private:
     void updatePath();
 
     AppContext *m_ctx;
-    WalletKeysFilesModel *walletKeysFilesModel;
+    WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
-    QSortFilterProxyModel *ll;
-    QLabel *topLabel;
     Ui::OpenWalletPage *ui;
     QStandardItemModel *m_model;
 };

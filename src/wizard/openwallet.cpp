@@ -10,12 +10,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-// @TODO: rescan wallet dir on wizard open
-
-OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
-        QWizardPage(parent),
-        ui(new Ui::OpenWalletPage),
-        m_ctx(ctx) {
+OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent)
+        : QWizardPage(parent)
+        , ui(new Ui::OpenWalletPage)
+        , m_ctx(ctx)
+        , m_walletKeysFilesModel(wallets)
+{
     ui->setupUi(this);
 
     connect(ui->btnBrowse, &QPushButton::clicked, [=]{
@@ -46,11 +46,8 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
     ui->walletTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->walletTable->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    this->walletKeysFilesModel = new WalletKeysFilesModel(m_ctx);
-    this->walletKeysFilesModel->refresh();
-
     m_keysProxy = new WalletKeysFilesProxyModel(this, m_ctx->networkType);
-    m_keysProxy->setSourceModel(this->walletKeysFilesModel);
+    m_keysProxy->setSourceModel(m_walletKeysFilesModel);
     m_keysProxy->setSortRole(Qt::UserRole);
 
     ui->walletTable->setModel(m_keysProxy);
@@ -65,6 +62,10 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, QWidget *parent) :
     connect(ui->walletTable->selectionModel(), &QItemSelectionModel::currentRowChanged, [this](QModelIndex current, QModelIndex prev){
         this->updatePath();
     });
+}
+
+void OpenWalletPage::initializePage() {
+    m_walletKeysFilesModel->refresh();
 }
 
 void OpenWalletPage::updatePath() {

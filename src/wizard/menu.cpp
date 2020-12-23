@@ -11,13 +11,22 @@
 
 #include "libwalletqt/WalletManager.h"
 
-MenuPage::MenuPage(AppContext *ctx, QWidget *parent) :
-        QWizardPage(parent),
-        ui(new Ui::MenuPage),
-        m_ctx(ctx) {
+MenuPage::MenuPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent)
+        : QWizardPage(parent)
+        , ui(new Ui::MenuPage)
+        , m_ctx(ctx)
+        , m_walletKeysFilesModel(wallets)
+{
     ui->setupUi(this);
     this->setButtonText(QWizard::FinishButton, "Open recent wallet");
-    ui->radioCreate->setChecked(true);
+}
+
+void MenuPage::initializePage() {
+    if (m_walletKeysFilesModel->rowCount() > 0) {
+        ui->radioOpen->setChecked(true);
+    } else {
+        ui->radioCreate->setChecked(true);
+    }
 }
 
 int MenuPage::nextId() const {
