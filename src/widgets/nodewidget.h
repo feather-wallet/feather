@@ -35,12 +35,9 @@ public slots:
 
 private slots:
     void onContextConnect();
-    void onContextDisconnect();
     void onContextCustomNodeRemove();
-    void onContextWSStatusURL();
-    void onContextCustomStatusURL();
-    void onContextWSNodeCopy();
-    void onContextCustomNodeCopy();
+    void onContextStatusURL();
+    void onContextNodeCopy();
 
 signals:
     void connectToNode(FeatherNode node);
@@ -54,14 +51,13 @@ private:
 
     QTreeView *m_activeView;
 
-    QMenu *m_contextMenu;
     QAction *m_contextActionConnect;
-    QAction *m_contextActionDisconnect;
     QAction *m_contextActionRemove;
     QAction *m_contextActionOpenStatusURL;
     QAction *m_contextActionCopy;
 
     void showContextMenu(const QPoint &pos, const FeatherNode &node);
+    FeatherNode selectedNode();
 };
 
 #endif // NODEWIDGET_H
