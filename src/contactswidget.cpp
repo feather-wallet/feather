@@ -5,17 +5,17 @@
 #include "ui_contactswidget.h"
 #include "dialog/contactsdialog.h"
 #include "model/ModelUtils.h"
-#include "utils/utils.h"
+#include "mainwindow.h"
+#include "libwalletqt/AddressBook.h"
 
-#include <QClipboard>
-#include <QDebug>
-#include <QKeyEvent>
+#include <QMessageBox>
 
 ContactsWidget::ContactsWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::ContactsWidget)
 {
     ui->setupUi(this);
+    m_ctx = MainWindow::getContext();
 
     // header context menu
     ui->contacts->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -28,15 +28,16 @@ ContactsWidget::ContactsWidget(QWidget *parent) :
     // context menu
     ui->contacts->setContextMenuPolicy(Qt::CustomContextMenu);
     m_contextMenu = new QMenu(ui->contacts);
-    m_contextMenu->addAction(QIcon(":/assets/images/person.svg"), "New contact", this, &ContactsWidget::newContact);
-
+    m_contextMenu->addAction(QIcon(":/assets/images/person.svg"), "New contact", [this]{
+        this->newContact();
+    });
 
     // row context menu
     m_rowMenu = new QMenu(ui->contacts);
     m_rowMenu->addAction(QIcon(":/assets/images/copy.png"), "Copy address", this, &ContactsWidget::copyAddress);
     m_rowMenu->addAction(QIcon(":/assets/images/copy.png"), "Copy name", this, &ContactsWidget::copyName);
-    m_rowMenu->addAction(QIcon(":/assets/images/appicons/128x128.png"), "Pay to", this, &ContactsWidget::payTo);
-    m_deleteEntryAction = m_rowMenu->addAction("Delete", this, &ContactsWidget::deleteContact);
+    m_rowMenu->addAction("Pay to", this, &ContactsWidget::payTo);
+    m_rowMenu->addAction("Delete", this, &ContactsWidget::deleteContact);
 
     connect(ui->contacts, &QTreeView::customContextMenuRequested, [=](const QPoint & point){
         QModelIndex index = ui->contacts->indexAt(point);
@@ -95,16 +96,44 @@ void ContactsWidget::showHeaderMenu(const QPoint& position)
     m_headerMenu->exec(QCursor::pos());
 }
 
-void ContactsWidget::newContact()
+void ContactsWidget::newContact(QString address, QString name)
 {
-    auto * dialog = new ContactsDialog(this);
+    auto * dialog = new ContactsDialog(this, address, name);
     int ret = dialog->exec();
     if (!ret) return;
 
-    QString address = dialog->getAddress();
-    QString name = dialog->getName();
+    address = dialog->getAddress();
+    name = dialog->getName();
 
-    emit addContact(address, name);
+    bool addressValid = WalletManager::addressValid(address, m_ctx->currentWallet->nettype());
+    if (!addressValid) {
+        QMessageBox::warning(this, "Invalid address", "Invalid address");
+        return;
+    }
+
+    int num_addresses = m_ctx->currentWallet->addressBook()->count();
+    QString address_entry;
+    QString name_entry;
+    for (int i=0; i<num_addresses; i++) {
+        m_ctx->currentWallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
+            address_entry = entry.address();
+            name_entry = entry.description();
+        });
+
+        if (address == address_entry) {
+            QMessageBox::warning(this, "Unable to add contact", "Duplicate address");
+            ui->contacts->setCurrentIndex(m_model->index(i,0)); // Highlight duplicate address
+            return;
+        }
+        if (name == name_entry) {
+            QMessageBox::warning(this, "Unable to add contact", "Duplicate label");
+            this->newContact(address, name);
+            return;
+        }
+    }
+
+    m_ctx->currentWallet->addressBook()->addRow(address, "", name);
+    m_ctx->storeWallet();
 }
 
 void ContactsWidget::deleteContact()

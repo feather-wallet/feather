@@ -118,7 +118,6 @@ public slots:
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
     void onViewOnBlockExplorer(const QString &txid);
     void onResendTransaction(const QString &txid);
-    void onAddContact(const QString &address, const QString &name);
     void importContacts();
     void showRestoreHeightDialog();
     void importTransaction();

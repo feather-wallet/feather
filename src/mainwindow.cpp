@@ -289,7 +289,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->historyWidget, &HistoryWidget::resendTransaction, this, &MainWindow::onResendTransaction);
 
     // Contacts
-    connect(ui->contactWidget, &ContactsWidget::addContact, this, &MainWindow::onAddContact);
     connect(ui->contactWidget, &ContactsWidget::fillAddress, ui->sendWidget, &SendWidget::fillAddress);
 
     // Open alias
@@ -1052,16 +1051,6 @@ void MainWindow::onResendTransaction(const QString &txid) {
     auto dialog = new BroadcastTxDialog(this, m_ctx, AppContext::txCache[txid]);
     dialog->exec();
     dialog->deleteLater();
-}
-
-void MainWindow::onAddContact(const QString &address, const QString &name) {
-    bool addressValid = WalletManager::addressValid(address, m_ctx->currentWallet->nettype());
-    if (!addressValid)
-        QMessageBox::warning(this, "Invalid address", "Invalid address");
-    else {
-        m_ctx->currentWallet->addressBook()->addRow(address, "", name);
-        m_ctx->storeWallet();
-    }
 }
 
 void MainWindow::importContacts() {
