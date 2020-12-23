@@ -637,7 +637,7 @@ void MainWindow::onWalletOpened() {
     this->touchbarShowWallet();
     this->updatePasswordIcon();
 
-    m_updateBytes.start(1000);
+    m_updateBytes.start(100);
 }
 
 void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
@@ -663,14 +663,15 @@ void MainWindow::onSynchronized() {
 }
 
 void MainWindow::onBlockchainSync(int height, int target) {
-    QString heightText = QString("Blockchain sync: %1 blocks remaining").arg(target - height);
+    QString blocks = (target >= height) ? QString::number(target - height) : "?";
+    QString heightText = QString("Blockchain sync: %1 blocks remaining").arg(blocks);
     m_statusLabelStatus->setText(heightText);
 }
 
 void MainWindow::onRefreshSync(int height, int target) {
-    QString heightText = QString("Wallet refresh: %1 blocks remaining").arg(target - height);
+    QString blocks = (target >= height) ? QString::number(target - height) : "?";
+    QString heightText = QString("Wallet refresh: %1 blocks remaining").arg(blocks);
     m_statusLabelStatus->setText(heightText);
-    this->updateNetStats();
 }
 
 void MainWindow::onConnectionStatusChanged(int status)
