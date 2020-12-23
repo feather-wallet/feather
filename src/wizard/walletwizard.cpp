@@ -18,14 +18,20 @@
 #include <QScreen>
 #include <QApplication>
 
-WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidget *parent) : QWizard(parent),
-        m_ctx(ctx) {
+WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidget *parent)
+        : QWizard(parent)
+        , m_ctx(ctx)
+{
     this->setWindowTitle("Welcome to Feather Wallet");
     this->setWindowIcon(QIcon(":/assets/images/appicons/64x64.png"));
-    auto openWalletPage = new OpenWalletPage(m_ctx, this);
+
+    m_walletKeysFilesModel = new WalletKeysFilesModel(m_ctx, this);
+    m_walletKeysFilesModel->refresh();
+
+    auto openWalletPage = new OpenWalletPage(m_ctx, m_walletKeysFilesModel, this);
     auto createWallet = new CreateWalletPage(m_ctx, this);
     auto createWalletSeed = new CreateWalletSeedPage(m_ctx, this);
-    setPage(Page_Menu, new MenuPage(m_ctx, this));
+    setPage(Page_Menu, new MenuPage(m_ctx, m_walletKeysFilesModel, this));
     setPage(Page_CreateWallet, createWallet);
     setPage(Page_OpenWallet, openWalletPage);
     setPage(Page_CreateWalletSeed, createWalletSeed);

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>424</width>
-    <height>245</height>
+    <width>617</width>
+    <height>463</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,6 +29,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioCreate">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>Create new wallet</string>
      </property>
@@ -36,6 +39,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioOpen">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>Open wallet file</string>
      </property>
@@ -43,6 +49,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioSeed">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>Restore wallet from seed</string>
      </property>
@@ -50,6 +59,9 @@
    </item>
    <item>
     <widget class="QRadioButton" name="radioViewOnly">
+     <property name="focusPolicy">
+      <enum>Qt::ClickFocus</enum>
+     </property>
      <property name="text">
       <string>Import from keys</string>
      </property>
