@@ -18,10 +18,10 @@
 #include "utils/nodes.h"
 #include "mainwindow.h"
 
-NodeWidget::NodeWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::NodeWidget),
-        m_contextMenu(new QMenu(this)) {
+NodeWidget::NodeWidget(QWidget *parent)
+        : QWidget(parent)
+        , ui(new Ui::NodeWidget)
+{
     ui->setupUi(this);
 
     connect(ui->btn_add_custom, &QPushButton::clicked, this, &NodeWidget::onCustomAddClicked);
@@ -35,112 +35,91 @@ NodeWidget::NodeWidget(QWidget *parent) :
         }
     });
 
+    m_contextActionRemove = new QAction("Remove", this);
+    m_contextActionConnect = new QAction(QIcon(":/assets/images/connect.svg"), "Connect to node", this);
+    m_contextActionOpenStatusURL = new QAction(QIcon(":/assets/images/network.png"), "Visit status page", this);
+    m_contextActionCopy = new QAction(QIcon(":/assets/images/copy.png"), "Copy", this);
+    connect(m_contextActionConnect, &QAction::triggered, this, &NodeWidget::onContextConnect);
+    connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
+    connect(m_contextActionOpenStatusURL, &QAction::triggered, this, &NodeWidget::onContextStatusURL);
+    connect(m_contextActionCopy, &QAction::triggered, this, &NodeWidget::onContextNodeCopy);
+    connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
+
     ui->wsView->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->customView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->wsView, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowWSContextMenu);
     connect(ui->customView, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowCustomContextMenu);
+
+    connect(ui->customView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
+    connect(ui->wsView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
 }
 
 void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
-    QModelIndex index = ui->wsView->indexAt(pos);
-    if (!index.isValid()) return;
+    m_activeView = ui->wsView;
+    FeatherNode node = this->selectedNode();
+    if (node.full.isEmpty()) return;
 
-    FeatherNode node = m_wsModel->node(index.row());
     this->showContextMenu(pos, node);
 }
 
 void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
-    QModelIndex index = ui->customView->indexAt(pos);
-    if (!index.isValid()) return;
+    m_activeView = ui->customView;
+    FeatherNode node = this->selectedNode();
+    if (node.full.isEmpty()) return;
 
-    FeatherNode node = m_customModel->node(index.row());
     this->showContextMenu(pos, node);
 }
 
-
 void NodeWidget::showContextMenu(const QPoint &pos, const FeatherNode &node) {
-    bool custom = node.custom;
-    m_activeView = custom ? ui->customView : ui->wsView;
+    QMenu menu(this);
 
-    m_contextActionRemove = new QAction("Remove");
-    m_contextActionConnect = new QAction("Connect to node");
-    m_contextActionConnect->setIcon(QIcon(":/assets/images/connect.svg"));
-    m_contextActionOpenStatusURL = new QAction("Visit status page");
-    m_contextActionOpenStatusURL->setIcon(QIcon(":/assets/images/network.png"));
-    m_contextActionCopy = new QAction("Copy");
-    m_contextActionCopy->setIcon(QIcon(":/assets/images/copy.png"));
-
-    if(!node.isActive) {
-        connect(m_contextActionConnect, &QAction::triggered, this, &NodeWidget::onContextConnect);
-        m_contextMenu->addAction(m_contextActionConnect);
+    if (!node.isActive) {
+        menu.addAction(m_contextActionConnect);
     }
 
-    m_contextMenu->addAction(m_contextActionOpenStatusURL);
-    m_contextMenu->addAction(m_contextActionCopy);
+    menu.addAction(m_contextActionOpenStatusURL);
+    menu.addAction(m_contextActionCopy);
 
-    if(custom) {
-        connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
-        m_contextMenu->addAction(m_contextActionRemove);
+    if (m_activeView == ui->customView)
+        menu.addAction(m_contextActionRemove);
 
-        connect(m_contextActionOpenStatusURL, &QAction::triggered, this, &NodeWidget::onContextCustomStatusURL);
-        connect(m_contextActionCopy, &QAction::triggered, this, &NodeWidget::onContextCustomNodeCopy);
-    } else {
-        connect(m_contextActionOpenStatusURL, &QAction::triggered, this, &NodeWidget::onContextWSStatusURL);
-        connect(m_contextActionCopy, &QAction::triggered, this, &NodeWidget::onContextWSNodeCopy);
-    }
-
-    m_contextMenu->exec(m_activeView->viewport()->mapToGlobal(pos));
-    m_contextActionRemove->deleteLater();
-    m_contextActionConnect->deleteLater();
-    m_contextActionOpenStatusURL->deleteLater();
-    m_contextActionCopy->deleteLater();
+    menu.exec(m_activeView->viewport()->mapToGlobal(pos));
 }
 
 void NodeWidget::onContextConnect() {
+    QObject *obj = sender();
+    if (obj == ui->customView)
+        m_activeView = ui->customView;
+    else
+        m_activeView = ui->wsView;
+
+    FeatherNode node = this->selectedNode();
+    if (!node.full.isEmpty())
+        emit connectToNode(node);
+}
+
+void NodeWidget::onContextStatusURL() {
+    FeatherNode node = this->selectedNode();
+    if (!node.full.isEmpty())
+        Utils::externalLinkWarning(this, node.as_url());
+}
+
+void NodeWidget::onContextNodeCopy() {
+    FeatherNode node = this->selectedNode();
+    Utils::copyToClipboard(node.full);
+}
+
+FeatherNode NodeWidget::selectedNode() {
     QModelIndex index = m_activeView->currentIndex();
-    if (!index.isValid()) return;
+    if (!index.isValid()) return FeatherNode();
 
-    if(m_activeView->objectName() == "wsView"){
-        FeatherNode node = m_wsModel->node(index.row());
-        emit connectToNode(node);
+    FeatherNode node;
+    if (m_activeView == ui->customView) {
+        node = m_customModel->node(index.row());
     } else {
-        FeatherNode node = m_customModel->node(index.row());
-        emit connectToNode(node);
+        node = m_wsModel->node(index.row());
     }
-}
-
-void NodeWidget::onContextWSStatusURL() {
-    QModelIndex index = ui->wsView->currentIndex();
-    if (!index.isValid()) return;
-    FeatherNode node = m_wsModel->node(index.row());
-    Utils::externalLinkWarning(this, node.as_url());
-}
-
-void NodeWidget::onContextCustomStatusURL() {
-    QModelIndex index = ui->customView->currentIndex();
-    if (!index.isValid()) return;
-    FeatherNode node = m_customModel->node(index.row());
-    Utils::externalLinkWarning(this, node.as_url());
-}
-
-void NodeWidget::onContextDisconnect() {
-    QModelIndex index = ui->customView->currentIndex();
-    if (!index.isValid()) return;
-    FeatherNode node = m_customModel->node(index.row());
-
-    Utils::copyToClipboard(node.full);
-}
-
-void NodeWidget::onContextWSNodeCopy() {
-    QModelIndex index = ui->wsView->currentIndex();
-    if (!index.isValid()) return;
-    FeatherNode node = m_wsModel->node(index.row());
-
-    Utils::copyToClipboard(node.full);
-}
-
-void NodeWidget::onContextCustomNodeCopy() {
-
+    return node;
 }
 
 void NodeWidget::onContextCustomNodeRemove() {
