@@ -15,7 +15,7 @@ class ContactsDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit ContactsDialog(QWidget *parent = nullptr);
+    explicit ContactsDialog(QWidget *parent = nullptr, const QString &address = "", const QString &name = "");
     ~ContactsDialog() override;
 
     QString getAddress();
