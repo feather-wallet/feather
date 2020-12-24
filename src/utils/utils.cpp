@@ -553,14 +553,14 @@ QString Utils::formatBytes(quint64 bytes)
 
     int i;
     double _data;
-    for (i = 0; i < sizes.count() && bytes >= 1000; i++, bytes /= 1000)
+    for (i = 0; i < sizes.count() && bytes >= 10000; i++, bytes /= 1000)
         _data = bytes / 1000.0;
 
     if (_data < 0)
         _data = 0;
 
     // unrealistic
-    if (_data > 1000)
+    if (_data > 10000)
         _data = 0;
 
     return QString("%1 %2").arg(QString::number(_data, 'f', 1), sizes[i]);
