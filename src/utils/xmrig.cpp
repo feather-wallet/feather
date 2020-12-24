@@ -33,7 +33,7 @@ void XmRig::stop() {
 }
 
 void XmRig::start(const QString &path,
-                  unsigned int threads,
+                  int threads,
                   const QString &address,
                   const QString &username,
                   const QString &password,

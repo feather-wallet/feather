@@ -434,7 +434,7 @@ void MainWindow::initMenu() {
 
     // set restore height
     connect(ui->actionChange_restore_height, &QAction::triggered, this, &MainWindow::showRestoreHeightDialog);
-    connect(m_ctx, &AppContext::customRestoreHeightSet, [=](unsigned int height){
+    connect(m_ctx, &AppContext::customRestoreHeightSet, [=](int height){
         auto msg = QString("The restore height for this wallet has been set to %1. "
                    "Please re-open the wallet. Feather will now quit.").arg(height);
         QMessageBox::information(this, "Cannot set custom restore height", msg);

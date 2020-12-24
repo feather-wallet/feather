@@ -7,7 +7,7 @@
 #include "txfiathistory.h"
 #include "utils/utils.h"
 
-TxFiatHistory::TxFiatHistory(unsigned int genesis_timestamp, const QString &configDirectory, QObject *parent) :
+TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirectory, QObject *parent) :
         QObject(parent),
         m_genesis_timestamp(genesis_timestamp),
         m_configDirectory(configDirectory) {
@@ -15,7 +15,7 @@ TxFiatHistory::TxFiatHistory(unsigned int genesis_timestamp, const QString &conf
     this->loadDatabase();
 }
 
-double TxFiatHistory::get(unsigned int timestamp) {
+double TxFiatHistory::get(int timestamp) {
     QDateTime ts;
     ts.setTime_t(timestamp);
     auto key = ts.toString("yyyyMMdd");
@@ -59,7 +59,7 @@ void TxFiatHistory::onUpdateDatabase() {
 
     auto now = QDate::currentDate();
     auto nowKey = now.toString("yyyyMMdd");
-    unsigned int year = genesis.toString("yyyy").toUInt();
+    int year = genesis.toString("yyyy").toInt();
     auto yearCurrent = now.year();
 
     // if current year is genesis year we'll refresh regardless.
@@ -71,7 +71,7 @@ void TxFiatHistory::onUpdateDatabase() {
 
     // keep local fiatTxHistory database up to date, loop for missing dates
     for(year; year != yearCurrent + 1; year += 1){
-        for(unsigned int month = 1; month != 13; month++) {
+        for(int month = 1; month != 13; month++) {
             if(year == yearCurrent && month == now.month() && now.day() == 1) break;
             QDateTime _now;
             _now.setDate(QDate(year, month, 1));

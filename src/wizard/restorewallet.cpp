@@ -31,7 +31,7 @@ RestorePage::RestorePage(AppContext *ctx, QWidget *parent) :
     auto data = Utils::fileOpen(":/assets/mnemonic_25_english.txt");
     for(const auto &seed_word: data.split('\n'))
         m_words25 << seed_word;
-    for(unsigned int i = 0; i != 2048; i++)
+    for(int i = 0; i != 2048; i++)
         m_words14 << QString::fromStdString(wordlist::english.get_word(i));
 
     //
@@ -109,7 +109,7 @@ void RestorePage::cleanupPage() const {}
 bool RestorePage::validatePage() {
     ui->label_errorString->hide();
     auto errStyle = "QTextEdit{border: 1px solid red;}";
-    unsigned int restoreHeight = ui->restoreHeightWidget->getHeight();
+    int restoreHeight = ui->restoreHeightWidget->getHeight();
     auto seed = ui->seedEdit->toPlainText().replace("\n", "").replace("\r", "").trimmed();
     auto seedSplit = seed.split(" ");
 

@@ -24,7 +24,7 @@ RestoreDialog::RestoreDialog(AppContext *ctx, QWidget *parent)
     }
 }
 
-unsigned int RestoreDialog::getHeight() {
+int RestoreDialog::getHeight() {
     return ui->restoreHeightWidget->getHeight();
 }
 

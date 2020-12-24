@@ -40,7 +40,7 @@ private:
     Ui::CreateWalletSeedPage *ui;
 
     QString m_mnemonic;
-    unsigned int m_restoreHeight;
+    int m_restoreHeight;
 
     bool m_roulette = false;
     int m_rouletteSpin = 15;

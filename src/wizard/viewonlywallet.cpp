@@ -72,7 +72,7 @@ bool ViewOnlyPage::validatePage() {
     ui->lineEdit_viewkey->setStyleSheet("");
     ui->label_errorString->hide();
 
-    unsigned int restoreHeight = ui->restoreHeightWidget->getHeight();
+    int restoreHeight = ui->restoreHeightWidget->getHeight();
     auto spendkey = ui->lineEdit_spendkey->text().trimmed();
     auto viewkey = ui->lineEdit_viewkey->text().trimmed();
     auto address = ui->lineEdit_address->text().trimmed();
