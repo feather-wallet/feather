@@ -758,9 +758,11 @@ void AppContext::onTransactionCreated(PendingTransaction *tx, const QString &add
     if(address == this->donationAddress)
         this->donationSending = true;
 
+    // Let UI know that the transaction was constructed
+    emit endTransaction();
+
     // tx created, but not sent yet. ask user to verify first.
     emit createTransactionSuccess(tx, address, mixin);
-    emit endTransaction();
 }
 
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
