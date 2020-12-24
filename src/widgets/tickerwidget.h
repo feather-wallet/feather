@@ -18,7 +18,6 @@ class TickerWidget : public QWidget
 
 public:
     explicit TickerWidget(QWidget *parent, QString symbol, QString title = "", bool convertBalance = false, bool hidePercent = false);
-    void removePctContainer();
     void setFiatText(QString &fiatCurrency, double amount);
     void setPctText(QString &text, bool positive);
     void setFontSizes();

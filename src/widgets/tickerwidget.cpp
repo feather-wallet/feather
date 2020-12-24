@@ -50,15 +50,19 @@ void TickerWidget::init() {
     double amount = m_convertBalance ? AppContext::balance : 1.0;
     double conversion = AppContext::prices->convert(m_symbol, fiatCurrency, amount);
     if (conversion < 0) return;
-    ui->tickerPct->setHidden(conversion == 0 || m_hidePercent);
 
     auto markets = AppContext::prices->markets;
     if(!markets.contains(m_symbol)) return;
 
-    auto pct24h = markets[m_symbol].price_usd_change_pct_24h;
-    auto pct24hText = QString::number(pct24h, 'f', 2);
+    bool hidePercent = (conversion == 0 || m_hidePercent);
+    if (hidePercent) {
+        ui->tickerPct->hide();
+    } else {
+        auto pct24h = markets[m_symbol].price_usd_change_pct_24h;
+        auto pct24hText = QString::number(pct24h, 'f', 2);
+        this->setPctText(pct24hText, pct24h >= 0.0);
+    }
 
-    this->setPctText(pct24hText, pct24h >= 0.0);
     this->setFiatText(fiatCurrency, conversion);
 }
 
@@ -82,10 +86,6 @@ void TickerWidget::setPctText(QString &text, bool positive) {
 void TickerWidget::setFontSizes() {
     ui->tickerPct->setFont(Utils::relativeFont(-2));
     ui->tickerFiat->setFont(Utils::relativeFont(0));
-}
-
-void TickerWidget::removePctContainer() {
-    ui->tickerPct->deleteLater();
 }
 
 TickerWidget::~TickerWidget() {
