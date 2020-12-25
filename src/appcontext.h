@@ -66,9 +66,9 @@ public:
 
     static void createConfigDirectory(const QString &dir) ;
 
-    QMap<QString, unsigned int> heights;
+    QMap<QString, int> heights;
     QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
-    const unsigned int kdfRounds = 1;
+    const quint64 kdfRounds = 1;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
     quint32 tx_mixin = static_cast<const quint32 &>(10);
     QString seedLanguage = "English";  // 14 word `monero-seed` only has English
@@ -90,7 +90,6 @@ public:
     static TxFiatHistory *txFiatHistory;
 
     // libwalletqt
-    unsigned int blockHeight = 0;
     bool refreshed = false;
     WalletManager *walletManager;
     Wallet *currentWallet = nullptr;
@@ -116,7 +115,7 @@ public slots:
     void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;
     void onCreateTransactionError(const QString &msg);
     void onOpenAliasResolve(const QString &openAlias);
-    void onSetRestoreHeight(unsigned int height);
+    void onSetRestoreHeight(quint64 height);
     void onPreferredFiatCurrencyChanged(const QString &symbol);
 
 private slots:
@@ -142,7 +141,7 @@ signals:
     void blockchainSync(int height, int target);
     void refreshSync(int height, int target);
     void synchronized();
-    void blockHeightWSUpdated(QMap<QString, unsigned int> heights);
+    void blockHeightWSUpdated(QMap<QString, int> heights);
     void walletSynchronized();
     void walletOpened();
     void walletClosed();
@@ -164,7 +163,7 @@ signals:
     void openAliasResolveError(const QString &msg);
     void openAliasResolved(const QString &address, const QString &openAlias);
     void setRestoreHeightError(const QString &msg);
-    void customRestoreHeightSet(unsigned int height);
+    void customRestoreHeightSet(int height);
     void closeApplication();
     void donationNag();
     void initiateTransaction();
@@ -173,7 +172,7 @@ signals:
     void setTitle(const QString &title); // set window title
 
 private:
-    const unsigned int m_donationBoundary = 15;
+    const int m_donationBoundary = 15;
     UtilsNetworking *m_utilsNetworkingNodes;
     QTimer *m_storeTimer = new QTimer(this);
     QUrl m_wsUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));

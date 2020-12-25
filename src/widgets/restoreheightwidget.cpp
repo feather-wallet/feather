@@ -36,8 +36,8 @@ void RestoreHeightWidget::hideSlider(){
 void RestoreHeightWidget::initRestoreHeights(RestoreHeightLookup *lookup) {
     // init slider
     m_restoreHeightLookup = lookup;
-    auto now = (unsigned int)std::time(nullptr);
-    QList<unsigned int> blockDates = m_restoreHeightLookup->data.keys();
+    int now = std::time(nullptr);
+    QList<int> blockDates = m_restoreHeightLookup->data.keys();
     ui->restoreSlider->setMinimum(blockDates[0]);
     ui->restoreSlider->setMaximum(now);
     connect(ui->restoreSlider, &QSlider::valueChanged, this, &RestoreHeightWidget::onValueChanged);
@@ -45,14 +45,14 @@ void RestoreHeightWidget::initRestoreHeights(RestoreHeightLookup *lookup) {
 
 void RestoreHeightWidget::onValueChanged(int date) {
     QDateTime timestamp;
-    timestamp.setTime_t((unsigned int) date);
+    timestamp.setTime_t(date);
     ui->label_restoreHeightDate->setText(timestamp.toString("yyyy-MM-dd"));
-    auto blockHeight = m_restoreHeightLookup->dateToRestoreHeight((unsigned int) date);
+    auto blockHeight = m_restoreHeightLookup->dateToRestoreHeight(date);
     ui->lineEdit_restoreHeight->setText(QString::number(blockHeight));
 }
 
-unsigned int RestoreHeightWidget::getHeight() {
-    return ui->lineEdit_restoreHeight->text().toUInt();
+int RestoreHeightWidget::getHeight() {
+    return ui->lineEdit_restoreHeight->text().toInt();
 }
 
 RestoreHeightWidget::~RestoreHeightWidget() {

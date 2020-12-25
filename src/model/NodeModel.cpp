@@ -5,7 +5,7 @@
 #include <utils/nodes.h>
 #include "appcontext.h"
 
-NodeModel::NodeModel(unsigned int nodeSource, QObject *parent)
+NodeModel::NodeModel(int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)
         , m_nodeSource(nodeSource)
         , m_offline(QIcon(":/assets/images/expired_icon.png"))

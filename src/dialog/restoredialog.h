@@ -24,7 +24,7 @@ Q_OBJECT
 public:
     explicit RestoreDialog(AppContext *ctx, QWidget *parent = nullptr);
     void initRestoreHeights(RestoreHeightLookup *lookup);
-    unsigned int getHeight();
+    int getHeight();
     ~RestoreDialog() override;
 
 signals:

@@ -19,44 +19,44 @@
 
 struct RestoreHeightLookup {
     NetworkType::Type type;
-    QMap<unsigned int, unsigned int> data;
+    QMap<int, int> data;
     explicit RestoreHeightLookup(NetworkType::Type type) : type(type) {}
 
-    unsigned int dateToRestoreHeight(unsigned int date) {
+    int dateToRestoreHeight(int date) {
         // restore height based on a given timestamp using a lookup
         // table. If it cannot find the date in the lookup table, it
         // will calculate the blockheight based off the last known
         // date: ((now - lastKnownDate) / blockTime) - clearance
 
         if(this->type == NetworkType::TESTNET) return 1;
-        unsigned int blockTime = 120;
-        unsigned int blocksPerDay = 86400 / blockTime;
-        unsigned int blockCalcClearance = blocksPerDay * 5;
-        QList<unsigned int> values = this->data.keys();
+        int blockTime = 120;
+        int blocksPerDay = 86400 / blockTime;
+        int blockCalcClearance = blocksPerDay * 5;
+        QList<int> values = this->data.keys();
         if(date <= values.at(0))
             return this->data[values.at(0)];
-        for(unsigned int i = 0; i != values.count(); i++) {
+        for(int i = 0; i != values.count(); i++) {
             if(values[i] > date) {
                 return i - 1 < 0 ? this->data[values[i]] : this->data[values[i-1]] - blockCalcClearance;
             }
         }
 
         // lookup failed, calculate blockheight from last known checkpoint
-        unsigned int lastBlockHeightTime = values.at(values.count() - 1);
-        unsigned int lastBlockHeight = this->data[lastBlockHeightTime];
-        unsigned int deltaTime = date - lastBlockHeightTime;
-        unsigned int deltaBlocks = deltaTime / blockTime;
-        unsigned int blockHeight = (lastBlockHeight + deltaBlocks) - blockCalcClearance;
+        int lastBlockHeightTime = values.at(values.count() - 1);
+        int lastBlockHeight = this->data[lastBlockHeightTime];
+        int deltaTime = date - lastBlockHeightTime;
+        int deltaBlocks = deltaTime / blockTime;
+        int blockHeight = (lastBlockHeight + deltaBlocks) - blockCalcClearance;
         qDebug() << "Calculated blockheight: " << blockHeight << " from epoch " << date;
         return blockHeight;
     }
 
-    unsigned int restoreHeightToDate(unsigned int height) {
+    int restoreHeightToDate(int height) {
         // @TODO: most likely inefficient, refactor
-        QMap<unsigned int, unsigned int>::iterator i;
-        unsigned int timestamp = 0;
+        QMap<int, int>::iterator i;
+        int timestamp = 0;
         for (i = this->data.begin(); i != this->data.end(); ++i) {
-            unsigned int ts = i.key();
+            int ts = i.key();
             if (i.value() > height)
                 return timestamp;
             timestamp = ts;
@@ -68,7 +68,7 @@ struct RestoreHeightLookup {
         // initialize this class using a lookup table, e.g `:/assets/restore_heights_monero_mainnet.txt`/
         auto rtn = new RestoreHeightLookup(type);
         auto data = Utils::barrayToString(Utils::fileOpen(fn));
-        QMap<unsigned int, unsigned int> _data;
+        QMap<int, int> _data;
         for(const auto &line: data.split('\n')) {
             if(line.trimmed().isEmpty()) continue;
             auto spl = line.trimmed().split(':');
@@ -82,7 +82,7 @@ struct FeatherSeed {
     QString mnemonicSeed;
     QString spendKey;
     time_t time = 0;
-    unsigned int restoreHeight = 0;
+    int restoreHeight = 0;
     RestoreHeightLookup *lookup = nullptr;
     QString language;
     std::string coinName;
@@ -124,7 +124,7 @@ struct FeatherSeed {
         return rtn;
     }
 
-    Wallet *writeWallet(WalletManager *manager, NetworkType::Type type, const QString &path, const QString &password, unsigned int kdfRounds) {
+    Wallet *writeWallet(WalletManager *manager, NetworkType::Type type, const QString &path, const QString &password, quint64 kdfRounds) {
         // writes both 14/25 word mnemonic seeds.
         Wallet *wallet = nullptr;
         if(this->lookup == nullptr) return wallet;
@@ -136,25 +136,25 @@ struct FeatherSeed {
                 this->restoreHeight = _seed.restoreHeight;
                 this->spendKey = _seed.spendKey;
             }
-            wallet = manager->createDeterministicWalletFromSpendKey(path, password, this->language, type, this->spendKey, this->restoreHeight, (quint64)kdfRounds);
+            wallet = manager->createDeterministicWalletFromSpendKey(path, password, this->language, type, this->spendKey, this->restoreHeight, kdfRounds);
             wallet->setCacheAttribute("feather.seed", this->mnemonicSeed);
         } else {
-            wallet = manager->recoveryWallet(path, password, this->mnemonicSeed, "", type, this->restoreHeight, (quint64) kdfRounds);
+            wallet = manager->recoveryWallet(path, password, this->mnemonicSeed, "", type, this->restoreHeight, kdfRounds);
         }
 
         wallet->setPassword(password);
         return wallet;
     }
 
-    unsigned int setRestoreHeight() {
+    int setRestoreHeight() {
         if(this->lookup == nullptr) return 1;
         if(this->time == 0) return 1;
-        this->restoreHeight = this->lookup->dateToRestoreHeight((unsigned int)this->time);
+        this->restoreHeight = this->lookup->dateToRestoreHeight(this->time);
         return this->restoreHeight;
     }
 
-    unsigned int setRestoreHeight(unsigned int height) {
-        auto now = (unsigned int)std::time(nullptr);
+    int setRestoreHeight(int height) {
+        auto now = std::time(nullptr);
         auto nowClearance = 3600 * 24;
         auto currentBlockHeight = this->lookup->dateToRestoreHeight(now - nowClearance);
         if(height >= currentBlockHeight + nowClearance) {

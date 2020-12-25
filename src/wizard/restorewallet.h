@@ -33,7 +33,7 @@ private:
     QLabel *topLabel;
     Ui::RestorePage *ui;
 
-    unsigned int m_mode = 14;
+    int m_mode = 14;
     QStringList m_words14;
     QStringList m_words25;
     QStringListModel *m_completer14Model = nullptr;

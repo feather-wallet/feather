@@ -134,11 +134,11 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     auto genesis_timestamp = this->restoreHeights[NetworkType::Type::MAINNET]->data.firstKey();
     AppContext::txFiatHistory = new TxFiatHistory(genesis_timestamp, this->configDirectory);
     connect(this->ws, &WSClient::connectionEstablished, AppContext::txFiatHistory, &TxFiatHistory::onUpdateDatabase);
-    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYear, [=](unsigned int year){
+    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYear, [=](int year){
         QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1}})").arg(year).toUtf8();
         this->ws->sendMsg(data);
     });
-    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYearMonth, [=](unsigned int year, unsigned int month) {
+    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYearMonth, [=](int year, int month) {
         QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1, "month": %2}})").arg(year).arg(month).toUtf8();
         this->ws->sendMsg(data);
     });
@@ -378,22 +378,22 @@ void AppContext::onWSMessage(const QJsonObject &msg) {
         auto changed = false;
 
         if(!this->heights.contains("mainnet")) {
-            this->heights["mainnet"] = (unsigned int) mainnet;
+            this->heights["mainnet"] = mainnet;
             changed = true;
         }
         else {
             if (mainnet > this->heights["mainnet"]) {
-                this->heights["mainnet"] = (unsigned int) mainnet;
+                this->heights["mainnet"] = mainnet;
                 changed = true;
             }
         }
         if(!this->heights.contains("stagenet")) {
-            this->heights["stagenet"] = (unsigned int) stagenet;
+            this->heights["stagenet"] = stagenet;
             changed = true;
         }
         else {
             if (stagenet > this->heights["stagenet"]) {
-                this->heights["stagenet"] = (unsigned int) stagenet;
+                this->heights["stagenet"] = stagenet;
                 changed = true;
             }
         }
@@ -605,7 +605,7 @@ void AppContext::initRestoreHeights() {
     restoreHeights[NetworkType::MAINNET] = RestoreHeightLookup::fromFile(":/assets/restore_heights_monero_mainnet.txt", NetworkType::MAINNET);
 }
 
-void AppContext::onSetRestoreHeight(unsigned int height){
+void AppContext::onSetRestoreHeight(quint64 height){
     auto seed = this->currentWallet->getCacheAttribute("feather.seed");
     if(!seed.isEmpty()) {
         const auto msg = "This wallet has a 14 word mnemonic seed which has the restore height embedded.";

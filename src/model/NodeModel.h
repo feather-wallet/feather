@@ -19,7 +19,7 @@ public:
         COUNT
     };
 
-    explicit NodeModel(unsigned int nodeSource, QObject *parent = nullptr);
+    explicit NodeModel(int nodeSource, QObject *parent = nullptr);
 
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -34,7 +34,7 @@ private:
     QList<FeatherNode> m_nodes;
     QIcon m_offline;
     QIcon m_online;
-    unsigned int m_nodeSource;
+    int m_nodeSource;
 };
 
 #endif //FEATHER_NODEMODEL_H
