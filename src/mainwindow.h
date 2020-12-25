@@ -177,7 +177,6 @@ private:
     Ui::MainWindow *ui;
     Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
-    SignVerifyDialog *m_windowSignVerify = nullptr;
     RestoreDialog *m_restoreDialog = nullptr;
     AboutDialog *m_aboutDialog = nullptr;
     XMRigWidget *m_xmrig = nullptr;

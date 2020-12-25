@@ -46,19 +46,11 @@ int WalletKeysFiles::networkType() const {
     return m_networkType;
 }
 
-WalletKeysFilesModel::WalletKeysFilesModel(AppContext *ctx, QObject *parent) :
-        QAbstractTableModel(parent),
-        m_ctx(ctx) {
-    this->walletDirectories << m_ctx->defaultWalletDirRoot;
-    auto walletPath = config()->get(Config::walletPath).toString();
-    if(!walletPath.isEmpty() && Utils::fileExists(walletPath)) {
-        QDir d = QFileInfo(walletPath).absoluteDir();
-        this->walletDirectories << d.absolutePath();
-    }
-
-    this->walletDirectories << m_ctx->homeDir;
-    this->walletDirectories.removeDuplicates();
-
+WalletKeysFilesModel::WalletKeysFilesModel(AppContext *ctx, QObject *parent)
+        : QAbstractTableModel(parent)
+        , m_ctx(ctx)
+{
+    this->updateDirectories();
     this->m_walletKeysFilesItemModel = qobject_cast<QAbstractItemModel *>(this);
 }
 
@@ -71,6 +63,20 @@ void WalletKeysFilesModel::clear() {
 void WalletKeysFilesModel::refresh() {
     this->clear();
     this->findWallets();
+    endResetModel();
+}
+
+void WalletKeysFilesModel::updateDirectories() {
+    this->walletDirectories.clear();
+    this->walletDirectories << m_ctx->defaultWalletDirRoot;
+    auto walletPath = config()->get(Config::walletPath).toString();
+    if(!walletPath.isEmpty() && Utils::fileExists(walletPath)) {
+        QDir d = QFileInfo(walletPath).absoluteDir();
+        this->walletDirectories << d.absolutePath();
+    }
+
+    this->walletDirectories << m_ctx->homeDir;
+    this->walletDirectories.removeDuplicates();
 }
 
 void WalletKeysFilesModel::findWallets() {

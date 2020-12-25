@@ -7,6 +7,8 @@
 #include "utils/config.h"
 #include "mainwindow.h"
 
+#include <QFileDialog>
+
 Settings::Settings(QWidget *parent) :
         QDialog(parent),
         ui(new Ui::Settings)
@@ -58,14 +60,24 @@ Settings::Settings(QWidget *parent) :
 
     connect(ui->comboBox_fiatCurrency, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::fiatCurrencySelected);
 
-    // setup path tab
-#if defined(Q_OS_LINUX)
-    ui->textEditPaths->appendPlainText(m_ctx->applicationPath);
-#endif
-    ui->textEditPaths->appendPlainText(m_ctx->configDirectory);
-    ui->textEditPaths->appendPlainText(m_ctx->defaultWalletDir);
+    // setup paths tab
+    this->updatePaths();
+    connect(ui->btn_browseDefaultWalletDir, &QPushButton::clicked, [this]{
+        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
+        if (walletDir.isEmpty()) return;
+        m_ctx->defaultWalletDir = walletDir;
+        m_ctx->defaultWalletDirRoot = walletDir;
+        config()->set(Config::walletDirectory, walletDir);
+        ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+    });
 
     this->adjustSize();
+}
+
+void Settings::updatePaths() {
+    ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+    ui->lineEdit_configDir->setText(m_ctx->configDirectory);
+    ui->lineEdit_applicationDir->setText(m_ctx->applicationPath);
 }
 
 void Settings::fiatCurrencySelected(int index) {

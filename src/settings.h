@@ -31,6 +31,7 @@ signals:
     void blockExplorerChanged(QString blockExplorer);
 
 public slots:
+    void updatePaths();
     void copyToClipboard();
     void checkboxExternalLinkWarn();
     void fiatCurrencySelected(int index);

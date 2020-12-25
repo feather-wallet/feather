@@ -23,7 +23,6 @@ public:
     explicit CreateWalletSeedPage(AppContext *ctx, QWidget *parent = nullptr);
     bool validatePage() override;
     int nextId() const override;
-//    bool isFinalPage() const;
 
 public slots:
     void displaySeed(const QString &seed);
