@@ -79,7 +79,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
         connected ? m_statusBtnTor->setIcon(QIcon(":/assets/images/tor_logo.png"))
                   : m_statusBtnTor->setIcon(QIcon(":/assets/images/tor_logo_disabled.png"));});
     connect(m_ctx->nodes, &Nodes::updateStatus, [=](const QString &msg){
-        m_statusLabelStatus->setText(msg);
+        this->setStatusText(msg);
     });
 
     // menu connects
@@ -233,6 +233,22 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // XMR.to
     connect(m_ctx, &AppContext::initiateTransaction, ui->xmrToWidget, &XMRToWidget::onInitiateTransaction);
     connect(m_ctx, &AppContext::endTransaction, ui->xmrToWidget, &XMRToWidget::onEndTransaction);
+
+    connect(m_ctx, &AppContext::initiateTransaction, [this]{
+        m_statusDots = 0;
+        m_constructingTransaction = true;
+        m_txTimer.start(1000);
+    });
+    connect(m_ctx, &AppContext::endTransaction, [this]{
+        // Todo: endTransaction can fail to fire when the node is switched during tx creation
+        m_constructingTransaction = false;
+        m_txTimer.stop();
+        this->setStatusText(m_statusText);
+    });
+    connect(&m_txTimer, &QTimer::timeout, [this]{
+        m_statusLabelStatus->setText("Constructing transaction" + this->statusDots());
+    });
+
 
     // testnet/stagenet warning
     auto worthlessWarning = QString("Feather wallet is currently running in %1 mode. This is meant "
@@ -592,9 +608,9 @@ void MainWindow::onWalletOpened() {
     this->activateWindow();
     this->setEnabled(true);
     if(!m_ctx->tor->torConnected)
-        m_statusLabelStatus->setText("Wallet opened - Starting Tor (may take a while)");
+        this->setStatusText("Wallet opened - Starting Tor (may take a while)");
     else
-        m_statusLabelStatus->setText("Wallet opened - Searching for node");
+        this->setStatusText("Wallet opened - Searching for node");
 
     connect(m_ctx->currentWallet, &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
 
@@ -655,22 +671,28 @@ void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString
     m_balanceWidget->setHidden(hide);
 }
 
+void MainWindow::setStatusText(const QString &text) {
+    m_statusText = text;
+    if (!m_constructingTransaction)
+        m_statusLabelStatus->setText(text);
+}
+
 void MainWindow::onSynchronized() {
     this->updateNetStats();
-    m_statusLabelStatus->setText("Synchronized");
+    this->setStatusText("Synchronized");
     this->onConnectionStatusChanged(Wallet::ConnectionStatus_Connected);
 }
 
 void MainWindow::onBlockchainSync(int height, int target) {
     QString blocks = (target >= height) ? QString::number(target - height) : "?";
     QString heightText = QString("Blockchain sync: %1 blocks remaining").arg(blocks);
-    m_statusLabelStatus->setText(heightText);
+    this->setStatusText(heightText);
 }
 
 void MainWindow::onRefreshSync(int height, int target) {
     QString blocks = (target >= height) ? QString::number(target - height) : "?";
     QString heightText = QString("Wallet refresh: %1 blocks remaining").arg(blocks);
-    m_statusLabelStatus->setText(heightText);
+    this->setStatusText(heightText);
 }
 
 void MainWindow::onConnectionStatusChanged(int status)
@@ -684,7 +706,7 @@ void MainWindow::onConnectionStatusChanged(int status)
     switch(status){
         case Wallet::ConnectionStatus_Disconnected:
             statusIcon = ":/assets/images/status_disconnected.svg";
-            m_statusLabelStatus->setText("Disconnected");
+            this->setStatusText("Disconnected");
             break;
         case Wallet::ConnectionStatus_Connected:
             if (m_ctx->currentWallet->synchronized()) {
@@ -695,11 +717,11 @@ void MainWindow::onConnectionStatusChanged(int status)
             break;
         case Wallet::ConnectionStatus_Connecting:
             statusIcon = ":/assets/images/status_lagging.svg";
-            m_statusLabelStatus->setText("Connecting to daemon");
+            this->setStatusText("Connecting to daemon");
             break;
         case Wallet::ConnectionStatus_WrongVersion:
             statusIcon = ":/assets/images/status_disconnected.svg";
-            m_statusLabelStatus->setText("Incompatible daemon");
+            this->setStatusText("Incompatible daemon");
             break;
         default:
             statusIcon = ":/assets/images/status_disconnected.svg";
@@ -1298,6 +1320,12 @@ void MainWindow::rescanSpent() {
     } else {
         QMessageBox::information(this, "Rescan spent", "Successfully rescanned spent outputs.");
     }
+}
+
+QString MainWindow::statusDots() {
+    m_statusDots++;
+    m_statusDots = m_statusDots % 4;
+    return QString(".").repeated(m_statusDots);
 }
 
 MainWindow::~MainWindow() {

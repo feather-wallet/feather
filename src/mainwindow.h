@@ -168,6 +168,8 @@ private:
     void updatePasswordIcon();
     void updateNetStats();
     void rescanSpent();
+    void setStatusText(const QString &text);
+    QString statusDots();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
@@ -178,8 +180,6 @@ private:
     RestoreDialog *m_restoreDialog = nullptr;
     AboutDialog *m_aboutDialog = nullptr;
     XMRigWidget *m_xmrig = nullptr;
-
-    bool m_windowSpawned = false;
 
     QSystemTrayIcon *m_trayIcon;
     QMenu m_trayMenu;
@@ -217,6 +217,11 @@ private:
     QMap<QString, QString> m_skins;
 
     QTimer m_updateBytes;
+
+    QString m_statusText;
+    int m_statusDots;
+    bool m_constructingTransaction = false;
+    QTimer m_txTimer;
 
 private slots:
     void menuToggleTabVisible(const QString &key);
