@@ -104,7 +104,10 @@ int RestorePage::nextId() const {
     return WalletWizard::Page_CreateWallet;
 }
 
-void RestorePage::cleanupPage() const {}
+void RestorePage::initializePage() {
+    ui->seedEdit->setText("");
+    ui->restoreHeightWidget->setHeight(1);
+}
 
 bool RestorePage::validatePage() {
     ui->label_errorString->hide();

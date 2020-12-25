@@ -25,12 +25,11 @@ class RestorePage : public QWizardPage
 public:
     explicit RestorePage(AppContext *ctx, QWidget *parent = nullptr);
     bool validatePage() override;
+    void initializePage() override;
     int nextId() const override;
-    void cleanupPage() const;
 
 private:
     AppContext *m_ctx;
-    QLabel *topLabel;
     Ui::RestorePage *ui;
 
     int m_mode = 14;

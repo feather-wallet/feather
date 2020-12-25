@@ -17,20 +17,29 @@ RestoreHeightWidget::RestoreHeightWidget(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->lineEdit_restoreHeight->setValidator(new QIntValidator(0, 2147483647, this));
-    connect(ui->lineEdit_restoreHeight, &QLineEdit::textEdited, [=](const QString &val){
-        // update slider on lineEdit change
-        if(val.isEmpty()) return;
-        auto height = val.toUInt();
-        if(height <= 1) return;
-        auto timestamp = m_restoreHeightLookup->restoreHeightToDate(height);
-        ui->restoreSlider->blockSignals(true);
-        ui->restoreSlider->setValue(timestamp);
-        ui->restoreSlider->blockSignals(false);
+
+    connect(ui->lineEdit_restoreHeight, &QLineEdit::textEdited, [this](const QString &val){
+        if (val.isEmpty()) return;
+        this->setHeight(val.toInt());
     });
 }
 
 void RestoreHeightWidget::hideSlider(){
     ui->restoreGrid->hide();
+}
+
+void RestoreHeightWidget::setHeight(int height) {
+    if (height < 0)
+        height = 0;
+
+    // Update lineEdit
+    ui->lineEdit_restoreHeight->setText(QString::number(height));
+
+    // Update slider
+    int date = m_restoreHeightLookup->restoreHeightToDate(height);
+    ui->restoreSlider->setValue(date);
+
+    this->updateTimestamp(date);
 }
 
 void RestoreHeightWidget::initRestoreHeights(RestoreHeightLookup *lookup) {
@@ -40,15 +49,20 @@ void RestoreHeightWidget::initRestoreHeights(RestoreHeightLookup *lookup) {
     QList<int> blockDates = m_restoreHeightLookup->data.keys();
     ui->restoreSlider->setMinimum(blockDates[0]);
     ui->restoreSlider->setMaximum(now);
-    connect(ui->restoreSlider, &QSlider::valueChanged, this, &RestoreHeightWidget::onValueChanged);
+
+    connect(ui->restoreSlider, &QSlider::sliderMoved, [this](int date){
+        // Update lineEdit
+        int blockHeight = m_restoreHeightLookup->dateToRestoreHeight(date);
+        ui->lineEdit_restoreHeight->setText(QString::number(blockHeight));
+
+        this->updateTimestamp(date);
+    });
 }
 
-void RestoreHeightWidget::onValueChanged(int date) {
+void RestoreHeightWidget::updateTimestamp(int date) {
     QDateTime timestamp;
     timestamp.setTime_t(date);
     ui->label_restoreHeightDate->setText(timestamp.toString("yyyy-MM-dd"));
-    auto blockHeight = m_restoreHeightLookup->dateToRestoreHeight(date);
-    ui->lineEdit_restoreHeight->setText(QString::number(blockHeight));
 }
 
 int RestoreHeightWidget::getHeight() {

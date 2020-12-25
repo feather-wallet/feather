@@ -20,14 +20,14 @@ class RestoreHeightWidget : public QWidget
 public:
     explicit RestoreHeightWidget(QWidget *parent = nullptr);
     void initRestoreHeights(RestoreHeightLookup *lookup);
+    void setHeight(int height);
     int getHeight();
     void hideSlider();
     ~RestoreHeightWidget() override;
 
-private slots:
-    void onValueChanged(int date);
-
 private:
+    void updateTimestamp(int date);
+
     RestoreHeightLookup *m_restoreHeightLookup = nullptr;
     Ui::RestoreHeightWidget *ui;
 };
