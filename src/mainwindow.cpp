@@ -21,12 +21,14 @@
 #include "dialog/broadcasttxdialog.h"
 #include "dialog/tximportdialog.h"
 #include "dialog/passworddialog.h"
+#include "dialog/balancedialog.h"
 #include "utils/utils.h"
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
 #include "components.h"
 #include "calcwindow.h"
 #include "ui_mainwindow.h"
+#include "globals.h"
 
 // libwalletqt
 #include "libwalletqt/WalletManager.h"
@@ -212,7 +214,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(this, &MainWindow::walletClosed, ui->xmrToWidget, &XMRToWidget::onWalletClosed);
     connect(this, &MainWindow::walletClosed, ui->sendWidget, &SendWidget::onWalletClosed);
     connect(m_ctx, &AppContext::balanceUpdated, this, &MainWindow::onBalanceUpdated);
-    connect(m_ctx, &AppContext::balanceUpdated, ui->xmrToWidget, &XMRToWidget::onBalanceUpdated);
     connect(m_ctx, &AppContext::walletOpened, this, &MainWindow::onWalletOpened);
     connect(m_ctx, &AppContext::walletClosed, this, QOverload<>::of(&MainWindow::onWalletClosed));
     connect(m_ctx, &AppContext::walletOpenedError, this, &MainWindow::onWalletOpenedError);
@@ -655,18 +656,18 @@ void MainWindow::onWalletOpened() {
     m_updateBytes.start(100);
 }
 
-void MainWindow::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
+void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
     bool hide = config()->get(Config::hideBalance).toBool();
 
-    auto label_str = QString("Balance: %1 XMR").arg(unlocked_str);
-    if(balance > unlocked)
-        label_str += QString(" (+%1 XMR unconfirmed)").arg(QString::number(balance - unlocked, 'f'));
+    QString label_str = QString("Balance: %1 XMR").arg(QString::number(spendable / globals::cdiv, 'f'));
+    if (balance > spendable)
+        label_str += QString(" (+%1 XMR unconfirmed)").arg(QString::number((balance - spendable) / globals::cdiv, 'f'));
 
-    if (hide) {
+    if (hide)
         label_str = "Balance: HIDDEN";
-    }
 
+    m_statusLabelBalance->setToolTip("Click for details");
     m_statusLabelBalance->setText(label_str);
     m_balanceWidget->setHidden(hide);
 }
@@ -823,9 +824,11 @@ void MainWindow::create_status_bar() {
     m_statusLabelNetStats->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addWidget(m_statusLabelNetStats);
 
-    m_statusLabelBalance = new QLabel("Balance: 0.00 XMR", this);
+    m_statusLabelBalance = new ClickableLabel(this);
+    m_statusLabelBalance->setText("Balance: 0.00 XMR");
     m_statusLabelBalance->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addPermanentWidget(m_statusLabelBalance);
+    connect(m_statusLabelBalance, &ClickableLabel::clicked, this, &MainWindow::showBalanceDialog);
 
     m_statusBtnConnectionStatusIndicator = new StatusBarButton(QIcon(":/assets/images/status_disconnected.svg"), "Connection status");
     connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, this, &MainWindow::showConnectionStatusDialog);
@@ -1320,6 +1323,15 @@ void MainWindow::rescanSpent() {
     } else {
         QMessageBox::information(this, "Rescan spent", "Successfully rescanned spent outputs.");
     }
+}
+
+void MainWindow::showBalanceDialog() {
+    if (!m_ctx->currentWallet) {
+        return;
+    }
+    auto *dialog = new BalanceDialog(this, m_ctx->currentWallet);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 QString MainWindow::statusDots() {

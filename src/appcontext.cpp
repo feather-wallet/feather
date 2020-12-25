@@ -793,16 +793,14 @@ void AppContext::storeWallet() {
 }
 
 void AppContext::updateBalance() {
-    if(!this->currentWallet)
+    if (!this->currentWallet)
         return;
 
-    AppContext::balance = this->currentWallet->balance() / globals::cdiv;
-    auto balance_str = QString::number(balance, 'f');
+    quint64 balance_u = this->currentWallet->balance();
+    AppContext::balance = balance_u / globals::cdiv;
+    double spendable = this->currentWallet->unlockedBalance();
 
-    double unlocked = this->currentWallet->unlockedBalance() / globals::cdiv;
-    auto unlocked_str = QString::number(unlocked, 'f');
-
-    emit balanceUpdated(balance, unlocked, balance_str, unlocked_str);
+    emit balanceUpdated(balance_u, spendable);
 }
 
 void AppContext::syncStatusUpdated(quint64 height, quint64 target) {

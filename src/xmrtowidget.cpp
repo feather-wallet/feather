@@ -6,6 +6,7 @@
 #include "dialog/xmrtoinfodialog.h"
 #include "libwalletqt/WalletManager.h"
 #include "mainwindow.h"
+#include "globals.h"
 
 #include <QMenu>
 #include <QMessageBox>
@@ -71,8 +72,8 @@ void XMRToWidget::setHistoryModel(XmrToModel *model) {
     this->ui->historyTable->setModel(model);
 }
 
-void XMRToWidget::onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str) {
-    this->m_unlockedBalance = unlocked;
+void XMRToWidget::onBalanceUpdated(quint64 balance, quint64 spendable) {
+    this->m_unlockedBalance = spendable / globals::cdiv;
 }
 
 void XMRToWidget::onWalletClosed() {
