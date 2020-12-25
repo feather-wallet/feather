@@ -138,7 +138,7 @@ private slots:
     void onConnectionStatusChanged(int status);
 
 signals:
-    void balanceUpdated(double balance, double unlocked, QString balance_str, QString unlocked_str);
+    void balanceUpdated(quint64 balance, quint64 spendable);
     void blockchainSync(int height, int target);
     void refreshSync(int height, int target);
     void synchronized();

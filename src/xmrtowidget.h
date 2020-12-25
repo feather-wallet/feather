@@ -30,7 +30,7 @@ public slots:
     void onRatesUpdated(XmrToRates rates);
     void onTorCheckBoxToggled(int state);
     void onCreateOrder();
-    void onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str);
+    void onBalanceUpdated(quint64 balance, quint64 spendable);
     void updateConversionLabel();
 
     void onInitiateTransaction();

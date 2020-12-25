@@ -133,7 +133,7 @@ public slots:
     void loadSignedTxFromText();
 
     // libwalletqt
-    void onBalanceUpdated(double balance, double unlocked, const QString &balance_str, const QString &unlocked_str);
+    void onBalanceUpdated(quint64 balance, quint64 spendable);
     void onSynchronized();
     void onWalletOpened();
     void onWalletClosed();
@@ -169,6 +169,7 @@ private:
     void updateNetStats();
     void rescanSpent();
     void setStatusText(const QString &text);
+    void showBalanceDialog();
     QString statusDots();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
@@ -192,7 +193,7 @@ private:
     TickerWidget *m_balanceWidget;
 
     // lower status bar
-    QLabel *m_statusLabelBalance;
+    ClickableLabel *m_statusLabelBalance;
     QLabel *m_statusLabelStatus;
     QLabel *m_statusLabelNetStats;
     StatusBarButton *m_statusBtnConnectionStatusIndicator;
