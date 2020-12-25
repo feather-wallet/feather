@@ -54,6 +54,9 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
 
     connect(createWalletSeed, &CreateWalletSeedPage::createWallet, this, &WalletWizard::createWallet);
     connect(createWallet, &CreateWalletPage::createWallet, this, &WalletWizard::createWallet);
+    connect(createWallet, &CreateWalletPage::defaultWalletDirChanged, [this](const QString &walletDir){
+        emit defaultWalletDirChanged(walletDir);
+    });
 
     connect(openWalletPage, &OpenWalletPage::openWallet, [=](const QString &path){
         const auto walletPasswd = this->field("walletPasswd").toString();

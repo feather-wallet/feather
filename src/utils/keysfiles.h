@@ -54,6 +54,8 @@ public:
     QStringList walletDirectories;
 
 private:
+    void updateDirectories();
+
     AppContext *m_ctx;
     QList<WalletKeysFiles> m_walletKeyFiles;
     QAbstractItemModel *m_walletKeysFilesItemModel;

@@ -20,15 +20,16 @@ class CreateWalletPage : public QWizardPage
 
 public:
     explicit CreateWalletPage(AppContext *ctx, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
 signals:
     void createWallet();
+    void defaultWalletDirChanged(QString walletDir);
 
 private:
     AppContext *m_ctx;
-    QLabel *topLabel;
     Ui::CreateWalletPage *ui;
     QString m_walletDir;
     bool validateWidgets();

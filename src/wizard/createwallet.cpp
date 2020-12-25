@@ -34,7 +34,11 @@ CreateWalletPage::CreateWalletPage(AppContext *ctx, QWidget *parent) :
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
         if(walletDir.isEmpty()) return;
+        m_ctx->defaultWalletDir = walletDir;
+        m_ctx->defaultWalletDirRoot = walletDir;
         ui->directory->setText(walletDir);
+        config()->set(Config::walletDirectory, walletDir);
+        emit defaultWalletDirChanged(walletDir);
     });
 
     connect(ui->directory, &QLineEdit::textChanged, [=](const QString &data) {
@@ -45,6 +49,10 @@ CreateWalletPage::CreateWalletPage(AppContext *ctx, QWidget *parent) :
     connect(ui->walletName, &QLineEdit::textChanged, [=](QString data) {
         this->validateWidgets();
     });
+}
+
+void CreateWalletPage::initializePage() {
+    ui->directory->setText(m_ctx->defaultWalletDir);
 }
 
 bool CreateWalletPage::validateWidgets(){

@@ -20,8 +20,10 @@ public:
     enum Page { Page_Menu, Page_CreateWallet, Page_CreateWalletSeed, Page_OpenWallet, Page_Network, Page_Restore, Page_ViewOnly };
 
     explicit WalletWizard(AppContext *ctx, WalletWizard::Page startPage = WalletWizard::Page::Page_Menu, QWidget *parent = nullptr);
+
 signals:
     void openWallet(QString path, QString password);
+    void defaultWalletDirChanged(QString walletDir);
 
 private:
     AppContext *m_ctx;
