@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (C) 2020 KeePassXC Team <team@keepassxc.org>
 // Copyright (C) 2011 Felix Geyer <debfx@fobos.de>
-// Copyright (C) 2020, The Monero Project.
+// Copyright (c) 2020-2021, The Monero Project.
 
 #include "config.h"
 #include "utils/utils.h"

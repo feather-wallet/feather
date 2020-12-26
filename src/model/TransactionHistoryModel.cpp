@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2014-2020, The Monero Project.
+// Copyright (c) 2014-2021, The Monero Project.
 
 #include "TransactionHistoryModel.h"
 #include "TransactionHistory.h"
