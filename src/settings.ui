@@ -287,8 +287,8 @@
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QLineEdit" name="lineEdit_defaultWalletDir">
-             <property name="enabled">
-              <bool>false</bool>
+             <property name="readOnly">
+              <bool>true</bool>
              </property>
             </widget>
            </item>
@@ -317,8 +317,8 @@
          </item>
          <item row="1" column="1">
           <widget class="QLineEdit" name="lineEdit_configDir">
-           <property name="enabled">
-            <bool>false</bool>
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -331,8 +331,8 @@
          </item>
          <item row="2" column="1">
           <widget class="QLineEdit" name="lineEdit_applicationDir">
-           <property name="enabled">
-            <bool>false</bool>
+           <property name="readOnly">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
