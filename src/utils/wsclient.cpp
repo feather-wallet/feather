@@ -3,13 +3,10 @@
 
 #include <QObject>
 #include <QNetworkAccessManager>
-#include <QStandardPaths>
 #include <QScreen>
 #include <QDesktopWidget>
-#include <QtCore>
 #include "wsclient.h"
 #include "appcontext.h"
-
 
 WSClient::WSClient(AppContext *ctx, const QUrl &url, QObject *parent) :
         QObject(parent),

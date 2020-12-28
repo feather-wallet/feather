@@ -9,10 +9,6 @@
 #include "config-feather.h"
 #include "mainwindow.h"
 #include "cli.h"
-#include "utils/utils.h"
-#include "appcontext.h"
-
-#include <QtPlugin>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>

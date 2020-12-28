@@ -5,7 +5,6 @@
 #include "ui_txproofwidget.h"
 
 #include <QMessageBox>
-#include <utility>
 
 #include "utils/utils.h"
 

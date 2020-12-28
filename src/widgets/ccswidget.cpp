@@ -3,13 +3,10 @@
 
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QProgressBar>
-#include <QMessageBox>
 #include <QDesktopServices>
 
 #include "ccswidget.h"
 #include "ui_ccswidget.h"
-#include "utils/utils.h"
 #include "ccsprogressdelegate.h"
 
 CCSWidget::CCSWidget(QWidget *parent) :

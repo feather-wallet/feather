@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QtCore>
 #include <QScreen>
 #include <QDesktopWidget>
-#include <QProcess>
 #include <QDesktopServices>
 #include "utils/utils.h"
 #include "utils/tor.h"
@@ -215,48 +213,6 @@ bool Tor::unpackBins() {
     torBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
 #endif
     return true;
-}
-
-networkPeer Tor::getPeerFromConfig(const QString &path) {
-    // parse Tor bind addr from given Tor config
-    QRegularExpression re("^SocksPort ([\\d|.|:]+)");
-
-    networkPeer peer;
-    peer.host = "127.0.0.1";
-    peer.port = 9050;
-
-    if(!Utils::fileExists(path)) {
-        peer.active = Utils::portOpen(peer.host, peer.port);
-        return peer;
-    }
-
-    for(const auto &line: Utils::fileOpen(path).split('\n')) {
-        QRegularExpressionMatch match = re.match(line);
-        if(!match.hasMatch())
-            continue;
-
-        QString match_group = match.captured(1);
-        int host_idx = match_group.indexOf(':');
-        if(host_idx >= 1){
-            peer.host = match_group.mid(0, host_idx);
-            QString port = match_group.mid(host_idx + 1);
-            if(!Utils::isDigit(port))
-                continue;
-
-            peer.port = (quint16)port.toInt();
-            qDebug() << "Parsed port from local Tor config";
-            break;
-        }
-
-        if(Utils::isDigit(match_group)) {
-            peer.port = (quint16)match_group.toInt();
-            qDebug() << "Parsed port from local Tor config";
-            break;
-        }
-    }
-
-    peer.active = Utils::portOpen(peer.host, peer.port);
-    return peer;
 }
 
 QString Tor::getVersion() {

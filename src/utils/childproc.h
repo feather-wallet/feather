@@ -4,7 +4,6 @@
 #ifndef FEATHER_FPROCESS_H
 #define FEATHER_FPROCESS_H
 
-#include <QtCore>
 #include <QProcess>
 
 #if defined(HAVE_SYS_PRCTL_H) && defined(Q_OS_UNIX)

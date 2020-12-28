@@ -5,15 +5,7 @@
 #include "wizard/walletwizard.h"
 #include "ui_viewonlywallet.h"
 
-#include <QLineEdit>
 #include <QPlainTextEdit>
-#include <QTextCharFormat>
-#include <QPushButton>
-#include <QButtonGroup>
-
-#include <monero_seed/wordlist.hpp>  // tevador 14 word
-
-#include "libwalletqt/WalletManager.h"
 
 ViewOnlyPage::ViewOnlyPage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),

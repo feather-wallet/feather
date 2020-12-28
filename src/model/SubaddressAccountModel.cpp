@@ -3,10 +3,8 @@
 
 #include "SubaddressAccountModel.h"
 #include "SubaddressAccount.h"
-#include <wallet/api/wallet2_api.h>
 
 #include <QDebug>
-#include <QHash>
 
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
     : QAbstractListModel(parent), m_subaddressAccount(subaddressAccount)

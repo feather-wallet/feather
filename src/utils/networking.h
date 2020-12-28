@@ -4,16 +4,13 @@
 #ifndef FEATHER_NETWORKING_H
 #define FEATHER_NETWORKING_H
 
-#include <QtCore>
 #include <QRegExp>
-#include <QApplication>
 #include <QtNetwork>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
 #include "utils/utils.h"
 
-static QStringList randomHTTPAgents;
 class CCSEntry;
 
 class UtilsNetworking : public QObject

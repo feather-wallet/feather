@@ -1,23 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QtCore>
-#include <QtGlobal>
-#include <QObject>
 #include <QScreen>
 #include <QMessageBox>
 #include <QtNetwork>
-#include <QTcpSocket>
 #include <QClipboard>
-#include <QDesktopWidget>
-#include <QProcess>
 #include <QCompleter>
 #include <QDesktopServices>
-#include <QApplication>
-#include <QMainWindow>
-#include <QTextStream>
 #include <QtWidgets/QStyle>
-#include <QVector>
 
 #include "utils.h"
 #include "utils/config.h"
@@ -212,69 +202,6 @@ QByteArray Utils::readSocket(QTcpSocket &socket, int buffer_size) {
     }
 
     return data;
-}
-
-bool Utils::testSocks5(const QString &host, quint16 port){
-    // synchronous socks5 tester
-    QByteArray data;
-    QTcpSocket socket;
-    socket.connectToHost(host, port);
-    if (!socket.waitForConnected(1000)) {
-        qDebug() << QString("could not connect to %1 %2")
-                .arg(host).arg(port);
-        socket.close();
-        return false;
-    }
-
-    // latest & greatest
-    socket.write(QByteArray("\x05\x02", 2));
-    socket.flush();
-
-    // no auth pl0x
-    socket.write(QByteArray("\x00\x01", 2));
-    socket.flush();
-
-    // cool story
-    if(Utils::readSocket(socket, 2).isEmpty()){
-        qDebug() << "socks response timeout";
-        socket.close();
-        return false;
-    }
-
-    // pls sir
-    socket.write(QByteArray("\x05\x01\x00\x03", 4));
-
-    // here we go!!
-    socket.write(QByteArray("\x16", 1));  // len
-    socket.write(QByteArray("kebjllr47c2ouoly.onion"));
-    socket.write(QByteArray("\x00\x50", 2)); // port
-    socket.flush();
-
-    // fingers crossed
-    auto result = Utils::readSocket(socket, 10);
-    qDebug() << result;
-    if(result.length() != 10 || result.at(1) != 0) {
-        qDebug() << "bad socks response";
-        socket.close();
-        return false;
-    }
-
-    // can haz?
-    QByteArray http("GET /api/v1/ping HTTP/1.1\r\nHost: kebjllr47c2ouoly.onion\r\nConnection: close\r\n\r\n");
-    socket.write(http);
-
-    auto resp = Utils::readSocket(socket, 555);
-    QRegularExpression re(R"(^HTTP\/\d.\d 200 OK)");
-    QRegularExpressionMatch match = re.match(resp);
-    if(match.hasMatch()){
-        socket.close();
-        return true;
-    }
-
-    qDebug() << resp;
-
-    socket.close();
-    return false;
 }
 
 void Utils::externalLinkWarning(QWidget *parent, const QString &url){

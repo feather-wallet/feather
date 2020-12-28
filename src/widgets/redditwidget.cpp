@@ -3,8 +3,6 @@
 
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QProgressBar>
-#include <QMessageBox>
 #include <QDesktopServices>
 
 #include "model/RedditModel.h"

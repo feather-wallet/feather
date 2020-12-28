@@ -3,10 +3,7 @@
 
 #include "wizard/openwallet.h"
 #include "ui_openwallet.h"
-#include "appcontext.h"
-#include "utils/config.h"
 
-#include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
 

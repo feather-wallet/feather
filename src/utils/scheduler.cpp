@@ -3,10 +3,6 @@
 
 #include "scheduler.h"
 
-#include <mutex>
-
-#include <QThreadPool>
-
 FutureScheduler::FutureScheduler(QObject *parent)
     : QObject(parent), Alive(0), Stopping(false)
 {

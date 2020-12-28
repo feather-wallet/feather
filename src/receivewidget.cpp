@@ -3,12 +3,10 @@
 
 #include "ui_receivewidget.h"
 #include "receivewidget.h"
-#include "qrcode/QrCode.h"
 #include "model/ModelUtils.h"
 #include "dialog/qrcodedialog.h"
 
 #include <QMenu>
-#include <QClipboard>
 
 ReceiveWidget::ReceiveWidget(QWidget *parent) :
         QWidget(parent),

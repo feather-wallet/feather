@@ -1,10 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QtCore>
 #include <QScreen>
 #include <QDesktopWidget>
-#include <QProcess>
 #include <QDesktopServices>
 
 #include "utils/utils.h"

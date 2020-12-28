@@ -4,10 +4,6 @@
 #include "historywidget.h"
 #include "ui_historywidget.h"
 #include "dialog/transactioninfodialog.h"
-#include "libwalletqt/TransactionHistory.h"
-#include "model/TransactionHistoryProxyModel.h"
-
-#include <QIcon>
 
 HistoryWidget::HistoryWidget(QWidget *parent)
         : QWidget(parent)

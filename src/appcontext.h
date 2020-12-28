@@ -35,7 +35,7 @@ Q_OBJECT
 
 public:
     explicit AppContext(QCommandLineParser *cmdargs);
-    ~AppContext();
+    ~AppContext() override;
     bool isTails = false;
     bool isWhonix = false;
     bool isDebug = false;
@@ -75,9 +75,9 @@ public:
 
     QNetworkAccessManager *network;
     QNetworkAccessManager *networkClearnet;
-    QNetworkProxy *networkProxy;
+    QNetworkProxy *networkProxy{};
 
-    Tor *tor;
+    Tor *tor{};
     WSClient *ws;
     XmrTo *XMRTo;
     XmRig *XMRig;
@@ -109,7 +109,7 @@ public:
 
 public slots:
     void onOpenWallet(const QString& path, const QString &password);
-    void onCreateTransaction(const QString &address, const double amount, const QString &description, bool all);
+    void onCreateTransaction(const QString &address, double amount, const QString &description, bool all);
     void onCreateTransaction(XmrToOrder *order);
     void onCancelTransaction(PendingTransaction *tx, const QString &address);
     void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;
@@ -134,7 +134,6 @@ private slots:
     void onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight);
     void onTransactionCreated(PendingTransaction *tx, const QString &address, const QString &paymentId, quint32 mixin);
     void onTransactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
-    void onConnectionStatusChanged(int status);
 
 signals:
     void balanceUpdated(quint64 balance, quint64 spendable);
@@ -173,8 +172,8 @@ signals:
 
 private:
     const int m_donationBoundary = 15;
-    UtilsNetworking *m_utilsNetworkingNodes;
-    QTimer *m_storeTimer = new QTimer(this);
+    UtilsNetworking *m_utilsNetworkingNodes{};
+    QTimer m_storeTimer;
     QUrl m_wsUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
 };
 

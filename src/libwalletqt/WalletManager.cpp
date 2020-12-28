@@ -3,15 +3,6 @@
 
 #include "libwalletqt/WalletManager.h"
 #include "Wallet.h"
-#include "wallet/api/wallet2_api.h"
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QUrl>
-#include <QtConcurrent/QtConcurrent>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QString>
 
 //#include "qt/updater.h"
 #include "utils/ScopeGuard.h"

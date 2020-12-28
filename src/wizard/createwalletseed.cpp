@@ -4,11 +4,8 @@
 #include "wizard/createwalletseed.h"
 #include "wizard/walletwizard.h"
 #include "ui_createwalletseed.h"
-#include "appcontext.h"
 
-#include <QPushButton>
 #include <QFileDialog>
-#include <QDebug>
 
 CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),

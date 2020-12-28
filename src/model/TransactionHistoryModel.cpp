@@ -6,10 +6,6 @@
 #include "TransactionInfo.h"
 #include "globals.h"
 
-#include <QDateTime>
-#include <QDebug>
-#include <QIcon>
-
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
     m_transactionHistory(nullptr)

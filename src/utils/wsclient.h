@@ -4,9 +4,9 @@
 #ifndef ECHOCLIENT_H
 #define ECHOCLIENT_H
 
-#include <QtCore/QObject>
+#include <QObject>
 #include <QtWebSockets/QWebSocket>
-#include <QtCore/QTimer>
+#include <QTimer>
 
 class AppContext;
 class WSClient : public QObject

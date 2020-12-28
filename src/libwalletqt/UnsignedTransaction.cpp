@@ -2,7 +2,6 @@
 // Copyright (c) 2014-2021, The Monero Project.
 
 #include "UnsignedTransaction.h"
-#include <QVector>
 #include <QDebug>
 
 UnsignedTransaction::Status UnsignedTransaction::status() const

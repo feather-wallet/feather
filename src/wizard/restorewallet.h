@@ -4,7 +4,6 @@
 #ifndef FEATHER_WIZARDRESTORE_H
 #define FEATHER_WIZARDRESTORE_H
 
-#include <QtCore>
 #include <QLabel>
 #include <QWizardPage>
 #include <QWidget>

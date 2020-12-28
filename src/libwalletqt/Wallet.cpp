@@ -3,12 +3,6 @@
 
 #include "Wallet.h"
 
-#include <chrono>
-#include <stdexcept>
-#include <thread>
-
-#include "PendingTransaction.h"
-#include "UnsignedTransaction.h"
 #include "TransactionHistory.h"
 #include "AddressBook.h"
 #include "Subaddress.h"
@@ -20,17 +14,6 @@
 #include "model/SubaddressModel.h"
 #include "model/SubaddressAccountModel.h"
 #include "model/CoinsModel.h"
-#include "wallet/api/wallet2_api.h"
-
-#include <QFile>
-#include <QDir>
-#include <QDebug>
-#include <QUrl>
-#include <QTimer>
-#include <QtConcurrent/QtConcurrent>
-#include <QList>
-#include <QVector>
-#include <QMutexLocker>
 
 #include "utils/ScopeGuard.h"
 

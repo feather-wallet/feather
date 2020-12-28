@@ -3,11 +3,8 @@
 
 #include "txconfadvdialog.h"
 #include "ui_txconfadvdialog.h"
-#include "libwalletqt/WalletManager.h"
 #include "qrcode/QrCode.h"
 #include "dialog/qrcodedialog.h"
-#include "utils/utils.h"
-#include "libwalletqt/PendingTransactionInfo.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/Input.h"
 #include "model/ModelUtils.h"

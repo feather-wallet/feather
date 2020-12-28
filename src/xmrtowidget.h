@@ -20,7 +20,7 @@ Q_OBJECT
 public:
     explicit XMRToWidget(QWidget *parent = nullptr);
     void setHistoryModel(XmrToModel *model);
-    ~XMRToWidget();
+    ~XMRToWidget() override;
 
 public slots:
     void onWalletClosed();

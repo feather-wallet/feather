@@ -2,8 +2,6 @@
 // Copyright (c) 2014-2021, The Monero Project.
 
 #include "PendingTransactionInfo.h"
-#include "Input.h"
-#include "Transfer.h"
 
 quint64 PendingTransactionInfo::fee() const {
     return m_fee;

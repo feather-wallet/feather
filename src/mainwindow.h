@@ -12,6 +12,7 @@
 #include <QSystemTrayIcon>
 #include <QScreen>
 #include <QtWidgets/QMenu>
+#include <utility>
 #include <model/SubaddressModel.h>
 #include <model/SubaddressProxyModel.h>
 #include <model/TransactionHistoryModel.h>
@@ -43,8 +44,8 @@ namespace Ui {
 }
 
 struct ToggleTab {
-    ToggleTab(QWidget *tab, const QString &name, const QString &description, QAction *menuAction, Config::ConfigKey configKey) :
-            tab(tab), key(name), name(description), menuAction(menuAction), configKey(configKey){}
+    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction, Config::ConfigKey configKey) :
+            tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction), configKey(configKey){}
     QWidget *tab;
     QString key;
     QString name;

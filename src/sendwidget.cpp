@@ -3,7 +3,6 @@
 
 #include <QMessageBox>
 #include "sendwidget.h"
-#include "widgets/ccswidget.h"
 #include "mainwindow.h"
 #include "ui_sendwidget.h"
 
@@ -150,7 +149,7 @@ void SendWidget::updateConversionLabel() {
             auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
             double conversionAmount = AppContext::prices->convert("XMR", preferredFiatCurrency, this->amount());
             return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
-        };
+        }
     }();
 
     ui->label_conversionAmount->setText(conversionAmountStr);

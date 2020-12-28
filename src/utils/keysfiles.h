@@ -7,7 +7,6 @@
 #include "libwalletqt/WalletManager.h"
 #include "utils/networktype.h"
 #include "utils/utils.h"
-#include <QtCore>
 
 class WalletKeysFiles
 {

@@ -7,11 +7,8 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <QtCore>
 #include <QRegExp>
 #include <QtNetwork>
-#include <QApplication>
-#include <QMainWindow>
 #include "utils/childproc.h"
 
 class Tor : public QObject
@@ -25,7 +22,6 @@ public:
     void stop();
     bool unpackBins();
     QString getVersion();
-    networkPeer getPeerFromConfig(const QString &path);
 
     bool torConnected = false;
     bool localTor = false;

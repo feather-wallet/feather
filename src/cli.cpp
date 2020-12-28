@@ -4,17 +4,9 @@
 #include "cli.h"
 
 // libwalletqt
-#include "Wallet.h"
 #include "libwalletqt/TransactionHistory.h"
-#include "libwalletqt/SubaddressAccount.h"
-#include "libwalletqt/Subaddress.h"
-#include "libwalletqt/AddressBook.h"
-#include "libwalletqt/Coins.h"
 #include "model/AddressBookModel.h"
 #include "model/TransactionHistoryModel.h"
-#include "model/SubaddressAccountModel.h"
-#include "model/SubaddressModel.h"
-#include "model/CoinsModel.h"
 
 CLI::CLI(AppContext *ctx, QObject *parent) :
         QObject(parent),

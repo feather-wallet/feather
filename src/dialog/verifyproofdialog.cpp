@@ -4,7 +4,6 @@
 #include "verifyproofdialog.h"
 #include "ui_verifyproofdialog.h"
 
-#include "utils/utils.h"
 #include "libwalletqt/WalletManager.h"
 
 #include <QMessageBox>

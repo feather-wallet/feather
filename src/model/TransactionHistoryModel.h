@@ -35,7 +35,6 @@ public:
     void setTransactionHistory(TransactionHistory * th);
     TransactionHistory * transactionHistory() const;
 
-    QString preferredFiatSign = "$";
     QString preferredFiatSymbol = "USD";
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;

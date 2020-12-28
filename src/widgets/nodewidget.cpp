@@ -1,21 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QtCore>
-#include <QPlainTextEdit>
 #include <QInputDialog>
-#include <QStandardItemModel>
 #include <QTableWidget>
-#include <QProgressBar>
 #include <QMessageBox>
 #include <QDesktopServices>
-#include <utils/config.h>
 
 #include "model/NodeModel.h"
 #include "nodewidget.h"
 #include "ui_nodewidget.h"
-#include "utils/utils.h"
-#include "utils/nodes.h"
 #include "mainwindow.h"
 
 NodeWidget::NodeWidget(QWidget *parent)

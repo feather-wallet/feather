@@ -6,7 +6,6 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <QtCore>
 #include <QRegExp>
 #include <QStandardItemModel>
 #include <QtNetwork>
@@ -80,7 +79,7 @@ public:
     static bool dirExists(const QString &path);
     static QString barrayToString(const QByteArray &data);
     static QByteArray readSocket(QTcpSocket &socket, int buffer_size);
-    static bool testSocks5(const QString &host, quint16 port);
+
     static QStandardItem *qStandardItem(const QString &text);
     static QStandardItem *qStandardItem(const QString &text, QFont &font);
     static void copyToClipboard(const QString &string);

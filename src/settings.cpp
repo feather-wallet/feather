@@ -3,8 +3,6 @@
 
 #include "settings.h"
 #include "ui_settings.h"
-#include "appcontext.h"
-#include "utils/config.h"
 #include "mainwindow.h"
 
 #include <QFileDialog>

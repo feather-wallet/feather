@@ -3,8 +3,6 @@
 
 #include "daemonrpc.h"
 
-#include <utility>
-
 DaemonRpc::DaemonRpc(QObject *parent, UtilsNetworking *network, QString daemonAddress)
         : QObject(parent)
         , m_network(network)

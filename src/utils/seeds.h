@@ -4,7 +4,6 @@
 #ifndef FEATHER_SEEDS_H
 #define FEATHER_SEEDS_H
 
-#include <QtCore>
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
@@ -15,7 +14,6 @@
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "utils/utils.h"
-
 
 struct RestoreHeightLookup {
     NetworkType::Type type;

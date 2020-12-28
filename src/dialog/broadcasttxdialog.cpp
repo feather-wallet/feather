@@ -3,7 +3,6 @@
 
 #include "broadcasttxdialog.h"
 #include "ui_broadcasttxdialog.h"
-#include "utils/nodes.h"
 
 #include <QMessageBox>
 

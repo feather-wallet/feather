@@ -4,8 +4,6 @@
 #include "tickerwidget.h"
 #include "ui_tickerwidget.h"
 
-#include "appcontext.h"
-#include "utils/config.h"
 #include "mainwindow.h"
 
 TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool convertBalance, bool hidePercent) :

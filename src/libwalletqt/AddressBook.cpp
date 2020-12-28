@@ -2,7 +2,6 @@
 // Copyright (c) 2014-2021, The Monero Project.
 
 #include "AddressBook.h"
-#include "AddressBookInfo.h"
 #include <QDebug>
 
 AddressBook::AddressBook(Monero::AddressBook *abImpl,QObject *parent)

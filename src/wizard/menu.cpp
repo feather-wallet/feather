@@ -5,11 +5,7 @@
 #include "wizard/walletwizard.h"
 #include "ui_menu.h"
 
-#include <QPushButton>
 #include <QFileDialog>
-#include <QDebug>
-
-#include "libwalletqt/WalletManager.h"
 
 MenuPage::MenuPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)

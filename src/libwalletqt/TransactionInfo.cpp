@@ -5,8 +5,6 @@
 #include "libwalletqt/WalletManager.h"
 #include "Transfer.h"
 #include "Ring.h"
-#include <QDateTime>
-#include <QDebug>
 
 TransactionInfo::Direction TransactionInfo::direction() const
 {

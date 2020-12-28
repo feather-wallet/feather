@@ -11,12 +11,9 @@
 #include "wizard/restorewallet.h"
 #include "wizard/viewonlywallet.h"
 
-#include <QStyle>
-#include <QLabel>
 #include <QLineEdit>
 #include <QVBoxLayout>
 #include <QScreen>
-#include <QApplication>
 
 WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidget *parent)
         : QWizard(parent)

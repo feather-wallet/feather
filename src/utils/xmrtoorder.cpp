@@ -3,12 +3,9 @@
 
 #include "xmrtoorder.h"
 
-#include <utility>
-
 #include "libwalletqt/Wallet.h"
 #include "appcontext.h"
 #include "globals.h"
-#include "utils/xmrto.h"
 
 XmrToOrder::XmrToOrder(AppContext *ctx, UtilsNetworking *network, QString baseUrl, bool clearnet, XmrToRates *rates, QObject *parent) :
         QObject(parent),
