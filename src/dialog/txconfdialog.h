@@ -25,8 +25,6 @@ public:
 
 private:
     void setShowAdvanced();
-    void saveToFile();
-    void copyToClipboard();
 
     Ui::TxConfDialog *ui;
     AppContext *m_ctx;

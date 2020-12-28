@@ -1,15 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QStandardItemModel>
 #include <QTableWidget>
-#include <QProgressBar>
 #include <QMessageBox>
 #include <QDesktopServices>
 
 #include "restoreheightwidget.h"
 #include "ui_restoreheightwidget.h"
-#include "utils/utils.h"
 
 RestoreHeightWidget::RestoreHeightWidget(QWidget *parent) :
     QWidget(parent),

@@ -4,7 +4,6 @@
 #ifndef FEATHER_WIZARDVIEWONLY_H
 #define FEATHER_WIZARDVIEWONLY_H
 
-#include <QtCore>
 #include <QLabel>
 #include <QWizardPage>
 #include <QWidget>

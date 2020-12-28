@@ -3,8 +3,6 @@
 
 #include "restoredialog.h"
 #include "ui_restoredialog.h"
-#include "utils/utils.h"
-#include "appcontext.h"
 
 RestoreDialog::RestoreDialog(AppContext *ctx, QWidget *parent)
         : QDialog(parent)

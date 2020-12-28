@@ -3,17 +3,11 @@
 
 #include "coinswidget.h"
 #include "ui_coinswidget.h"
-#include "model/ModelUtils.h"
-#include "utils/utils.h"
 #include "dialog/outputinfodialog.h"
 #include "dialog/outputsweepdialog.h"
 #include "mainwindow.h"
 
 #include <QClipboard>
-#include <QDebug>
-#include <QKeyEvent>
-#include <QMenu>
-#include <QAction>
 #include <QMessageBox>
 
 CoinsWidget::CoinsWidget(QWidget *parent)

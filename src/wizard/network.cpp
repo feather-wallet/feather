@@ -2,14 +2,9 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "wizard/network.h"
-#include "wizard/walletwizard.h"
 #include "ui_network.h"
 
-#include <QPushButton>
 #include <QFileDialog>
-#include <QDebug>
-
-#include "libwalletqt/WalletManager.h"
 
 NetworkPage::NetworkPage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),

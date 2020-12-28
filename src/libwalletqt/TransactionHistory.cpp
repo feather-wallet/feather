@@ -5,13 +5,6 @@
 #include "TransactionInfo.h"
 #include "utils/utils.h"
 #include "appcontext.h"
-#include <wallet/api/wallet2_api.h>
-
-#include <QFile>
-#include <QDebug>
-#include <QReadLocker>
-#include <QWriteLocker>
-#include <QtGlobal>
 
 
 bool TransactionHistory::transaction(int index, std::function<void (TransactionInfo &)> callback)

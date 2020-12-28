@@ -4,7 +4,6 @@
 #include "ModelUtils.h"
 
 #include <QDebug>
-#include <QStringList>
 #include <QClipboard>
 #include <QApplication>
 #include <QFont>

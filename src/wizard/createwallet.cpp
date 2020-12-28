@@ -5,14 +5,9 @@
 #include "wizard/createwallet.h"
 #include "wizard/walletwizard.h"
 #include "ui_createwallet.h"
-#include "appcontext.h"
 
-#include <QPushButton>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QDebug>
-
-#include "libwalletqt/WalletManager.h"
 
 CreateWalletPage::CreateWalletPage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),

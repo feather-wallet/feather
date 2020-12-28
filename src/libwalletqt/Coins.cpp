@@ -5,15 +5,9 @@
 
 #include <QDebug>
 
-#include "Coins.h"
 #include "CoinsInfo.h"
-#include <wallet/api/wallet2_api.h>
 
 #include <QFile>
-#include <QDebug>
-#include <QReadLocker>
-#include <QWriteLocker>
-#include <QtGlobal>
 
 
 bool Coins::coin(int index, std::function<void (CoinsInfo &)> callback)

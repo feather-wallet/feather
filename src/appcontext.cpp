@@ -1,35 +1,19 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <stdexcept>
 #include <QDir>
-#include <QStandardPaths>
 #include <QMessageBox>
-#include <QClipboard>
-#include <QDesktopWidget>
 
 #include "appcontext.h"
 #include "globals.h"
-#include "utils/tails.h"
 #include "utils/whonix.h"
-#include "utils/utils.h"
-#include "utils/prices.h"
-#include "utils/networktype.h"
-#include "utils/wsclient.h"
-#include "utils/config.h"
 
 // libwalletqt
-#include "libwalletqt/WalletManager.h"
-#include "libwalletqt/Wallet.h"
 #include "libwalletqt/TransactionHistory.h"
-#include "libwalletqt/SubaddressAccount.h"
 #include "libwalletqt/Subaddress.h"
 #include "libwalletqt/Coins.h"
 #include "model/TransactionHistoryModel.h"
-#include "model/SubaddressAccountModel.h"
 #include "model/SubaddressModel.h"
-#include "utils/keysfiles.h"
-#include "utils/networktype.h"
 
 
 Prices *AppContext::prices = nullptr;
@@ -125,8 +109,8 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     connect(this->ws, &WSClient::WSMessage, this, &AppContext::onWSMessage);
 
     // timers
-    m_storeTimer->setSingleShot(true);
-    connect(this->m_storeTimer, &QTimer::timeout, [this](){
+    m_storeTimer.setSingleShot(true);
+    connect(&m_storeTimer, &QTimer::timeout, [this](){
         if (!this->currentWallet)
             return;
         qDebug() << "Storing wallet";
@@ -186,7 +170,7 @@ void AppContext::initTor() {
     this->tor->start();
 
     if (!(isWhonix)) {
-        auto networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
+        this->networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
         this->network->setProxy(*networkProxy);
         if (m_wsUrl.host().endsWith(".onion"))
             this->ws->webSocket.setProxy(*networkProxy);
@@ -301,7 +285,6 @@ void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
     if(this->currentWallet) {
         auto *model = this->currentWallet->transactionHistoryModel();
         if(model != nullptr) {
-            model->preferredFiatSign = AppContext::prices->fiat[symbol];
             model->preferredFiatSymbol = symbol;
         }
     }
@@ -344,7 +327,6 @@ void AppContext::onWalletOpened(Wallet *wallet) {
     connect(this->currentWallet, &Wallet::transactionCommitted, this, &AppContext::onTransactionCommitted);
     connect(this->currentWallet, &Wallet::heightRefreshed, this, &AppContext::onHeightRefreshed);
     connect(this->currentWallet, &Wallet::transactionCreated, this, &AppContext::onTransactionCreated);
-    connect(this->currentWallet, &Wallet::connectionStatusChanged, this, &AppContext::onConnectionStatusChanged);
 
     emit walletOpened();
 
@@ -787,15 +769,11 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
     }
 }
 
-void AppContext::onConnectionStatusChanged(int status) {
-
-}
-
 void AppContext::storeWallet() {
-    if (m_storeTimer->isActive())
+    if (m_storeTimer.isActive())
         return;
 
-    m_storeTimer->start(60000);
+    m_storeTimer.start(60000);
 }
 
 void AppContext::updateBalance() {

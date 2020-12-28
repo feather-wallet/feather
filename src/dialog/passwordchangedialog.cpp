@@ -4,7 +4,6 @@
 #include "passwordchangedialog.h"
 #include "ui_passwordchangedialog.h"
 
-#include <QPushButton>
 #include <QMessageBox>
 
 PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)

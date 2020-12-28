@@ -4,14 +4,10 @@
 #include "CoinsModel.h"
 #include "CoinsInfo.h"
 #include "Coins.h"
-#include <wallet/api/wallet2_api.h>
 #include "ModelUtils.h"
 #include "globals.h"
 
-#include <QDebug>
-#include <QHash>
 #include <QBrush>
-#include <QColor>
 #include <QFont>
 
 CoinsModel::CoinsModel(QObject *parent, Coins *coins)

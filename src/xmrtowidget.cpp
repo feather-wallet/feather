@@ -4,11 +4,9 @@
 #include "xmrtowidget.h"
 #include "ui_xmrtowidget.h"
 #include "dialog/xmrtoinfodialog.h"
-#include "libwalletqt/WalletManager.h"
 #include "mainwindow.h"
 #include "globals.h"
 
-#include <QMenu>
 #include <QMessageBox>
 
 XMRToWidget::XMRToWidget(QWidget *parent) :

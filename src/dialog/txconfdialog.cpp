@@ -3,10 +3,7 @@
 
 #include "txconfdialog.h"
 #include "ui_txconfdialog.h"
-#include "appcontext.h"
-#include "utils/config.h"
 #include "model/ModelUtils.h"
-#include "libwalletqt/WalletManager.h"
 #include "txconfadvdialog.h"
 #include "globals.h"
 

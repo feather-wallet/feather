@@ -5,7 +5,6 @@
 
 #include "calcwidget.h"
 #include "ui_calcwidget.h"
-#include "utils/config.h"
 #include "mainwindow.h"
 
 CalcWidget::CalcWidget(QWidget *parent) :

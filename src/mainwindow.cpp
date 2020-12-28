@@ -7,11 +7,8 @@
 #include <QCoreApplication>
 #include <QSystemTrayIcon>
 #include <QFileDialog>
-#include <QInputDialog>
 
 #include "mainwindow.h"
-#include "widgets/ccswidget.h"
-#include "widgets/redditwidget.h"
 #include "dialog/txconfdialog.h"
 #include "dialog/txconfadvdialog.h"
 #include "dialog/debuginfodialog.h"
@@ -22,23 +19,11 @@
 #include "dialog/tximportdialog.h"
 #include "dialog/passworddialog.h"
 #include "dialog/balancedialog.h"
-#include "utils/utils.h"
-#include "utils/config.h"
-#include "utils/daemonrpc.h"
-#include "components.h"
-#include "calcwindow.h"
 #include "ui_mainwindow.h"
 #include "globals.h"
 
 // libwalletqt
-#include "libwalletqt/WalletManager.h"
-#include "Wallet.h"
-#include "libwalletqt/TransactionHistory.h"
-#include "libwalletqt/SubaddressAccount.h"
 #include "libwalletqt/AddressBook.h"
-#include "model/SubaddressAccountModel.h"
-#include "model/SubaddressModel.h"
-#include "utils/networktype.h"
 
 MainWindow * MainWindow::pMainWindow = nullptr;
 

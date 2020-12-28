@@ -4,10 +4,6 @@
 #include "debuginfodialog.h"
 #include "ui_debuginfodialog.h"
 #include "config-feather.h"
-#include "utils/utils.h"
-
-#include <QDateTime>
-#include <QSysInfo>
 
 DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
         : QDialog(parent)

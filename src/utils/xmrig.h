@@ -7,7 +7,6 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <QtCore>
 #include <QRegExp>
 #include <QtNetwork>
 #include <QApplication>
@@ -25,7 +24,6 @@ public:
 
     void start(const QString &path, int threads, const QString &address, const QString &username, const QString &password, bool tor = false, bool tls = true);
     void stop();
-    bool unpackBins();
 
     QString rigDir;
     QString rigPath;

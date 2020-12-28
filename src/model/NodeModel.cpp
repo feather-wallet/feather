@@ -3,7 +3,6 @@
 
 #include "NodeModel.h"
 #include <utils/nodes.h>
-#include "appcontext.h"
 
 NodeModel::NodeModel(int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)

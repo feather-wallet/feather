@@ -16,7 +16,6 @@ public:
     static QString version();
 
     static void showDataPersistenceDisabledWarning();
-    static void askPersistence();
     static void persistXdgMime(const QString& filePath, const QString& data);
 
     static bool usePersistence;

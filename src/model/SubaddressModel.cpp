@@ -4,9 +4,7 @@
 #include "SubaddressModel.h"
 #include "Subaddress.h"
 #include "ModelUtils.h"
-#include <wallet/api/wallet2_api.h>
 
-#include <QHash>
 #include <QPoint>
 #include <QColor>
 #include <QBrush>

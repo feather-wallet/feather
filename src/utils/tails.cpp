@@ -3,9 +3,6 @@
 
 #include <QRegExp>
 #include <QMessageBox>
-#include <QPixmap>
-#include <QTranslator>
-#include <QCheckBox>
 
 #include "tails.h"
 #include "utils.h"

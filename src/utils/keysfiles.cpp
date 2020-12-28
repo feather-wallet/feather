@@ -7,14 +7,8 @@
 #include <QDebug>
 #include <QUrl>
 #include <QtConcurrent/QtConcurrent>
-#include <QMutex>
-#include <QString>
 
 #include "appcontext.h"
-#include "utils/config.h"
-#include "utils/networktype.h"
-#include "utils/utils.h"
-#include "keysfiles.h"
 
 using namespace std::chrono;
 

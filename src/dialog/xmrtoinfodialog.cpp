@@ -4,8 +4,6 @@
 #include "xmrtoinfodialog.h"
 #include "ui_xmrtoinfodialog.h"
 
-#include <QFont>
-
 XmrToInfoDialog::XmrToInfoDialog(XmrToOrder *oInfo, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::XmrToInfoDialog)

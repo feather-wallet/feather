@@ -17,7 +17,7 @@ Q_OBJECT
 
 public:
     explicit CalcWidget(QWidget *parent = nullptr);
-    ~CalcWidget();
+    ~CalcWidget() override;
 
 signals:
     void closed();

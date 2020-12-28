@@ -7,13 +7,8 @@
 
 #include <QLineEdit>
 #include <QPlainTextEdit>
-#include <QTextCharFormat>
-#include <QPushButton>
-#include <QButtonGroup>
 
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
-
-#include "libwalletqt/WalletManager.h"
 
 RestorePage::RestorePage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),

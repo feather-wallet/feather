@@ -3,7 +3,6 @@
 
 #include "xmrto.h"
 
-#include "utils/xmrtoorder.h"
 #include "appcontext.h"
 
 QMap<OrderState, QString> XmrTo::stateMap;

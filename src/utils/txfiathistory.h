@@ -4,7 +4,6 @@
 #ifndef FEATHER_TXFIATHISTORY_H
 #define FEATHER_TXFIATHISTORY_H
 
-
 class TxFiatHistory : public QObject {
     Q_OBJECT
 

@@ -5,12 +5,6 @@
 #include "AddressBook.h"
 #include "ModelUtils.h"
 #include "utils/utils.h"
-#include <wallet/api/wallet2_api.h>
-
-#include <QDebug>
-#include <QFileDialog>
-#include <QDir>
-#include <QFontDatabase>
 
 AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
     : QAbstractTableModel(parent),

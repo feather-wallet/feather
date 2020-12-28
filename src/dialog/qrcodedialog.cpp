@@ -3,7 +3,6 @@
 
 #include "qrcodedialog.h"
 #include "ui_qrcodedialog.h"
-#include "qrcode/QrCode.h"
 
 #include <QClipboard>
 #include <QFileDialog>

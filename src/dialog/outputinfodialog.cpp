@@ -4,10 +4,7 @@
 #include "outputinfodialog.h"
 #include "ui_outputinfodialog.h"
 #include "model/ModelUtils.h"
-#include "libwalletqt/CoinsInfo.h"
 #include "utils/utils.h"
-
-#include <QFont>
 
 OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
         : QDialog(parent)

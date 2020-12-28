@@ -7,10 +7,6 @@
 #include "utils/utils.h"
 #include "utils/tails.h"
 
-#include <QCoreApplication>
-#include <QDir>
-#include <QStandardPaths>
-
 #define QS QStringLiteral
 
 struct ConfigDirective

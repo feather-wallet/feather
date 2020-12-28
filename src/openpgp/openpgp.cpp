@@ -28,17 +28,13 @@
 
 #include "openpgp.h"
 
-#include <algorithm>
 #include <locale>
-#include <vector>
 
 #include <string_coding.h>
 
 #include "hash.h"
 #include "mpi.h"
 #include "packet_stream.h"
-#include "s_expression.h"
-#include "serialization.h"
 
 namespace openpgp
 {

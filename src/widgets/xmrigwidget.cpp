@@ -3,17 +3,13 @@
 
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QProgressBar>
 #include <QMessageBox>
 #include <QDesktopServices>
-#include <QSysInfo>
 #include <QScrollBar>
 #include <QFileDialog>
-#include <QStandardPaths>
 
 #include "xmrigwidget.h"
 #include "ui_xmrigwidget.h"
-#include "utils/utils.h"
 
 XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     QWidget(parent),

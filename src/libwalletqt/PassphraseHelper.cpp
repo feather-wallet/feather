@@ -2,7 +2,6 @@
 // Copyright (c) 2014-2021, The Monero Project.
 
 #include "PassphraseHelper.h"
-#include <QMutexLocker>
 #include <QDebug>
 
 Monero::optional<std::string> PassphraseHelper::onDevicePassphraseRequest(bool & on_device)

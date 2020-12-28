@@ -3,8 +3,6 @@
 
 #include "xmrtoapi.h"
 
-#include <utility>
-
 XmrToApi::XmrToApi(QObject *parent, UtilsNetworking *network, QString baseUrl)
     : QObject(parent)
     , m_network(network)

@@ -3,9 +3,6 @@
 
 #include "CoinsInfo.h"
 #include "libwalletqt/WalletManager.h"
-#include "Transfer.h"
-#include <QDateTime>
-#include <QDebug>
 
 quint64 CoinsInfo::blockHeight() const
 {

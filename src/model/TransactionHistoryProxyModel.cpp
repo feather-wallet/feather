@@ -5,7 +5,6 @@
 #include "TransactionHistoryModel.h"
 
 #include "libwalletqt/TransactionInfo.h"
-#include <QSet>
 
 TransactionHistoryProxyModel::TransactionHistoryProxyModel(Wallet *wallet, QObject *parent)
         : QSortFilterProxyModel(parent),

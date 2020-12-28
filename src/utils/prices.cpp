@@ -3,7 +3,6 @@
 
 #include <QStandardPaths>
 #include <QScreen>
-#include <QObject>
 #include <QDesktopWidget>
 
 #include "utils/prices.h"

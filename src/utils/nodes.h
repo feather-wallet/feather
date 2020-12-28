@@ -4,7 +4,6 @@
 #ifndef FEATHER_NODES_H
 #define FEATHER_NODES_H
 
-#include <QtCore>
 #include <QTimer>
 #include <QRegExp>
 #include <QApplication>
