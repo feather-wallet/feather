@@ -505,9 +505,6 @@ void AppContext::onWSCCS(const QJsonArray &ccs_data) {
         l.append(c);
     }
 
-    if(l.count() == 0)
-        emit ccsEmpty();
-
     emit ccsUpdated(l);
 }
 
