@@ -36,6 +36,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::websocketEnabled,{QS("websocketEnabled"), true}},
         {Config::nodeSource,{QS("nodeSource"), 0}},
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
+        {Config::showTabHome,{QS("showTabHome"), true}},
         {Config::showTabCoins,{QS("showTabCoins"), false}},
         {Config::showTabExchange, {QS("showTabExchange"), true}},
         {Config::showTabXMRig,{QS("showTabXMRig"), false}},

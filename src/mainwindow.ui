@@ -463,6 +463,7 @@
     <property name="title">
      <string>View</string>
     </property>
+    <addaction name="actionShow_Home"/>
     <addaction name="actionShow_Coins"/>
     <addaction name="actionShow_calc"/>
     <addaction name="actionShow_Exchange"/>
@@ -712,6 +713,11 @@
   <action name="actionRescan_spent">
    <property name="text">
     <string>Rescan spent</string>
+   </property>
+  </action>
+  <action name="actionShow_Home">
+   <property name="text">
+    <string>Show Home</string>
    </property>
   </action>
  </widget>

@@ -38,6 +38,7 @@ public:
         websocketEnabled,
         nodeSource,
         useOnionNodes,
+        showTabHome,
         showTabCoins,
         showTabExchange,
         showTabCalc,

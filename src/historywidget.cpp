@@ -84,6 +84,11 @@ void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet
     ui->history->hideColumn(TransactionHistoryModel::TxID);
 }
 
+void HistoryWidget::resetModel()
+{
+    ui->history->setModel(nullptr);
+}
+
 void HistoryWidget::showTxDetails() {
     QModelIndex index = ui->history->currentIndex();
 
