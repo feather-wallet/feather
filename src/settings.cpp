@@ -45,6 +45,7 @@ Settings::Settings(QWidget *parent) :
 
     connect(ui->comboBox_skin, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_skinChanged);
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
+    connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
 
     // setup preferred fiat currency combobox
     QStringList fiatCurrencies;
@@ -92,6 +93,11 @@ void Settings::comboBox_blockExplorerChanged(int pos) {
     QString blockExplorer = ui->comboBox_blockExplorer->currentText();
     config()->set(Config::blockExplorer, blockExplorer);
     emit blockExplorerChanged(blockExplorer);
+}
+
+void Settings::comboBox_redditFrontendChanged(int pos) {
+    QString redditFrontend = ui->comboBox_redditFrontend->currentText();
+    config()->set(Config::redditFrontend, redditFrontend);
 }
 
 void Settings::copyToClipboard() {

@@ -9,6 +9,7 @@
 #include "redditwidget.h"
 #include "ui_redditwidget.h"
 #include "utils/utils.h"
+#include "utils/config.h"
 
 RedditWidget::RedditWidget(QWidget *parent) :
     QWidget(parent),
@@ -36,8 +37,11 @@ void RedditWidget::linkClicked() {
     QModelIndex index = ui->tableView->currentIndex();
     auto post = m_model->post(index.row());
 
-    if (post) {
-        Utils::externalLinkWarning(this, post->url);
+    if (post != nullptr) {
+        QString redditFrontend = config()->get(Config::redditFrontend).toString();
+        QString link = QString("https://%1%2").arg(redditFrontend, post->permalink);
+
+        Utils::externalLinkWarning(this, link);
     }
 }
 

@@ -45,7 +45,8 @@ public:
         geometry,
         windowState,
         firstRun,
-        hideBalance
+        hideBalance,
+        redditFrontend
     };
 
     ~Config() override;
