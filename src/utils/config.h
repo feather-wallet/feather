@@ -47,7 +47,8 @@ public:
         windowState,
         firstRun,
         hideBalance,
-        redditFrontend
+        redditFrontend,
+        showHistorySyncNotice
     };
 
     ~Config() override;

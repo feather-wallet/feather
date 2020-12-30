@@ -316,6 +316,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
         return;
     }
 
+    this->refreshed = false;
     this->currentWallet = wallet;
     this->walletPath = this->currentWallet->path() + ".keys";
     this->walletViewOnly = this->currentWallet->viewOnly();
@@ -716,6 +717,7 @@ void AppContext::onWalletRefreshed(bool success) {
     if (!this->refreshed) {
         refreshModels();
         this->refreshed = true;
+        emit walletRefreshed();
         // store wallet immediately upon finishing synchronization
         this->currentWallet->store();
     }
