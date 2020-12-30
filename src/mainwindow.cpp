@@ -327,7 +327,12 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->coinsWidget, &CoinsWidget::sweepOutput, m_ctx, &AppContext::onSweepOutput);
 
     connect(m_ctx, &AppContext::walletClosing, [=]{
-        ui->tabWidget->setCurrentIndex(Tabs::HOME);
+        if (!config()->get(Config::showTabHome).toBool())
+            ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
+        else
+            ui->tabWidget->setCurrentIndex(Tabs::HOME);
+
+        ui->historyWidget->resetModel();
     });
 
     // window title
@@ -388,6 +393,10 @@ void MainWindow::initMenu() {
 
     // hide/show tabs
     m_tabShowHideSignalMapper = new QSignalMapper(this);
+
+    connect(ui->actionShow_Home, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["Home"] = new ToggleTab(ui->tabHome, "Home", "Home", ui->actionShow_Home, Config::showTabHome);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Home, "Home");
 
     connect(ui->actionShow_Coins, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins, Config::showTabCoins);

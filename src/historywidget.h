@@ -27,6 +27,7 @@ public:
 
 public slots:
     void setSearchText(const QString &text);
+    void resetModel();
 
 signals:
     void viewOnBlockExplorer(QString txid);
