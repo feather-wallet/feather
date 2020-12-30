@@ -158,7 +158,6 @@ signals:
     void nodeSourceChanged(NodeSource nodeSource);
     void XMRigDownloads(const QJsonObject &data);
     void setCustomNodes(QList<FeatherNode> nodes);
-    void ccsEmpty();
     void openAliasResolveError(const QString &msg);
     void openAliasResolved(const QString &address, const QString &openAlias);
     void setRestoreHeightError(const QString &msg);
