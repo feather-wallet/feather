@@ -36,7 +36,8 @@ public slots:
     void checkboxExternalLinkWarn();
     void fiatCurrencySelected(int index);
     void comboBox_skinChanged(int pos);
-    void comboBox_blockExplorerChanged(int post);
+    void comboBox_blockExplorerChanged(int pos);
+    void comboBox_redditFrontendChanged(int pos);
 
 private:
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};

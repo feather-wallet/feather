@@ -161,18 +161,44 @@
          </item>
         </widget>
        </item>
-       <item row="3" column="0">
+       <item row="4" column="0">
         <widget class="QCheckBox" name="checkBox_externalLink">
          <property name="text">
           <string>Warn before opening external link</string>
          </property>
         </widget>
        </item>
-       <item row="4" column="0">
+       <item row="5" column="0">
         <widget class="QCheckBox" name="checkBox_hideBalance">
          <property name="text">
           <string>Hide balance</string>
          </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>Reddit frontend:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QComboBox" name="comboBox_redditFrontend">
+         <item>
+          <property name="text">
+           <string>old.reddit.com</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>reddit.com</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>teddit.net</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>

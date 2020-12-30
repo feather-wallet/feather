@@ -468,7 +468,7 @@ void AppContext::onWSReddit(const QJsonArray& reddit_data) {
         auto redditPost = new RedditPost(
                 obj.value("title").toString(),
                 obj.value("author").toString(),
-                obj.value("url").toString(),
+                obj.value("permalink").toString(),
                 obj.value("comments").toInt());
         QSharedPointer<RedditPost> r = QSharedPointer<RedditPost>(redditPost);
         l.append(r);

@@ -7,11 +7,12 @@
 #include <QString>
 
 struct RedditPost {
-    RedditPost(const QString &title, const QString &author, const QString &url, int comments) : title(title), author(author), url(url), comments(comments){};
+    RedditPost(const QString &title, const QString &author, const QString &permalink, int comments)
+            : title(title), author(author), permalink(permalink), comments(comments){};
 
     QString title;
     QString author;
-    QString url;
+    QString permalink;
     int comments;
 };
 
