@@ -757,6 +757,8 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
     // Store wallet immediately so we don't risk losing tx key if wallet crashes
     this->currentWallet->store();
 
+    this->updateBalance();
+
     emit transactionCommitted(status, tx, txid);
 
     // this tx was a donation to Feather, stop our nagging
