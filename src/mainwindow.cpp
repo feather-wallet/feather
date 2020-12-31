@@ -177,6 +177,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx, &AppContext::ccsUpdated, ui->ccsWidget->model(), &CCSModel::updateEntries);
     connect(m_ctx, &AppContext::redditUpdated, ui->redditWidget->model(), &RedditModel::updatePosts);
 
+    connect(ui->redditWidget, &RedditWidget::setStatusText, this, &MainWindow::setStatusText);
+
     connect(ui->tabHomeWidget, &QTabWidget::currentChanged, [](int index){
         config()->set(Config::homeWidget, TabsHome(index));
     });
@@ -675,10 +677,22 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     m_balanceWidget->setHidden(hide);
 }
 
-void MainWindow::setStatusText(const QString &text) {
-    m_statusText = text;
-    if (!m_constructingTransaction)
+void MainWindow::setStatusText(const QString &text, bool override, int timeout) {
+    if (override) {
+        m_statusOverrideActive = true;
         m_statusLabelStatus->setText(text);
+        QTimer::singleShot(timeout, [this]{
+            m_statusOverrideActive = false;
+            this->setStatusText(m_statusText);
+        });
+        return;
+    }
+
+    m_statusText = text;
+
+    if (!m_statusOverrideActive && !m_constructingTransaction) {
+        m_statusLabelStatus->setText(text);
+    }
 }
 
 void MainWindow::onSynchronized() {
