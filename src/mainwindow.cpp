@@ -149,7 +149,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     ui->fiatTickerLayout->addWidget(m_balanceWidget);
 
     // Send widget
-    connect(ui->sendWidget, &SendWidget::createTransaction, m_ctx, QOverload<const QString &, const double, const QString &, bool>::of(&AppContext::onCreateTransaction));
+    connect(ui->sendWidget, &SendWidget::createTransaction, m_ctx, QOverload<const QString &, quint64, const QString &, bool>::of(&AppContext::onCreateTransaction));
 
     // Nodes
     connect(m_ctx->nodes, &Nodes::nodeExhausted, this, &MainWindow::showNodeExhaustedMessage);

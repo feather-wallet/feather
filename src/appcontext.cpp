@@ -206,10 +206,11 @@ void AppContext::onSweepOutput(const QString &keyImage, QString address, bool ch
 void AppContext::onCreateTransaction(XmrToOrder *order) {
     // tx creation via xmr.to
     const QString description = QString("XmrTo order %1").arg(order->uuid);
-    this->onCreateTransaction(order->receiving_subaddress, order->incoming_amount_total, description, false);
+    quint64 amount = WalletManager::amountFromDouble(order->incoming_amount_total);
+    this->onCreateTransaction(order->receiving_subaddress, amount, description, false);
 }
 
-void AppContext::onCreateTransaction(const QString &address, const double amount, const QString &description, bool all) {
+void AppContext::onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
     // tx creation
     this->tmpTxDescription = description;
 
@@ -218,13 +219,13 @@ void AppContext::onCreateTransaction(const QString &address, const double amount
         return;
     }
 
-    if (!all && amount <= 0) {
+    if (!all && amount == 0) {
         emit createTransactionError("Cannot send nothing");
         return;
     }
 
-    auto balance = this->currentWallet->balance() / globals::cdiv;
-    auto unlocked_balance = this->currentWallet->unlockedBalance() / globals::cdiv;
+    auto balance = this->currentWallet->balance();
+    auto unlocked_balance = this->currentWallet->unlockedBalance();
     if(!all && amount > unlocked_balance) {
         emit createTransactionError("Not enough money to spend");
         return;
@@ -233,12 +234,11 @@ void AppContext::onCreateTransaction(const QString &address, const double amount
         return;
     }
 
-    auto amount_num = static_cast<quint64>(amount * globals::cdiv);
     qDebug() << "creating tx";
-    if(all || amount == balance)
+    if (all)
         this->currentWallet->createTransactionAllAsync(address, "", this->tx_mixin, this->tx_priority);
     else
-        this->currentWallet->createTransactionAsync(address, "", amount_num, this->tx_mixin, this->tx_priority);
+        this->currentWallet->createTransactionAsync(address, "", amount, this->tx_mixin, this->tx_priority);
 
     emit initiateTransaction();
 }

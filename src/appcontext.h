@@ -109,7 +109,7 @@ public:
 
 public slots:
     void onOpenWallet(const QString& path, const QString &password);
-    void onCreateTransaction(const QString &address, double amount, const QString &description, bool all);
+    void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
     void onCreateTransaction(XmrToOrder *order);
     void onCancelTransaction(PendingTransaction *tx, const QString &address);
     void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;

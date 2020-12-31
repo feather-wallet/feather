@@ -5,6 +5,7 @@
 #include "sendwidget.h"
 #include "mainwindow.h"
 #include "ui_sendwidget.h"
+#include "globals.h"
 
 SendWidget::SendWidget(QWidget *parent) :
         QWidget(parent),
@@ -87,7 +88,6 @@ void SendWidget::sendClicked() {
         return;
     }
 
-    double amount;
     QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
     QString description = ui->lineDescription->text();
@@ -96,24 +96,23 @@ void SendWidget::sendClicked() {
         return;
     }
 
-    if (currency != "XMR") {
-        amount = this->conversionAmount();
-        if(amount <= 0.0) {
+    quint64 amount;
+    if (currency == "XMR") {
+        amount = this->amount();
+        bool sendAll = (ui->lineAmount->text() == "all");
+        if (amount == 0 && !sendAll) {
+            QMessageBox::warning(this, "Amount error", "Invalid amount specified.");
+            return;
+        }
+        emit createTransaction(recipient, amount, description, sendAll);
+    } else {
+        amount = WalletManager::amountFromDouble(this->conversionAmount());
+        if (amount == 0) {
             QMessageBox::warning(this, "Fiat conversion error", "Could not create transaction.");
             return;
         }
         emit createTransaction(recipient, amount, description, false);
-        return;
     }
-
-    amount = this->amount();
-    bool sendAll = amount == -1.0;
-    if(amount == 0.0){
-        QMessageBox::warning(this, "Amount error", "Invalid amount specified.");
-        return;
-    }
-
-    emit createTransaction(recipient, amount, description, sendAll);
 }
 
 void SendWidget::aliasClicked() {
@@ -129,13 +128,14 @@ void SendWidget::clearClicked() {
 
 void SendWidget::btnMaxClicked() {
     ui->lineAmount->setText("all");
+    this->updateConversionLabel();
 }
 
 void SendWidget::updateConversionLabel() {
-    auto amount = this->amount();
-    if(amount == -1) return;
+    auto amount = this->amountDouble();
+
     ui->label_conversionAmount->setText("");
-    if(amount <= 0) {
+    if (amount <= 0) {
         ui->label_conversionAmount->hide();
         return;
     }
@@ -147,7 +147,7 @@ void SendWidget::updateConversionLabel() {
 
         } else {
             auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
-            double conversionAmount = AppContext::prices->convert("XMR", preferredFiatCurrency, this->amount());
+            double conversionAmount = AppContext::prices->convert("XMR", preferredFiatCurrency, this->amountDouble());
             return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
         }
     }();
@@ -158,18 +158,23 @@ void SendWidget::updateConversionLabel() {
 
 double SendWidget::conversionAmount() {
     QString currency = ui->comboCurrencySelection->currentText();
-    return AppContext::prices->convert(currency, "XMR", this->amount());
+    return AppContext::prices->convert(currency, "XMR", this->amountDouble());
 }
 
-double SendWidget::amount() {
+quint64 SendWidget::amount() {
     // grab amount from "amount" text box
     QString amount = ui->lineAmount->text();
-    if(amount == "all") return -1.0;
+    if (amount == "all") return 0;
+
     amount.replace(',', '.');
-    if(amount.isEmpty()) return 0.0;
-    auto amount_num = amount.toDouble();
-    if(amount_num <= 0) return 0.0;
-    return amount_num;
+    if (amount.isEmpty()) return 0;
+
+    return WalletManager::amountFromString(amount);
+}
+
+double SendWidget::amountDouble() {
+    quint64 amount = this->amount();
+    return amount / globals::cdiv;
 }
 
 void SendWidget::onOpenAliasResolved(const QString &address, const QString &openAlias) {
