@@ -255,12 +255,12 @@ QString WalletManager::displayAmount(quint64 amount)
     return QString::fromStdString(Monero::Wallet::displayAmount(amount));
 }
 
-quint64 WalletManager::amountFromString(const QString &amount) const
+quint64 WalletManager::amountFromString(const QString &amount)
 {
     return Monero::Wallet::amountFromString(amount.toStdString());
 }
 
-quint64 WalletManager::amountFromDouble(double amount) const
+quint64 WalletManager::amountFromDouble(double amount)
 {
     return Monero::Wallet::amountFromDouble(amount);
 }

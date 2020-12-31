@@ -44,14 +44,15 @@ public slots:
 
 signals:
     void resolveOpenAlias(const QString &address);
-    void createTransaction(const QString &address, double amount, const QString &description, bool all);
+    void createTransaction(const QString &address, quint64 amount, const QString &description, bool all);
 
 private:
     void setupComboBox();
+    double amountDouble();
 
     Ui::SendWidget *ui;
     AppContext *m_ctx;
-    double amount();
+    quint64 amount();
     double conversionAmount();
 };
 
