@@ -26,9 +26,14 @@ public:
 public slots:
     void linkClicked();
 
+signals:
+    void setStatusText(const QString &msg, bool override, int timeout);
+
 private:
     void setupTable();
     void showContextMenu(const QPoint &pos);
+    void copyUrl();
+    QString getLink(const QString &permaLink);
 
     Ui::RedditWidget *ui;
     RedditModel* const m_model;

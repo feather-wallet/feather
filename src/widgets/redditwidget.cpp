@@ -22,6 +22,7 @@ RedditWidget::RedditWidget(QWidget *parent) :
     this->setupTable();
 
     m_contextMenu->addAction("View thread", this, &RedditWidget::linkClicked);
+    m_contextMenu->addAction("Copy link", this, &RedditWidget::copyUrl);
     connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &RedditWidget::showContextMenu);
 
     connect(ui->tableView, &QTableView::doubleClicked, this, &RedditWidget::linkClicked);
@@ -37,11 +38,17 @@ void RedditWidget::linkClicked() {
     QModelIndex index = ui->tableView->currentIndex();
     auto post = m_model->post(index.row());
 
-    if (post != nullptr) {
-        QString redditFrontend = config()->get(Config::redditFrontend).toString();
-        QString link = QString("https://%1%2").arg(redditFrontend, post->permalink);
+    if (post)
+        Utils::externalLinkWarning(this, this->getLink(post->permalink));
+}
 
-        Utils::externalLinkWarning(this, link);
+void RedditWidget::copyUrl() {
+    QModelIndex index = ui->tableView->currentIndex();
+    auto post = m_model->post(index.row());
+
+    if (post) {
+        Utils::copyToClipboard(this->getLink(post->permalink));
+        emit setStatusText("Link copied to clipboard", true, 1000);
     }
 }
 
@@ -60,6 +67,11 @@ void RedditWidget::showContextMenu(const QPoint &pos) {
     }
 
     m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
+}
+
+QString RedditWidget::getLink(const QString &permaLink) {
+    QString redditFrontend = config()->get(Config::redditFrontend).toString();
+    return QString("https://%1%2").arg(redditFrontend, permaLink);
 }
 
 RedditWidget::~RedditWidget() {

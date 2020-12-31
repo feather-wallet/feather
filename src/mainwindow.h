@@ -169,7 +169,7 @@ private:
     void updatePasswordIcon();
     void updateNetStats();
     void rescanSpent();
-    void setStatusText(const QString &text);
+    void setStatusText(const QString &text, bool override = false, int timeout = 1000);
     void showBalanceDialog();
     QString statusDots();
 
@@ -222,6 +222,7 @@ private:
     QString m_statusText;
     int m_statusDots;
     bool m_constructingTransaction = false;
+    bool m_statusOverrideActive = false;
     QTimer m_txTimer;
 
 private slots:
