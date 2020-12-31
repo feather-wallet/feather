@@ -334,7 +334,11 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
         else
             ui->tabWidget->setCurrentIndex(Tabs::HOME);
 
+        // Clear all tables when wallet is closed
         ui->historyWidget->resetModel();
+        ui->contactWidget->resetModel();
+        ui->receiveWidget->resetModel();
+        ui->coinsWidget->resetModel();
     });
 
     // window title

@@ -206,6 +206,10 @@ void CoinsWidget::onSweepOutput() {
     dialog->deleteLater();
 }
 
+void CoinsWidget::resetModel() {
+    ui->coins->setModel(nullptr);
+}
+
 void CoinsWidget::copy(copyField field) {
     QModelIndex index = ui->coins->currentIndex();
     int row = m_proxyModel->mapToSource(index).row();
