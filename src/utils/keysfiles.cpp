@@ -18,7 +18,14 @@ WalletKeysFiles::WalletKeysFiles(const QFileInfo &info, int networkType, QString
         m_modified(info.lastModified().toSecsSinceEpoch()),
         m_path(QDir::toNativeSeparators(info.absoluteFilePath())),
         m_networkType(networkType),
-        m_address(std::move(address)) {}
+        m_address(std::move(address))
+{
+    QFileInfo cacheFile = QFileInfo(info.absoluteFilePath().replace(QRegExp(".keys$"), ""));
+    qint64 cacheLastModified = cacheFile.lastModified().toSecsSinceEpoch();
+    if (cacheFile.exists()) {
+        m_modified = (cacheLastModified > m_modified) ? cacheLastModified : m_modified;
+    }
+}
 
 QString WalletKeysFiles::fileName() const {
     return m_fileName;
