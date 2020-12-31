@@ -13,6 +13,7 @@
 #include "utils/config.h"
 #include "utils/tails.h"
 #include "utils/whonix.h"
+#include "globals.h"
 
 // Application log for current session
 QVector<logMessage> applicationLog = QVector<logMessage>(); // todo: replace with ring buffer
@@ -531,4 +532,13 @@ int Utils::maxLength(const QVector<QString> &array) {
         }
     }
     return maxLength;
+}
+
+QString Utils::balanceFormat(quint64 balance) {
+    QString str = QString::number(balance / globals::cdiv, 'f', 4);
+
+    str.remove(QRegExp("0+$"));
+    str.remove(QRegExp("\\.$"));
+
+    return str;
 }

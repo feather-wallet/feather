@@ -665,9 +665,9 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
     bool hide = config()->get(Config::hideBalance).toBool();
 
-    QString label_str = QString("Balance: %1 XMR").arg(QString::number(spendable / globals::cdiv, 'f'));
+    QString label_str = QString("Balance: %1 XMR").arg(Utils::balanceFormat(spendable));
     if (balance > spendable)
-        label_str += QString(" (+%1 XMR unconfirmed)").arg(QString::number((balance - spendable) / globals::cdiv, 'f'));
+        label_str += QString(" (+%1 XMR unconfirmed)").arg(Utils::balanceFormat(balance - spendable));
 
     if (hide)
         label_str = "Balance: HIDDEN";
@@ -842,7 +842,7 @@ void MainWindow::create_status_bar() {
     this->statusBar()->addWidget(m_statusLabelNetStats);
 
     m_statusLabelBalance = new ClickableLabel(this);
-    m_statusLabelBalance->setText("Balance: 0.00 XMR");
+    m_statusLabelBalance->setText("Balance: 0 XMR");
     m_statusLabelBalance->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addPermanentWidget(m_statusLabelBalance);
     connect(m_statusLabelBalance, &ClickableLabel::clicked, this, &MainWindow::showBalanceDialog);
