@@ -98,6 +98,7 @@ public:
     static QString amountToCurrencyString(double amount, const QString &currencyCode);
     static int maxLength(const QVector<QString> &array);
     static QMap<QString, QLocale> localeCache;
+    static QString balanceFormat(quint64 balance);
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)
