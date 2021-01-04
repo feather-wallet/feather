@@ -413,7 +413,7 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Exchange"] = new ToggleTab(ui->tabExchange, "Exchange", "Exchange", ui->actionShow_Exchange, Config::showTabExchange);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Exchange, "Exchange");
 #else
-    ui->actionShow_Exchanges->setVisible(false);
+    ui->actionShow_Exchange->setVisible(false);
 #endif
 
 #if defined(HAS_XMRIG)
