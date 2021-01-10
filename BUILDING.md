@@ -22,7 +22,7 @@ git clone --branch master --recursive https://git.wownero.com/feather/feather.gi
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-1`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-4`) to build the release binary.
 
 #### 2. Base image
 
@@ -48,37 +48,35 @@ Hashes for tagged commits should match:
 beta-1: d1a52e3bac1abbae4adda1fc88cb2a7a06fbd61085868421897c6a4f3f4eb091  feather
 ```
 
-### Windows
-
-The docker image for Windows static compiles uses Ubuntu 18.04 and installs [mxe](https://mxe.cc) from [our git](https://git.wownero.com/feather/mxe/src/branch/feather-patch), 
-which comes with: OpenSSL 1.1.1g, Qt 5.15.0 (OpenGL via mesa). For more information, check the Dockerfile: `Dockerfile_windows`.
+### Windows (reproducible)
 
 #### 1. Clone
 
 ```bash
-git clone --recursive https://git.wownero.com/feather/feather.git
+git clone --branch master --recursive https://git.wownero.com/feather/feather.git
 cd feather
 ```
 
+Replace `master` with the desired version tag (e.g. `beta-4`) to build the release binary.
+
 #### 2. Base image
 
-Warning: Building the MXE base image takes up to a hour, so go watch a movie.
 
 ```bash
-docker build -f Dockerfile_windows --tag feather:win --build-arg THREADS=8 .
+docker build -f Dockerfile.windows --tag feather:win --build-arg THREADS=4 .
 ```
 
-Note: You only need to build the base image once.
+Building the base image takes a while. You only need to build the base image once.
 
 #### 3. Build
 
 ```bash
-docker run --rm -it -v /tmp/ccache:/root/.ccache -v PATH_TO_FEATHER:/feather -w /feather feather:win /bin/bash -c 'PATH="/mxe/usr/bin/:$PATH" TOR_BIN="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" make windows-mxe-release -j8'
+docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'TOR_BIN="/usr/local/tor/bin/tor.exe" make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
 ```
 
-Replace `PATH_TO_FEATHER` with the absolute path to Feather locally.
+If you're re-running a build make sure to `rm -rf build/` first.
 
-The resulting binary can be found in `build/bin/feather.exe`.
+The resulting binary can be found in `build/x86_64-w64-mingw32/release/bin/feather.exe`.
 
 ## macOS
 

@@ -53,6 +53,7 @@ if(STATIC)
 
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ${CMAKE_FIND_LIBRARY_SUFFIXES})
     add_definitions(-DMONERO_GUI_STATIC)
 endif()
 
@@ -147,6 +148,9 @@ endif()
 if(APPLE AND NOT BOOST_ROOT)
     execute_process(COMMAND brew --prefix boost OUTPUT_VARIABLE BOOST_ROOT OUTPUT_STRIP_TRAILING_WHITESPACE)
 endif()
+if(MINGW)
+    set(Boost_THREADAPI win32)
+endif()
 find_package(Boost 1.58 REQUIRED COMPONENTS
         system
         filesystem
@@ -223,7 +227,7 @@ if(MINGW)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
     set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
     if(DEPENDS)
-        set(ICU_LIBRARIES icuio icui18n icuuc icudata icutu iconv)
+	set(ICU_LIBRARIES iconv)
     else()
         set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
     endif()
