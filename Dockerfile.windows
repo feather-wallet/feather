@@ -1,0 +1,169 @@
+FROM ubuntu:20.04
+
+ARG THREADS=1
+ARG QT_VERSION=5.15.2
+ENV SOURCE_DATE_EPOCH=1397818193
+
+RUN apt update && \
+    DEBIAN_FRONTEND=noninteractive apt install -y curl wget zip automake build-essential cmake gcc-mingw-w64 g++-mingw-w64 gettext git libtool pkg-config \
+    python && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --set x86_64-w64-mingw32-g++ $(which x86_64-w64-mingw32-g++-posix) && \
+    update-alternatives --set x86_64-w64-mingw32-gcc $(which x86_64-w64-mingw32-gcc-posix)
+
+RUN git clone -b v0.17.1.9 --depth 1 https://github.com/monero-project/monero && \
+    cd monero && \
+    git reset --hard 8fef32e45c80aec41f25be9d1d8fb75adc883c64 && \
+    cp -a contrib/depends / && \
+    cd .. && \
+    rm -rf monero
+
+RUN make -j$THREADS -C /depends HOST=x86_64-w64-mingw32 NO_QT=1
+
+RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
+    cd qt5 && \
+    git clone git://code.qt.io/qt/qtbase.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qtimageformats.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qtmultimedia.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qtsvg.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qttools.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qttranslations.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qtxmlpatterns.git -b ${QT_VERSION} --depth 1 && \
+    git clone git://code.qt.io/qt/qtwebsockets.git -b ${QT_VERSION} --depth 1 && \
+    OPENSSL_LIBS="-lssl -lcrypto -lpthread -ldl" \
+    ./configure --prefix=/depends/x86_64-w64-mingw32 -xplatform win32-g++ \
+    -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- \
+    -I $(pwd)/qtbase/src/3rdparty/angle/include \
+    -opensource -confirm-license -release -static -static-runtime -no-opengl \
+    -no-avx -openssl -I /depends/x86_64-w64-mingw32/include -L /depends/x86_64-w64-mingw32/lib \
+    -qt-freetype -qt-harfbuzz -qt-libjpeg -qt-libpng -qt-pcre -qt-zlib \
+    -skip gamepad -skip location -skip qt3d -skip qtactiveqt -skip qtandroidextras \
+    -skip qtcanvas3d -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtdoc \
+    -skip qtgamepad -skip qtlocation -skip qtmacextras -skip qtnetworkauth -skip qtpurchasing \
+    -skip qtscript -skip qtscxml -skip qtsensors -skip qtserialbus -skip qtserialport \
+    -skip qtspeech -skip qttools -skip qtvirtualkeyboard -skip qtwayland -skip qtwebchannel \
+    -skip qtwebengine -skip qtwebview -skip qtwinextras -skip qtx11extras \
+    -skip qtdeclarative -skip qtquickcontrols -skip qtquickcontrols2 \
+    -skip serialbus -skip webengine \
+    -nomake examples -nomake tests -nomake tools && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    cd qttools/src/linguist/lrelease && \
+    ../../../../qtbase/bin/qmake && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    cd ../../../.. && \
+    rm -rf $(pwd)
+
+RUN git clone -b libgpg-error-1.38 --depth 1 git://git.gnupg.org/libgpg-error.git && \
+    cd libgpg-error && \
+    git reset --hard 71d278824c5fe61865f7927a2ed1aa3115f9e439 && \
+    ./autogen.sh && \
+    ./configure --disable-shared --enable-static --disable-doc --disable-tests \
+    --host=x86_64-w64-mingw32 --prefix=/depends/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    cd .. && \
+    rm -rf libgpg-error
+
+RUN git clone -b libgcrypt-1.8.5 --depth 1 git://git.gnupg.org/libgcrypt.git && \
+    cd libgcrypt && \
+    git reset --hard 56606331bc2a80536db9fc11ad53695126007298 && \
+    ./autogen.sh && \
+    ./configure --disable-shared --enable-static --disable-doc \
+    --host=x86_64-w64-mingw32 --prefix=/depends/x86_64-w64-mingw32 \
+    --with-gpg-error-prefix=/depends/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    cd .. && \
+    rm -rf libgcrypt
+
+# zlib -> libpng, Tor
+RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
+    cd zlib && \
+    git reset --hard cacf7f1d4e3d44d871b605da3b647f07d718623f && \
+    CC=x86_64-w64-mingw32-gcc AR=x86_64-w64-mingw32-ar ./configure --static --prefix=/usr/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+# libpng -> libqrencode
+RUN git clone -b libpng16 --depth 1 https://github.com/glennrp/libpng.git && \
+    cd libpng && \
+    git reset --hard dbe3e0c43e549a1602286144d94b0666549b18e6 && \
+    CPPFLAGS="-I/depends/x86_64-w64-mingw32/include" LDFLAGS="-L/depends/x86_64-w64-mingw32/lib" \
+    ./configure --host=x86_64-w64-mingw32 --prefix=/depends/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+RUN git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && \
+    cd libqrencode && \
+    git reset --hard 59ee597f913fcfda7a010a6e106fbee2595f68e4 && \
+    ./autogen.sh && \
+    CPPFLAGS="-I/depends/x86_64-w64-mingw32/include" LDFLAGS="-L/depends/x86_64-w64-mingw32/lib" \
+    ./configure --disable-shared --enable-static --host=x86_64-w64-mingw32 --prefix=/depends/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
+    echo "e6a1b1b589654277ee790cce3734f07876ac4ccfaecbee8afa0b649cf529cc04 libiconv-1.16.tar.gz" | sha256sum -c && \
+    tar -xzf libiconv-1.16.tar.gz && \
+    rm libiconv-1.16.tar.gz && \
+    cd libiconv-1.16 && \
+    ./configure --enable-static --host=x86_64-w64-mingw32 --prefix=/usr/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+# OpenSSL -> Tor
+# TODO: Tor will not cross-compile with 1.1.1i
+RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
+    echo "ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16 openssl-1.0.2u.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.0.2u.tar.gz && \
+    rm openssl-1.0.2u.tar.gz && \
+    cd openssl-1.0.2u && \
+    ./Configure mingw64 no-shared no-dso --cross-compile-prefix=x86_64-w64-mingw32- --prefix=/usr/local/openssl && \
+    make -j$THREADS && \
+    make install_sw && \
+    rm -rf $(pwd)
+
+# libevent -> Tor
+RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz && \
+    echo "a65bac6202ea8c5609fd5c7e480e6d25de467ea1917c08290c521752f147283d libevent-2.1.11-stable.tar.gz" | sha256sum -c && \
+    tar -zxvf libevent-2.1.11-stable.tar.gz && \
+    cd libevent-2.1.11-stable && \
+    ./configure --prefix=/usr/local/libevent \
+                --disable-shared \
+                --enable-static \
+                --with-pic \
+                --host=x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+RUN git clone -b tor-0.4.4.6 --depth 1 https://git.torproject.org/tor.git && \
+    cd tor  && \
+    git reset --hard 2a8b789ea6f308d081f369d78fa7cfdc9d00bf90 && \
+    ./autogen.sh && \
+    ./configure --host=x86_64-w64-mingw32 \
+    --disable-asciidoc \
+    --disable-zstd \
+    --disable-lzma \
+    --disable-manpage \
+    --disable-html-manual \
+    --disable-system-torrc \
+    --disable-module-relay \
+    --enable-static-tor \
+    --with-libevent-dir=/usr/local/libevent \
+    --with-openssl-dir=/usr/local/openssl \
+    --with-zlib-dir=/usr/x86_64-w64-mingw32 \
+    --disable-tool-name-check \
+    --enable-fatal-warnings \
+    --prefix=/usr/local/tor \
+    LIBS=-lcrypt32 && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)

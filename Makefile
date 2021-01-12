@@ -48,6 +48,10 @@ release-static:
 	cmake -Bbuild $(CMAKEFLAGS)
 	$(MAKE) -Cbuild
 
+depends:
+	mkdir -p build/$(target)/release
+	cd build/$(target)/release && cmake -D STATIC=ON -DTOR_BIN=$(or ${TOR_BIN},OFF) -D DEV_MODE=$(or ${DEV_MODE},OFF) -D BUILD_TAG=$(tag) -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake ../../.. && $(MAKE)
+
 windows-mxe-release: CMAKEFLAGS += -DBUILD_TAG="win-x64"
 windows-mxe-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 windows-mxe-release: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
