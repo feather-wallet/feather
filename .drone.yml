@@ -83,13 +83,11 @@ volumes:
 ---
 kind: pipeline
 type: docker
-name: windows-mxe-release
+name: windows-release
 steps:
   - name: build
     image: feather:win
     volumes:
-    - name: ccache_win_release
-      path: /root/.ccache
     - name: files_win_release
       path: /files
     commands:
@@ -98,14 +96,12 @@ steps:
     - git config --global url."http://gitea:3000/".insteadOf https://git.wownero.com/
     - git submodule update --init monero
     - git submodule update --init --depth 1 --recursive monero
-    - PATH="/mxe/usr/bin/:$PATH" TOR_BIN="/mxe/usr/x86_64-w64-mingw32.static/bin/tor.exe" make -j8 windows-mxe-release
+    - TOR_BIN="/usr/local/tor/bin/tor.exe" make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j6
     environment:
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
   - name: deploy
     image: feather:win
     volumes:
-    - name: ccache_win_release
-      path: /root/.ccache
     - name: files_win_release
       path: /files
     commands:
@@ -113,15 +109,12 @@ steps:
     - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
-    - zip -j "$TARGET_DIR/$FN" build/feather.log build/bin/feather.exe
+    - zip -j "$TARGET_DIR/$FN" build/bin/feather.exe
     - echo "[*] written to https://build.featherwallet.org/files/windows-mxe-release/$DRONE_SOURCE_BRANCH/$FN"
 volumes:
-- name: ccache_win_release
-  host:
-    path: /var/drone/ccache_win_release/
 - name: files_win_release
   host:
-    path: /build/feather_files/files/windows-mxe-release/
+    path: /build/feather_files/files/windows-release/
 
 ---
 kind: pipeline
