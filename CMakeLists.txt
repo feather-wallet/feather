@@ -53,7 +53,6 @@ if(STATIC)
 
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
-    set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ${CMAKE_FIND_LIBRARY_SUFFIXES})
     add_definitions(-DMONERO_GUI_STATIC)
 endif()
 

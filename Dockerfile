@@ -8,14 +8,35 @@ ENV CPPFLAGS="-fPIC"
 ENV CXXFLAGS="-fPIC"
 ENV SOURCE_DATE_EPOCH=1397818193
 
-RUN apt-get update
-RUN apt-get install -y nano vim ccache software-properties-common
+RUN apt-get update && \
+    apt-get install -y \
+# dev tools
+    nano vim ccache \
+# build tools
+    software-properties-common automake pkg-config python \
+    libtool-bin wget zip \
+# dependencies
+    libusb-1.0-0-dev \
+# Qt
+    libgl1-mesa-dev libglib2.0-dev mesa-common-dev \
+# libusb
+    libudev-dev \
+# fontconfig
+    autopoint gettext gperf libpng12-dev \
+# libxcb
+    libpthread-stubs0-dev \
+# xorgproto
+    xutils-dev  \
+# libxkbcommon
+    bison \
+# zeromq
+    libsodium-dev
 
-RUN add-apt-repository ppa:git-core/ppa
-RUN apt-get update
+RUN add-apt-repository ppa:git-core/ppa && \
+    apt-get install -y git && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN apt install -y automake git pkg-config python xutils-dev && \
-    git clone -b xorgproto-2020.1 --depth 1 https://gitlab.freedesktop.org/xorg/proto/xorgproto && \
+RUN git clone -b xorgproto-2020.1 --depth 1 https://gitlab.freedesktop.org/xorg/proto/xorgproto && \
     cd xorgproto && \
     git reset --hard c62e8203402cafafa5ba0357b6d1c019156c9f36 && \
     ./autogen.sh && \
@@ -31,8 +52,7 @@ RUN git clone -b 1.12 --depth 1 https://gitlab.freedesktop.org/xorg/proto/xcbpro
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y libtool-bin && \
-    git clone -b libXau-1.0.9 --depth 1 https://gitlab.freedesktop.org/xorg/lib/libxau && \
+RUN git clone -b libXau-1.0.9 --depth 1 https://gitlab.freedesktop.org/xorg/lib/libxau && \
     cd libxau && \
     git reset --hard d9443b2c57b512cfb250b35707378654d86c7dea && \
     ./autogen.sh --enable-shared --disable-static && \
@@ -40,8 +60,7 @@ RUN apt install -y libtool-bin && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y libpthread-stubs0-dev && \
-    git clone -b 1.12 --depth 1 https://gitlab.freedesktop.org/xorg/lib/libxcb && \
+RUN git clone -b 1.12 --depth 1 https://gitlab.freedesktop.org/xorg/lib/libxcb && \
     cd libxcb && \
     git reset --hard d34785a34f28fa6a00f8ce00d87e3132ff0f6467 && \
     ./autogen.sh --enable-shared --disable-static && \
@@ -109,8 +128,7 @@ RUN git clone -b 0.4.1 --depth 1 https://gitlab.freedesktop.org/xorg/lib/libxcb-
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y bison && \
-    git clone -b xkbcommon-0.5.0 --depth 1 https://github.com/xkbcommon/libxkbcommon && \
+RUN git clone -b xkbcommon-0.5.0 --depth 1 https://github.com/xkbcommon/libxkbcommon && \
     cd libxkbcommon && \
     git reset --hard c43c3c866eb9d52cd8f61e75cbef1c30d07f3a28 && \
     ./autogen.sh --prefix=/usr --enable-shared --disable-static --enable-x11 --disable-docs && \
@@ -121,9 +139,6 @@ RUN apt install -y bison && \
 RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
     cd zlib && \
     git reset --hard cacf7f1d4e3d44d871b605da3b647f07d718623f && \
-    ./configure --static && \
-    make -j$THREADS && \
-    make -j$THREADS install && \
     ./configure --static --prefix=/usr/local/zlib && \
     make -j$THREADS && \
     make -j$THREADS install && \
@@ -147,8 +162,7 @@ RUN git clone -b R_2_2_9 --depth 1 https://github.com/libexpat/libexpat && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y autopoint gettext gperf libpng12-dev && \
-    git clone -b 2.13.92 --depth 1 https://gitlab.freedesktop.org/fontconfig/fontconfig && \
+RUN git clone -b 2.13.92 --depth 1 https://gitlab.freedesktop.org/fontconfig/fontconfig && \
     cd fontconfig && \
     git reset --hard b1df1101a643ae16cdfa1d83b939de2497b1bf27 && \
     ./autogen.sh --disable-shared --enable-static --sysconfdir=/etc --localstatedir=/var && \
@@ -164,8 +178,7 @@ RUN git clone -b release-64-2 --depth 1 https://github.com/unicode-org/icu && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y wget && \
-    wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.gz && \
+RUN wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.gz && \
     echo "9995e192e68528793755692917f9eb6422f3052a53c5e13ba278a228af6c7acf boost_1_73_0.tar.gz" | sha256sum -c && \
     tar -xzf boost_1_73_0.tar.gz && \
     rm boost_1_73_0.tar.gz && \
@@ -179,16 +192,13 @@ RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
     tar -xzf openssl-1.1.1i.tar.gz && \
     rm openssl-1.1.1i.tar.gz && \
     cd openssl-1.1.1i && \
-    ./config no-shared no-zlib-dynamic --prefix=/usr/local/openssl && \
+    ./config no-shared no-dso --prefix=/usr/local/openssl && \
     make -j$THREADS && \
-    make -j$THREADS install && \
-    ./config no-shared no-zlib-dynamic --openssldir=/usr && \
-    make -j$THREADS && \
-    make -j$THREADS install && \
+    make test && \
+    make -j$THREADS install_sw && \
     rm -rf $(pwd)
 
-RUN apt install -y libgl1-mesa-dev libglib2.0-dev mesa-common-dev && \
-    rm /usr/lib/x86_64-linux-gnu/libX11.a && \
+RUN rm /usr/lib/x86_64-linux-gnu/libX11.a && \
     rm /usr/lib/x86_64-linux-gnu/libXext.a && \
     rm /usr/lib/x86_64-linux-gnu/libX11-xcb.a && \
     git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
@@ -229,8 +239,7 @@ RUN apt install -y libgl1-mesa-dev libglib2.0-dev mesa-common-dev && \
     cd ../../../.. && \
     rm -rf $(pwd)
 
-RUN apt install -y libudev-dev && \
-    git clone -b v1.0.23 --depth 1 https://github.com/libusb/libusb && \
+RUN git clone -b v1.0.23 --depth 1 https://github.com/libusb/libusb && \
     cd libusb && \
     git reset --hard e782eeb2514266f6738e242cdcb18e3ae1ed06fa && \
     ./autogen.sh --disable-shared --enable-static && \
@@ -247,8 +256,7 @@ RUN git clone -b hidapi-0.9.0 --depth 1 https://github.com/libusb/hidapi && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y libsodium-dev && \
-    git clone -b v4.3.2 --depth 1 https://github.com/zeromq/libzmq && \
+RUN git clone -b v4.3.2 --depth 1 https://github.com/zeromq/libzmq && \
     cd libzmq && \
     git reset --hard a84ffa12b2eb3569ced199660bac5ad128bff1f0 && \
     ./autogen.sh && \
@@ -287,14 +295,12 @@ RUN git clone -b v3.10.0 --depth 1 https://github.com/protocolbuffers/protobuf &
 RUN git clone -b v3.18.4 --depth 1 https://github.com/Kitware/CMake && \
     cd CMake && \
     git reset --hard 3cc3d42aba879fff5e85b363ae8f21386a3f9f9b && \
-    ./bootstrap && \
+    OPENSSL_ROOT_DIR=/usr/local/openssl ./bootstrap && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y libusb-1.0-0-dev
-
-RUN apt install -y zip && git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && \
+RUN git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && \
     cd libqrencode && \
     git reset --hard 59ee597f913fcfda7a010a6e106fbee2595f68e4 && \
     cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr . && \
@@ -302,38 +308,47 @@ RUN apt install -y zip && git clone -b v4.0.2 --depth 1 https://github.com/fukuc
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN apt install -y libmbedtls-dev && git clone -b release-2.1.12-stable --depth 1 https://github.com/libevent/libevent.git && \
-    cd libevent && \
-    git reset --hard 5df3037d10556bfcb675bc73e516978b75fc7bc7 && \
-    mkdir build && cd build && \
-    cmake -DEVENT_LIBRARY_STATIC=ON -DOPENSSL_ROOT_DIR=/usr/local/openssl -DCMAKE_INSTALL_PREFIX=/usr/local/libevent .. && \
+RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz && \
+    echo "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb libevent-2.1.12-stable.tar.gz" | sha256sum -c && \
+    tar -zxvf libevent-2.1.12-stable.tar.gz && \
+    cd libevent-2.1.12-stable && \
+    PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig/ \
+    ./configure --prefix=/usr/local/libevent \
+                --disable-shared \
+                --enable-static \
+                --with-pic && \
     make -j$THREADS && \
     make -j$THREADS install && \
+    rm -rf $(pwd)
+
+# Todo: Tor will not static link with 1.1.1i
+RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
+    echo "ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16 openssl-1.0.2u.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.0.2u.tar.gz && \
+    rm openssl-1.0.2u.tar.gz && \
+    cd openssl-1.0.2u && \
+    ./config no-shared no-dso --prefix=/usr/local/openssl-1.0.2u && \
+    make -j$THREADS && \
+    make test && \
+    make -j$THREADS install_sw && \
     rm -rf $(pwd)
 
 RUN git clone -b tor-0.4.4.6 --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
     git reset --hard 2a8b789ea6f308d081f369d78fa7cfdc9d00bf90 && \
-    bash autogen.sh && \
-    LDFLAGS="-L/usr/local/openssl/lib/" LIBS="-lssl -lcrypto -lpthread -ldl" CPPFLAGS="-I/usr/local/openssl/include/" ./configure \
-    --enable-static-zlib \
-    --enable-static-openssl \
-    --enable-static-libevent \
-    --disable-system-torrc \
-    --with-libevent-dir=/usr/local/libevent \
-    --with-openssl-dir=/usr/local/openssl/ \
-    --with-zlib-dir=/usr/local/zlib \
-    --disable-system-torrc \
-    --disable-tool-name-check \
-    --disable-systemd \
-    --disable-lzma \
-    --disable-unittests \
-    --disable-zstd \
-    --disable-seccomp \
+    ./autogen.sh && \
+    ./configure \
     --disable-asciidoc \
     --disable-manpage \
     --disable-html-manual \
     --disable-system-torrc \
+    --disable-module-relay \
+    --enable-static-tor \
+    --with-libevent-dir=/usr/local/libevent \
+    --with-openssl-dir=/usr/local/openssl-1.0.2u \
+    --with-zlib-dir=/usr/local/zlib \
+    --disable-tool-name-check \
+    --enable-fatal-warnings \
     --prefix=/usr/local/tor && \
     make -j$THREADS && \
     make -j$THREADS install && \
