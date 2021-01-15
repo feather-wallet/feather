@@ -9,15 +9,12 @@ steps:
     volumes:
     - name: ccache_linux_release
       path: /root/.ccache
+    - name: monero
+      path: /drone/src/monero
     - name: files_linux_release
       path: /files
     commands:
-    - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
-    - git config --global url."http://gitea:3000/".insteadOf https://github.com/
-    - git config --global url."http://gitea:3000/".insteadOf https://git.wownero.com/
-    - git submodule update --init monero
-    - git submodule update --init --depth 1 --recursive monero
-    - TOR_BIN="/usr/local/tor/bin/tor" make -j8 release-static
+    - TOR_BIN="/usr/local/tor/bin/tor" make -j11 release-static
     environment:
       OPENSSL_ROOT_DIR: /usr/local/openssl/
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
@@ -41,6 +38,9 @@ volumes:
 - name: ccache_linux_release
   host:
     path: /var/drone/ccache_linux_release/
+- name: monero
+  host:
+    path: /var/drone/monero
 - name: files_linux_release
   host:
     path: /build/feather_files/files/linux-release/
@@ -88,15 +88,14 @@ steps:
   - name: build
     image: feather:win
     volumes:
+    - name: ccache_win_release
+      path: /root/.ccache
     - name: files_win_release
       path: /files
+    - name: monero
+      path: /drone/src/monero
     commands:
-    - git config --global url."http://gitea:3000/tor/".insteadOf https://git.torproject.org/
-    - git config --global url."http://gitea:3000/".insteadOf https://github.com/
-    - git config --global url."http://gitea:3000/".insteadOf https://git.wownero.com/
-    - git submodule update --init monero
-    - git submodule update --init --depth 1 --recursive monero
-    - TOR_BIN="/usr/local/tor/bin/tor.exe" make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j6
+    - TOR_BIN="/usr/local/tor/bin/tor.exe" make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j11
     environment:
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
   - name: deploy
@@ -109,12 +108,18 @@ steps:
     - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
-    - zip -j "$TARGET_DIR/$FN" build/bin/feather.exe
-    - echo "[*] written to https://build.featherwallet.org/files/windows-mxe-release/$DRONE_SOURCE_BRANCH/$FN"
+    - zip -j "$TARGET_DIR/$FN" build/x86_64-w64-mingw32/release/bin/feather.exe
+    - echo "[*] written to https://build.featherwallet.org/files/windows-release/$DRONE_SOURCE_BRANCH/$FN"
 volumes:
+- name: ccache_win_release
+  host:
+    path: /var/drone/ccache_win_release/
 - name: files_win_release
   host:
     path: /build/feather_files/files/windows-release/
+- name: monero
+  host:
+    path: /var/drone/monero
 
 ---
 kind: pipeline
