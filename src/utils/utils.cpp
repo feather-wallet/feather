@@ -8,6 +8,7 @@
 #include <QCompleter>
 #include <QDesktopServices>
 #include <QtWidgets/QStyle>
+#include <QPushButton>
 
 #include "utils.h"
 #include "utils/config.h"
@@ -212,17 +213,25 @@ void Utils::externalLinkWarning(QWidget *parent, const QString &url){
     }
 
     QString body = "You are about to open the following link:\n\n";
-    body += QString("%1\n\n").arg(url);
+    body += QString("%1").arg(url);
 
     if (!(TailsOS::detect() || WhonixOS::detect()))
-        body += "You will NOT be using Tor.";
+        body += "\n\nYou will NOT be using Tor.";
 
-    switch (QMessageBox::warning(parent, "External link warning", body, QMessageBox::Cancel|QMessageBox::Ok)) {
-        case QMessageBox::Cancel:
-            break;
-        default:
-            QDesktopServices::openUrl(QUrl(url));
-            break;
+
+    QMessageBox linkWarning;
+    linkWarning.setWindowTitle("External link warning");
+    linkWarning.setText(body);
+    QPushButton *copy = linkWarning.addButton("Copy link", QMessageBox::HelpRole);
+    linkWarning.addButton(QMessageBox::Cancel);
+    linkWarning.addButton(QMessageBox::Ok);
+
+    linkWarning.exec();
+
+    if (linkWarning.clickedButton() == copy) {
+        Utils::copyToClipboard(url);
+    } else if (linkWarning.result() == QMessageBox::Ok) {
+        QDesktopServices::openUrl(QUrl(url));
     }
 }
 
