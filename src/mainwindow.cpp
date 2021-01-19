@@ -103,6 +103,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx->XMRTo, &XmrTo::connectionSuccess, ui->xmrToWidget, &XMRToWidget::onConnectionSuccess);
     connect(m_ctx, &AppContext::balanceUpdated, ui->xmrToWidget, &XMRToWidget::onBalanceUpdated);
     connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(this, url); });
+    connect(m_ctx, &AppContext::walletClosed, ui->xmrToWidget, &XMRToWidget::onWalletClosed);
     ui->xmrToWidget->setHistoryModel(m_ctx->XMRTo->tableModel);
 #else
     ui->tabExchanges->setTabVisible(0, false);
@@ -198,11 +199,12 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     });
 
     // libwalletqt
-    connect(this, &MainWindow::walletClosed, ui->xmrToWidget, &XMRToWidget::onWalletClosed);
-    connect(this, &MainWindow::walletClosed, ui->sendWidget, &SendWidget::onWalletClosed);
+    connect(m_ctx, &AppContext::walletClosed, [this]{
+        this->onWalletClosed();
+    });
+    connect(m_ctx, &AppContext::walletClosed, ui->sendWidget, &SendWidget::onWalletClosed);
     connect(m_ctx, &AppContext::balanceUpdated, this, &MainWindow::onBalanceUpdated);
     connect(m_ctx, &AppContext::walletOpened, this, &MainWindow::onWalletOpened);
-    connect(m_ctx, &AppContext::walletClosed, this, QOverload<>::of(&MainWindow::onWalletClosed));
     connect(m_ctx, &AppContext::walletOpenedError, this, &MainWindow::onWalletOpenedError);
     connect(m_ctx, &AppContext::walletCreatedError, this, &MainWindow::onWalletCreatedError);
     connect(m_ctx, &AppContext::walletCreated, this, &MainWindow::onWalletCreated);
@@ -281,7 +283,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // Receive
     connect(ui->receiveWidget, &ReceiveWidget::generateSubaddress, [=]() {
         m_ctx->currentWallet->subaddress()->addRow( m_ctx->currentWallet->currentSubaddressAccount(), "");
-        m_ctx->storeWallet();
     });
     connect(ui->receiveWidget, &ReceiveWidget::showTransactions, [this](const QString &text) {
         ui->historyWidget->setSearchText(text);
@@ -328,7 +329,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     });
     connect(ui->coinsWidget, &CoinsWidget::sweepOutput, m_ctx, &AppContext::onSweepOutput);
 
-    connect(m_ctx, &AppContext::walletClosing, [=]{
+    connect(m_ctx, &AppContext::walletAboutToClose, [=]{
         if (!config()->get(Config::showTabHome).toBool())
             ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
         else
@@ -540,15 +541,9 @@ void MainWindow::showWizard(WalletWizard::Page startPage) {
     m_wizard->show();
 }
 
-void MainWindow::onWalletClosed() {
-    this->onWalletClosed(WalletWizard::Page_Menu);
-}
-
 void MainWindow::onWalletClosed(WalletWizard::Page page) {
-    emit walletClosed();
     m_statusLabelBalance->clear();
     m_statusLabelStatus->clear();
-    this->setWindowTitle("Feather");
     this->showWizard(page);
 }
 
@@ -628,32 +623,17 @@ void MainWindow::onWalletOpened() {
             m_ctx->currentWallet->subaddress()->addRow(m_ctx->currentWallet->currentSubaddressAccount(), "");
         }
     }
-    connect(m_ctx->currentWallet->subaddress(), &Subaddress::labelChanged, [this]{
-        m_ctx->storeWallet();
-    });
 
     // history page
     m_ctx->currentWallet->history()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
     ui->historyWidget->setModel(m_ctx->currentWallet->historyModel(), m_ctx->currentWallet);
-    connect(m_ctx->currentWallet->history(), &TransactionHistory::txNoteChanged, [this]{
-        m_ctx->storeWallet();
-    });
 
     // contacts widget
     ui->contactWidget->setModel(m_ctx->currentWallet->addressBookModel());
-    connect(m_ctx->currentWallet->addressBook(), &AddressBook::descriptionChanged, [this]{
-        m_ctx->storeWallet();
-    });
 
     // coins page
     m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
     ui->coinsWidget->setModel(m_ctx->currentWallet->coinsModel(), m_ctx->currentWallet->coins());
-    connect(m_ctx->currentWallet->coins(), &Coins::coinFrozen, [this]{
-        m_ctx->storeWallet();
-    });
-    connect(m_ctx->currentWallet->coins(), &Coins::coinThawed, [this]{
-        m_ctx->storeWallet();
-    });
 
     this->touchbarShowWallet();
     this->updatePasswordIcon();
@@ -983,8 +963,10 @@ void MainWindow::menuQuitClicked() {
 }
 
 void MainWindow::menuWalletCloseClicked() {
-    if(m_ctx->currentWallet == nullptr) return;
-    m_ctx->walletClose(true);
+    if (m_ctx->currentWallet == nullptr)
+        return;
+
+    m_ctx->closeWallet(true, true);
 }
 
 void MainWindow::menuWalletOpenClicked() {
@@ -1005,8 +987,7 @@ void MainWindow::menuWalletOpenClicked() {
         return;
     }
 
-    m_ctx->walletClose(false);
-    emit walletClosed();
+    m_ctx->closeWallet(false);
     m_ctx->onOpenWallet(path, "");
 }
 
@@ -1110,10 +1091,6 @@ void MainWindow::importContacts() {
             m_ctx->currentWallet->addressBook()->addRow(i.value(), "", i.key());
             inserts++;
         }
-    }
-
-    if(inserts > 0) {
-        m_ctx->storeWallet();
     }
 
     QMessageBox::information(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
@@ -1243,7 +1220,7 @@ void MainWindow::importOutputs() {
 }
 
 void MainWindow::cleanupBeforeClose() {
-    m_ctx->walletManager->closeWallet();
+    m_ctx->closeWallet(false, true);
     m_ctx->tor->stop();
 
     this->saveGeo();
@@ -1321,7 +1298,7 @@ void MainWindow::importTransaction() {
 }
 
 void MainWindow::updateNetStats() {
-    if (!m_ctx->currentWallet) {
+    if (m_ctx->currentWallet == nullptr) {
         m_statusLabelNetStats->setText("");
         return;
     }

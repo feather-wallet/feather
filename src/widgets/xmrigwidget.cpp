@@ -84,11 +84,11 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
     // username/password
     connect(ui->lineEdit_password, &QLineEdit::editingFinished, [=]() {
         m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
-        m_ctx->currentWallet->store();
+        m_ctx->storeWallet();
     });
     connect(ui->lineEdit_address, &QLineEdit::editingFinished, [=]() {
         m_ctx->currentWallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
-        m_ctx->currentWallet->store();
+        m_ctx->storeWallet();
     });
 
     // checkbox connects

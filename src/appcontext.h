@@ -102,10 +102,12 @@ public:
     void initRestoreHeights();
     void initWS();
     void donateBeg();
-    void walletClose(bool emitClosedSignal = true);
-    void storeWallet();
     void refreshModels();
     void setWindowTitle(bool mining = false);
+
+    // Closes the currently opened wallet
+    void closeWallet(bool emitClosedSignal = true, bool storeWallet = false);
+    void storeWallet();
 
 public slots:
     void onOpenWallet(const QString& path, const QString &password);
@@ -136,6 +138,12 @@ private slots:
     void onTransactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
 
 signals:
+    // Emitted just before the wallet is closed
+    void walletAboutToClose();
+
+    // Emitted after a wallet has been closed
+    void walletClosed();
+
     void balanceUpdated(quint64 balance, quint64 spendable);
     void blockchainSync(int height, int target);
     void refreshSync(int height, int target);
@@ -143,7 +151,6 @@ signals:
     void blockHeightWSUpdated(QMap<QString, int> heights);
     void walletSynchronized();
     void walletOpened();
-    void walletClosed();
     void walletCreatedError(const QString &msg);
     void walletCreated(Wallet *wallet);
     void walletOpenedError(QString msg);
@@ -166,12 +173,10 @@ signals:
     void donationNag();
     void initiateTransaction();
     void endTransaction();
-    void walletClosing();
     void setTitle(const QString &title); // set window title
 
 private:
     const int m_donationBoundary = 15;
-    UtilsNetworking *m_utilsNetworkingNodes{};
     QTimer m_storeTimer;
     QUrl m_wsUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
 };
