@@ -15,6 +15,7 @@ steps:
       path: /files
     commands:
     - TOR_BIN="/usr/local/tor/bin/tor" make -j11 release-static
+    - contrib/build-appimage.sh
     environment:
       OPENSSL_ROOT_DIR: /usr/local/openssl/
       CMAKEFLAGS_EXTRA: -DFETCH_DEPS=Off
@@ -24,15 +25,24 @@ steps:
     - name: ccache_linux_release
       path: /root/.ccache
     - name: files_linux_release
-      path: /files
+      path: /linux-release
+    - name: files_linux_appimage
+      path: /linux-release-appimage
     commands:
     - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
-    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
+    - export TARGET_DIR="/linux-release/$DRONE_SOURCE_BRANCH"
     - mkdir -p "$TARGET_DIR"
     - echo "writing to $TARGET_DIR/$FN"
     - strip -s build/bin/feather
     - zip -j "$TARGET_DIR/$FN" build/feather.log build/bin/feather
     - echo "[*] written to https://build.featherwallet.org/files/linux-release/$DRONE_SOURCE_BRANCH/$FN"
+    - # AppImage
+    - export FN="feather-`git rev-parse --short HEAD`.AppImage"
+    - export TARGET_DIR="/linux-release-appimage/$DRONE_SOURCE_BRANCH"
+    - mkdir -p "$TARGET_DIR"
+    - echo "writing to $TARGET_DIR/$FN"
+    - mv "feather.AppImage" "$TARGET_DIR/$FN"
+    - echo "[*] written to https://build.featherwallet.org/files/linux-release-appimage/$DRONE_SOURCE_BRANCH/$FN"
 
 volumes:
 - name: ccache_linux_release
@@ -44,41 +54,9 @@ volumes:
 - name: files_linux_release
   host:
     path: /build/feather_files/files/linux-release/
-
----
-kind: pipeline
-type: docker
-name: linux-release-appimage
-steps:
-  - name: build
-    image: feather:appimage
-    volumes:
-     - name: files_linux_release
-       path: /files
-    commands:
-    - export FN="feather-`echo $DRONE_COMMIT_AFTER | cut -c 1-7`.zip"
-    - export BRANCH="$DRONE_SOURCE_BRANCH"
-    - cp /files/$BRANCH/$FN feather.zip
-    - bash ./contrib/build-appimage.sh
-  - name: deploy
-    image: feather:appimage
-    volumes:
-      - name: files_linux_appimage
-        path: /files
-    commands:
-    - export FN="feather-`git rev-parse --short HEAD`.AppImage"
-    - export TARGET_DIR="/files/$DRONE_SOURCE_BRANCH"
-    - mkdir -p "$TARGET_DIR"
-    - echo "writing to $TARGET_DIR/$FN"
-    - mv "Feather-1.0-x86_64.AppImage" "$TARGET_DIR/$FN"
-    - echo "[*] written to https://build.featherwallet.org/files/linux-release-appimage/$DRONE_SOURCE_BRANCH/$FN"
-volumes:
-  - name: files_linux_appimage
-    host:
-      path: /build/feather_files/files/linux-release-appimage/
-  - name: files_linux_release
-    host:
-      path: /build/feather_files/files/linux-release/
+- name: files_linux_appimage
+  host:
+    path: /build/feather_files/files/linux-release-appimage/
 
 ---
 kind: pipeline

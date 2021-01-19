@@ -30,12 +30,22 @@ RUN apt-get update && \
 # libxkbcommon
     bison \
 # zeromq
-    libsodium-dev
+    libsodium-dev \
+# AppImage tools
+    file squashfs-tools desktop-file-utils patchelf
 
 RUN add-apt-repository ppa:git-core/ppa && \
     apt-get update && \
     apt-get install -y git && \
     rm -rf /var/lib/apt/lists/*
+
+RUN mkdir appimagetool && \
+    cd appimagetool && \
+    wget https://github.com/AppImage/AppImageKit/releases/download/12/appimagetool-x86_64.AppImage && \
+    echo "d918b4df547b388ef253f3c9e7f6529ca81a885395c31f619d9aaf7030499a13 appimagetool-x86_64.AppImage" | sha256sum -c && \
+    chmod +x appimagetool-x86_64.AppImage && \
+    ./appimagetool-x86_64.AppImage --appimage-extract && \
+    rm appimagetool-x86_64.AppImage
 
 RUN git clone -b xorgproto-2020.1 --depth 1 https://gitlab.freedesktop.org/xorg/proto/xorgproto && \
     cd xorgproto && \
@@ -362,3 +372,18 @@ RUN git clone https://git.wownero.com/feather/monero-seed.git && \
     make -Cbuild -j$THREADS && \
     make -Cbuild install && \
     rm -rf $(pwd)
+
+RUN git clone https://github.com/plougher/squashfs-tools.git && \
+    cd squashfs-tools/squashfs-tools && \
+    git reset --hard 38fa0720526222827da44b3b6c3f7eb63e8f5c2f && \
+    make && \
+    make install && \
+    rm -rf $(pwd)
+
+RUN mkdir linuxdeployqt && \
+    cd linuxdeployqt && \
+    wget https://github.com/probonopd/linuxdeployqt/releases/download/7/linuxdeployqt-7-x86_64.AppImage && \
+    echo "645276306a801d7154d59e5b4b3c2fac3d34e09be57ec31f6d9a09814c6c162a linuxdeployqt-7-x86_64.AppImage" | sha256sum -c && \
+    chmod +x linuxdeployqt-7-x86_64.AppImage && \
+    ./linuxdeployqt-7-x86_64.AppImage --appimage-extract && \
+    rm linuxdeployqt-7-x86_64.AppImage
