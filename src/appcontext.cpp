@@ -108,13 +108,10 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     this->ws = new WSClient(this, m_wsUrl);
     connect(this->ws, &WSClient::WSMessage, this, &AppContext::onWSMessage);
 
-    // timers
-    m_storeTimer.setSingleShot(true);
+    // Store the wallet every 2 minutes
+    m_storeTimer.start(2 * 60 * 1000);
     connect(&m_storeTimer, &QTimer::timeout, [this](){
-        if (!this->currentWallet)
-            return;
-        qDebug() << "Storing wallet";
-        this->currentWallet->store();
+        this->storeWallet();
     });
 
     // restore height lookup
@@ -248,15 +245,21 @@ void AppContext::onCreateTransactionError(const QString &msg) {
     emit endTransaction();
 }
 
-void AppContext::walletClose(bool emitClosedSignal) {
-    if(this->currentWallet == nullptr) return;
-    emit walletClosing();
-    //ctx->currentWallet->store();  @TODO: uncomment to store on wallet close
+void AppContext::closeWallet(bool emitClosedSignal, bool storeWallet) {
+    if (this->currentWallet == nullptr)
+        return;
+
+    emit walletAboutToClose();
+
+    if (storeWallet) {
+        this->storeWallet();
+    }
+
     this->currentWallet->disconnect();
     this->walletManager->closeWallet();
-    if(this->currentWallet != nullptr)
-        this->currentWallet = nullptr;
-    if(emitClosedSignal)
+    this->currentWallet = nullptr;
+
+    if (emitClosedSignal)
         emit walletClosed();
 }
 
@@ -298,16 +301,16 @@ void AppContext::onWalletOpened(Wallet *wallet) {
             qCritical() << errMsg;
             this->walletManager->clearWalletCache(this->walletPath);
             errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
-            this->walletClose(false);
+            this->closeWallet(false);
             emit walletOpenedError(errMsg);
         } else if(errMsg.contains("wallet cannot be opened as")) {
-            this->walletClose(false);
+            this->closeWallet(false);
             emit walletOpenedError(errMsg);
         } else if(errMsg.contains("is opened by another wallet program")) {
-            this->walletClose(false);
+            this->closeWallet(false);
             emit walletOpenedError(errMsg);
         } else {
-            this->walletClose(false);
+            this->closeWallet(false);
             emit walletOpenPasswordNeeded(!this->walletPassword.isEmpty(), wallet->path());
         }
         return;
@@ -665,9 +668,7 @@ void AppContext::donateBeg() {
     config()->set(Config::donateBeg, donationCounter);
 }
 
-AppContext::~AppContext() {
-    this->walletClose(false);
-}
+AppContext::~AppContext() {}
 
 // ############################################## LIBWALLET QT #########################################################
 
@@ -696,10 +697,10 @@ void AppContext::onUnconfirmedMoneyReceived(const QString &txId, quint64 amount)
 void AppContext::onWalletUpdate() {
     if (this->currentWallet->synchronized()) {
         this->refreshModels();
+        this->storeWallet();
     }
 
     this->updateBalance();
-    this->storeWallet();
 }
 
 void AppContext::onWalletRefreshed(bool success) {
@@ -769,10 +770,12 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
 }
 
 void AppContext::storeWallet() {
-    if (m_storeTimer.isActive())
+    // Do not store a synchronizing wallet: store() is NOT thread safe and may crash the wallet
+    if (this->currentWallet == nullptr || !this->currentWallet->synchronized())
         return;
 
-    m_storeTimer.start(60000);
+    qDebug() << "Storing wallet";
+    this->currentWallet->store();
 }
 
 void AppContext::updateBalance() {

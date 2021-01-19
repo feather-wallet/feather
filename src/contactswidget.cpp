@@ -133,7 +133,6 @@ void ContactsWidget::newContact(QString address, QString name)
     }
 
     m_ctx->currentWallet->addressBook()->addRow(address, "", name);
-    m_ctx->storeWallet();
 }
 
 void ContactsWidget::deleteContact()

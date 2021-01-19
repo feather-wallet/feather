@@ -137,15 +137,13 @@ public slots:
     void onBalanceUpdated(quint64 balance, quint64 spendable);
     void onSynchronized();
     void onWalletOpened();
-    void onWalletClosed();
-    void onWalletClosed(WalletWizard::Page page);
+    void onWalletClosed(WalletWizard::Page page = WalletWizard::Page_Menu);
     void onConnectionStatusChanged(int status);
     void onCreateTransactionError(const QString &message);
     void onCreateTransactionSuccess(PendingTransaction *tx, const QString &address, const quint32 &mixin);
     void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
 
 signals:
-    void walletClosed();
     void closed();
 
 private:
@@ -202,9 +200,6 @@ private:
     StatusBarButton *m_statusBtnSeed;
     StatusBarButton *m_statusBtnTor;
 
-    SubaddressProxyModel *subaddressProxyModel;
-    TransactionHistoryModel *txHistModel;
-    CoinsModel *coinsModel;
 #ifdef Q_OS_MAC
     QAction *m_touchbarActionWelcome;
     KDMacTouchBar *m_touchbar;
