@@ -34,8 +34,8 @@ CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
 void CreateWalletSeedPage::seedRoulette(int count) {
     count += 1;
     if(count > m_rouletteSpin) return;
-    auto seed = FeatherSeed::generate(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage);
-    m_mnemonic = seed.mnemonicSeed;
+    FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage);
+    m_mnemonic = seed.mnemonic.join(" ");
     m_restoreHeight = seed.restoreHeight;
 
     this->displaySeed(m_mnemonic);

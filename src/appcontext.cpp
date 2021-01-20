@@ -533,12 +533,21 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
         return;
     }
 
-    if(seed.mnemonicSeed.isEmpty()) {
+    if(seed.mnemonic.isEmpty()) {
         emit walletCreatedError("Mnemonic seed error. Failed to write wallet.");
         return;
     }
 
-    this->currentWallet = seed.writeWallet(this->walletManager, this->networkType, path, password, this->kdfRounds);
+    Wallet *wallet = nullptr;
+    if (seed.seedType == SeedType::TEVADOR) {
+        wallet = this->walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, this->networkType, seed.spendKey, seed.restoreHeight, this->kdfRounds);
+        wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
+    }
+    if (seed.seedType == SeedType::MONERO) {
+        wallet = this->walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), "", this->networkType, seed.restoreHeight, this->kdfRounds);
+    }
+
+    this->currentWallet = wallet;
     if(this->currentWallet == nullptr) {
         emit walletCreatedError("Failed to write wallet");
         return;

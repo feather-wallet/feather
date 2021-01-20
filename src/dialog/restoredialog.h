@@ -10,7 +10,7 @@
 #include <QStandardItemModel>
 #include <QAbstractButton>
 
-#include "utils/seeds.h"
+#include "utils/RestoreHeightLookup.h"
 #include "appcontext.h"
 
 namespace Ui {
