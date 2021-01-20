@@ -9,7 +9,7 @@
 #include <QRadioButton>
 
 #include "appcontext.h"
-#include "utils/seeds.h"
+#include "utils/RestoreHeightLookup.h"
 #include "utils/config.h"
 
 class WalletWizard : public QWizard

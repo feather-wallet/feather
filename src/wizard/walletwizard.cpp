@@ -80,7 +80,8 @@ void WalletWizard::createWallet() {
         return;
     }
 
-    auto seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, mnemonicSeed.toStdString());
+    auto seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage, mnemonicSeed.split(" "));
+
     if(restoreHeight > 0)
         seed.setRestoreHeight(restoreHeight);
     m_ctx->createWallet(seed, walletPath, walletPasswd);

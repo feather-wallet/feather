@@ -17,9 +17,10 @@
 #include "utils/xmrig.h"
 #include "utils/wsclient.h"
 #include "utils/txfiathistory.h"
+#include "utils/FeatherSeed.h"
 #include "widgets/RedditPost.h"
 #include "widgets/CCSEntry.h"
-#include "utils/seeds.h"
+#include "utils/RestoreHeightLookup.h"
 #include "utils/nodes.h"
 
 #include "libwalletqt/WalletManager.h"

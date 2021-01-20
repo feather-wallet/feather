@@ -7,8 +7,10 @@
 
 #include <QLineEdit>
 #include <QPlainTextEdit>
+#include <QMessageBox>
 
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
+#include "utils/FeatherSeed.h"
 
 RestorePage::RestorePage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),
@@ -28,6 +30,10 @@ RestorePage::RestorePage(AppContext *ctx, QWidget *parent) :
         m_words25 << seed_word;
     for(int i = 0; i != 2048; i++)
         m_words14 << QString::fromStdString(wordlist::english.get_word(i));
+
+    // Restore has limited error correction capability, namely it can correct a single erasure
+    // (illegible word with a known location). This can be tested by replacing a word with xxxx
+    m_words14 << "xxxx";
 
     //
     m_completer14Model = new QStringListModel(m_words14, m_completer14);
@@ -127,13 +133,6 @@ bool RestorePage::validatePage() {
                 return false;
             }
         }
-
-        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, seed.toStdString());
-        restoreHeight = _seed.restoreHeight;
-
-        this->setField("restoreHeight", restoreHeight);
-        this->setField("mnemonicRestoredSeed", seed);
-        return true;
     } else if(m_mode == 25) {
         if(seedSplit.length() != 25) {
             ui->label_errorString->show();
@@ -150,15 +149,22 @@ bool RestorePage::validatePage() {
                 return false;
             }
         }
-
-        auto _seed = FeatherSeed::fromSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName.toStdString(), m_ctx->seedLanguage, seed.toStdString());
-        _seed.setRestoreHeight(restoreHeight);
-        this->setField("restoreHeight", restoreHeight);
-        this->setField("mnemonicSeed", seed);
-        this->setField("mnemonicRestoredSeed", seed);
-        return true;
     }
 
-    ui->seedEdit->setStyleSheet(errStyle);
-    return false;
+    auto _seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage, seedSplit);
+    if (!_seed.errorString.isEmpty()) {
+        QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));
+        ui->seedEdit->setStyleSheet(errStyle);
+        return false;
+    }
+    if (!_seed.correction.isEmpty()) {
+        QMessageBox::information(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
+    }
+
+    restoreHeight = _seed.restoreHeight;
+
+    this->setField("restoreHeight", restoreHeight);
+    this->setField("mnemonicSeed", seed);
+    this->setField("mnemonicRestoredSeed", seed);
+    return true;
 }
