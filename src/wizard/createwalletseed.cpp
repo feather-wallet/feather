@@ -6,6 +6,7 @@
 #include "ui_createwalletseed.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
 
 CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
         QWizardPage(parent),
@@ -19,7 +20,9 @@ CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
     this->registerField("mnemonicSeed", ui->hiddenMnemonicSeed);
     ui->hiddenMnemonicSeed->hide();
 
-    ui->seed->setFont(Utils::relativeFont(1));
+    ui->seedWord2->setHelpText("In addition to the private spend key, Tevador's 14 word seed scheme also encodes the "
+                               "restore date, cryptocurrency type, and reserves a few bits for future use. "
+                               "The second word is static because the reserved bits remain the same for each seed generation.");
 
     connect(ui->btnRoulette, &QPushButton::clicked, [=]{
         this->seedRoulette(0);
@@ -45,7 +48,22 @@ void CreateWalletSeedPage::seedRoulette(int count) {
 }
 
 void CreateWalletSeedPage::displaySeed(const QString &seed){
-    ui->seed->setPlainText(seed);
+    QStringList seedSplit = seed.split(" ");
+
+    ui->seedWord1->setText(seedSplit[0]);
+    ui->seedWord2->setText(seedSplit[1]);
+    ui->seedWord3->setText(seedSplit[2]);
+    ui->seedWord4->setText(seedSplit[3]);
+    ui->seedWord5->setText(seedSplit[4]);
+    ui->seedWord6->setText(seedSplit[5]);
+    ui->seedWord7->setText(seedSplit[6]);
+    ui->seedWord8->setText(seedSplit[7]);
+    ui->seedWord9->setText(seedSplit[8]);
+    ui->seedWord10->setText(seedSplit[9]);
+    ui->seedWord11->setText(seedSplit[10]);
+    ui->seedWord12->setText(seedSplit[11]);
+    ui->seedWord13->setText(seedSplit[12]);
+    ui->seedWord14->setText(seedSplit[13]);
 }
 
 int CreateWalletSeedPage::nextId() const {
@@ -55,6 +73,16 @@ int CreateWalletSeedPage::nextId() const {
 bool CreateWalletSeedPage::validatePage() {
     if(m_mnemonic.isEmpty()) return false;
     if(!m_restoreHeight) return false;
+
+    QMessageBox seedWarning(this);
+    seedWarning.setWindowTitle("Warning!");
+    seedWarning.setText("• Never disclose your seed\n"
+                        "• Never type it on a website\n"
+                        "• Store it safely (offline)\n"
+                        "• Do not lose your seed!");
+    seedWarning.addButton("I understand", QMessageBox::AcceptRole);
+    seedWarning.exec();
+
     this->setField("mnemonicSeed", m_mnemonic);
     this->setField("restoreHeight", m_restoreHeight);
     emit createWallet();
