@@ -32,6 +32,7 @@ public slots:
     void deleteContact();
     void setShowFullAddresses(bool show);
     void setSearchFilter(const QString &filter);
+    void resetModel();
 
 signals:
     void fillAddress(QString &address);

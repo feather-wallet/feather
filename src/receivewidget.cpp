@@ -103,6 +103,10 @@ void ReceiveWidget::onShowTransactions() {
     emit showTransactions(address);
 }
 
+void ReceiveWidget::resetModel() {
+    ui->addresses->setModel(nullptr);
+}
+
 void ReceiveWidget::setShowFullAddresses(bool show) {
     if (!m_model) return;
     m_model->setShowFullAddresses(show);

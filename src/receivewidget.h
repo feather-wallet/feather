@@ -36,6 +36,7 @@ public slots:
     void setShowUsedAddresses(bool show);
     void setSearchFilter(const QString &filter);
     void onShowTransactions();
+    void resetModel();
 
 signals:
     void generateSubaddress();
