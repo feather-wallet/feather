@@ -6,7 +6,6 @@
 
 #include "appcontext.h"
 #include "globals.h"
-#include "utils/whonix.h"
 
 // libwalletqt
 #include "libwalletqt/TransactionHistory.h"

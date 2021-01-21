@@ -64,6 +64,9 @@ void DebugInfoDialog::updateInfo() {
     if (m_ctx->isTails) {
         os = QString("Tails %1").arg(TailsOS::version());
     }
+    if (m_ctx->isWhonix) {
+        os = QString("Whonix %1").arg(WhonixOS::version());
+    }
     ui->label_OS->setText(os);
     ui->label_timestamp->setText(QString::number(QDateTime::currentSecsSinceEpoch()));
 }
