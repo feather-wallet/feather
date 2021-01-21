@@ -45,7 +45,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::windowState, {QS("windowState"), {}}},
         {Config::firstRun,{QS("firstRun"), false}},
         {Config::hideBalance, {QS("hideBalance"), false}},
-        {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}}
+        {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
+        {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}}
 };
 
 

@@ -292,6 +292,8 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // History
     connect(ui->historyWidget, &HistoryWidget::viewOnBlockExplorer, this, &MainWindow::onViewOnBlockExplorer);
     connect(ui->historyWidget, &HistoryWidget::resendTransaction, this, &MainWindow::onResendTransaction);
+    connect(m_ctx, &AppContext::walletRefreshed, ui->historyWidget, &HistoryWidget::onWalletRefreshed);
+    connect(m_ctx, &AppContext::walletOpened, ui->historyWidget, &HistoryWidget::onWalletOpened);
 
     // Contacts
     connect(ui->contactWidget, &ContactsWidget::fillAddress, ui->sendWidget, &SendWidget::fillAddress);
@@ -693,7 +695,7 @@ void MainWindow::onBlockchainSync(int height, int target) {
 
 void MainWindow::onRefreshSync(int height, int target) {
     QString blocks = (target >= height) ? QString::number(target - height) : "?";
-    QString heightText = QString("Wallet refresh: %1 blocks remaining").arg(blocks);
+    QString heightText = QString("Wallet sync: %1 blocks remaining").arg(blocks);
     this->setStatusText(heightText);
 }
 

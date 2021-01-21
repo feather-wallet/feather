@@ -4,6 +4,7 @@
 #include "historywidget.h"
 #include "ui_historywidget.h"
 #include "dialog/transactioninfodialog.h"
+#include <QMessageBox>
 
 HistoryWidget::HistoryWidget(QWidget *parent)
         : QWidget(parent)
@@ -33,6 +34,11 @@ HistoryWidget::HistoryWidget(QWidget *parent)
         }
     });
 
+    connect(ui->btn_moreInfo, &QPushButton::clicked, this, &HistoryWidget::showSyncNoticeMsg);
+    connect(ui->btn_close, &QPushButton::clicked, [this]{
+        config()->set(Config::showHistorySyncNotice, false);
+        ui->syncNotice->hide();
+    });
 }
 
 void HistoryWidget::showContextMenu(const QPoint &point) {
@@ -141,6 +147,23 @@ void HistoryWidget::copy(copyField field) {
     });
 
     Utils::copyToClipboard(data);
+}
+
+void HistoryWidget::onWalletOpened() {
+    ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
+}
+
+void HistoryWidget::onWalletRefreshed() {
+    ui->syncNotice->hide();
+}
+
+void HistoryWidget::showSyncNoticeMsg() {
+    QMessageBox::information(this, "Sync notice",
+                             "The wallet needs to scan the blockchain to find your transactions. "
+                             "The status bar will show you how many blocks are still remaining.\n"
+                             "\n"
+                             "The history page will update once synchronization has finished. "
+                             "To update the history page during synchronization press Ctrl+R.");
 }
 
 HistoryWidget::~HistoryWidget() {

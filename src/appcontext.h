@@ -150,7 +150,7 @@ signals:
     void refreshSync(int height, int target);
     void synchronized();
     void blockHeightWSUpdated(QMap<QString, int> heights);
-    void walletSynchronized();
+    void walletRefreshed();
     void walletOpened();
     void walletCreatedError(const QString &msg);
     void walletCreated(Wallet *wallet);

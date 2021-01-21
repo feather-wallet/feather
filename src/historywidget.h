@@ -28,6 +28,8 @@ public:
 public slots:
     void setSearchText(const QString &text);
     void resetModel();
+    void onWalletRefreshed();
+    void onWalletOpened();
 
 signals:
     void viewOnBlockExplorer(QString txid);
@@ -48,6 +50,7 @@ private:
 
     void copy(copyField field);
     void showContextMenu(const QPoint &point);
+    void showSyncNoticeMsg();
 
     Ui::HistoryWidget *ui;
     QMenu *m_contextMenu;
