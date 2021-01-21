@@ -21,6 +21,7 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     ui->setupUi(this);
 
     ui->label_warning->setText("You are about to send a transaction.\nVerify the information below.");
+    ui->label_note->hide();
 
     QString preferredCur = config()->get(Config::preferredFiatCurrency).toString();
 
@@ -46,9 +47,17 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
     ui->label_total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 
+    auto subaddressIndex = m_ctx->currentWallet->subaddressIndex(address);
+    QString addressExtra;
+    if (subaddressIndex.first >= 0) {
+        ui->label_note->setText("Note: this is a churn transaction.");
+        ui->label_note->show();
+    }
+
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));
     ui->label_address->setFont(ModelUtils::getMonospaceFont());
     ui->label_address->setToolTip(address);
+
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");
 
