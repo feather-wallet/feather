@@ -10,6 +10,7 @@
 #include <QTimer>
 
 #include "utils/tails.h"
+#include "utils/whonix.h"
 #include "utils/prices.h"
 #include "utils/networking.h"
 #include "utils/tor.h"

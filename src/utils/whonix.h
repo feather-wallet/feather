@@ -4,9 +4,11 @@
 #ifndef FEATHER_WHONIX_H
 #define FEATHER_WHONIX_H
 
+#include <QString>
 
 struct WhonixOS {
     static bool detect();
+    static QString version();
 };
 
 
