@@ -1,4 +1,4 @@
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 ARG THREADS=1
 ARG QT_VERSION=5.15.2
@@ -22,7 +22,7 @@ RUN apt-get update && \
 # libusb
     libudev-dev \
 # fontconfig
-    autopoint gettext gperf libpng12-dev \
+    autopoint gettext gperf libpng-dev \
 # libxcb
     libpthread-stubs0-dev \
 # xorgproto
@@ -344,9 +344,9 @@ RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
     make -j$THREADS install_sw && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-0.4.4.6 --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.5.3-rc --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
-    git reset --hard 2a8b789ea6f308d081f369d78fa7cfdc9d00bf90 && \
+    git reset --hard e5c47d295bd3dc35f75c7d5c1753c650fd912640 && \
     ./autogen.sh && \
     ./configure \
     --disable-asciidoc \
@@ -354,6 +354,8 @@ RUN git clone -b tor-0.4.4.6 --depth 1 https://git.torproject.org/tor.git && \
     --disable-html-manual \
     --disable-system-torrc \
     --disable-module-relay \
+    --disable-lzma \
+    --disable-zstd \
     --enable-static-tor \
     --with-libevent-dir=/usr/local/libevent \
     --with-openssl-dir=/usr/local/openssl-1.0.2u \
