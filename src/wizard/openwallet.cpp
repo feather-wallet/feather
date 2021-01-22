@@ -59,6 +59,7 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, Q
     connect(ui->walletTable->selectionModel(), &QItemSelectionModel::currentRowChanged, [this](QModelIndex current, QModelIndex prev){
         this->updatePath();
     });
+    connect(ui->walletTable, &QTreeView::doubleClicked, this, &OpenWalletPage::validatePage);
 }
 
 void OpenWalletPage::initializePage() {
