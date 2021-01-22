@@ -26,28 +26,14 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto ack_text = Utils::barrayToString(ack);
     ui->ackText->setText(ack_text);
 
-    auto sm = QApplication::font();
-    auto font = QApplication::font();
-    sm.setPointSize(sm.pointSize() - 2);
-    this->m_model = new QStandardItemModel(this);
-    this->m_model->setHorizontalHeaderItem(0, Utils::qStandardItem("Name", sm));
-    this->m_model->setHorizontalHeaderItem(1, Utils::qStandardItem("Email", sm));
+    m_model = new QStringListModel(this);
+
+    QString contributors = Utils::barrayToString(Utils::fileOpenQRC(":assets/contributors.txt"));
+    QStringList contributor_list = contributors.split("\n");
+    m_model->setStringList(contributor_list);
+
+    ui->authorView->setHeaderHidden(true);
     ui->authorView->setModel(this->m_model);
-
-    int i = 0;
-    auto contributors = Utils::barrayToString(Utils::fileOpenQRC(":assets/contributors.txt"));
-    for(const auto &line: contributors.split("\n")){
-        // too lazy for regex #sorry #notsorry
-        auto name = line.left(line.indexOf("<")).trimmed();
-        auto nameItem = Utils::qStandardItem(name, font);
-        auto email = line.mid(line.indexOf("<")+1, line.length()).replace(">", "").trimmed();
-        auto emailItem = Utils::qStandardItem(email, font);
-
-        this->m_model->setItem(i, 0, nameItem);
-        this->m_model->setItem(i, 1, emailItem);
-        i++;
-    }
-
     ui->authorView->header()->setSectionResizeMode(QHeaderView::Stretch);
 
     this->adjustSize();

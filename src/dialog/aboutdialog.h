@@ -5,7 +5,7 @@
 #define ABOUT_H
 
 #include <QDialog>
-#include <QStandardItemModel>
+#include <QStringListModel>
 #include <QAbstractButton>
 
 namespace Ui {
@@ -21,7 +21,7 @@ public:
     ~AboutDialog() override;
 
 private:
-    QStandardItemModel *m_model;
+    QStringListModel *m_model;
     Ui::AboutDialog *ui;
 };
 

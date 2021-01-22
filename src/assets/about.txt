@@ -1,8 +1,9 @@
 Feather <feather_version> (<feather_git_head>)
 
-https://featherwallet.org
+Website: https://featherwallet.org
+E-mail: dev@featherwallet.org
 
-Created by dsc <dsc@xmr.pm>, tobtoht <thotbot@protonmail.com>, and contributors.
+Created by dsc, tobtoht, and contributors.
 
 Copyright (c) 2020-<current_year>, The Monero Project
 
