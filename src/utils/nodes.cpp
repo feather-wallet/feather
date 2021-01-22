@@ -83,6 +83,37 @@ void Nodes::loadConfig() {
         qDebug() << QString("Loaded %1 custom nodes from config").arg(m_customNodes.count());
     }
 
+    // No nodes cached, fallback to hardcorded list
+    if (m_websocketNodes.count() == 0) {
+        QByteArray file = Utils::fileOpenQRC(":/assets/nodes.json");
+        QJsonDocument nodes_json = QJsonDocument::fromJson(file);
+        QJsonObject nodes_obj = nodes_json.object();
+
+        QString netKey;
+        if (m_ctx->networkType == NetworkType::MAINNET) {
+            netKey = "mainnet";
+        } else if (m_ctx->networkType == NetworkType::STAGENET) {
+            netKey = "stagenet";
+        }
+
+        if (nodes_obj.contains(netKey)) {
+            QJsonArray nodes_list;
+            if (m_ctx->isTails || m_ctx->isWhonix || m_ctx->isTorSocks) {
+                nodes_list = nodes_json[netKey].toObject()["tor"].toArray();
+            } else {
+                nodes_list = nodes_json[netKey].toObject()["clearnet"].toArray();
+            }
+            for (auto node: nodes_list) {
+                auto wsNode = FeatherNode(node.toString());
+                wsNode.custom = false;
+                wsNode.online = true;
+                m_websocketNodes.append(wsNode);
+            }
+        }
+
+        qDebug() << QString("Loaded %1 nodes from hardcoded list").arg(m_websocketNodes.count());
+    }
+
     m_configJson[key] = obj;
     this->writeConfig();
     this->updateModels();

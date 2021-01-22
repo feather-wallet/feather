@@ -1,0 +1,37 @@
+{
+  "mainnet": {
+    "tor": [
+      "xmrtolujkxnlinre.onion:18081",
+      "xmrag4hf5xlabmob.onion:18081",
+      "monero26mmldsallmxok2kwamne4ve3mybvvn2yijsvss7ey63hc4yyd.onion:18081",
+      "monero5sjoz5xmjn.onion:18081",
+      "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
+      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
+      "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
+      "3t7v5zpcfxq2tocdofdcwxgrldco3elotz3iis4jtbbnscy5alezw7yd.onion:18081",
+      "4mslnrs5sfjxrb35.onion:18081",
+      "aytzr6aoxsegx2y6.onion:18081"
+    ],
+    "clearnet": [
+      "eu-west.node.xmr.pm:18089",
+      "eu-west-2.node.xmr.pm:18089",
+      "usa-east-va.node.xmr.pm:18089",
+      "canada.node.xmr.pm:18089",
+      "singapore.node.xmr.pm:18089",
+      "nodes.hashvault.pro:18081",
+      "node.supportxmr.com:18081",
+      "xmr-node-eu.cakewallet.com:18081",
+      "xmr-node-usa-east.cakewallet.com:18081",
+      "node.xmr.ru:18081",
+      "selsta1.featherwallet.net:18081",
+      "selsta2.featherwallet.net:18081"
+    ]
+  },
+  "stagenet": {
+    "tor": [],
+    "clearnet": [
+      "run.your.own.node.xmr.pm:38089",
+      "super.fast.node.xmr.pm:38089"
+    ]
+  }
+}
