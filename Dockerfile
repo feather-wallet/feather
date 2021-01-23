@@ -344,9 +344,9 @@ RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
     make -j$THREADS install_sw && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-0.4.5.3-rc --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
-    git reset --hard e5c47d295bd3dc35f75c7d5c1753c650fd912640 && \
+    git reset --hard 9e26a9399fe2422475406d6ee3cb29b2924f3274 && \
     ./autogen.sh && \
     ./configure \
     --disable-asciidoc \
