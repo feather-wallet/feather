@@ -21,6 +21,7 @@ class CreateWalletSeedPage : public QWizardPage
 
 public:
     explicit CreateWalletSeedPage(AppContext *ctx, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
@@ -29,6 +30,7 @@ public slots:
 
 private:
     void seedRoulette(int count);
+    void generateSeed();
 
 signals:
     void createWallet();
