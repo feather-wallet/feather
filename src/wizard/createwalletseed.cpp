@@ -27,24 +27,34 @@ CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
     connect(ui->btnRoulette, &QPushButton::clicked, [=]{
         this->seedRoulette(0);
     });
+    connect(ui->btnCopy, &QPushButton::clicked, [this]{
+        Utils::copyToClipboard(m_mnemonic);
+    });
 
     this->setButtonText(QWizard::FinishButton, "Create/Open wallet");
+}
 
-    // generate new seed
-    this->seedRoulette(m_rouletteSpin - 1);
+void CreateWalletSeedPage::initializePage() {
+    this->generateSeed();
 }
 
 void CreateWalletSeedPage::seedRoulette(int count) {
     count += 1;
-    if(count > m_rouletteSpin) return;
-    FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage);
-    m_mnemonic = seed.mnemonic.join(" ");
-    m_restoreHeight = seed.restoreHeight;
+    if (count > m_rouletteSpin)
+        return;
 
-    this->displaySeed(m_mnemonic);
+    this->generateSeed();
+
     QTimer::singleShot(10, [=] {
         this->seedRoulette(count);
     });
+}
+
+void CreateWalletSeedPage::generateSeed() {
+    FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage);
+    m_mnemonic = seed.mnemonic.join(" ");
+    m_restoreHeight = seed.restoreHeight;
+    this->displaySeed(m_mnemonic);
 }
 
 void CreateWalletSeedPage::displaySeed(const QString &seed){
