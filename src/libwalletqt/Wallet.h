@@ -139,6 +139,10 @@ public:
     //! returns wallet's public address
     Q_INVOKABLE QString address(quint32 accountIndex, quint32 addressIndex) const;
 
+    //! returns the subaddress index (major, minor) of the address
+    // (-1, -1) if address does not belong to wallet
+    Q_INVOKABLE QPair<int, int> subaddressIndex(const QString &address) const;
+
     //! returns wallet file's path
     QString path() const;
 

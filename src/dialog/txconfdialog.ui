@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>844</width>
-    <height>248</height>
+    <width>612</width>
+    <height>288</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,6 +21,16 @@
     <widget class="QLabel" name="label_warning">
      <property name="text">
       <string>warning</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLabel" name="label_note">
+     <property name="text">
+      <string>note</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
      </property>
     </widget>
    </item>

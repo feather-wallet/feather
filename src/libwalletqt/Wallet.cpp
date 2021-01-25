@@ -150,6 +150,15 @@ QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const
     return QString::fromStdString(m_walletImpl->address(accountIndex, addressIndex));
 }
 
+QPair<int, int> Wallet::subaddressIndex(const QString &address) const
+{
+    std::pair<uint32_t, uint32_t> i;
+    if (!m_walletImpl->subaddressIndex(address.toStdString(), i)) {
+        return QPair<int, int>(-1, -1);
+    }
+    return QPair<int, int>(i.first, i.second);
+}
+
 QString Wallet::path() const
 {
     return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->path()));
