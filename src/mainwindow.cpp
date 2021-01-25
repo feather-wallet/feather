@@ -19,6 +19,7 @@
 #include "dialog/tximportdialog.h"
 #include "dialog/passworddialog.h"
 #include "dialog/balancedialog.h"
+#include "dialog/WalletCacheDebugDialog.h"
 #include "ui_mainwindow.h"
 #include "globals.h"
 
@@ -73,6 +74,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::menuQuitClicked);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::menuSettingsClicked);
     connect(ui->actionCalculator, &QAction::triggered, this, &MainWindow::showCalcWindow);
+    connect(ui->actionWallet_cache_debug, &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
 
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
     ui->actionCreateDesktopEntry->setDisabled(true);
@@ -1153,6 +1155,12 @@ void MainWindow::restoreGeo() {
 
 void MainWindow::showDebugInfo() {
     auto *dialog = new DebugInfoDialog(m_ctx, this);
+    dialog->exec();
+    dialog->deleteLater();
+}
+
+void MainWindow::showWalletCacheDebugDialog() {
+    auto *dialog = new WalletCacheDebugDialog(m_ctx, this);
     dialog->exec();
     dialog->deleteLater();
 }

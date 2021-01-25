@@ -104,6 +104,7 @@ public slots:
     void showViewOnlyDialog();
     void donateButtonClicked();
     void showCalcWindow();
+    void showWalletCacheDebugDialog();
     void showSendTab();
     void showHistoryTab();
     void showSendScreen(const CCSEntry &entry);

@@ -404,6 +404,7 @@
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
      <addaction name="actionRescan_spent"/>
+     <addaction name="actionWallet_cache_debug"/>
      <addaction name="separator"/>
      <addaction name="actionChange_restore_height"/>
      <addaction name="menuExport"/>
@@ -718,6 +719,11 @@
   <action name="actionShow_Home">
    <property name="text">
     <string>Show Home</string>
+   </property>
+  </action>
+  <action name="actionWallet_cache_debug">
+   <property name="text">
+    <string>Wallet cache debug</string>
    </property>
   </action>
  </widget>
