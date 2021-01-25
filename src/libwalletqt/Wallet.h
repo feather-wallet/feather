@@ -217,6 +217,24 @@ public:
     //! import a transaction
     Q_INVOKABLE bool importTransaction(const QString& txid, const QVector<quint64>& output_indeces, quint64 height, quint64 timestamp, bool miner_tx, bool pool, bool double_spend_seen);
 
+    Q_INVOKABLE QString printBlockchain();
+    Q_INVOKABLE QString printTransfers();
+    Q_INVOKABLE QString printPayments();
+    Q_INVOKABLE QString printUnconfirmedPayments();
+    Q_INVOKABLE QString printConfirmedTransferDetails();
+    Q_INVOKABLE QString printUnconfirmedTransferDetails();
+    Q_INVOKABLE QString printPubKeys();
+    Q_INVOKABLE QString printTxNotes();
+    Q_INVOKABLE QString printSubaddresses();
+    Q_INVOKABLE QString printSubaddressLabels();
+    Q_INVOKABLE QString printAdditionalTxKeys();
+    Q_INVOKABLE QString printAttributes();
+    Q_INVOKABLE QString printKeyImages();
+    Q_INVOKABLE QString printAccountTags();
+    Q_INVOKABLE QString printTxKeys();
+    Q_INVOKABLE QString printAddressBook();
+    Q_INVOKABLE QString printScannedPoolTxs();
+
     //! refreshes the wallet
     Q_INVOKABLE bool refresh(bool historyAndSubaddresses = false);
 

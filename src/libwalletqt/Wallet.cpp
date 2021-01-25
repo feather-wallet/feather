@@ -468,6 +468,91 @@ bool Wallet::importTransaction(const QString& txid, const QVector<quint64>& outp
             double_spend_seen);
 }
 
+QString Wallet::printBlockchain()
+{
+    return QString::fromStdString(m_walletImpl->printBlockchain());
+}
+
+QString Wallet::printTransfers()
+{
+    return QString::fromStdString(m_walletImpl->printTransfers());
+}
+
+QString Wallet::printPayments()
+{
+    return QString::fromStdString(m_walletImpl->printPayments());
+}
+
+QString Wallet::printUnconfirmedPayments()
+{
+    return QString::fromStdString(m_walletImpl->printUnconfirmedPayments());
+}
+
+QString Wallet::printConfirmedTransferDetails()
+{
+    return QString::fromStdString(m_walletImpl->printConfirmedTransferDetails());
+}
+
+QString Wallet::printUnconfirmedTransferDetails()
+{
+    return QString::fromStdString(m_walletImpl->printUnconfirmedTransferDetails());
+}
+
+QString Wallet::printPubKeys()
+{
+    return QString::fromStdString(m_walletImpl->printPubKeys());
+}
+
+QString Wallet::printTxNotes()
+{
+    return QString::fromStdString(m_walletImpl->printTxNotes());
+}
+
+QString Wallet::printSubaddresses()
+{
+    return QString::fromStdString(m_walletImpl->printSubaddresses());
+}
+
+QString Wallet::printSubaddressLabels()
+{
+    return QString::fromStdString(m_walletImpl->printSubaddressLabels());
+}
+
+QString Wallet::printAdditionalTxKeys()
+{
+    return QString::fromStdString(m_walletImpl->printAdditionalTxKeys());
+}
+
+QString Wallet::printAttributes()
+{
+    return QString::fromStdString(m_walletImpl->printAttributes());
+}
+
+QString Wallet::printKeyImages()
+{
+    return QString::fromStdString(m_walletImpl->printKeyImages());
+}
+
+QString Wallet::printAccountTags()
+{
+    return QString::fromStdString(m_walletImpl->printAccountTags());
+}
+
+QString Wallet::printTxKeys()
+{
+    return QString::fromStdString(m_walletImpl->printTxKeys());
+}
+
+QString Wallet::printAddressBook()
+{
+    return QString::fromStdString(m_walletImpl->printAddressBook());
+}
+
+QString Wallet::printScannedPoolTxs()
+{
+    return QString::fromStdString(m_walletImpl->printScannedPoolTxs());
+}
+
 void Wallet::startRefresh()
 {
     m_refreshEnabled = true;
