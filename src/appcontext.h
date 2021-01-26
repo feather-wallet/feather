@@ -115,7 +115,8 @@ public slots:
     void onOpenWallet(const QString& path, const QString &password);
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
     void onCreateTransaction(XmrToOrder *order);
-    void onCancelTransaction(PendingTransaction *tx, const QString &address);
+    void onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
+    void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
     void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;
     void onCreateTransactionError(const QString &msg);
     void onOpenAliasResolve(const QString &openAlias);
@@ -136,7 +137,7 @@ private slots:
     void onWalletOpened(Wallet *wallet);
     void onWalletNewBlock(quint64 blockheight, quint64 targetHeight);
     void onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight);
-    void onTransactionCreated(PendingTransaction *tx, const QString &address, const QString &paymentId, quint32 mixin);
+    void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
     void onTransactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
 
 signals:
@@ -159,8 +160,8 @@ signals:
     void walletOpenPasswordNeeded(bool invalidPassword, QString path);
     void transactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
     void createTransactionError(QString message);
-    void createTransactionCancelled(QString address, double amount);
-    void createTransactionSuccess(PendingTransaction *tx, const QString &address, const quint32 &mixin);
+    void createTransactionCancelled(const QVector<QString> &address, double amount);
+    void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
     void redditUpdated(QList<QSharedPointer<RedditPost>> &posts);
     void nodesUpdated(QList<QSharedPointer<FeatherNode>> &nodes);
     void ccsUpdated(QList<QSharedPointer<CCSEntry>> &entries);

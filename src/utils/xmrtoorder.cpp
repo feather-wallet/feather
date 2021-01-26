@@ -24,9 +24,9 @@ XmrToOrder::XmrToOrder(AppContext *ctx, UtilsNetworking *network, QString baseUr
     connect(m_ctx, &AppContext::createTransactionCancelled, this, &XmrToOrder::onTransactionCancelled);
 }
 
-void XmrToOrder::onTransactionCancelled(const QString &address, double amount) {
+void XmrToOrder::onTransactionCancelled(const QVector<QString> &address, double amount) {
     // listener for all cancelled transactions - will try to match the exact amount to this order.
-    if(this->incoming_amount_total != amount || this->receiving_subaddress != address) return;
+    if(this->incoming_amount_total != amount || this->receiving_subaddress != address[0]) return;
 
     this->errorMsg = "TX cancelled by user";
     this->changeState(OrderState::Status_OrderFailed);

@@ -24,8 +24,8 @@ SendWidget::SendWidget(QWidget *parent) :
     connect(ui->btnClear, &QPushButton::clicked, this, &SendWidget::clearClicked);
     connect(ui->btnMax, &QPushButton::clicked, this, &SendWidget::btnMaxClicked);
     connect(ui->comboCurrencySelection, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &SendWidget::currencyComboChanged);
-    connect(ui->lineAmount, &QLineEdit::textEdited, this, &SendWidget::amountEdited);
-    connect(ui->lineAddress, &QLineEdit::textEdited, this, &SendWidget::addressEdited);
+    connect(ui->lineAmount, &QLineEdit::textChanged, this, &SendWidget::amountEdited);
+    connect(ui->lineAddress, &QPlainTextEdit::textChanged, this, &SendWidget::addressEdited);
     connect(ui->btn_openAlias, &QPushButton::clicked, this, &SendWidget::aliasClicked);
     ui->label_conversionAmount->setText("");
     ui->label_conversionAmount->hide();
@@ -41,6 +41,7 @@ SendWidget::SendWidget(QWidget *parent) :
                                   "You will be able to review the transaction fee before the transaction is broadcast.\n\n"
                                   "To send all your balance, click the Max button to the right.");
 
+    ui->lineAddress->setNetType(m_ctx->networkType);
     this->setupComboBox();
 }
 
@@ -50,8 +51,22 @@ void SendWidget::currencyComboChanged(int index) {
     this->amountEdited(amount);
 }
 
-void SendWidget::addressEdited(const QString &text) {
-    text.contains(".") ? ui->btn_openAlias->show() : ui->btn_openAlias->hide();
+void SendWidget::addressEdited() {
+    QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
+
+    bool freezeAmounts = outputs.size() > 0;
+
+    ui->lineAmount->setReadOnly(freezeAmounts);
+    ui->lineAmount->setFrame(!freezeAmounts);
+    ui->btnMax->setDisabled(freezeAmounts);
+
+    if (outputs.size() > 0) {
+        ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal()));
+    } else {
+        ui->lineAmount->setText("");
+    }
+
+    ui->btn_openAlias->setVisible(ui->lineAddress->isOpenAlias());
 }
 
 void SendWidget::amountEdited(const QString &text) {
@@ -69,7 +84,9 @@ void SendWidget::fill(double amount) {
 void SendWidget::fill(const QString &address, const QString &description, double amount) {
     ui->lineDescription->setText(description);
     ui->lineAddress->setText(address);
-    ui->lineAddress->setCursorPosition(0);
+
+    ui->lineAddress->moveCursor(QTextCursor::Start);
+
     if (amount > 0)
         ui->lineAmount->setText(QString::number(amount));
     this->updateConversionLabel();
@@ -77,7 +94,7 @@ void SendWidget::fill(const QString &address, const QString &description, double
 
 void SendWidget::fillAddress(const QString &address) {
     ui->lineAddress->setText(address);
-    ui->lineAddress->setCursorPosition(0);
+    ui->lineAddress->moveCursor(QTextCursor::Start);
 }
 
 void SendWidget::sendClicked() {
@@ -93,6 +110,35 @@ void SendWidget::sendClicked() {
     QString description = ui->lineDescription->text();
     if(recipient.isEmpty()) {
         QMessageBox::warning(this, "Malformed recipient", "The recipient address was not correct");
+        return;
+    }
+
+    QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
+    QVector<PayToLineError> errors = ui->lineAddress->getErrors();
+    if (errors.size() > 0 && ui->lineAddress->isMultiline()) {
+        QString errorText;
+        for (auto &error: errors) {
+            errorText += QString("Line #%1:\n%2\n").arg(QString::number(error.idx + 1), error.error);
+        }
+
+        QMessageBox::warning(this, "Warning", QString("Invalid lines found:\n\n%1").arg(errorText));
+        return;
+    }
+
+    if (outputs.size() > 0) { // multi destination transaction
+        if (outputs.size() > 16) {
+            QMessageBox::warning(this, "Warning", "Maximum number of outputs (16) exceeded.");
+            return;
+        }
+
+        QVector<QString> addresses;
+        QVector<quint64> amounts;
+        for (auto &output : outputs) {
+            addresses.push_back(output.address);
+            amounts.push_back(output.amount);
+        }
+
+        emit createTransactionMultiDest(addresses, amounts, description);
         return;
     }
 
@@ -191,6 +237,10 @@ void SendWidget::clearFields() {
     ui->lineAmount->clear();
     ui->lineDescription->clear();
     ui->label_conversionAmount->clear();
+}
+
+void SendWidget::payToMany() {
+    ui->lineAddress->payToMany();
 }
 
 void SendWidget::onWalletClosed() {

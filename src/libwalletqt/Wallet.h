@@ -266,6 +266,15 @@ public:
                                             quint64 amount, quint32 mixin_count,
                                             PendingTransaction::Priority priority);
 
+    //! creates multi-destination transaction
+    Q_INVOKABLE PendingTransaction * createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+                                                                PendingTransaction::Priority priority);
+
+    //! creates async multi-destination transaction
+    Q_INVOKABLE void createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+                                                     PendingTransaction::Priority priority);
+
+
     //! creates transaction with all outputs
     Q_INVOKABLE PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
                                                           quint32 mixin_count, PendingTransaction::Priority priority);
@@ -449,7 +458,7 @@ signals:
     void deviceShowAddressShowed();
 
     // emitted when transaction is created async
-    void transactionCreated(PendingTransaction * transaction, QString address, QString paymentId, quint32 mixinCount);
+    void transactionCreated(PendingTransaction * transaction, QVector<QString> address);
 
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;

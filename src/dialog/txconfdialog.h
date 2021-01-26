@@ -18,7 +18,7 @@ class TxConfDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, int mixin, QWidget *parent = nullptr);
+    explicit TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent = nullptr);
     ~TxConfDialog() override;
 
     bool showAdvanced = false;
@@ -31,7 +31,6 @@ private:
     PendingTransaction *m_tx;
     QString m_address;
     QString m_description;
-    int m_mixin;
 };
 
 #endif //FEATHER_TXCONFDIALOG_H

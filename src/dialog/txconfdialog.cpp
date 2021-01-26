@@ -9,14 +9,13 @@
 
 #include <QMessageBox>
 
-TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, int mixin, QWidget *parent)
+TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TxConfDialog)
         , m_ctx(ctx)
         , m_tx(tx)
         , m_address(address)
         , m_description(description)
-        , m_mixin(mixin)
 {
     ui->setupUi(this);
 
