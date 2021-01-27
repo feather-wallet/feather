@@ -74,6 +74,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->actionQuit, &QAction::triggered, this, &MainWindow::menuQuitClicked);
     connect(ui->actionSettings, &QAction::triggered, this, &MainWindow::menuSettingsClicked);
     connect(ui->actionCalculator, &QAction::triggered, this, &MainWindow::showCalcWindow);
+    connect(ui->actionPay_to_many, &QAction::triggered, this, &MainWindow::payToMany);
     connect(ui->actionWallet_cache_debug, &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
 
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
@@ -153,6 +154,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
 
     // Send widget
     connect(ui->sendWidget, &SendWidget::createTransaction, m_ctx, QOverload<const QString &, quint64, const QString &, bool>::of(&AppContext::onCreateTransaction));
+    connect(ui->sendWidget, &SendWidget::createTransactionMultiDest, m_ctx, &AppContext::onCreateTransactionMultiDest);
 
     // Nodes
     connect(m_ctx->nodes, &Nodes::nodeExhausted, this, &MainWindow::showNodeExhaustedMessage);
@@ -737,7 +739,7 @@ void MainWindow::onConnectionStatusChanged(int status)
     m_statusBtnConnectionStatusIndicator->setIcon(QIcon(statusIcon));
 }
 
-void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QString &address, const quint32 &mixin) {
+void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
     auto tx_status = tx->status();
     auto err = QString("Can't create transaction: ");
 
@@ -761,7 +763,16 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QStrin
     } else {
         const auto &description = m_ctx->tmpTxDescription;
 
-        auto *dialog = new TxConfDialog(m_ctx, tx, address, description, mixin, this);
+        // Show advanced dialog on multi-destination transactions
+        if (address.size() > 1) {
+            auto *dialog_adv = new TxConfAdvDialog(m_ctx, description, this);
+            dialog_adv->setTransaction(tx);
+            dialog_adv->exec();
+            dialog_adv->deleteLater();
+            return;
+        }
+
+        auto *dialog = new TxConfDialog(m_ctx, tx, address[0], description, this);
         switch (dialog->exec()) {
             case QDialog::Rejected:
             {
@@ -1059,6 +1070,15 @@ void MainWindow::showSendTab() {
 
 void MainWindow::showCalcWindow() {
     m_windowCalc->show();
+}
+
+void MainWindow::payToMany() {
+    ui->tabWidget->setCurrentIndex(Tabs::SEND);
+    ui->sendWidget->payToMany();
+    QMessageBox::information(this, "Pay to many", "Enter a list of outputs in the 'Pay to' field.\n"
+                                                  "One output per line.\n"
+                                                  "Format: address, amount\n"
+                                                  "A maximum of 16 addresses may be specified.");
 }
 
 void MainWindow::showSendScreen(const CCSEntry &entry) {

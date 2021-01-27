@@ -178,7 +178,7 @@ void AppContext::initWS() {
     this->ws->start();
 }
 
-void AppContext::onCancelTransaction(PendingTransaction *tx, const QString &address) {
+void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address) {
     // tx cancelled by user
     double amount = tx->amount() / globals::cdiv;
     emit createTransactionCancelled(address, amount);
@@ -235,6 +235,30 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
         this->currentWallet->createTransactionAllAsync(address, "", this->tx_mixin, this->tx_priority);
     else
         this->currentWallet->createTransactionAsync(address, "", amount, this->tx_mixin, this->tx_priority);
+
+    emit initiateTransaction();
+}
+
+void AppContext::onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description) {
+    this->tmpTxDescription = description;
+
+    if (this->currentWallet == nullptr) {
+        emit createTransactionError("Cannot create transaction; no wallet loaded");
+        return;
+    }
+
+    quint64 total_amount = 0;
+    for (auto &amount : amounts) {
+        total_amount += amount;
+    }
+
+    auto unlocked_balance = this->currentWallet->unlockedBalance();
+    if (total_amount > unlocked_balance) {
+        emit createTransactionError("Not enough money to spend");
+    }
+
+    qDebug() << "Creating tx";
+    this->currentWallet->createTransactionMultiDestAsync(addresses, amounts, this->tx_priority);
 
     emit initiateTransaction();
 }
@@ -750,15 +774,18 @@ void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, q
     }
 }
 
-void AppContext::onTransactionCreated(PendingTransaction *tx, const QString &address, const QString &paymentId, quint32 mixin) {
-    if(address == this->donationAddress)
-        this->donationSending = true;
+void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
+    for (auto &addr : address) {
+        if (addr == this->donationAddress) {
+            this->donationSending = true;
+        }
+    }
 
     // Let UI know that the transaction was constructed
     emit endTransaction();
 
     // tx created, but not sent yet. ask user to verify first.
-    emit createTransactionSuccess(tx, address, mixin);
+    emit createTransactionSuccess(tx, address);
 }
 
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){

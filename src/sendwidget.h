@@ -22,6 +22,7 @@ public:
     void fill(const QString &address, const QString& description, double amount = 0);
     void fill(double amount);
     void clearFields();
+    void payToMany();
     ~SendWidget() override;
 
 public slots:
@@ -30,7 +31,7 @@ public slots:
     void aliasClicked();
     void btnMaxClicked();
     void amountEdited(const QString &text);
-    void addressEdited(const QString &text);
+    void addressEdited();
     void currencyComboChanged(int index);
     void fillAddress(const QString &address);
     void updateConversionLabel();
@@ -45,6 +46,7 @@ public slots:
 signals:
     void resolveOpenAlias(const QString &address);
     void createTransaction(const QString &address, quint64 amount, const QString &description, bool all);
+    void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
 
 private:
     void setupComboBox();

@@ -190,7 +190,7 @@
         <item>
          <widget class="SendWidget" name="sendWidget" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
@@ -446,6 +446,7 @@
     <addaction name="menuLoad_signed_transaction"/>
     <addaction name="actionImport_transaction"/>
     <addaction name="separator"/>
+    <addaction name="actionPay_to_many"/>
     <addaction name="actionCalculator"/>
     <addaction name="actionCreateDesktopEntry"/>
    </widget>
@@ -724,6 +725,11 @@
   <action name="actionWallet_cache_debug">
    <property name="text">
     <string>Wallet cache debug</string>
+   </property>
+  </action>
+  <action name="actionPay_to_many">
+   <property name="text">
+    <string>Pay to many</string>
    </property>
   </action>
  </widget>

@@ -104,6 +104,7 @@ public slots:
     void showViewOnlyDialog();
     void donateButtonClicked();
     void showCalcWindow();
+    void payToMany();
     void showWalletCacheDebugDialog();
     void showSendTab();
     void showHistoryTab();
@@ -141,7 +142,7 @@ public slots:
     void onWalletClosed(WalletWizard::Page page = WalletWizard::Page_Menu);
     void onConnectionStatusChanged(int status);
     void onCreateTransactionError(const QString &message);
-    void onCreateTransactionSuccess(PendingTransaction *tx, const QString &address, const quint32 &mixin);
+    void onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
     void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
 
 signals:

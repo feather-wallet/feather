@@ -591,7 +591,40 @@ void Wallet::createTransactionAsync(const QString &dst_addr, const QString &paym
 {
     m_scheduler.run([this, dst_addr, payment_id, amount, mixin_count, priority] {
         PendingTransaction *tx = createTransaction(dst_addr, payment_id, amount, mixin_count, priority);
-        emit transactionCreated(tx, dst_addr, payment_id, mixin_count);
+        QVector<QString> address {dst_addr};
+        emit transactionCreated(tx, address);
+    });
+}
+
+PendingTransaction* Wallet::createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+                                                       PendingTransaction::Priority priority)
+{
+    std::vector<std::string> dests;
+    for (auto &addr : dst_addr) {
+        dests.push_back(addr.toStdString());
+    }
+
+    std::vector<uint64_t> amounts;
+    for (auto &a : amount) {
+        amounts.push_back(a);
+    }
+
+    // TODO: remove mixin count
+    Monero::PendingTransaction * ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amounts, 11, static_cast<Monero::PendingTransaction::Priority>(priority));
+    PendingTransaction * result = new PendingTransaction(ptImpl);
+    return result;
+}
+
+void Wallet::createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+                                             PendingTransaction::Priority priority)
+{
+    m_scheduler.run([this, dst_addr, amount, priority] {
+        PendingTransaction *tx = createTransactionMultiDest(dst_addr, amount, priority);
+        QVector<QString> addresses;
+        for (auto &addr : dst_addr) {
+            addresses.push_back(addr);
+        }
+        emit transactionCreated(tx, addresses);
     });
 }
 
@@ -612,7 +645,8 @@ void Wallet::createTransactionAllAsync(const QString &dst_addr, const QString &p
 {
     m_scheduler.run([this, dst_addr, payment_id, mixin_count, priority] {
         PendingTransaction *tx = createTransactionAll(dst_addr, payment_id, mixin_count, priority);
-        emit transactionCreated(tx, dst_addr, payment_id, mixin_count);
+        QVector<QString> address {dst_addr};
+        emit transactionCreated(tx, address);
     });
 }
 
@@ -630,7 +664,8 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
 {
     m_scheduler.run([this, key_image, dst_addr, outputs, priority] {
         PendingTransaction *tx = createTransactionSingle(key_image, dst_addr, outputs, priority);
-        emit transactionCreated(tx, dst_addr, "", 10); // todo: return true mixincount
+        QVector<QString> address {dst_addr};
+        emit transactionCreated(tx, address);
     });
 }
 
@@ -645,7 +680,8 @@ void Wallet::createSweepUnmixableTransactionAsync()
 {
     m_scheduler.run([this] {
         PendingTransaction *tx = createSweepUnmixableTransaction();
-        emit transactionCreated(tx, "", "", 0);
+        QVector<QString> address {""};
+        emit transactionCreated(tx, address);
     });
 }
 

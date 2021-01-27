@@ -161,6 +161,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 #endif
 
     qInstallMessageHandler(Utils::applicationLogHandler);
+    qRegisterMetaType<QVector<QString>>();
 
     auto *mainWindow = new MainWindow(ctx);
     return QApplication::exec();

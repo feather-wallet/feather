@@ -66,7 +66,7 @@ public:
 
 public slots:
     void onCountdown();
-    void onTransactionCancelled(const QString &address, double amount);
+    void onTransactionCancelled(const QVector<QString> &address, double amount);
     void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
 
     void onCreatedError();
