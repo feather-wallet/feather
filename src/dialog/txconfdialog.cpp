@@ -6,6 +6,7 @@
 #include "model/ModelUtils.h"
 #include "txconfadvdialog.h"
 #include "globals.h"
+#include "utils/ColorScheme.h"
 
 #include <QMessageBox>
 
@@ -42,20 +43,32 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     int maxLengthFiat = Utils::maxLength(amounts_fiat);
     std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
 
+    ui->label_amount->setFont(ModelUtils::getMonospaceFont());
+    ui->label_fee->setFont(ModelUtils::getMonospaceFont());
+    ui->label_total->setFont(ModelUtils::getMonospaceFont());
+
     ui->label_amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
     ui->label_total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 
     auto subaddressIndex = m_ctx->currentWallet->subaddressIndex(address);
     QString addressExtra;
-    if (subaddressIndex.first >= 0) {
-        ui->label_note->setText("Note: this is a churn transaction.");
-        ui->label_note->show();
-    }
 
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));
     ui->label_address->setFont(ModelUtils::getMonospaceFont());
     ui->label_address->setToolTip(address);
+
+    if (subaddressIndex.first >= 0) {
+        ui->label_note->setText("Note: this is a churn transaction.");
+        ui->label_note->show();
+        ui->label_address->setStyleSheet(ColorScheme::GREEN.asStylesheet(true));
+        ui->label_address->setToolTip("Wallet receive address");
+    }
+
+    if (subaddressIndex.first == 0 && subaddressIndex.second == 0) {
+        ui->label_address->setStyleSheet(ColorScheme::YELLOW.asStylesheet(true));
+        ui->label_address->setToolTip("Wallet change/primary address");
+    }
 
 
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");

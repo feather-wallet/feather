@@ -8,6 +8,7 @@
 #include <QStandardItemModel>
 #include <QAbstractButton>
 #include <QMenu>
+#include <QTextCharFormat>
 
 #include "libwalletqt/PendingTransaction.h"
 #include "appcontext.h"
@@ -40,6 +41,8 @@ private:
     void signedCopy();
     void signedQrCode();
     void signedSaveFile();
+
+    QTextCharFormat textFormat(const QString &address);
 
     Ui::TxConfAdvDialog *ui;
     AppContext *m_ctx;

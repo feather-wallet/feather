@@ -22,6 +22,7 @@
 #include "dialog/WalletCacheDebugDialog.h"
 #include "ui_mainwindow.h"
 #include "globals.h"
+#include "utils/ColorScheme.h"
 
 // libwalletqt
 #include "libwalletqt/AddressBook.h"
@@ -365,6 +366,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     this->initMenu();
 
     connect(&m_updateBytes, &QTimer::timeout, this, &MainWindow::updateNetStats);
+    ColorScheme::updateFromWidget(this);
 }
 
 void MainWindow::initMain() {
@@ -1041,6 +1043,7 @@ void MainWindow::skinChanged(const QString &skinName) {
     config()->set(Config::skin, skinName);
     qApp->setStyleSheet(m_skins[skinName]);
     qDebug() << QString("Skin changed to %1").arg(skinName);
+    ColorScheme::updateFromWidget(this);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
