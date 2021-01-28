@@ -8,6 +8,7 @@
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/Input.h"
 #include "model/ModelUtils.h"
+#include "utils/ColorScheme.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -52,7 +53,7 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx) {
 
     m_tx = tx;
     m_tx->refresh();
-    PendingTransactionInfo *ptx = m_tx->transaction(0);
+    PendingTransactionInfo *ptx = m_tx->transaction(0); //Todo: support split transactions
 
     ui->txid->setText(tx->txid().first());
 
@@ -102,12 +103,16 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     ui->inputs->setText(inputs_str);
     ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(inputs.size())));
 
-    QString outputs_str;
     auto outputs = ci->outputs();
+
+    QTextCursor cursor = ui->outputs->textCursor();
     for (const auto& o: outputs) {
-        outputs_str += QString("%1 %2\n").arg(o->address(), WalletManager::displayAmount(o->amount()));
+        auto address = o->address();
+        auto amount = WalletManager::displayAmount(o->amount());
+        cursor.insertText(address, textFormat(address));
+        cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
+        cursor.insertBlock();
     }
-    ui->outputs->setText(outputs_str);
     ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(outputs.size())));
 
     ui->label_ringSize->setText(QString("Ring size: %1").arg(QString::number(ci->minMixinCount() + 1)));
@@ -176,6 +181,23 @@ void TxConfAdvDialog::closeDialog() {
     if (m_utx != nullptr)
         m_ctx->currentWallet->disposeTransaction(m_utx);
     QDialog::reject();
+}
+
+QTextCharFormat TxConfAdvDialog::textFormat(const QString &address) {
+    auto index = m_ctx->currentWallet->subaddressIndex(address);
+    if (index.first == 0 && index.second == 0) {
+        QTextCharFormat rec;
+        rec.setBackground(QBrush(ColorScheme::YELLOW.asColor(true)));
+        rec.setToolTip("Wallet change/primary address");
+        return rec;
+    }
+    if (index.first >= 0) {
+        QTextCharFormat rec;
+        rec.setBackground(QBrush(ColorScheme::GREEN.asColor(true)));
+        rec.setToolTip("Wallet receive address");
+        return rec;
+    }
+    return QTextCharFormat();
 }
 
 TxConfAdvDialog::~TxConfAdvDialog() {

@@ -4,6 +4,7 @@
 #include "XmrToModel.h"
 #include "model/ModelUtils.h"
 #include "utils/xmrto.h"
+#include "utils/ColorScheme.h"
 
 XmrToModel::XmrToModel(QList<XmrToOrder*> *orders, QObject *parent)
         : QAbstractTableModel(parent),
@@ -61,15 +62,15 @@ QVariant XmrToModel::data(const QModelIndex &index, int role) const {
     else if(role == Qt::BackgroundRole) {
         if (_col == 0) {
             if (order->state == OrderState::Status_OrderPaid || order->state == OrderState::Status_OrderPaidUnconfirmed)
-                return QBrush(Qt::darkGreen);
+                return QBrush(ColorScheme::GREEN.asColor(true));
             else if (order->state == OrderState::Status_OrderCreating || order->state == OrderState::Status_OrderToBeCreated)
-                return QBrush(Qt::yellow);
+                return QBrush(ColorScheme::YELLOW.asColor(true));
             else if (order->state == OrderState::Status_OrderUnpaid)
-                return QBrush(Qt::cyan);
+                return QBrush(ColorScheme::YELLOW.asColor(true));
             else if (order->state == OrderState::Status_OrderBTCSent)
-                return QBrush(Qt::green);
+                return QBrush(ColorScheme::GREEN.asColor(true));
             else if (order->state == OrderState::Status_OrderFailed || order->state == OrderState::Status_OrderTimedOut)
-                return QBrush(QColor(191, 255, 0)); // lime
+                return QBrush(ColorScheme::RED.asColor(true));
         }
     }
     else if (role == Qt::FontRole) {

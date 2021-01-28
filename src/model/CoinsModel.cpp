@@ -6,6 +6,7 @@
 #include "Coins.h"
 #include "ModelUtils.h"
 #include "globals.h"
+#include "utils/ColorScheme.h"
 
 #include <QBrush>
 #include <QFont>
@@ -67,13 +68,13 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
         }
         else if (role == Qt::BackgroundRole) {
             if (cInfo.spent()) {
-                result = QBrush(QColor(255, 100, 100));
+                result = QBrush(ColorScheme::RED.asColor(true));
             }
             else if (cInfo.frozen()) {
-                result = QBrush(QColor(173, 216, 230));
+                result = QBrush(ColorScheme::BLUE.asColor(true));
             }
             else if (!cInfo.unlocked()) {
-                result = QBrush(QColor("#60993E"));
+                result = QBrush(ColorScheme::YELLOW.asColor(true));
             }
         }
         else if (role == Qt::TextAlignmentRole) {

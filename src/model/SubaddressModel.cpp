@@ -4,6 +4,7 @@
 #include "SubaddressModel.h"
 #include "Subaddress.h"
 #include "ModelUtils.h"
+#include "utils/ColorScheme.h"
 
 #include <QPoint>
 #include <QColor>
@@ -56,8 +57,13 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
             result = parseSubaddressRow(subaddress, index, role);
         }
         else if (role == Qt::BackgroundRole) {
-            if (subaddress.isUsed()) {
-                result = QBrush(QColor(255,100,100));
+            switch(index.column()) {
+                case Address:
+                {
+                    if (subaddress.isUsed()) {
+                        result = QBrush(ColorScheme::RED.asColor(true));
+                    }
+                }
             }
         }
         else if (role == Qt::FontRole) {
@@ -65,6 +71,16 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
                 case Address:
                 {
                    result = ModelUtils::getMonospaceFont();
+                }
+            }
+        }
+        else if (role == Qt::ToolTipRole) {
+            switch(index.column()) {
+                case Address:
+                {
+                    if (subaddress.isUsed()) {
+                        result = "This address is used.";
+                    }
                 }
             }
         }

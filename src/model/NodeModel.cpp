@@ -2,7 +2,8 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "NodeModel.h"
-#include <utils/nodes.h>
+#include "utils/nodes.h"
+#include "utils/ColorScheme.h"
 
 NodeModel::NodeModel(int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)
@@ -69,9 +70,9 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     }
     else if(role == Qt::BackgroundRole) {
         if (node.isConnecting)
-            return QBrush(QColor("#A9DEF9"));
+            return QBrush(ColorScheme::YELLOW.asColor(true));
         else if (node.isActive)
-            return QBrush(QColor("#78BC61"));
+            return QBrush(ColorScheme::GREEN.asColor(true));
     }
     return QVariant();
 }

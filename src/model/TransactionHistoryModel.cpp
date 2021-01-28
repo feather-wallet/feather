@@ -5,6 +5,7 @@
 #include "TransactionHistory.h"
 #include "TransactionInfo.h"
 #include "globals.h"
+#include "utils/ColorScheme.h"
 
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
