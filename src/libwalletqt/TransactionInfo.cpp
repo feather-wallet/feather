@@ -144,6 +144,10 @@ QList<QString> TransactionInfo::destinations() const
     return dests;
 }
 
+QList<Transfer*> TransactionInfo::transfers() const {
+    return m_transfers;
+}
+
 QString TransactionInfo::rings_formatted() const
 {
     QString rings;

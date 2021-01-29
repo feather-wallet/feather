@@ -42,8 +42,6 @@ private:
     void signedQrCode();
     void signedSaveFile();
 
-    QTextCharFormat textFormat(const QString &address);
-
     Ui::TxConfAdvDialog *ui;
     AppContext *m_ctx;
     PendingTransaction *m_tx = nullptr;
@@ -51,7 +49,5 @@ private:
     QMenu *m_exportUnsignedMenu;
     QMenu *m_exportSignedMenu;
 };
-
-
 
 #endif //FEATHER_TXCONFADVDIALOG_H

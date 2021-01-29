@@ -5,6 +5,7 @@
 #define FEATHER_TRANSACTIONINFODIALOG_H
 
 #include <QDialog>
+#include <QTextCharFormat>
 #include <QtSvg/QSvgWidget>
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/TransactionInfo.h"
@@ -24,11 +25,14 @@ public:
     ~TransactionInfoDialog() override;
 
 private:
+    void copyTxKey();
+
     Ui::TransactionInfoDialog *ui;
 
     TransactionInfo *m_txInfo;
     Wallet *m_wallet;
     TxProofWidget *m_txProofWidget;
+    QString m_txKey;
 };
 
 #endif //FEATHER_TRANSACTIONINFODIALOG_H

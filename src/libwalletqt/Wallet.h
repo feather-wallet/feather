@@ -30,6 +30,22 @@ struct TxProof {
     QString error;
 };
 
+struct SubaddressIndex {
+    SubaddressIndex(int major, int minor)
+        : major(major), minor(minor) {}
+
+    bool isValid() const {
+        return major >= 0 && minor >= 0;
+    }
+
+    bool isPrimary() const {
+        return major == 0 && minor == 0;
+    }
+
+    int major;
+    int minor;
+};
+
 class TransactionHistory;
 class TransactionHistoryModel;
 class TransactionHistoryProxyModel;
@@ -139,9 +155,8 @@ public:
     //! returns wallet's public address
     Q_INVOKABLE QString address(quint32 accountIndex, quint32 addressIndex) const;
 
-    //! returns the subaddress index (major, minor) of the address
-    // (-1, -1) if address does not belong to wallet
-    Q_INVOKABLE QPair<int, int> subaddressIndex(const QString &address) const;
+    //! returns the subaddress index of the address
+    Q_INVOKABLE SubaddressIndex subaddressIndex(const QString &address) const;
 
     //! returns wallet file's path
     QString path() const;
