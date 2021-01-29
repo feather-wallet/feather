@@ -10,7 +10,10 @@
       "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
       "3t7v5zpcfxq2tocdofdcwxgrldco3elotz3iis4jtbbnscy5alezw7yd.onion:18081",
       "4mslnrs5sfjxrb35.onion:18081",
-      "aytzr6aoxsegx2y6.onion:18081"
+      "aytzr6aoxsegx2y6.onion:18081",
+      "rbpgdckle3h3vi4wwwrh75usqtoc5r3alohy7yyx57isynvay63nacyd.onion:18089",
+      "slvb7iuq6rwj4gjbbfwile5piamhnllwk3s5vqccn2hqvz2nmrkvpiid.onion:18089",
+      "wq7o3snkc65onqc3rjdoynnsve2z22aqs3gixdtaaayx4qhgbz74auqd.onion:18089"
     ],
     "clearnet": [
       "eu-west.node.xmr.pm:18089",
@@ -24,7 +27,10 @@
       "xmr-node-usa-east.cakewallet.com:18081",
       "node.xmr.ru:18081",
       "selsta1.featherwallet.net:18081",
-      "selsta2.featherwallet.net:18081"
+      "selsta2.featherwallet.net:18081",
+      "node-1.sethsimmons.me:18089",
+      "node-2.sethsimmons.me:18089",
+      "node-3.sethsimmons.me:18089"
     ]
   },
   "stagenet": {
