@@ -6,7 +6,9 @@
 
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/WalletManager.h"
+#include "libwalletqt/Transfer.h"
 #include "utils.h"
+#include "utils/ColorScheme.h"
 
 #include <QMessageBox>
 
@@ -23,12 +25,16 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
     ui->label_txid->setText(QString(txInfo->hash()));
 
     if (txInfo->direction() == TransactionInfo::Direction_In) {
-        ui->txKey->hide();
+        ui->frameTxKey->hide();
     } else {
         QString txKey = m_wallet->getTxKey(txInfo->hash());
-        txKey = txKey.isEmpty() ? "unknown" : txKey;
-        ui->label_txKey->setText(txKey);
+        if (txKey.isEmpty()) {
+            ui->btn_CopyTxKey->setEnabled(false);
+            ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
+        }
+        m_txKey = txKey;
     }
+    connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TransactionInfoDialog::copyTxKey);
 
     QString blockHeight = QString::number(txInfo->blockHeight());
     if (blockHeight == "0")
@@ -47,16 +53,26 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
 
     qDebug() << m_wallet->coins()->coins_from_txid(txInfo->hash());
 
-    QString destinations = txInfo->destinations_formatted();
-    if (destinations.isEmpty()) {
+    QTextCursor cursor = ui->destinations->textCursor();
+    for (const auto& transfer : txInfo->transfers()) {
+        auto address = transfer->address();
+        auto amount = WalletManager::displayAmount(transfer->amount());
+        auto index = m_wallet->subaddressIndex(address);
+        cursor.insertText(address, Utils::addressTextFormat(index));
+        cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
+        cursor.insertBlock();
+    }
+    if (txInfo->transfers().size() == 0) {
         ui->frameDestinations->hide();
-    } else {
-        ui->destinations->setText(destinations);
     }
 
     ui->txProofWidget->addWidget(m_txProofWidget);
 
     this->adjustSize();
+}
+
+void TransactionInfoDialog::copyTxKey() {
+    Utils::copyToClipboard(m_txKey);
 }
 
 TransactionInfoDialog::~TransactionInfoDialog() {

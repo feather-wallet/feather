@@ -109,7 +109,8 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     for (const auto& o: outputs) {
         auto address = o->address();
         auto amount = WalletManager::displayAmount(o->amount());
-        cursor.insertText(address, textFormat(address));
+        auto index = m_ctx->currentWallet->subaddressIndex(address);
+        cursor.insertText(address, Utils::addressTextFormat(index));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
     }
@@ -181,23 +182,6 @@ void TxConfAdvDialog::closeDialog() {
     if (m_utx != nullptr)
         m_ctx->currentWallet->disposeTransaction(m_utx);
     QDialog::reject();
-}
-
-QTextCharFormat TxConfAdvDialog::textFormat(const QString &address) {
-    auto index = m_ctx->currentWallet->subaddressIndex(address);
-    if (index.first == 0 && index.second == 0) {
-        QTextCharFormat rec;
-        rec.setBackground(QBrush(ColorScheme::YELLOW.asColor(true)));
-        rec.setToolTip("Wallet change/primary address");
-        return rec;
-    }
-    if (index.first >= 0) {
-        QTextCharFormat rec;
-        rec.setBackground(QBrush(ColorScheme::GREEN.asColor(true)));
-        rec.setToolTip("Wallet receive address");
-        return rec;
-    }
-    return QTextCharFormat();
 }
 
 TxConfAdvDialog::~TxConfAdvDialog() {

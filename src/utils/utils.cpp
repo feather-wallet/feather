@@ -14,6 +14,7 @@
 #include "utils/config.h"
 #include "utils/tails.h"
 #include "utils/whonix.h"
+#include "utils/ColorScheme.h"
 #include "globals.h"
 
 // Application log for current session
@@ -550,4 +551,20 @@ QString Utils::balanceFormat(quint64 balance) {
     str.remove(QRegExp("\\.$"));
 
     return str;
+}
+
+QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index) {
+    if (index.isPrimary()) {
+        QTextCharFormat rec;
+        rec.setBackground(QBrush(ColorScheme::YELLOW.asColor(true)));
+        rec.setToolTip("Wallet change/primary address");
+        return rec;
+    }
+    if (index.isValid()) {
+        QTextCharFormat rec;
+        rec.setBackground(QBrush(ColorScheme::GREEN.asColor(true)));
+        rec.setToolTip("Wallet receive address");
+        return rec;
+    }
+    return QTextCharFormat();
 }

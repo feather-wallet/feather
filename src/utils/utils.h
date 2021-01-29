@@ -11,11 +11,13 @@
 #include <QtNetwork>
 #include <QApplication>
 #include <QMainWindow>
+#include <QTextCharFormat>
 #include <sstream>
 
 #include <monero_seed/monero_seed.hpp>
 
 #include "networktype.h"
+#include "libwalletqt/Wallet.h"
 
 struct logMessage
 {
@@ -99,6 +101,7 @@ public:
     static int maxLength(const QVector<QString> &array);
     static QMap<QString, QLocale> localeCache;
     static QString balanceFormat(quint64 balance);
+    static QTextCharFormat addressTextFormat(const SubaddressIndex &index);
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)

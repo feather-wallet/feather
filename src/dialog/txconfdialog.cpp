@@ -58,14 +58,14 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     ui->label_address->setFont(ModelUtils::getMonospaceFont());
     ui->label_address->setToolTip(address);
 
-    if (subaddressIndex.first >= 0) {
+    if (subaddressIndex.isValid()) {
         ui->label_note->setText("Note: this is a churn transaction.");
         ui->label_note->show();
         ui->label_address->setStyleSheet(ColorScheme::GREEN.asStylesheet(true));
         ui->label_address->setToolTip("Wallet receive address");
     }
 
-    if (subaddressIndex.first == 0 && subaddressIndex.second == 0) {
+    if (subaddressIndex.isPrimary()) {
         ui->label_address->setStyleSheet(ColorScheme::YELLOW.asStylesheet(true));
         ui->label_address->setToolTip("Wallet change/primary address");
     }

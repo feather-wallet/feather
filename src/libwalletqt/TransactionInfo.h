@@ -76,6 +76,7 @@ public:
     //! used in tx details popup
     QList<QString> destinations() const;
     QString destinations_formatted() const;
+    QList<Transfer*> transfers() const;
     QString rings_formatted() const;
 
 private:
