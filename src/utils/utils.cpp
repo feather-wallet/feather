@@ -21,12 +21,6 @@
 QVector<logMessage> applicationLog = QVector<logMessage>(); // todo: replace with ring buffer
 QMutex logMutex;
 
-void Utils::openWindow(QWidget *w) {
-    auto first_screen = QApplication::screens()[0];
-    w->setGeometry(QStyle::alignedRect(Qt::LeftToRight, Qt::AlignCenter, w->size(), first_screen->availableGeometry()));
-    w->show();
-}
-
 bool Utils::fileExists(const QString &path) {
     QFileInfo check_file(path);
     return check_file.exists() && check_file.isFile();
@@ -69,16 +63,6 @@ bool Utils::fileWrite(const QString &path, const QString &data) {
     return false;
 }
 
-QString Utils::systemAccountName(){
-    QString accountName = qgetenv("USER"); // mac/linux
-    if (accountName.isEmpty())
-        return qgetenv("USERNAME"); // Windows
-    if (accountName.isEmpty())
-        qDebug() << "accountName was empty";
-
-    return "";
-}
-
 bool Utils::validateJSON(const QByteArray &blob) {
     QJsonDocument doc = QJsonDocument::fromJson(blob);
     QString jsonString = doc.toJson(QJsonDocument::Indented);
@@ -94,18 +78,6 @@ bool Utils::readJsonFile(QIODevice &device, QSettings::SettingsMap &map) {
 bool Utils::writeJsonFile(QIODevice &device, const QSettings::SettingsMap &map) {
     device.write(QJsonDocument(QJsonObject::fromVariantMap(map)).toJson(QJsonDocument::Indented));
     return true;
-}
-
-QStringList Utils::readJsonStringToQStringList(const QString &input) {
-    QStringList data;
-
-    QJsonDocument doc = QJsonDocument::fromJson(input.toUtf8());
-    QJsonObject object = doc.object();
-    QJsonArray array = doc.array();
-
-    for(auto &&entry: array)
-        data << entry.toString();
-    return data;
 }
 
 void Utils::applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg) {
@@ -147,19 +119,6 @@ void Utils::applicationLogHandler(QtMsgType type, const QMessageLogContext &cont
     //emit applicationLogUpdated(message);
 }
 
-QByteArray Utils::zipExtract(const QString &path, const QString& destination) {
-    Q_UNUSED(path)
-    Q_UNUSED(destination)
-    return QByteArray();
-}
-
-bool Utils::isDigit(const QString& inp) {
-    for (auto &&i : inp) {
-        if(!i.isDigit()) return false;
-    }
-    return true;
-}
-
 void Utils::desktopNotify(const QString &title, const QString &message, int duration) {
     QStringList notify_send = QStringList() << title << message << "-t" << QString::number(duration);
     QStringList kdialog = QStringList() << title << message;
@@ -191,20 +150,6 @@ bool Utils::portOpen(const QString &hostname, quint16 port){
 
 QString Utils::barrayToString(const QByteArray &data) {
     return QString(QTextCodec::codecForMib(106)->toUnicode(data));
-}
-
-QByteArray Utils::readSocket(QTcpSocket &socket, int buffer_size) {
-    QByteArray data;
-    if(!socket.waitForReadyRead(6000))
-        return data;
-
-    while(buffer_size > 0 && socket.bytesAvailable() > 0){
-        QByteArray _data = socket.read(buffer_size);
-        buffer_size -= _data.size();
-        data += _data;
-    }
-
-    return data;
 }
 
 void Utils::externalLinkWarning(QWidget *parent, const QString &url){
@@ -262,12 +207,6 @@ QStringList Utils::fileFind(const QRegExp &pattern, const QString &baseDir, int 
     return rtn;
 }
 
-bool Utils::walletExists(QString name, const QString &path) {
-    name = name.replace(".keys", "");
-    auto walletPath = QDir(path).filePath(name + ".keys");
-    return Utils::fileExists(walletPath);
-}
-
 void Utils::copyToClipboard(const QString &string){
     QClipboard * clipboard = QApplication::clipboard();
     if (!clipboard) {
@@ -319,45 +258,6 @@ QString Utils::blockExplorerLink(const QString &blockExplorer, NetworkType::Type
     }
 
     return QString("");
-}
-
-QList<processStruct> Utils::procList() {
-    // windows maybe: https://stackoverflow.com/a/13635377/2054778
-    QList<processStruct> rtn;
-    QProcess process;
-#if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-#if defined(Q_OS_MAC)
-    process.start("ps", QStringList() << "-wwaxo" << "pid,command");
-#elif defined(Q_OS_LINUX)
-    process.start("ps", QStringList() << "-wwaxo" << "pid,command");
-#endif
-    process.waitForFinished(-1);
-
-    QString stdout = process.readAllStandardOutput();
-    QString stderr = process.readAllStandardError();
-
-    if(stdout.isEmpty())
-        return rtn;
-
-    QStringList spl = stdout.split("\n");
-    if(spl.count() >= 1)
-        spl.removeAt(0);
-
-    for (auto& line: spl) {
-        line = line.trimmed();
-        if(line.isEmpty())
-           continue;
-
-        QStringList _spl = line.split(" ");
-        processStruct ps;
-        if(_spl.length() >= 2) {
-            ps.pid = _spl.at(0).toInt();
-            ps.command = _spl.at(1);
-            rtn.append(ps);
-        }
-    }
-#endif
-    return rtn;
 }
 
 QStandardItem *Utils::qStandardItem(const QString& text) {
