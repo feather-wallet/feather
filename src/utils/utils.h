@@ -4,15 +4,10 @@
 #ifndef FEATHER_UTILS_H
 #define FEATHER_UTILS_H
 
-#include <cstdio>
-#include <cstdlib>
 #include <QRegExp>
 #include <QStandardItemModel>
-#include <QtNetwork>
 #include <QApplication>
-#include <QMainWindow>
 #include <QTextCharFormat>
-#include <sstream>
 
 #include <monero_seed/monero_seed.hpp>
 
@@ -29,18 +24,6 @@ struct logMessage
     QtMsgType type;
     QString message;
     QString fn;
-};
-
-struct networkPeer {
-    QString host;
-    quint16 port;
-    bool active = false;
-};
-
-struct processStruct {
-    int pid = 0;
-    QString command;
-    QFileInfo fileInfo;
 };
 
 struct xdgDesktopEntryPaths {
@@ -60,28 +43,19 @@ class Utils
 
 public:
     static bool portOpen(const QString &hostname, quint16 port);
-    static bool isDigit(const QString &inp);
     static bool fileExists(const QString &path);
     static QByteArray fileOpen(const QString &path);
     static QByteArray fileOpenQRC(const QString &path);
     static void desktopNotify(const QString &title, const QString &message, int duration);
     static bool fileWrite(const QString &path, const QString &data);
     static QStringList fileFind(const QRegExp &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
-    static QString systemAccountName();
-    static QByteArray zipExtract(const QString &path, const QString& destination);
     static bool validateJSON(const QByteArray &blob);
     static bool readJsonFile(QIODevice &device, QSettings::SettingsMap &map);
-    static bool walletExists(QString name, const QString &path);
     static bool writeJsonFile(QIODevice &device, const QSettings::SettingsMap &map);
-    static QStringList readJsonStringToQStringList(const QString &input);
     static void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
-    static void openWindow(QWidget *w);
     static void externalLinkWarning(QWidget *parent, const QString &url);
-    static QList<processStruct> procList();
     static bool dirExists(const QString &path);
     static QString barrayToString(const QByteArray &data);
-    static QByteArray readSocket(QTcpSocket &socket, int buffer_size);
-
     static QStandardItem *qStandardItem(const QString &text);
     static QStandardItem *qStandardItem(const QString &text, QFont &font);
     static void copyToClipboard(const QString &string);
@@ -111,7 +85,5 @@ public:
 };
 
 class AppContext;  // forward declaration
-
-
 
 #endif //FEATHER_UTILS_H
