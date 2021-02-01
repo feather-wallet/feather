@@ -122,10 +122,6 @@ if(DONATE_BEG)
     target_compile_definitions(feather PRIVATE DONATE_BEG=1)
 endif()
 
-if(XMRTO)
-    target_compile_definitions(feather PRIVATE HAS_XMRTO=1)
-endif()
-
 if(TOR_BIN)
     target_compile_definitions(feather PRIVATE HAS_TOR_BIN=1)
 endif()

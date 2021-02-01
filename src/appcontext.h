@@ -14,7 +14,6 @@
 #include "utils/prices.h"
 #include "utils/networking.h"
 #include "utils/tor.h"
-#include "utils/xmrto.h"
 #include "utils/xmrig.h"
 #include "utils/wsclient.h"
 #include "utils/txfiathistory.h"
@@ -81,7 +80,6 @@ public:
 
     Tor *tor{};
     WSClient *ws;
-    XmrTo *XMRTo;
     XmRig *XMRig;
     Nodes *nodes;
     static Prices *prices;
@@ -114,7 +112,6 @@ public:
 public slots:
     void onOpenWallet(const QString& path, const QString &password);
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
-    void onCreateTransaction(XmrToOrder *order);
     void onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
     void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
     void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;

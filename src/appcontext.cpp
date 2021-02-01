@@ -132,11 +132,6 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     // fiat/crypto lookup
     AppContext::prices = new Prices();
 
-    // xmr.to
-#ifdef HAS_XMRTO
-    this->XMRTo = new XmrTo(this);
-#endif
-
     // XMRig
 #ifdef HAS_XMRIG
     this->XMRig = new XmRig(this->configDirectory, this);
@@ -171,7 +166,6 @@ void AppContext::initTor() {
         if (m_wsUrl.host().endsWith(".onion"))
             this->ws->webSocket.setProxy(*networkProxy);
     }
-
 }
 
 void AppContext::initWS() {
@@ -197,13 +191,6 @@ void AppContext::onSweepOutput(const QString &keyImage, QString address, bool ch
 
     qCritical() << "Creating transaction";
     this->currentWallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
-}
-
-void AppContext::onCreateTransaction(XmrToOrder *order) {
-    // tx creation via xmr.to
-    const QString description = QString("XmrTo order %1").arg(order->uuid);
-    quint64 amount = WalletManager::amountFromDouble(order->incoming_amount_total);
-    this->onCreateTransaction(order->receiving_subaddress, amount, description, false);
 }
 
 void AppContext::onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
@@ -434,12 +421,6 @@ void AppContext::onWSMessage(const QJsonObject &msg) {
         QJsonObject fiat_rates = msg.value("data").toObject();
         AppContext::prices->fiatPricesReceived(fiat_rates);
     }
-#if defined(HAS_XMRTO)
-    else if(cmd == "xmrto_rates") {
-        auto xmr_rates = msg.value("data").toObject();
-        this->XMRTo->onRatesReceived(xmr_rates);
-    }
-#endif
     else if(cmd == "reddit") {
         QJsonArray reddit_data = msg.value("data").toArray();
         this->onWSReddit(reddit_data);
