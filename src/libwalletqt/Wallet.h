@@ -31,8 +31,10 @@ struct TxProof {
 };
 
 struct SubaddressIndex {
-    SubaddressIndex(int major, int minor)
-        : major(major), minor(minor) {}
+    SubaddressIndex(int major, int minor) {
+        this->major = major;
+        this->minor = minor;
+    }
 
     bool isValid() const {
         return major >= 0 && minor >= 0;
