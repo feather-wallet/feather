@@ -97,22 +97,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->actionShow_debug_info, &QAction::triggered, this, &MainWindow::showDebugInfo);
     connect(ui->actionOfficialWebsite, &QAction::triggered, [=] { Utils::externalLinkWarning(this, "https://featherwallet.org"); });
 
-#if defined(HAS_XMRTO)
-    // xmr.to connects/widget
-    connect(ui->xmrToWidget, &XMRToWidget::viewOrder, m_ctx->XMRTo, &XmrTo::onViewOrder);
-    connect(ui->xmrToWidget, &XMRToWidget::getRates, m_ctx->XMRTo, &XmrTo::onGetRates);
-    connect(ui->xmrToWidget, &XMRToWidget::createOrder, m_ctx->XMRTo, &XmrTo::createOrder);
-    connect(m_ctx->XMRTo, &XmrTo::ratesUpdated, ui->xmrToWidget, &XMRToWidget::onRatesUpdated);
-    connect(m_ctx->XMRTo, &XmrTo::connectionError, ui->xmrToWidget, &XMRToWidget::onConnectionError);
-    connect(m_ctx->XMRTo, &XmrTo::connectionSuccess, ui->xmrToWidget, &XMRToWidget::onConnectionSuccess);
-    connect(m_ctx, &AppContext::balanceUpdated, ui->xmrToWidget, &XMRToWidget::onBalanceUpdated);
-    connect(m_ctx->XMRTo, &XmrTo::openURL, this, [=](const QString &url){ Utils::externalLinkWarning(this, url); });
-    connect(m_ctx, &AppContext::walletClosed, ui->xmrToWidget, &XMRToWidget::onWalletClosed);
-    ui->xmrToWidget->setHistoryModel(m_ctx->XMRTo->tableModel);
-#else
-    ui->tabExchanges->setTabVisible(0, false);
-#endif
-
 #if defined(Q_OS_LINUX)
     // system tray
     m_trayIcon = new QSystemTrayIcon(QIcon(":/assets/images/appicons/64x64.png"));
@@ -224,10 +208,6 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     // Send
     connect(m_ctx, &AppContext::initiateTransaction, ui->sendWidget, &SendWidget::onInitiateTransaction);
     connect(m_ctx, &AppContext::endTransaction, ui->sendWidget, &SendWidget::onEndTransaction);
-
-    // XMR.to
-    connect(m_ctx, &AppContext::initiateTransaction, ui->xmrToWidget, &XMRToWidget::onInitiateTransaction);
-    connect(m_ctx, &AppContext::endTransaction, ui->xmrToWidget, &XMRToWidget::onEndTransaction);
 
     connect(m_ctx, &AppContext::initiateTransaction, [this]{
         m_statusDots = 0;
@@ -421,13 +401,8 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
-#if defined(HAS_XMRTO)
-    connect(ui->actionShow_Exchange, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Exchange"] = new ToggleTab(ui->tabExchange, "Exchange", "Exchange", ui->actionShow_Exchange, Config::showTabExchange);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Exchange, "Exchange");
-#else
     ui->actionShow_Exchange->setVisible(false);
-#endif
+    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, false);
 
 #if defined(HAS_XMRIG)
     connect(ui->actionShow_XMRig, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));

@@ -34,6 +34,7 @@
     <file>assets/images/cutexmrfox.png</file>
     <file>assets/images/edit.png</file>
     <file>assets/images/exchange.png</file>
+    <file>assets/images/exchange_white.png</file>
     <file>assets/images/expired.png</file>
     <file>assets/images/expired_icon.png</file>
     <file>assets/images/eye1.png</file>
@@ -97,8 +98,6 @@
     <file>assets/images/unpaid.png</file>
     <file>assets/images/update.png</file>
     <file>assets/images/warning.png</file>
-    <file>assets/images/xmrto_big.png</file>
-    <file>assets/images/xmrto.png</file>
     <file>assets/images/xmrig.ico</file>
     <file>assets/images/xmrig.svg</file>
     <file>assets/images/zoom.png</file>

@@ -41,7 +41,6 @@ via the `CMAKE_PREFIX_PATH` definition. For me this is:
 
 There are some Monero/Feather related options/definitions that you may pass:
 
-- `-DXMRTO=OFF` - disable Xmr.To feature
 - `-DXMRIG=OFF` - disable XMRig feature
 - `-DTOR_BIN=/path/to/tor` - Embed a Tor executable inside Feather
 - `-DDONATE_BEG=OFF` - disable the dreaded donate requests

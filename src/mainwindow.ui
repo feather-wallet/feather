@@ -293,39 +293,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item>
-         <widget class="QTabWidget" name="tabExchanges">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="tabXMRto">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/xmrto.png</normaloff>:/assets/images/xmrto.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>XMR.to</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_10">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="XMRToWidget" name="xmrToWidget" native="true"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabXmrRig">
@@ -763,12 +730,6 @@
    <class>HistoryWidget</class>
    <extends>QWidget</extends>
    <header>historywidget.h</header>
-  </customwidget>
-  <customwidget>
-   <class>XMRToWidget</class>
-   <extends>QWidget</extends>
-   <header>xmrtowidget.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>CalcWidget</class>
