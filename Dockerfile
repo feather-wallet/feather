@@ -1,4 +1,71 @@
-FROM ubuntu:18.04
+FROM ubuntu:18.04 AS tor
+
+ENV CFLAGS="-fPIC"
+ENV CPPFLAGS="-fPIC"
+ENV CXXFLAGS="-fPIC"
+ENV SOURCE_DATE_EPOCH=1397818193
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y build-essential wget git automake pkg-config python python3 && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
+    echo "e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 openssl-1.1.1i.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1i.tar.gz && \
+    rm openssl-1.1.1i.tar.gz && \
+    cd openssl-1.1.1i && \
+    ./config no-shared no-dso --prefix=/usr/local/openssl && \
+    make -j$THREADS && \
+    make test && \
+    make -j$THREADS install_sw && \
+    rm -rf $(pwd)
+
+RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz && \
+    echo "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb libevent-2.1.12-stable.tar.gz" | sha256sum -c && \
+    tar -zxvf libevent-2.1.12-stable.tar.gz && \
+    cd libevent-2.1.12-stable && \
+    PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig/ \
+    ./configure --prefix=/usr/local/libevent \
+                --disable-shared \
+                --enable-static \
+                --with-pic && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
+    cd zlib && \
+    git reset --hard cacf7f1d4e3d44d871b605da3b647f07d718623f && \
+    ./configure --static --prefix=/usr/local/zlib && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && \
+    cd tor && \
+    git reset --hard 9e26a9399fe2422475406d6ee3cb29b2924f3274 && \
+    ./autogen.sh && \
+    ./configure \
+    --disable-asciidoc \
+    --disable-manpage \
+    --disable-html-manual \
+    --disable-system-torrc \
+    --disable-module-relay \
+    --disable-lzma \
+    --disable-zstd \
+    --enable-static-tor \
+    --with-libevent-dir=/usr/local/libevent \
+    --with-openssl-dir=/usr/local/openssl-1.0.2u \
+    --with-zlib-dir=/usr/local/zlib \
+    --disable-tool-name-check \
+    --enable-fatal-warnings \
+    --prefix=/usr/local/tor && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
+FROM ubuntu:16.04
 
 ARG THREADS=1
 ARG QT_VERSION=5.15.2
@@ -7,6 +74,8 @@ ENV CFLAGS="-fPIC"
 ENV CPPFLAGS="-fPIC"
 ENV CXXFLAGS="-fPIC"
 ENV SOURCE_DATE_EPOCH=1397818193
+
+COPY --from=tor /usr/local/tor/bin/tor /usr/local/tor/bin/tor
 
 RUN apt-get update && \
     apt-get install -y \
@@ -22,7 +91,7 @@ RUN apt-get update && \
 # libusb
     libudev-dev \
 # fontconfig
-    autopoint gettext gperf libpng-dev \
+    autopoint gettext gperf libpng12-dev \
 # libxcb
     libpthread-stubs0-dev \
 # xorgproto
@@ -315,54 +384,6 @@ RUN git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && 
     cd libqrencode && \
     git reset --hard 59ee597f913fcfda7a010a6e106fbee2595f68e4 && \
     cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr . && \
-    make -j$THREADS && \
-    make -j$THREADS install && \
-    rm -rf $(pwd)
-
-RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/libevent-2.1.12-stable.tar.gz && \
-    echo "92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb libevent-2.1.12-stable.tar.gz" | sha256sum -c && \
-    tar -zxvf libevent-2.1.12-stable.tar.gz && \
-    cd libevent-2.1.12-stable && \
-    PKG_CONFIG_PATH=/usr/local/openssl/lib/pkgconfig/ \
-    ./configure --prefix=/usr/local/libevent \
-                --disable-shared \
-                --enable-static \
-                --with-pic && \
-    make -j$THREADS && \
-    make -j$THREADS install && \
-    rm -rf $(pwd)
-
-# Todo: Tor will not static link with 1.1.1i
-RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
-    echo "ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16 openssl-1.0.2u.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.0.2u.tar.gz && \
-    rm openssl-1.0.2u.tar.gz && \
-    cd openssl-1.0.2u && \
-    ./config no-shared no-dso --prefix=/usr/local/openssl-1.0.2u && \
-    make -j$THREADS && \
-    make test && \
-    make -j$THREADS install_sw && \
-    rm -rf $(pwd)
-
-RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && \
-    cd tor && \
-    git reset --hard 9e26a9399fe2422475406d6ee3cb29b2924f3274 && \
-    ./autogen.sh && \
-    ./configure \
-    --disable-asciidoc \
-    --disable-manpage \
-    --disable-html-manual \
-    --disable-system-torrc \
-    --disable-module-relay \
-    --disable-lzma \
-    --disable-zstd \
-    --enable-static-tor \
-    --with-libevent-dir=/usr/local/libevent \
-    --with-openssl-dir=/usr/local/openssl-1.0.2u \
-    --with-zlib-dir=/usr/local/zlib \
-    --disable-tool-name-check \
-    --enable-fatal-warnings \
-    --prefix=/usr/local/tor && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)
