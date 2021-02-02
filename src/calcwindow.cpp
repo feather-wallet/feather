@@ -14,7 +14,7 @@ CalcWindow::CalcWindow(QWidget *parent) :
     this->setWindowFlags(flags|Qt::WindowStaysOnTopHint); // on top
 
     ui->setupUi(this);
-    this->setWindowIcon(QIcon("://assets/images/coldcard.png"));
+    this->setWindowIcon(QIcon("://assets/images/gnome-calc.png"));
 
     connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &CalcWindow::initFiat);
     connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &CalcWindow::initCrypto);
