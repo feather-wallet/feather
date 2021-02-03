@@ -61,7 +61,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     m_coins = coins;
     m_model = model;
-    m_proxyModel = new CoinsProxyModel(this);
+    m_proxyModel = new CoinsProxyModel(this, m_coins);
     m_proxyModel->setSourceModel(m_model);
     ui->coins->setModel(m_proxyModel);
     ui->coins->setColumnHidden(CoinsModel::Spent, true);
@@ -135,7 +135,8 @@ void CoinsWidget::setShowSpent(bool show)
 
 void CoinsWidget::freezeOutput() {
     QModelIndex index = ui->coins->currentIndex();
-    emit freeze(m_proxyModel->mapToSource(index).row());
+    QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
+    emit freeze(indexes);
 }
 
 void CoinsWidget::freezeAllSelected() {
@@ -145,12 +146,13 @@ void CoinsWidget::freezeAllSelected() {
     for (QModelIndex index: list) {
         indexes.push_back(m_proxyModel->mapToSource(index).row()); // todo: will segfault if index get invalidated
     }
-    emit freezeMulti(indexes);
+    emit freeze(indexes);
 }
 
 void CoinsWidget::thawOutput() {
     QModelIndex index = ui->coins->currentIndex();
-    emit thaw(m_proxyModel->mapToSource(index).row());
+    QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
+    emit thaw(indexes);
 }
 
 void CoinsWidget::thawAllSelected() {
@@ -160,7 +162,7 @@ void CoinsWidget::thawAllSelected() {
     for (QModelIndex index: list) {
         indexes.push_back(m_proxyModel->mapToSource(index).row());
     }
-    emit thawMulti(indexes);
+    emit thaw(indexes);
 }
 
 void CoinsWidget::viewOutput() {
