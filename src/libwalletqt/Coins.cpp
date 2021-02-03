@@ -36,10 +36,6 @@ void Coins::refresh(quint32 accountIndex)
 
         m_pimpl->refresh();
         for (const auto i : m_pimpl->getAll()) {
-            if (i->subaddrAccount() != accountIndex) {
-                continue;
-            }
-
             m_tinfo.append(new CoinsInfo(i, this));
         }
     }

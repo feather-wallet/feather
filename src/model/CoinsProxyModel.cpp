@@ -3,17 +3,22 @@
 
 #include "CoinsProxyModel.h"
 #include "CoinsModel.h"
+#include "libwalletqt/CoinsInfo.h"
 
-CoinsProxyModel::CoinsProxyModel(QObject *parent)
-    : QSortFilterProxyModel(parent)
+CoinsProxyModel::CoinsProxyModel(QObject *parent, Coins *coins)
+    : QSortFilterProxyModel(parent), m_coins(coins)
 {
     setSortRole(Qt::UserRole);
 }
 
 bool CoinsProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    QModelIndex spentIndex = sourceModel()->index(sourceRow, CoinsModel::Spent, sourceParent);
-    bool isSpent = sourceModel()->data(spentIndex).toBool();
+    bool isSpent;
+    int accountIndex;
+    m_coins->coin(sourceRow, [&isSpent, &accountIndex](const CoinsInfo &c){
+        isSpent = c.spent();
+        accountIndex = c.subaddrAccount();
+    });
 
-    return !(!m_showSpent && isSpent);
+    return !(!m_showSpent && isSpent) && accountIndex == 0;
 }

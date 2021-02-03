@@ -289,30 +289,19 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_ctx, &AppContext::openAliasResolved, ui->sendWidget, &SendWidget::onOpenAliasResolved);
 
     // Coins
-    connect(ui->coinsWidget, &CoinsWidget::freeze, [=](int index) {
-        m_ctx->currentWallet->coins()->freeze(index);
-        m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
-        m_ctx->updateBalance();
-        // subaddress account filtering should be done in Model maybe, so we can update data in coins() directly
-    });
-    connect(ui->coinsWidget, &CoinsWidget::freezeMulti, [&](const QVector<int>& indexes) {
+    connect(ui->coinsWidget, &CoinsWidget::freeze, [&](const QVector<int>& indexes) {
         for (int i : indexes) {
             m_ctx->currentWallet->coins()->freeze(i);
-            m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
-            m_ctx->updateBalance();
         }
-    });
-    connect(ui->coinsWidget, &CoinsWidget::thaw, [=](int index) {
-        m_ctx->currentWallet->coins()->thaw(index);
         m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
         m_ctx->updateBalance();
     });
-    connect(ui->coinsWidget, &CoinsWidget::thawMulti, [&](const QVector<int>& indexes) {
+    connect(ui->coinsWidget, &CoinsWidget::thaw, [&](const QVector<int>& indexes) {
         for (int i : indexes) {
             m_ctx->currentWallet->coins()->thaw(i);
-            m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
-            m_ctx->updateBalance();
         }
+        m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
+        m_ctx->updateBalance();
     });
     connect(ui->coinsWidget, &CoinsWidget::sweepOutput, m_ctx, &AppContext::onSweepOutput);
 

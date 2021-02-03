@@ -39,10 +39,8 @@ private slots:
     void onSweepOutput();
 
 signals:
-    void freeze(int index);
-    void freezeMulti(QVector<int>);
-    void thaw(int index);
-    void thawMulti(QVector<int>);
+    void freeze(QVector<int> indexes);
+    void thaw(QVector<int> indexes);
     void sweepOutput(const QString &keyImage, const QString &address, bool isChurn, int outputs);
 
 private:

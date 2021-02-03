@@ -5,12 +5,13 @@
 #define FEATHER_COINSPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
+#include "libwalletqt/Coins.h"
 
 class CoinsProxyModel : public QSortFilterProxyModel
 {
 Q_OBJECT
 public:
-    explicit CoinsProxyModel(QObject* parent = nullptr);
+    explicit CoinsProxyModel(QObject* parent, Coins *coins);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
 
 public slots:
@@ -21,6 +22,7 @@ public slots:
 
 private:
     bool m_showSpent = false;
+    Coins *m_coins;
 };
 
 #endif //FEATHER_COINSPROXYMODEL_H
