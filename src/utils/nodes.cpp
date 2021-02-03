@@ -207,7 +207,8 @@ FeatherNode Nodes::pickEligibleNode() {
     auto nodes = wsMode ? m_websocketNodes : m_customNodes;
 
     if (nodes.count() == 0) {
-        this->exhausted();
+        if (wsMode)
+            this->exhausted();
         return rtn;
     }
 
@@ -250,7 +251,10 @@ FeatherNode Nodes::pickEligibleNode() {
     }
 
     // All nodes tried, and none eligible
-    this->exhausted();
+    // Don't show node exhaustion warning if single custom node is used
+    if (wsMode || node_indeces.size() > 1) {
+        this->exhausted();
+    }
     return rtn;
 }
 
