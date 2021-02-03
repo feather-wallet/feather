@@ -59,9 +59,11 @@ void SendWidget::addressEdited() {
     ui->lineAmount->setReadOnly(freezeAmounts);
     ui->lineAmount->setFrame(!freezeAmounts);
     ui->btnMax->setDisabled(freezeAmounts);
+    ui->comboCurrencySelection->setDisabled(freezeAmounts);
 
     if (outputs.size() > 0) {
         ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal()));
+        ui->comboCurrencySelection->setCurrentIndex(0);
     } else {
         ui->lineAmount->setText("");
     }
