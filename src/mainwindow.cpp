@@ -1019,6 +1019,8 @@ void MainWindow::skinChanged(const QString &skinName) {
     qApp->setStyleSheet(m_skins[skinName]);
     qDebug() << QString("Skin changed to %1").arg(skinName);
     ColorScheme::updateFromWidget(this);
+
+    ui->conversionWidget->skinChanged();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {

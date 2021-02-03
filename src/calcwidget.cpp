@@ -6,6 +6,8 @@
 #include "calcwidget.h"
 #include "ui_calcwidget.h"
 #include "mainwindow.h"
+#include "components.h"
+#include "utils/ColorScheme.h"
 
 CalcWidget::CalcWidget(QWidget *parent) :
         QWidget(parent),
@@ -15,8 +17,7 @@ CalcWidget::CalcWidget(QWidget *parent) :
     m_ctx = MainWindow::getContext();
 
     ui->imageExchange->setBackgroundRole(QPalette::Base);
-    QPixmap pm(":/assets/images/exchange.png");
-    ui->imageExchange->setPixmap(pm);
+    ui->imageExchange->setAssets(":/assets/images/exchange.png", ":/assets/images/exchange_white.png");
     ui->imageExchange->setScaledContents(true);
     ui->imageExchange->setFixedSize(26, 26);
 
@@ -132,6 +133,10 @@ void CalcWidget::initComboBox() {
     ui->comboCalcTo->setCurrentText(preferredFiat);
 
     this->m_comboBoxInit = true;
+}
+
+void CalcWidget::skinChanged() {
+    ui->imageExchange->setMode(ColorScheme::hasDarkBackground(this));
 }
 
 CalcWidget::~CalcWidget() {

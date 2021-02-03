@@ -11,6 +11,23 @@
 #include <QPlainTextEdit>
 #include <QLineEdit>
 
+class DoublePixmapLabel : public QLabel
+{
+Q_OBJECT
+
+public:
+    explicit DoublePixmapLabel(QWidget *parent = nullptr);
+
+public slots:
+    void setAssets(const QString &firstAsset, const QString &secondAsset);
+    void setMode(bool mode);
+
+private:
+    bool m_mode = false;
+    QPixmap m_first;
+    QPixmap m_second;
+};
+
 class StatusBarButton : public QPushButton
 {
     Q_OBJECT

@@ -28,6 +28,7 @@ public slots:
     void toComboChanged(const QString& data);
     void initFiat();
     void initCrypto();
+    void skinChanged();
 
 private:
     Ui::CalcWidget *ui;
