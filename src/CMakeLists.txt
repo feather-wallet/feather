@@ -175,7 +175,6 @@ target_link_libraries(feather
         ${SODIUM_LIBRARY}
         easylogging
         blockchain_db
-        randomx
         hardforks
         ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}
