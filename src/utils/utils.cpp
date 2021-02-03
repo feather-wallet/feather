@@ -165,12 +165,13 @@ void Utils::externalLinkWarning(QWidget *parent, const QString &url){
         body += "\n\nYou will NOT be using Tor.";
 
 
-    QMessageBox linkWarning;
+    QMessageBox linkWarning(parent);
     linkWarning.setWindowTitle("External link warning");
     linkWarning.setText(body);
     QPushButton *copy = linkWarning.addButton("Copy link", QMessageBox::HelpRole);
     linkWarning.addButton(QMessageBox::Cancel);
     linkWarning.addButton(QMessageBox::Ok);
+    linkWarning.setDefaultButton(QMessageBox::Ok);
 
     linkWarning.exec();
 
