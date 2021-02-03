@@ -5,6 +5,24 @@
 
 #include <QtWidgets>
 
+DoublePixmapLabel::DoublePixmapLabel(QWidget *parent)
+        : QLabel(parent)
+{}
+
+void DoublePixmapLabel::setAssets(const QString &firstAsset, const QString &secondAsset)
+{
+    m_first.load(firstAsset);
+    m_second.load(secondAsset);
+    this->setPixmap(m_first);
+}
+
+void DoublePixmapLabel::setMode(bool mode) {
+    if (mode != m_mode) {
+        this->setPixmap(mode ? m_second : m_first);
+    }
+    m_mode = mode;
+}
+
 StatusBarButton::StatusBarButton(const QIcon &icon, const QString &tooltip, QWidget *parent) : QPushButton(parent) {
     setIcon(icon);
     setToolTip(tooltip);

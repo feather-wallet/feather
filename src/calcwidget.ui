@@ -84,7 +84,7 @@
             </layout>
            </item>
            <item row="0" column="1">
-            <widget class="QLabel" name="imageExchange">
+            <widget class="DoublePixmapLabel" name="imageExchange">
              <property name="text">
               <string>exchange image</string>
              </property>
@@ -159,6 +159,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>DoublePixmapLabel</class>
+   <extends>QLabel</extends>
+   <header>components.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>

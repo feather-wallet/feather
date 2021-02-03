@@ -20,7 +20,7 @@ bool ColorScheme::hasDarkBackground(QWidget *widget) {
 }
 
 void ColorScheme::updateFromWidget(QWidget *widget, bool forceDark) {
-    darkScheme = forceDark or ColorScheme::hasDarkBackground(widget);
+    darkScheme = forceDark || ColorScheme::hasDarkBackground(widget);
 }
 
 QString ColorSchemeItem::asStylesheet(bool background) {
