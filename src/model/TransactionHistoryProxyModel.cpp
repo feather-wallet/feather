@@ -13,20 +13,19 @@ TransactionHistoryProxyModel::TransactionHistoryProxyModel(Wallet *wallet, QObje
 {
     m_searchRegExp.setCaseSensitivity(Qt::CaseInsensitive);
     m_searchRegExp.setPatternSyntax(QRegExp::RegExp);
+    m_history = m_wallet->history();
 }
 
 bool TransactionHistoryProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    QModelIndex descriptionIndex = sourceModel()->index(sourceRow, TransactionHistoryModel::Description, sourceParent);
-    QModelIndex txidIndex = sourceModel()->index(sourceRow, TransactionHistoryModel::TxID, sourceParent);
-
-    QString descriptionData = sourceModel()->data(descriptionIndex).toString();
-    QString txidData = sourceModel()->data(txidIndex).toString();
-
+    QString description, txid, subaddrlabel;
     quint32 subaddrAcount;
     QSet<quint32> subaddrIndex;
 
-    m_wallet->history()->transaction(sourceRow, [&subaddrAcount, &subaddrIndex](TransactionInfo &tInfo){
+    m_history->transaction(sourceRow, [&description, &txid, &subaddrlabel, &subaddrAcount, &subaddrIndex](TransactionInfo &tInfo){
+        description = tInfo.description();
+        txid = tInfo.hash();
+        subaddrlabel = tInfo.label();
         subaddrAcount = tInfo.subaddrAccount();
         subaddrIndex = tInfo.subaddrIndex();
     });
@@ -38,5 +37,5 @@ bool TransactionHistoryProxyModel::filterAcceptsRow(int sourceRow, const QModelI
         if (addressFound) break;
     }
     
-    return (descriptionData.contains(m_searchRegExp) || txidData.contains(m_searchRegExp)) || addressFound;
+    return (description.contains(m_searchRegExp) || txid.contains(m_searchRegExp) || subaddrlabel.contains(m_searchRegExp)) || addressFound;
 }
