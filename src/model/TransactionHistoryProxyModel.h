@@ -6,6 +6,7 @@
 
 #include "libwalletqt/TransactionHistory.h"
 #include "libwalletqt/Wallet.h"
+#include "libwalletqt/TransactionHistory.h"
 
 #include <QSortFilterProxyModel>
 
@@ -23,7 +24,8 @@ public slots:
     }
 
 private:
-    Wallet * m_wallet;
+    Wallet *m_wallet;
+    TransactionHistory *m_history;
 
     QRegExp m_searchRegExp;
 };
