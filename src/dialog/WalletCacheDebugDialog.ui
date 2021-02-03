@@ -53,52 +53,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="m_unconfirmed_txs">
-         <property name="text">
-          <string>m_unconfirmed_txs</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_payments">
-         <property name="text">
-          <string>m_payments</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_tx_keys">
-         <property name="text">
-          <string>m_tx_keys</string>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QRadioButton" name="m_confirmed_txs">
-         <property name="text">
-          <string>m_confirmed_txs</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_tx_notes">
-         <property name="text">
-          <string>m_tx_notes</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_unconfirmed_payments">
-         <property name="text">
-          <string>m_unconfirmed_payments</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <widget class="QRadioButton" name="m_pub_keys">
          <property name="text">
           <string>m_pub_keys</string>
@@ -112,10 +66,49 @@
          </property>
         </widget>
        </item>
+      </layout>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
        <item>
-        <widget class="QRadioButton" name="m_scanned_pool_txs">
+        <widget class="QRadioButton" name="m_unconfirmed_payments">
          <property name="text">
-          <string>m_scanned_pool_txs</string>
+          <string>m_unconfirmed_payments</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_payments">
+         <property name="text">
+          <string>m_payments</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_unconfirmed_txs">
+         <property name="text">
+          <string>m_unconfirmed_txs</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_confirmed_txs">
+         <property name="text">
+          <string>m_confirmed_txs</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_tx_keys">
+         <property name="text">
+          <string>m_tx_keys</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_additional_tx_keys">
+         <property name="text">
+          <string>m_additional_tx_keys</string>
          </property>
         </widget>
        </item>
@@ -123,6 +116,20 @@
      </item>
      <item>
       <layout class="QVBoxLayout" name="verticalLayout_4">
+       <item>
+        <widget class="QRadioButton" name="m_tx_notes">
+         <property name="text">
+          <string>m_tx_notes</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="m_scanned_pool_txs">
+         <property name="text">
+          <string>m_scanned_pool_txs</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QRadioButton" name="m_subaddresses">
          <property name="text">
@@ -138,9 +145,9 @@
         </widget>
        </item>
        <item>
-        <widget class="QRadioButton" name="m_additional_tx_keys">
+        <widget class="QRadioButton" name="m_account_tags">
          <property name="text">
-          <string>m_additional_tx_keys</string>
+          <string>m_account_tags</string>
          </property>
         </widget>
        </item>
@@ -148,13 +155,6 @@
         <widget class="QRadioButton" name="m_attributes">
          <property name="text">
           <string>m_attributes</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QRadioButton" name="m_account_tags">
-         <property name="text">
-          <string>m_account_tags</string>
          </property>
         </widget>
        </item>
