@@ -18,7 +18,6 @@ RestorePage::RestorePage(AppContext *ctx, QWidget *parent) :
         m_ctx(ctx) {
     ui->setupUi(this);
     this->setTitle("Restore wallet");
-    this->setButtonText(QWizard::FinishButton, "walletKeysFilesModel");
     ui->restoreFrame->hide();
     ui->label_errorString->hide();
 

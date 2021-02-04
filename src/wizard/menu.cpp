@@ -38,10 +38,5 @@ int MenuPage::nextId() const {
 }
 
 bool MenuPage::validatePage() {
-    // Check if file exists
-    // Check if wallet has password
-    // Check if wallet can be decrypted with entered password
-
-    // TODO: Check if password is correct, otherwise show error message
     return true;
 }
