@@ -12,7 +12,6 @@ NetworkPage::NetworkPage(AppContext *ctx, QWidget *parent) :
         m_ctx(ctx) {
     ui->setupUi(this);
     this->setTitle("Welcome to Feather!");
-    this->setButtonText(QWizard::FinishButton, "walletKeysFilesModel");
 
     ui->customFrame->hide();
 
