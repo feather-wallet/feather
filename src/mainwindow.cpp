@@ -515,6 +515,10 @@ WalletWizard *MainWindow::createWizard(WalletWizard::Page startPage){
     auto *wizard = new WalletWizard(m_ctx, startPage, this);
     connect(wizard, &WalletWizard::openWallet, m_ctx, &AppContext::onOpenWallet);
     connect(wizard, &WalletWizard::defaultWalletDirChanged, m_windowSettings, &Settings::updatePaths);
+    connect(wizard, &WalletWizard::rejected, [this]{
+        this->cleanupBeforeClose();
+        QCoreApplication::quit();
+    });
     return wizard;
 }
 

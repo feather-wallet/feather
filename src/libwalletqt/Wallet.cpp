@@ -1249,7 +1249,9 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
     m_daemonUsername = "";
     m_daemonPassword = "";
 
-    startRefreshThread();
+    if (this->status() == Status_Ok) {
+        startRefreshThread();
+    }
 }
 
 Wallet::~Wallet()
