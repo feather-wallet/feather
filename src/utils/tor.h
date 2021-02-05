@@ -54,6 +54,10 @@ struct TorVersion
                                           QString::number(patch), QString::number(release));
     }
 
+    static bool isValid(const TorVersion &v) {
+        return v != TorVersion();
+    }
+
     int major;
     int minor;
     int patch;
