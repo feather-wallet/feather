@@ -42,9 +42,9 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.5.5-rc --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
-    git reset --hard 9e26a9399fe2422475406d6ee3cb29b2924f3274 && \
+    git reset --hard b36a00e9a9d3eb4b2949951afaa72e45fb7e68cd && \
     ./autogen.sh && \
     ./configure \
     --disable-asciidoc \
@@ -56,14 +56,15 @@ RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && 
     --disable-zstd \
     --enable-static-tor \
     --with-libevent-dir=/usr/local/libevent \
-    --with-openssl-dir=/usr/local/openssl-1.0.2u \
+    --with-openssl-dir=/usr/local/openssl \
     --with-zlib-dir=/usr/local/zlib \
     --disable-tool-name-check \
     --enable-fatal-warnings \
     --prefix=/usr/local/tor && \
     make -j$THREADS && \
     make -j$THREADS install && \
-    rm -rf $(pwd)
+    rm -rf $(pwd) && \
+    strip -s -D /usr/local/tor/bin/tor
 
 FROM ubuntu:16.04
 
@@ -75,7 +76,10 @@ ENV CPPFLAGS="-fPIC"
 ENV CXXFLAGS="-fPIC"
 ENV SOURCE_DATE_EPOCH=1397818193
 
-COPY --from=tor /usr/local/tor/bin/tor /usr/local/tor/bin/tor
+ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
+ENV TOR_BIN=/usr/local/tor/bin/tor
+
+COPY --from=tor ${TOR_BIN} /usr/local/tor/bin/tor
 
 RUN apt-get update && \
     apt-get install -y \
@@ -375,7 +379,7 @@ RUN git clone -b v3.10.0 --depth 1 https://github.com/protocolbuffers/protobuf &
 RUN git clone -b v3.18.4 --depth 1 https://github.com/Kitware/CMake && \
     cd CMake && \
     git reset --hard 3cc3d42aba879fff5e85b363ae8f21386a3f9f9b && \
-    OPENSSL_ROOT_DIR=/usr/local/openssl ./bootstrap && \
+    ./bootstrap && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)

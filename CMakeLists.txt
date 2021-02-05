@@ -188,9 +188,16 @@ if(TOR_BIN)
         execute_process(COMMAND bash -c "touch ${CMAKE_CURRENT_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
     endif()
 
+    execute_process(COMMAND bash -c "${TOR_BIN} --version --quiet" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE out RESULT_VARIABLE ret)
+    if (ret EQUAL "0")
+        set(TOR_VERSION "${out}")
+    endif()
+    message(STATUS "${TOR_VERSION}")
+    configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
+
     # on the buildbot Tor is baked into the image
     # - linux: See `Dockerfile`
-    # - windows: https://github.com/mxe/mxe/blob/1024dc7d2db5eb7d5d3c64a2c12b5f592572f1ce/plugins/apps/tor.mk
+    # - windows: See `Dockerfile.windows`
     # - macos: taken from Tor Browser official release
     set(TOR_COPY_CMD "cp -u ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
     message(STATUS "${TOR_COPY_CMD}")

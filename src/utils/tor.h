@@ -11,6 +11,55 @@
 #include <QtNetwork>
 #include "utils/childproc.h"
 
+struct TorVersion
+{
+    explicit TorVersion(int major=0, int minor=0, int patch=0, int release=0)
+        : patch(patch), release(release)
+    {
+        this->major = major;
+        this->minor = minor;
+    }
+
+    friend bool operator== (const TorVersion &v1, const TorVersion &v2) {
+        return (v1.major == v2.major &&
+                v1.minor == v2.minor &&
+                v1.patch == v2.patch &&
+                v1.release == v2.release);
+    }
+
+    friend bool operator!= (const TorVersion &v1, const TorVersion &v2) {
+        return !(v1 == v2);
+    }
+
+    friend bool operator> (const TorVersion &v1, const TorVersion &v2) {
+        if (v1.major != v2.major)
+            return v1.major > v2.major;
+        if (v1.minor != v2.minor)
+            return v1.minor > v2.minor;
+        if (v1.patch != v2.patch)
+            return v1.patch > v2.patch;
+        if (v1.release != v2.release)
+            return v1.release > v2.release;
+        return false;
+    }
+
+    friend bool operator< (const TorVersion &v1, const TorVersion &v2) {
+        if (v1 == v2)
+            return false;
+        return !(v1 > v2);
+    }
+
+    QString toString() {
+        return QString("%1.%2.%3.%4").arg(QString::number(major), QString::number(minor),
+                                          QString::number(patch), QString::number(release));
+    }
+
+    int major;
+    int minor;
+    int patch;
+    int release;
+};
+
 class Tor : public QObject
 {
 Q_OBJECT
@@ -21,7 +70,8 @@ public:
     void start();
     void stop();
     bool unpackBins();
-    QString getVersion();
+    TorVersion getVersion(const QString &fileName);
+    TorVersion stringToVersion(const QString &version);
 
     bool torConnected = false;
     bool localTor = false;
