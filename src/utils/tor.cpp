@@ -211,8 +211,12 @@ bool Tor::unpackBins() {
     TorVersion embeddedVersion = this->stringToVersion(QString(TOR_VERSION));
     TorVersion filesystemVersion = this->getVersion(torPath);
     qDebug() << QString("Tor versions: embedded %1, filesystem %2").arg(embeddedVersion.toString(), filesystemVersion.toString());
-    if (embeddedVersion > filesystemVersion) {
-        QFile::remove(torPath);
+    if (TorVersion::isValid(filesystemVersion) && (embeddedVersion > filesystemVersion)) {
+        qInfo() << "Embedded version is newer, overwriting.";
+        QFile::setPermissions(torPath, QFile::ReadOther | QFile::WriteOther);
+        if (!QFile::remove(torPath)) {
+            qWarning() << "Unable to remove old Tor binary";
+        };
     }
 
     qDebug() << "Writing Tor executable to " << this->torPath;
