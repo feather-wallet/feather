@@ -4,6 +4,9 @@ ARG THREADS=1
 ARG QT_VERSION=5.15.2
 ENV SOURCE_DATE_EPOCH=1397818193
 
+ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
+ENV TOR_BIN=/usr/local/tor/bin/tor.exe
+
 RUN apt update && \
     DEBIAN_FRONTEND=noninteractive apt install -y curl wget zip automake build-essential cmake gcc-mingw-w64 g++-mingw-w64 gettext git libtool pkg-config \
     python && \
@@ -119,15 +122,14 @@ RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
     rm -rf $(pwd)
 
 # OpenSSL -> Tor
-# TODO: Tor will not cross-compile with 1.1.1i
-RUN wget https://www.openssl.org/source/openssl-1.0.2u.tar.gz && \
-    echo "ecd0c6ffb493dd06707d38b14bb4d8c2288bb7033735606569d8f90f89669d16 openssl-1.0.2u.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.0.2u.tar.gz && \
-    rm openssl-1.0.2u.tar.gz && \
-    cd openssl-1.0.2u && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
+    echo "e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 openssl-1.1.1i.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1i.tar.gz && \
+    rm openssl-1.1.1i.tar.gz && \
+    cd openssl-1.1.1i && \
     ./Configure mingw64 no-shared no-dso --cross-compile-prefix=x86_64-w64-mingw32- --prefix=/usr/local/openssl && \
     make -j$THREADS && \
-    make install_sw && \
+    make -j$THREADS install_sw && \
     rm -rf $(pwd)
 
 # libevent -> Tor
@@ -144,9 +146,10 @@ RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.11-s
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && \
+ENV TOR_VERSION=0.4.5.5-rc
+RUN git clone -b tor-0.4.5.5-rc --depth 1 https://git.torproject.org/tor.git && \
     cd tor  && \
-    git reset --hard 9e26a9399fe2422475406d6ee3cb29b2924f3274 && \
+    git reset --hard b36a00e9a9d3eb4b2949951afaa72e45fb7e68cd && \
     ./autogen.sh && \
     ./configure --host=x86_64-w64-mingw32 \
     --disable-asciidoc \
@@ -166,7 +169,8 @@ RUN git clone -b tor-0.4.5.4-rc --depth 1 https://git.torproject.org/tor.git && 
     LIBS=-lcrypt32 && \
     make -j$THREADS && \
     make -j$THREADS install && \
-    rm -rf $(pwd)
+    rm -rf $(pwd) && \
+    strip -s -D /usr/local/tor/bin/tor.exe
 
 RUN git clone https://git.wownero.com/feather/monero-seed.git && \
     cd monero-seed && \

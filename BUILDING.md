@@ -37,18 +37,12 @@ Building the base image takes a while. You only need to build the base image onc
 ##### Standalone binary
 
 ```bash
-docker run --rm -it -v $PWD:/feather --env OPENSSL_ROOT_DIR=/usr/local/openssl/ -w /feather feather:linux sh -c 'TOR_BIN="/usr/local/tor/bin/tor" make release-static -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'make release-static -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.
 
 The resulting binary can be found in `build/bin/feather`.
-
-Hashes for tagged commits should match:
-
-```
-beta-1: d1a52e3bac1abbae4adda1fc88cb2a7a06fbd61085868421897c6a4f3f4eb091  feather
-```
 
 ##### AppImage
 
@@ -81,7 +75,7 @@ Building the base image takes a while. You only need to build the base image onc
 #### 3. Build
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'TOR_BIN="/usr/local/tor/bin/tor.exe" make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.

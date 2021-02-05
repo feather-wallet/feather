@@ -4,9 +4,11 @@
 #include <QScreen>
 #include <QDesktopWidget>
 #include <QDesktopServices>
+#include <QRegularExpression>
 #include "utils/utils.h"
 #include "utils/tor.h"
 #include "appcontext.h"
+#include "config-feather.h"
 
 QString Tor::torHost = "127.0.0.1";
 quint16 Tor::torPort = 9050;
@@ -200,10 +202,19 @@ bool Tor::unpackBins() {
     QFile f(torFile);
     QFileInfo fileInfo(f);
     this->torPath = QDir(this->torDir).filePath(fileInfo.fileName());
+
 #if defined(Q_OS_WIN)
     if(!this->torPath.endsWith(".exe"))
         this->torPath += ".exe";
 #endif
+
+    TorVersion embeddedVersion = this->stringToVersion(QString(TOR_VERSION));
+    TorVersion filesystemVersion = this->getVersion(torPath);
+    qDebug() << QString("Tor versions: embedded %1, filesystem %2").arg(embeddedVersion.toString(), filesystemVersion.toString());
+    if (embeddedVersion > filesystemVersion) {
+        QFile::remove(torPath);
+    }
+
     qDebug() << "Writing Tor executable to " << this->torPath;
     f.copy(torPath);
     f.close();
@@ -215,7 +226,7 @@ bool Tor::unpackBins() {
     return true;
 }
 
-QString Tor::getVersion() {
+TorVersion Tor::getVersion(const QString &fileName) {
     QProcess process;
     process.setProcessChannelMode(QProcess::MergedChannels);
     process.start(this->torPath, QStringList() << "--version");
@@ -224,13 +235,23 @@ QString Tor::getVersion() {
 
     if(output.isEmpty()) {
         qWarning() << "Could not grab Tor version";
-        return "";
+        return TorVersion();
     }
-    QString version = output.split('\n').at(0);
-    if(version.startsWith("Tor version")){
-        return version;
-    } else {
+
+    return this->stringToVersion(output);
+}
+
+TorVersion Tor::stringToVersion(const QString &version) {
+    QRegularExpression re("(?<major>\\d)\\.(?<minor>\\d)\\.(?<patch>\\d)\\.(?<release>\\d)");
+    QRegularExpressionMatch match = re.match(version);
+
+    if (!match.hasMatch()) {
         qWarning() << "Could not parse Tor version";
-        return "";
+        return TorVersion();
     }
+
+    return TorVersion(match.captured("major").toInt(),
+                      match.captured("minor").toInt(),
+                      match.captured("patch").toInt(),
+                      match.captured("release").toInt());
 }
