@@ -43,13 +43,14 @@ CMAKEFLAGS = \
 release-static: CMAKEFLAGS += -DBUILD_TAG="linux-x64"
 release-static: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 release-static: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
+release-static: CMAKEFLAGS += -DREPRODUCIBLE=$(or ${SOURCE_DATE_EPOCH},OFF)
 release-static:
 	cmake -Bbuild $(CMAKEFLAGS)
 	$(MAKE) -Cbuild
 
 depends:
 	mkdir -p build/$(target)/release
-	cd build/$(target)/release && cmake -D STATIC=ON -DTOR_VERSION=$(or ${TOR_VERSION}, OFF) -DTOR_BIN=$(or ${TOR_BIN},OFF) -D DEV_MODE=$(or ${DEV_MODE},OFF) -D BUILD_TAG=$(tag) -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake ../../.. && $(MAKE)
+	cd build/$(target)/release && cmake -D STATIC=ON -DREPRODUCIBLE=$(or ${SOURCE_DATE_EPOCH},OFF) -DTOR_VERSION=$(or ${TOR_VERSION}, OFF) -DTOR_BIN=$(or ${TOR_BIN},OFF) -D DEV_MODE=$(or ${DEV_MODE},OFF) -D BUILD_TAG=$(tag) -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake ../../.. && $(MAKE)
 
 windows-mxe-release: CMAKEFLAGS += -DBUILD_TAG="win-x64"
 windows-mxe-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)

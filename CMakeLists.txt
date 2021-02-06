@@ -199,7 +199,11 @@ if(TOR_BIN)
     # - linux: See `Dockerfile`
     # - windows: See `Dockerfile.windows`
     # - macos: taken from Tor Browser official release
-    set(TOR_COPY_CMD "cp -u ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    if(REPRODUCIBLE) # Always copy Tor when doing a reproducible build to prevent old versions from getting included
+        set(TOR_COPY_CMD "cp ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    else()
+        set(TOR_COPY_CMD "cp -u ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    endif()
     message(STATUS "${TOR_COPY_CMD}")
     execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
     if(ret EQUAL "1")
