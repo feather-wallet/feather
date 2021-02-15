@@ -88,7 +88,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(ui->actionReport_bug, &QAction::triggered, [this](){
         QMessageBox::information(this, "Reporting Bugs",
                                  "<body>Please report any bugs as issues on our git repo:<br>\n"
-                                 "<a href=\"https://git.wownero.com/feather/feather/issues\" style=\"color: #33A4DF\">https://git.wownero.com/feather/feather/issues</a><br/><br/>"
+                                 "<a href=\"https://git.featherwallet.org/feather/feather/issues\" style=\"color: #33A4DF\">https://git.featherwallet.org/feather/feather/issues</a><br/><br/>"
                                  "\n"
                                  "Before reporting a bug, upgrade to the most recent version of Feather "
                                  "(latest release or git HEAD), and include the version number in your report. "

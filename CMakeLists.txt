@@ -126,7 +126,7 @@ find_package(monero-seed CONFIG)
 if(NOT monero-seed_FOUND)
   if(FETCH_DEPS)
     FetchContent_Declare(monero-seed
-      GIT_REPOSITORY https://git.wownero.com/feather/monero-seed.git)
+      GIT_REPOSITORY https://git.featherwallet.org/feather/monero-seed.git)
     FetchContent_GetProperties(monero-seed)
     if(NOT monero-seed_POPULATED)
       message(STATUS "Fetching monero-seed")

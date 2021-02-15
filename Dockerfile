@@ -392,7 +392,7 @@ RUN git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && 
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone https://git.wownero.com/feather/monero-seed.git && \
+RUN git clone https://git.featherwallet.org/feather/monero-seed.git && \
     cd monero-seed && \
     git reset --hard 4674ef09b6faa6fe602ab5ae0b9ca8e1fd7d5e1b && \
     cmake -DCMAKE_BUILD_TYPE=Release -Bbuild && \

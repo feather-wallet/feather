@@ -18,7 +18,7 @@ so that the resulting Feather binary is static. For more information, check the 
 #### 1. Clone
 
 ```bash
-git clone --branch master --recursive https://git.wownero.com/feather/feather.git
+git clone --branch master --recursive https://git.featherwallet.org/feather/feather.git
 cd feather
 ```
 
@@ -57,7 +57,7 @@ docker run --rm -it -v $PWD:/feather -w /feather feather:linux contrib/build-app
 #### 1. Clone
 
 ```bash
-git clone --branch master --recursive https://git.wownero.com/feather/feather.git
+git clone --branch master --recursive https://git.featherwallet.org/feather/feather.git
 cd feather
 ```
 
@@ -94,7 +94,7 @@ HOMEBREW_OPTFLAGS="-march=core2" HOMEBREW_OPTIMIZATION_LEVEL="O0" \
 Clone the repository.
 
 ```bash
-git clone --recursive https://git.wownero.com/feather/feather.git
+git clone --recursive https://git.featherwallet.org/feather/feather.git
 ``` 
 
 Get the latest LTS from here: https://www.qt.io/offline-installers and install.
