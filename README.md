@@ -2,11 +2,12 @@
 
 [![Build Status](https://build.featherwallet.org/api/badges/feather/feather/status.svg)](https://build.featherwallet.org/feather/feather)
 
-Feather is a free, open-source Monero client Linux with ports for Mac OS and Windows written in C++ with the Qt framework. It is created and maintained by [dsc](dsc@xmr.pm) and [tobtoht](thotbot@protonmail.com).
+Feather is a free, open-source Monero client Linux with ports for Mac OS and Windows written in C++ with the Qt framework.
 
 ## Development resources
 * Web: [featherwallet.org](https://featherwallet.org)
 * Git: [git.featherwallet.org/feather/feather](https://git.featherwallet.org/feather/feather)
+* Mail: dev@featherwallet.org
 * IRC: `#feather` on OFTC
 * Development builds: [build.featherwallet.org/files](https://build.featherwallet.org/files/)
 
