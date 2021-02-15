@@ -6,7 +6,7 @@ Feather is a free, open-source Monero client Linux with ports for Mac OS and Win
 
 ## Development resources
 * Web: [featherwallet.org](https://featherwallet.org)
-* Git: [git.wownero.com/feather/feather](https://git.wownero.com/feather/feather)
+* Git: [git.featherwallet.org/feather/feather](https://git.featherwallet.org/feather/feather)
 * IRC: `#feather` on OFTC
 * Development builds: [build.featherwallet.org/files](https://build.featherwallet.org/files/)
 
@@ -20,7 +20,7 @@ Feather uses Monero, as such it requires the same dependencies as outlined in [M
 - libqrencode
 - openpgp
 
-See [BUILDING.md](https://git.wownero.com/feather/feather/src/branch/master/BUILDING.md) for information on how to compile a build.
+See [BUILDING.md](https://git.featherwallet.org/feather/feather/src/branch/master/BUILDING.md) for information on how to compile a build.
 
 ## Supporting the project
 
@@ -30,6 +30,6 @@ Feather is a 100% community-sponsored endeavor. If you want to join our efforts,
 
 ## Developers
 
-See [HACKING.md](https://git.wownero.com/feather/feather/src/branch/master/HACKING.md) for useful development resources.
+See [HACKING.md](https://git.featherwallet.org/feather/feather/src/branch/master/HACKING.md) for useful development resources.
 
 It is HIGHLY recommended that you join the `#feather` IRC channel on OFTC if you are hacking on Feather. Due to the nature of this open source software project, joining this channel and idling is the best way to stay updated on best practices and new developments.

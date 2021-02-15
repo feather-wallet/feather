@@ -11,7 +11,7 @@ url="https://featherwallet.org"
 depends=('boost-libs' 'libunwind' 'openssl' 'readline' 'pcsclite' 'hidapi' 'protobuf' 'miniupnpc' 'libgcrypt' 'qrencode' 'libsodium' 'libpgm' 'expat' 'qt5-base' 'qt5-websockets' 'tor')
 makedepends=('git' 'cmake' 'boost')
 
-source=("${pkgname}"::"git+https://git.wownero.com/feather/feather")
+source=("${pkgname}"::"git+https://git.featherwallet.org/feather/feather")
 
 sha256sums=('SKIP')
 
