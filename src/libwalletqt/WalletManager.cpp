@@ -225,6 +225,11 @@ bool WalletManager::walletExists(const QString &path) const
     return m_pimpl->walletExists(path.toStdString());
 }
 
+bool WalletManager::verifyWalletPassword(const QString &keys_file_name, const QString &password, bool no_spend_key, uint64_t kdf_rounds) const
+{
+    return m_pimpl->verifyWalletPassword(keys_file_name.toStdString(), password.toStdString(), no_spend_key, kdf_rounds);
+}
+
 QStringList WalletManager::findWallets(const QString &path)
 {
     std::vector<std::string> found_wallets = m_pimpl->findWallets(path.toStdString());
