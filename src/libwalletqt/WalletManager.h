@@ -105,6 +105,9 @@ public:
     //! checks is given filename is a wallet;
     Q_INVOKABLE bool walletExists(const QString &path) const;
 
+    //! verify wallet password
+    Q_INVOKABLE bool verifyWalletPassword(const QString &keys_file_name, const QString &password, bool no_spend_key, uint64_t kdf_rounds = 1) const;
+
     //! returns list with wallet's filenames, if found by given path
     Q_INVOKABLE QStringList findWallets(const QString &path);
 

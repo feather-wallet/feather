@@ -78,6 +78,15 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QCommandLineOption exportTxHistoryOption(QStringList() << "export-txhistory", "Output wallet transaction history as CSV to specified path.", "file");
     parser.addOption(exportTxHistoryOption);
 
+    QCommandLineOption bruteforcePasswordOption(QStringList() << "bruteforce-password", "Bruteforce wallet password", "file");
+    parser.addOption(bruteforcePasswordOption);
+
+    QCommandLineOption bruteforceCharsOption(QStringList() << "bruteforce-chars", "Chars used to bruteforce password", "string");
+    parser.addOption(bruteforceCharsOption);
+
+    QCommandLineOption bruteforceDictionairy(QStringList() << "bruteforce-dict", "Bruteforce dictionairy", "file");
+    parser.addOption(bruteforceDictionairy);
+
     auto parsed = parser.parse(argv_);
     if(!parsed) {
         qCritical() << parser.errorText();
@@ -92,7 +101,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     bool quiet = parser.isSet(quietModeOption);
     bool exportContacts = parser.isSet(exportContactsOption);
     bool exportTxHistory = parser.isSet(exportTxHistoryOption);
-    bool cliMode = exportContacts || exportTxHistory;
+    bool bruteforcePassword = parser.isSet(bruteforcePasswordOption);
+    bool cliMode = exportContacts || exportTxHistory || bruteforcePassword;
 
     if(cliMode) {
         QCoreApplication cli_app(argc, argv);
@@ -110,12 +120,15 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         if(exportContacts) {
             if(!quiet)
                 qInfo() << "CLI mode: Address book export";
-            cli->mode = CLIMode::CLIModeExportContacts;
+            cli->mode = CLIMode::ExportContacts;
             QTimer::singleShot(0, cli, &CLI::run);
         } else if(exportTxHistory) {
             if(!quiet)
                 qInfo() << "CLI mode: Transaction history export";
-            cli->mode = CLIMode::CLIModeExportTxHistory;
+            cli->mode = CLIMode::ExportTxHistory;
+            QTimer::singleShot(0, cli, &CLI::run);
+        } else if(bruteforcePassword) {
+            cli->mode = CLIMode::BruteforcePassword;
             QTimer::singleShot(0, cli, &CLI::run);
         }
 

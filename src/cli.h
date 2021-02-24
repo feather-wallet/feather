@@ -8,8 +8,9 @@
 #include "appcontext.h"
 
 enum CLIMode {
-    CLIModeExportContacts,
-    CLIModeExportTxHistory
+    ExportContacts,
+    ExportTxHistory,
+    BruteforcePassword
 };
 
 class CLI : public QObject
