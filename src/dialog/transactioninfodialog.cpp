@@ -20,21 +20,18 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
 {
     ui->setupUi(this);
 
-    m_txProofWidget = new TxProofWidget(this, wallet, txInfo);
+    m_txid = txInfo->hash();
+    ui->label_txid->setText(m_txid);
 
-    ui->label_txid->setText(QString(txInfo->hash()));
-
-    if (txInfo->direction() == TransactionInfo::Direction_In) {
-        ui->frameTxKey->hide();
-    } else {
-        QString txKey = m_wallet->getTxKey(txInfo->hash());
-        if (txKey.isEmpty()) {
-            ui->btn_CopyTxKey->setEnabled(false);
-            ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
-        }
-        m_txKey = txKey;
+    QString txKey = m_wallet->getTxKey(txInfo->hash());
+    if (txKey.isEmpty()) {
+        ui->btn_CopyTxKey->setEnabled(false);
+        ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
     }
+    m_txKey = txKey;
+
     connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TransactionInfoDialog::copyTxKey);
+    connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TransactionInfoDialog::createTxProof);
 
     QString blockHeight = QString::number(txInfo->blockHeight());
     if (blockHeight == "0")
@@ -66,13 +63,17 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
         ui->frameDestinations->hide();
     }
 
-    ui->txProofWidget->addWidget(m_txProofWidget);
+    m_txProofDialog = new TxProofDialog(this, m_wallet, txInfo);
 
     this->adjustSize();
 }
 
 void TransactionInfoDialog::copyTxKey() {
     Utils::copyToClipboard(m_txKey);
+}
+
+void TransactionInfoDialog::createTxProof() {
+    m_txProofDialog->show();
 }
 
 TransactionInfoDialog::~TransactionInfoDialog() {

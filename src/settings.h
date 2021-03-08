@@ -29,6 +29,7 @@ signals:
     void skinChanged(QString skinName);
     void showHomeCCS(bool);
     void blockExplorerChanged(QString blockExplorer);
+    void amountPrecisionChanged(int precision);
 
 public slots:
     void updatePaths();
@@ -38,6 +39,7 @@ public slots:
     void comboBox_skinChanged(int pos);
     void comboBox_blockExplorerChanged(int pos);
     void comboBox_redditFrontendChanged(int pos);
+    void comboBox_amountPrecisionChanged(int pos);
 
 private:
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};

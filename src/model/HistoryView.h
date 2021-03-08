@@ -1,0 +1,44 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2020-2021, The Monero Project.
+
+#ifndef FEATHER_HISTORYVIEW_H
+#define FEATHER_HISTORYVIEW_H
+
+#include <QTreeView>
+#include <QActionGroup>
+
+#include "TransactionHistoryModel.h"
+
+class HistoryView : public QTreeView
+{
+    Q_OBJECT
+
+public:
+    explicit HistoryView(QWidget* parent = nullptr);
+    void setHistoryModel(TransactionHistoryProxyModel *model);
+    TransactionInfo* currentEntry();
+
+    void setSearchMode(bool mode);
+    QByteArray viewState() const;
+    bool setViewState(const QByteArray& state);
+
+private slots:
+    void showHeaderMenu(const QPoint& position);
+    void toggleColumnVisibility(QAction* action);
+    void fitColumnsToWindow();
+    void fitColumnsToContents();
+    void resetViewToDefaults();
+
+private:
+    TransactionHistoryModel* sourceModel();
+
+    TransactionHistoryProxyModel* m_model;
+    bool m_inSearchMode = false;
+    bool m_columnsNeedRelayout = true;
+
+    QMenu* m_headerMenu;
+    QActionGroup* m_columnActions;
+};
+
+
+#endif //FEATHER_HISTORYVIEW_H

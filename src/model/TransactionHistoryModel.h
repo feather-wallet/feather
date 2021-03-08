@@ -24,9 +24,9 @@ public:
     enum Column
     {
         Date = 0,
+        TxID,
         Description,
         Amount,
-        TxID,
         FiatAmount,
         COUNT
     };
@@ -34,8 +34,11 @@ public:
     explicit TransactionHistoryModel(QObject * parent = nullptr);
     void setTransactionHistory(TransactionHistory * th);
     TransactionHistory * transactionHistory() const;
+    TransactionInfo* entryFromIndex(const QModelIndex& index) const;
 
     QString preferredFiatSymbol = "USD";
+    int amountPrecision = 4;
+
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
@@ -48,7 +51,7 @@ signals:
     void transactionHistoryChanged();
 
 private:
-    QVariant parseTransactionInfo(const TransactionInfo &tInfo, int column) const;
+    QVariant parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const;
 
     TransactionHistory * m_transactionHistory;
     QIcon m_unconfirmedTx;

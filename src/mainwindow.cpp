@@ -255,6 +255,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx, &AppContext::onPreferredFiatCurrencyChanged);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, ui->sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
+    connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx, &AppContext::onAmountPrecisionChanged);
 
     // Skin
     connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
@@ -584,9 +585,7 @@ void MainWindow::onWalletOpened() {
         m_wizard->hide();
     }
 
-    this->raise();
-    this->show();
-    this->activateWindow();
+    this->bringToFront();
     this->setEnabled(true);
     if(!m_ctx->tor->torConnected)
         this->setStatusText("Wallet opened - Starting Tor (may take a while)");
@@ -766,17 +765,10 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
 }
 
 void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid) {
-    if(status) { // success
+    if (status) { // success
         QString body = QString("Successfully sent %1 transaction(s).").arg(txid.count());
         QMessageBox::information(this, "Transactions sent", body);
         ui->sendWidget->clearFields();
-
-        for(const auto &entry: txid) {
-            m_ctx->currentWallet->setUserNote(entry, m_ctx->tmpTxDescription);
-            AppContext::txDescriptionCache[entry] = m_ctx->tmpTxDescription;
-        }
-
-        m_ctx->tmpTxDescription = "";
     } else {
         auto err = tx->errorString();
         QString body = QString("Error committing transaction: %1").arg(err);
@@ -1339,6 +1331,14 @@ QString MainWindow::statusDots() {
     m_statusDots++;
     m_statusDots = m_statusDots % 4;
     return QString(".").repeated(m_statusDots);
+}
+
+void MainWindow::bringToFront() {
+    ensurePolished();
+    setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    show();
+    raise();
+    activateWindow();
 }
 
 MainWindow::~MainWindow() {

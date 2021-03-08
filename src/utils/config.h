@@ -48,7 +48,9 @@ public:
         firstRun,
         hideBalance,
         redditFrontend,
-        showHistorySyncNotice
+        showHistorySyncNotice,
+        GUI_HistoryViewState,
+        amountPrecision
     };
 
     ~Config() override;

@@ -19,7 +19,6 @@ Prices *AppContext::prices = nullptr;
 WalletKeysFilesModel *AppContext::wallets = nullptr;
 TxFiatHistory *AppContext::txFiatHistory = nullptr;
 double AppContext::balance = 0;
-QMap<QString, QString> AppContext::txDescriptionCache;
 QMap<QString, QString> AppContext::txCache;
 
 AppContext::AppContext(QCommandLineParser *cmdargs) {
@@ -301,6 +300,13 @@ void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
             model->preferredFiatSymbol = symbol;
         }
     }
+}
+
+void AppContext::onAmountPrecisionChanged(int precision) {
+    if (!this->currentWallet) return;
+    auto *model = this->currentWallet->transactionHistoryModel();
+    if (!model) return;
+    model->amountPrecision = precision;
 }
 
 void AppContext::onWalletOpened(Wallet *wallet) {
@@ -770,21 +776,28 @@ void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 }
 
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
-    this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
-    this->currentWallet->coins()->refresh(this->currentWallet->currentSubaddressAccount());
+    if (status) {
+        for (const auto &entry: txid) {
+            this->currentWallet->setUserNote(entry, this->tmpTxDescription);
+        }
+        this->tmpTxDescription = "";
+    }
 
     // Store wallet immediately so we don't risk losing tx key if wallet crashes
     this->currentWallet->store();
 
-    this->updateBalance();
+    this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
+    this->currentWallet->coins()->refresh(this->currentWallet->currentSubaddressAccount());
 
-    emit transactionCommitted(status, tx, txid);
+    this->updateBalance();
 
     // this tx was a donation to Feather, stop our nagging
     if(this->donationSending) {
         this->donationSending = false;
         config()->set(Config::donateBeg, -1);
     }
+
+    emit transactionCommitted(status, tx, txid);
 }
 
 void AppContext::storeWallet() {

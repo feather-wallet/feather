@@ -43,9 +43,15 @@ Settings::Settings(QWidget *parent) :
     if (m_skins.contains(settingsSkin))
         ui->comboBox_skin->setCurrentIndex(m_skins.indexOf(settingsSkin));
 
+    for (int i = 0; i <= 12; i++) {
+        ui->comboBox_amountPrecision->addItem(QString::number(i));
+    }
+    ui->comboBox_amountPrecision->setCurrentIndex(config()->get(Config::amountPrecision).toInt());
+
     connect(ui->comboBox_skin, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_skinChanged);
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
     connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
+    connect(ui->comboBox_amountPrecision, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_amountPrecisionChanged);
 
     // setup preferred fiat currency combobox
     QStringList fiatCurrencies;
@@ -98,6 +104,11 @@ void Settings::comboBox_blockExplorerChanged(int pos) {
 void Settings::comboBox_redditFrontendChanged(int pos) {
     QString redditFrontend = ui->comboBox_redditFrontend->currentText();
     config()->set(Config::redditFrontend, redditFrontend);
+}
+
+void Settings::comboBox_amountPrecisionChanged(int pos) {
+    config()->set(Config::amountPrecision, pos);
+    emit amountPrecisionChanged(pos);
 }
 
 void Settings::copyToClipboard() {

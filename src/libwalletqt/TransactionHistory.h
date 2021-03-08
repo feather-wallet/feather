@@ -29,6 +29,7 @@ class TransactionHistory : public QObject
 public:
     Q_INVOKABLE bool transaction(int index, std::function<void (TransactionInfo &)> callback);
     Q_INVOKABLE TransactionInfo * transaction(const QString &id);
+    TransactionInfo* transaction(int index);
     Q_INVOKABLE void refresh(quint32 accountIndex);
     Q_INVOKABLE void setTxNote(const QString &txid, const QString &note);
     Q_INVOKABLE bool writeCSV(const QString &path);

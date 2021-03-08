@@ -16,7 +16,7 @@ QString ModelUtils::displayAddress(const QString& address, int sections, const Q
     for (int i = 0; i < sections; i += 1) {
         list << address.mid(i*5, 5);
     }
-    list << "...";
+    list << "…"; // utf-8 Horizontal Ellipsis
     for (int i = sections; i > 0; i -= 1) {
         list << address.mid(address.length() - i * 5, 5);
     }

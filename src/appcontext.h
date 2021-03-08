@@ -85,7 +85,6 @@ public:
     static Prices *prices;
     static WalletKeysFilesModel *wallets;
     static double balance;
-    static QMap<QString, QString> txDescriptionCache;
     static QMap<QString, QString> txCache;
     static TxFiatHistory *txFiatHistory;
 
@@ -119,6 +118,7 @@ public slots:
     void onOpenAliasResolve(const QString &openAlias);
     void onSetRestoreHeight(quint64 height);
     void onPreferredFiatCurrencyChanged(const QString &symbol);
+    void onAmountPrecisionChanged(int precision);
 
 private slots:
     void onWSNodes(const QJsonArray &nodes);

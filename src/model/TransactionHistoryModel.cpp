@@ -6,6 +6,7 @@
 #include "TransactionInfo.h"
 #include "globals.h"
 #include "utils/ColorScheme.h"
+#include "ModelUtils.h"
 
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
@@ -38,6 +39,11 @@ TransactionHistory *TransactionHistoryModel::transactionHistory() const {
     return m_transactionHistory;
 }
 
+TransactionInfo* TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
+    Q_ASSERT(index.isValid() && index.row() < m_transactionHistory->count());
+    return m_transactionHistory->transaction(index.row());
+}
+
 int TransactionHistoryModel::rowCount(const QModelIndex &parent) const {
     if (parent.isValid()) {
         return 0;
@@ -65,8 +71,8 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
     QVariant result;
 
     bool found = m_transactionHistory->transaction(index.row(), [this, &index, &result, &role](const TransactionInfo &tInfo) {
-        if(role == Qt::DisplayRole || role == Qt::EditRole) {
-            result = parseTransactionInfo(tInfo, index.column());
+        if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+            result = parseTransactionInfo(tInfo, index.column(), role);
         }
         else if (role == Qt::TextAlignmentRole) {
             switch (index.column()) {
@@ -130,31 +136,26 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tInfo, int column) const
+QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const
 {
     switch (column)
     {
         case Column::Date:
-            return tInfo.timestamp().toString("yyyy-MM-dd HH:mm");
-        case Column::Description: {
-            // if this tx is still in the pool, then we wont get the
-            // description. We've cached it inside `AppContext::txDescriptionCache`
-            // for the time being.
-            if(tInfo.isPending()) {
-                auto hash = tInfo.hash();
-                if (AppContext::txDescriptionCache.contains(hash))
-                    return AppContext::txDescriptionCache[hash];
-            }
+            return tInfo.timestamp().toString("yyyy-MM-dd HH:mm ");
+        case Column::Description:
             return tInfo.description();
-        }
         case Column::Amount:
         {
-            QString amount = QString::number(tInfo.balanceDelta() / globals::cdiv, 'f', 4);
+            if (role == Qt::UserRole) {
+                return tInfo.balanceDelta();
+            }
+            QString amount = QString::number(tInfo.balanceDelta() / globals::cdiv, 'f', this->amountPrecision);
             amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
-        case Column::TxID:
-            return tInfo.hash();
+        case Column::TxID: {
+            return ModelUtils::displayAddress(tInfo.hash(), 1);
+        }
         case Column::FiatAmount:
         {
             double usd_price = AppContext::txFiatHistory->get(tInfo.timestamp().toString("yyyyMMdd"));
@@ -164,8 +165,11 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             double usd_amount = usd_price * (tInfo.balanceDelta() / globals::cdiv);
             if(this->preferredFiatSymbol != "USD")
                 usd_amount = AppContext::prices->convert("USD", this->preferredFiatSymbol, usd_amount);
-            double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
+            if (role == Qt::UserRole) {
+                return usd_amount;
+            }
 
+            double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
             return QString("%1").arg(Utils::amountToCurrencyString(fiat_rounded, this->preferredFiatSymbol));
         }
         default:
@@ -224,15 +228,10 @@ bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &
 }
 
 Qt::ItemFlags TransactionHistoryModel::flags(const QModelIndex &index) const {
-    bool isPending;
-    m_transactionHistory->transaction(index.row(), [this, &isPending](const TransactionInfo &tInfo){
-        isPending = tInfo.isPending();
-    });
-
     if (!index.isValid())
         return Qt::ItemIsEnabled;
 
-    if (index.column() == Description && !isPending)
+    if (index.column() == Description)
         return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
 
     return QAbstractTableModel::flags(index);

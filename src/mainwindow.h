@@ -172,6 +172,7 @@ private:
     void setStatusText(const QString &text, bool override = false, int timeout = 1000);
     void showBalanceDialog();
     QString statusDots();
+    void bringToFront();
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 

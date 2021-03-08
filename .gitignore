@@ -13,3 +13,4 @@ feather.cbp
 src/tor/*
 !src/tor/.gitkeep
 src/config-feather.h
+src/assets/exec/*

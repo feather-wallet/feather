@@ -16,6 +16,7 @@ Q_OBJECT
 public:
     explicit TransactionHistoryProxyModel(Wallet *wallet, QObject* parent = nullptr);
     bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    TransactionHistory* history();
 
 public slots:
     void setSearchFilter(const QString& searchString){

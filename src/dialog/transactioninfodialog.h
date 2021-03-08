@@ -10,7 +10,7 @@
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/TransactionInfo.h"
 #include "libwalletqt/Wallet.h"
-#include "widgets/txproofwidget.h"
+#include "dialog/TxProofDialog.h"
 
 namespace Ui {
     class TransactionInfoDialog;
@@ -26,13 +26,15 @@ public:
 
 private:
     void copyTxKey();
+    void createTxProof();
 
     Ui::TransactionInfoDialog *ui;
 
+    TxProofDialog *m_txProofDialog;
     TransactionInfo *m_txInfo;
     Wallet *m_wallet;
-    TxProofWidget *m_txProofWidget;
     QString m_txKey;
+    QString m_txid;
 };
 
 #endif //FEATHER_TRANSACTIONINFODIALOG_H

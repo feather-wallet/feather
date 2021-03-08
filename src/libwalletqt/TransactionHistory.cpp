@@ -32,6 +32,15 @@ TransactionInfo* TransactionHistory::transaction(const QString &id)
     return itr != m_tinfo.end() ? *itr : nullptr;
 }
 
+TransactionInfo* TransactionHistory::transaction(int index)
+{
+    if (index < 0 || index >= m_tinfo.size()) {
+        return nullptr;
+    }
+
+    return m_tinfo[index];
+}
+
 void TransactionHistory::refresh(quint32 accountIndex)
 {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)

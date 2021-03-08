@@ -16,6 +16,10 @@ TransactionHistoryProxyModel::TransactionHistoryProxyModel(Wallet *wallet, QObje
     m_history = m_wallet->history();
 }
 
+TransactionHistory* TransactionHistoryProxyModel::history() {
+    return m_history;
+}
+
 bool TransactionHistoryProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
     QString description, txid, subaddrlabel;

@@ -40,10 +40,12 @@ private slots:
     void onViewOnBlockExplorer();
     void setSearchFilter(const QString &filter);
     void onResendTransaction();
+    void createTxProof();
 
 private:
     enum copyField {
         TxID = 0,
+        Description,
         Date,
         Amount
     };

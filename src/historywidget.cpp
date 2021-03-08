@@ -4,6 +4,7 @@
 #include "historywidget.h"
 #include "ui_historywidget.h"
 #include "dialog/transactioninfodialog.h"
+#include "dialog/TxProofDialog.h"
 #include <QMessageBox>
 
 HistoryWidget::HistoryWidget(QWidget *parent)
@@ -20,6 +21,7 @@ HistoryWidget::HistoryWidget(QWidget *parent)
     // copy menu
     m_copyMenu->setIcon(QIcon(":/assets/images/copy.png"));
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
+    m_copyMenu->addAction("Description", this, [this]{copy(copyField::Description);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
     m_copyMenu->addAction("Amount", this, [this]{copy(copyField::Amount);});
 
@@ -48,34 +50,29 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     }
 
     QMenu menu(this);
-    TransactionInfo::Direction direction;
-    QString txid;
-    bool unconfirmed;
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [&direction, &txid, &unconfirmed](TransactionInfo &tInfo) {
-        direction = tInfo.direction();
-        txid = tInfo.hash();
-        unconfirmed = tInfo.isFailed() || tInfo.isPending();
-    });
 
-    if (AppContext::txCache.contains(txid) && unconfirmed && direction != TransactionInfo::Direction_In) {
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
+
+    bool unconfirmed = tx->isFailed() || tx->isPending();
+    if (AppContext::txCache.contains(tx->hash()) && unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
         menu.addAction(QIcon(":/assets/images/info.png"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
     menu.addMenu(m_copyMenu);
     menu.addAction(QIcon(":/assets/images/info.png"), "Show details", this, &HistoryWidget::showTxDetails);
     menu.addAction(QIcon(":/assets/images/network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+    menu.addAction("Create tx proof", this, &HistoryWidget::createTxProof);
 
     menu.exec(ui->history->viewport()->mapToGlobal(point));
 }
 
 void HistoryWidget::onResendTransaction() {
-    QModelIndex index = ui->history->currentIndex();
-    QString txid;
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [&txid](TransactionInfo &tInfo) {
-        txid = tInfo.hash();
-    });
-
-    emit resendTransaction(txid);
+    auto *tx = ui->history->currentEntry();
+    if (tx) {
+        QString txid = tx->hash();
+        emit resendTransaction(txid);
+    }
 }
 
 void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet)
@@ -83,39 +80,35 @@ void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet
     m_model = model;
     m_wallet = wallet;
     m_txHistory = m_wallet->history();
-    ui->history->setModel(m_model);
+    ui->history->setHistoryModel(m_model);
+    m_wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
 
-    ui->history->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->history->header()->setSectionResizeMode(TransactionHistoryModel::Description, QHeaderView::Stretch);
-    ui->history->hideColumn(TransactionHistoryModel::TxID);
+    // Load view state
+    ui->history->setViewState(QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray()));
 }
 
 void HistoryWidget::resetModel()
 {
+    // Save view state
+    config()->set(Config::GUI_HistoryViewState, ui->history->viewState().toBase64());
+    config()->sync();
+
     ui->history->setModel(nullptr);
 }
 
 void HistoryWidget::showTxDetails() {
-    QModelIndex index = ui->history->currentIndex();
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
 
-    TransactionInfo *i = nullptr;
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [&i](TransactionInfo &tInfo) {
-        i = &tInfo;
-    });
-
-    if (i != nullptr) {
-        auto * dialog = new TransactionInfoDialog(m_wallet, i, this);
-        dialog->exec();
-    }
+    auto *dialog = new TransactionInfoDialog(m_wallet, tx, this);
+    dialog->show();
 }
 
 void HistoryWidget::onViewOnBlockExplorer() {
-    QModelIndex index = ui->history->currentIndex();
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
 
-    QString txid;
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [&txid](TransactionInfo &tInfo) {
-        txid = tInfo.hash();
-    });
+    QString txid = tx->hash();
     emit viewOnBlockExplorer(txid);
 }
 
@@ -124,27 +117,36 @@ void HistoryWidget::setSearchText(const QString &text) {
 }
 
 void HistoryWidget::setSearchFilter(const QString &filter) {
-    if(!m_model) return;
+    if (!m_model) return;
     m_model->setSearchFilter(filter);
+    ui->history->setSearchMode(!filter.isEmpty());
+}
+
+void HistoryWidget::createTxProof() {
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
+
+    auto *dialog = new TxProofDialog(this, m_wallet, tx);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 void HistoryWidget::copy(copyField field) {
-    QModelIndex index = ui->history->currentIndex();
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
 
-    QString data;
-    m_txHistory->transaction(m_model->mapToSource(index).row(), [field, &data](TransactionInfo &tInfo) {
+    QString data = [field, tx]{
         switch(field) {
             case copyField::TxID:
-                data = tInfo.hash();
-                break;
+                return tx->hash();
             case copyField::Date:
-                data = tInfo.timestamp().toString("yyyy-MM-dd HH:mm");
-                break;
+                return tx->timestamp().toString("yyyy-MM-dd HH:mm");
             case copyField::Amount:
-                data = tInfo.displayAmount();
-                break;
+                return tx->displayAmount();
+            default:
+                return QString("");
         }
-    });
+    }();
 
     Utils::copyToClipboard(data);
 }
