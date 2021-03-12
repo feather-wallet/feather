@@ -76,7 +76,6 @@ class Wallet : public QObject, public PassprasePrompter
 Q_OBJECT
     Q_PROPERTY(bool disconnected READ disconnected NOTIFY disconnectedChanged)
     Q_PROPERTY(bool refreshing READ refreshing NOTIFY refreshingChanged)
-    Q_PROPERTY(QString seed READ getSeed)
     Q_PROPERTY(QString seedLanguage READ getSeedLanguage)
     Q_PROPERTY(Status status READ status)
     Q_PROPERTY(NetworkType::Type nettype READ nettype)
@@ -127,7 +126,7 @@ public:
     ConnectionStatus connectionStatus() const;
 
     //! returns mnemonic seed
-    QString getSeed() const;
+    QString getSeed(const QString &seedOffset) const;
 
     //! returns seed language
     QString getSeedLanguage() const;

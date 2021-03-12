@@ -1,24 +1,23 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "wizard/createwalletseed.h"
-#include "wizard/walletwizard.h"
-#include "ui_createwalletseed.h"
+#include "WalletWizard.h"
+#include "PageWalletSeed.h"
+#include "ui_PageWalletSeed.h"
+#include "globals.h"
 
-#include <QFileDialog>
 #include <QMessageBox>
 
-CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
-        QWizardPage(parent),
-        m_ctx(ctx),
-        ui(new Ui::CreateWalletSeedPage) {
+PageWalletSeed::PageWalletSeed(AppContext *ctx, WizardFields *fields, QWidget *parent)
+    : QWizardPage(parent)
+    , m_ctx(ctx)
+    , ui(new Ui::PageWalletSeed)
+    , m_fields(fields)
+{
     ui->setupUi(this);
-    this->setFinalPage(true);
-    this->setTitle("Wallet seed");
 
-    // hide ui element, we only need it for registerField
-    this->registerField("mnemonicSeed", ui->hiddenMnemonicSeed);
-    ui->hiddenMnemonicSeed->hide();
+    QPixmap pixmap = QPixmap(":/assets/images/seed.png");
+    ui->seedIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     ui->seedWord2->setHelpText("In addition to the private spend key, Tevador's 14 word seed scheme also encodes the "
                                "restore date, cryptocurrency type, and reserves a few bits for future use. "
@@ -30,15 +29,14 @@ CreateWalletSeedPage::CreateWalletSeedPage(AppContext *ctx, QWidget *parent) :
     connect(ui->btnCopy, &QPushButton::clicked, [this]{
         Utils::copyToClipboard(m_mnemonic);
     });
-
-    this->setButtonText(QWizard::FinishButton, "Create/Open wallet");
 }
 
-void CreateWalletSeedPage::initializePage() {
+void PageWalletSeed::initializePage() {
     this->generateSeed();
+    this->setTitle(m_fields->modeText);
 }
 
-void CreateWalletSeedPage::seedRoulette(int count) {
+void PageWalletSeed::seedRoulette(int count) {
     count += 1;
     if (count > m_rouletteSpin)
         return;
@@ -50,14 +48,18 @@ void CreateWalletSeedPage::seedRoulette(int count) {
     });
 }
 
-void CreateWalletSeedPage::generateSeed() {
-    FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], m_ctx->coinName, m_ctx->seedLanguage);
-    m_mnemonic = seed.mnemonic.join(" ");
-    m_restoreHeight = seed.restoreHeight;
+void PageWalletSeed::generateSeed() {
+    do {
+        FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType],
+                                       QString::fromStdString(globals::coinName), m_ctx->seedLanguage);
+        m_mnemonic = seed.mnemonic.join(" ");
+        m_restoreHeight = seed.restoreHeight;
+    } while (m_mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2
+
     this->displaySeed(m_mnemonic);
 }
 
-void CreateWalletSeedPage::displaySeed(const QString &seed){
+void PageWalletSeed::displaySeed(const QString &seed){
     QStringList seedSplit = seed.split(" ");
 
     ui->seedWord1->setText(seedSplit[0]);
@@ -76,13 +78,13 @@ void CreateWalletSeedPage::displaySeed(const QString &seed){
     ui->seedWord14->setText(seedSplit[13]);
 }
 
-int CreateWalletSeedPage::nextId() const {
-    return -1;
+int PageWalletSeed::nextId() const {
+    return WalletWizard::Page_WalletFile;
 }
 
-bool CreateWalletSeedPage::validatePage() {
-    if(m_mnemonic.isEmpty()) return false;
-    if(!m_restoreHeight) return false;
+bool PageWalletSeed::validatePage() {
+    if (m_mnemonic.isEmpty()) return false;
+    if (!m_restoreHeight) return false;
 
     QMessageBox seedWarning(this);
     seedWarning.setWindowTitle("Warning!");
@@ -90,11 +92,15 @@ bool CreateWalletSeedPage::validatePage() {
                         "• Never type it on a website\n"
                         "• Store it safely (offline)\n"
                         "• Do not lose your seed!");
+    seedWarning.addButton("Go back", QMessageBox::RejectRole);
     seedWarning.addButton("I understand", QMessageBox::AcceptRole);
-    seedWarning.exec();
+    int res = seedWarning.exec();
 
-    this->setField("mnemonicSeed", m_mnemonic);
-    this->setField("restoreHeight", m_restoreHeight);
-    emit createWallet();
+    if (res == QMessageBox::Rejected) {
+        return false;
+    }
+
+    m_fields->seed = m_mnemonic;
+
     return true;
 }

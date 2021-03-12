@@ -69,14 +69,14 @@ void WalletKeysFilesModel::refresh() {
 
 void WalletKeysFilesModel::updateDirectories() {
     this->walletDirectories.clear();
-    this->walletDirectories << m_ctx->defaultWalletDirRoot;
+    this->walletDirectories << m_ctx->defaultWalletDir; // TODO
     auto walletPath = config()->get(Config::walletPath).toString();
     if(!walletPath.isEmpty() && Utils::fileExists(walletPath)) {
         QDir d = QFileInfo(walletPath).absoluteDir();
         this->walletDirectories << d.absolutePath();
     }
 
-    this->walletDirectories << m_ctx->homeDir;
+    this->walletDirectories << QDir::homePath();
     this->walletDirectories.removeDuplicates();
 }
 
@@ -160,12 +160,13 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
                 return QString("main");
             }
             case ModelColumns::FileName:
-                return walletKeyFile.fileName();
+                return walletKeyFile.fileName().replace(".keys", "");
             case ModelColumns::Path: {
                 auto fp = walletKeyFile.path();
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
-                if (fp.startsWith(m_ctx->homeDir))
-                    fp = QString("~/%1").arg(fp.remove(0, m_ctx->homeDir.length() + 1));
+                if (fp.startsWith(QDir::homePath())) {
+                    fp = QString("~/%1").arg(fp.remove(0, QDir::homePath().length() + 1));
+                }
 #endif
                 return fp;
             }

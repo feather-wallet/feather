@@ -26,84 +26,39 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
     this->networkClearnet = new QNetworkAccessManager();
     this->cmdargs = cmdargs;
 
-#if defined(Q_OS_MAC)
-    this->isTorSocks = qgetenv("DYLD_INSERT_LIBRARIES").indexOf("libtorsocks") >= 0;
-#elif defined(Q_OS_LINUX)
-    this->isTorSocks = qgetenv("LD_PRELOAD").indexOf("libtorsocks") >= 0;
-#elif defined(Q_OS_WIN)
-    this->isTorSocks = false;
-#endif
-
+    this->isTorSocks = Utils::isTorsocks();
     this->isTails = TailsOS::detect();
     this->isWhonix = WhonixOS::detect();
 
-    //Paths
-    this->configRoot = QDir::homePath();
-    if (isTails) { // #if defined(PORTABLE)
-        QString portablePath = []{
-            QString appImagePath = qgetenv("APPIMAGE");
-            if (appImagePath.isEmpty()) {
-                qDebug() << "Not an appimage, using currentPath()";
-                return QDir::currentPath() + "/.feather";
-            }
+    // ----------------- Setup Paths -----------------
 
-            QFileInfo appImageDir(appImagePath);
-            return appImageDir.absoluteDir().path() + "/.feather";
-        }();
-
-
-        if (QDir().mkpath(portablePath)) {
-            this->configRoot = portablePath;
-        } else {
-            qCritical() << "Unable to create portable directory: " << portablePath;
-        }
-    }
-
-    this->accountName = Utils::getUnixAccountName();
-    this->homeDir = QDir::homePath();
+    QString configDir = Config::defaultConfigDir().path();
+    createConfigDirectory(configDir);
 
     QString walletDir = config()->get(Config::walletDirectory).toString();
     if (walletDir.isEmpty()) {
-#if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
-        this->defaultWalletDir = QString("%1/Monero/wallets").arg(this->configRoot);
-        this->defaultWalletDirRoot = QString("%1/Monero").arg(this->configRoot);
-#elif defined(Q_OS_WIN)
-        this->defaultWalletDir = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/Monero";
-        this->defaultWalletDirRoot = QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation);
-#endif
-    } else {
-        this->defaultWalletDir = walletDir;
-        this->defaultWalletDirRoot = walletDir;
+        walletDir = Utils::defaultWalletDir();
     }
-
-    // Create wallet dirs
+    this->defaultWalletDir = walletDir;
     if (!QDir().mkpath(defaultWalletDir))
         qCritical() << "Unable to create dir: " << defaultWalletDir;
 
-    this->configDirectory = QString("%1/.config/feather/").arg(this->configRoot);
-#if defined(Q_OS_UNIX)
-    if(!this->configDirectory.endsWith('/'))
-        this->configDirectory = QString("%1/").arg(this->configDirectory);
-#endif
+    // ----------------- Network Type -----------------
 
-    // Config
-    createConfigDirectory(this->configDirectory);
-
-    if(this->cmdargs->isSet("stagenet"))
+    if (this->cmdargs->isSet("stagenet"))
         this->networkType = NetworkType::STAGENET;
-    else if(this->cmdargs->isSet("testnet"))
+    else if (this->cmdargs->isSet("testnet"))
         this->networkType = NetworkType::TESTNET;
     else
         this->networkType = NetworkType::MAINNET;
 
-//    auto nodeSourceUInt = config()->get(Config::nodeSource).toUInt();
-//    AppContext::nodeSource = static_cast<NodeSource>(nodeSourceUInt);
+
     this->nodes = new Nodes(this, this->networkClearnet);
     connect(this, &AppContext::nodeSourceChanged, this->nodes, &Nodes::onNodeSourceChanged);
     connect(this, &AppContext::setCustomNodes, this->nodes, &Nodes::setCustomNodes);
 
     // Tor & socks proxy
-    this->ws = new WSClient(this, m_wsUrl);
+    this->ws = new WSClient(this, globals::websocketUrl);
     connect(this->ws, &WSClient::WSMessage, this, &AppContext::onWSMessage);
 
     // Store the wallet every 2 minutes
@@ -117,7 +72,7 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 
     // price history lookup
     auto genesis_timestamp = this->restoreHeights[NetworkType::Type::MAINNET]->data.firstKey();
-    AppContext::txFiatHistory = new TxFiatHistory(genesis_timestamp, this->configDirectory);
+    AppContext::txFiatHistory = new TxFiatHistory(genesis_timestamp, configDir);
     connect(this->ws, &WSClient::connectionEstablished, AppContext::txFiatHistory, &TxFiatHistory::onUpdateDatabase);
     connect(AppContext::txFiatHistory, &TxFiatHistory::requestYear, [=](int year){
         QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1}})").arg(year).toUtf8();
@@ -133,18 +88,18 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 
     // XMRig
 #ifdef HAS_XMRIG
-    this->XMRig = new XmRig(this->configDirectory, this);
+    this->XMRig = new XmRig(configDir, this);
     this->XMRig->prepare();
 #endif
 
     this->walletManager = WalletManager::instance();
-    QString logPath = QString("%1/daemon.log").arg(configDirectory);
+    QString logPath = QString("%1/daemon.log").arg(configDir);
     Monero::Utils::onStartup();
     Monero::Wallet::init("", "feather", logPath.toStdString(), true);
 
     bool logLevelFromEnv;
     int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
-    if(this->cmdargs->isSet("quiet"))
+    if (this->cmdargs->isSet("quiet"))
         this->walletManager->setLogLevel(-1);
     else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max)
         Monero::WalletManagerFactory::setLogLevel(logLevel);
@@ -159,11 +114,12 @@ void AppContext::initTor() {
     this->tor = new Tor(this, this);
     this->tor->start();
 
-    if (!(isWhonix)) {
+    if (!(isWhonix) && !(isTorSocks)) {
         this->networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
         this->network->setProxy(*networkProxy);
-        if (m_wsUrl.host().endsWith(".onion"))
+        if (globals::websocketUrl.host().endsWith(".onion")) {
             this->ws->webSocket.setProxy(*networkProxy);
+        }
     }
 }
 
@@ -218,9 +174,9 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
 
     qDebug() << "creating tx";
     if (all)
-        this->currentWallet->createTransactionAllAsync(address, "", this->tx_mixin, this->tx_priority);
+        this->currentWallet->createTransactionAllAsync(address, "", globals::mixin, this->tx_priority);
     else
-        this->currentWallet->createTransactionAsync(address, "", amount, this->tx_mixin, this->tx_priority);
+        this->currentWallet->createTransactionAsync(address, "", amount, globals::mixin, this->tx_priority);
 
     emit initiateTransaction();
 }
@@ -335,7 +291,6 @@ void AppContext::onWalletOpened(Wallet *wallet) {
     this->refreshed = false;
     this->currentWallet = wallet;
     this->walletPath = this->currentWallet->path() + ".keys";
-    this->walletViewOnly = this->currentWallet->viewOnly();
     config()->set(Config::walletPath, this->walletPath);
 
     connect(this->currentWallet, &Wallet::moneySpent, this, &AppContext::onMoneySpent);
@@ -368,7 +323,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 void AppContext::setWindowTitle(bool mining) {
     QFileInfo fileInfo(this->walletPath);
     auto title = QString("Feather - [%1]").arg(fileInfo.fileName());
-    if(this->walletViewOnly)
+    if(this->currentWallet && this->currentWallet->viewOnly())
         title += " [view-only]";
     if(mining)
         title += " [mining]";
@@ -536,7 +491,7 @@ void AppContext::createConfigDirectory(const QString &dir) {
     }
 }
 
-void AppContext::createWallet(FeatherSeed seed, const QString &path, const QString &password) {
+void AppContext::createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
         qCritical() << err;
@@ -551,11 +506,12 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
 
     Wallet *wallet = nullptr;
     if (seed.seedType == SeedType::TEVADOR) {
-        wallet = this->walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, this->networkType, seed.spendKey, seed.restoreHeight, this->kdfRounds);
+        wallet = this->walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, this->networkType, seed.spendKey, seed.restoreHeight, globals::kdfRounds, seedOffset);
         wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
+        wallet->setCacheAttribute("feather.seedoffset", seedOffset);
     }
     if (seed.seedType == SeedType::MONERO) {
-        wallet = this->walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), "", this->networkType, seed.restoreHeight, this->kdfRounds);
+        wallet = this->walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, this->networkType, seed.restoreHeight, globals::kdfRounds);
     }
 
     this->currentWallet = wallet;
@@ -567,7 +523,7 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
     this->createWalletFinish(password);
 }
 
-void AppContext::createWalletViewOnly(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight) {
+void AppContext::createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
         qCritical() << err;
@@ -674,17 +630,18 @@ void AppContext::onOpenAliasResolve(const QString &openAlias) {
 }
 
 void AppContext::donateBeg() {
-    if(this->currentWallet == nullptr) return;
-    if(this->networkType != NetworkType::Type::MAINNET) return;
-    if(this->currentWallet->viewOnly()) return;
+    if (this->currentWallet == nullptr) return;
+    if (this->networkType != NetworkType::Type::MAINNET) return;
+    if (this->currentWallet->viewOnly()) return;
 
     auto donationCounter = config()->get(Config::donateBeg).toInt();
     if(donationCounter == -1)
         return;  // previously donated
 
     donationCounter += 1;
-    if (donationCounter % m_donationBoundary == 0)
+    if (donationCounter % globals::donationBoundary == 0) {
         emit donationNag();
+    }
     config()->set(Config::donateBeg, donationCounter);
 }
 
@@ -763,7 +720,7 @@ void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, q
 
 void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
     for (auto &addr : address) {
-        if (addr == this->donationAddress) {
+        if (addr == globals::donationAddress) {
             this->donationSending = true;
         }
     }

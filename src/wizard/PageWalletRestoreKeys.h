@@ -13,23 +13,25 @@
 #include "appcontext.h"
 
 namespace Ui {
-    class ViewOnlyPage;
+    class PageWalletRestoreKeys;
 }
 
-class ViewOnlyPage : public QWizardPage
+class PageWalletRestoreKeys : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit ViewOnlyPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageWalletRestoreKeys(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
-    void cleanupPage() const;
 
 private:
+    void resetWidgets();
+
     AppContext *m_ctx;
-    QLabel *topLabel;
-    Ui::ViewOnlyPage *ui;
+    WizardFields *m_fields;
+    Ui::PageWalletRestoreKeys *ui;
 };
 
 #endif

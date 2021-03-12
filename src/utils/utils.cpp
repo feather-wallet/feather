@@ -469,3 +469,21 @@ QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index) {
     }
     return QTextCharFormat();
 }
+
+bool Utils::isTorsocks() {
+#if defined(Q_OS_MAC)
+    return qgetenv("DYLD_INSERT_LIBRARIES").indexOf("libtorsocks") >= 0;
+#elif defined(Q_OS_LINUX)
+    return qgetenv("LD_PRELOAD").indexOf("libtorsocks") >= 0;
+#else
+    return false;
+#endif
+}
+
+QString Utils::defaultWalletDir() {
+#if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
+    return QString("%1/Monero/wallets").arg(QDir::homePath());
+#elif defined(Q_OS_WIN)
+    return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/Monero/wallets";
+#endif
+}

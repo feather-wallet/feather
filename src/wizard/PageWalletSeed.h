@@ -12,15 +12,15 @@
 #include "appcontext.h"
 
 namespace Ui {
-    class CreateWalletSeedPage;
+    class PageWalletSeed;
 }
 
-class CreateWalletSeedPage : public QWizardPage
+class PageWalletSeed : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit CreateWalletSeedPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageWalletSeed(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -37,8 +37,9 @@ signals:
 
 private:
     AppContext *m_ctx;
-    QLabel *topLabel;
-    Ui::CreateWalletSeedPage *ui;
+    Ui::PageWalletSeed *ui;
+
+    WizardFields *m_fields;
 
     QString m_mnemonic;
     int m_restoreHeight;

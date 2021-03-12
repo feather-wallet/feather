@@ -23,7 +23,10 @@ struct RestoreHeightLookup {
         // will calculate the blockheight based off the last known
         // date: ((now - lastKnownDate) / blockTime) - clearance
 
-        if(this->type == NetworkType::TESTNET) return 1;
+        if (this->type == NetworkType::TESTNET) {
+            return 1;
+        }
+
         int blockTime = 120;
         int blocksPerDay = 86400 / blockTime;
         int blockCalcClearance = blocksPerDay * 5;
@@ -50,12 +53,20 @@ struct RestoreHeightLookup {
         // @TODO: most likely inefficient, refactor
         QMap<int, int>::iterator i;
         int timestamp = 0;
+        int heightData = 1;
         for (i = this->data.begin(); i != this->data.end(); ++i) {
             int ts = i.key();
             if (i.value() > height)
                 return timestamp;
             timestamp = ts;
+            heightData = i.value();
         }
+
+        while (heightData < height) {
+            heightData += 720; // blocks per day
+            timestamp += 86400; // seconds in day
+        }
+
         return timestamp;
     }
 
@@ -67,7 +78,7 @@ struct RestoreHeightLookup {
         for(const auto &line: data.split('\n')) {
             if(line.trimmed().isEmpty()) continue;
             auto spl = line.trimmed().split(':');
-            rtn->data[spl.at(0).toUInt()] = spl.at(1).toUInt();
+            rtn->data[spl.at(0).toInt()] = spl.at(1).toInt();
         }
         return rtn;
     }

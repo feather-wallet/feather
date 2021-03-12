@@ -503,6 +503,7 @@ void MainWindow::initWidgets() {
 
 WalletWizard *MainWindow::createWizard(WalletWizard::Page startPage){
     auto *wizard = new WalletWizard(m_ctx, startPage, this);
+    connect(wizard, &WalletWizard::skinChanged, this, &MainWindow::skinChanged);
     connect(wizard, &WalletWizard::openWallet, m_ctx, &AppContext::onOpenWallet);
     connect(wizard, &WalletWizard::defaultWalletDirChanged, m_windowSettings, &Settings::updatePaths);
     connect(wizard, &WalletWizard::rejected, [this]{
@@ -544,7 +545,7 @@ void MainWindow::touchbarShowWallet() {
 
 void MainWindow::onWalletCreatedError(const QString &err) {
     QMessageBox::warning(this, "Wallet creation error", err);
-    this->showWizard(WalletWizard::Page_CreateWallet);
+    this->showWizard(WalletWizard::Page_WalletFile);
 }
 
 void MainWindow::onWalletOpenPasswordRequired(bool invalidPassword, const QString &path) {
@@ -1015,11 +1016,11 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::donateButtonClicked() {
-    double donation = AppContext::prices->convert("EUR", "XMR", m_ctx->donationAmount);
+    double donation = AppContext::prices->convert("EUR", "XMR", globals::donationAmount);
     if (donation <= 0)
         donation = 0.1337;
 
-    ui->sendWidget->fill(m_ctx->donationAddress, "Donation to the Feather development team", donation);
+    ui->sendWidget->fill(globals::donationAddress, "Donation to the Feather development team", donation);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
