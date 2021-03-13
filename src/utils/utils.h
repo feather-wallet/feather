@@ -76,6 +76,8 @@ public:
     static QMap<QString, QLocale> localeCache;
     static QString balanceFormat(quint64 balance);
     static QTextCharFormat addressTextFormat(const SubaddressIndex &index);
+    static bool isTorsocks();
+    static QString defaultWalletDir();
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)

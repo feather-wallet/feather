@@ -51,9 +51,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QCommandLineOption torPortOption(QStringList() << "tor-port", "Port of running Tor instance.", "torPort");
     parser.addOption(torPortOption);
 
-    QCommandLineOption debugModeOption(QStringList() << "debug", "Run program in debug mode.");
-    parser.addOption(debugModeOption);
-
     QCommandLineOption quietModeOption(QStringList() << "quiet", "Limit console output");
     parser.addOption(quietModeOption);
 
@@ -94,7 +91,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
 
     const QStringList args = parser.positionalArguments();
-    bool debugMode = parser.isSet(debugModeOption);
     bool localTor = parser.isSet(useLocalTorOption);
     bool stagenet = parser.isSet(stagenetOption);
     bool testnet = parser.isSet(testnetOption);
@@ -111,8 +107,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         QCoreApplication::setOrganizationName("featherwallet.org");
 
         auto *ctx = new AppContext(&parser);
-        ctx->applicationPath = QString(argv[0]);
-        ctx->isDebug = debugMode;
 
         auto *cli = new CLI(ctx, &cli_app);
         QObject::connect(cli, &CLI::closeApplication, &cli_app, &QCoreApplication::quit);
@@ -162,8 +156,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
 
     auto *ctx = new AppContext(&parser);
-    ctx->applicationPath = QString(argv[0]);
-    ctx->isDebug = debugMode;
 
 #if defined(Q_OS_MAC)
     // For some odd reason, if we don't do this, QPushButton's

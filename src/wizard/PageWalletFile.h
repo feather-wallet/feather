@@ -7,32 +7,37 @@
 #include <QLabel>
 #include <QWizardPage>
 #include <QWidget>
+#include <QDir>
 
 #include "appcontext.h"
 
 namespace Ui {
-    class CreateWalletPage;
+    class PageWalletFile;
 }
 
-class CreateWalletPage : public QWizardPage
+class PageWalletFile : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit CreateWalletPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
+    bool isComplete() const override;
 
 signals:
-    void createWallet();
     void defaultWalletDirChanged(QString walletDir);
 
 private:
-    AppContext *m_ctx;
-    Ui::CreateWalletPage *ui;
-    QString m_walletDir;
+    QString defaultWalletName();
+    bool walletPathExists(const QString &walletName);
     bool validateWidgets();
+
+    AppContext *m_ctx;
+    Ui::PageWalletFile *ui;
+    WizardFields *m_fields;
+    bool m_validated;
 };
 
 #endif //FEATHER_CREATEWALLET_H

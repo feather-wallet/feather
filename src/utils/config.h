@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QPointer>
+#include <QDir>
 
 class Config : public QObject
 {
@@ -50,7 +51,8 @@ public:
         redditFrontend,
         showHistorySyncNotice,
         GUI_HistoryViewState,
-        amountPrecision
+        amountPrecision,
+        portableMode
     };
 
     ~Config() override;
@@ -59,6 +61,9 @@ public:
     void set(ConfigKey key, const QVariant& value);
     void sync();
     void resetToDefaults();
+
+    static QDir defaultConfigDir();
+    static QDir defaultPortableConfigDir();
 
     static Config* instance();
 

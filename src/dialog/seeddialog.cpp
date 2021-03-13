@@ -13,8 +13,9 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
 
     ui->label_restoreHeight->setText(QString::number(wallet->getWalletCreationHeight()));
 
+    QString seedOffset = wallet->getCacheAttribute("feather.seedoffset");
     QString seed_14_words = wallet->getCacheAttribute("feather.seed");
-    QString seed_25_words = wallet->getSeed();
+    QString seed_25_words = wallet->getSeed(seedOffset);
 
     if (seed_14_words.isEmpty()) {
         ui->check_toggleSeedType->hide();
@@ -23,6 +24,9 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
         this->setSeed(seed_14_words);
         ui->frameRestoreHeight->setVisible(false);
     }
+
+    ui->frameSeedOffset->setVisible(!seedOffset.isEmpty());
+    ui->line_seedOffset->setText(seedOffset);
 
     connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed_14_words](bool toggled){
         this->setSeed(toggled ? seed_25_words : seed_14_words);

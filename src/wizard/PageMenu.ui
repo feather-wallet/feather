@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MenuPage</class>
- <widget class="QWizardPage" name="MenuPage">
+ <class>PageMenu</class>
+ <widget class="QWizardPage" name="PageMenu">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -63,7 +63,7 @@
       <enum>Qt::ClickFocus</enum>
      </property>
      <property name="text">
-      <string>Import from keys</string>
+      <string>Restore wallet from keys</string>
      </property>
     </widget>
    </item>
@@ -81,24 +81,39 @@
     </spacer>
    </item>
    <item>
-    <widget class="QLabel" name="label_2">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
+    <widget class="QCheckBox" name="check_darkMode">
      <property name="text">
-      <string>by dsc &amp; tobtoht</string>
+      <string>Dark mode</string>
      </property>
     </widget>
    </item>
    <item>
-    <widget class="QLabel" name="label_3">
-     <property name="enabled">
-      <bool>false</bool>
-     </property>
-     <property name="text">
-      <string>banner: themonera.art</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_2">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>by dsc &amp; tobtoht</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="label_3">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>banner: themonera.art</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>

@@ -35,9 +35,9 @@ Wallet::ConnectionStatus Wallet::connectionStatus() const
     return m_connectionStatus;
 }
 
-QString Wallet::getSeed() const
+QString Wallet::getSeed(const QString &seedOffset) const
 {
-    return QString::fromStdString(m_walletImpl->seed());
+    return QString::fromStdString(m_walletImpl->seed(seedOffset.toStdString()));
 }
 
 QString Wallet::getSeedLanguage() const

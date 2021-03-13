@@ -37,41 +37,25 @@ Q_OBJECT
 public:
     explicit AppContext(QCommandLineParser *cmdargs);
     ~AppContext() override;
-    bool isTails = false;
-    bool isWhonix = false;
-    bool isDebug = false;
-
-    // Donation config
-    const QString donationAddress = "47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f";
-    const int donationAmount = 25;  // euro
-    bool donationSending = false;
 
     QCommandLineParser *cmdargs;
 
-    QString coinName = "monero";
+    bool isTails = false;
+    bool isWhonix = false;
     bool isTorSocks = false;
-    QString homeDir;
-    QString accountName;
-    QString configRoot;
-    QString configDirectory;
+
+    bool donationSending = false;
+
     QString defaultWalletDir;
-    QString defaultWalletDirRoot;
     QString tmpTxDescription;
 
     QString walletPath;
     QString walletPassword = "";
-    bool walletViewOnly = false;
     NetworkType::Type networkType;
-
-    QString applicationPath;
-
-    static void createConfigDirectory(const QString &dir) ;
 
     QMap<QString, int> heights;
     QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
-    const quint64 kdfRounds = 1;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
-    quint32 tx_mixin = static_cast<const quint32 &>(10);
     QString seedLanguage = "English";  // 14 word `monero-seed` only has English
 
     QNetworkAccessManager *network;
@@ -88,12 +72,14 @@ public:
     static QMap<QString, QString> txCache;
     static TxFiatHistory *txFiatHistory;
 
+    static void createConfigDirectory(const QString &dir);
+
     // libwalletqt
     bool refreshed = false;
     WalletManager *walletManager;
     Wallet *currentWallet = nullptr;
-    void createWallet(FeatherSeed seed, const QString &path, const QString &password);
-    void createWalletViewOnly(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight);
+    void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset = "");
+    void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
     void createWalletFinish(const QString &password);
     void syncStatusUpdated(quint64 height, quint64 target);
     void updateBalance();
@@ -176,9 +162,7 @@ signals:
     void setTitle(const QString &title); // set window title
 
 private:
-    const int m_donationBoundary = 15;
     QTimer m_storeTimer;
-    QUrl m_wsUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
 };
 
 #endif //FEATHER_APPCONTEXT_H

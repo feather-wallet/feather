@@ -28,7 +28,7 @@
 #include "utils/networking.h"
 #include "appcontext.h"
 #include "utils/config.h"
-#include "wizard/walletwizard.h"
+#include "wizard/WalletWizard.h"
 #include "settings.h"
 #include "dialog/aboutdialog.h"
 #include "dialog/signverifydialog.h"

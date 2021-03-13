@@ -12,22 +12,22 @@
 #include "utils/nodes.h"
 
 namespace Ui {
-    class NetworkPage;
+    class PageNetwork;
 }
 
-class NetworkPage : public QWizardPage
+class PageNetwork : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit NetworkPage(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageNetwork(AppContext *ctx, QWidget *parent = nullptr);
     bool validatePage() override;
     int nextId() const override;
 
 private:
     AppContext *m_ctx;
     QLabel *topLabel;
-    Ui::NetworkPage *ui;
+    Ui::PageNetwork *ui;
 };
 
 #endif //FEATHER_WIZARDNETWORK_H

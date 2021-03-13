@@ -20,7 +20,7 @@ Tor::Tor(AppContext *ctx, QObject *parent)
 {
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &Tor::checkConnection);
 
-    this->torDir = QDir(m_ctx->configDirectory).filePath("tor");
+    this->torDir = Config::defaultConfigDir().filePath("tor");
     this->torDataPath = QDir(this->torDir).filePath("data");
 
     if (m_ctx->cmdargs->isSet("tor-port")) {

@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "wizard/openwallet.h"
-#include "ui_openwallet.h"
+#include "PageOpenWallet.h"
+#include "ui_PageOpenWallet.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 
-OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent)
+PageOpenWallet::PageOpenWallet(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
-        , ui(new Ui::OpenWalletPage)
+        , ui(new Ui::PageOpenWallet)
         , m_ctx(ctx)
         , m_walletKeysFilesModel(wallets)
 {
@@ -18,7 +18,7 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, Q
     connect(ui->btnBrowse, &QPushButton::clicked, [=]{
         // manually browsing for wallet
         auto walletPath = config()->get(Config::walletPath).toString();
-        if(walletPath.isEmpty())
+        if (walletPath.isEmpty())
             walletPath = m_ctx->defaultWalletDir;
         QString path = QFileDialog::getOpenFileName(this, "Select your wallet file", walletPath, "Wallet file (*.keys)");
         if(path.isEmpty()) return;
@@ -29,9 +29,7 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, Q
             return;
         }
 
-        setField("walletPath", path);
-
-        if(ui->openOnStartup->isChecked())
+        if (ui->openOnStartup->isChecked())
             config()->set(Config::autoOpenWalletPath, QString("%1%2").arg(m_ctx->networkType).arg(path));
 
         emit openWallet(path);
@@ -59,29 +57,29 @@ OpenWalletPage::OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, Q
     connect(ui->walletTable->selectionModel(), &QItemSelectionModel::currentRowChanged, [this](QModelIndex current, QModelIndex prev){
         this->updatePath();
     });
-    connect(ui->walletTable, &QTreeView::doubleClicked, this, &OpenWalletPage::validatePage);
+    connect(ui->walletTable, &QTreeView::doubleClicked, this, &PageOpenWallet::validatePage);
 }
 
-void OpenWalletPage::initializePage() {
+void PageOpenWallet::initializePage() {
     m_walletKeysFilesModel->refresh();
 }
 
-void OpenWalletPage::updatePath() {
+void PageOpenWallet::updatePath() {
     QModelIndex index = ui->walletTable->currentIndex();
     if (!index.isValid()) {
-        ui->labelPath->clear();
+        ui->linePath->clear();
         return;
     }
 
     QString path = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Path), Qt::DisplayRole).toString();
-    ui->labelPath->setText(path);
+    ui->linePath->setText(path);
 }
 
-int OpenWalletPage::nextId() const {
+int PageOpenWallet::nextId() const {
     return -1;
 }
 
-bool OpenWalletPage::validatePage() {
+bool PageOpenWallet::validatePage() {
     QModelIndex index = ui->walletTable->currentIndex();
     if(!index.isValid()) {
         QMessageBox::warning(this, "Wallet not selected", "Please select a wallet from the list.");

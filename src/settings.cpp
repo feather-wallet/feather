@@ -71,7 +71,6 @@ Settings::Settings(QWidget *parent) :
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
         if (walletDir.isEmpty()) return;
         m_ctx->defaultWalletDir = walletDir;
-        m_ctx->defaultWalletDirRoot = walletDir;
         config()->set(Config::walletDirectory, walletDir);
         ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
     });
@@ -81,8 +80,8 @@ Settings::Settings(QWidget *parent) :
 
 void Settings::updatePaths() {
     ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
-    ui->lineEdit_configDir->setText(m_ctx->configDirectory);
-    ui->lineEdit_applicationDir->setText(m_ctx->applicationPath);
+    ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
+    ui->lineEdit_applicationDir->setText(QCoreApplication::applicationDirPath());
 }
 
 void Settings::fiatCurrencySelected(int index) {

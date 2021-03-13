@@ -142,7 +142,7 @@ Wallet *WalletManager::createWalletFromKeys(const QString &path, const QString &
 }
 
 Wallet *WalletManager::createDeterministicWalletFromSpendKey(const QString &path, const QString &password, const QString &language, NetworkType::Type nettype,
-                                                             const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds)
+                                                             const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds, const QString &offset_passphrase)
 {
     QMutexLocker locker(&m_mutex);
     if (m_currentWallet) {
@@ -151,7 +151,7 @@ Wallet *WalletManager::createDeterministicWalletFromSpendKey(const QString &path
         m_currentWallet = NULL;
     }
     Monero::Wallet * w = m_pimpl->createDeterministicWalletFromSpendKey(path.toStdString(), "", language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
-                                                                        spendkey.toStdString(), kdfRounds);
+                                                                        spendkey.toStdString(), kdfRounds, offset_passphrase.toStdString());
     m_currentWallet = new Wallet(w);
     return m_currentWallet;
 }

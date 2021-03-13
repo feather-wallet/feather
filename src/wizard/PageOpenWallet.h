@@ -12,15 +12,15 @@
 #include "utils/keysfiles.h"
 
 namespace Ui {
-    class OpenWalletPage;
+    class PageOpenWallet;
 }
 
-class OpenWalletPage : public QWizardPage
+class PageOpenWallet : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit OpenWalletPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    explicit PageOpenWallet(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -34,7 +34,7 @@ private:
     AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
-    Ui::OpenWalletPage *ui;
+    Ui::PageOpenWallet *ui;
     QStandardItemModel *m_model;
 };
 

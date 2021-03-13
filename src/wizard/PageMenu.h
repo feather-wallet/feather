@@ -11,23 +11,27 @@
 #include "appcontext.h"
 
 namespace Ui {
-    class MenuPage;
+    class PageMenu;
 }
 
-class MenuPage : public QWizardPage
+class PageMenu : public QWizardPage
 {
     Q_OBJECT
 
 public:
-    explicit MenuPage(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    explicit PageMenu(AppContext *ctx, WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
+signals:
+    void enableDarkMode(bool enable);
+
 private:
     AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
-    Ui::MenuPage *ui;
+    Ui::PageMenu *ui;
+    WizardFields *m_fields;
 };
 
 #endif //FEATHER_WIZARDMENU_H
