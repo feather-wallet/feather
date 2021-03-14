@@ -52,7 +52,9 @@ public:
         showHistorySyncNotice,
         GUI_HistoryViewState,
         amountPrecision,
-        portableMode
+        portableMode,
+        dateFormat,
+        timeFormat
     };
 
     ~Config() override;

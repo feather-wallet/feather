@@ -24,9 +24,14 @@ public:
     explicit TransactionInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent = nullptr);
     ~TransactionInfoDialog() override;
 
+signals:
+    void resendTranscation(const QString &txid);
+
 private:
     void copyTxKey();
     void createTxProof();
+    void setData(TransactionInfo* tx);
+    void updateData();
 
     Ui::TransactionInfoDialog *ui;
 
@@ -35,6 +40,7 @@ private:
     Wallet *m_wallet;
     QString m_txKey;
     QString m_txid;
+    QTimer m_updateTimer;
 };
 
 #endif //FEATHER_TRANSACTIONINFODIALOG_H

@@ -141,7 +141,10 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
     switch (column)
     {
         case Column::Date:
-            return tInfo.timestamp().toString("yyyy-MM-dd HH:mm ");
+        {
+            return tInfo.timestamp().toString(QString("%1 %2 ").arg(config()->get(Config::dateFormat).toString(),
+                                                                    config()->get(Config::timeFormat).toString()));
+        }
         case Column::Description:
             return tInfo.description();
         case Column::Amount:

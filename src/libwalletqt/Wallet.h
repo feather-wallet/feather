@@ -224,6 +224,9 @@ public:
     //! returns if view only wallet
     Q_INVOKABLE bool viewOnly() const;
 
+    //! return true if deterministic keys
+    Q_INVOKABLE bool isDeterministic() const;
+
     Q_INVOKABLE void refreshHeightAsync();
 
     //! export/import key images

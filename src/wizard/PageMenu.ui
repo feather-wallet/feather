@@ -82,6 +82,9 @@
    </item>
    <item>
     <widget class="QCheckBox" name="check_darkMode">
+     <property name="focusPolicy">
+      <enum>Qt::NoFocus</enum>
+     </property>
      <property name="text">
       <string>Dark mode</string>
      </property>

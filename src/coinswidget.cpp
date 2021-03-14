@@ -89,19 +89,12 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
         menu->addAction(m_thawAllSelectedAction);
     }
     else {
-        QModelIndex index = ui->coins->indexAt(point);
-        if (!index.isValid()) {
-            return;
-        }
+        CoinsInfo* c = this->currentEntry();
+        if (!c) return;
 
-        int row = m_proxyModel->mapToSource(index).row();
-
-        bool isSpent, isFrozen, isUnlocked;
-        m_coins->coin(row, [&isSpent, &isFrozen, &isUnlocked](CoinsInfo &c) {
-            isSpent = c.spent();
-            isFrozen = c.frozen();
-            isUnlocked = c.unlocked();
-        });
+        bool isSpent = c->spent();
+        bool isFrozen = c->frozen();
+        bool isUnlocked = c->unlocked();
 
         menu->addMenu(m_copyMenu);
 
@@ -166,43 +159,27 @@ void CoinsWidget::thawAllSelected() {
 }
 
 void CoinsWidget::viewOutput() {
-    QModelIndex index = ui->coins->currentIndex();
+    CoinsInfo* c = this->currentEntry();
+    if (!c) return;
 
-    int row = m_proxyModel->mapToSource(index).row();
-    QPointer<CoinsInfo> c;
-    m_coins->coin(row, [&c](CoinsInfo &cInfo) {
-        c = &cInfo;
-    });
-
-    if (c) {
-        auto * dialog = new OutputInfoDialog(c, this);
-        dialog->show();
-    }
+    auto * dialog = new OutputInfoDialog(c, this);
+    dialog->show();
 }
 
 void CoinsWidget::onSweepOutput() {
-    QModelIndex index = ui->coins->currentIndex();
-    int row = m_proxyModel->mapToSource(index).row();
+    CoinsInfo* c = this->currentEntry();
+    if (!c) return;
 
-    QString keyImage;
-    bool keyImageKnown;
-    m_coins->coin(row, [&keyImage, &keyImageKnown](CoinsInfo &c) {
-        keyImageKnown = c.keyImageKnown();
-        keyImage = c.keyImage();
-    });
+    QString keyImage = c->keyImage();
 
-    qCritical() << "key image: " << keyImage;
-
-    if (!keyImageKnown) {
+    if (!c->keyImageKnown()) {
         QMessageBox::warning(this, "Unable to sweep output", "Unable to sweep output: key image unknown");
         return;
     }
 
-    auto * dialog = new OutputSweepDialog(this);
+    auto *dialog = new OutputSweepDialog(this, c);
     int ret = dialog->exec();
     if (!ret) return;
-
-    qCritical() << "key image: " << keyImage;
 
     emit sweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
     dialog->deleteLater();
@@ -213,37 +190,44 @@ void CoinsWidget::resetModel() {
 }
 
 void CoinsWidget::copy(copyField field) {
-    QModelIndex index = ui->coins->currentIndex();
-    int row = m_proxyModel->mapToSource(index).row();
+    CoinsInfo* c = this->currentEntry();
+    if (!c) return;
 
     QString data;
-    m_coins->coin(row, [field, &data](CoinsInfo &c) {
-        switch (field) {
-            case PubKey:
-                data = c.pubKey();
-                break;
-            case KeyImage:
-                data = c.keyImage();
-                break;
-            case TxID:
-                data = c.hash();
-                break;
-            case Address:
-                data = c.address();
-                break;
-            case Label:
-                data = c.addressLabel();
-                break;
-            case Height:
-                data = QString::number(c.blockHeight());
-                break;
-            case Amount:
-                data = c.displayAmount();
-                break;
-        }
-    });
+    switch (field) {
+        case PubKey:
+            data = c->pubKey();
+            break;
+        case KeyImage:
+            data = c->keyImage();
+            break;
+        case TxID:
+            data = c->hash();
+            break;
+        case Address:
+            data = c->address();
+            break;
+        case Label:
+            data = c->addressLabel();
+            break;
+        case Height:
+            data = QString::number(c->blockHeight());
+            break;
+        case Amount:
+            data = c->displayAmount();
+            break;
+    }
 
     Utils::copyToClipboard(data);
+}
+
+CoinsInfo* CoinsWidget::currentEntry() {
+    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
+    if (list.size() == 1) {
+        return m_model->entryFromIndex(m_proxyModel->mapToSource(list.first()));
+    } else {
+        return nullptr;
+    }
 }
 
 CoinsWidget::~CoinsWidget() {

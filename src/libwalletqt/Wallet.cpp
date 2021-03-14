@@ -293,6 +293,11 @@ bool Wallet::viewOnly() const
     return m_walletImpl->watchOnly();
 }
 
+bool Wallet::isDeterministic() const
+{
+    return m_walletImpl->isDeterministic();
+}
+
 quint64 Wallet::balance() const
 {
     return balance(m_currentSubaddressAccount);
@@ -400,9 +405,11 @@ void Wallet::refreshHeightAsync()
         daemonHeightFuture.second.waitForFinished();
         targetHeightFuture.second.waitForFinished();
 
-        setConnectionStatus(ConnectionStatus_Connected);
-
-        emit heightRefreshed(walletHeight, daemonHeight, targetHeight);
+        if (daemonHeight > 0 && targetHeight > 0) {
+            emit heightRefreshed(walletHeight, daemonHeight, targetHeight);
+            qDebug() << "Setting connection status from refreshHeightAsync";
+            setConnectionStatus(ConnectionStatus_Connected);
+        }
     });
 }
 

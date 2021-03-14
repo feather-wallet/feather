@@ -29,6 +29,10 @@ bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &so
     if (sourceRow == 0 && m_hidePrimary)
         return false;
 
+    if (!m_showHidden && m_hiddenAddresses.contains(address)) {
+        return false;
+    }
+
     if (!m_searchRegExp.isEmpty()) {
         return address.contains(m_searchCaseSensitiveRegExp) || label.contains(m_searchRegExp);
     }

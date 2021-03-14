@@ -27,8 +27,6 @@ public:
     int nextId() const override;
 
 private:
-    void resetWidgets();
-
     AppContext *m_ctx;
     WizardFields *m_fields;
     Ui::PageWalletRestoreKeys *ui;

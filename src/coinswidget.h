@@ -73,6 +73,7 @@ private:
 
     void showContextMenu(const QPoint & point);
     void copy(copyField field);
+    CoinsInfo* currentEntry();
 };
 
 

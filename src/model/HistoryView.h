@@ -4,6 +4,7 @@
 #ifndef FEATHER_HISTORYVIEW_H
 #define FEATHER_HISTORYVIEW_H
 
+#include <QKeyEvent>
 #include <QTreeView>
 #include <QActionGroup>
 
@@ -28,6 +29,9 @@ private slots:
     void fitColumnsToWindow();
     void fitColumnsToContents();
     void resetViewToDefaults();
+
+protected:
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     TransactionHistoryModel* sourceModel();

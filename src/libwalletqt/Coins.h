@@ -25,11 +25,12 @@ Q_OBJECT
 
 public:
     Q_INVOKABLE bool coin(int index, std::function<void (CoinsInfo &)> callback);
+    Q_INVOKABLE CoinsInfo * coin(int index);
     Q_INVOKABLE void refresh(quint32 accountIndex);
     Q_INVOKABLE void refreshUnlocked();
     Q_INVOKABLE void freeze(int index) const;
     Q_INVOKABLE void thaw(int index) const;
-    Q_INVOKABLE QStringList coins_from_txid(const QString &txid); // Todo: return CoinsInfo vector
+    Q_INVOKABLE QVector<CoinsInfo*> coins_from_txid(const QString &txid);
 
     quint64 count() const;
 

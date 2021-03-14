@@ -4,6 +4,7 @@
 #include "HistoryView.h"
 
 #include "TransactionHistoryProxyModel.h"
+#include "libwalletqt/TransactionInfo.h"
 
 #include <QHeaderView>
 #include <QMenu>
@@ -184,5 +185,16 @@ void HistoryView::resetViewToDefaults()
     // the initial default layout.
     if (isVisible()) {
         fitColumnsToWindow();
+    }
+}
+
+void HistoryView::keyPressEvent(QKeyEvent *event) {
+    TransactionInfo* tx = this->currentEntry();
+
+    if (event->matches(QKeySequence::Copy) && tx) {
+        Utils::copyToClipboard(tx->hash());
+    }
+    else {
+        QTreeView::keyPressEvent(event);
     }
 }

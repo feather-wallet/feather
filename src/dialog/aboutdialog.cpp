@@ -9,6 +9,7 @@
 AboutDialog::AboutDialog(QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::AboutDialog)
+        , m_model(new QStringListModel(this))
 {
     ui->setupUi(this);
     this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
@@ -25,8 +26,6 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");
     auto ack_text = Utils::barrayToString(ack);
     ui->ackText->setText(ack_text);
-
-    m_model = new QStringListModel(this);
 
     QString contributors = Utils::barrayToString(Utils::fileOpenQRC(":assets/contributors.txt"));
     QStringList contributor_list = contributors.split("\n");
