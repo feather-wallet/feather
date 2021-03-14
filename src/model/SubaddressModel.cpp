@@ -180,3 +180,8 @@ bool SubaddressModel::isShowFullAddresses() const {
 int SubaddressModel::unusedLookahead() const {
     return m_subaddress->unusedLookahead();
 }
+
+Monero::SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {
+    Q_ASSERT(index.isValid() && index.row() < m_subaddress->count());
+    return m_subaddress->row(index.row());
+}

@@ -23,7 +23,7 @@ Q_OBJECT
 
 public:
     explicit ReceiveWidget(QWidget *parent = nullptr);
-    void setModel(SubaddressModel * model, Subaddress * subaddress);
+    void setModel(SubaddressModel * model, Wallet * wallet);
     ~ReceiveWidget() override;
 
 
@@ -34,6 +34,7 @@ public slots:
     void showContextMenu(const QPoint& point);
     void setShowFullAddresses(bool show);
     void setShowUsedAddresses(bool show);
+    void setShowHiddenAddresses(bool show);
     void setSearchFilter(const QString &filter);
     void onShowTransactions();
     void resetModel();
@@ -44,6 +45,8 @@ signals:
 
 private slots:
     void showHeaderMenu(const QPoint& position);
+    void hideAddress();
+    void showAddress();
 
 private:
     Ui::ReceiveWidget *ui;
@@ -54,9 +57,14 @@ private:
     Subaddress * m_subaddress;
     SubaddressModel * m_model;
     SubaddressProxyModel * m_proxyModel;
+    Wallet * m_wallet;
 
     void updateQrCode();
     void showQrCodeDialog();
+    QStringList getHiddenAddresses();
+    void addHiddenAddress(const QString& address);
+    void removeHiddenAddress(const QString& address);
+    Monero::SubaddressRow* currentEntry();
 };
 
 #endif //FEATHER_RECEIVEWIDGET_H

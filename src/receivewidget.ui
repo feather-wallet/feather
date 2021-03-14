@@ -83,6 +83,27 @@
         </spacer>
        </item>
        <item>
+        <layout class="QVBoxLayout" name="verticalLayout_3">
+         <property name="spacing">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="check_showUsed">
+           <property name="text">
+            <string>Show used</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="check_showHidden">
+           <property name="text">
+            <string>Show hidden</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
         <widget class="QPushButton" name="btn_generateSubaddress">
          <property name="text">
           <string>Generate Subaddress</string>

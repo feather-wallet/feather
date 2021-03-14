@@ -597,7 +597,7 @@ void MainWindow::onWalletOpened() {
 
     // receive page
     m_ctx->currentWallet->subaddress()->refresh( m_ctx->currentWallet->currentSubaddressAccount());
-    ui->receiveWidget->setModel( m_ctx->currentWallet->subaddressModel(),  m_ctx->currentWallet->subaddress());
+    ui->receiveWidget->setModel( m_ctx->currentWallet->subaddressModel(),  m_ctx->currentWallet);
     if (m_ctx->currentWallet->subaddress()->count() == 1) {
         for (int i = 0; i < 10; i++) {
             m_ctx->currentWallet->subaddress()->addRow(m_ctx->currentWallet->currentSubaddressAccount(), "");
@@ -837,6 +837,16 @@ void MainWindow::showWalletInfoDialog() {
 }
 
 void MainWindow::showSeedDialog() {
+    if (m_ctx->currentWallet->viewOnly()) {
+        QMessageBox::information(this, "Information", "Wallet is view-only and has no seed.\n\nTo obtain wallet keys go to Wallet -> View-Only");
+        return;
+    }
+
+    if (!m_ctx->currentWallet->isDeterministic()) {
+        QMessageBox::information(this, "Information", "Wallet is non-deterministic and has no seed.\n\nTo obtain wallet keys go to Wallet -> Keys");
+        return;
+    }
+
     auto *dialog = new SeedDialog(m_ctx->currentWallet, this);
     dialog->exec();
     dialog->deleteLater();
@@ -1299,6 +1309,11 @@ void MainWindow::importTransaction() {
 
 void MainWindow::updateNetStats() {
     if (m_ctx->currentWallet == nullptr) {
+        m_statusLabelNetStats->setText("");
+        return;
+    }
+
+    if (m_ctx->currentWallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected) {
         m_statusLabelNetStats->setText("");
         return;
     }

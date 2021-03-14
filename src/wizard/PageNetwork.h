@@ -26,7 +26,6 @@ public:
 
 private:
     AppContext *m_ctx;
-    QLabel *topLabel;
     Ui::PageNetwork *ui;
 };
 

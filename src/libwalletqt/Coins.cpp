@@ -24,6 +24,11 @@ bool Coins::coin(int index, std::function<void (CoinsInfo &)> callback)
     return true;
 }
 
+CoinsInfo* Coins::coin(int index)
+{
+    return m_tinfo.value(index);
+}
+
 void Coins::refresh(quint32 accountIndex)
 {
     emit refreshStarted();
@@ -74,18 +79,17 @@ void Coins::thaw(int index) const
     emit coinThawed();
 }
 
-QStringList Coins::coins_from_txid(const QString &txid)
+QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
 {
-    QStringList keyimages;
+    QVector<CoinsInfo*> coins;
 
     for (int i = 0; i < this->count(); i++) {
-        this->coin(i, [&keyimages, &txid](const CoinsInfo &x) {
-            if (x.hash() == txid) {
-                keyimages += x.keyImage();
-            }
-        });
+        CoinsInfo* coin = this->coin(i);
+        if (coin->hash() == txid) {
+            coins.append(coin);
+        }
     }
-    return keyimages;
+    return coins;
 }
 
 Coins::Coins(Monero::Coins *pimpl, QObject *parent)

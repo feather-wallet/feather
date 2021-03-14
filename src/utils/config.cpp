@@ -48,7 +48,9 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
         {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
-        {Config::amountPrecision, {QS("amountPrecision"), 4}}
+        {Config::amountPrecision, {QS("amountPrecision"), 4}},
+        {Config::dateFormat, {QS("dateFormat"), "yyyy-MM-dd"}},
+        {Config::timeFormat, {QS("timeFormat"), "HH:mm"}}
 };
 
 

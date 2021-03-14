@@ -23,6 +23,7 @@ public:
     Q_INVOKABLE void refresh(quint32 accountIndex) const;
     Q_INVOKABLE quint64 unusedLookahead() const;
     quint64 count() const;
+    Monero::SubaddressRow* row(int index) const;
 
 signals:
     void refreshStarted() const;

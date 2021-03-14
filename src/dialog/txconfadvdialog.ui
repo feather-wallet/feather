@@ -53,6 +53,9 @@
          <property name="text">
           <string>TextLabel</string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
        <item row="1" column="0">
@@ -66,6 +69,9 @@
         <widget class="QLabel" name="fee">
          <property name="text">
           <string>TextLabel</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -88,6 +94,9 @@
          <property name="text">
           <string>TextLabel</string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
       </layout>
@@ -106,12 +115,18 @@
          <property name="text">
           <string>Description:</string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_size">
          <property name="text">
           <string>Size: </string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>
@@ -120,12 +135,18 @@
          <property name="text">
           <string>Unlock time: </string>
          </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="label_ringSize">
          <property name="text">
           <string>Ringsize:</string>
+         </property>
+         <property name="textInteractionFlags">
+          <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
          </property>
         </widget>
        </item>

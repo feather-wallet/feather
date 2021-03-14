@@ -40,15 +40,18 @@ public slots:
     void comboBox_blockExplorerChanged(int pos);
     void comboBox_redditFrontendChanged(int pos);
     void comboBox_amountPrecisionChanged(int pos);
-
-private:
-    QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};
+    void comboBox_dateFormatChanged(int pos);
+    void comboBox_timeFormatChanged(int pos);
 
 private:
     void setupSkinCombobox();
 
     AppContext *m_ctx;
     Ui::Settings *ui;
+
+    QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};
+    QStringList m_dateFormats{"yyyy-MM-dd", "MM-dd-yyyy", "dd-MM-yyyy"};
+    QStringList m_timeFormats{"hh:mm", "hh:mm ap"};
 };
 
 #endif // SETTINGS_H

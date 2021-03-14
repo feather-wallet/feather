@@ -5,6 +5,7 @@
 #define FEATHER_OUTPUTSWEEPDIALOG_H
 
 #include <QDialog>
+#include "libwalletqt/CoinsInfo.h"
 
 namespace Ui {
     class OutputSweepDialog;
@@ -15,7 +16,7 @@ class OutputSweepDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit OutputSweepDialog(QWidget *parent = nullptr);
+    explicit OutputSweepDialog(QWidget *parent, CoinsInfo* coin);
     ~OutputSweepDialog() override;
 
     QString address();
@@ -24,6 +25,8 @@ public:
 
 private:
     Ui::OutputSweepDialog *ui;
+
+    uint64_t m_amount;
 
     QString m_address;
     bool m_churn;

@@ -198,3 +198,8 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         }
     }
 }
+
+CoinsInfo* CoinsModel::entryFromIndex(const QModelIndex &index) const {
+    Q_ASSERT(index.isValid() && index.row() < m_coins->count());
+    return m_coins->coin(index.row());
+}

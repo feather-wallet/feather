@@ -5,7 +5,6 @@
 #include "PageWalletRestoreSeed.h"
 #include "ui_PageWalletRestoreSeed.h"
 
-#include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QMessageBox>
 

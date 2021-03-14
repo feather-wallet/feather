@@ -48,10 +48,29 @@ Settings::Settings(QWidget *parent) :
     }
     ui->comboBox_amountPrecision->setCurrentIndex(config()->get(Config::amountPrecision).toInt());
 
+    // Date format combobox
+    QDateTime now = QDateTime::currentDateTime();
+    for (const auto & format : m_dateFormats) {
+        ui->comboBox_dateFormat->addItem(now.toString(format));
+    }
+    QString dateFormatSetting = config()->get(Config::dateFormat).toString();
+    if (m_dateFormats.contains(dateFormatSetting))
+        ui->comboBox_dateFormat->setCurrentIndex(m_dateFormats.indexOf(dateFormatSetting));
+
+    // Time format combobox
+    for (const auto & format : m_timeFormats) {
+        ui->comboBox_timeFormat->addItem(now.toString(format));
+    }
+    QString timeFormatSetting = config()->get(Config::timeFormat).toString();
+    if (m_timeFormats.contains(timeFormatSetting))
+        ui->comboBox_timeFormat->setCurrentIndex(m_timeFormats.indexOf(timeFormatSetting));
+
     connect(ui->comboBox_skin, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_skinChanged);
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
     connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
     connect(ui->comboBox_amountPrecision, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_amountPrecisionChanged);
+    connect(ui->comboBox_dateFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_dateFormatChanged);
+    connect(ui->comboBox_timeFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_timeFormatChanged);
 
     // setup preferred fiat currency combobox
     QStringList fiatCurrencies;
@@ -108,6 +127,14 @@ void Settings::comboBox_redditFrontendChanged(int pos) {
 void Settings::comboBox_amountPrecisionChanged(int pos) {
     config()->set(Config::amountPrecision, pos);
     emit amountPrecisionChanged(pos);
+}
+
+void Settings::comboBox_dateFormatChanged(int pos) {
+    config()->set(Config::dateFormat, m_dateFormats.at(pos));
+}
+
+void Settings::comboBox_timeFormatChanged(int pos) {
+    config()->set(Config::timeFormat, m_timeFormats.at(pos));
 }
 
 void Settings::copyToClipboard() {

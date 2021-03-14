@@ -38,6 +38,8 @@ public:
     bool isShowFullAddresses() const;
     void setShowFullAddresses(bool show);
 
+    Monero::SubaddressRow* entryFromIndex(const QModelIndex &index) const;
+
     int unusedLookahead() const;
 
 public slots:

@@ -43,6 +43,8 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    CoinsInfo* entryFromIndex(const QModelIndex &index) const;
+
 public slots:
     void startReset();
     void endReset();

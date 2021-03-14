@@ -101,6 +101,9 @@ void HistoryWidget::showTxDetails() {
     if (!tx) return;
 
     auto *dialog = new TransactionInfoDialog(m_wallet, tx, this);
+    connect(dialog, &TransactionInfoDialog::resendTranscation, [this](const QString &txid){
+       emit resendTransaction(txid);
+    });
     dialog->show();
 }
 
