@@ -20,6 +20,9 @@ Settings::Settings(QWidget *parent) :
     ui->tabWidget->setTabVisible(4, false);
 
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
+    connect(ui->checkBox_multiBroadcast, &QCheckBox::toggled, [](bool toggled){
+        config()->set(Config::multiBroadcast, toggled);
+    });
     connect(ui->checkBox_externalLink, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
         config()->set(Config::hideBalance, toggled);
@@ -34,6 +37,7 @@ Settings::Settings(QWidget *parent) :
     connect(ui->nodeWidget, &NodeWidget::connectToNode, m_ctx->nodes, QOverload<const FeatherNode&>::of(&Nodes::connectToNode));
 
     // setup checkboxes
+    ui->checkBox_multiBroadcast->setChecked(config()->get(Config::multiBroadcast).toBool());
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
 

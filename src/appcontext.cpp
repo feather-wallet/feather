@@ -265,6 +265,35 @@ void AppContext::onAmountPrecisionChanged(int precision) {
     model->amountPrecision = precision;
 }
 
+void AppContext::commitTransaction(PendingTransaction *tx) {
+    // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
+    // To mitigate transactions failing we just send the transaction to every node we know about over Tor
+    if (config()->get(Config::multiBroadcast).toBool()) {
+        this->onMultiBroadcast(tx);
+    }
+
+    this->currentWallet->commitTransactionAsync(tx);
+}
+
+void AppContext::onMultiBroadcast(PendingTransaction *tx) {
+    UtilsNetworking *net = new UtilsNetworking(this->network, this);
+    DaemonRpc *rpc = new DaemonRpc(this, net, "");
+
+    int count = tx->txCount();
+    for (int i = 0; i < count; i++) {
+        QString txData = tx->signedTxToHex(i);
+
+        for (const auto& node: this->nodes->websocketNodes()) {
+            if (!node.online) continue;
+
+            QString address = node.as_url();
+            qDebug() << QString("Relaying to: %1").arg(address);
+            rpc->setDaemonAddress(address);
+            rpc->sendRawTransaction(txData);
+        }
+    }
+}
+
 void AppContext::onWalletOpened(Wallet *wallet) {
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {

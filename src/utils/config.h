@@ -54,7 +54,8 @@ public:
         amountPrecision,
         portableMode,
         dateFormat,
-        timeFormat
+        timeFormat,
+        multiBroadcast
     };
 
     ~Config() override;

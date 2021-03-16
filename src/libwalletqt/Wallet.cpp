@@ -1286,11 +1286,10 @@ Wallet::~Wallet()
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if(status() == Status_Critical)
         qDebug("Not storing wallet cache");
-    // Don't store on wallet close for now
-//    else if( m_walletImpl->store(""))
-//        qDebug("Wallet cache stored successfully");
-//    else
-//        qDebug("Error storing wallet cache");
+    else if( m_walletImpl->store(""))
+        qDebug("Wallet cache stored successfully");
+    else
+        qDebug("Error storing wallet cache");
     delete m_walletImpl;
     m_walletImpl = NULL;
     delete m_walletListener;

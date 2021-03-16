@@ -50,7 +50,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
         {Config::amountPrecision, {QS("amountPrecision"), 4}},
         {Config::dateFormat, {QS("dateFormat"), "yyyy-MM-dd"}},
-        {Config::timeFormat, {QS("timeFormat"), "HH:mm"}}
+        {Config::timeFormat, {QS("timeFormat"), "HH:mm"}},
+        {Config::multiBroadcast, {QS("multiBroadcast"), true}}
 };
 
 

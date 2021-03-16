@@ -69,8 +69,7 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     });
 
     connect(openWalletPage, &PageOpenWallet::openWallet, [=](const QString &path){
-        const auto walletPassword = this->field("walletPassword").toString();
-        emit openWallet(path, walletPassword);
+        emit openWallet(path, "");
     });
 }
 

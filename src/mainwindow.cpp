@@ -751,7 +751,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
                 break;
             }
             case QDialog::Accepted:
-                m_ctx->currentWallet->commitTransactionAsync(tx);
+                m_ctx->commitTransaction(tx);
                 break;
         }
 

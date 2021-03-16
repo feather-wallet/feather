@@ -376,6 +376,10 @@ QList<FeatherNode> Nodes::customNodes() {
     return m_customNodes;
 }
 
+QList<FeatherNode> Nodes::websocketNodes() {
+    return m_websocketNodes;
+}
+
 FeatherNode Nodes::connection() {
     return m_connection;
 }

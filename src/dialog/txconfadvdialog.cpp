@@ -172,7 +172,7 @@ void TxConfAdvDialog::signedQrCode() {
 
 void TxConfAdvDialog::broadcastTransaction() {
     if (m_tx == nullptr) return;
-    m_ctx->currentWallet->commitTransactionAsync(m_tx);
+    m_ctx->commitTransaction(m_tx);
     QDialog::accept();
 }
 

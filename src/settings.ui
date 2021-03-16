@@ -23,213 +23,224 @@
       <attribute name="title">
        <string>General</string>
       </attribute>
-      <layout class="QFormLayout" name="formLayout">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <layout class="QFormLayout" name="formLayout_3">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>Preferred fiat currency:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="comboBox_fiatCurrency">
+           <item>
+            <property name="text">
+             <string>USD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>EUR</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>RUB</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GBP</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>AUD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CAD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CHF</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CNY</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>CZK</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>JPY</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>KRW</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>MXN</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>NZD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>SEK</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>THB</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>TRY</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ZAR</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>Appearance:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="comboBox_skin"/>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Block explorer:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="comboBox_blockExplorer">
+           <item>
+            <property name="text">
+             <string>exploremonero.com</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>xmrchain.net</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>moneroblocks.info</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>blockchair.com</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>Reddit frontend:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="comboBox_redditFrontend">
+           <item>
+            <property name="text">
+             <string>old.reddit.com</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>reddit.com</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>teddit.net</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>Amount precision:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QComboBox" name="comboBox_amountPrecision"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>Date format:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="comboBox_dateFormat"/>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>Time format:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QComboBox" name="comboBox_timeFormat"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_multiBroadcast">
          <property name="text">
-          <string>Preferred fiat currency:</string>
+          <string>Multibroadcast outgoing transactions</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
-        <widget class="QComboBox" name="comboBox_fiatCurrency">
-         <item>
-          <property name="text">
-           <string>USD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>EUR</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>RUB</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>GBP</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>AUD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CAD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CHF</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CNY</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>CZK</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>JPY</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>KRW</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>MXN</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>NZD</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>SEK</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>THB</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>TRY</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>ZAR</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_6">
-         <property name="text">
-          <string>Appearance:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="comboBox_skin"/>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Block explorer:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="comboBox_blockExplorer">
-         <item>
-          <property name="text">
-           <string>exploremonero.com</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>xmrchain.net</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>moneroblocks.info</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>blockchair.com</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="7" column="0">
+       <item>
         <widget class="QCheckBox" name="checkBox_externalLink">
          <property name="text">
           <string>Warn before opening external link</string>
          </property>
         </widget>
        </item>
-       <item row="8" column="0">
+       <item>
         <widget class="QCheckBox" name="checkBox_hideBalance">
          <property name="text">
           <string>Hide balance</string>
          </property>
         </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>Reddit frontend:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QComboBox" name="comboBox_redditFrontend">
-         <item>
-          <property name="text">
-           <string>old.reddit.com</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>reddit.com</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>teddit.net</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>Amount precision:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="4" column="1">
-        <widget class="QComboBox" name="comboBox_amountPrecision"/>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_10">
-         <property name="text">
-          <string>Date format:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="1">
-        <widget class="QComboBox" name="comboBox_dateFormat"/>
-       </item>
-       <item row="6" column="0">
-        <widget class="QLabel" name="label_11">
-         <property name="text">
-          <string>Time format:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QComboBox" name="comboBox_timeFormat"/>
        </item>
       </layout>
      </widget>
