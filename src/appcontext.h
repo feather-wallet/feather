@@ -18,6 +18,7 @@
 #include "utils/wsclient.h"
 #include "utils/txfiathistory.h"
 #include "utils/FeatherSeed.h"
+#include "utils/daemonrpc.h"
 #include "widgets/RedditPost.h"
 #include "widgets/CCSEntry.h"
 #include "utils/RestoreHeightLookup.h"
@@ -53,7 +54,7 @@ public:
     QString walletPassword = "";
     NetworkType::Type networkType;
 
-    QMap<QString, int> heights;
+    QMap<NetworkType::Type, int> heights;
     QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
     QString seedLanguage = "English";  // 14 word `monero-seed` only has English
@@ -66,6 +67,7 @@ public:
     WSClient *ws;
     XmRig *XMRig;
     Nodes *nodes;
+    DaemonRpc *daemonRpc;
     static Prices *prices;
     static WalletKeysFilesModel *wallets;
     static double balance;
@@ -81,6 +83,7 @@ public:
     void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset = "");
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
     void createWalletFinish(const QString &password);
+    void commitTransaction(PendingTransaction *tx);
     void syncStatusUpdated(quint64 height, quint64 target);
     void updateBalance();
     void initTor();
@@ -105,6 +108,7 @@ public slots:
     void onSetRestoreHeight(quint64 height);
     void onPreferredFiatCurrencyChanged(const QString &symbol);
     void onAmountPrecisionChanged(int precision);
+    void onMultiBroadcast(PendingTransaction *tx);
 
 private slots:
     void onWSNodes(const QJsonArray &nodes);
@@ -134,7 +138,6 @@ signals:
     void blockchainSync(int height, int target);
     void refreshSync(int height, int target);
     void synchronized();
-    void blockHeightWSUpdated(QMap<QString, int> heights);
     void walletRefreshed();
     void walletOpened();
     void walletCreatedError(const QString &msg);

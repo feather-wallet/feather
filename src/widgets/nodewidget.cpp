@@ -94,7 +94,7 @@ void NodeWidget::onContextConnect() {
 void NodeWidget::onContextStatusURL() {
     FeatherNode node = this->selectedNode();
     if (!node.full.isEmpty())
-        Utils::externalLinkWarning(this, node.as_url());
+        Utils::externalLinkWarning(this, QString("%1/get_info").arg(node.as_url()));
 }
 
 void NodeWidget::onContextNodeCopy() {

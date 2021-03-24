@@ -47,7 +47,7 @@ void DebugInfoDialog::updateInfo() {
     ui->label_daemonHeight->setText(QString::number(m_ctx->currentWallet->daemonBlockChainHeight()));
     ui->label_targetHeight->setText(QString::number(m_ctx->currentWallet->daemonBlockChainTargetHeight()));
     ui->label_restoreHeight->setText(QString::number(m_ctx->currentWallet->getWalletCreationHeight()));
-    ui->label_synchronized->setText(m_ctx->currentWallet->synchronized() ? "True" : "False");
+    ui->label_synchronized->setText(m_ctx->currentWallet->isSynchronized() ? "True" : "False");
 
     auto node = m_ctx->nodes->connection();
     ui->label_remoteNode->setText(node.full);
@@ -75,12 +75,14 @@ QString DebugInfoDialog::statusToString(Wallet::ConnectionStatus status) {
     switch (status) {
         case Wallet::ConnectionStatus_Disconnected:
             return "Disconnected";
-        case Wallet::ConnectionStatus_Connected:
-            return "Connected";
         case Wallet::ConnectionStatus_WrongVersion:
             return "Daemon wrong version";
         case Wallet::ConnectionStatus_Connecting:
             return "Connecting";
+        case Wallet::ConnectionStatus_Synchronizing:
+            return "Synchronizing";
+        case Wallet::ConnectionStatus_Synchronized:
+            return "Synchronized";
         default:
             return "Unknown";
     }

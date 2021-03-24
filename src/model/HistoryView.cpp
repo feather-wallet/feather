@@ -85,6 +85,8 @@ void HistoryView::setSearchMode(bool mode) {
 
     if (mode) {
         header()->showSection(TransactionHistoryModel::TxID);
+    } else {
+        header()->hideSection(TransactionHistoryModel::TxID);
     }
 }
 
@@ -99,6 +101,8 @@ bool HistoryView::setViewState(const QByteArray& state)
     header()->setSortIndicator(-1, Qt::AscendingOrder);
     bool status = header()->restoreState(state);
     m_columnsNeedRelayout = state.isEmpty();
+
+    m_showTxidColumn = !header()->isSectionHidden(TransactionHistoryModel::TxID);
     return status;
 }
 

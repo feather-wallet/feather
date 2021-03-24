@@ -18,10 +18,6 @@
 #include "utils/ScopeGuard.h"
 
 namespace {
-    static const int DAEMON_BLOCKCHAIN_HEIGHT_CACHE_TTL_SECONDS = 5;
-    static const int DAEMON_BLOCKCHAIN_TARGET_HEIGHT_CACHE_TTL_SECONDS = 30;
-    static const int WALLET_CONNECTION_STATUS_CACHE_TTL_SECONDS = 5;
-
     static constexpr char ATTRIBUTE_SUBADDRESS_ACCOUNT[] = "feather.subaddress_account";
 }
 
@@ -78,10 +74,6 @@ void Wallet::refreshingSet(bool value)
     }
 }
 
-void Wallet::setConnectionTimeout(int timeout) {
-    m_connectionTimeout = timeout;
-}
-
 void Wallet::setConnectionStatus(ConnectionStatus value)
 {
     if (m_connectionStatus == value)
@@ -99,6 +91,17 @@ void Wallet::setConnectionStatus(ConnectionStatus value)
     {
         m_disconnected = disconnected;
         emit disconnectedChanged();
+    }
+}
+
+void Wallet::onNewBlock(uint64_t walletHeight) {
+    // Called whenever a new block gets scanned by the wallet
+    quint64 daemonHeight = m_daemonBlockChainTargetHeight;
+
+    if (walletHeight < (daemonHeight - 1)) {
+        setConnectionStatus(ConnectionStatus_Synchronizing);
+    } else {
+        setConnectionStatus(ConnectionStatus_Synchronized);
     }
 }
 
@@ -127,7 +130,19 @@ void Wallet::setProxyAddress(QString address)
 
 bool Wallet::synchronized() const
 {
+    // Misleading: this will return true if wallet has synchronized at least once even if it isn't currently synchronized
     return m_walletImpl->synchronized();
+}
+
+bool Wallet::isSynchronized() const
+{
+    return connectionStatus() == ConnectionStatus_Synchronized;
+}
+
+bool Wallet::isConnected() const
+{
+    auto status = connectionStatus();
+    return status == ConnectionStatus_Synchronizing || status == ConnectionStatus_Synchronized;
 }
 
 QString Wallet::errorString() const
@@ -212,7 +227,6 @@ bool Wallet::init(const QString &daemonAddress, bool trustedDaemon, quint64 uppe
     emit proxyAddressChanged();
 
     setTrustedDaemon(trustedDaemon);
-    setTrustedDaemon(trustedDaemon);
     return true;
 }
 
@@ -239,7 +253,6 @@ void Wallet::initAsync(
         {
             emit walletCreationHeightChanged();
             qDebug() << "init async finished - starting refresh";
-            refreshHeightAsync();
             startRefresh();
         }
     });
@@ -247,6 +260,12 @@ void Wallet::initAsync(
     {
         setConnectionStatus(Wallet::ConnectionStatus_Connecting);
     }
+}
+
+bool Wallet::setDaemon(const QString &daemonAddress)
+{
+    qDebug() << "setDaemon: " + daemonAddress;
+    return m_walletImpl->setDaemon(daemonAddress.toStdString(), m_daemonUsername.toStdString(), m_daemonPassword.toStdString(), m_useSSL);
 }
 
 bool Wallet::isHwBacked() const
@@ -380,37 +399,53 @@ void Wallet::deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, 
     });
 }
 
-void Wallet::refreshHeightAsync()
+bool Wallet::refreshHeights()
 {
-    m_scheduler.run([this] {
-        quint64 daemonHeight;
-        QPair<bool, QFuture<void>> daemonHeightFuture = m_scheduler.run([this, &daemonHeight] {
-            daemonHeight = daemonBlockChainHeight();
-        });
-        if (!daemonHeightFuture.first)
-        {
-            return;
-        }
+    // daemonHeight and targetHeight will be 0 if call to get_info fails
 
-        quint64 targetHeight;
+    quint64 daemonHeight;
+    QPair<bool, QFuture<void>> daemonHeightFuture = m_scheduler.run([this, &daemonHeight] {
+        daemonHeight = m_walletImpl->daemonBlockChainHeight();;
+    });
+    if (!daemonHeightFuture.first)
+    {
+        return false;
+    }
+    // We must wait here for get_info to return, otherwise targetHeight will get cache value of 0
+    daemonHeightFuture.second.waitForFinished();
+    bool success = daemonHeight > 0;
+
+    quint64 targetHeight = 0;
+    if (success) {
         QPair<bool, QFuture<void>> targetHeightFuture = m_scheduler.run([this, &targetHeight] {
-            targetHeight = daemonBlockChainTargetHeight();
+            targetHeight = m_walletImpl->daemonBlockChainTargetHeight();
         });
         if (!targetHeightFuture.first)
         {
-            return;
+            return false;
         }
-
-        quint64 walletHeight = blockChainHeight();
-        daemonHeightFuture.second.waitForFinished();
         targetHeightFuture.second.waitForFinished();
+    }
 
-        if (daemonHeight > 0 && targetHeight > 0) {
-            emit heightRefreshed(walletHeight, daemonHeight, targetHeight);
-            qDebug() << "Setting connection status from refreshHeightAsync";
-            setConnectionStatus(ConnectionStatus_Connected);
+    m_daemonBlockChainHeight = daemonHeight;
+    m_daemonBlockChainTargetHeight = targetHeight;
+
+    success = (daemonHeight > 0 && targetHeight > 0);
+
+    if (success) {
+        quint64 walletHeight = blockChainHeight();
+        emit heightRefreshed(walletHeight, daemonHeight, targetHeight);
+
+        if (walletHeight < (daemonHeight - 1)) {
+            setConnectionStatus(ConnectionStatus_Synchronizing);
+        } else {
+            setConnectionStatus(ConnectionStatus_Synchronized);
         }
-    });
+    } else {
+        setConnectionStatus(ConnectionStatus_Disconnected);
+    }
+
+    return success;
 }
 
 quint64 Wallet::blockChainHeight() const
@@ -420,32 +455,13 @@ quint64 Wallet::blockChainHeight() const
 
 quint64 Wallet::daemonBlockChainHeight() const
 {
-    // cache daemon blockchain height for some time (60 seconds by default)
-
-    if (m_daemonBlockChainHeight == 0
-        || m_daemonBlockChainHeightTime.elapsed() / 1000 > m_daemonBlockChainHeightTtl)
-    {
-        m_daemonBlockChainHeight = m_walletImpl->daemonBlockChainHeight();
-        m_daemonBlockChainHeightTime.restart();
-    }
+    // Can not block UI
     return m_daemonBlockChainHeight;
 }
 
 quint64 Wallet::daemonBlockChainTargetHeight() const
 {
-    if (m_daemonBlockChainTargetHeight <= 1
-        || m_daemonBlockChainTargetHeightTime.elapsed() / 1000 > m_daemonBlockChainTargetHeightTtl)
-    {
-        m_daemonBlockChainTargetHeight = m_walletImpl->daemonBlockChainTargetHeight();
-
-        // Target height is set to 0 if daemon is synced.
-        // Use current height from daemon when target height < current height
-        if (m_daemonBlockChainTargetHeight < m_daemonBlockChainHeight){
-            m_daemonBlockChainTargetHeight = m_daemonBlockChainHeight;
-        }
-        m_daemonBlockChainTargetHeightTime.restart();
-    }
-
+    // Can not block UI
     return m_daemonBlockChainTargetHeight;
 }
 
@@ -584,11 +600,15 @@ PendingTransaction *Wallet::createTransaction(const QString &dst_addr, const QSt
                                               quint64 amount, quint32 mixin_count,
                                               PendingTransaction::Priority priority)
 {
+    pauseRefresh();
+
     std::set<uint32_t> subaddr_indices;
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransaction(
             dst_addr.toStdString(), payment_id.toStdString(), amount, mixin_count,
             static_cast<Monero::PendingTransaction::Priority>(priority), currentSubaddressAccount(), subaddr_indices);
     PendingTransaction * result = new PendingTransaction(ptImpl,0);
+
+    startRefresh();
     return result;
 }
 
@@ -606,6 +626,8 @@ void Wallet::createTransactionAsync(const QString &dst_addr, const QString &paym
 PendingTransaction* Wallet::createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
                                                        PendingTransaction::Priority priority)
 {
+    pauseRefresh();
+
     std::vector<std::string> dests;
     for (auto &addr : dst_addr) {
         dests.push_back(addr.toStdString());
@@ -619,6 +641,8 @@ PendingTransaction* Wallet::createTransactionMultiDest(const QVector<QString> &d
     // TODO: remove mixin count
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amounts, 11, static_cast<Monero::PendingTransaction::Priority>(priority));
     PendingTransaction * result = new PendingTransaction(ptImpl);
+
+    startRefresh();
     return result;
 }
 
@@ -638,11 +662,15 @@ void Wallet::createTransactionMultiDestAsync(const QVector<QString> &dst_addr, c
 PendingTransaction *Wallet::createTransactionAll(const QString &dst_addr, const QString &payment_id,
                                                  quint32 mixin_count, PendingTransaction::Priority priority)
 {
+    pauseRefresh();
+
     std::set<uint32_t> subaddr_indices;
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransaction(
             dst_addr.toStdString(), payment_id.toStdString(), Monero::optional<uint64_t>(), mixin_count,
             static_cast<Monero::PendingTransaction::Priority>(priority), currentSubaddressAccount(), subaddr_indices);
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
+
+    startRefresh();
     return result;
 }
 
@@ -660,9 +688,13 @@ void Wallet::createTransactionAllAsync(const QString &dst_addr, const QString &p
 PendingTransaction *Wallet::createTransactionSingle(const QString &key_image, const QString &dst_addr, const size_t outputs,
         PendingTransaction::Priority priority)
 {
+    pauseRefresh();
+
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransactionSingle(key_image.toStdString(), dst_addr.toStdString(),
             outputs, static_cast<Monero::PendingTransaction::Priority>(priority));
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
+
+    startRefresh();
     return result;
 }
 
@@ -678,8 +710,12 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
 
 PendingTransaction *Wallet::createSweepUnmixableTransaction()
 {
+    pauseRefresh();
+
     Monero::PendingTransaction * ptImpl = m_walletImpl->createSweepUnmixableTransaction();
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
+
+    startRefresh();
     return result;
 }
 
@@ -868,16 +904,6 @@ QString Wallet::generatePaymentId() const
 QString Wallet::integratedAddress(const QString &paymentId) const
 {
     return QString::fromStdString(m_walletImpl->integratedAddress(paymentId.toStdString()));
-}
-
-QString Wallet::paymentId() const
-{
-    return m_paymentId;
-}
-
-void Wallet::setPaymentId(const QString &paymentId)
-{
-    m_paymentId = paymentId;
 }
 
 QString Wallet::getCacheAttribute(const QString &key) const {
@@ -1221,11 +1247,8 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
         , m_addressBook(nullptr)
         , m_addressBookModel(nullptr)
         , m_daemonBlockChainHeight(0)
-        , m_daemonBlockChainHeightTtl(DAEMON_BLOCKCHAIN_HEIGHT_CACHE_TTL_SECONDS)
         , m_daemonBlockChainTargetHeight(0)
-        , m_daemonBlockChainTargetHeightTtl(DAEMON_BLOCKCHAIN_TARGET_HEIGHT_CACHE_TTL_SECONDS)
         , m_connectionStatus(Wallet::ConnectionStatus_Disconnected)
-        , m_connectionStatusTtl(WALLET_CONNECTION_STATUS_CACHE_TTL_SECONDS)
         , m_disconnected(true)
         , m_currentSubaddressAccount(0)
         , m_subaddress(nullptr)
@@ -1248,11 +1271,7 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
     m_walletImpl->setListener(m_walletListener);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
     // start cache timers
-    m_connectionStatusTime.start();
-    m_daemonBlockChainHeightTime.start();
-    m_daemonBlockChainTargetHeightTime.start();
     m_initialized = false;
-    m_connectionStatusRunning = false;
     m_daemonUsername = "";
     m_daemonPassword = "";
 
@@ -1286,11 +1305,10 @@ Wallet::~Wallet()
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if(status() == Status_Critical)
         qDebug("Not storing wallet cache");
-    // Don't store on wallet close for now
-//    else if( m_walletImpl->store(""))
-//        qDebug("Wallet cache stored successfully");
-//    else
-//        qDebug("Error storing wallet cache");
+    else if( m_walletImpl->store(""))
+        qDebug("Wallet cache stored successfully");
+    else
+        qDebug("Error storing wallet cache");
     delete m_walletImpl;
     m_walletImpl = NULL;
     delete m_walletListener;
@@ -1314,7 +1332,12 @@ void Wallet::startRefreshThread()
                 if (elapsed >= refreshInterval || m_refreshNow)
                 {
                     m_refreshNow = false;
-                    refresh(false);
+                    // Don't call refresh function if we don't have the daemon and target height
+                    // We do this to prevent to UI from getting confused about the amount of blocks that are still remaining
+                    bool haveHeights = refreshHeights();
+                    if (haveHeights) {
+                        refresh(false);
+                    }
                     last = std::chrono::steady_clock::now();
                 }
             }
@@ -1329,9 +1352,7 @@ void Wallet::startRefreshThread()
 }
 
 void Wallet::onRefreshed(bool success) {
-    if (success) {
-        setConnectionStatus(ConnectionStatus_Connected);
-    } else {
+    if (!success) {
         setConnectionStatus(ConnectionStatus_Disconnected);
     }
 }

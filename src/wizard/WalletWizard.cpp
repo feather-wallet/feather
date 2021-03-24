@@ -69,8 +69,7 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     });
 
     connect(openWalletPage, &PageOpenWallet::openWallet, [=](const QString &path){
-        const auto walletPassword = this->field("walletPassword").toString();
-        emit openWallet(path, walletPassword);
+        emit openWallet(path, "");
     });
 }
 
@@ -88,6 +87,12 @@ void WalletWizard::createWallet() {
     }
 
     auto seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], QString::fromStdString(globals::coinName), m_ctx->seedLanguage, m_wizardFields.seed.split(" "));
+
+    if (m_wizardFields.mode == WizardMode::CreateWallet && m_ctx->heights.contains(m_ctx->networkType)) {
+        int restoreHeight = m_ctx->heights[m_ctx->networkType];
+        qInfo() << "New wallet, setting restore height to latest blockheight: " << restoreHeight;
+        seed.setRestoreHeight(restoreHeight);
+    }
 
     if (m_wizardFields.mode == WizardMode::RestoreFromSeed && m_wizardFields.seedType == SeedType::MONERO)
         seed.setRestoreHeight(m_wizardFields.restoreHeight);

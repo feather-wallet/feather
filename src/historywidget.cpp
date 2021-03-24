@@ -84,7 +84,11 @@ void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet
     m_wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
 
     // Load view state
-    ui->history->setViewState(QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray()));
+    QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
+
+    if (!historyViewState.isEmpty()) {
+      ui->history->setViewState(historyViewState);
+    }
 }
 
 void HistoryWidget::resetModel()

@@ -42,9 +42,9 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-0.4.5.6 --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.5.7 --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
-    git reset --hard b36a00e9a9d3eb4b2949951afaa72e45fb7e68cd && \
+    git reset --hard 83f895c015de55201e5f226f84a866f30f5ee14b && \
     ./autogen.sh && \
     ./configure \
     --disable-asciidoc \

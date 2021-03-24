@@ -69,8 +69,8 @@ struct FeatherNode {
         return QString("%1%2").arg(auth).arg(this->address);
     }
 
-    QString as_url() {
-        return QString("%1://%2/get_info").arg(this->isHttps ? "https": "http",this->full);
+    QString as_url() const {
+        return QString("%1://%2").arg(this->isHttps ? "https": "http",this->full);
     }
 
     bool operator == (const FeatherNode &other) const {
@@ -88,7 +88,9 @@ public:
 
     NodeSource source();
     FeatherNode connection();
+
     QList<FeatherNode> customNodes();
+    QList<FeatherNode> websocketNodes();
 
     NodeModel *modelWebsocket;
     NodeModel *modelCustom;

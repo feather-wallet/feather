@@ -11,7 +11,7 @@ TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirecto
         QObject(parent),
         m_genesis_timestamp(genesis_timestamp),
         m_configDirectory(configDirectory) {
-    m_databasePath = QString("%1fiatHistory.db").arg(configDirectory);
+    m_databasePath = QString("%1/fiatHistory.db").arg(configDirectory);
     this->loadDatabase();
 }
 

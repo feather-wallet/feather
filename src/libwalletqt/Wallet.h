@@ -74,36 +74,8 @@ struct TxProofResult {
 class Wallet : public QObject, public PassprasePrompter
 {
 Q_OBJECT
-    Q_PROPERTY(bool disconnected READ disconnected NOTIFY disconnectedChanged)
-    Q_PROPERTY(bool refreshing READ refreshing NOTIFY refreshingChanged)
-    Q_PROPERTY(QString seedLanguage READ getSeedLanguage)
-    Q_PROPERTY(Status status READ status)
-    Q_PROPERTY(NetworkType::Type nettype READ nettype)
-    Q_PROPERTY(ConnectionStatus connectionStatus READ connectionStatus)
-    Q_PROPERTY(quint32 currentSubaddressAccount READ currentSubaddressAccount NOTIFY currentSubaddressAccountChanged)
-    Q_PROPERTY(bool synchronized READ synchronized)
-    Q_PROPERTY(QString errorString READ errorString)
-    Q_PROPERTY(TransactionHistory * history READ history)
-    Q_PROPERTY(QString paymentId READ paymentId WRITE setPaymentId)
-    Q_PROPERTY(TransactionHistoryProxyModel * historyModel READ historyModel NOTIFY historyModelChanged)
-    Q_PROPERTY(QString path READ path)
-    Q_PROPERTY(AddressBookModel * addressBookModel READ addressBookModel)
-    Q_PROPERTY(AddressBook * addressBook READ addressBook NOTIFY addressBookChanged)
-    Q_PROPERTY(SubaddressModel * subaddressModel READ subaddressModel)
-    Q_PROPERTY(Subaddress * subaddress READ subaddress)
-    Q_PROPERTY(SubaddressAccountModel * subaddressAccountModel READ subaddressAccountModel)
-    Q_PROPERTY(SubaddressAccount * subaddressAccount READ subaddressAccount)
-    Q_PROPERTY(bool viewOnly READ viewOnly)
-    Q_PROPERTY(QString secretViewKey READ getSecretViewKey)
-    Q_PROPERTY(QString publicViewKey READ getPublicViewKey)
-    Q_PROPERTY(QString secretSpendKey READ getSecretSpendKey)
-    Q_PROPERTY(QString publicSpendKey READ getPublicSpendKey)
-    Q_PROPERTY(QString daemonLogPath READ getDaemonLogPath CONSTANT)
-    Q_PROPERTY(QString proxyAddress READ getProxyAddress WRITE setProxyAddress NOTIFY proxyAddressChanged)
-    Q_PROPERTY(quint64 walletCreationHeight READ getWalletCreationHeight WRITE setWalletCreationHeight NOTIFY walletCreationHeightChanged)
 
 public:
-
 
     enum Status {
         Status_Ok       = Monero::Wallet::Status_Ok,
@@ -115,9 +87,10 @@ public:
 
     enum ConnectionStatus {
         ConnectionStatus_Disconnected    = Monero::Wallet::ConnectionStatus_Disconnected,
-        ConnectionStatus_Connected       = Monero::Wallet::ConnectionStatus_Connected,
         ConnectionStatus_WrongVersion    = Monero::Wallet::ConnectionStatus_WrongVersion,
-        ConnectionStatus_Connecting
+        ConnectionStatus_Connecting = 9,
+        ConnectionStatus_Synchronizing = 10,
+        ConnectionStatus_Synchronized = 11
     };
 
     Q_ENUM(ConnectionStatus)
@@ -132,7 +105,7 @@ public:
     QString getSeedLanguage() const;
 
     //! set seed language
-    Q_INVOKABLE void setSeedLanguage(const QString &lang);
+    void setSeedLanguage(const QString &lang);
 
     //! returns last operation's status
     Status status() const;
@@ -143,32 +116,37 @@ public:
     //! returns true if wallet was ever synchronized
     bool synchronized() const;
 
+    //! returns true if wallet is currently synchronized
+    bool isSynchronized() const;
+
+    //! return true if wallet is connected to a node
+    bool isConnected() const;
 
     //! returns last operation's error message
     QString errorString() const;
 
     //! changes the password using existing parameters (path, seed, seed lang)
-    Q_INVOKABLE bool setPassword(const QString &password);
+    bool setPassword(const QString &password);
 
     //! get current wallet password
-    Q_INVOKABLE QString getPassword();
+    QString getPassword();
 
     //! returns wallet's public address
-    Q_INVOKABLE QString address(quint32 accountIndex, quint32 addressIndex) const;
+    QString address(quint32 accountIndex, quint32 addressIndex) const;
 
     //! returns the subaddress index of the address
-    Q_INVOKABLE SubaddressIndex subaddressIndex(const QString &address) const;
+    SubaddressIndex subaddressIndex(const QString &address) const;
 
     //! returns wallet file's path
     QString path() const;
 
     //! saves wallet to the file by given path
     //! empty path stores in current location
-    Q_INVOKABLE void store(const QString &path = "");
-   // Q_INVOKABLE void storeAsync(const QJSValue &callback, const QString &path = "");
+    void store(const QString &path = "");
+   // void storeAsync(const QJSValue &callback, const QString &path = "");
 
     //! initializes wallet asynchronously
-    Q_INVOKABLE void initAsync(
+    void initAsync(
             const QString &daemonAddress,
             bool trustedDaemon = false,
             quint64 upperTransactionLimit = 0,
@@ -177,167 +155,167 @@ public:
             quint64 restoreHeight = 0,
             const QString &proxyAddress = "");
 
+    bool setDaemon(const QString &daemonAddress);
+
     // Set daemon rpc user/pass
-    Q_INVOKABLE void setDaemonLogin(const QString &daemonUsername = "", const QString &daemonPassword = "");
+    void setDaemonLogin(const QString &daemonUsername = "", const QString &daemonPassword = "");
 
     //! create a view only wallet
-    Q_INVOKABLE bool createViewOnly(const QString &path, const QString &password) const;
+    bool createViewOnly(const QString &path, const QString &password) const;
 
     //! connects to daemon
-    Q_INVOKABLE bool connectToDaemon();
-
-    //! set connect to daemon timeout
-    Q_INVOKABLE void setConnectionTimeout(int timeout);
+    bool connectToDaemon();
 
     //! indicates if daemon is trusted
-    Q_INVOKABLE void setTrustedDaemon(bool arg);
+    void setTrustedDaemon(bool arg);
 
     //! indicates if ssl should be used to connect to daemon
-    Q_INVOKABLE void setUseSSL(bool ssl);
+    void setUseSSL(bool ssl);
 
     //! returns balance
-    Q_INVOKABLE quint64 balance() const;
-    Q_INVOKABLE quint64 balance(quint32 accountIndex) const;
-    Q_INVOKABLE quint64 balanceAll() const;
+    quint64 balance() const;
+    quint64 balance(quint32 accountIndex) const;
+    quint64 balanceAll() const;
 
     //! returns unlocked balance
-    Q_INVOKABLE quint64 unlockedBalance() const;
-    Q_INVOKABLE quint64 unlockedBalance(quint32 accountIndex) const;
-    Q_INVOKABLE quint64 unlockedBalanceAll() const;
+    quint64 unlockedBalance() const;
+    quint64 unlockedBalance(quint32 accountIndex) const;
+    quint64 unlockedBalanceAll() const;
 
     //! account/address management
     quint32 currentSubaddressAccount() const;
-    Q_INVOKABLE void switchSubaddressAccount(quint32 accountIndex);
-    Q_INVOKABLE void addSubaddressAccount(const QString& label);
-    Q_INVOKABLE quint32 numSubaddressAccounts() const;
-    Q_INVOKABLE quint32 numSubaddresses(quint32 accountIndex) const;
-    Q_INVOKABLE void addSubaddress(const QString& label);
-    Q_INVOKABLE QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
-    Q_INVOKABLE void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
-    Q_INVOKABLE void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
+    void switchSubaddressAccount(quint32 accountIndex);
+    void addSubaddressAccount(const QString& label);
+    quint32 numSubaddressAccounts() const;
+    quint32 numSubaddresses(quint32 accountIndex) const;
+    void addSubaddress(const QString& label);
+    QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
+    void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
+    void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
 
     //! hw-device backed wallets
-    Q_INVOKABLE bool isHwBacked() const;
-    Q_INVOKABLE bool isLedger() const;
-    Q_INVOKABLE bool isTrezor() const;
+    bool isHwBacked() const;
+    bool isLedger() const;
+    bool isTrezor() const;
 
     //! returns if view only wallet
-    Q_INVOKABLE bool viewOnly() const;
+    bool viewOnly() const;
 
     //! return true if deterministic keys
-    Q_INVOKABLE bool isDeterministic() const;
+    bool isDeterministic() const;
 
-    Q_INVOKABLE void refreshHeightAsync();
+    //! refresh daemon blockchain and target height
+    bool refreshHeights();
 
     //! export/import key images
-    Q_INVOKABLE bool exportKeyImages(const QString& path, bool all = false);
-    Q_INVOKABLE bool importKeyImages(const QString& path);
+    bool exportKeyImages(const QString& path, bool all = false);
+    bool importKeyImages(const QString& path);
 
     //! export/import outputs
-    Q_INVOKABLE bool exportOutputs(const QString& path, bool all = false);
-    Q_INVOKABLE bool importOutputs(const QString& path);
+    bool exportOutputs(const QString& path, bool all = false);
+    bool importOutputs(const QString& path);
 
     //! import a transaction
-    Q_INVOKABLE bool importTransaction(const QString& txid, const QVector<quint64>& output_indeces, quint64 height, quint64 timestamp, bool miner_tx, bool pool, bool double_spend_seen);
+    bool importTransaction(const QString& txid, const QVector<quint64>& output_indeces, quint64 height, quint64 timestamp, bool miner_tx, bool pool, bool double_spend_seen);
 
-    Q_INVOKABLE QString printBlockchain();
-    Q_INVOKABLE QString printTransfers();
-    Q_INVOKABLE QString printPayments();
-    Q_INVOKABLE QString printUnconfirmedPayments();
-    Q_INVOKABLE QString printConfirmedTransferDetails();
-    Q_INVOKABLE QString printUnconfirmedTransferDetails();
-    Q_INVOKABLE QString printPubKeys();
-    Q_INVOKABLE QString printTxNotes();
-    Q_INVOKABLE QString printSubaddresses();
-    Q_INVOKABLE QString printSubaddressLabels();
-    Q_INVOKABLE QString printAdditionalTxKeys();
-    Q_INVOKABLE QString printAttributes();
-    Q_INVOKABLE QString printKeyImages();
-    Q_INVOKABLE QString printAccountTags();
-    Q_INVOKABLE QString printTxKeys();
-    Q_INVOKABLE QString printAddressBook();
-    Q_INVOKABLE QString printScannedPoolTxs();
+    QString printBlockchain();
+    QString printTransfers();
+    QString printPayments();
+    QString printUnconfirmedPayments();
+    QString printConfirmedTransferDetails();
+    QString printUnconfirmedTransferDetails();
+    QString printPubKeys();
+    QString printTxNotes();
+    QString printSubaddresses();
+    QString printSubaddressLabels();
+    QString printAdditionalTxKeys();
+    QString printAttributes();
+    QString printKeyImages();
+    QString printAccountTags();
+    QString printTxKeys();
+    QString printAddressBook();
+    QString printScannedPoolTxs();
 
     //! refreshes the wallet
-    Q_INVOKABLE bool refresh(bool historyAndSubaddresses = false);
+    bool refresh(bool historyAndSubaddresses = false);
 
     // pause/resume refresh
-    Q_INVOKABLE void startRefresh();
-    Q_INVOKABLE void pauseRefresh();
+    void startRefresh();
+    void pauseRefresh();
 
     //! returns current wallet's block height
     //! (can be less than daemon's blockchain height when wallet sync in progress)
-    Q_INVOKABLE quint64 blockChainHeight() const;
+    quint64 blockChainHeight() const;
 
     //! returns daemon's blockchain height
-    Q_INVOKABLE quint64 daemonBlockChainHeight() const;
+    quint64 daemonBlockChainHeight() const;
 
     //! returns daemon's blockchain target height
-    Q_INVOKABLE quint64 daemonBlockChainTargetHeight() const;
+    quint64 daemonBlockChainTargetHeight() const;
 
     //! creates transaction
-    Q_INVOKABLE PendingTransaction * createTransaction(const QString &dst_addr, const QString &payment_id,
+    PendingTransaction * createTransaction(const QString &dst_addr, const QString &payment_id,
                                                        quint64 amount, quint32 mixin_count,
                                                        PendingTransaction::Priority priority);
 
     //! creates async transaction
-    Q_INVOKABLE void createTransactionAsync(const QString &dst_addr, const QString &payment_id,
+    void createTransactionAsync(const QString &dst_addr, const QString &payment_id,
                                             quint64 amount, quint32 mixin_count,
                                             PendingTransaction::Priority priority);
 
     //! creates multi-destination transaction
-    Q_INVOKABLE PendingTransaction * createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+    PendingTransaction * createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
                                                                 PendingTransaction::Priority priority);
 
     //! creates async multi-destination transaction
-    Q_INVOKABLE void createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
+    void createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
                                                      PendingTransaction::Priority priority);
 
 
     //! creates transaction with all outputs
-    Q_INVOKABLE PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
+    PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
                                                           quint32 mixin_count, PendingTransaction::Priority priority);
 
     //! creates async transaction with all outputs
-    Q_INVOKABLE void createTransactionAllAsync(const QString &dst_addr, const QString &payment_id,
+    void createTransactionAllAsync(const QString &dst_addr, const QString &payment_id,
                                                quint32 mixin_count, PendingTransaction::Priority priority);
 
     //! creates transaction with single input
-    Q_INVOKABLE PendingTransaction * createTransactionSingle(const QString &key_image, const QString &dst_addr,
+    PendingTransaction * createTransactionSingle(const QString &key_image, const QString &dst_addr,
             size_t outputs, PendingTransaction::Priority priority);
 
     //! creates async transaction with single input
-    Q_INVOKABLE void createTransactionSingleAsync(const QString &key_image, const QString &dst_addr,
+    void createTransactionSingleAsync(const QString &key_image, const QString &dst_addr,
             size_t outputs, PendingTransaction::Priority priority);
 
     //! creates sweep unmixable transaction
-    Q_INVOKABLE PendingTransaction * createSweepUnmixableTransaction();
+    PendingTransaction * createSweepUnmixableTransaction();
 
     //! creates async sweep unmixable transaction
-    Q_INVOKABLE void createSweepUnmixableTransactionAsync();
+    void createSweepUnmixableTransactionAsync();
 
     //! Sign a transfer from file
-    Q_INVOKABLE UnsignedTransaction * loadTxFile(const QString &fileName);
+    UnsignedTransaction * loadTxFile(const QString &fileName);
 
     //! Load an unsigned transaction from a base64 encoded string
-    Q_INVOKABLE UnsignedTransaction * loadTxFromBase64Str(const QString &unsigned_tx);
+    UnsignedTransaction * loadTxFromBase64Str(const QString &unsigned_tx);
 
     //! Load a signed transaction from file
-    Q_INVOKABLE PendingTransaction * loadSignedTxFile(const QString &fileName);
+    PendingTransaction * loadSignedTxFile(const QString &fileName);
 
     //! Submit a transfer from file
-    Q_INVOKABLE bool submitTxFile(const QString &fileName) const;
+    bool submitTxFile(const QString &fileName) const;
 
     //! asynchronous transaction commit
-    Q_INVOKABLE void commitTransactionAsync(PendingTransaction * t);
+    void commitTransactionAsync(PendingTransaction * t);
 
     //! deletes transaction and frees memory
-    Q_INVOKABLE void disposeTransaction(PendingTransaction * t);
+    void disposeTransaction(PendingTransaction * t);
 
     //! deletes unsigned transaction and frees memory
-    Q_INVOKABLE void disposeTransaction(UnsignedTransaction * t);
+    void disposeTransaction(UnsignedTransaction * t);
 
-//    Q_INVOKABLE void estimateTransactionFeeAsync(const QString &destination,
+//    void estimateTransactionFeeAsync(const QString &destination,
 //                                                 quint64 amount,
 //                                                 PendingTransaction::Priority priority,
 //                                                 const QJSValue &callback);
@@ -376,46 +354,41 @@ public:
     CoinsModel *coinsModel() const;
 
     //! generate payment id
-    Q_INVOKABLE QString generatePaymentId() const;
+    QString generatePaymentId() const;
 
     //! integrated address
-    Q_INVOKABLE QString integratedAddress(const QString &paymentId) const;
+    QString integratedAddress(const QString &paymentId) const;
 
     //! signing a message
-    Q_INVOKABLE QString signMessage(const QString &message, bool filename = false, const QString &address = "") const;
+    QString signMessage(const QString &message, bool filename = false, const QString &address = "") const;
 
     //! verify a signed message
-    Q_INVOKABLE bool verifySignedMessage(const QString &message, const QString &address, const QString &signature, bool filename = false) const;
+    bool verifySignedMessage(const QString &message, const QString &address, const QString &signature, bool filename = false) const;
 
     //! Parse URI
-    Q_INVOKABLE bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error);
-
-    //! saved payment id
-    QString paymentId() const;
-
-    void setPaymentId(const QString &paymentId);
+    bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error);
 
     //! Namespace your cacheAttribute keys to avoid collisions
-    Q_INVOKABLE bool setCacheAttribute(const QString &key, const QString &val);
-    Q_INVOKABLE QString getCacheAttribute(const QString &key) const;
+    bool setCacheAttribute(const QString &key, const QString &val);
+    QString getCacheAttribute(const QString &key) const;
 
-    Q_INVOKABLE bool setUserNote(const QString &txid, const QString &note);
-    Q_INVOKABLE QString getUserNote(const QString &txid) const;
-    Q_INVOKABLE QString getTxKey(const QString &txid) const;
-    //Q_INVOKABLE void getTxKeyAsync(const QString &txid, const QJSValue &callback);
-    Q_INVOKABLE QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
-    Q_INVOKABLE TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
-   // Q_INVOKABLE void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
-    //Q_INVOKABLE QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    Q_INVOKABLE TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    Q_INVOKABLE TxProof getSpendProof(const QString &txid, const QString &message) const;
-   // Q_INVOKABLE void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
-    Q_INVOKABLE QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
+    bool setUserNote(const QString &txid, const QString &note);
+    QString getUserNote(const QString &txid) const;
+    QString getTxKey(const QString &txid) const;
+    //void getTxKeyAsync(const QString &txid, const QJSValue &callback);
+    QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
+    TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
+   // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
+    //QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    TxProof getSpendProof(const QString &txid, const QString &message) const;
+   // void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
+    QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
     // Rescan spent outputs
-    Q_INVOKABLE bool rescanSpent();
+    bool rescanSpent();
 
     // check if fork rules should be used
-    Q_INVOKABLE bool useForkRules(quint8 version, quint64 earlyBlocks = 0) const;
+    bool useForkRules(quint8 version, quint64 earlyBlocks = 0) const;
 
     //! Get wallet keys
     QString getSecretViewKey() const {return QString::fromStdString(m_walletImpl->secretViewKey());}
@@ -427,30 +400,29 @@ public:
     void setWalletCreationHeight(quint64 height);
 
     QString getDaemonLogPath() const;
-    QString getWalletLogPath() const;
 
     // Blackalled outputs
-    Q_INVOKABLE bool blackballOutput(const QString &amount, const QString &offset);
-    Q_INVOKABLE bool blackballOutputs(const QList<QString> &outputs, bool add);
-    Q_INVOKABLE bool blackballOutputs(const QString &filename, bool add);
-    Q_INVOKABLE bool unblackballOutput(const QString &amount, const QString &offset);
+    bool blackballOutput(const QString &amount, const QString &offset);
+    bool blackballOutputs(const QList<QString> &outputs, bool add);
+    bool blackballOutputs(const QString &filename, bool add);
+    bool unblackballOutput(const QString &amount, const QString &offset);
 
     // Rings
-    Q_INVOKABLE QString getRing(const QString &key_image);
-    Q_INVOKABLE QString getRings(const QString &txid);
-    Q_INVOKABLE bool setRing(const QString &key_image, const QString &ring, bool relative);
+    QString getRing(const QString &key_image);
+    QString getRings(const QString &txid);
+    bool setRing(const QString &key_image, const QString &ring, bool relative);
 
     // key reuse mitigation options
-    Q_INVOKABLE void segregatePreForkOutputs(bool segregate);
-    Q_INVOKABLE void segregationHeight(quint64 height);
-    Q_INVOKABLE void keyReuseMitigation2(bool mitigation);
+    void segregatePreForkOutputs(bool segregate);
+    void segregationHeight(quint64 height);
+    void keyReuseMitigation2(bool mitigation);
 
     // Passphrase entry for hardware wallets
-    Q_INVOKABLE void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
+    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
     virtual void onWalletPassphraseNeeded(bool on_device) override;
 
-    Q_INVOKABLE quint64 getBytesReceived() const;
-    Q_INVOKABLE quint64 getBytesSent() const;
+    quint64 getBytesReceived() const;
+    quint64 getBytesSent() const;
 
     // TODO: setListenter() when it implemented in API
 signals:
@@ -510,6 +482,8 @@ private:
     void setProxyAddress(QString address);
     void startRefreshThread();
 
+    void onNewBlock(uint64_t height);
+
 private:
     friend class WalletManager;
     friend class WalletListenerImpl;
@@ -523,17 +497,13 @@ private:
     QString m_paymentId;
     AddressBook * m_addressBook;
     mutable AddressBookModel * m_addressBookModel;
-    mutable QElapsedTimer m_daemonBlockChainHeightTime;
     mutable quint64 m_daemonBlockChainHeight;
-    int     m_daemonBlockChainHeightTtl;
-    mutable QElapsedTimer m_daemonBlockChainTargetHeightTime;
     mutable quint64 m_daemonBlockChainTargetHeight;
-    int     m_daemonBlockChainTargetHeightTtl;
+
     mutable ConnectionStatus m_connectionStatus;
-    int     m_connectionStatusTtl;
-    mutable QElapsedTimer m_connectionStatusTime;
+
     bool m_disconnected;
-    mutable bool    m_initialized;
+    mutable bool m_initialized;
     uint32_t m_currentSubaddressAccount;
     Subaddress * m_subaddress;
     mutable SubaddressModel * m_subaddressModel;
@@ -542,8 +512,6 @@ private:
     Coins * m_coins;
     mutable CoinsModel * m_coinsModel;
     QMutex m_asyncMutex;
-    QMutex m_connectionStatusMutex;
-    bool m_connectionStatusRunning;
     QString m_daemonUsername;
     QString m_daemonPassword;
     QString m_proxyAddress;

@@ -265,6 +265,35 @@ void AppContext::onAmountPrecisionChanged(int precision) {
     model->amountPrecision = precision;
 }
 
+void AppContext::commitTransaction(PendingTransaction *tx) {
+    // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
+    // To mitigate transactions failing we just send the transaction to every node we know about over Tor
+    if (config()->get(Config::multiBroadcast).toBool()) {
+        this->onMultiBroadcast(tx);
+    }
+
+    this->currentWallet->commitTransactionAsync(tx);
+}
+
+void AppContext::onMultiBroadcast(PendingTransaction *tx) {
+    UtilsNetworking *net = new UtilsNetworking(this->network, this);
+    DaemonRpc *rpc = new DaemonRpc(this, net, "");
+
+    int count = tx->txCount();
+    for (int i = 0; i < count; i++) {
+        QString txData = tx->signedTxToHex(i);
+
+        for (const auto& node: this->nodes->websocketNodes()) {
+            if (!node.online) continue;
+
+            QString address = node.as_url();
+            qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
+            rpc->setDaemonAddress(address);
+            rpc->sendRawTransaction(txData);
+        }
+    }
+}
+
 void AppContext::onWalletOpened(Wallet *wallet) {
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {
@@ -334,35 +363,13 @@ void AppContext::setWindowTitle(bool mining) {
 void AppContext::onWSMessage(const QJsonObject &msg) {
     QString cmd = msg.value("cmd").toString();
 
-    if(cmd == "blockheights") {
-        auto heights = msg.value("data").toObject();
-        auto mainnet = heights.value("mainnet").toInt();
-        auto stagenet = heights.value("stagenet").toInt();
-        auto changed = false;
+    if (cmd == "blockheights") {
+        QJsonObject data = msg.value("data").toObject();
+        int mainnet = data.value("mainnet").toInt();
+        int stagenet = data.value("stagenet").toInt();
 
-        if(!this->heights.contains("mainnet")) {
-            this->heights["mainnet"] = mainnet;
-            changed = true;
-        }
-        else {
-            if (mainnet > this->heights["mainnet"]) {
-                this->heights["mainnet"] = mainnet;
-                changed = true;
-            }
-        }
-        if(!this->heights.contains("stagenet")) {
-            this->heights["stagenet"] = stagenet;
-            changed = true;
-        }
-        else {
-            if (stagenet > this->heights["stagenet"]) {
-                this->heights["stagenet"] = stagenet;
-                changed = true;
-            }
-        }
-
-        if(changed)
-            emit blockHeightWSUpdated(this->heights);
+        this->heights[NetworkType::MAINNET] = mainnet;
+        this->heights[NetworkType::STAGENET] = stagenet;
     }
 
     else if(cmd == "nodes") {
@@ -478,15 +485,16 @@ void AppContext::onWSCCS(const QJsonArray &ccs_data) {
 }
 
 void AppContext::createConfigDirectory(const QString &dir) {
-    QString config_dir_tor = QString("%1%2").arg(dir).arg("tor");
-    QString config_dir_tordata = QString("%1%2").arg(dir).arg("tor/data");
+    QString config_dir_tor = QString("%1/%2").arg(dir).arg("tor");
+    QString config_dir_tordata = QString("%1/%2").arg(dir).arg("tor/data");
 
     QStringList createDirs({dir, config_dir_tor, config_dir_tordata});
     for(const auto &d: createDirs) {
         if(!Utils::dirExists(d)) {
             qDebug() << QString("Creating directory: %1").arg(d);
-            if (!QDir().mkpath(d))
-                throw std::runtime_error("Could not create directory " + d.toStdString());
+            if (!QDir().mkpath(d)) {
+                qCritical() << "Could not create directory " << d;
+            }
         }
     }
 }
@@ -690,14 +698,14 @@ void AppContext::onWalletRefreshed(bool success) {
     }
 
     qDebug() << "Wallet refresh status: " << success;
-
-    this->currentWallet->refreshHeightAsync();
 }
 
 void AppContext::onWalletNewBlock(quint64 blockheight, quint64 targetHeight) {
+    // Called whenever a new block gets scanned by the wallet
     this->syncStatusUpdated(blockheight, targetHeight);
 
-    if (this->currentWallet->synchronized()) {
+    if (!this->currentWallet) return;
+    if (this->currentWallet->isSynchronized()) {
         this->currentWallet->coins()->refreshUnlocked();
         this->currentWallet->history()->refresh(this->currentWallet->currentSubaddressAccount());
         // Todo: only refresh tx confirmations
@@ -759,7 +767,7 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
 
 void AppContext::storeWallet() {
     // Do not store a synchronizing wallet: store() is NOT thread safe and may crash the wallet
-    if (this->currentWallet == nullptr || !this->currentWallet->synchronized())
+    if (this->currentWallet == nullptr || !this->currentWallet->isSynchronized())
         return;
 
     qDebug() << "Storing wallet";
