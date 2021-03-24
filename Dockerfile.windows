@@ -94,7 +94,7 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
 # libpng -> libqrencode
 RUN git clone -b libpng16 --depth 1 https://github.com/glennrp/libpng.git && \
     cd libpng && \
-    git reset --hard dbe3e0c43e549a1602286144d94b0666549b18e6 && \
+    git reset --hard a37d4836519517bdce6cb9d956092321eca3e73b && \
     CPPFLAGS="-I/depends/x86_64-w64-mingw32/include" LDFLAGS="-L/depends/x86_64-w64-mingw32/lib" \
     ./configure --host=x86_64-w64-mingw32 --prefix=/depends/x86_64-w64-mingw32 && \
     make -j$THREADS && \
