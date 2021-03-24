@@ -100,7 +100,7 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::sendClicked() {
-    if (m_ctx->currentWallet->connectionStatus() != Wallet::ConnectionStatus_Connected) {
+    if (!m_ctx->currentWallet->isConnected()) {
         QMessageBox::warning(this, "Error", "Unable to create transaction:\n\n"
                                             "Wallet is not connected to a node.\n"
                                             "Go to File -> Settings -> Node to manually connect to a node.");

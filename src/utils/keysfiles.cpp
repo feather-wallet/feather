@@ -69,7 +69,12 @@ void WalletKeysFilesModel::refresh() {
 
 void WalletKeysFilesModel::updateDirectories() {
     this->walletDirectories.clear();
-    this->walletDirectories << m_ctx->defaultWalletDir; // TODO
+    QDir defaultWalletDir = QDir(Utils::defaultWalletDir());
+    QString walletDir = defaultWalletDir.path();
+    defaultWalletDir.cdUp();
+    QString walletDirRoot = defaultWalletDir.path();
+    this->walletDirectories << walletDir;
+    this->walletDirectories << walletDirRoot;
     auto walletPath = config()->get(Config::walletPath).toString();
     if(!walletPath.isEmpty() && Utils::fileExists(walletPath)) {
         QDir d = QFileInfo(walletPath).absoluteDir();

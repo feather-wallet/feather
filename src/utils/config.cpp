@@ -111,23 +111,8 @@ Config::Config(QObject* parent)
 {
     QDir configDir = Config::defaultConfigDir();
 
-    QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
-    if (QFile::exists(portablePath.arg(".portable"))) {
-        init(portablePath.arg("feather_data/settings.json"));
-        return;
-    }
-
-    bool isTails = TailsOS::detect();
-    if (isTails) { // #if defined(PORTABLE)
-        QString appImagePath = qgetenv("APPIMAGE");
-        QFileInfo appImageDir(appImagePath);
-
-        QDir portablePath(appImageDir.absoluteDir().path() + "/feather_data");
-        if (portablePath.mkpath(".")) {
-            configDir = portablePath;
-        } else {
-            qCritical() << "Unable to create portable directory: " << portablePath.path();
-        }
+    if (!QDir().mkpath(configDir.path())) {
+        qWarning() << "Unable to create config path: " << configDir.path();
     }
 
     QString configPath = configDir.filePath("settings.json");
@@ -136,6 +121,26 @@ Config::Config(QObject* parent)
 }
 
 QDir Config::defaultConfigDir() {
+    QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
+    if (QFile::exists(portablePath.arg(".portable"))) {
+        return portablePath.arg("feather_data");
+    }
+
+    if (TailsOS::detect()) {
+        QString path = []{
+            QString appImagePath = qgetenv("APPIMAGE");
+            if (appImagePath.isEmpty()) {
+                qDebug() << "Not an appimage, using currentPath()";
+                return QDir::currentPath() + "/.feather/.config/feather";
+            }
+
+            QFileInfo appImageDir(appImagePath);
+            return appImageDir.absoluteDir().path() + "/.feather/.config/feather";
+        }();
+
+        return QDir(path);
+    }
+
 #if defined(Q_OS_WIN)
     return QDir(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
 #elif defined(Q_OS_MACOS)

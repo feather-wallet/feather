@@ -7,6 +7,7 @@
 #include <QCoreApplication>
 #include <QSystemTrayIcon>
 #include <QFileDialog>
+#include <QDesktopWidget>
 
 #include "mainwindow.h"
 #include "dialog/txconfdialog.h"
@@ -36,6 +37,12 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
 {
     pMainWindow = this;
     ui->setupUi(this);
+
+    // Preload icons for better performance
+    m_statusDisconnected = QIcon(":/assets/images/status_disconnected.svg");
+    m_statusConnecting = QIcon(":/assets/images/status_lagging.svg");
+    m_statusSynchronizing = QIcon(":/assets/images/status_waiting.svg");
+    m_statusSynchronized = QIcon(":/assets/images/status_connected.svg");
 
     m_windowSettings = new Settings(this);
     m_aboutDialog = new AboutDialog(this);
@@ -244,7 +251,11 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent) :
     if(config()->get(Config::warnOnAlpha).toBool()) {
         QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
                           "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
-        QMessageBox::warning(this, "Beta Warning", warning);
+        QMessageBox warningMb(this);
+        warningMb.setWindowTitle("Beta Warning");
+        warningMb.setText(warning);
+        this->centerWidget(warningMb);
+        warningMb.exec();
         config()->set(Config::warnOnAlpha, false);
     }
 
@@ -360,10 +371,14 @@ void MainWindow::initMain() {
         return;
     }
 
-    this->setEnabled(false);
+    this->setEnabled(true);
     this->show();
     m_wizard = this->createWizard(WalletWizard::Page_Menu);
     m_wizard->show();
+
+    // wizard won't spawn on top of MainWindow without this dumb pattern
+    this->setEnabled(false);
+    m_wizard->setEnabled(true);
     this->touchbarShowWizard();
 }
 
@@ -658,7 +673,6 @@ void MainWindow::setStatusText(const QString &text, bool override, int timeout) 
 void MainWindow::onSynchronized() {
     this->updateNetStats();
     this->setStatusText("Synchronized");
-    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Connected);
 }
 
 void MainWindow::onBlockchainSync(int height, int target) {
@@ -679,34 +693,32 @@ void MainWindow::onConnectionStatusChanged(int status)
 
     // Update connection info in status bar.
 
-    QString statusIcon;
-    QString statusMsg;
+    QIcon *icon;
     switch(status){
         case Wallet::ConnectionStatus_Disconnected:
-            statusIcon = ":/assets/images/status_disconnected.svg";
+            icon = &m_statusDisconnected;
             this->setStatusText("Disconnected");
             break;
-        case Wallet::ConnectionStatus_Connected:
-            if (m_ctx->currentWallet->synchronized()) {
-                statusIcon = ":/assets/images/status_connected.svg";
-            } else {
-                statusIcon = ":/assets/images/status_waiting.svg";
-            }
-            break;
         case Wallet::ConnectionStatus_Connecting:
-            statusIcon = ":/assets/images/status_lagging.svg";
-            this->setStatusText("Connecting to daemon");
+            icon = &m_statusConnecting;
+            this->setStatusText("Connecting to node");
             break;
         case Wallet::ConnectionStatus_WrongVersion:
-            statusIcon = ":/assets/images/status_disconnected.svg";
-            this->setStatusText("Incompatible daemon");
+            icon = &m_statusDisconnected;
+            this->setStatusText("Incompatible node");
+            break;
+        case Wallet::ConnectionStatus_Synchronizing:
+            icon = &m_statusSynchronizing;
+            break;
+        case Wallet::ConnectionStatus_Synchronized:
+            icon = &m_statusSynchronized;
             break;
         default:
-            statusIcon = ":/assets/images/status_disconnected.svg";
+            icon = &m_statusDisconnected;
             break;
     }
 
-    m_statusBtnConnectionStatusIndicator->setIcon(QIcon(statusIcon));
+    m_statusBtnConnectionStatusIndicator->setIcon(*icon);
 }
 
 void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
@@ -854,20 +866,13 @@ void MainWindow::showSeedDialog() {
 
 void MainWindow::showConnectionStatusDialog() {
     auto status = m_ctx->currentWallet->connectionStatus();
-    bool synchronized = m_ctx->currentWallet->synchronized();
+    bool synchronized = m_ctx->currentWallet->isSynchronized();
 
     QString statusMsg;
     switch(status){
         case Wallet::ConnectionStatus_Disconnected:
             statusMsg = "Wallet is disconnected from daemon.";
             break;
-        case Wallet::ConnectionStatus_Connected: {
-            auto node = m_ctx->nodes->connection();
-            statusMsg = QString("Wallet is connected to %1").arg(node.full);
-            if (synchronized)
-                statusMsg += " and synchronized";
-            break;
-        }
         case Wallet::ConnectionStatus_Connecting: {
             auto node = m_ctx->nodes->connection();
             statusMsg = QString("Wallet is connecting to %1").arg(node.full);
@@ -876,6 +881,15 @@ void MainWindow::showConnectionStatusDialog() {
         case Wallet::ConnectionStatus_WrongVersion:
             statusMsg = "Wallet is connected to incompatible daemon.";
             break;
+        case Wallet::ConnectionStatus_Synchronizing: {
+            auto node = m_ctx->nodes->connection();
+            statusMsg = QString("Wallet is connected to %1").arg(node.full);
+        }
+        case Wallet::ConnectionStatus_Synchronized: {
+            if (synchronized)
+                statusMsg += " and synchronized";
+            break;
+        }
         default:
             statusMsg = "Unknown connection status (this should never happen).";
     }
@@ -959,28 +973,6 @@ void MainWindow::menuWalletCloseClicked() {
         return;
 
     m_ctx->closeWallet(true, true);
-}
-
-void MainWindow::menuWalletOpenClicked() {
-    auto walletPath = config()->get(Config::walletPath).toString();
-    if(walletPath.isEmpty())
-        walletPath = m_ctx->defaultWalletDir;
-    QString path = QFileDialog::getOpenFileName(this, "Select your wallet file", walletPath, "Wallet file (*.keys)");
-    if(path.isEmpty()) return;
-
-    QFileInfo infoPath(path);
-    if(!infoPath.isReadable()) {
-        QMessageBox::warning(this, "Cannot read wallet file", "Permission error.");
-        return;
-    }
-
-    if(path == m_ctx->walletPath) {
-        QMessageBox::warning(this, "Wallet already opened", "Please open another wallet.");
-        return;
-    }
-
-    m_ctx->closeWallet(false);
-    m_ctx->onOpenWallet(path, "");
 }
 
 void MainWindow::menuAboutClicked() {
@@ -1318,7 +1310,7 @@ void MainWindow::updateNetStats() {
         return;
     }
 
-    if (m_ctx->currentWallet->connectionStatus() == Wallet::ConnectionStatus_Connected && m_ctx->currentWallet->synchronized()) {
+    if (m_ctx->currentWallet->connectionStatus() == Wallet::ConnectionStatus_Synchronized) {
         m_statusLabelNetStats->setText("");
         return;
     }
@@ -1355,6 +1347,16 @@ void MainWindow::bringToFront() {
     show();
     raise();
     activateWindow();
+}
+
+void MainWindow::centerWidget(QWidget &w) {
+    QScreen *s = QGuiApplication::primaryScreen();
+
+    const QRect sr = s->geometry();
+    const QRect wr({}, w.frameSize().boundedTo(sr.size()));
+
+    w.resize(wr.size());
+    w.move(sr.center() - wr.center());
 }
 
 MainWindow::~MainWindow() {

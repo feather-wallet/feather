@@ -481,6 +481,26 @@ bool Utils::isTorsocks() {
 }
 
 QString Utils::defaultWalletDir() {
+    QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
+    if (QFile::exists(portablePath.arg(".portable"))) {
+        return portablePath.arg("feather_data/wallets");
+    }
+
+    if (TailsOS::detect()) {
+        QString path = []{
+            QString appImagePath = qgetenv("APPIMAGE");
+            if (appImagePath.isEmpty()) {
+                qDebug() << "Not an appimage, using currentPath()";
+                return QDir::currentPath() + "/.feather/Monero/wallets";
+            }
+
+            QFileInfo appImageDir(appImagePath);
+            return appImageDir.absoluteDir().path() + "/.feather/Monero/wallets";
+        }();
+
+        return path;
+    }
+
 #if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
     return QString("%1/Monero/wallets").arg(QDir::homePath());
 #elif defined(Q_OS_WIN)

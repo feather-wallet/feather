@@ -102,9 +102,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     if(cliMode) {
         QCoreApplication cli_app(argc, argv);
-        QCoreApplication::setApplicationName("feather");
-        QCoreApplication::setOrganizationDomain("featherwallet.org");
-        QCoreApplication::setOrganizationName("featherwallet.org");
+        QCoreApplication::setApplicationName("FeatherWallet");
 
         auto *ctx = new AppContext(&parser);
 
@@ -136,9 +134,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     QApplication app(argc, argv);
 
-    QApplication::setApplicationName("feather");
-    QApplication::setOrganizationDomain("featherwallet.org");
-    QApplication::setOrganizationName("featherwallet.org");
+    QApplication::setApplicationName("FeatherWallet");
 
     parser.process(app); // Parse again for --help and --version
 

@@ -32,6 +32,7 @@ void WalletListenerImpl::unconfirmedMoneyReceived(const std::string &txId, uint6
 void WalletListenerImpl::newBlock(uint64_t height)
 {
     // qDebug() << __FUNCTION__;
+    m_wallet->onNewBlock(height);
     emit m_wallet->newBlock(height, m_wallet->daemonBlockChainTargetHeight());
 }
 

@@ -39,6 +39,7 @@ private:
     TransactionHistoryProxyModel* m_model;
     bool m_inSearchMode = false;
     bool m_columnsNeedRelayout = true;
+    bool m_showTxidColumn = false;
 
     QMenu* m_headerMenu;
     QActionGroup* m_columnActions;

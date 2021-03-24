@@ -38,6 +38,7 @@
 #include "dialog/keysdialog.h"
 #include "dialog/aboutdialog.h"
 #include "dialog/restoredialog.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class MainWindow;
@@ -117,7 +118,6 @@ public slots:
     void onWalletCreatedError(const QString &err);
     void onWalletCreated(Wallet *wallet);
     void menuWalletCloseClicked();
-    void menuWalletOpenClicked();
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
     void onViewOnBlockExplorer(const QString &txid);
     void onResendTransaction(const QString &txid);
@@ -173,6 +173,7 @@ private:
     void showBalanceDialog();
     QString statusDots();
     void bringToFront();
+    void centerWidget(QWidget &w);
 
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
@@ -222,6 +223,11 @@ private:
     bool m_constructingTransaction = false;
     bool m_statusOverrideActive = false;
     QTimer m_txTimer;
+
+    QIcon m_statusDisconnected;
+    QIcon m_statusConnecting;
+    QIcon m_statusSynchronizing;
+    QIcon m_statusSynchronized;
 
 private slots:
     void menuToggleTabVisible(const QString &key);

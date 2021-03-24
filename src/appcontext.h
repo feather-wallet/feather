@@ -54,7 +54,7 @@ public:
     QString walletPassword = "";
     NetworkType::Type networkType;
 
-    QMap<QString, int> heights;
+    QMap<NetworkType::Type, int> heights;
     QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
     QString seedLanguage = "English";  // 14 word `monero-seed` only has English
@@ -138,7 +138,6 @@ signals:
     void blockchainSync(int height, int target);
     void refreshSync(int height, int target);
     void synchronized();
-    void blockHeightWSUpdated(QMap<QString, int> heights);
     void walletRefreshed();
     void walletOpened();
     void walletCreatedError(const QString &msg);

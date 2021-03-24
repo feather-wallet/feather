@@ -183,7 +183,7 @@ void Nodes::autoConnect(bool forceReconnect) {
         this->connectToNode(node);
         return;
     }
-    else if (status == Wallet::ConnectionStatus_Connected && m_connection.isConnecting) {
+    else if ((status == Wallet::ConnectionStatus_Synchronizing || status == Wallet::ConnectionStatus_Synchronized) && m_connection.isConnecting) {
         qInfo() << QString("Node connected to %1").arg(m_connection.address);
 
         // set current connection object
