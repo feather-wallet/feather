@@ -106,8 +106,17 @@ void TransactionInfoDialog::setData(TransactionInfo* tx) {
     QString direction = tx->direction() == TransactionInfo::Direction_In ? "received" : "sent";
     ui->label_amount->setText(QString("Amount %1: %2").arg(direction, tx->displayAmount()));
 
-    QString fee = tx->fee().isEmpty() ? "n/a" : tx->fee();
-    ui->label_fee->setText(QString("Fee: %1 XMR").arg(tx->isCoinbase() ? WalletManager::displayAmount(0) : fee));
+    QString fee;
+    if (tx->isCoinbase())
+        fee = "Not applicable";
+    else if (tx->direction() == TransactionInfo::Direction_In)
+        fee = "Paid by sender";
+    else if (tx->fee().isEmpty())
+        fee = "N/A";
+    else
+        fee = QString("%1 XMR").arg(tx->fee());
+
+    ui->label_fee->setText(QString("Fee: %1").arg(fee));
 
 }
 
