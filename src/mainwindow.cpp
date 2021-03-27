@@ -881,13 +881,16 @@ void MainWindow::showConnectionStatusDialog() {
         case Wallet::ConnectionStatus_WrongVersion:
             statusMsg = "Wallet is connected to incompatible daemon.";
             break;
-        case Wallet::ConnectionStatus_Synchronizing: {
-            auto node = m_ctx->nodes->connection();
-            statusMsg = QString("Wallet is connected to %1").arg(node.full);
-        }
+        case Wallet::ConnectionStatus_Synchronizing:
         case Wallet::ConnectionStatus_Synchronized: {
-            if (synchronized)
-                statusMsg += " and synchronized";
+            auto node = m_ctx->nodes->connection();
+            statusMsg = QString("Wallet is connected to %1 ").arg(node.full);
+
+            if (synchronized) {
+                statusMsg += "and synchronized";
+            } else {
+                statusMsg += "and synchronizing";
+            }
             break;
         }
         default:
