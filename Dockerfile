@@ -10,11 +10,11 @@ RUN apt-get update && \
     apt-get install -y build-essential wget git automake pkg-config python python3 && \
     rm -rf /var/lib/apt/lists/*
 
-RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
-    echo "e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 openssl-1.1.1i.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.1.1i.tar.gz && \
-    rm openssl-1.1.1i.tar.gz && \
-    cd openssl-1.1.1i && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1k.tar.gz && \
+    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1k.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1k.tar.gz && \
+    rm openssl-1.1.1k.tar.gz && \
+    cd openssl-1.1.1k && \
     ./config no-shared no-dso --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make test && \
@@ -271,11 +271,11 @@ RUN wget https://dl.bintray.com/boostorg/release/1.73.0/source/boost_1_73_0.tar.
     ./b2 --with-atomic --with-system --with-filesystem --with-thread --with-date_time --with-chrono --with-regex --with-serialization --with-program_options --with-locale variant=release link=static runtime-link=static cflags="${CFLAGS}" cxxflags="${CXXFLAGS}" install -a --prefix=/usr && \
     rm -rf $(pwd)
 
-RUN wget https://www.openssl.org/source/openssl-1.1.1i.tar.gz && \
-    echo "e8be6a35fe41d10603c3cc635e93289ed00bf34b79671a3a4de64fcee00d5242 openssl-1.1.1i.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.1.1i.tar.gz && \
-    rm openssl-1.1.1i.tar.gz && \
-    cd openssl-1.1.1i && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1k.tar.gz && \
+    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1k.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1k.tar.gz && \
+    rm openssl-1.1.1k.tar.gz && \
+    cd openssl-1.1.1k && \
     ./config no-shared no-dso --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make test && \
