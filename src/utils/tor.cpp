@@ -23,11 +23,14 @@ Tor::Tor(AppContext *ctx, QObject *parent)
     this->torDir = Config::defaultConfigDir().filePath("tor");
     this->torDataPath = QDir(this->torDir).filePath("data");
 
-    if (m_ctx->cmdargs->isSet("tor-port")) {
-        Tor::torPort = m_ctx->cmdargs->value("tor-port").toUShort();
+    if (m_ctx->cmdargs->isSet("tor-port") || m_ctx->cmdargs->isSet("tor-host")) {
+        if (m_ctx->cmdargs->isSet("tor-host"))
+                Tor::torHost = m_ctx->cmdargs->value("tor-host");
+        if (m_ctx->cmdargs->isSet("tor-port"))
+                Tor::torPort = m_ctx->cmdargs->value("tor-port").toUShort();
         this->localTor = true;
         if (!Utils::portOpen(Tor::torHost, Tor::torPort)) {
-            this->errorMsg = QString("--tor-port was specified but no running Tor instance was found on port %1.").arg(QString::number(Tor::torPort));
+            this->errorMsg = QString("--tor-host || --tor-port were specified but no running Tor instance was found on %1:%2.").arg(Tor::torHost,QString::number(Tor::torPort));
         }
         return;
     }
