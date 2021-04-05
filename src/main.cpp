@@ -48,6 +48,9 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QCommandLineOption useLocalTorOption(QStringList() << "use-local-tor", "Use system wide installed Tor instead of the bundled.");
     parser.addOption(useLocalTorOption);
 
+    QCommandLineOption torHostOption(QStringList() << "tor-host", "Address of running Tor instance.", "torHost");
+    parser.addOption(torHostOption);
+
     QCommandLineOption torPortOption(QStringList() << "tor-port", "Port of running Tor instance.", "torPort");
     parser.addOption(torPortOption);
 
