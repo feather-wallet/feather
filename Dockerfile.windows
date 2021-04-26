@@ -34,12 +34,12 @@ RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qttranslations.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qtxmlpatterns.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qtwebsockets.git -b ${QT_VERSION} --depth 1 && \
-    OPENSSL_LIBS="-lssl -lcrypto -lpthread -ldl" \
+    OPENSSL_LIBS="-lssl -lcrypto -lws2_32" \
     ./configure --prefix=/depends/x86_64-w64-mingw32 -xplatform win32-g++ \
     -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- \
     -I $(pwd)/qtbase/src/3rdparty/angle/include \
     -opensource -confirm-license -release -static -static-runtime -no-opengl \
-    -no-avx -openssl -I /depends/x86_64-w64-mingw32/include -L /depends/x86_64-w64-mingw32/lib \
+    -no-avx -openssl-linked -I /depends/x86_64-w64-mingw32/include -L /depends/x86_64-w64-mingw32/lib \
     -qt-freetype -qt-harfbuzz -qt-libjpeg -qt-libpng -qt-pcre -qt-zlib \
     -skip gamepad -skip location -skip qt3d -skip qtactiveqt -skip qtandroidextras \
     -skip qtcanvas3d -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtdoc \
