@@ -122,11 +122,11 @@ RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
     rm -rf $(pwd)
 
 # OpenSSL -> Tor
-RUN wget https://www.openssl.org/source/openssl-1.1.1.k.tar.gz && \
-    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1.k.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.1.1.k.tar.gz && \
-    rm openssl-1.1.1.k.tar.gz && \
-    cd openssl-1.1.1.k && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1k.tar.gz && \
+    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1k.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1k.tar.gz && \
+    rm openssl-1.1.1k.tar.gz && \
+    cd openssl-1.1.1k && \
     ./Configure mingw64 no-shared no-dso --cross-compile-prefix=x86_64-w64-mingw32- --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make -j$THREADS install_sw && \
