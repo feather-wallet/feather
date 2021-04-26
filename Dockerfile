@@ -414,3 +414,10 @@ RUN mkdir linuxdeployqt && \
     chmod +x linuxdeployqt-7-x86_64.AppImage && \
     ./linuxdeployqt-7-x86_64.AppImage --appimage-extract && \
     rm linuxdeployqt-7-x86_64.AppImage
+
+RUN git clone https://github.com/nih-at/libzip.git && \
+    cd libzip && \
+    git reset --hard 66e496489bdae81bfda8b0088172871d8fda0032 && \
+    cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr . && \
+    make -j$THREADS && \
+    make -j$THREADS install
