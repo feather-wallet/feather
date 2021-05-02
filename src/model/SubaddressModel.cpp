@@ -9,7 +9,6 @@
 #include <QPoint>
 #include <QColor>
 #include <QBrush>
-#include <QFont>
 
 SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
     : QAbstractTableModel(parent),

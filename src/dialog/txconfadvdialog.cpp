@@ -8,7 +8,6 @@
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/Input.h"
 #include "model/ModelUtils.h"
-#include "utils/ColorScheme.h"
 
 #include <QFileDialog>
 #include <QMessageBox>

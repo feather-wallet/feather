@@ -1,85 +1,50 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "utils/TorManager.h"
+
 #include <QScreen>
 #include <QDesktopWidget>
 #include <QDesktopServices>
 #include <QRegularExpression>
+
 #include "utils/utils.h"
-#include "utils/tor.h"
 #include "appcontext.h"
 #include "config-feather.h"
 
-QString Tor::torHost = "127.0.0.1";
-quint16 Tor::torPort = 9050;
-
-Tor::Tor(AppContext *ctx, QObject *parent) 
-        : QObject(parent)
-        , m_ctx(ctx)
-        , m_checkConnectionTimer(new QTimer(this))
+TorManager::TorManager(QObject *parent)
+    : QObject(parent)
+    , m_checkConnectionTimer(new QTimer(this))
 {
-    connect(m_checkConnectionTimer, &QTimer::timeout, this, &Tor::checkConnection);
+    connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
     this->torDir = Config::defaultConfigDir().filePath("tor");
     this->torDataPath = QDir(this->torDir).filePath("data");
 
-    if (m_ctx->cmdargs->isSet("tor-port") || m_ctx->cmdargs->isSet("tor-host")) {
-        if (m_ctx->cmdargs->isSet("tor-host"))
-                Tor::torHost = m_ctx->cmdargs->value("tor-host");
-        if (m_ctx->cmdargs->isSet("tor-port"))
-                Tor::torPort = m_ctx->cmdargs->value("tor-port").toUShort();
-        this->localTor = true;
-        if (!Utils::portOpen(Tor::torHost, Tor::torPort)) {
-            this->errorMsg = QString("--tor-host || --tor-port were specified but no running Tor instance was found on %1:%2.").arg(Tor::torHost,QString::number(Tor::torPort));
-        }
-        return;
-    }
-
-    // Assume Tor is already running
-    this->localTor = m_ctx->cmdargs->isSet("use-local-tor");
-    if (this->localTor && !Utils::portOpen(Tor::torHost, Tor::torPort)) {
-        this->errorMsg = "--use-local-tor was specified but no running Tor instance found.";
-    }
-    if (m_ctx->isTorSocks || m_ctx->isTails || m_ctx->isWhonix || Utils::portOpen(Tor::torHost, Tor::torPort))
-        this->localTor = true;
-    if (this->localTor) {
-        return;
-    }
-
-#ifndef HAS_TOR_BIN
-    qCritical() << "Feather built without embedded Tor. Assuming --use-local-tor";
-    this->localTor = true;
-    return;
-#endif
-
-    bool unpacked = this->unpackBins();
-    if (!unpacked) {
-        qCritical() << "Error unpacking embedded Tor. Assuming --use-local-tor";
-        this->localTor = true;
-        return;
-    }
-
-    // Don't spawn Tor on default port to avoid conflicts
-    Tor::torPort = 19450;
-    if (Utils::portOpen(Tor::torHost, Tor::torPort)) {
-        this->localTor = true;
-        return;
-    }
-
-    qDebug() << "Using embedded tor instance";
     m_process.setProcessChannelMode(QProcess::MergedChannels);
 
-    connect(&m_process, &QProcess::readyReadStandardOutput, this, &Tor::handleProcessOutput);
-    connect(&m_process, &QProcess::errorOccurred, this, &Tor::handleProcessError);
-    connect(&m_process, &QProcess::stateChanged, this, &Tor::stateChanged);
+    connect(&m_process, &QProcess::readyReadStandardOutput, this, &TorManager::handleProcessOutput);
+    connect(&m_process, &QProcess::errorOccurred, this, &TorManager::handleProcessError);
+    connect(&m_process, &QProcess::stateChanged, this, &TorManager::stateChanged);
 }
 
-void Tor::stop() {
+QPointer<TorManager> TorManager::m_instance(nullptr);
+
+void TorManager::init() {
+    m_localTor = !shouldStartTorDaemon();
+
+    auto state = m_process.state();
+    if (m_localTor && (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting)) {
+        m_process.kill();
+    }
+}
+
+void TorManager::stop() {
     m_process.kill();
 }
 
-void Tor::start() {
-    if (this->localTor) {
+void TorManager::start() {
+    if (m_localTor) {
         this->checkConnection();
         m_checkConnectionTimer->start(5000);
         return;
@@ -91,8 +56,8 @@ void Tor::start() {
         return;
     }
 
-    if (Utils::portOpen(Tor::torHost, Tor::torPort)) {
-        this->errorMsg = QString("Unable to start Tor on %1:%2. Port already in use.").arg(Tor::torHost, Tor::torPort);
+    if (Utils::portOpen(featherTorHost, featherTorPort)) {
+        this->errorMsg = QString("Unable to start Tor on %1:%2. Port already in use.").arg(featherTorHost, QString::number(featherTorPort));
         return;
     }
 
@@ -107,7 +72,7 @@ void Tor::start() {
     QStringList arguments;
 
     arguments << "--ignore-missing-torrc";
-    arguments << "--SocksPort" << QString("%1:%2").arg(Tor::torHost, QString::number(Tor::torPort));
+    arguments << "--SocksPort" << QString("%1:%2").arg(featherTorHost, QString::number(featherTorPort));
     arguments << "--TruncateLogFile" << "1";
     arguments << "--DataDirectory" << this->torDataPath;
     arguments << "--Log" << "notice";
@@ -116,38 +81,46 @@ void Tor::start() {
     qDebug() << QString("%1 %2").arg(this->torPath, arguments.join(" "));
 
     m_process.start(this->torPath, arguments);
+    m_started = true;
 }
 
-void Tor::checkConnection() {
+void TorManager::checkConnection() {
     // We might not be able to connect to localhost if torsocks is used to start feather
-    if (m_ctx->isTorSocks)
+    if (Utils::isTorsocks()) {
         this->setConnectionState(true);
+    }
 
-    else if (m_ctx->isWhonix)
+    else if (WhonixOS::detect()) {
         this->setConnectionState(true);
+    }
 
-    else if (m_ctx->isTails) {
+    else if (TailsOS::detect()) {
         QStringList args = QStringList() << "--quiet" << "is-active" << "tails-tor-has-bootstrapped.target";
         int code = QProcess::execute("/bin/systemctl", args);
 
         this->setConnectionState(code == 0);
     }
 
-    else if (Utils::portOpen(Tor::torHost, Tor::torPort))
-        this->setConnectionState(true);
+    else if (m_localTor) {
+        QString host = config()->get(Config::socks5Host).toString();
+        quint16 port = config()->get(Config::socks5Port).toString().toUShort();
+        this->setConnectionState(Utils::portOpen(host, port));
+    }
 
-    else
-        this->setConnectionState(false);
+    else {
+        this->setConnectionState(Utils::portOpen(featherTorHost, featherTorPort));
+    }
 }
 
-void Tor::setConnectionState(bool connected) {
+void TorManager::setConnectionState(bool connected) {
     this->torConnected = connected;
     emit connectionStateChanged(connected);
 }
 
-void Tor::stateChanged(QProcess::ProcessState state) {
-    if(state == QProcess::ProcessState::Running)
+void TorManager::stateChanged(QProcess::ProcessState state) {
+    if (state == QProcess::ProcessState::Running) {
         qWarning() << "Tor started, awaiting bootstrap";
+    }
     else if (state == QProcess::ProcessState::NotRunning) {
         this->setConnectionState(false);
 
@@ -160,7 +133,7 @@ void Tor::stateChanged(QProcess::ProcessState state) {
     }
 }
 
-void Tor::handleProcessOutput() {
+void TorManager::handleProcessOutput() {
     QByteArray output = m_process.readAllStandardOutput();
     this->torLogs.append(Utils::barrayToString(output));
     emit logsUpdated();
@@ -172,7 +145,7 @@ void Tor::handleProcessOutput() {
     qDebug() << output;
 }
 
-void Tor::handleProcessError(QProcess::ProcessError error) {
+void TorManager::handleProcessError(QProcess::ProcessError error) {
     if (error == QProcess::ProcessError::Crashed)
         qWarning() << "Tor crashed or killed";
     else if (error == QProcess::ProcessError::FailedToStart) {
@@ -181,7 +154,7 @@ void Tor::handleProcessError(QProcess::ProcessError error) {
     }
 }
 
-bool Tor::unpackBins() {
+bool TorManager::unpackBins() {
     QString torFile;
 
     // On MacOS write libevent to disk
@@ -211,10 +184,10 @@ bool Tor::unpackBins() {
         this->torPath += ".exe";
 #endif
 
-    TorVersion embeddedVersion = this->stringToVersion(QString(TOR_VERSION));
-    TorVersion filesystemVersion = this->getVersion(torPath);
+    SemanticVersion embeddedVersion = SemanticVersion::fromString(QString(TOR_VERSION));
+    SemanticVersion filesystemVersion = this->getVersion(torPath);
     qDebug() << QString("Tor versions: embedded %1, filesystem %2").arg(embeddedVersion.toString(), filesystemVersion.toString());
-    if (TorVersion::isValid(filesystemVersion) && (embeddedVersion > filesystemVersion)) {
+    if (SemanticVersion::isValid(filesystemVersion) && (embeddedVersion > filesystemVersion)) {
         qInfo() << "Embedded version is newer, overwriting.";
         QFile::setPermissions(torPath, QFile::ReadOther | QFile::WriteOther);
         if (!QFile::remove(torPath)) {
@@ -228,12 +201,68 @@ bool Tor::unpackBins() {
 
 #if defined(Q_OS_UNIX)
     QFile torBin(this->torPath);
-    torBin.setPermissions(QFile::ExeGroup | QFile::ExeOther | QFile::ExeOther | QFile::ExeUser);
+    torBin.setPermissions(QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther
+                          | QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther);
 #endif
     return true;
 }
 
-TorVersion Tor::getVersion(const QString &fileName) {
+bool TorManager::isLocalTor() {
+    return m_localTor;
+}
+
+bool TorManager::isStarted() {
+    return m_started;
+}
+
+bool TorManager::shouldStartTorDaemon() {
+    QString torHost = config()->get(Config::socks5Host).toString();
+    quint16 torPort = config()->get(Config::socks5Port).toString().toUShort();
+    QString torHostPort = QString("%1:%2").arg(torHost, QString::number(torPort));
+
+    // Don't start a Tor daemon if Feather is run with Torsocks
+    if (Utils::isTorsocks()) {
+        return false;
+    }
+
+    // Don't start a Tor daemon on privacy OSes
+    if (TailsOS::detect() || WhonixOS::detect()) {
+        return false;
+    }
+
+    // Don't start a Tor daemon if we don't have one
+#ifndef HAS_TOR_BIN
+    qWarning() << "Feather built without embedded Tor. Assuming --use-local-tor";
+    return false;
+#endif
+
+    // Don't start a Tor daemon if --use-local-tor is specified
+    if (config()->get(Config::useLocalTor).toBool()) {
+        return false;
+    }
+
+    // Don't start a Tor daemon if one is already running
+    if (Utils::portOpen(torHost, torPort)) {
+        return false;
+    }
+
+    bool unpacked = this->unpackBins();
+    if (!unpacked) {
+        // Don't try to start a Tor daemon if unpacking failed
+        qWarning() << "Error unpacking embedded Tor. Assuming --use-local-tor";
+        this->errorMsg = "Error unpacking embedded Tor. Assuming --use-local-tor";
+        return false;
+    }
+
+    // Tor daemon (or other service) is already running on our port (19450)
+    if (Utils::portOpen(featherTorHost, featherTorPort)) {
+        return false;
+    }
+
+    return true;
+}
+
+SemanticVersion TorManager::getVersion(const QString &fileName) {
     QProcess process;
     process.setProcessChannelMode(QProcess::MergedChannels);
     process.start(this->torPath, QStringList() << "--version");
@@ -242,23 +271,17 @@ TorVersion Tor::getVersion(const QString &fileName) {
 
     if(output.isEmpty()) {
         qWarning() << "Could not grab Tor version";
-        return TorVersion();
+        return SemanticVersion();
     }
 
-    return this->stringToVersion(output);
+    return SemanticVersion::fromString(output);
 }
 
-TorVersion Tor::stringToVersion(const QString &version) {
-    QRegularExpression re("(?<major>\\d)\\.(?<minor>\\d)\\.(?<patch>\\d)\\.(?<release>\\d)");
-    QRegularExpressionMatch match = re.match(version);
-
-    if (!match.hasMatch()) {
-        qWarning() << "Could not parse Tor version";
-        return TorVersion();
+TorManager* TorManager::instance()
+{
+    if (!m_instance) {
+        m_instance = new TorManager(QCoreApplication::instance());
     }
 
-    return TorVersion(match.captured("major").toInt(),
-                      match.captured("minor").toInt(),
-                      match.captured("patch").toInt(),
-                      match.captured("release").toInt());
+    return m_instance;
 }

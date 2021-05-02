@@ -23,6 +23,7 @@ public:
     explicit PageNetwork(AppContext *ctx, QWidget *parent = nullptr);
     bool validatePage() override;
     int nextId() const override;
+    bool isComplete() const override;
 
 private:
     AppContext *m_ctx;

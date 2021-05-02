@@ -10,22 +10,31 @@
 
 #include "xmrigwidget.h"
 #include "ui_xmrigwidget.h"
+#include "utils/Icons.h"
 
-XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::XMRigWidget),
-    m_ctx(ctx),
-    m_model(new QStandardItemModel(this)),
-    m_contextMenu(new QMenu(this))
+XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::XMRigWidget)
+    , m_ctx(ctx)
+    , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
+    , m_model(new QStandardItemModel(this))
+    , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
 
     QPixmap p(":assets/images/xmrig.svg");
     ui->lbl_logo->setPixmap(p.scaled(64, 64, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
+    connect(m_XMRig, &XmRig::output, this, &XMRigWidget::onProcessOutput);
+    connect(m_XMRig, &XmRig::error, this, &XMRigWidget::onProcessError);
+    connect(m_XMRig, &XmRig::hashrate, this, &XMRigWidget::onHashrate);
+
+    connect(m_ctx, &AppContext::walletClosed, this, &XMRigWidget::onWalletClosed);
+    connect(m_ctx, &AppContext::walletOpened, this, &XMRigWidget::onWalletOpened);
+
     // table
     ui->tableView->setModel(this->m_model);
-    m_contextMenu->addAction(QIcon(":/assets/images/network.png"), "Download file", this, &XMRigWidget::linkClicked);
+    m_contextMenu->addAction(icons()->icon("network.png"), "Download file", this, &XMRigWidget::linkClicked);
     connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &XMRigWidget::showContextMenu);
     connect(ui->tableView, &QTableView::doubleClicked, this, &XMRigWidget::linkClicked);
 
@@ -166,14 +175,14 @@ void XMRigWidget::onStartClicked() {
         username = QString("%1.%2").arg(username, m_ctx->currentWallet->address(0, 0).mid(0, 6));
     }
 
-    m_ctx->XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
+    m_XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
     ui->btn_start->setEnabled(false);
     ui->btn_stop->setEnabled(true);
     emit miningStarted();
 }
 
 void XMRigWidget::onStopClicked() {
-    m_ctx->XMRig->stop();
+    m_XMRig->stop();
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
     ui->label_status->hide();

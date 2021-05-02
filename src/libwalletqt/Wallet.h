@@ -78,9 +78,10 @@ Q_OBJECT
 public:
 
     enum Status {
-        Status_Ok       = Monero::Wallet::Status_Ok,
-        Status_Error    = Monero::Wallet::Status_Error,
-        Status_Critical = Monero::Wallet::Status_Critical
+        Status_Ok          = Monero::Wallet::Status_Ok,
+        Status_Error       = Monero::Wallet::Status_Error,
+        Status_Critical    = Monero::Wallet::Status_Critical,
+        Status_BadPassword = Monero::Wallet::Status_BadPassword
     };
 
     Q_ENUM(Status)
@@ -197,6 +198,9 @@ public:
     bool isHwBacked() const;
     bool isLedger() const;
     bool isTrezor() const;
+
+    //! attempt to reconnect to hw-device
+    bool reconnectDevice();
 
     //! returns if view only wallet
     bool viewOnly() const;
@@ -424,6 +428,8 @@ public:
     quint64 getBytesReceived() const;
     quint64 getBytesSent() const;
 
+    bool isDeviceConnected() const;
+
     // TODO: setListenter() when it implemented in API
 signals:
     // emitted on every event happened with wallet
@@ -432,7 +438,7 @@ signals:
 
     // emitted when refresh process finished (could take a long time)
     // signalling only after we
-    void refreshed(bool success);
+    void refreshed(bool success, const QString &message);
 
     void moneySpent(const QString &txId, quint64 amount);
     void moneyReceived(const QString &txId, quint64 amount);
@@ -443,6 +449,7 @@ signals:
     void walletCreationHeightChanged();
     void deviceButtonRequest(quint64 buttonCode);
     void deviceButtonPressed();
+    void deviceError(const QString &message);
     void walletPassphraseNeeded(bool onDevice);
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
     void heightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) const;

@@ -2,20 +2,22 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include <QObject>
-#include <QNetworkAccessManager>
 
 #include "nodes.h"
 #include "utils/utils.h"
+#include "utils/WebsocketClient.h"
 #include "appcontext.h"
 
-Nodes::Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObject *parent) :
-        QObject(parent),
-        m_ctx(ctx),
-        m_networkAccessManager(networkAccessManager),
-        m_connection(FeatherNode()),
-        modelWebsocket(new NodeModel(NodeSource::websocket, this)),
-        modelCustom(new NodeModel(NodeSource::custom, this)) {
+
+Nodes::Nodes(AppContext *ctx, QObject *parent)
+    : QObject(parent)
+    , m_ctx(ctx)
+    , m_connection(FeatherNode())
+    , modelWebsocket(new NodeModel(NodeSource::websocket, this))
+    , modelCustom(new NodeModel(NodeSource::custom, this))
+{
     this->loadConfig();
+    connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);
 }
 
 void Nodes::loadConfig() {
@@ -71,10 +73,6 @@ void Nodes::loadConfig() {
         m_websocketNodes.append(wsNode);
     }
 
-    if (!obj.contains("source"))
-        obj["source"] = NodeSource::websocket;
-    m_source = static_cast<NodeSource>(obj.value("source").toInt());
-
     if (m_websocketNodes.count() > 0) {
         qDebug() << QString("Loaded %1 cached websocket nodes from config").arg(m_websocketNodes.count());
     }
@@ -98,11 +96,8 @@ void Nodes::loadConfig() {
 
         if (nodes_obj.contains(netKey)) {
             QJsonArray nodes_list;
-            if (m_ctx->isTails || m_ctx->isWhonix || m_ctx->isTorSocks) {
-                nodes_list = nodes_json[netKey].toObject()["tor"].toArray();
-            } else {
-                nodes_list = nodes_json[netKey].toObject()["clearnet"].toArray();
-            }
+            nodes_list = nodes_json[netKey].toObject()["tor"].toArray();
+            nodes_list.append(nodes_list = nodes_json[netKey].toObject()["clearnet"].toArray());
             for (auto node: nodes_list) {
                 auto wsNode = FeatherNode(node.toString());
                 wsNode.custom = false;
@@ -135,19 +130,29 @@ void Nodes::connectToNode() {
 }
 
 void Nodes::connectToNode(const FeatherNode &node) {
-    if (node.address.isEmpty())
+    if (!node.isValid())
         return;
 
-    emit updateStatus(QString("Connecting to %1").arg(node.address));
-    qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.address).arg(node.custom ? "custom" : "ws");
+    emit updateStatus(QString("Connecting to %1").arg(node.toAddress()));
+    qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress()).arg(node.custom ? "custom" : "ws");
 
-    if (!node.username.isEmpty() && !node.password.isEmpty())
-        m_ctx->currentWallet->setDaemonLogin(node.username, node.password);
+    if (!node.url.userName().isEmpty() && !node.url.password().isEmpty())
+        m_ctx->currentWallet->setDaemonLogin(node.url.userName(), node.url.password());
 
     // Don't use SSL over Tor
-    m_ctx->currentWallet->setUseSSL(!node.tor);
+    m_ctx->currentWallet->setUseSSL(!node.isOnion());
 
-    m_ctx->currentWallet->initAsync(node.address, true, 0, false, false, 0);
+    QString proxyAddress;
+    if (useTorProxy(node)) {
+        if (!torManager()->isLocalTor()) {
+            proxyAddress = QString("%1:%2").arg(torManager()->featherTorHost, QString::number(torManager()->featherTorPort));
+        } else {
+            proxyAddress = QString("%1:%2").arg(config()->get(Config::socks5Host).toString(),
+                                                config()->get(Config::socks5Port).toString());
+        }
+    }
+
+    m_ctx->currentWallet->initAsync(node.toAddress(), true, 0, false, false, 0, proxyAddress);
 
     m_connection = node;
     m_connection.isActive = false;
@@ -165,17 +170,16 @@ void Nodes::autoConnect(bool forceReconnect) {
 
     Wallet::ConnectionStatus status = m_ctx->currentWallet->connectionStatus();
     bool wsMode = (this->source() == NodeSource::websocket);
-    auto nodes = wsMode ? m_customNodes : m_websocketNodes;
 
-    if (wsMode && !m_wsNodesReceived && m_websocketNodes.count() == 0) {
+    if (wsMode && !m_wsNodesReceived && websocketNodes().count() == 0) {
         // this situation should rarely occur due to the usage of the websocket node cache on startup.
         qInfo() << "Feather is in websocket connection mode but was not able to receive any nodes (yet).";
         return;
     }
 
     if (status == Wallet::ConnectionStatus_Disconnected || forceReconnect) {
-        if (!m_connection.address.isEmpty() && !forceReconnect) {
-            m_recentFailures << m_connection.address;
+        if (m_connection.isValid() && !forceReconnect) {
+            m_recentFailures << m_connection.toAddress();
         }
 
         // try a connect
@@ -184,7 +188,7 @@ void Nodes::autoConnect(bool forceReconnect) {
         return;
     }
     else if ((status == Wallet::ConnectionStatus_Synchronizing || status == Wallet::ConnectionStatus_Synchronized) && m_connection.isConnecting) {
-        qInfo() << QString("Node connected to %1").arg(m_connection.address);
+        qInfo() << QString("Node connected to %1").arg(m_connection.toAddress());
 
         // set current connection object
         m_connection.isConnecting = false;
@@ -204,7 +208,7 @@ FeatherNode Nodes::pickEligibleNode() {
     // Pick a node at random to connect to
     auto rtn = FeatherNode();
     auto wsMode = (this->source() == NodeSource::websocket);
-    auto nodes = wsMode ? m_websocketNodes : m_customNodes;
+    auto nodes = wsMode ? websocketNodes() : m_customNodes;
 
     if (nodes.count() == 0) {
         if (wsMode)
@@ -243,7 +247,7 @@ FeatherNode Nodes::pickEligibleNode() {
         }
 
         // Don't connect to nodes that failed to connect recently
-        if (m_recentFailures.contains(node.address)) {
+        if (m_recentFailures.contains(node.toAddress())) {
             continue;
         }
 
@@ -258,18 +262,19 @@ FeatherNode Nodes::pickEligibleNode() {
     return rtn;
 }
 
-void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
+void Nodes::onWSNodesReceived(QList<FeatherNode> &nodes) {
     m_websocketNodes.clear();
+
     m_wsNodesReceived = true;
 
     for (auto &node: nodes) {
-        if (m_connection == *node) {
+        if (m_connection == node) {
             if (m_connection.isActive)
-                node->isActive = true;
+                node.isActive = true;
             else if (m_connection.isConnecting)
-                node->isConnecting = true;
+                node.isConnecting = true;
         }
-        m_websocketNodes.push_back(*node);
+        m_websocketNodes.push_back(node);
     }
 
     // cache into config
@@ -277,7 +282,7 @@ void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
     auto obj = m_configJson.value(key).toObject();
     auto ws = QJsonArray();
     for (auto const &node: m_websocketNodes)
-        ws.push_back(node.address);
+        ws.push_back(node.toAddress());
 
     obj["ws"] = ws;
     m_configJson[key] = obj;
@@ -287,20 +292,9 @@ void Nodes::onWSNodesReceived(const QList<QSharedPointer<FeatherNode>> &nodes) {
 }
 
 void Nodes::onNodeSourceChanged(NodeSource nodeSource) {
-    if (nodeSource == this->source())
-        return;
-    m_source = nodeSource;
-
-    auto key = QString::number(m_ctx->networkType);
-    auto obj = m_configJson.value(key).toObject();
-    obj["source"] = nodeSource;
-
-    m_configJson[key] = obj;
-    this->writeConfig();
     this->resetLocalState();
     this->updateModels();
-
-    this->autoConnect(true);
+    this->connectToNode();
 }
 
 void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
@@ -310,8 +304,8 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 
     QStringList nodesList;
     for (auto const &node: nodes) {
-        if (nodesList.contains(node.full)) continue;
-        nodesList.append(node.full);
+        if (nodesList.contains(node.toAddress())) continue;
+        nodesList.append(node.toAddress());
         m_customNodes.append(node);
     }
 
@@ -323,14 +317,41 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
     this->updateModels();
 }
 
+void Nodes::onWalletRefreshed() {
+    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync && !m_connection.isLocal()) {
+        this->autoConnect(true);
+    }
+}
+
+bool Nodes::useOnionNodes() {
+    auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
+    if (privacyLevel == Config::allTor || (privacyLevel == Config::allTorExceptInitSync && m_ctx->refreshed)) {
+        return true;
+    }
+    return false;
+}
+
+bool Nodes::useTorProxy(const FeatherNode &node) {
+    if (node.isLocal()) {
+        return false;
+    }
+
+    if (Utils::isTorsocks()) {
+        return false;
+    }
+
+    return this->useOnionNodes();
+}
+
 void Nodes::updateModels() {
     this->modelCustom->updateNodes(m_customNodes);
-    this->modelWebsocket->updateNodes(m_websocketNodes);
+
+    this->modelWebsocket->updateNodes(this->websocketNodes());
 }
 
 void Nodes::resetLocalState() {
-    auto resetState = [this](QList<FeatherNode> *model){
-        for (auto&& node: *model) {
+    auto resetState = [this](QList<FeatherNode> &model){
+        for (auto &node: model) {
             node.isConnecting = false;
             node.isActive = false;
 
@@ -341,14 +362,12 @@ void Nodes::resetLocalState() {
         }
     };
 
-    resetState(&m_customNodes);
-    resetState(&m_websocketNodes);
+    resetState(m_customNodes);
+    resetState(m_websocketNodes);
 }
 
 void Nodes::exhausted() {
-    bool wsMode = (this->source() == NodeSource::websocket);
-
-    if (wsMode)
+    if (this->source() == NodeSource::websocket)
         this->WSNodeExhaustedWarning();
     else
         this->nodeExhaustedWarning();
@@ -377,7 +396,26 @@ QList<FeatherNode> Nodes::customNodes() {
 }
 
 QList<FeatherNode> Nodes::websocketNodes() {
-    return m_websocketNodes;
+    bool onionNode = this->useOnionNodes();
+
+    QList<FeatherNode> nodes;
+    for (const auto &node : m_websocketNodes) {
+        if (onionNode && !node.isOnion()) {
+            continue;
+        }
+
+        if (!onionNode && node.isOnion()) {
+            continue;
+        }
+
+        nodes.push_back(node);
+    }
+
+    return nodes;
+}
+
+void Nodes::onTorSettingsChanged() {
+    this->autoConnect(true);
 }
 
 FeatherNode Nodes::connection() {
@@ -385,7 +423,7 @@ FeatherNode Nodes::connection() {
 }
 
 NodeSource Nodes::source() {
-    return m_source;
+    return static_cast<NodeSource>(config()->get(Config::nodeSource).toInt());
 }
 
 int Nodes::modeHeight(const QList<FeatherNode> &nodes) {

@@ -25,7 +25,7 @@ PageSetRestoreHeight::PageSetRestoreHeight(AppContext *ctx, WizardFields *fields
     QPixmap pixmap = QPixmap(":/assets/images/unpaid.png");
     ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
-    QPixmap pixmap2 = QPixmap(":/assets/images/info.png");
+    QPixmap pixmap2 = QPixmap(":/assets/images/info2.svg");
     ui->warningIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
     ui->infoIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
 
@@ -61,7 +61,7 @@ void PageSetRestoreHeight::onCreationDateEdited() {
     QDateTime restoreDate = date > curDate ? curDate : date;
     int timestamp = restoreDate.toSecsSinceEpoch();
 
-    QString restoreHeight = QString::number(m_ctx->restoreHeights[m_ctx->networkType]->dateToRestoreHeight(timestamp));
+    QString restoreHeight = QString::number(appData()->restoreHeights[m_ctx->networkType]->dateToRestoreHeight(timestamp));
     ui->line_restoreHeight->setText(restoreHeight);
 
     this->showScanWarning(restoreDate);
@@ -77,7 +77,7 @@ void PageSetRestoreHeight::onRestoreHeightEdited() {
         return;
     }
 
-    int timestamp = m_ctx->restoreHeights[m_ctx->networkType]->restoreHeightToDate(restoreHeight);
+    int timestamp = appData()->restoreHeights[m_ctx->networkType]->restoreHeightToDate(restoreHeight);
     auto date = QDateTime::fromSecsSinceEpoch(timestamp);
     ui->line_creationDate->setText(date.toString("yyyy-MM-dd"));
 

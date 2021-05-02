@@ -3,6 +3,7 @@
 
 #include "tximportdialog.h"
 #include "ui_tximportdialog.h"
+#include "utils/NetworkManager.h"
 
 #include <QMessageBox>
 
@@ -16,10 +17,8 @@ TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
     ui->resp->hide();
     ui->label_loading->hide();
 
-    m_network = new UtilsNetworking(m_ctx->network, this);
-
     auto node = ctx->nodes->connection();
-    m_rpc = new DaemonRpc(this, m_network, node.full);
+    m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_load, &QPushButton::clicked, this, &TxImportDialog::loadTx);
     connect(ui->btn_import, &QPushButton::clicked, this, &TxImportDialog::onImport);
@@ -35,7 +34,7 @@ TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
 
 void TxImportDialog::loadTx() {
     QString txid = ui->line_txid->text();
-    QString node = m_ctx->nodes->connection().full;
+    QString node = m_ctx->nodes->connection().toAddress();
 
     if (!node.startsWith("http://"))
         node = QString("http://%1").arg(node);

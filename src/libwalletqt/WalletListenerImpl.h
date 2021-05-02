@@ -31,6 +31,8 @@ public:
 
     virtual void onDeviceButtonPressed() override;
 
+    virtual void onDeviceError(const std::string &message) override;
+
     virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override;
 
     virtual Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override;

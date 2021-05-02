@@ -53,8 +53,6 @@ private:
     QVariant parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const;
 
     Coins *m_coins;
-    QIcon m_eye;
-    QIcon m_eyeBlind;
 };
 
 #endif //FEATHER_COINSMODEL_H

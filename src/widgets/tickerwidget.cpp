@@ -4,17 +4,18 @@
 #include "tickerwidget.h"
 #include "ui_tickerwidget.h"
 
-#include "mainwindow.h"
+#include "globals.h"
+#include "utils/AppData.h"
 
-TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool convertBalance, bool hidePercent) :
+TickerWidget::TickerWidget(QWidget *parent, AppContext *ctx, QString symbol, QString title, bool convertBalance, bool hidePercent) :
     QWidget(parent),
     ui(new Ui::TickerWidget),
+    m_ctx(ctx),
     m_symbol(std::move(symbol)),
     m_convertBalance(convertBalance),
     m_hidePercent(hidePercent)
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     // default values before API data
     if (title == "") title = m_symbol;
@@ -28,28 +29,30 @@ TickerWidget::TickerWidget(QWidget *parent, QString symbol, QString title, bool 
 
     ui->tickerPct->setHidden(hidePercent);
 
-    connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
-    connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
+    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
     if (convertBalance)
         connect(m_ctx, &AppContext::balanceUpdated, this, &TickerWidget::init);
 }
 
 void TickerWidget::init() {
-    if(!AppContext::prices->markets.count() || !AppContext::prices->rates.count())
+    if(!appData()->prices.markets.count() || !appData()->prices.rates.count())
         return;
 
     QString fiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
 
-    if(!AppContext::prices->rates.contains(fiatCurrency)){
+    if(!appData()->prices.rates.contains(fiatCurrency)){
         config()->set(Config::preferredFiatCurrency, "USD");
         return;
     }
 
-    double amount = m_convertBalance ? AppContext::balance : 1.0;
-    double conversion = AppContext::prices->convert(m_symbol, fiatCurrency, amount);
+    double walletBalance = m_ctx->currentWallet ? (m_ctx->currentWallet->balance() / globals::cdiv) : 0;
+
+    double amount = m_convertBalance ? walletBalance : 1.0;
+    double conversion = appData()->prices.convert(m_symbol, fiatCurrency, amount);
     if (conversion < 0) return;
 
-    auto markets = AppContext::prices->markets;
+    auto markets = appData()->prices.markets;
     if(!markets.contains(m_symbol)) return;
 
     bool hidePercent = (conversion == 0 || m_hidePercent);

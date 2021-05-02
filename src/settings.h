@@ -37,14 +37,17 @@ public slots:
     void checkboxExternalLinkWarn();
     void fiatCurrencySelected(int index);
     void comboBox_skinChanged(int pos);
-    void comboBox_blockExplorerChanged(int pos);
-    void comboBox_redditFrontendChanged(int pos);
     void comboBox_amountPrecisionChanged(int pos);
     void comboBox_dateFormatChanged(int pos);
     void comboBox_timeFormatChanged(int pos);
 
+    void comboBox_blockExplorerChanged(int pos);
+    void comboBox_redditFrontendChanged(int pos);
+    void comboBox_localMoneroFrontendChanged(int pos);
+
 private:
     void setupSkinCombobox();
+    void setupLocalMoneroFrontendCombobox();
 
     AppContext *m_ctx;
     Ui::Settings *ui;

@@ -1,0 +1,13 @@
+<svg width="14px" height="16px" viewBox="0 0 14 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <style>
+    use:not(:target) {
+      display: none;
+    }
+  </style>
+  <defs>
+    <g id="safer_icon" stroke="none" stroke-width="1">
+      <path fill-rule="nonzero" d="M7.0 2.1658351C7.0 13.931584 7.0 2.1658351 7.0 13.931584C9.8656467 13.057677 12.0 10.241354 12.0 7.2727273C12.0 7.2727273 12.0 4.2437572 12.0 4.2437572C12.0 4.2437572 7.0 2.1658351 7.0 2.1658351C7.0 2.1658351 7.0 2.1658351 7.0 2.1658351M7.0 0.0C7.0 0.0 14.0 2.9090909 14.0 2.9090909C14.0 2.9090909 14.0 7.2727273 14.0 7.2727273C14.0 11.309091 11.013333 15.083636 7.0 16.0C2.9866667 15.083636 0.0 11.309091 0.0 7.2727273C0.0 7.2727273 0.0 2.9090909 0.0 2.9090909C0.0 2.9090909 7.0 0.0 7.0 0.0"/>
+    </g>
+  </defs>
+  <use id="safer" fill="context-fill" fill-opacity="context-fill-opacity" href="#safer_icon" />
+</svg>

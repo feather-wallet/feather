@@ -4,8 +4,8 @@
 #include "TransactionHistory.h"
 #include "TransactionInfo.h"
 #include "utils/utils.h"
-#include "appcontext.h"
-
+#include "utils/AppData.h"
+#include "utils/config.h"
 
 bool TransactionHistory::transaction(int index, std::function<void (TransactionInfo &)> callback)
 {
@@ -164,11 +164,11 @@ bool TransactionHistory::writeCSV(const QString &path) {
         // calc historical fiat price
         QString fiatAmount;
         QString preferredFiatSymbol = config()->get(Config::preferredFiatCurrency).toString();
-        const double usd_price = AppContext::txFiatHistory->get(timeStamp.toString("yyyyMMdd"));
+        const double usd_price = appData()->txFiatHistory->get(timeStamp.toString("yyyyMMdd"));
         double fiat_price = usd_price * amount;
 
         if(preferredFiatSymbol != "USD")
-            fiat_price = AppContext::prices->convert("USD", preferredFiatSymbol, fiat_price);
+            fiat_price = appData()->prices.convert("USD", preferredFiatSymbol, fiat_price);
         double fiat_rounded = ceil(Utils::roundSignificant(fiat_price, 3) * 100.0) / 100.0;
         if(fiat_price != 0)
             fiatAmount = QString("%1 %2").arg(QString::number(fiat_rounded)).arg(preferredFiatSymbol);

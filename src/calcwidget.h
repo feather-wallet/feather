@@ -4,8 +4,7 @@
 #ifndef CALC_H
 #define CALC_H
 
-#include <QMainWindow>
-#include "appcontext.h"
+#include <QWidget>
 
 namespace Ui {
     class CalcWidget;
@@ -32,7 +31,7 @@ public slots:
 
 private:
     Ui::CalcWidget *ui;
-    AppContext *m_ctx;
+
     bool m_comboBoxInit = false;
     void initComboBox();
     bool m_changing = false;

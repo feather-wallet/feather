@@ -3,6 +3,7 @@
 // Copyright (c) 2012 thomasv@gitorious
 
 #include "ColorScheme.h"
+#include <QDebug>
 
 bool ColorScheme::darkScheme = false;
 ColorSchemeItem ColorScheme::GREEN   = ColorSchemeItem("#117c11", "#8af296");

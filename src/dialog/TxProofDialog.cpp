@@ -211,7 +211,8 @@ TxProof TxProofDialog::getProof() {
                 return m_wallet->getSpendProof(m_txid, message);
             }
             case Mode::OutProof:
-            case Mode::InProof: { // Todo: split this into separate functions
+            case Mode::InProof:
+            default: { // Todo: split this into separate functions
                 return m_wallet->getTxProof(m_txid, address, message);
             }
         }

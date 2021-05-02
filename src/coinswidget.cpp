@@ -6,6 +6,7 @@
 #include "dialog/outputinfodialog.h"
 #include "dialog/outputsweepdialog.h"
 #include "mainwindow.h"
+#include "utils/Icons.h"
 
 #include <QClipboard>
 #include <QMessageBox>
@@ -26,7 +27,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
     connect(ui->coins->header(), &QHeaderView::customContextMenuRequested, this, &CoinsWidget::showHeaderMenu);
 
     // copy menu
-    m_copyMenu->setIcon(QIcon(":/assets/images/copy.png"));
+    m_copyMenu->setIcon(icons()->icon("copy.png"));
     m_copyMenu->addAction("Public key", this, [this]{copy(copyField::PubKey);});
     m_copyMenu->addAction("Key Image", this, [this]{copy(copyField::KeyImage);});
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
@@ -44,7 +45,7 @@ CoinsWidget::CoinsWidget(QWidget *parent)
     m_freezeAllSelectedAction = new QAction("Freeze selected", this);
     m_thawAllSelectedAction = new QAction("Thaw selected", this);
 
-    m_viewOutputAction = new QAction(QIcon(":/assets/images/info.png"), "Details", this);
+    m_viewOutputAction = new QAction(icons()->icon("info2.svg"), "Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
@@ -129,7 +130,7 @@ void CoinsWidget::setShowSpent(bool show)
 void CoinsWidget::freezeOutput() {
     QModelIndex index = ui->coins->currentIndex();
     QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
-    emit freeze(indexes);
+    this->freezeCoins(indexes);
 }
 
 void CoinsWidget::freezeAllSelected() {
@@ -139,13 +140,13 @@ void CoinsWidget::freezeAllSelected() {
     for (QModelIndex index: list) {
         indexes.push_back(m_proxyModel->mapToSource(index).row()); // todo: will segfault if index get invalidated
     }
-    emit freeze(indexes);
+    this->freezeCoins(indexes);
 }
 
 void CoinsWidget::thawOutput() {
     QModelIndex index = ui->coins->currentIndex();
     QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
-    emit thaw(indexes);
+    this->thawCoins(indexes);
 }
 
 void CoinsWidget::thawAllSelected() {
@@ -155,7 +156,7 @@ void CoinsWidget::thawAllSelected() {
     for (QModelIndex index: list) {
         indexes.push_back(m_proxyModel->mapToSource(index).row());
     }
-    emit thaw(indexes);
+    this->thawCoins(indexes);
 }
 
 void CoinsWidget::viewOutput() {
@@ -181,7 +182,7 @@ void CoinsWidget::onSweepOutput() {
     int ret = dialog->exec();
     if (!ret) return;
 
-    emit sweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
+    m_ctx->onSweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
     dialog->deleteLater();
 }
 
@@ -228,6 +229,22 @@ CoinsInfo* CoinsWidget::currentEntry() {
     } else {
         return nullptr;
     }
+}
+
+void CoinsWidget::freezeCoins(const QVector<int>& indexes) {
+    for (int i : indexes) {
+        m_ctx->currentWallet->coins()->freeze(i);
+    }
+    m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
+    m_ctx->updateBalance();
+}
+
+void CoinsWidget::thawCoins(const QVector<int> &indexes) {
+    for (int i : indexes) {
+        m_ctx->currentWallet->coins()->thaw(i);
+    }
+    m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
+    m_ctx->updateBalance();
 }
 
 CoinsWidget::~CoinsWidget() {

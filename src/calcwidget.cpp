@@ -5,16 +5,15 @@
 
 #include "calcwidget.h"
 #include "ui_calcwidget.h"
-#include "mainwindow.h"
-#include "components.h"
 #include "utils/ColorScheme.h"
+#include "utils/AppData.h"
+#include "utils/config.h"
 
 CalcWidget::CalcWidget(QWidget *parent) :
         QWidget(parent),
         ui(new Ui::CalcWidget)
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     ui->imageExchange->setBackgroundRole(QPalette::Base);
     ui->imageExchange->setAssets(":/assets/images/exchange.png", ":/assets/images/exchange_white.png");
@@ -30,8 +29,8 @@ CalcWidget::CalcWidget(QWidget *parent) :
     ui->lineFrom->setValidator(dv);
     ui->lineTo->setValidator(dv);
 
-    connect(AppContext::prices, &Prices::fiatPricesUpdated, this, &CalcWidget::initFiat);
-    connect(AppContext::prices, &Prices::cryptoPricesUpdated, this, &CalcWidget::initCrypto);
+    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &CalcWidget::initFiat);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &CalcWidget::initCrypto);;
 }
 
 void CalcWidget::fromChanged(const QString &data) {
@@ -56,12 +55,12 @@ void CalcWidget::fromChanged(const QString &data) {
     }
 
     double amount = amount_str.toDouble();
-    double result = AppContext::prices->convert(symbolFrom, symbolTo, amount);
+    double result = appData()->prices.convert(symbolFrom, symbolTo, amount);
 
     this->m_changing = true;
 
     int precision = 10;
-    if(AppContext::prices->rates.contains(symbolTo))
+    if (appData()->prices.rates.contains(symbolTo))
         precision = 2;
 
     ui->lineTo->setText(QString::number(result, 'f', precision));
@@ -91,12 +90,12 @@ void CalcWidget::toChanged(const QString &data) {
     }
 
     double amount = amount_str.toDouble();
-    double result = AppContext::prices->convert(symbolTo, symbolFrom, amount);
+    double result = appData()->prices.convert(symbolTo, symbolFrom, amount);
 
     this->m_changing = true;
 
     int precision = 10;
-    if(AppContext::prices->rates.contains(symbolFrom))
+    if(appData()->prices.rates.contains(symbolFrom))
         precision = 2;
 
     ui->lineFrom->setText(QString::number(result, 'f', precision));
@@ -116,8 +115,8 @@ void CalcWidget::initFiat() {
 
 void CalcWidget::initComboBox() {
     if(m_comboBoxInit) return;
-    QList<QString> marketsKeys = AppContext::prices->markets.keys();
-    QList<QString> ratesKeys = AppContext::prices->rates.keys();
+    QList<QString> marketsKeys = appData()->prices.markets.keys();
+    QList<QString> ratesKeys = appData()->prices.rates.keys();
     if(marketsKeys.count() <= 0 || ratesKeys.count() <= 0) return;
 
     ui->comboCalcFrom->addItems(marketsKeys);

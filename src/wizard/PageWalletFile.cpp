@@ -22,9 +22,6 @@ PageWalletFile::PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *p
     QPixmap pixmap = QPixmap(":/assets/images/file.png");
     ui->lockIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
-    this->registerField("walletName", ui->line_walletName);
-    this->registerField("walletDirectory", ui->line_walletDir);
-
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
         if(walletDir.isEmpty()) return;

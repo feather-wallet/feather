@@ -42,6 +42,7 @@ class Utils
 {
 
 public:
+    static QByteArray fileGetContents(const QString &path);
     static bool portOpen(const QString &hostname, quint16 port);
     static bool fileExists(const QString &path);
     static QByteArray fileOpen(const QString &path);

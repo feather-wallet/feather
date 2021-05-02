@@ -3,9 +3,9 @@
 
 #include "daemonrpc.h"
 
-DaemonRpc::DaemonRpc(QObject *parent, UtilsNetworking *network, QString daemonAddress)
+DaemonRpc::DaemonRpc(QObject *parent, QNetworkAccessManager *network, QString daemonAddress)
         : QObject(parent)
-        , m_network(network)
+        , m_network(new UtilsNetworking(network, this))
         , m_daemonAddress(std::move(daemonAddress))
 {
 }
@@ -91,8 +91,4 @@ QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {
 
 void DaemonRpc::setDaemonAddress(const QString &daemonAddress) {
     m_daemonAddress = daemonAddress;
-}
-
-void DaemonRpc::setNetwork(UtilsNetworking *network) {
-    m_network = network;
 }

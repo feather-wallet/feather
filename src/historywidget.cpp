@@ -5,6 +5,10 @@
 #include "ui_historywidget.h"
 #include "dialog/transactioninfodialog.h"
 #include "dialog/TxProofDialog.h"
+#include "utils/Icons.h"
+#include "utils/config.h"
+#include "appcontext.h"
+
 #include <QMessageBox>
 
 HistoryWidget::HistoryWidget(QWidget *parent)
@@ -15,11 +19,11 @@ HistoryWidget::HistoryWidget(QWidget *parent)
 {
     ui->setupUi(this);
     m_contextMenu->addMenu(m_copyMenu);
-    m_contextMenu->addAction(QIcon(":/assets/images/info.png"), "Show details", this, &HistoryWidget::showTxDetails);
-    m_contextMenu->addAction(QIcon(":/assets/images/network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+    m_contextMenu->addAction(icons()->icon("info2.svg"), "Show details", this, &HistoryWidget::showTxDetails);
+    m_contextMenu->addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
 
     // copy menu
-    m_copyMenu->setIcon(QIcon(":/assets/images/copy.png"));
+    m_copyMenu->setIcon(icons()->icon("copy.png"));
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Description", this, [this]{copy(copyField::Description);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
@@ -56,12 +60,12 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
 
     bool unconfirmed = tx->isFailed() || tx->isPending();
     if (AppContext::txCache.contains(tx->hash()) && unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
-        menu.addAction(QIcon(":/assets/images/info.png"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
+        menu.addAction(icons()->icon("info2.svg"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
     menu.addMenu(m_copyMenu);
-    menu.addAction(QIcon(":/assets/images/info.png"), "Show details", this, &HistoryWidget::showTxDetails);
-    menu.addAction(QIcon(":/assets/images/network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+    menu.addAction(icons()->icon("info2.svg"), "Show details", this, &HistoryWidget::showTxDetails);
+    menu.addAction(icons()->icon("network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
     menu.addAction("Create tx proof", this, &HistoryWidget::createTxProof);
 
     menu.exec(ui->history->viewport()->mapToGlobal(point));

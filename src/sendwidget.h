@@ -43,11 +43,6 @@ public slots:
     void onInitiateTransaction();
     void onEndTransaction();
 
-signals:
-    void resolveOpenAlias(const QString &address);
-    void createTransaction(const QString &address, quint64 amount, const QString &description, bool all);
-    void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
-
 private:
     void setupComboBox();
     double amountDouble();

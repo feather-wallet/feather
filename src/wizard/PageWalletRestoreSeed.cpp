@@ -110,7 +110,7 @@ bool PageWalletRestoreSeed::validatePage() {
         }
     }
 
-    auto _seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], QString::fromStdString(globals::coinName), m_ctx->seedLanguage, seedSplit);
+    auto _seed = FeatherSeed(m_ctx->networkType, QString::fromStdString(globals::coinName), m_ctx->seedLanguage, seedSplit);
     if (!_seed.errorString.isEmpty()) {
         QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));
         ui->seedEdit->setStyleSheet(errStyle);

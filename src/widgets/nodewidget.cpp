@@ -10,6 +10,7 @@
 #include "nodewidget.h"
 #include "ui_nodewidget.h"
 #include "mainwindow.h"
+#include "utils/Icons.h"
 
 NodeWidget::NodeWidget(QWidget *parent)
         : QWidget(parent)
@@ -19,19 +20,18 @@ NodeWidget::NodeWidget(QWidget *parent)
 
     connect(ui->btn_add_custom, &QPushButton::clicked, this, &NodeWidget::onCustomAddClicked);
 
-    connect(ui->nodeBtnGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), [=](QAbstractButton *button) {
-        auto name = button->objectName();
-        if (name == "radioButton_websocket") {
-            emit nodeSourceChanged(NodeSource::websocket);
-        } else if (name == "radioButton_custom") {
-            emit nodeSourceChanged(NodeSource::custom);
-        }
+    ui->nodeBtnGroup->setId(ui->radioButton_websocket, NodeSource::websocket);
+    ui->nodeBtnGroup->setId(ui->radioButton_custom, NodeSource::custom);
+
+    connect(ui->nodeBtnGroup, &QButtonGroup::idClicked, [this](int id){
+        config()->set(Config::nodeSource, id);
+        emit nodeSourceChanged(static_cast<NodeSource>(id));
     });
 
     m_contextActionRemove = new QAction("Remove", this);
-    m_contextActionConnect = new QAction(QIcon(":/assets/images/connect.svg"), "Connect to node", this);
-    m_contextActionOpenStatusURL = new QAction(QIcon(":/assets/images/network.png"), "Visit status page", this);
-    m_contextActionCopy = new QAction(QIcon(":/assets/images/copy.png"), "Copy", this);
+    m_contextActionConnect = new QAction(icons()->icon("connect.svg"), "Connect to node", this);
+    m_contextActionOpenStatusURL = new QAction(icons()->icon("network.png"), "Visit status page", this);
+    m_contextActionCopy = new QAction(icons()->icon("copy.png"), "Copy", this);
     connect(m_contextActionConnect, &QAction::triggered, this, &NodeWidget::onContextConnect);
     connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
     connect(m_contextActionOpenStatusURL, &QAction::triggered, this, &NodeWidget::onContextStatusURL);
@@ -50,7 +50,7 @@ NodeWidget::NodeWidget(QWidget *parent)
 void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
     m_activeView = ui->wsView;
     FeatherNode node = this->selectedNode();
-    if (node.full.isEmpty()) return;
+    if (node.toAddress().isEmpty()) return;
 
     this->showContextMenu(pos, node);
 }
@@ -58,7 +58,7 @@ void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
 void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
     m_activeView = ui->customView;
     FeatherNode node = this->selectedNode();
-    if (node.full.isEmpty()) return;
+    if (node.toAddress().isEmpty()) return;
 
     this->showContextMenu(pos, node);
 }
@@ -87,19 +87,19 @@ void NodeWidget::onContextConnect() {
         m_activeView = ui->wsView;
 
     FeatherNode node = this->selectedNode();
-    if (!node.full.isEmpty())
+    if (!node.toAddress().isEmpty())
         emit connectToNode(node);
 }
 
 void NodeWidget::onContextStatusURL() {
     FeatherNode node = this->selectedNode();
-    if (!node.full.isEmpty())
-        Utils::externalLinkWarning(this, QString("%1/get_info").arg(node.as_url()));
+    if (!node.toAddress().isEmpty())
+        Utils::externalLinkWarning(this, QString("%1/get_info").arg(node.toURL()));
 }
 
 void NodeWidget::onContextNodeCopy() {
     FeatherNode node = this->selectedNode();
-    Utils::copyToClipboard(node.full);
+    Utils::copyToClipboard(node.toAddress());
 }
 
 FeatherNode NodeWidget::selectedNode() {
@@ -131,10 +131,10 @@ void NodeWidget::onContextCustomNodeRemove() {
 
 void NodeWidget::onCustomAddClicked(){
     auto currentNodes = m_ctx->nodes->customNodes();
-    auto currentNodesText = QString("");
+    QString currentNodesText;
 
-    for(auto &entry: currentNodes)
-        currentNodesText += QString("%1\n").arg(entry.full);
+    for (auto &entry: currentNodes)
+        currentNodesText += QString("%1\n").arg(entry.url.toString());
 
     bool ok;
     QString text = QInputDialog::getMultiLineText(this, "Add custom node(s).", "E.g: user:password@127.0.0.1:18081", currentNodesText, &ok);
@@ -160,7 +160,6 @@ void NodeWidget::setupUI(AppContext *ctx) {
     m_ctx = ctx;
 
     auto nodeSource = m_ctx->nodes->source();
-    qCritical() << nodeSource;
 
     if(nodeSource == NodeSource::websocket){
         ui->radioButton_websocket->setChecked(true);

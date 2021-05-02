@@ -17,7 +17,7 @@ Settings::Settings(QWidget *parent) :
     this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
 
     ui->tabWidget->setTabVisible(2, false);
-    ui->tabWidget->setTabVisible(4, false);
+    ui->tabWidget->setTabVisible(5, false);
 
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
     connect(ui->checkBox_multiBroadcast, &QCheckBox::toggled, [](bool toggled){
@@ -70,8 +70,6 @@ Settings::Settings(QWidget *parent) :
         ui->comboBox_timeFormat->setCurrentIndex(m_timeFormats.indexOf(timeFormatSetting));
 
     connect(ui->comboBox_skin, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_skinChanged);
-    connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
-    connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
     connect(ui->comboBox_amountPrecision, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_amountPrecisionChanged);
     connect(ui->comboBox_dateFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_dateFormatChanged);
     connect(ui->comboBox_timeFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_timeFormatChanged);
@@ -98,6 +96,16 @@ Settings::Settings(QWidget *parent) :
         ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
     });
 
+    // Links tab
+    connect(ui->combo_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
+    connect(ui->combo_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
+    connect(ui->combo_localMoneroFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_localMoneroFrontendChanged);
+
+    ui->combo_blockExplorer->setCurrentIndex(ui->combo_blockExplorer->findText(config()->get(Config::blockExplorer).toString()));
+    ui->combo_redditFrontend->setCurrentIndex(ui->combo_redditFrontend->findText(config()->get(Config::redditFrontend).toString()));
+
+    this->setupLocalMoneroFrontendCombobox();
+
     this->adjustSize();
 }
 
@@ -118,14 +126,19 @@ void Settings::comboBox_skinChanged(int pos) {
 }
 
 void Settings::comboBox_blockExplorerChanged(int pos) {
-    QString blockExplorer = ui->comboBox_blockExplorer->currentText();
+    QString blockExplorer = ui->combo_blockExplorer->currentText();
     config()->set(Config::blockExplorer, blockExplorer);
     emit blockExplorerChanged(blockExplorer);
 }
 
 void Settings::comboBox_redditFrontendChanged(int pos) {
-    QString redditFrontend = ui->comboBox_redditFrontend->currentText();
+    QString redditFrontend = ui->combo_redditFrontend->currentText();
     config()->set(Config::redditFrontend, redditFrontend);
+}
+
+void Settings::comboBox_localMoneroFrontendChanged(int pos) {
+    QString localMoneroFrontend = ui->combo_localMoneroFrontend->currentData().toString();
+    config()->set(Config::localMoneroFrontend, localMoneroFrontend);
 }
 
 void Settings::comboBox_amountPrecisionChanged(int pos) {
@@ -159,6 +172,15 @@ void Settings::setupSkinCombobox() {
 #endif
 
     ui->comboBox_skin->insertItems(0, m_skins);
+}
+
+void Settings::setupLocalMoneroFrontendCombobox() {
+    ui->combo_localMoneroFrontend->addItem("localmonero.co", "https://localmonero.co");
+    ui->combo_localMoneroFrontend->addItem("localmonero.co/nojs", "https://localmonero.co/nojs");
+    ui->combo_localMoneroFrontend->addItem("nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion",
+                                           "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion");
+
+    ui->combo_localMoneroFrontend->setCurrentIndex(ui->combo_localMoneroFrontend->findData(config()->get(Config::localMoneroFrontend).toString()));
 }
 
 Settings::~Settings() {

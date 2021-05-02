@@ -9,11 +9,11 @@
 #include "utils/xmrig.h"
 #include "appcontext.h"
 
-XmRig::XmRig(const QString &configDir, QObject *parent) : QObject(parent) {
+XmRig::XmRig(const QString &configDir, QObject *parent)
+    : QObject(parent)
+{
     this->rigDir = QDir(configDir).filePath("xmrig");
-}
 
-void XmRig::prepare() {
     m_process.setProcessChannelMode(QProcess::MergedChannels);
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
     connect(&m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
@@ -30,12 +30,9 @@ void XmRig::stop() {
     }
 }
 
-void XmRig::start(const QString &path,
-                  int threads,
-                  const QString &address,
-                  const QString &username,
-                  const QString &password,
-                  bool tor, bool tls) {
+void XmRig::start(const QString &path, int threads, const QString &address, const QString &username,
+                  const QString &password, bool tor, bool tls)
+{
     auto state = m_process.state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
         emit error("Can't start XMRig, already running or starting");
@@ -60,8 +57,16 @@ void XmRig::start(const QString &path,
         arguments << "-p" << password;
     arguments << "--no-color";
     arguments << "-t" << QString::number(threads);
-    if(tor)
-        arguments << "-x" << QString("%1:%2").arg(Tor::torHost).arg(Tor::torPort);
+    if (tor) {
+        QString host = config()->get(Config::socks5Host).toString();
+        QString port = config()->get(Config::socks5Port).toString();
+        if (!torManager()->isLocalTor()) {
+            host = torManager()->featherTorHost;
+            port = QString::number(torManager()->featherTorPort);
+        }
+        arguments << "-x" << QString("%1:%2").arg(host, port);
+    }
+
     if(tls)
         arguments << "--tls";
     arguments << "--donate-level" << "1";

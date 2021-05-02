@@ -18,7 +18,7 @@ RestoreDialog::RestoreDialog(AppContext *ctx, QWidget *parent)
         ui->restoreHeightWidget->hideSlider();
     } else {
         // load restoreHeight lookup db
-        ui->restoreHeightWidget->initRestoreHeights(m_ctx->restoreHeights[m_ctx->networkType]);
+        ui->restoreHeightWidget->initRestoreHeights(appData()->restoreHeights[m_ctx->networkType]);
     }
 }
 

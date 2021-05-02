@@ -283,6 +283,11 @@ bool Wallet::isTrezor() const
     return m_walletImpl->getDeviceType() == Monero::Wallet::Device_Trezor;
 }
 
+bool Wallet::reconnectDevice()
+{
+    return m_walletImpl->reconnectDevice();
+}
+
 //! create a view only wallet
 bool Wallet::createViewOnly(const QString &path, const QString &password) const
 {
@@ -1224,11 +1229,21 @@ void Wallet::onWalletPassphraseNeeded(bool on_device)
 }
 
 quint64 Wallet::getBytesReceived() const {
-    return m_walletImpl->getBytesReceived();
+    // TODO: this can segfault. Unclear why.
+    try {
+        return m_walletImpl->getBytesReceived();
+    }
+    catch (...) {
+        return 0;
+    }
 }
 
 quint64 Wallet::getBytesSent() const {
     return m_walletImpl->getBytesSent();
+}
+
+bool Wallet::isDeviceConnected() const {
+    return m_walletImpl->isDeviceConnected();
 }
 
 void Wallet::onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort)
@@ -1303,14 +1318,14 @@ Wallet::~Wallet()
     delete m_coins;
     m_coins = NULL;
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
-    if(status() == Status_Critical)
+    if(status() == Status_Critical || status() == Status_BadPassword)
         qDebug("Not storing wallet cache");
     else if( m_walletImpl->store(""))
         qDebug("Wallet cache stored successfully");
     else
         qDebug("Error storing wallet cache");
     delete m_walletImpl;
-    m_walletImpl = NULL;
+    m_walletImpl = nullptr;
     delete m_walletListener;
     m_walletListener = NULL;
     qDebug("m_walletImpl deleted");
@@ -1325,7 +1340,7 @@ void Wallet::startRefreshThread()
         auto last = std::chrono::steady_clock::now();
         while (!m_scheduler.stopping())
         {
-            if (m_refreshEnabled)
+            if (m_refreshEnabled && (!isHwBacked() || isDeviceConnected()))
             {
                 const auto now = std::chrono::steady_clock::now();
                 const auto elapsed = now - last;

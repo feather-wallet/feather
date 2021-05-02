@@ -9,6 +9,7 @@
 #include "model/CoinsProxyModel.h"
 #include "libwalletqt/Coins.h"
 
+#include <QMenu>
 #include <QWidget>
 #include <QtSvg/QSvgWidget>
 
@@ -38,12 +39,10 @@ private slots:
     void viewOutput();
     void onSweepOutput();
 
-signals:
-    void freeze(QVector<int> indexes);
-    void thaw(QVector<int> indexes);
-    void sweepOutput(const QString &keyImage, const QString &address, bool isChurn, int outputs);
-
 private:
+    void freezeCoins(const QVector<int>& indexes);
+    void thawCoins(const QVector<int>& indexes);
+
     enum copyField {
         PubKey = 0,
         KeyImage,

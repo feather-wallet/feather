@@ -21,7 +21,7 @@ public:
     enum ConfigKey
     {
         warnOnExternalLink,
-        checkForAppUpdates,
+        checkForUpdates,
         warnOnStagenet,
         warnOnTestnet,
         warnOnAlpha,
@@ -55,7 +55,21 @@ public:
         portableMode,
         dateFormat,
         timeFormat,
-        multiBroadcast
+        multiBroadcast,
+        torPrivacyLevel,
+        socks5Host,
+        socks5Port,
+        socks5User,
+        socks5Pass,
+        useLocalTor, // Prevents Feather from starting bundled Tor daemon
+        networkType,
+        localMoneroFrontend
+    };
+
+    enum PrivacyLevel {
+        allTorExceptNode = 0,
+        allTorExceptInitSync,
+        allTor
     };
 
     ~Config() override;
@@ -71,7 +85,7 @@ public:
     static Config* instance();
 
 signals:
-    void changed(ConfigKey key);
+    void changed(Config::ConfigKey key);
 
 private:
     Config(const QString& fileName, QObject* parent = nullptr);

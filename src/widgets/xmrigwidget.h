@@ -54,6 +54,8 @@ private:
     Ui::XMRigWidget *ui;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
+    XmRig * m_XMRig;
+
     int m_threads;
     QStringList m_urls;
     QStringList m_pools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};
