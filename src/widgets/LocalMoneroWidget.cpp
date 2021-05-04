@@ -194,7 +194,7 @@ void LocalMoneroWidget::updatePaymentMethods() {
     QString currency = ui->combo_currency->currentText().toUpper();
 
     ui->combo_paymentMethod->clear();
-    ui->combo_paymentMethod->addItem("All online offers");
+    ui->combo_paymentMethod->addItem("Any payment method");
 
     for (const auto &payment_method : m_paymentMethods.keys()) {
         auto pm = m_paymentMethods[payment_method].toObject();

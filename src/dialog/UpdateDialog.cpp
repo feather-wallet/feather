@@ -47,6 +47,7 @@ UpdateDialog::UpdateDialog(QWidget *parent, QString version, QString downloadUrl
 }
 
 void UpdateDialog::onDownloadClicked() {
+    ui->label_body->setText("Downloading update..");
     ui->btn_download->hide();
     ui->progressBar->show();
 
@@ -173,7 +174,9 @@ void UpdateDialog::onInstallUpdate() {
     zip_close(zip_archive);
 
     QString applicationPath = qgetenv("APPIMAGE");
-    if (applicationPath.isEmpty()) {
+    if (!applicationPath.isEmpty()) {
+        applicationPath = QFileInfo(applicationPath).absoluteDir().path();
+    } else {
         applicationPath = QCoreApplication::applicationDirPath();
     }
 
@@ -184,7 +187,7 @@ void UpdateDialog::onInstallUpdate() {
     QFile file(filePath);
     if (!file.open(QIODevice::WriteOnly))
     {
-        this->onInstallError("Error: Could not write to application directory");
+        this->onInstallError(QString("Error: Could not write to application path: %1").arg(filePath));
         return;
     }
 
@@ -193,7 +196,9 @@ void UpdateDialog::onInstallUpdate() {
         return;
     }
 
-    if (!file.setPermissions(QFile::ExeUser | QFile::ExeOwner | QFile::ReadUser | QFile::ReadOwner | QFile::WriteUser | QFile::WriteOwner)) {
+    if (!file.setPermissions(QFile::ExeUser | QFile::ExeOwner | QFile::ExeGroup | QFile::ExeOther
+                             | QFile::ReadUser | QFile::ReadOwner
+                             | QFile::WriteUser | QFile::WriteOwner)) {
         this->onInstallError("Error: Unable to set executable flags");
         return;
     }

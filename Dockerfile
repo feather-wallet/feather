@@ -323,17 +323,17 @@ RUN rm /usr/lib/x86_64-linux-gnu/libX11.a && \
     cd ../../../.. && \
     rm -rf $(pwd)
 
-RUN git clone -b v1.0.23 --depth 1 https://github.com/libusb/libusb && \
+RUN git clone -b v1.0.24 --depth 1 https://github.com/libusb/libusb && \
     cd libusb && \
-    git reset --hard e782eeb2514266f6738e242cdcb18e3ae1ed06fa && \
+    git reset --hard c6a35c56016ea2ab2f19115d2ea1e85e0edae155 && \
     ./autogen.sh --disable-shared --enable-static && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b hidapi-0.9.0 --depth 1 https://github.com/libusb/hidapi && \
+RUN git clone -b hidapi-0.10.1 --depth 1 https://github.com/libusb/hidapi && \
     cd hidapi && \
-    git reset --hard 7da5cc91fc0d2dbe4df4f08cd31f6ca1a262418f && \
+    git reset --hard f6d0073fcddbdda24549199445e844971d3c9cef && \
     ./bootstrap && \
     ./configure --disable-shared --enable-static && \
     make -j$THREADS && \
@@ -384,9 +384,9 @@ RUN git clone -b v3.18.4 --depth 1 https://github.com/Kitware/CMake && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b v4.0.2 --depth 1 https://github.com/fukuchi/libqrencode.git && \
+RUN git clone -b v4.1.1 --depth 1 https://github.com/fukuchi/libqrencode.git && \
     cd libqrencode && \
-    git reset --hard 59ee597f913fcfda7a010a6e106fbee2595f68e4 && \
+    git reset --hard 715e29fd4cd71b6e452ae0f4e36d917b43122ce8 && \
     cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr . && \
     make -j$THREADS && \
     make -j$THREADS install && \
@@ -415,7 +415,7 @@ RUN mkdir linuxdeployqt && \
     ./linuxdeployqt-7-x86_64.AppImage --appimage-extract && \
     rm linuxdeployqt-7-x86_64.AppImage
 
-RUN git clone https://github.com/nih-at/libzip.git && \
+RUN git clone -b v1.7.3 --depth 1 https://github.com/nih-at/libzip.git && \
     cd libzip && \
     git reset --hard 66e496489bdae81bfda8b0088172871d8fda0032 && \
     cmake -DBUILD_SHARED_LIBS=OFF -DCMAKE_INSTALL_PREFIX=/usr . && \

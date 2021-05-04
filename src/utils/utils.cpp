@@ -17,10 +17,6 @@
 #include "utils/ColorScheme.h"
 #include "globals.h"
 
-// Application log for current session
-QVector<logMessage> applicationLog = QVector<logMessage>(); // todo: replace with ring buffer
-QMutex logMutex;
-
 QByteArray Utils::fileGetContents(const QString &path)
 {
     QFile file(path);
@@ -127,12 +123,6 @@ void Utils::applicationLogHandler(QtMsgType type, const QMessageLogContext &cont
     }
 
     auto message = logMessage(type, line, fn);
-
-    {
-        QMutexLocker locker(&logMutex);
-        applicationLog.append(message);
-    }
-
 
     //emit applicationLogUpdated(message);
 }

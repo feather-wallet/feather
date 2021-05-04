@@ -37,6 +37,7 @@ void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
     const auto err = reply->errorString();
 
     QByteArray data = reply->readAll();
+    reply->deleteLater();
     QJsonObject obj;
     if (!data.isEmpty() && Utils::validateJSON(data)) {
         auto doc = QJsonDocument::fromJson(data);
@@ -65,8 +66,8 @@ void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
         return;
     }
 
-    reply->deleteLater();
-    emit ApiResponse(DaemonResponse(true, endpoint, "", obj));
+    DaemonResponse resp{true, endpoint, "", obj};
+    emit ApiResponse(resp);
 }
 
 QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {

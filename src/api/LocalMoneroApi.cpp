@@ -112,7 +112,7 @@ QString LocalMoneroApi::getBuySellUrl(bool buy, const QString &currencyCode, con
         url += QString("/%1/%2").arg(countryCode, paymentMethod);
 
     QUrlQuery query;
-    if (!amount.isEmpty())
+    if (!amount.isEmpty() && amount != "0")
         query.addQueryItem("amount", amount);
     if (page > 0)
         query.addQueryItem("page", QString::number(page));

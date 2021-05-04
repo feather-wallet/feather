@@ -21,6 +21,9 @@ public:
     static bool usePersistence;
     static bool rememberChoice;
     static const QString tailsPathData;
+
+    static bool isTails;
+    static bool detected;
 };
 
 #endif // TAILSOS_H

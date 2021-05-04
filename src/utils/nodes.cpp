@@ -318,12 +318,19 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 }
 
 void Nodes::onWalletRefreshed() {
-    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync && !m_connection.isLocal()) {
+    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
+        if (m_connection.isLocal())
+            return;
+        if (TailsOS::detect() || WhonixOS::detect())
+            return;
         this->autoConnect(true);
     }
 }
 
 bool Nodes::useOnionNodes() {
+    if (TailsOS::detect() || WhonixOS::detect()) {
+        return true;
+    }
     auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
     if (privacyLevel == Config::allTor || (privacyLevel == Config::allTorExceptInitSync && m_ctx->refreshed)) {
         return true;

@@ -86,7 +86,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent)
     connect(m_ctx, &AppContext::walletRefreshed, ui->historyWidget, &HistoryWidget::onWalletRefreshed);
     connect(m_ctx, &AppContext::walletOpened, ui->historyWidget, &HistoryWidget::onWalletOpened);
 
-    if (!config()->get(Config::firstRun).toBool()) {
+    if (!config()->get(Config::firstRun).toBool() || TailsOS::detect() || WhonixOS::detect()) {
         this->onInitialNetworkConfigured();
     }
 
@@ -418,8 +418,9 @@ void MainWindow::initWalletContext() {
 }
 
 void MainWindow::initWizard() {
+    this->setEnabled(false);
     auto startPage = WalletWizard::Page_Menu;
-    if (config()->get(Config::firstRun).toBool()) {
+    if (config()->get(Config::firstRun).toBool() && !(TailsOS::detect() || WhonixOS::detect())) {
         startPage = WalletWizard::Page_Network;
     }
 
@@ -544,6 +545,8 @@ void MainWindow::onDeviceButtonRequest(quint64 code) {
         m_wizard->hide();
     }
 
+    m_splashDialog->setMessage("Action required on device: Export the view key to open the wallet.");
+    m_splashDialog->setIcon(QPixmap(":/assets/images/key.png"));
     m_splashDialog->show();
     m_splashDialog->setEnabled(true);
 }
@@ -571,7 +574,10 @@ void MainWindow::displayWalletErrorMsg(const QString &err) {
         errMsg += "\n\nIncompatible version: you may need to upgrade the Monero app on the Ledger device to the latest version.";
     }
     else if (errMsg.contains("Wrong Device Status")) {
-        errMsg += "\n\nThe device may need to be unlocked";
+        errMsg += "\n\nThe device may need to be unlocked.";
+    }
+    else if (errMsg.contains("Wrong Channel")) {
+        errMsg += "\n\nRestart the hardware device and try again.";
     }
 
     QMessageBox::warning(this, "Wallet error", errMsg);
@@ -630,9 +636,18 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
     bool hide = config()->get(Config::hideBalance).toBool();
 
-    QString label_str = QString("Balance: %1 XMR").arg(Utils::balanceFormat(spendable));
-    if (balance > spendable)
+    int amountPrecision = config()->get(Config::amountPrecision).toInt();
+
+    QString balance_str = WalletManager::displayAmount(spendable);
+    balance_str.remove(QRegExp("0+$"));
+
+    QString label_str = QString("Balance: %1 XMR").arg(balance_str);
+    if (balance > spendable) {
+        QString unconfirmed_str = WalletManager::displayAmount(spendable);
+        unconfirmed_str.remove(QRegExp("0+$"));
         label_str += QString(" (+%1 XMR unconfirmed)").arg(Utils::balanceFormat(balance - spendable));
+    }
+
 
     if (hide)
         label_str = "Balance: HIDDEN";
@@ -725,12 +740,12 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
             err = QString("%1 %2").arg(err).arg(tx_err);
 
         qDebug() << Q_FUNC_INFO << err;
-        QMessageBox::warning(this, "Transactions error", err);
+        this->displayWalletErrorMsg(err);
         m_ctx->currentWallet->disposeTransaction(tx);
     } else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
-        QMessageBox::warning(this, "Transaction error", err);
+        this->displayWalletErrorMsg(err);
         m_ctx->currentWallet->disposeTransaction(tx);
     } else {
         const auto &description = m_ctx->tmpTxDescription;
@@ -797,7 +812,7 @@ void MainWindow::showWalletInfoDialog() {
 
 void MainWindow::showSeedDialog() {
     if (m_ctx->currentWallet->isHwBacked()) {
-        QMessageBox::information(this, "Information", "Wallet keys are stored on hardware device.");
+        QMessageBox::information(this, "Information", "Seed unavailable: Wallet keys are stored on hardware device.");
         return;
     }
 
@@ -1232,15 +1247,21 @@ void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
 
 void MainWindow::importTransaction() {
 
-    auto result = QMessageBox::warning(this, "Warning", "Using this feature may allow a remote node to associate the transaction with your IP address.\n"
-                                          "\n"
-                                          "Connect to a trusted node or run Feather over Tor if network level metadata leakage is included in your threat model.",
-                                          QMessageBox::Ok | QMessageBox::Cancel);
-    if (result == QMessageBox::Ok) {
-        auto *dialog = new TxImportDialog(this, m_ctx);
-        dialog->exec();
-        dialog->deleteLater();
+    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptNode) {
+        // TODO: don't show if connected to local node
+
+        auto result = QMessageBox::warning(this, "Warning", "Using this feature may allow a remote node to associate the transaction with your IP address.\n"
+                                                            "\n"
+                                                            "Connect to a trusted node or run Feather over Tor if network level metadata leakage is included in your threat model.",
+                                           QMessageBox::Ok | QMessageBox::Cancel);
+        if (result != QMessageBox::Ok) {
+            return;
+        }
     }
+
+    auto *dialog = new TxImportDialog(this, m_ctx);
+    dialog->exec();
+    dialog->deleteLater();
 }
 
 void MainWindow::onDeviceError(const QString &error) {
@@ -1332,9 +1353,10 @@ void MainWindow::onCheckUpdatesComplete(const QString &version, const QString &b
     versionDisplay.replace("beta", "Beta");
     QString updateText = QString("Update to Feather %1 is available").arg(versionDisplay);
     m_statusUpdateAvailable->setText(updateText);
+    m_statusUpdateAvailable->setToolTip("Click to Download update.");
     m_statusUpdateAvailable->show();
 
-    disconnect(m_statusUpdateAvailable);
+    m_statusUpdateAvailable->disconnect();
     connect(m_statusUpdateAvailable, &StatusBarButton::clicked, [this, version, binaryFilename, hash, signer] {
         this->onShowUpdateCheck(version, binaryFilename, hash, signer);
     });
@@ -1367,9 +1389,9 @@ void MainWindow::onUpdatesAvailable(const QJsonObject &updates) {
     }
 
     QString newVersion = platformData["version"].toString();
-//    if (SemanticVersion::fromString(newVersion) <= featherVersion) {
-//        return;
-//    }
+    if (SemanticVersion::fromString(newVersion) <= featherVersion) {
+        return;
+    }
 
     // Hooray! New update available
 
@@ -1423,6 +1445,14 @@ void MainWindow::onInitiateTransaction() {
     m_statusDots = 0;
     m_constructingTransaction = true;
     m_txTimer.start(1000);
+
+    if (m_ctx->currentWallet->isHwBacked()) {
+        QString message = "Constructing transaction: action may be required on device.";
+        m_splashDialog->setMessage(message);
+        m_splashDialog->setIcon(QPixmap(":/assets/images/unconfirmed.png"));
+        m_splashDialog->show();
+        m_splashDialog->setEnabled(true);
+    }
 }
 
 void MainWindow::onEndTransaction() {
@@ -1430,6 +1460,10 @@ void MainWindow::onEndTransaction() {
     m_constructingTransaction = false;
     m_txTimer.stop();
     this->setStatusText(m_statusText);
+
+    if (m_ctx->currentWallet->isHwBacked()) {
+        m_splashDialog->hide();
+    }
 }
 
 void MainWindow::onCustomRestoreHeightSet(int height) {

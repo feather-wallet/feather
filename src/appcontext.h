@@ -82,7 +82,7 @@ public slots:
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
     void onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
     void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
-    void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const;
+    void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs);
     void onCreateTransactionError(const QString &msg);
     void onOpenAliasResolve(const QString &openAlias);
     void onSetRestoreHeight(quint64 height);
@@ -140,6 +140,7 @@ signals:
     void deviceError(const QString &message);
 
 private:
+    DaemonRpc *m_rpc;
     QTimer m_storeTimer;
     bool m_openWalletTriedOnce = false;
 };

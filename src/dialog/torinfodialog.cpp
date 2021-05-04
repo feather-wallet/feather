@@ -120,17 +120,16 @@ void TorInfoDialog::initPrivacyLevel() {
     if (m_ctx->nodes->connection().isLocal()) {
         ui->label_notice->setText("You are connected to a local node. Traffic is not routed over Tor.");
     }
-    else if (Utils::isTorsocks() || WhonixOS::detect() || TailsOS::detect()) {
-        ui->radio_allTorExceptNode->setEnabled(false);
-        ui->radio_allTorExceptInitSync->setEnabled(false);
-
-        if (Utils::isTorsocks())
-            ui->label_notice->setText("Feather was started with torsocks, all traffic is routed over Tor");
-        else if (WhonixOS::detect())
-            ui->label_notice->setText("Feather is running on Whonix, all traffic is routed over Tor");
-        else if (TailsOS::detect())
-            ui->label_notice->setText("Feather is running on Tails, all traffic is routed over Tor");
-    } else {
+    else if (Utils::isTorsocks()) {
+        ui->label_notice->setText("Feather was started with torsocks, all traffic is routed over Tor");
+    }
+    else if (WhonixOS::detect()) {
+        ui->label_notice->setText("Feather is running on Whonix, all traffic is routed over Tor");
+    }
+    else if (TailsOS::detect()) {
+        ui->label_notice->setText("Feather is running on Tails, all traffic is routed over Tor");
+    }
+    else {
         ui->frame_notice->hide();
     }
 

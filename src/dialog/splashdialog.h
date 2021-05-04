@@ -18,6 +18,9 @@ public:
     explicit SplashDialog(QWidget *parent = nullptr);
     ~SplashDialog() override;
 
+    void setMessage(const QString &message);
+    void setIcon(const QPixmap &icon);
+
 private:
     Ui::SplashDialog *ui;
 };

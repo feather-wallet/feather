@@ -44,9 +44,10 @@ void TorManager::stop() {
 }
 
 void TorManager::start() {
+    m_checkConnectionTimer->start(5000);
+
     if (m_localTor) {
         this->checkConnection();
-        m_checkConnectionTimer->start(5000);
         return;
     }
 
@@ -256,6 +257,9 @@ bool TorManager::shouldStartTorDaemon() {
 
     // Tor daemon (or other service) is already running on our port (19450)
     if (Utils::portOpen(featherTorHost, featherTorPort)) {
+        // TODO: this is a hack, fix it later
+        config()->set(Config::socks5Host, featherTorHost);
+        config()->set(Config::socks5Port, featherTorPort);
         return false;
     }
 

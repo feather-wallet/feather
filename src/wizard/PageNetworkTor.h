@@ -18,6 +18,7 @@ Q_OBJECT
 
 public:
     explicit PageNetworkTor(AppContext *ctx, QWidget *parent = nullptr);
+    void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 

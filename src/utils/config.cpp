@@ -38,7 +38,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
         {Config::showTabHome,{QS("showTabHome"), true}},
         {Config::showTabCoins,{QS("showTabCoins"), false}},
-        {Config::showTabExchange, {QS("showTabExchange"), true}},
+        {Config::showTabExchange, {QS("showTabExchange"), false}},
         {Config::showTabXMRig,{QS("showTabXMRig"), false}},
         {Config::showTabCalc,{QS("showTabCalc"), true}},
         {Config::geometry, {QS("geometry"), {}}},

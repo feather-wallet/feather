@@ -84,6 +84,8 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 
     // TODO: move me
     connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this->nodes, &Nodes::onWSNodesReceived);
+
+    m_rpc = new DaemonRpc{this, getNetworkTor(), ""};
 }
 
 void AppContext::initTor() {
@@ -113,7 +115,7 @@ void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QStri
     this->currentWallet->disposeTransaction(tx);
 }
 
-void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const {
+void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) {
     if(this->currentWallet == nullptr){
         qCritical() << "Cannot create transaction; no wallet loaded";
         return;
@@ -125,6 +127,8 @@ void AppContext::onSweepOutput(const QString &keyImage, QString address, bool ch
 
     qCritical() << "Creating transaction";
     this->currentWallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
+
+    emit initiateTransaction();
 }
 
 void AppContext::onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
@@ -266,8 +270,6 @@ void AppContext::commitTransaction(PendingTransaction *tx) {
 }
 
 void AppContext::onMultiBroadcast(PendingTransaction *tx) {
-    DaemonRpc rpc{this, getNetworkTor(), ""};
-
     int count = tx->txCount();
     for (int i = 0; i < count; i++) {
         QString txData = tx->signedTxToHex(i);
@@ -277,8 +279,8 @@ void AppContext::onMultiBroadcast(PendingTransaction *tx) {
 
             QString address = node.toURL();
             qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
-            rpc.setDaemonAddress(address);
-            rpc.sendRawTransaction(txData);
+            m_rpc->setDaemonAddress(address);
+            m_rpc->sendRawTransaction(txData);
         }
     }
 }
@@ -362,6 +364,7 @@ void AppContext::onWalletOpened(Wallet *wallet) {
     connect(this->currentWallet, &Wallet::heightRefreshed, this, &AppContext::onHeightRefreshed);
     connect(this->currentWallet, &Wallet::transactionCreated, this, &AppContext::onTransactionCreated);
     connect(this->currentWallet, &Wallet::deviceError, this, &AppContext::onDeviceError);
+    connect(this->currentWallet, &Wallet::deviceButtonRequest, this, &AppContext::onDeviceButtonRequest);
 
     emit walletOpened();
 
@@ -626,6 +629,8 @@ void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, q
 }
 
 void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
+    qDebug() << Q_FUNC_INFO;
+
     for (auto &addr : address) {
         if (addr == globals::donationAddress) {
             this->donationSending = true;

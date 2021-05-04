@@ -83,6 +83,12 @@
    </item>
    <item>
     <widget class="QFrame" name="frame_privacyLevel">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
      </property>
@@ -107,6 +113,12 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radio_allTorExceptNode">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Route all traffic over Tor, except traffic to node</string>
           </property>
@@ -134,8 +146,14 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radio_allTorExceptInitSync">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
-           <string>Route all traffic over Tor, except initial wallet synchronization</string>
+           <string>Route all traffic over Tor, except initial wallet sync</string>
           </property>
           <attribute name="buttonGroup">
            <string notr="true">btnGroup_privacyLevel</string>
@@ -161,6 +179,12 @@
         </item>
         <item>
          <widget class="QRadioButton" name="radio_allTor">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="text">
            <string>Route all traffic over Tor</string>
           </property>

@@ -112,7 +112,7 @@
          </property>
          <item>
           <property name="text">
-           <string>All online offers</string>
+           <string>Any payment method</string>
           </property>
          </item>
         </widget>

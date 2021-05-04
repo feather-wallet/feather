@@ -28,11 +28,6 @@
        <string>Ledger Nano S/X</string>
       </property>
      </item>
-     <item>
-      <property name="text">
-       <string>Trezor Model T</string>
-      </property>
-     </item>
     </widget>
    </item>
    <item>

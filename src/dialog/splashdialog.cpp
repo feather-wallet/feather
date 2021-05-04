@@ -18,7 +18,14 @@ SplashDialog::SplashDialog(QWidget *parent)
     this->adjustSize();
 }
 
+void SplashDialog::setMessage(const QString &message) {
+    ui->label_message->setText(message);
+}
+
+void SplashDialog::setIcon(const QPixmap &icon) {
+    ui->icon->setPixmap(icon.scaledToWidth(32, Qt::SmoothTransformation));
+}
+
 SplashDialog::~SplashDialog() {
     delete ui;
 }
-

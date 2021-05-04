@@ -12,16 +12,20 @@ PageNetworkTor::PageNetworkTor(AppContext *ctx, QWidget *parent)
 {
     ui->setupUi(this);
 
-    QPixmap iconAllTorExceptNode(":/assets/images/securityLevelStandardWhite.png");
-    QPixmap iconAllTorExceptInitSync(":/assets/images/securityLevelSaferWhite.png");
-    QPixmap iconAllTor(":/assets/images/securityLevelSafestWhite.png");
+    this->setCommitPage(true);
+    this->setButtonText(QWizard::CommitButton, "Next");
+
+    QPixmap iconAllTorExceptNode(":/assets/images/securityLevelStandard.png");
+    QPixmap iconAllTorExceptInitSync(":/assets/images/securityLevelSafer.png");
+    QPixmap iconAllTor(":/assets/images/securityLevelSafest.png");
     ui->icon_allTorExceptNode->setPixmap(iconAllTorExceptNode.scaledToHeight(16, Qt::SmoothTransformation));
     ui->icon_allTorExceptInitSync->setPixmap(iconAllTorExceptInitSync.scaledToHeight(16, Qt::SmoothTransformation));
     ui->icon_allTor->setPixmap(iconAllTor.scaledToHeight(16, Qt::SmoothTransformation));
 
-    ui->frame_privacyLevel->setVisible(false);
     connect(ui->radio_configureManually, &QRadioButton::toggled, [this](bool checked){
         ui->frame_privacyLevel->setVisible(checked);
+        this->adjustSize();
+        this->updateGeometry();
     });
 
     ui->btnGroup_privacyLevel->setId(ui->radio_allTorExceptNode, Config::allTorExceptNode);
@@ -33,6 +37,13 @@ PageNetworkTor::PageNetworkTor(AppContext *ctx, QWidget *parent)
     if (button) {
         button->setChecked(true);
     }
+}
+
+void PageNetworkTor::initializePage() {
+    // Fuck you Qt. No squish.
+    QTimer::singleShot(1, [this]{
+        ui->frame_privacyLevel->setVisible(false);
+    });
 }
 
 int PageNetworkTor::nextId() const {

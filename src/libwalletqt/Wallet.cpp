@@ -605,15 +605,15 @@ PendingTransaction *Wallet::createTransaction(const QString &dst_addr, const QSt
                                               quint64 amount, quint32 mixin_count,
                                               PendingTransaction::Priority priority)
 {
-    pauseRefresh();
+//    pauseRefresh();
 
     std::set<uint32_t> subaddr_indices;
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransaction(
             dst_addr.toStdString(), payment_id.toStdString(), amount, mixin_count,
             static_cast<Monero::PendingTransaction::Priority>(priority), currentSubaddressAccount(), subaddr_indices);
-    PendingTransaction * result = new PendingTransaction(ptImpl,0);
+    PendingTransaction * result = new PendingTransaction(ptImpl, nullptr);
 
-    startRefresh();
+//    startRefresh();
     return result;
 }
 
@@ -631,7 +631,7 @@ void Wallet::createTransactionAsync(const QString &dst_addr, const QString &paym
 PendingTransaction* Wallet::createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
                                                        PendingTransaction::Priority priority)
 {
-    pauseRefresh();
+//    pauseRefresh();
 
     std::vector<std::string> dests;
     for (auto &addr : dst_addr) {
@@ -647,7 +647,7 @@ PendingTransaction* Wallet::createTransactionMultiDest(const QVector<QString> &d
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amounts, 11, static_cast<Monero::PendingTransaction::Priority>(priority));
     PendingTransaction * result = new PendingTransaction(ptImpl);
 
-    startRefresh();
+//    startRefresh();
     return result;
 }
 
@@ -667,7 +667,7 @@ void Wallet::createTransactionMultiDestAsync(const QVector<QString> &dst_addr, c
 PendingTransaction *Wallet::createTransactionAll(const QString &dst_addr, const QString &payment_id,
                                                  quint32 mixin_count, PendingTransaction::Priority priority)
 {
-    pauseRefresh();
+//    pauseRefresh();
 
     std::set<uint32_t> subaddr_indices;
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransaction(
@@ -675,7 +675,7 @@ PendingTransaction *Wallet::createTransactionAll(const QString &dst_addr, const 
             static_cast<Monero::PendingTransaction::Priority>(priority), currentSubaddressAccount(), subaddr_indices);
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
 
-    startRefresh();
+//    startRefresh();
     return result;
 }
 
@@ -693,13 +693,13 @@ void Wallet::createTransactionAllAsync(const QString &dst_addr, const QString &p
 PendingTransaction *Wallet::createTransactionSingle(const QString &key_image, const QString &dst_addr, const size_t outputs,
         PendingTransaction::Priority priority)
 {
-    pauseRefresh();
+//    pauseRefresh();
 
     Monero::PendingTransaction * ptImpl = m_walletImpl->createTransactionSingle(key_image.toStdString(), dst_addr.toStdString(),
             outputs, static_cast<Monero::PendingTransaction::Priority>(priority));
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
 
-    startRefresh();
+//    startRefresh();
     return result;
 }
 
@@ -715,12 +715,12 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
 
 PendingTransaction *Wallet::createSweepUnmixableTransaction()
 {
-    pauseRefresh();
+//    pauseRefresh();
 
     Monero::PendingTransaction * ptImpl = m_walletImpl->createSweepUnmixableTransaction();
     PendingTransaction * result = new PendingTransaction(ptImpl, this);
 
-    startRefresh();
+//    startRefresh();
     return result;
 }
 

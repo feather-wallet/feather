@@ -97,7 +97,11 @@ QString PageWalletFile::defaultWalletName() {
     int count = 1;
     QString walletName;
     do {
-        walletName = QString("wallet_%1").arg(count);
+        QString walletStr = QString("wallet_%1");
+        if (m_fields->mode == WizardMode::CreateWalletFromDevice) {
+            walletStr = QString("ledger_%1");
+        }
+        walletName = walletStr.arg(count);
         count++;
     } while (this->walletPathExists(walletName));
 
