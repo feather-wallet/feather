@@ -5,6 +5,7 @@
     <file>assets/contributors.txt</file>
     <file>assets/feather.desktop</file>
     <file>assets/nodes.json</file>
+    <file>assets/gpg_keys/featherwallet.asc</file>
     <file>assets/images/appicons/32x32.png</file>
     <file>assets/images/appicons/48x48.png</file>
     <file>assets/images/appicons/64x64.png</file>
@@ -44,10 +45,18 @@
     <file>assets/images/gnome-calc.png</file>
     <file>assets/images/history.png</file>
     <file>assets/images/info.png</file>
+    <file>assets/images/info2.svg</file>
     <file>assets/images/key.png</file>
     <file>assets/images/ledger.png</file>
     <file>assets/images/ledger_unpaired.png</file>
     <file>assets/images/lightning.png</file>
+    <file>assets/images/localMonero_search.svg</file>
+    <file>assets/images/localMonero_buy.svg</file>
+    <file>assets/images/localMonero_buy_white.svg</file>
+    <file>assets/images/localMonero_sell.svg</file>
+    <file>assets/images/localMonero_sell_white.svg</file>
+    <file>assets/images/localMonero_logo.png</file>
+    <file>assets/images/localMonero_register.svg</file>
     <file>assets/images/lock.png</file>
     <file>assets/images/lock_icon.png</file>
     <file>assets/images/lock.svg</file>
@@ -63,6 +72,12 @@
     <file>assets/images/revealer_c.png</file>
     <file>assets/images/revealer.png</file>
     <file>assets/images/seal.png</file>
+    <file>assets/images/securityLevelSafer.png</file>
+    <file>assets/images/securityLevelSafest.png</file>
+    <file>assets/images/securityLevelStandard.png</file>
+    <file>assets/images/securityLevelSaferWhite.png</file>
+    <file>assets/images/securityLevelSafestWhite.png</file>
+    <file>assets/images/securityLevelStandardWhite.png</file>
     <file>assets/images/seed.png</file>
     <file>assets/images/speaker.png</file>
     <file>assets/images/status_connected_fork.png</file>

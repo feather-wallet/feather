@@ -13,6 +13,8 @@
 #include "PageWalletRestoreKeys.h"
 #include "PageSetPassword.h"
 #include "PageSetRestoreHeight.h"
+#include "PageHardwareDevice.h"
+#include "PageNetworkTor.h"
 #include "globals.h"
 
 #include <QLineEdit>
@@ -29,6 +31,8 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     m_walletKeysFilesModel = new WalletKeysFilesModel(m_ctx, this);
     m_walletKeysFilesModel->refresh();
 
+    auto networkPage = new PageNetwork(m_ctx, this);
+    auto networkTorPage = new PageNetworkTor(m_ctx, this);
     auto menuPage = new PageMenu(m_ctx, &m_wizardFields, m_walletKeysFilesModel, this);
     auto openWalletPage = new PageOpenWallet(m_ctx, m_walletKeysFilesModel, this);
     auto createWallet = new PageWalletFile(m_ctx, &m_wizardFields , this);
@@ -39,13 +43,14 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
     setPage(Page_OpenWallet, openWalletPage);
     setPage(Page_CreateWalletSeed, createWalletSeed);
     setPage(Page_SetPasswordPage, walletSetPasswordPage);
-    setPage(Page_Network, new PageNetwork(m_ctx, this));
+    setPage(Page_Network, networkPage);
+    setPage(Page_NetworkTor, networkTorPage);
     setPage(Page_WalletRestoreSeed, new PageWalletRestoreSeed(m_ctx, &m_wizardFields, this));
     setPage(Page_WalletRestoreKeys, new PageWalletRestoreKeys(m_ctx, &m_wizardFields, this));
     setPage(Page_SetRestoreHeight, new PageSetRestoreHeight(m_ctx, &m_wizardFields, this));
+    setPage(Page_HardwareDevice, new PageHardwareDevice(m_ctx, &m_wizardFields, this));
 
-
-    setStartId(Page_Menu);
+    setStartId(startPage);
 
     setButtonText(QWizard::CancelButton, "Close");
     setPixmap(QWizard::WatermarkPixmap, QPixmap(":/assets/images/banners/3.png"));
@@ -54,6 +59,10 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
 
     connect(this, &QWizard::rejected, [=]{
         return QApplication::exit(1);
+    });
+
+    connect(networkTorPage, &PageNetworkTor::initialNetworkConfigured, [this](){
+        emit initialNetworkConfigured();
     });
 
     connect(menuPage, &PageMenu::enableDarkMode, [this](bool enable){
@@ -76,6 +85,21 @@ WalletWizard::WalletWizard(AppContext *ctx, WalletWizard::Page startPage, QWidge
 void WalletWizard::createWallet() {
     auto walletPath = QString("%1/%2").arg(m_wizardFields.walletDir, m_wizardFields.walletName);
 
+    int currentBlockHeight = 0;
+    if (appData()->heights.contains(m_ctx->networkType)) {
+        currentBlockHeight = appData()->heights[m_ctx->networkType];
+    }
+
+    if (m_wizardFields.mode == WizardMode::CreateWalletFromDevice) {
+        int restoreHeight = currentBlockHeight;
+        if (m_wizardFields.restoreHeight > 0) {
+            restoreHeight = m_wizardFields.restoreHeight;
+        }
+
+        m_ctx->createWalletFromDevice(walletPath, m_wizardFields.password, restoreHeight);
+        return;
+    }
+
     if (m_wizardFields.mode == WizardMode::RestoreFromKeys) {
         m_ctx->createWalletFromKeys(walletPath,
                                     m_wizardFields.password,
@@ -86,12 +110,11 @@ void WalletWizard::createWallet() {
         return;
     }
 
-    auto seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType], QString::fromStdString(globals::coinName), m_ctx->seedLanguage, m_wizardFields.seed.split(" "));
+    auto seed = FeatherSeed(m_ctx->networkType, QString::fromStdString(globals::coinName), m_ctx->seedLanguage, m_wizardFields.seed.split(" "));
 
-    if (m_wizardFields.mode == WizardMode::CreateWallet && m_ctx->heights.contains(m_ctx->networkType)) {
-        int restoreHeight = m_ctx->heights[m_ctx->networkType];
-        qInfo() << "New wallet, setting restore height to latest blockheight: " << restoreHeight;
-        seed.setRestoreHeight(restoreHeight);
+    if (m_wizardFields.mode == WizardMode::CreateWallet) {
+        qInfo() << "New wallet, setting restore height to latest blockheight: " << currentBlockHeight;
+        seed.setRestoreHeight(currentBlockHeight);
     }
 
     if (m_wizardFields.mode == WizardMode::RestoreFromSeed && m_wizardFields.seedType == SeedType::MONERO)

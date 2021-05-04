@@ -6,7 +6,6 @@
 
 #include <QAbstractListModel>
 #include <QIcon>
-#include "appcontext.h"
 
 class TransactionHistory;
 class TransactionInfo;
@@ -54,14 +53,6 @@ private:
     QVariant parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const;
 
     TransactionHistory * m_transactionHistory;
-    QIcon m_unconfirmedTx;
-    QIcon m_warning;
-    QIcon m_clock1;
-    QIcon m_clock2;
-    QIcon m_clock3;
-    QIcon m_clock4;
-    QIcon m_clock5;
-    QIcon m_confirmedTx;
 };
 
 #endif // TRANSACTIONHISTORYMODEL_H

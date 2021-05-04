@@ -8,17 +8,18 @@
 #include <QtWebSockets/QWebSocket>
 #include <QTimer>
 
-class AppContext;
 class WSClient : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit WSClient(AppContext *ctx, const QUrl &url, QObject *parent = nullptr);
+    explicit WSClient(QUrl url, QObject *parent = nullptr);
     void start();
     void sendMsg(const QByteArray &data);
     QWebSocket webSocket;
-    QUrl url;
+
+public slots:
+    void onToggleConnect(bool connect);
 
 signals:
     void closed();
@@ -32,10 +33,10 @@ private slots:
     void onError(QAbstractSocket::SocketError error);
 
 private:
+    bool m_connect = false;
+    QUrl m_url;
     QTimer m_connectionTimer;
     QTimer m_pingTimer;
-    AppContext *m_ctx;
-    bool m_tor = true;
 };
 
 #endif // ECHOCLIENT_H

@@ -50,8 +50,7 @@ void PageWalletSeed::seedRoulette(int count) {
 
 void PageWalletSeed::generateSeed() {
     do {
-        FeatherSeed seed = FeatherSeed(m_ctx->restoreHeights[m_ctx->networkType],
-                                       QString::fromStdString(globals::coinName), m_ctx->seedLanguage);
+        FeatherSeed seed = FeatherSeed(m_ctx->networkType, QString::fromStdString(globals::coinName), m_ctx->seedLanguage);
         m_mnemonic = seed.mnemonic.join(" ");
         m_restoreHeight = seed.restoreHeight;
     } while (m_mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2

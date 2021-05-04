@@ -5,6 +5,7 @@
 #include "AddressBook.h"
 #include "ModelUtils.h"
 #include "utils/utils.h"
+#include "utils/Icons.h"
 
 AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
     : QAbstractTableModel(parent),
@@ -13,7 +14,7 @@ AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
 {
     connect(m_addressBook, &AddressBook::refreshStarted, this, &AddressBookModel::startReset);
     connect(m_addressBook, &AddressBook::refreshFinished, this, &AddressBookModel::endReset);
-    m_contactIcon = QIcon(":/assets/images/person.svg");
+    m_contactIcon = icons()->icon("person.svg");
 }
 
 void AddressBookModel::startReset(){

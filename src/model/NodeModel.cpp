@@ -4,12 +4,13 @@
 #include "NodeModel.h"
 #include "utils/nodes.h"
 #include "utils/ColorScheme.h"
+#include "utils/Icons.h"
 
 NodeModel::NodeModel(int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)
         , m_nodeSource(nodeSource)
-        , m_offline(QIcon(":/assets/images/expired_icon.png"))
-        , m_online(QIcon(":/assets/images/confirmed_icon.png"))
+        , m_offline(icons()->icon("expired_icon.png"))
+        , m_online(icons()->icon("confirmed_icon.png"))
 {
 }
 
@@ -47,7 +48,7 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     if(role == Qt::DisplayRole) {
         switch(index.column()) {
             case NodeModel::URL:
-                return node.full;
+                return node.toFullAddress();
             case NodeModel::Height:
                 if(node.online)
                     return node.height == 0 ? QString("-") : QString::number(node.height);

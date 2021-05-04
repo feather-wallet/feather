@@ -62,6 +62,7 @@ public:
                                        NetworkType::Type nettype = NetworkType::MAINNET, quint64 restoreHeight = 0, quint64 kdfRounds = 1);
 
     Q_INVOKABLE Wallet * createWalletFromKeys(const QString &path,
+                                              const QString &password,
                                               const QString &language,
                                               NetworkType::Type nettype,
                                               const QString &address,
@@ -159,12 +160,6 @@ public:
     Q_INVOKABLE bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
     Q_INVOKABLE QVariantMap parse_uri_to_object(const QString &uri) const;
 //    Q_INVOKABLE bool saveQrCode(const QString &, const QString &) const;
-//    Q_INVOKABLE void checkUpdatesAsync(
-//        const QString &software,
-//        const QString &subdir,
-//        const QString &buildTag,
-//        const QString &version);
-    Q_INVOKABLE QString checkUpdates(const QString &software, const QString &subdir) const;
 
     // clear/rename wallet cache
     Q_INVOKABLE bool clearWalletCache(const QString &fileName) const;
@@ -182,12 +177,7 @@ signals:
     void walletPassphraseNeeded(bool onDevice);
     void deviceButtonRequest(quint64 buttonCode);
     void deviceButtonPressed();
-    void checkUpdatesComplete(
-        const QString &version,
-        const QString &downloadUrl,
-        const QString &hash,
-        const QString &firstSigner,
-        const QString &secondSigner) const;
+    void deviceError(const QString &message);
     void miningStatus(bool isMining) const;
     void proxyAddressChanged() const;
 

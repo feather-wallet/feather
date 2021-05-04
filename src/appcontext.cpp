@@ -13,20 +13,16 @@
 #include "libwalletqt/Coins.h"
 #include "model/TransactionHistoryModel.h"
 #include "model/SubaddressModel.h"
+#include "utils/NetworkManager.h"
+#include "utils/WebsocketClient.h"
+#include "utils/WebsocketNotifier.h"
 
-
-Prices *AppContext::prices = nullptr;
 WalletKeysFilesModel *AppContext::wallets = nullptr;
-TxFiatHistory *AppContext::txFiatHistory = nullptr;
-double AppContext::balance = 0;
 QMap<QString, QString> AppContext::txCache;
 
 AppContext::AppContext(QCommandLineParser *cmdargs) {
-    this->network = new QNetworkAccessManager();
-    this->networkClearnet = new QNetworkAccessManager();
     this->cmdargs = cmdargs;
 
-    this->isTorSocks = Utils::isTorsocks();
     this->isTails = TailsOS::detect();
     this->isWhonix = WhonixOS::detect();
 
@@ -45,52 +41,26 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 
     // ----------------- Network Type -----------------
 
-    if (this->cmdargs->isSet("stagenet"))
+    if (this->cmdargs->isSet("stagenet")) {
         this->networkType = NetworkType::STAGENET;
-    else if (this->cmdargs->isSet("testnet"))
+        config()->set(Config::networkType, NetworkType::STAGENET);
+    }
+    else if (this->cmdargs->isSet("testnet")) {
         this->networkType = NetworkType::TESTNET;
-    else
+        config()->set(Config::networkType, NetworkType::TESTNET);
+    }
+    else {
         this->networkType = NetworkType::MAINNET;
+        config()->set(Config::networkType, NetworkType::MAINNET);
+    }
 
-
-    this->nodes = new Nodes(this, this->networkClearnet);
-    connect(this, &AppContext::nodeSourceChanged, this->nodes, &Nodes::onNodeSourceChanged);
-    connect(this, &AppContext::setCustomNodes, this->nodes, &Nodes::setCustomNodes);
-
-    // Tor & socks proxy
-    this->ws = new WSClient(this, globals::websocketUrl);
-    connect(this->ws, &WSClient::WSMessage, this, &AppContext::onWSMessage);
+    this->nodes = new Nodes(this, this);
 
     // Store the wallet every 2 minutes
     m_storeTimer.start(2 * 60 * 1000);
     connect(&m_storeTimer, &QTimer::timeout, [this](){
         this->storeWallet();
     });
-
-    // restore height lookup
-    this->initRestoreHeights();
-
-    // price history lookup
-    auto genesis_timestamp = this->restoreHeights[NetworkType::Type::MAINNET]->data.firstKey();
-    AppContext::txFiatHistory = new TxFiatHistory(genesis_timestamp, configDir);
-    connect(this->ws, &WSClient::connectionEstablished, AppContext::txFiatHistory, &TxFiatHistory::onUpdateDatabase);
-    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYear, [=](int year){
-        QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1}})").arg(year).toUtf8();
-        this->ws->sendMsg(data);
-    });
-    connect(AppContext::txFiatHistory, &TxFiatHistory::requestYearMonth, [=](int year, int month) {
-        QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1, "month": %2}})").arg(year).arg(month).toUtf8();
-        this->ws->sendMsg(data);
-    });
-
-    // fiat/crypto lookup
-    AppContext::prices = new Prices();
-
-    // XMRig
-#ifdef HAS_XMRIG
-    this->XMRig = new XmRig(configDir, this);
-    this->XMRig->prepare();
-#endif
 
     this->walletManager = WalletManager::instance();
     QString logPath = QString("%1/daemon.log").arg(configDir);
@@ -108,23 +78,34 @@ AppContext::AppContext(QCommandLineParser *cmdargs) {
 
     // libwallet connects
     connect(this->walletManager, &WalletManager::walletOpened, this, &AppContext::onWalletOpened);
+    connect(this->walletManager, &WalletManager::walletCreated, this, &AppContext::onWalletCreated);
+    connect(this->walletManager, &WalletManager::deviceButtonRequest, this, &AppContext::onDeviceButtonRequest);
+    connect(this->walletManager, &WalletManager::deviceError, this, &AppContext::onDeviceError);
+
+    // TODO: move me
+    connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this->nodes, &Nodes::onWSNodesReceived);
+
+    m_rpc = new DaemonRpc{this, getNetworkTor(), ""};
 }
 
 void AppContext::initTor() {
-    this->tor = new Tor(this, this);
-    this->tor->start();
+    if (this->cmdargs->isSet("tor-host"))
+        config()->set(Config::socks5Host, this->cmdargs->value("tor-host"));
+    if (this->cmdargs->isSet("tor-port"))
+        config()->set(Config::socks5Port, this->cmdargs->value("tor-port"));
+    if (this->cmdargs->isSet("use-local-tor"))
+        config()->set(Config::useLocalTor, true);
 
-    if (!(isWhonix) && !(isTorSocks)) {
-        this->networkProxy = new QNetworkProxy(QNetworkProxy::Socks5Proxy, Tor::torHost, Tor::torPort);
-        this->network->setProxy(*networkProxy);
-        if (globals::websocketUrl.host().endsWith(".onion")) {
-            this->ws->webSocket.setProxy(*networkProxy);
-        }
-    }
+    torManager()->init();
+    torManager()->start();
+
+    connect(torManager(), &TorManager::connectionStateChanged, &websocketNotifier()->websocketClient, &WebsocketClient::onToggleConnect);
+
+    this->onTorSettingsChanged();
 }
 
 void AppContext::initWS() {
-    this->ws->start();
+    websocketNotifier()->websocketClient.start();
 }
 
 void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address) {
@@ -134,7 +115,7 @@ void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QStri
     this->currentWallet->disposeTransaction(tx);
 }
 
-void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) const {
+void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) {
     if(this->currentWallet == nullptr){
         qCritical() << "Cannot create transaction; no wallet loaded";
         return;
@@ -146,6 +127,8 @@ void AppContext::onSweepOutput(const QString &keyImage, QString address, bool ch
 
     qCritical() << "Creating transaction";
     this->currentWallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
+
+    emit initiateTransaction();
 }
 
 void AppContext::onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
@@ -249,6 +232,17 @@ void AppContext::onOpenWallet(const QString &path, const QString &password){
     this->walletManager->openWalletAsync(path, password, this->networkType, 1);
 }
 
+void AppContext::onWalletCreated(Wallet * wallet) {
+    // Currently only called when a wallet is created from device.
+    auto state = wallet->status();
+    if (state != Wallet::Status_Ok) {
+        emit walletCreatedError(wallet->errorString());
+        return;
+    }
+
+    this->onWalletOpened(wallet);
+}
+
 void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
     if(this->currentWallet) {
         auto *model = this->currentWallet->transactionHistoryModel();
@@ -276,9 +270,6 @@ void AppContext::commitTransaction(PendingTransaction *tx) {
 }
 
 void AppContext::onMultiBroadcast(PendingTransaction *tx) {
-    UtilsNetworking *net = new UtilsNetworking(this->network, this);
-    DaemonRpc *rpc = new DaemonRpc(this, net, "");
-
     int count = tx->txCount();
     for (int i = 0; i < count; i++) {
         QString txData = tx->signedTxToHex(i);
@@ -286,40 +277,81 @@ void AppContext::onMultiBroadcast(PendingTransaction *tx) {
         for (const auto& node: this->nodes->websocketNodes()) {
             if (!node.online) continue;
 
-            QString address = node.as_url();
+            QString address = node.toURL();
             qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
-            rpc->setDaemonAddress(address);
-            rpc->sendRawTransaction(txData);
+            m_rpc->setDaemonAddress(address);
+            m_rpc->sendRawTransaction(txData);
         }
     }
+}
+
+void AppContext::onDeviceButtonRequest(quint64 code) {
+    emit deviceButtonRequest(code);
+}
+
+void AppContext::onDeviceError(const QString &message) {
+    qCritical() << "Device error: " << message;
+    emit deviceError(message);
+}
+
+void AppContext::onTorSettingsChanged() {
+    if (WhonixOS::detect() || Utils::isTorsocks()) {
+        return;
+    }
+
+    // use local tor -> bundled tor
+    QString host = config()->get(Config::socks5Host).toString();
+    quint16 port = config()->get(Config::socks5Port).toString().toUShort();
+    if (!torManager()->isLocalTor()) {
+        host = torManager()->featherTorHost;
+        port = torManager()->featherTorPort;
+    }
+
+    QNetworkProxy proxy{QNetworkProxy::Socks5Proxy, host, port};
+    getNetworkTor()->setProxy(proxy);
+    websocketNotifier()->websocketClient.webSocket.setProxy(proxy);
+
+    this->nodes->connectToNode();
+
+    auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
+    qDebug() << "Changed privacyLevel to " << privacyLevel;
+}
+
+void AppContext::onInitialNetworkConfigured() {
+    this->initTor();
+    this->initWS();
 }
 
 void AppContext::onWalletOpened(Wallet *wallet) {
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {
         auto errMsg = wallet->errorString();
-        if(errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
+        if (state == Wallet::Status_BadPassword) {
+            this->closeWallet(false);
+            // Don't show incorrect password when we try with empty password for the first time
+            bool showIncorrectPassword = m_openWalletTriedOnce;
+            m_openWalletTriedOnce = true;
+            emit walletOpenPasswordNeeded(showIncorrectPassword, wallet->path());
+        }
+        else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
             qCritical() << errMsg;
             this->walletManager->clearWalletCache(this->walletPath);
             errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
             this->closeWallet(false);
             emit walletOpenedError(errMsg);
-        } else if(errMsg.contains("wallet cannot be opened as")) {
-            this->closeWallet(false);
-            emit walletOpenedError(errMsg);
-        } else if(errMsg.contains("is opened by another wallet program")) {
-            this->closeWallet(false);
-            emit walletOpenedError(errMsg);
         } else {
             this->closeWallet(false);
-            emit walletOpenPasswordNeeded(!this->walletPassword.isEmpty(), wallet->path());
+            emit walletOpenedError(errMsg);
         }
+
         return;
     }
 
+    m_openWalletTriedOnce = false;
     this->refreshed = false;
     this->currentWallet = wallet;
     this->walletPath = this->currentWallet->path() + ".keys";
+    this->walletPassword = this->currentWallet->getPassword();
     config()->set(Config::walletPath, this->walletPath);
 
     connect(this->currentWallet, &Wallet::moneySpent, this, &AppContext::onMoneySpent);
@@ -331,6 +363,8 @@ void AppContext::onWalletOpened(Wallet *wallet) {
     connect(this->currentWallet, &Wallet::transactionCommitted, this, &AppContext::onTransactionCommitted);
     connect(this->currentWallet, &Wallet::heightRefreshed, this, &AppContext::onHeightRefreshed);
     connect(this->currentWallet, &Wallet::transactionCreated, this, &AppContext::onTransactionCreated);
+    connect(this->currentWallet, &Wallet::deviceError, this, &AppContext::onDeviceError);
+    connect(this->currentWallet, &Wallet::deviceButtonRequest, this, &AppContext::onDeviceButtonRequest);
 
     emit walletOpened();
 
@@ -346,142 +380,6 @@ void AppContext::onWalletOpened(Wallet *wallet) {
 
     // force trigger preferredFiat signal for history model
     this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
-    this->setWindowTitle();
-}
-
-void AppContext::setWindowTitle(bool mining) {
-    QFileInfo fileInfo(this->walletPath);
-    auto title = QString("Feather - [%1]").arg(fileInfo.fileName());
-    if(this->currentWallet && this->currentWallet->viewOnly())
-        title += " [view-only]";
-    if(mining)
-        title += " [mining]";
-
-    emit setTitle(title);
-}
-
-void AppContext::onWSMessage(const QJsonObject &msg) {
-    QString cmd = msg.value("cmd").toString();
-
-    if (cmd == "blockheights") {
-        QJsonObject data = msg.value("data").toObject();
-        int mainnet = data.value("mainnet").toInt();
-        int stagenet = data.value("stagenet").toInt();
-
-        this->heights[NetworkType::MAINNET] = mainnet;
-        this->heights[NetworkType::STAGENET] = stagenet;
-    }
-
-    else if(cmd == "nodes") {
-        this->onWSNodes(msg.value("data").toArray());
-    }
-#if defined(HAS_XMRIG)
-    else if(cmd == "xmrig") {
-        this->XMRigDownloads(msg.value("data").toObject());
-    }
-#endif
-    else if(cmd == "crypto_rates") {
-        QJsonArray crypto_rates = msg.value("data").toArray();
-        AppContext::prices->cryptoPricesReceived(crypto_rates);
-    }
-
-    else if(cmd == "fiat_rates") {
-        QJsonObject fiat_rates = msg.value("data").toObject();
-        AppContext::prices->fiatPricesReceived(fiat_rates);
-    }
-    else if(cmd == "reddit") {
-        QJsonArray reddit_data = msg.value("data").toArray();
-        this->onWSReddit(reddit_data);
-    }
-
-    else if(cmd == "ccs") {
-        auto ccs_data = msg.value("data").toArray();
-        this->onWSCCS(ccs_data);
-    }
-
-    else if(cmd == "txFiatHistory") {
-        auto txFiatHistory_data = msg.value("data").toObject();
-        AppContext::txFiatHistory->onWSData(txFiatHistory_data);
-    }
-}
-
-void AppContext::onWSNodes(const QJsonArray &nodes) {
-    QList<QSharedPointer<FeatherNode>> l;
-    for (auto &&entry: nodes) {
-        auto obj = entry.toObject();
-        auto nettype = obj.value("nettype");
-        auto type = obj.value("type");
-
-        // filter remote node network types
-        if(nettype == "mainnet" && this->networkType != NetworkType::MAINNET)
-            continue;
-        if(nettype == "stagenet" && this->networkType != NetworkType::STAGENET)
-            continue;
-        if(nettype == "testnet" && this->networkType != NetworkType::TESTNET)
-            continue;
-
-        if(type == "clearnet" && (this->isTails || this->isWhonix || this->isTorSocks))
-            continue;
-        if(type == "tor" && (!(this->isTails || this->isWhonix || this->isTorSocks)))
-            continue;
-
-        auto node = new FeatherNode(
-                obj.value("address").toString(),
-                 obj.value("height").toInt(),
-                 obj.value("target_height").toInt(),
-                obj.value("online").toBool());
-        QSharedPointer<FeatherNode> r = QSharedPointer<FeatherNode>(node);
-        l.append(r);
-    }
-    this->nodes->onWSNodesReceived(l);
-}
-
-void AppContext::onWSReddit(const QJsonArray& reddit_data) {
-    QList<QSharedPointer<RedditPost>> l;
-
-    for (auto &&entry: reddit_data) {
-        auto obj = entry.toObject();
-        auto redditPost = new RedditPost(
-                obj.value("title").toString(),
-                obj.value("author").toString(),
-                obj.value("permalink").toString(),
-                obj.value("comments").toInt());
-        QSharedPointer<RedditPost> r = QSharedPointer<RedditPost>(redditPost);
-        l.append(r);
-    }
-
-    emit redditUpdated(l);
-}
-
-void AppContext::onWSCCS(const QJsonArray &ccs_data) {
-    QList<QSharedPointer<CCSEntry>> l;
-
-
-    QStringList fonts = {"state", "address", "author", "date",
-                         "title", "target_amount", "raised_amount",
-                         "percentage_funded", "contributions"};
-
-    for (auto &&entry: ccs_data) {
-        auto obj = entry.toObject();
-        auto c = QSharedPointer<CCSEntry>(new CCSEntry());
-
-        if (obj.value("state").toString() != "FUNDING-REQUIRED")
-            continue;
-
-        c->state = obj.value("state").toString();
-        c->address = obj.value("address").toString();
-        c->author = obj.value("author").toString();
-        c->date = obj.value("date").toString();
-        c->title = obj.value("title").toString();
-        c->url = obj.value("url").toString();
-        c->target_amount = obj.value("target_amount").toDouble();
-        c->raised_amount = obj.value("raised_amount").toDouble();
-        c->percentage_funded = obj.value("percentage_funded").toDouble();
-        c->contributions = obj.value("contributions").toInt();
-        l.append(c);
-    }
-
-    emit ccsUpdated(l);
 }
 
 void AppContext::createConfigDirectory(const QString &dir) {
@@ -528,7 +426,18 @@ void AppContext::createWallet(FeatherSeed seed, const QString &path, const QStri
         return;
     }
 
-    this->createWalletFinish(password);
+    this->onWalletOpened(wallet);
+}
+
+void AppContext::createWalletFromDevice(const QString &path, const QString &password, int restoreHeight) {
+    if(Utils::fileExists(path)) {
+        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
+        qCritical() << err;
+        emit walletCreatedError(err);
+        return;
+    }
+
+    this->walletManager->createWalletFromDeviceAsync(path, password, this->networkType, "Ledger", restoreHeight);
 }
 
 void AppContext::createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic) {
@@ -539,7 +448,7 @@ void AppContext::createWalletFromKeys(const QString &path, const QString &passwo
         return;
     }
 
-    if(!this->walletManager->addressValid(address, this->networkType)) {
+    if(!WalletManager::addressValid(address, this->networkType)) {
         auto err = QString("Failed to create wallet. Invalid address provided.").arg(path);
         qCritical() << err;
         emit walletCreatedError(err);
@@ -560,21 +469,8 @@ void AppContext::createWalletFromKeys(const QString &path, const QString &passwo
         return;
     }
 
-    this->currentWallet = this->walletManager->createWalletFromKeys(path, this->seedLanguage, this->networkType, address, viewkey, spendkey, restoreHeight);
-    this->createWalletFinish(password);
-}
-
-void AppContext::createWalletFinish(const QString &password) {
-    this->currentWallet->setPassword(password);
-    this->currentWallet->store();
-    this->walletPassword = password;
-    emit walletCreated(this->currentWallet);
-}
-
-void AppContext::initRestoreHeights() {
-    restoreHeights[NetworkType::TESTNET] = new RestoreHeightLookup(NetworkType::TESTNET);
-    restoreHeights[NetworkType::STAGENET] = RestoreHeightLookup::fromFile(":/assets/restore_heights_monero_stagenet.txt", NetworkType::STAGENET);
-    restoreHeights[NetworkType::MAINNET] = RestoreHeightLookup::fromFile(":/assets/restore_heights_monero_mainnet.txt", NetworkType::MAINNET);
+    Wallet *wallet = this->walletManager->createWalletFromKeys(path, password, this->seedLanguage, this->networkType, address, viewkey, spendkey, restoreHeight);
+    this->walletManager->walletOpened(wallet);
 }
 
 void AppContext::onSetRestoreHeight(quint64 height){
@@ -643,7 +539,7 @@ void AppContext::donateBeg() {
     if (this->currentWallet->viewOnly()) return;
 
     auto donationCounter = config()->get(Config::donateBeg).toInt();
-    if(donationCounter == -1)
+    if (donationCounter == -1)
         return;  // previously donated
 
     donationCounter += 1;
@@ -688,7 +584,13 @@ void AppContext::onWalletUpdate() {
     this->updateBalance();
 }
 
-void AppContext::onWalletRefreshed(bool success) {
+void AppContext::onWalletRefreshed(bool success, const QString &message) {
+    if (!success) {
+        // Something went wrong during refresh, in some cases we need to notify the user
+        qCritical() << "Exception during refresh: " << message; // Can't use ->errorString() here, other SLOT might snipe it first
+        return;
+    }
+
     if (!this->refreshed) {
         refreshModels();
         this->refreshed = true;
@@ -727,6 +629,8 @@ void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, q
 }
 
 void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
+    qDebug() << Q_FUNC_INFO;
+
     for (auto &addr : address) {
         if (addr == globals::donationAddress) {
             this->donationSending = true;
@@ -778,11 +682,10 @@ void AppContext::updateBalance() {
     if (!this->currentWallet)
         return;
 
-    quint64 balance_u = this->currentWallet->balance();
-    AppContext::balance = balance_u / globals::cdiv;
-    double spendable = this->currentWallet->unlockedBalance();
+    quint64 balance = this->currentWallet->balance();
+    quint64 spendable = this->currentWallet->unlockedBalance();
 
-    emit balanceUpdated(balance_u, spendable);
+    emit balanceUpdated(balance, spendable);
 }
 
 void AppContext::syncStatusUpdated(quint64 height, quint64 target) {

@@ -15,9 +15,9 @@ RUN apt update && \
 RUN update-alternatives --set x86_64-w64-mingw32-g++ $(which x86_64-w64-mingw32-g++-posix) && \
     update-alternatives --set x86_64-w64-mingw32-gcc $(which x86_64-w64-mingw32-gcc-posix)
 
-RUN git clone -b v0.17.1.9 --depth 1 https://github.com/monero-project/monero && \
+RUN git clone -b v0.17.2.0 --depth 1 https://github.com/monero-project/monero && \
     cd monero && \
-    git reset --hard 8fef32e45c80aec41f25be9d1d8fb75adc883c64 && \
+    git reset --hard f6e63ef260e795aacd408c28008398785b84103a && \
     cp -a contrib/depends / && \
     cd .. && \
     rm -rf monero
@@ -34,12 +34,12 @@ RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qttranslations.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qtxmlpatterns.git -b ${QT_VERSION} --depth 1 && \
     git clone git://code.qt.io/qt/qtwebsockets.git -b ${QT_VERSION} --depth 1 && \
-    OPENSSL_LIBS="-lssl -lcrypto -lpthread -ldl" \
+    OPENSSL_LIBS="-lssl -lcrypto -lws2_32" \
     ./configure --prefix=/depends/x86_64-w64-mingw32 -xplatform win32-g++ \
     -device-option CROSS_COMPILE=/usr/bin/x86_64-w64-mingw32- \
     -I $(pwd)/qtbase/src/3rdparty/angle/include \
     -opensource -confirm-license -release -static -static-runtime -no-opengl \
-    -no-avx -openssl -I /depends/x86_64-w64-mingw32/include -L /depends/x86_64-w64-mingw32/lib \
+    -no-avx -openssl-linked -I /depends/x86_64-w64-mingw32/include -L /depends/x86_64-w64-mingw32/lib \
     -qt-freetype -qt-harfbuzz -qt-libjpeg -qt-libpng -qt-pcre -qt-zlib \
     -skip gamepad -skip location -skip qt3d -skip qtactiveqt -skip qtandroidextras \
     -skip qtcanvas3d -skip qtcharts -skip qtconnectivity -skip qtdatavis3d -skip qtdoc \
@@ -122,11 +122,11 @@ RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
     rm -rf $(pwd)
 
 # OpenSSL -> Tor
-RUN wget https://www.openssl.org/source/openssl-1.1.1.k.tar.gz && \
-    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1.k.tar.gz" | sha256sum -c && \
-    tar -xzf openssl-1.1.1.k.tar.gz && \
-    rm openssl-1.1.1.k.tar.gz && \
-    cd openssl-1.1.1.k && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1k.tar.gz && \
+    echo "892a0875b9872acd04a9fde79b1f943075d5ea162415de3047c327df33fbaee5 openssl-1.1.1k.tar.gz" | sha256sum -c && \
+    tar -xzf openssl-1.1.1k.tar.gz && \
+    rm openssl-1.1.1k.tar.gz && \
+    cd openssl-1.1.1k && \
     ./Configure mingw64 no-shared no-dso --cross-compile-prefix=x86_64-w64-mingw32- --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make -j$THREADS install_sw && \
@@ -180,3 +180,13 @@ RUN git clone https://git.featherwallet.org/feather/monero-seed.git && \
     make -Cbuild -j$THREADS && \
     make -Cbuild install && \
     rm -rf $(pwd)
+
+RUN git clone https://github.com/nih-at/libzip.git && \
+    cd libzip && \
+    git reset --hard 66e496489bdae81bfda8b0088172871d8fda0032 && \
+    cmake -DCMAKE_INSTALL_PREFIX=/depends/x86_64-w64-mingw32 \
+          -DCMAKE_TOOLCHAIN_FILE=/depends/x86_64-w64-mingw32/share/toolchain.cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DCMAKE_PREFIX_PATH=/usr/x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make -j$THREADS install

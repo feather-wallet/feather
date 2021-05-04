@@ -3,6 +3,7 @@
 
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
+#include "utils/AppData.h"
 
 #include <sstream>
 #include "RestoreHeightLookup.h"
@@ -13,6 +14,8 @@ enum SeedType {
 };
 
 struct FeatherSeed {
+    // TODO: this is spaghetti, needs refactor
+
     QString coin;
     QString language;
     SeedType seedType;
@@ -21,17 +24,18 @@ struct FeatherSeed {
     QString spendKey;
     QString correction;
 
+    NetworkType::Type netType;
+
     time_t time;
     int restoreHeight = 0;
-    RestoreHeightLookup *lookup = nullptr;
 
     QString errorString;
 
-    explicit FeatherSeed(RestoreHeightLookup *lookup,
+    explicit FeatherSeed(NetworkType::Type networkType = NetworkType::MAINNET,
                           const QString &coin = "monero",
                           const QString &language = "English",
                           const QStringList &mnemonic = {})
-            : lookup(lookup), coin(coin), language(language), mnemonic(mnemonic)
+            : netType(networkType), coin(coin), language(language), mnemonic(mnemonic)
     {
         // Generate a new mnemonic if none was given
         if (mnemonic.length() == 0) {
@@ -85,21 +89,17 @@ struct FeatherSeed {
         }
     }
 
-    int setRestoreHeight() {
-        if (this->lookup == nullptr)
-            return 1;
-
+    void setRestoreHeight() {
         if (this->time == 0)
-            return 1;
+            this->restoreHeight = 1;
 
-        this->restoreHeight = this->lookup->dateToRestoreHeight(this->time);
-        return this->restoreHeight;
+        this->restoreHeight = appData()->restoreHeights[netType]->dateToRestoreHeight(this->time);
     }
 
     int setRestoreHeight(int height) {
         auto now = std::time(nullptr);
         auto nowClearance = 3600 * 24;
-        auto currentBlockHeight = this->lookup->dateToRestoreHeight(now - nowClearance);
+        auto currentBlockHeight = appData()->restoreHeights[netType]->dateToRestoreHeight(now - nowClearance);
         if (height >= currentBlockHeight + nowClearance) {
             qCritical() << "unrealistic restore height detected, setting to current blockheight instead: " << currentBlockHeight;
             this->restoreHeight = currentBlockHeight;

@@ -22,7 +22,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-4`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-6`) to build the release binary.
 
 #### 2. Base image
 
@@ -37,7 +37,7 @@ Building the base image takes a while. You only need to build the base image onc
 ##### Standalone binary
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'make release-static -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'CHECK_UPDATES=On make release-static -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.
@@ -75,7 +75,7 @@ Building the base image takes a while. You only need to build the base image onc
 #### 3. Build
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'CHECK_UPDATES=On make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.

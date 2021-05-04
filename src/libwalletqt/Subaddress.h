@@ -16,13 +16,14 @@ class Subaddress : public QObject
 {
     Q_OBJECT
 public:
-    Q_INVOKABLE void getAll() const;
-    Q_INVOKABLE bool getRow(int index, std::function<void (Monero::SubaddressRow &row)> callback) const;
-    Q_INVOKABLE void addRow(quint32 accountIndex, const QString &label) const;
-    Q_INVOKABLE void setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const;
-    Q_INVOKABLE void refresh(quint32 accountIndex) const;
-    Q_INVOKABLE quint64 unusedLookahead() const;
+    void getAll() const;
+    bool getRow(int index, std::function<void (Monero::SubaddressRow &row)> callback) const;
+    bool addRow(quint32 accountIndex, const QString &label) const;
+    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const;
+    void refresh(quint32 accountIndex) const;
+    quint64 unusedLookahead() const;
     quint64 count() const;
+    QString errorString() const;
     Monero::SubaddressRow* row(int index) const;
 
 signals:

@@ -6,6 +6,7 @@
 #include "model/ModelUtils.h"
 #include "txconfadvdialog.h"
 #include "globals.h"
+#include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 
 #include <QMessageBox>
@@ -26,7 +27,7 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     QString preferredCur = config()->get(Config::preferredFiatCurrency).toString();
 
     auto convert = [preferredCur](double amount){
-        return QString::number(AppContext::prices->convert("XMR", preferredCur, amount), 'f', 2);
+        return QString::number(appData()->prices.convert("XMR", preferredCur, amount), 'f', 2);
     };
 
     QString amount = WalletManager::displayAmount(tx->amount());

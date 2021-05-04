@@ -1,59 +1,60 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QObject>
 #include <QNetworkAccessManager>
-#include <QScreen>
-#include <QDesktopWidget>
+#include <utility>
 #include "wsclient.h"
-#include "appcontext.h"
+#include "utils/utils.h"
 
-WSClient::WSClient(AppContext *ctx, const QUrl &url, QObject *parent) :
-        QObject(parent),
-        url(url),
-        m_ctx(ctx) {
-    connect(&this->webSocket, &QWebSocket::binaryMessageReceived, this, &WSClient::onbinaryMessageReceived);
-    connect(&this->webSocket, &QWebSocket::connected, this, &WSClient::onConnected);
-    connect(&this->webSocket, &QWebSocket::disconnected, this, &WSClient::closed);
-    connect(&this->webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WSClient::onError);
-
-    m_tor = url.host().endsWith(".onion");
+WSClient::WSClient(QUrl url, QObject *parent)
+    : QObject(parent)
+    , m_url(std::move(url))
+{
+    connect(&webSocket, &QWebSocket::binaryMessageReceived, this, &WSClient::onbinaryMessageReceived);
+    connect(&webSocket, &QWebSocket::connected, this, &WSClient::onConnected);
+    connect(&webSocket, &QWebSocket::disconnected, this, &WSClient::closed);
+    connect(&webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WSClient::onError);
+    connect(&m_connectionTimer, &QTimer::timeout, this, &WSClient::checkConnection);
 
     // Keep websocket connection alive
     connect(&m_pingTimer, &QTimer::timeout, [this]{
-        if (this->webSocket.state() == QAbstractSocket::ConnectedState)
-            this->webSocket.ping();
+        if (webSocket.state() == QAbstractSocket::ConnectedState)
+            webSocket.ping();
     });
     m_pingTimer.setInterval(30 * 1000);
     m_pingTimer.start();
 }
 
 void WSClient::sendMsg(const QByteArray &data) {
-    auto state = this->webSocket.state();
-    if(state == QAbstractSocket::ConnectedState)
-        this->webSocket.sendBinaryMessage(data);
+    if (webSocket.state() == QAbstractSocket::ConnectedState)
+        webSocket.sendBinaryMessage(data);
+}
+
+void WSClient::onToggleConnect(bool connect) {
+    m_connect = connect;
+    if (m_connect)
+        checkConnection();
 }
 
 void WSClient::start() {
     // connect & reconnect on errors/close
 #ifdef QT_DEBUG
-    qDebug() << "WebSocket connect:" << url.url();
+    qDebug() << "WebSocket connect:" << m_url.url();
 #endif
-    if((m_tor && this->m_ctx->tor->torConnected) || !m_tor)
-        this->webSocket.open(QUrl(this->url));
 
-    if(!this->m_connectionTimer.isActive()) {
-        connect(&this->m_connectionTimer, &QTimer::timeout, this, &WSClient::checkConnection);
-        this->m_connectionTimer.start(2000);
+    if (m_connect)
+        webSocket.open(m_url);
+
+    if (!m_connectionTimer.isActive()) {
+        m_connectionTimer.start(2000);
     }
 }
 
 void WSClient::checkConnection() {
-    if(m_tor && !this->m_ctx->tor->torConnected)
+    if (!m_connect)
         return;
 
-    auto state = this->webSocket.state();
-    if(state == QAbstractSocket::UnconnectedState) {
+    if (webSocket.state() == QAbstractSocket::UnconnectedState) {
 #ifdef QT_DEBUG
         qDebug() << "WebSocket reconnect";
 #endif
@@ -70,9 +71,9 @@ void WSClient::onConnected() {
 
 void WSClient::onError(QAbstractSocket::SocketError error) {
     qCritical() << "WebSocket error: " << error;
-    auto state = this->webSocket.state();
-    if(state == QAbstractSocket::ConnectedState || state == QAbstractSocket::ConnectingState)
-        this->webSocket.abort();
+    auto state = webSocket.state();
+    if (state == QAbstractSocket::ConnectedState || state == QAbstractSocket::ConnectingState)
+        webSocket.abort();
 }
 
 void WSClient::onbinaryMessageReceived(const QByteArray &message) {

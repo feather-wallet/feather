@@ -7,6 +7,7 @@
 #include "model/ModelUtils.h"
 #include "mainwindow.h"
 #include "libwalletqt/AddressBook.h"
+#include "utils/Icons.h"
 
 #include <QMessageBox>
 
@@ -28,14 +29,14 @@ ContactsWidget::ContactsWidget(QWidget *parent) :
     // context menu
     ui->contacts->setContextMenuPolicy(Qt::CustomContextMenu);
     m_contextMenu = new QMenu(ui->contacts);
-    m_contextMenu->addAction(QIcon(":/assets/images/person.svg"), "New contact", [this]{
+    m_contextMenu->addAction(icons()->icon("person.svg"), "New contact", [this]{
         this->newContact();
     });
 
     // row context menu
     m_rowMenu = new QMenu(ui->contacts);
-    m_rowMenu->addAction(QIcon(":/assets/images/copy.png"), "Copy address", this, &ContactsWidget::copyAddress);
-    m_rowMenu->addAction(QIcon(":/assets/images/copy.png"), "Copy name", this, &ContactsWidget::copyName);
+    m_rowMenu->addAction(icons()->icon("copy.png"), "Copy address", this, &ContactsWidget::copyAddress);
+    m_rowMenu->addAction(icons()->icon("copy.png"), "Copy name", this, &ContactsWidget::copyName);
     m_rowMenu->addAction("Pay to", this, &ContactsWidget::payTo);
     m_rowMenu->addAction("Delete", this, &ContactsWidget::deleteContact);
 

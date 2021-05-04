@@ -5,21 +5,16 @@
 #include "TransactionHistory.h"
 #include "TransactionInfo.h"
 #include "globals.h"
+#include "utils/config.h"
 #include "utils/ColorScheme.h"
+#include "utils/Icons.h"
+#include "utils/AppData.h"
 #include "ModelUtils.h"
 
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
     m_transactionHistory(nullptr)
 {
-    m_unconfirmedTx = QIcon(":/assets/images/unconfirmed.png");
-    m_warning = QIcon(":/assets/images/warning.png");
-    m_clock1 = QIcon(":/assets/images/clock1.png");
-    m_clock2 = QIcon(":/assets/images/clock2.png");
-    m_clock3 = QIcon(":/assets/images/clock3.png");
-    m_clock4 = QIcon(":/assets/images/clock4.png");
-    m_clock5 = QIcon(":/assets/images/clock5.png");
-    m_confirmedTx = QIcon(":/assets/images/confirmed.png");
 }
 
 void TransactionHistoryModel::setTransactionHistory(TransactionHistory *th) {
@@ -86,21 +81,21 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                 case Column::Date:
                 {
                     if (tInfo.isFailed())
-                        result = QVariant(m_warning);
+                        result = QVariant(icons()->icon("warning.png"));
                     else if (tInfo.isPending())
-                        result = QVariant(m_unconfirmedTx);
+                        result = QVariant(icons()->icon("unconfirmed.png"));
                     else if (tInfo.confirmations() <= (1.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(m_clock1);
+                        result = QVariant(icons()->icon("clock1.png"));
                     else if (tInfo.confirmations() <= (2.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(m_clock2);
+                        result = QVariant(icons()->icon("clock2.png"));
                     else if (tInfo.confirmations() <= (3.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(m_clock3);
+                        result = QVariant(icons()->icon("clock3.png"));
                     else if (tInfo.confirmations() <= (4.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(m_clock4);
+                        result = QVariant(icons()->icon("clock4.png"));
                     else if (tInfo.confirmations() < tInfo.confirmationsRequired())
-                        result = QVariant(m_clock5);
+                        result = QVariant(icons()->icon("clock5.png"));
                     else if (tInfo.confirmations())
-                        result = QVariant(m_confirmedTx);
+                        result = QVariant(icons()->icon("confirmed.png"));
                 }
             }
         }
@@ -161,13 +156,13 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
         }
         case Column::FiatAmount:
         {
-            double usd_price = AppContext::txFiatHistory->get(tInfo.timestamp().toString("yyyyMMdd"));
+            double usd_price = appData()->txFiatHistory->get(tInfo.timestamp().toString("yyyyMMdd"));
             if (usd_price == 0.0)
                 return QVariant("?");
 
             double usd_amount = usd_price * (tInfo.balanceDelta() / globals::cdiv);
             if(this->preferredFiatSymbol != "USD")
-                usd_amount = AppContext::prices->convert("USD", this->preferredFiatSymbol, usd_amount);
+                usd_amount = appData()->prices.convert("USD", this->preferredFiatSymbol, usd_amount);
             if (role == Qt::UserRole) {
                 return usd_amount;
             }

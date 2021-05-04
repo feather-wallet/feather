@@ -18,6 +18,8 @@ qt5_add_resources(RESOURCES assets.qrc)
 file(GLOB SOURCE_FILES
         "*.h"
         "*.cpp"
+        "api/*.h"
+        "api/*.cpp"
         "utils/*.h"
         "utils/*.cpp"
         "libwalletqt/*.h"
@@ -116,10 +118,20 @@ target_include_directories(feather PUBLIC
         ${Qt5Svg_INCLUDE_DIRS}
         ${Qt5Xml_INCLUDE_DIRS}
         ${Qt5WebSockets_INCLUDE_DIRS}
+        ${ZLIB_INCLUDE_DIRS}
+        ${LIBZIP_INCLUDE_DIRS}
         )
 
 if(DONATE_BEG)
     target_compile_definitions(feather PRIVATE DONATE_BEG=1)
+endif()
+
+if (CHECK_UPDATES)
+    target_compile_definitions(feather PRIVATE CHECK_UPDATES=1)
+endif()
+
+if(LOCALMONERO)
+    target_compile_definitions(feather PRIVATE HAS_LOCALMONERO=1)
 endif()
 
 if(TOR_BIN)
@@ -129,6 +141,9 @@ endif()
 if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
+
+# TODO: PLACEHOLDER
+target_compile_definitions(feather PRIVATE HAS_WEBSOCKET=1)
 
 if(HAVE_SYS_PRCTL_H)
     target_compile_definitions(feather PRIVATE HAVE_SYS_PRCTL_H=1)
@@ -191,6 +206,8 @@ target_link_libraries(feather
         openpgp
         Threads::Threads
         ${QRENCODE_LIBRARY}
+        ${ZLIB_LIBRARIES}
+        ${LIBZIP_LIBRARIES}
         )
 
 if(APPLE)

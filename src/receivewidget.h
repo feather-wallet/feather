@@ -40,13 +40,14 @@ public slots:
     void resetModel();
 
 signals:
-    void generateSubaddress();
     void showTransactions(const QString& address);
 
 private slots:
     void showHeaderMenu(const QPoint& position);
     void hideAddress();
     void showAddress();
+    void showOnDevice();
+    void generateSubaddress();
 
 private:
     Ui::ReceiveWidget *ui;

@@ -3,9 +3,9 @@
 
 #include "daemonrpc.h"
 
-DaemonRpc::DaemonRpc(QObject *parent, UtilsNetworking *network, QString daemonAddress)
+DaemonRpc::DaemonRpc(QObject *parent, QNetworkAccessManager *network, QString daemonAddress)
         : QObject(parent)
-        , m_network(network)
+        , m_network(new UtilsNetworking(network, this))
         , m_daemonAddress(std::move(daemonAddress))
 {
 }
@@ -37,6 +37,7 @@ void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
     const auto err = reply->errorString();
 
     QByteArray data = reply->readAll();
+    reply->deleteLater();
     QJsonObject obj;
     if (!data.isEmpty() && Utils::validateJSON(data)) {
         auto doc = QJsonDocument::fromJson(data);
@@ -65,8 +66,8 @@ void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
         return;
     }
 
-    reply->deleteLater();
-    emit ApiResponse(DaemonResponse(true, endpoint, "", obj));
+    DaemonResponse resp{true, endpoint, "", obj};
+    emit ApiResponse(resp);
 }
 
 QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {
@@ -91,8 +92,4 @@ QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {
 
 void DaemonRpc::setDaemonAddress(const QString &daemonAddress) {
     m_daemonAddress = daemonAddress;
-}
-
-void DaemonRpc::setNetwork(UtilsNetworking *network) {
-    m_network = network;
 }

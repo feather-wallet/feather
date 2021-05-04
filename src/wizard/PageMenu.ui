@@ -68,6 +68,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QRadioButton" name="radioCreateFromDevice">
+     <property name="text">
+      <string>Create wallet from hardware device</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>

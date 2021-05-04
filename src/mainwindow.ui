@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1156</width>
-    <height>496</height>
+    <width>977</width>
+    <height>499</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -293,6 +293,39 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
+        <item>
+         <widget class="QTabWidget" name="tabWidgetExchanges">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tabLocalMonero">
+           <attribute name="icon">
+            <iconset resource="assets.qrc">
+             <normaloff>:/assets/images/localMonero_logo.png</normaloff>:/assets/images/localMonero_logo.png</iconset>
+           </attribute>
+           <attribute name="title">
+            <string>LocalMonero</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_4">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <layout class="QVBoxLayout" name="localMoneroLayout"/>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="tabXmrRig">
@@ -319,8 +352,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1156</width>
-     <height>30</height>
+     <width>977</width>
+     <height>28</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">

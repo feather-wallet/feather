@@ -22,9 +22,6 @@ PageWalletFile::PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *p
     QPixmap pixmap = QPixmap(":/assets/images/file.png");
     ui->lockIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
-    this->registerField("walletName", ui->line_walletName);
-    this->registerField("walletDirectory", ui->line_walletDir);
-
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
         if(walletDir.isEmpty()) return;
@@ -100,7 +97,11 @@ QString PageWalletFile::defaultWalletName() {
     int count = 1;
     QString walletName;
     do {
-        walletName = QString("wallet_%1").arg(count);
+        QString walletStr = QString("wallet_%1");
+        if (m_fields->mode == WizardMode::CreateWalletFromDevice) {
+            walletStr = QString("ledger_%1");
+        }
+        walletName = walletStr.arg(count);
         count++;
     } while (this->walletPathExists(walletName));
 

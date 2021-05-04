@@ -20,7 +20,6 @@ Q_OBJECT
 
 public:
     explicit XmRig(const QString &configDir, QObject *parent = nullptr);
-    void prepare();
 
     void start(const QString &path, int threads, const QString &address, const QString &username, const QString &password, bool tor = false, bool tls = true);
     void stop();

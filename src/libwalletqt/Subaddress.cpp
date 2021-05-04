@@ -10,6 +10,11 @@ Subaddress::Subaddress(Monero::Subaddress *subaddressImpl, QObject *parent)
     getAll();
 }
 
+QString Subaddress::errorString() const
+{
+    return QString::fromStdString(m_subaddressImpl->errorString());
+}
+
 void Subaddress::getAll() const
 {
     emit refreshStarted();
@@ -46,17 +51,24 @@ bool Subaddress::getRow(int index, std::function<void (Monero::SubaddressRow &ro
     return true;
 }
 
-void Subaddress::addRow(quint32 accountIndex, const QString &label) const
+bool Subaddress::addRow(quint32 accountIndex, const QString &label) const
 {
-    m_subaddressImpl->addRow(accountIndex, label.toStdString());
-    getAll();
+    bool r = m_subaddressImpl->addRow(accountIndex, label.toStdString());
+
+    if (r)
+        getAll();
+
+    return r;
 }
 
-void Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const
+bool Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const
 {
-    m_subaddressImpl->setLabel(accountIndex, addressIndex, label.toStdString());
-    getAll();
-    emit labelChanged();
+    bool r = m_subaddressImpl->setLabel(accountIndex, addressIndex, label.toStdString());
+    if (r) {
+        getAll();
+        emit labelChanged();
+    }
+    return r;
 }
 
 void Subaddress::refresh(quint32 accountIndex) const

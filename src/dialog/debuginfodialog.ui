@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>693</width>
-    <height>612</height>
+    <height>613</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,6 +83,23 @@
      </item>
      <item row="4" column="1">
       <widget class="QLabel" name="label_daemonHeight">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_5">
+       <property name="text">
+        <string>Target height:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QLabel" name="label_targetHeight">
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -242,82 +259,14 @@
       </widget>
      </item>
      <item row="16" column="0">
-      <widget class="QLabel" name="label_7">
+      <widget class="QLabel" name="label_8">
        <property name="text">
-        <string>View only:</string>
+        <string>Device type:</string>
        </property>
       </widget>
      </item>
      <item row="16" column="1">
-      <widget class="QLabel" name="label_viewOnly">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="0">
-      <widget class="QLabel" name="label_24">
-       <property name="text">
-        <string>Timestamp:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="20" column="1">
-      <widget class="QLabel" name="label_timestamp">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>Operating system:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="19" column="1">
-      <widget class="QLabel" name="label_OS">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="18" column="1">
-      <widget class="Line" name="line_4">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>Target height:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLabel" name="label_targetHeight">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="17" column="1">
-      <widget class="QLabel" name="label_primaryOnly">
+      <widget class="QLabel" name="label_deviceType">
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -327,9 +276,77 @@
       </widget>
      </item>
      <item row="17" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="text">
+        <string>View only:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="17" column="1">
+      <widget class="QLabel" name="label_viewOnly">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>Primary only:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="18" column="1">
+      <widget class="QLabel" name="label_primaryOnly">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="19" column="1">
+      <widget class="Line" name="line_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="0">
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Operating system:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="20" column="1">
+      <widget class="QLabel" name="label_OS">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="0">
+      <widget class="QLabel" name="label_24">
+       <property name="text">
+        <string>Timestamp:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="21" column="1">
+      <widget class="QLabel" name="label_timestamp">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>

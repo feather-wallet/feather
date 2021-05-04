@@ -45,8 +45,9 @@ void WalletListenerImpl::updated()
 void WalletListenerImpl::refreshed(bool success)
 {
     qDebug() << __FUNCTION__;
+    QString message = m_wallet->errorString();
     m_wallet->onRefreshed(success);
-    emit m_wallet->refreshed(success);
+    emit m_wallet->refreshed(success, message);
 }
 
 void WalletListenerImpl::onDeviceButtonRequest(uint64_t code)
@@ -59,6 +60,12 @@ void WalletListenerImpl::onDeviceButtonPressed()
 {
     qDebug() << __FUNCTION__;
     emit m_wallet->deviceButtonPressed();
+}
+
+void WalletListenerImpl::onDeviceError(const std::string &message)
+{
+    qDebug() << __FUNCTION__;
+    emit m_wallet->deviceError(QString::fromStdString(message));
 }
 
 void WalletListenerImpl::onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort)

@@ -7,11 +7,13 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
-set(VERSION "beta-5")
+set(VERSION "beta-6")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
+option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
+option(CHECK_UPDATES "Enable checking for application updates" OFF)
 
 option(STATIC "Link libraries statically, requires static Qt")
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
@@ -29,7 +31,7 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(MONERO_HEAD "41327974116dedccc2f9709d8ad3a8a1f591faed")
+set(MONERO_HEAD "36fb05da3394505f8033ceb8806b28909617696f")
 set(BUILD_GUI_DEPS ON)
 set(ARCH "x86-64")
 set(BUILD_64 ON)
@@ -138,6 +140,11 @@ if(NOT monero-seed_FOUND)
     message(FATAL_ERROR "monero-seed was not installed and fetching deps is disabled")
   endif()
 endif()
+
+# libzip
+find_package(zlib CONFIG)
+find_path(LIBZIP_INCLUDE_DIRS zip.h)
+find_library(LIBZIP_LIBRARIES zip)
 
 # Boost
 if(DEBUG)

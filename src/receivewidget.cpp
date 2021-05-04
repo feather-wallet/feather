@@ -5,8 +5,10 @@
 #include "receivewidget.h"
 #include "model/ModelUtils.h"
 #include "dialog/qrcodedialog.h"
+#include "utils/Icons.h"
 
 #include <QMenu>
+#include <QMessageBox>
 
 ReceiveWidget::ReceiveWidget(QWidget *parent) :
         QWidget(parent),
@@ -29,9 +31,7 @@ ReceiveWidget::ReceiveWidget(QWidget *parent) :
     connect(m_showTransactionsAction, &QAction::triggered, this, &ReceiveWidget::onShowTransactions);
     connect(ui->addresses, &QTreeView::customContextMenuRequested, this, &ReceiveWidget::showContextMenu);
 
-    connect(ui->btn_generateSubaddress, &QPushButton::clicked, [=]() {
-        emit generateSubaddress();
-    });
+    connect(ui->btn_generateSubaddress, &QPushButton::clicked, this, &ReceiveWidget::generateSubaddress);
 
     connect(ui->qrCode, &ClickableLabel::clicked, this, &ReceiveWidget::showQrCodeDialog);
     connect(ui->label_addressSearch, &QLineEdit::textChanged, this, &ReceiveWidget::setSearchFilter);
@@ -88,9 +88,9 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 
     auto *menu = new QMenu(ui->addresses);
 
-    menu->addAction(QIcon(":/assets/images/copy.png"), "Copy address", this, &ReceiveWidget::copyAddress);
-    menu->addAction(QIcon(":/assets/images/copy.png"), "Copy label", this, &ReceiveWidget::copyLabel);
-    menu->addAction(QIcon(":/assets/images/edit.png"), "Edit label", this, &ReceiveWidget::editLabel);
+    menu->addAction(icons()->icon("copy.png"), "Copy address", this, &ReceiveWidget::copyAddress);
+    menu->addAction(icons()->icon("copy.png"), "Copy label", this, &ReceiveWidget::copyLabel);
+    menu->addAction(icons()->icon("edit.png"), "Edit label", this, &ReceiveWidget::editLabel);
 
     if (isUsed) {
         menu->addAction(m_showTransactionsAction);
@@ -101,6 +101,10 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
         menu->addAction("Show address", this, &ReceiveWidget::showAddress);
     } else {
         menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
+    }
+
+    if (m_wallet->isHwBacked()) {
+        menu->addAction("Show on device", this, &ReceiveWidget::showOnDevice);
     }
 
     menu->popup(ui->addresses->viewport()->mapToGlobal(point));
@@ -162,6 +166,21 @@ void ReceiveWidget::showAddress()
     QString address = QString::fromStdString(row->getAddress());
     this->removeHiddenAddress(address);
     m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
+}
+
+void ReceiveWidget::showOnDevice() {
+    Monero::SubaddressRow* row = this->currentEntry();
+    if (!row) return;
+    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRowId(), "");
+}
+
+void ReceiveWidget::generateSubaddress() {
+    if (!m_wallet) return;
+
+    bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
+    if (!r) {
+        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_wallet->subaddress()->errorString()));
+    }
 }
 
 void ReceiveWidget::updateQrCode(){

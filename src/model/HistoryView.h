@@ -9,6 +9,7 @@
 #include <QActionGroup>
 
 #include "TransactionHistoryModel.h"
+#include "TransactionHistoryProxyModel.h"
 
 class HistoryView : public QTreeView
 {

@@ -18,7 +18,7 @@ struct ConfigDirective
 static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         // General
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
-        {Config::checkForAppUpdates,{QS("checkForAppUpdates"), true}},
+        {Config::checkForUpdates,{QS("checkForUpdates"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
         {Config::warnOnAlpha,{QS("warnOnAlpha"), true}},
@@ -38,12 +38,12 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
         {Config::showTabHome,{QS("showTabHome"), true}},
         {Config::showTabCoins,{QS("showTabCoins"), false}},
-        {Config::showTabExchange, {QS("showTabExchange"), true}},
+        {Config::showTabExchange, {QS("showTabExchange"), false}},
         {Config::showTabXMRig,{QS("showTabXMRig"), false}},
         {Config::showTabCalc,{QS("showTabCalc"), true}},
         {Config::geometry, {QS("geometry"), {}}},
         {Config::windowState, {QS("windowState"), {}}},
-        {Config::firstRun,{QS("firstRun"), false}},
+        {Config::firstRun, {QS("firstRun"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
@@ -51,7 +51,15 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::amountPrecision, {QS("amountPrecision"), 12}},
         {Config::dateFormat, {QS("dateFormat"), "yyyy-MM-dd"}},
         {Config::timeFormat, {QS("timeFormat"), "HH:mm"}},
-        {Config::multiBroadcast, {QS("multiBroadcast"), true}}
+        {Config::multiBroadcast, {QS("multiBroadcast"), true}},
+        {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
+        {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},
+        {Config::socks5Port, {QS("socks5Port"), "9050"}},
+        {Config::socks5User, {QS("socks5User"), ""}},
+        {Config::socks5Pass, {QS("socks5Pass"), ""}},
+        {Config::useLocalTor, {QS("useLocalTor"), false}},
+        {Config::networkType, {QS("networkType"), NetworkType::Type::MAINNET}},
+        {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}}
 };
 
 

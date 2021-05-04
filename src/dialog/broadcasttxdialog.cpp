@@ -3,6 +3,7 @@
 
 #include "broadcasttxdialog.h"
 #include "ui_broadcasttxdialog.h"
+#include "utils/NetworkManager.h"
 
 #include <QMessageBox>
 
@@ -13,10 +14,8 @@ BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QSt
 {
     ui->setupUi(this);
 
-    m_network = new UtilsNetworking(m_ctx->network, this);
-
     auto node = ctx->nodes->connection();
-    m_rpc = new DaemonRpc(this, m_network, node.full);
+    m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_Broadcast, &QPushButton::clicked, this, &BroadcastTxDialog::broadcastTx);
     connect(ui->btn_Close, &QPushButton::clicked, this, &BroadcastTxDialog::reject);
@@ -38,7 +37,7 @@ void BroadcastTxDialog::broadcastTx() {
         if (ui->radio_useCustom->isChecked())
             node = ui->customNode->text();
         else if (ui->radio_useDefault->isChecked())
-            node = m_ctx->nodes->connection().full;
+            node = m_ctx->nodes->connection().toAddress();
 
         if (!node.startsWith("http://"))
             node = QString("http://%1").arg(node);

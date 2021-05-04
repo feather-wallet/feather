@@ -5,6 +5,7 @@
 #define FEATHER_TORINFODIALOG_H
 
 #include <QDialog>
+#include <QAbstractButton>
 
 #include "appcontext.h"
 
@@ -17,13 +18,25 @@ class TorInfoDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TorInfoDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit TorInfoDialog(QWidget *parent, AppContext *ctx);
     ~TorInfoDialog() override;
 
 public slots:
     void onLogsUpdated();
 
+private slots:
+    void onConnectionStatusChanged(bool connected);
+    void onApplySettings();
+    void onSettingsChanged();
+    void onStopTor();
+
+signals:
+    void torSettingsChanged();
+
 private:
+    void initConnectionSettings();
+    void initPrivacyLevel();
+
     Ui::TorInfoDialog *ui;
     AppContext *m_ctx;
 };

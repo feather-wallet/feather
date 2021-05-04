@@ -7,9 +7,9 @@
 #include "ModelUtils.h"
 #include "globals.h"
 #include "utils/ColorScheme.h"
+#include "utils/Icons.h"
 
 #include <QBrush>
-#include <QFont>
 
 CoinsModel::CoinsModel(QObject *parent, Coins *coins)
         : QAbstractTableModel(parent),
@@ -17,9 +17,6 @@ CoinsModel::CoinsModel(QObject *parent, Coins *coins)
 {
     connect(m_coins, &Coins::refreshStarted, this, &CoinsModel::startReset);
     connect(m_coins, &Coins::refreshFinished, this, &CoinsModel::endReset);
-
-    m_eye = QIcon(":/assets/images/eye1.png");
-    m_eyeBlind = QIcon(":/assets/images/eye_blind.png");
 }
 
 void CoinsModel::startReset(){
@@ -88,10 +85,10 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
                 case KeyImageKnown:
                 {
                     if (cInfo.keyImageKnown()) {
-                        result = QVariant(m_eye);
+                        result = QVariant(icons()->icon("eye1.png"));
                     }
                     else {
-                        result = QVariant(m_eyeBlind);
+                        result = QVariant(icons()->icon("eye_blind.png"));
                     }
                 }
             }

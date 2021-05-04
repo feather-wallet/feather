@@ -16,7 +16,8 @@ enum WizardMode {
     CreateWallet = 0,
     OpenWallet,
     RestoreFromSeed,
-    RestoreFromKeys
+    RestoreFromKeys,
+    CreateWalletFromDevice
 };
 
 struct WizardFields {
@@ -30,7 +31,7 @@ struct WizardFields {
     QString secretViewKey;
     QString secretSpendKey;
     WizardMode mode;
-    int restoreHeight;
+    int restoreHeight = 0;
     SeedType seedType;
 };
 
@@ -48,12 +49,15 @@ public:
         Page_Network,
         Page_WalletRestoreSeed,
         Page_WalletRestoreKeys,
-        Page_SetRestoreHeight
+        Page_SetRestoreHeight,
+        Page_HardwareDevice,
+        Page_NetworkTor
     };
 
     explicit WalletWizard(AppContext *ctx, WalletWizard::Page startPage = WalletWizard::Page::Page_Menu, QWidget *parent = nullptr);
 
 signals:
+    void initialNetworkConfigured();
     void skinChanged(const QString &skin);
     void openWallet(QString path, QString password);
     void defaultWalletDirChanged(QString walletDir);

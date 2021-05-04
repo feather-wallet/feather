@@ -22,6 +22,9 @@ namespace globals
 
     // websocket constants
     const QUrl websocketUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
+
+    // website constants
+    const QString websiteUrl = "https://featherwallet.org";
 }
 
 #endif //FEATHER_GLOBALS_H

@@ -7,10 +7,16 @@
 #include "tails.h"
 #include "utils.h"
 
+bool TailsOS::detected = false;
+bool TailsOS::isTails = false;
 const QString TailsOS::tailsPathData = QString("/live/persistence/TailsData_unlocked/");
 
 bool TailsOS::detect()
 {
+    if (detected) {
+        return TailsOS::isTails;
+    }
+
     if (!Utils::fileExists("/etc/os-release"))
         return false;
 
@@ -21,6 +27,9 @@ bool TailsOS::detect()
 
     if (matched)
         qDebug() << "Tails OS detected";
+
+    TailsOS::detected = true;
+    TailsOS::isTails = matched;
 
     return matched;
 }

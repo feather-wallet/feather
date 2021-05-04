@@ -21,60 +21,68 @@ enum NodeSource {
 };
 
 struct FeatherNode {
-    explicit FeatherNode(QString _address = "", int height = 0, int target_height = 0, bool online = false)
-            : height(height), target_height(target_height), online(online){
-        // wonky ipv4/host parsing, should be fine(tm)(c).
-        if(_address.isEmpty()) return;
-        if(_address.contains("https://")) {
-            this->isHttps = true;
-        }
-        _address = _address.replace("https://", "");
-        _address = _address.replace("http://", "");
-        if(_address.contains("@")){  // authentication, user/pass
-            const auto spl = _address.split("@");
-            const auto &creds = spl.at(0);
-            if(creds.contains(":")) {
-                const auto _spl = creds.split(":");
-                this->username = _spl.at(0).trimmed().replace(" ", "");
-                this->password = _spl.at(1).trimmed().replace(" ", "");
-            }
-            _address = spl.at(1);
-        }
-        if(!_address.contains(":"))
-            _address += ":18081";
-        this->address = _address;
-        if(this->address.contains(".onion"))
-            tor = true;
-        this->full = this->generateFull();
+    explicit FeatherNode(QString address = "", int height = 0, int target_height = 0, bool online = false)
+            : height(height)
+            , target_height(target_height)
+            , online(online)
+    {
+        if (address.isEmpty())
+            return;
+
+        address.remove("https://"); // todo: regex
+        if (!address.startsWith("http://"))
+            address.prepend("http://");
+
+        url = QUrl(address);
+
+        if (!url.isValid())
+            return;
+
+        if (url.port() == -1)
+            url.setPort(18081);
     };
 
-    QString address;
-    QString full;
     int height;
     int target_height;
     bool online = false;
-    QString username;
-    QString password;
     bool cached = false;
     bool custom = false;
-    bool tor = false;
     bool isConnecting = false;
     bool isActive = false;
-    bool isHttps = false;
+    QUrl url;
 
-    QString generateFull() {
-        QString auth;
-        if(!this->username.isEmpty() && !this->password.isEmpty())
-            auth = QString("%1:%2@").arg(this->username).arg(this->password);
-        return QString("%1%2").arg(auth).arg(this->address);
+    bool isValid() const {
+        return url.isValid();
     }
 
-    QString as_url() const {
-        return QString("%1://%2").arg(this->isHttps ? "https": "http",this->full);
+    bool isLocal() const {
+        return (url.host() == "127.0.0.1" || url.host() == "localhost");
+    }
+
+    bool isOnion() const {
+        return url.host().endsWith(".onion");
+    }
+
+    QString toAddress() const {
+        return QString("%1:%2").arg(url.host(), QString::number(url.port()));
+    }
+
+    QString toFullAddress() const {
+        if (!url.userName().isEmpty() && !url.password().isEmpty())
+            return QString("%1:%2@%3:%4").arg(url.userName(), url.password(), url.host(), QString::number(url.port()));
+
+        return toAddress();
+    }
+
+    QString toURL() const {
+        QUrl withScheme(url);
+        withScheme.setScheme("http");
+
+        return withScheme.toString(QUrl::RemoveUserInfo | QUrl::RemovePath);
     }
 
     bool operator == (const FeatherNode &other) const {
-        return this->full == other.full;
+        return this->url == other.url;
     }
 };
 
@@ -82,7 +90,7 @@ class Nodes : public QObject {
     Q_OBJECT
 
 public:
-    explicit Nodes(AppContext *ctx, QNetworkAccessManager *networkAccessManager, QObject *parent = nullptr);
+    explicit Nodes(AppContext *ctx, QObject *parent = nullptr);
     void loadConfig();
     void writeConfig();
 
@@ -98,20 +106,23 @@ public:
 public slots:
     void connectToNode();
     void connectToNode(const FeatherNode &node);
-    void onWSNodesReceived(const QList<QSharedPointer<FeatherNode>>& nodes);
+    void onWSNodesReceived(QList<FeatherNode>& nodes);
     void onNodeSourceChanged(NodeSource nodeSource);
     void setCustomNodes(const QList<FeatherNode>& nodes);
     void autoConnect(bool forceReconnect = false);
+
+    void onTorSettingsChanged();
 
 signals:
     void WSNodeExhausted();
     void nodeExhausted();
     void updateStatus(const QString &msg);
 
+private slots:
+    void onWalletRefreshed();
+
 private:
     AppContext *m_ctx = nullptr;
-    NodeSource m_source = NodeSource::websocket;
-    QNetworkAccessManager *m_networkAccessManager = nullptr;
     QJsonObject m_configJson;
 
     QStringList m_recentFailures;
@@ -127,6 +138,9 @@ private:
     bool m_enableAutoconnect = true;
 
     FeatherNode pickEligibleNode();
+
+    bool useOnionNodes();
+    bool useTorProxy(const FeatherNode &node);
 
     void updateModels();
     void resetLocalState();

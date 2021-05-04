@@ -10,12 +10,15 @@ KeysDialog::KeysDialog(AppContext *ctx, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->label_restoreHeight->setText(QString::number(ctx->currentWallet->getWalletCreationHeight()));
-    ui->label_primaryAddress->setText(ctx->currentWallet->address(0, 0));
-    ui->label_secretSpendKey->setText(ctx->currentWallet->getSecretSpendKey());
-    ui->label_secretViewKey->setText(ctx->currentWallet->getSecretViewKey());
-    ui->label_publicSpendKey->setText(ctx->currentWallet->getPublicSpendKey());
-    ui->label_publicViewKey->setText(ctx->currentWallet->getPublicViewKey());
+    auto w = ctx->currentWallet;
+    QString unavailable = "Unavailable: Key is stored on hardware device";
+
+    ui->label_restoreHeight->setText(QString::number(w->getWalletCreationHeight()));
+    ui->label_primaryAddress->setText(w->address(0, 0));
+    ui->label_secretSpendKey->setText(w->isHwBacked() ? unavailable : w->getSecretSpendKey());
+    ui->label_secretViewKey->setText(w->getSecretViewKey());
+    ui->label_publicSpendKey->setText(w->getPublicSpendKey());
+    ui->label_publicViewKey->setText(w->getPublicViewKey());
 
     this->adjustSize();
 }

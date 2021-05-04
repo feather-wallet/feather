@@ -4,7 +4,6 @@
 #include "libwalletqt/WalletManager.h"
 #include "Wallet.h"
 
-//#include "qt/updater.h"
 #include "utils/ScopeGuard.h"
 
 class WalletPassphraseListenerImpl : public  Monero::WalletListener, public PassphraseReceiver
@@ -31,17 +30,23 @@ public:
 //        return m_phelper.onDevicePassphraseRequest(on_device);
 //    }
 //
-//    virtual void onDeviceButtonRequest(uint64_t code) override
-//    {
-//        qDebug() << __FUNCTION__;
-//        emit m_mgr->deviceButtonRequest(code);
-//    }
+    virtual void onDeviceButtonRequest(uint64_t code) override
+    {
+        qDebug() << __FUNCTION__;
+        emit m_mgr->deviceButtonRequest(code);
+    }
 //
 //    virtual void onDeviceButtonPressed() override
 //    {
 //        qDebug() << __FUNCTION__;
 //        emit m_mgr->deviceButtonPressed();
 //    }
+
+    virtual void onDeviceError(const std::string &message) override
+    {
+        qDebug() << __FUNCTION__;
+        emit m_mgr->deviceError(QString::fromStdString(message));
+    }
 
 private:
     WalletManager * m_mgr;
@@ -125,17 +130,17 @@ Wallet *WalletManager::recoveryWallet(const QString &path, const QString &passwo
     return m_currentWallet;
 }
 
-Wallet *WalletManager::createWalletFromKeys(const QString &path, const QString &language, NetworkType::Type nettype,
-                                            const QString &address, const QString &viewkey, const QString &spendkey,
-                                            quint64 restoreHeight, quint64 kdfRounds)
+Wallet *WalletManager::createWalletFromKeys(const QString &path, const QString &password, const QString &language,
+                                            NetworkType::Type nettype, const QString &address, const QString &viewkey,
+                                            const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds)
 {
     QMutexLocker locker(&m_mutex);
     if (m_currentWallet) {
         qDebug() << "Closing open m_currentWallet" << m_currentWallet;
         delete m_currentWallet;
-        m_currentWallet = NULL;
+        m_currentWallet = nullptr;
     }
-    Monero::Wallet * w = m_pimpl->createWalletFromKeys(path.toStdString(), "", language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
+    Monero::Wallet * w = m_pimpl->createWalletFromKeys(path.toStdString(), password.toStdString(), language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
                                                        address.toStdString(), viewkey.toStdString(), spendkey.toStdString(), kdfRounds);
     m_currentWallet = new Wallet(w);
     return m_currentWallet;
@@ -148,9 +153,9 @@ Wallet *WalletManager::createDeterministicWalletFromSpendKey(const QString &path
     if (m_currentWallet) {
         qDebug() << "Closing open m_currentWallet" << m_currentWallet;
         delete m_currentWallet;
-        m_currentWallet = NULL;
+        m_currentWallet = nullptr;
     }
-    Monero::Wallet * w = m_pimpl->createDeterministicWalletFromSpendKey(path.toStdString(), "", language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
+    Monero::Wallet * w = m_pimpl->createDeterministicWalletFromSpendKey(path.toStdString(), password.toStdString(), language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
                                                                         spendkey.toStdString(), kdfRounds, offset_passphrase.toStdString());
     m_currentWallet = new Wallet(w);
     return m_currentWallet;
@@ -172,7 +177,7 @@ Wallet *WalletManager::createWalletFromDevice(const QString &path, const QString
     if (m_currentWallet) {
         qDebug() << "Closing open m_currentWallet" << m_currentWallet;
         delete m_currentWallet;
-        m_currentWallet = NULL;
+        m_currentWallet = nullptr;
     }
     Monero::Wallet * w = m_pimpl->createWalletFromDevice(path.toStdString(), password.toStdString(), static_cast<Monero::NetworkType>(nettype),
                                                          deviceName.toStdString(), restoreHeight, subaddressLookahead.toStdString(), 1, &tmpListener);
@@ -201,10 +206,12 @@ void WalletManager::createWalletFromDeviceAsync(const QString &path, const QStri
 QString WalletManager::closeWallet()
 {
     QMutexLocker locker(&m_mutex);
+    qDebug() << Q_FUNC_INFO ;
     QString result;
     if (m_currentWallet) {
         result = m_currentWallet->address(0, 0);
         delete m_currentWallet;
+        m_currentWallet = nullptr;
     } else {
         qCritical() << "Trying to close non existing wallet " << m_currentWallet;
         result = "0";
@@ -428,15 +435,6 @@ QUrl WalletManager::localPathToUrl(const QString &path) const
     return QUrl::fromLocalFile(path);
 }
 
-QString WalletManager::checkUpdates(const QString &software, const QString &subdir) const
-{
-  qDebug() << "Checking for updates";
-  const std::tuple<bool, std::string, std::string, std::string, std::string> result = Monero::WalletManager::checkUpdates(software.toStdString(), subdir.toStdString());
-  if (!std::get<0>(result))
-    return QString("");
-  return QString::fromStdString(std::get<1>(result) + "|" + std::get<2>(result) + "|" + std::get<3>(result) + "|" + std::get<4>(result));
-}
-
 bool WalletManager::clearWalletCache(const QString &wallet_path) const
 {
 
@@ -459,6 +457,7 @@ WalletManager::WalletManager(QObject *parent)
     : QObject(parent)
     , m_passphraseReceiver(nullptr)
     , m_scheduler(this)
+    , m_currentWallet(nullptr)
 {
     m_pimpl =  Monero::WalletManagerFactory::getWalletManager();
 }

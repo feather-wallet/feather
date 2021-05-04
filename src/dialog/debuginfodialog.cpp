@@ -4,6 +4,9 @@
 #include "debuginfodialog.h"
 #include "ui_debuginfodialog.h"
 #include "config-feather.h"
+#include "utils/WebsocketClient.h"
+#include "utils/TorManager.h"
+#include "utils/WebsocketNotifier.h"
 
 DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
         : QDialog(parent)
@@ -26,16 +29,16 @@ void DebugInfoDialog::updateInfo() {
 
     // Special case for Tails because we know the status of the daemon by polling tails-tor-has-bootstrapped.target
     if(m_ctx->isTails) {
-        if(m_ctx->tor->torConnected)
+        if(torManager()->torConnected)
             torStatus = "Connected";
         else
             torStatus = "Disconnected";
     }
-    else if(m_ctx->isTorSocks)
+    else if(Utils::isTorsocks())
         torStatus = "Torsocks";
-    else if(m_ctx->tor->localTor)
+    else if(torManager()->isLocalTor())
         torStatus = "Local (assumed to be running)";
-    else if(m_ctx->tor->torConnected)
+    else if(torManager()->torConnected)
         torStatus = "Running";
     else
         torStatus = "Unknown";
@@ -50,13 +53,37 @@ void DebugInfoDialog::updateInfo() {
     ui->label_synchronized->setText(m_ctx->currentWallet->isSynchronized() ? "True" : "False");
 
     auto node = m_ctx->nodes->connection();
-    ui->label_remoteNode->setText(node.full);
+    ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_ctx->currentWallet->connectionStatus()));
     ui->label_torStatus->setText(torStatus);
-    ui->label_websocketStatus->setText(Utils::QtEnumToString(m_ctx->ws->webSocket.state()).remove("State"));
+    ui->label_websocketStatus->setText(Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State"));
+
+    QString seedType = [this](){
+        if (m_ctx->currentWallet->isHwBacked())
+            return "Hardware";
+        if (m_ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty())
+            return "25 word";
+        else
+            return "14 word";
+    }();
+
+    QString deviceType = [this](){
+        if (m_ctx->currentWallet->isHwBacked()) {
+            if (m_ctx->currentWallet->isLedger())
+                return "Ledger";
+            else if (m_ctx->currentWallet->isTrezor())
+                return "Trezor";
+            else
+                return "Unknown";
+        }
+        else {
+            return "Software";
+        }
+    }();
 
     ui->label_netType->setText(Utils::QtEnumToString(m_ctx->currentWallet->nettype()));
-    ui->label_seedType->setText(m_ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty() ? "25 word" : "14 word");
+    ui->label_seedType->setText(seedType);
+    ui->label_deviceType->setText(deviceType);
     ui->label_viewOnly->setText(m_ctx->currentWallet->viewOnly() ? "True" : "False");
     ui->label_primaryOnly->setText(m_ctx->currentWallet->balance(0) == m_ctx->currentWallet->balanceAll() ? "True" : "False");
 
@@ -107,6 +134,7 @@ void DebugInfoDialog::copyToClipboad() {
 
     text += QString("Network type: %1  \n").arg(ui->label_netType->text());
     text += QString("Seed type: %1  \n").arg(ui->label_seedType->text());
+    text += QString("Device type: %1  \n").arg(ui->label_deviceType->text());
     text += QString("View only: %1  \n").arg(ui->label_viewOnly->text());
     text += QString("Primary only: %1 \n").arg(ui->label_primaryOnly->text());
 

@@ -44,6 +44,8 @@ int PageMenu::nextId() const {
         return WalletWizard::Page_WalletRestoreSeed;
     if (ui->radioViewOnly->isChecked())
         return WalletWizard::Page_WalletRestoreKeys;
+    if (ui->radioCreateFromDevice->isChecked())
+        return WalletWizard::Page_HardwareDevice;
     return 0;
 }
 
@@ -63,6 +65,10 @@ bool PageMenu::validatePage() {
     if (ui->radioViewOnly->isChecked()) {
         m_fields->mode = WizardMode::RestoreFromKeys;
         m_fields->modeText = "Restore wallet";
+    }
+    if (ui->radioCreateFromDevice->isChecked()) {
+        m_fields->mode = WizardMode::CreateWalletFromDevice;
+        m_fields->modeText = "Create from hardware device";
     }
 
     return true;

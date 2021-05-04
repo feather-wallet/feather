@@ -17,9 +17,23 @@
 #include "utils/ColorScheme.h"
 #include "globals.h"
 
-// Application log for current session
-QVector<logMessage> applicationLog = QVector<logMessage>(); // todo: replace with ring buffer
-QMutex logMutex;
+QByteArray Utils::fileGetContents(const QString &path)
+{
+    QFile file(path);
+    if (!file.open(QFile::ReadOnly))
+    {
+        throw std::runtime_error(QString("failed to open %1").arg(path).toStdString());
+    }
+
+    QByteArray data;
+    data.resize(file.size());
+    if (file.read(data.data(), data.size()) != data.size())
+    {
+        throw std::runtime_error(QString("failed to read %1").arg(path).toStdString());
+    }
+
+    return data;
+}
 
 bool Utils::fileExists(const QString &path) {
     QFileInfo check_file(path);
@@ -109,12 +123,6 @@ void Utils::applicationLogHandler(QtMsgType type, const QMessageLogContext &cont
     }
 
     auto message = logMessage(type, line, fn);
-
-    {
-        QMutexLocker locker(&logMutex);
-        applicationLog.append(message);
-    }
-
 
     //emit applicationLogUpdated(message);
 }

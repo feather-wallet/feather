@@ -6,10 +6,11 @@
 #include "mainwindow.h"
 #include "ui_sendwidget.h"
 #include "globals.h"
+#include "utils/AppData.h"
 
-SendWidget::SendWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::SendWidget)
+SendWidget::SendWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::SendWidget)
 {
     ui->setupUi(this);
     m_ctx = MainWindow::getContext();
@@ -19,6 +20,12 @@ SendWidget::SendWidget(QWidget *parent) :
     rx.setPattern(amount_rx);
     QValidator *validator =  new QRegExpValidator(rx, this);
     ui->lineAmount->setValidator(validator);
+
+    connect(m_ctx, &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);
+    connect(m_ctx, &AppContext::endTransaction, this, &SendWidget::onEndTransaction);
+    connect(m_ctx, &AppContext::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
+    connect(m_ctx, &AppContext::openAliasResolveError, this, &SendWidget::onOpenAliasResolveError);
+    connect(m_ctx, &AppContext::walletClosed, this, &SendWidget::onWalletClosed);
 
     connect(ui->btnSend, &QPushButton::clicked, this, &SendWidget::sendClicked);
     connect(ui->btnClear, &QPushButton::clicked, this, &SendWidget::clearClicked);
@@ -140,7 +147,7 @@ void SendWidget::sendClicked() {
             amounts.push_back(output.amount);
         }
 
-        emit createTransactionMultiDest(addresses, amounts, description);
+        m_ctx->onCreateTransactionMultiDest(addresses, amounts, description);
         return;
     }
 
@@ -152,20 +159,20 @@ void SendWidget::sendClicked() {
             QMessageBox::warning(this, "Amount error", "Invalid amount specified.");
             return;
         }
-        emit createTransaction(recipient, amount, description, sendAll);
+        m_ctx->onCreateTransaction(recipient, amount, description, sendAll);
     } else {
         amount = WalletManager::amountFromDouble(this->conversionAmount());
         if (amount == 0) {
             QMessageBox::warning(this, "Fiat conversion error", "Could not create transaction.");
             return;
         }
-        emit createTransaction(recipient, amount, description, false);
+        m_ctx->onCreateTransaction(recipient, amount, description, false);
     }
 }
 
 void SendWidget::aliasClicked() {
     auto address = ui->lineAddress->text();
-    emit resolveOpenAlias(address);
+    m_ctx->onOpenAliasResolve(address);
 }
 
 void SendWidget::clearClicked() {
@@ -195,7 +202,7 @@ void SendWidget::updateConversionLabel() {
 
         } else {
             auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
-            double conversionAmount = AppContext::prices->convert("XMR", preferredFiatCurrency, this->amountDouble());
+            double conversionAmount = appData()->prices.convert("XMR", preferredFiatCurrency, this->amountDouble());
             return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
         }
     }();
@@ -206,7 +213,7 @@ void SendWidget::updateConversionLabel() {
 
 double SendWidget::conversionAmount() {
     QString currency = ui->comboCurrencySelection->currentText();
-    return AppContext::prices->convert(currency, "XMR", this->amountDouble());
+    return appData()->prices.convert(currency, "XMR", this->amountDouble());
 }
 
 quint64 SendWidget::amount() {
