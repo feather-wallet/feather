@@ -28,8 +28,8 @@ public:
     bool isComplete() const override;
 
 private:
-    AppContext *m_ctx;
     Ui::PageHardwareDevice *ui;
+    AppContext *m_ctx;
     WizardFields *m_fields;
 };
 

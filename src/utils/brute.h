@@ -40,8 +40,8 @@ private:
     std::string m_word;
     strategy m_currentStrategy;
 
-    int iword = 0;
-    int ichar = 0;
+    size_t iword = 0;
+    size_t ichar = 0;
 };
 
 #endif //FEATHER_BRUTE_H

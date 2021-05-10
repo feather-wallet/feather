@@ -5,16 +5,14 @@
 
 #include "nodes.h"
 #include "utils/utils.h"
-#include "utils/WebsocketClient.h"
 #include "appcontext.h"
-
 
 Nodes::Nodes(AppContext *ctx, QObject *parent)
     : QObject(parent)
-    , m_ctx(ctx)
-    , m_connection(FeatherNode())
     , modelWebsocket(new NodeModel(NodeSource::websocket, this))
     , modelCustom(new NodeModel(NodeSource::custom, this))
+    , m_ctx(ctx)
+    , m_connection(FeatherNode())
 {
     this->loadConfig();
     connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);

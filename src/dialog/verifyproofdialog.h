@@ -31,11 +31,11 @@ private:
     void checkFormattedProof();
     void proofStatus(bool success, const QString &message);
 
-    QPixmap m_success;
-    QPixmap m_failure;
-
     Ui::VerifyProofDialog *ui;
     Wallet *m_wallet;
+
+    QPixmap m_success;
+    QPixmap m_failure;
 };
 
 #endif //FEATHER_VERIFYPROOFDIALOG_H

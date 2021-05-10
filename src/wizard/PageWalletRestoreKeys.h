@@ -27,9 +27,9 @@ public:
     int nextId() const override;
 
 private:
+    Ui::PageWalletRestoreKeys *ui;
     AppContext *m_ctx;
     WizardFields *m_fields;
-    Ui::PageWalletRestoreKeys *ui;
 };
 
 #endif

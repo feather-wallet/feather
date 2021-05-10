@@ -9,8 +9,8 @@
 
 WalletCacheDebugDialog::WalletCacheDebugDialog(AppContext *ctx, QWidget *parent)
         : QDialog(parent)
-        , m_ctx(ctx)
         , ui(new Ui::WalletCacheDebugDialog)
+        , m_ctx(ctx)
 {
     ui->setupUi(this);
 

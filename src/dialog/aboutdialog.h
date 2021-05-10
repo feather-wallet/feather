@@ -21,8 +21,8 @@ public:
     ~AboutDialog() override;
 
 private:
-    QStringListModel *m_model;
     Ui::AboutDialog *ui;
+    QStringListModel *m_model;
 };
 
 #endif // ABOUT_H

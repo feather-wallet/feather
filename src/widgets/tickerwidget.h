@@ -29,10 +29,10 @@ public slots:
 
 private:
     Ui::TickerWidget *ui;
+    AppContext *m_ctx;
     QString m_symbol;
     bool m_convertBalance;
     bool m_hidePercent;
-    AppContext *m_ctx;
 };
 
 #endif // TICKERWIDGET_H

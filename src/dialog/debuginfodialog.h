@@ -25,10 +25,10 @@ private:
     void copyToClipboad();
     void updateInfo();
 
-    QTimer m_updateTimer;
+    Ui::DebugInfoDialog *ui;
     AppContext *m_ctx;
 
-    Ui::DebugInfoDialog *ui;
+    QTimer m_updateTimer;
 };
 
 #endif //FEATHER_DEBUGINFODIALOG_H

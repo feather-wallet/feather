@@ -50,11 +50,11 @@ signals:
 private:
     void showContextMenu(const QPoint &pos);
 
-    AppContext *m_ctx;
     Ui::XMRigWidget *ui;
+    AppContext *m_ctx;
+    XmRig * m_XMRig;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
-    XmRig * m_XMRig;
 
     int m_threads;
     QStringList m_urls;

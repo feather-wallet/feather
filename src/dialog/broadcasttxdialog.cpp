@@ -9,8 +9,8 @@
 
 BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QString &transactionHex)
         : QDialog(parent)
-        , m_ctx(ctx)
         , ui(new Ui::BroadcastTxDialog)
+        , m_ctx(ctx)
 {
     ui->setupUi(this);
 

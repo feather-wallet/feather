@@ -181,8 +181,6 @@ private:
     void startupWarning();
     bool autoOpenWallet();
 
-    AppContext *m_ctx;
-
     static MainWindow * pMainWindow;
     void closeEvent(QCloseEvent *event) override;
     void cleanupBeforeClose();
@@ -210,6 +208,8 @@ private:
     WalletWizard *createWizard(WalletWizard::Page startPage);
 
     Ui::MainWindow *ui;
+    AppContext *m_ctx;
+
     Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
     RestoreDialog *m_restoreDialog = nullptr;

@@ -45,8 +45,8 @@ private slots:
 private:
     QString getBuySellUrl(bool buy, const QString &currencyCode, const QString &countryCode="", const QString &paymentMethod="", const QString &amount = "", int page = 0);
 
-    QString m_baseUrl;
     UtilsNetworking *m_network;
+    QString m_baseUrl;
 };
 
 

@@ -11,8 +11,8 @@
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)
-        , m_wallet(wallet)
         , ui(new Ui::VerifyProofDialog)
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 

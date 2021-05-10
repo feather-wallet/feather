@@ -28,9 +28,9 @@ signals:
     void enableDarkMode(bool enable);
 
 private:
+    Ui::PageMenu *ui;
     AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
-    Ui::PageMenu *ui;
     WizardFields *m_fields;
 };
 

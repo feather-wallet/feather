@@ -50,8 +50,8 @@ private:
 
     void onSeedTypeToggled();
 
-    AppContext *m_ctx;
     Ui::PageWalletRestoreSeed *ui;
+    AppContext *m_ctx;
     WizardFields *m_fields;
 
     seedType m_tevador;

@@ -9,9 +9,9 @@
 
 TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
         : QDialog(parent)
+        , ui(new Ui::TxImportDialog)
         , m_ctx(ctx)
         , m_loadTimer(new QTimer(this))
-        , ui(new Ui::TxImportDialog)
 {
     ui->setupUi(this);
     ui->resp->hide();

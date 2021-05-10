@@ -35,9 +35,9 @@ private:
 
     Ui::TransactionInfoDialog *ui;
 
-    TxProofDialog *m_txProofDialog;
-    TransactionInfo *m_txInfo;
     Wallet *m_wallet;
+    TransactionInfo *m_txInfo;
+    TxProofDialog *m_txProofDialog;
     QString m_txKey;
     QString m_txid;
     QTimer m_updateTimer;

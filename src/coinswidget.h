@@ -56,9 +56,9 @@ private:
     Ui::CoinsWidget *ui;
 
     QMenu *m_contextMenu;
+    QMenu *m_headerMenu;
     QMenu *m_copyMenu;
     QAction *m_showSpentAction;
-    QMenu *m_headerMenu;
     QAction *m_freezeOutputAction;
     QAction *m_freezeAllSelectedAction;
     QAction *m_thawOutputAction;

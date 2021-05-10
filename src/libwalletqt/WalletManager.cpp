@@ -455,9 +455,9 @@ bool WalletManager::clearWalletCache(const QString &wallet_path) const
 
 WalletManager::WalletManager(QObject *parent)
     : QObject(parent)
+    , m_currentWallet(nullptr)
     , m_passphraseReceiver(nullptr)
     , m_scheduler(this)
-    , m_currentWallet(nullptr)
 {
     m_pimpl =  Monero::WalletManagerFactory::getWalletManager();
 }

@@ -142,7 +142,7 @@ void Utils::desktopNotify(const QString &title, const QString &message, int dura
     QString stderr = process.readAllStandardError();
 #elif defined(Q_OS_MACOS)
     QProcess process;
-    // @TODO: need to escape special chars with \
+    // @TODO: need to escape special chars with "\"
     process.start("osascript", macos);
     process.waitForFinished(-1);
     QString stdout = process.readAllStandardOutput();

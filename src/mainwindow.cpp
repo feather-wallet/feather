@@ -636,8 +636,6 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
     bool hide = config()->get(Config::hideBalance).toBool();
 
-    int amountPrecision = config()->get(Config::amountPrecision).toInt();
-
     QString balance_str = WalletManager::displayAmount(spendable);
     balance_str.remove(QRegExp("0+$"));
 

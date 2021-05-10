@@ -33,9 +33,9 @@ private:
     void showScanWarning(const QDateTime &date);
     void showWalletAgeWarning(const QDateTime &date);
 
+    Ui::PageSetRestoreHeight *ui;
     AppContext *m_ctx;
     WizardFields *m_fields;
-    Ui::PageSetRestoreHeight *ui;
 };
 
 #endif //FEATHER_PAGESETRESTOREHEIGHT_H

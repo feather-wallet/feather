@@ -145,7 +145,6 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
         return;
     }
 
-    auto balance = this->currentWallet->balance();
     auto unlocked_balance = this->currentWallet->unlockedBalance();
     if(!all && amount > unlocked_balance) {
         emit createTransactionError("Not enough money to spend");
@@ -549,7 +548,7 @@ void AppContext::donateBeg() {
     config()->set(Config::donateBeg, donationCounter);
 }
 
-AppContext::~AppContext() {}
+AppContext::~AppContext() = default;
 
 // ############################################## LIBWALLET QT #########################################################
 

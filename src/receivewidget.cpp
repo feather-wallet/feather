@@ -146,6 +146,7 @@ void ReceiveWidget::setSearchFilter(const QString &filter) {
 
 void ReceiveWidget::showHeaderMenu(const QPoint& position)
 {
+    Q_UNUSED(position);
     m_showFullAddressesAction->setChecked(m_model->isShowFullAddresses());
     m_headerMenu->exec(QCursor::pos());
 }

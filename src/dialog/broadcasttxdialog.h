@@ -26,8 +26,8 @@ private slots:
 
 private:
     Ui::BroadcastTxDialog *ui;
-    UtilsNetworking *m_network;
     AppContext *m_ctx;
+    UtilsNetworking *m_network;
     DaemonRpc *m_rpc;
 };
 

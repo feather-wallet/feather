@@ -26,8 +26,8 @@ public:
     bool isComplete() const override;
 
 private:
-    AppContext *m_ctx;
     Ui::PageNetwork *ui;
+    AppContext *m_ctx;
 };
 
 #endif //FEATHER_WIZARDNETWORK_H

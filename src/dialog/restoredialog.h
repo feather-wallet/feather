@@ -32,8 +32,8 @@ signals:
     void rejected();
 
 private:
-    AppContext *m_ctx;
     Ui::RestoreDialog *ui;
+    AppContext *m_ctx;
 };
 
 #endif // RESTOREDIALOG_H

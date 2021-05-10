@@ -34,8 +34,8 @@ private:
     bool walletPathExists(const QString &walletName);
     bool validateWidgets();
 
-    AppContext *m_ctx;
     Ui::PageWalletFile *ui;
+    AppContext *m_ctx;
     WizardFields *m_fields;
     bool m_validated;
 };

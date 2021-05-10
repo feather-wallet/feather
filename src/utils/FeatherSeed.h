@@ -16,6 +16,8 @@ enum SeedType {
 struct FeatherSeed {
     // TODO: this is spaghetti, needs refactor
 
+    NetworkType::Type netType;
+
     QString coin;
     QString language;
     SeedType seedType;
@@ -23,8 +25,6 @@ struct FeatherSeed {
     QStringList mnemonic;
     QString spendKey;
     QString correction;
-
-    NetworkType::Type netType;
 
     time_t time;
     int restoreHeight = 0;

@@ -29,9 +29,10 @@ signals:
     void createWallet();
 
 private:
+    Ui::PageSetPassword *ui;
+
     AppContext *m_ctx;
     WizardFields *m_fields;
-    Ui::PageSetPassword *ui;
 };
 
 

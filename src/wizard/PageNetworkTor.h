@@ -26,8 +26,8 @@ signals:
     void initialNetworkConfigured();
 
 private:
-    AppContext *m_ctx;
     Ui::PageNetworkTor *ui;
+    AppContext *m_ctx;
 };
 
 #endif //FEATHER_PAGENETWORKTOR_H

@@ -94,7 +94,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
 
     const QStringList args = parser.positionalArguments();
-    bool localTor = parser.isSet(useLocalTorOption);
     bool stagenet = parser.isSet(stagenetOption);
     bool testnet = parser.isSet(testnetOption);
     bool quiet = parser.isSet(quietModeOption);
@@ -167,6 +166,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     qInstallMessageHandler(Utils::applicationLogHandler);
     qRegisterMetaType<QVector<QString>>();
 
-    auto *mainWindow = new MainWindow(ctx);
+    new MainWindow(ctx);
     return QApplication::exec();
 }

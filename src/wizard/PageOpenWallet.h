@@ -31,10 +31,10 @@ signals:
 private:
     void updatePath();
 
+    Ui::PageOpenWallet *ui;
     AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
-    Ui::PageOpenWallet *ui;
     QStandardItemModel *m_model;
 };
 
