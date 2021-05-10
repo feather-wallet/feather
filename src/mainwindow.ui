@@ -188,29 +188,11 @@
          <number>11</number>
         </property>
         <item>
-         <widget class="SendWidget" name="sendWidget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <layout class="QVBoxLayout" name="sendWidgetLayout">
+          <property name="spacing">
+           <number>0</number>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>100</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-         </widget>
+         </layout>
         </item>
         <item>
          <widget class="Line" name="line_3">
@@ -226,7 +208,14 @@
          </widget>
         </item>
         <item>
-         <widget class="ContactsWidget" name="contactWidget" native="true"/>
+         <widget class="ContactsWidget" name="contactWidget" native="true">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
@@ -254,7 +243,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="CoinsWidget" name="coinsWidget" native="true"/>
+         <layout class="QVBoxLayout" name="coinsWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -736,12 +725,6 @@
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
   <customwidget>
-   <class>SendWidget</class>
-   <extends>QWidget</extends>
-   <header>sendwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>ContactsWidget</class>
    <extends>QWidget</extends>
    <header>contactswidget.h</header>
@@ -751,12 +734,6 @@
    <class>ReceiveWidget</class>
    <extends>QWidget</extends>
    <header>receivewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CoinsWidget</class>
-   <extends>QWidget</extends>
-   <header>coinswidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>

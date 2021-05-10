@@ -36,6 +36,9 @@
 #include "widgets/tickerwidget.h"
 #include "wizard/WalletWizard.h"
 
+#include "sendwidget.h"
+#include "coinswidget.h"
+
 #ifdef HAS_LOCALMONERO
 #include "widgets/LocalMoneroWidget.h"
 #endif
@@ -68,8 +71,6 @@ Q_OBJECT
 
 public:
     explicit MainWindow(AppContext *ctx, QWidget *parent = nullptr);
-    static MainWindow *getInstance();
-    static AppContext *getContext();
     ~MainWindow() override;
 
     enum Tabs {
@@ -181,7 +182,6 @@ private:
     void startupWarning();
     bool autoOpenWallet();
 
-    static MainWindow * pMainWindow;
     void closeEvent(QCloseEvent *event) override;
     void cleanupBeforeClose();
     QString loadStylesheet(const QString &resource);
@@ -216,6 +216,8 @@ private:
     XMRigWidget *m_xmrig = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 
+    SendWidget *m_sendWidget = nullptr;
+    CoinsWidget *m_coinsWidget = nullptr;
 #ifdef HAS_LOCALMONERO
     LocalMoneroWidget *m_localMoneroWidget = nullptr;
 #endif

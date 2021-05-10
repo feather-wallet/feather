@@ -7,12 +7,12 @@
 
 #include <QFileDialog>
 
-Settings::Settings(QWidget *parent) :
-        QDialog(parent),
-        ui(new Ui::Settings)
+Settings::Settings(AppContext *ctx, QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::Settings)
+    , m_ctx(ctx)
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
 

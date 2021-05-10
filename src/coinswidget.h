@@ -22,7 +22,7 @@ class CoinsWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit CoinsWidget(QWidget *parent = nullptr);
+    explicit CoinsWidget(AppContext *ctx, QWidget *parent = nullptr);
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
 
@@ -54,6 +54,7 @@ private:
     };
 
     Ui::CoinsWidget *ui;
+    AppContext *m_ctx;
 
     QMenu *m_contextMenu;
     QMenu *m_headerMenu;
@@ -68,7 +69,6 @@ private:
     Coins *m_coins;
     CoinsModel * m_model;
     CoinsProxyModel * m_proxyModel;
-    AppContext *m_ctx;
 
     void showContextMenu(const QPoint & point);
     void copy(copyField field);

@@ -423,7 +423,7 @@ public:
 
     // Passphrase entry for hardware wallets
     void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
-    virtual void onWalletPassphraseNeeded(bool on_device) override;
+    void onWalletPassphraseNeeded(bool on_device) override;
 
     quint64 getBytesReceived() const;
     quint64 getBytesSent() const;
@@ -466,7 +466,7 @@ signals:
 
 private:
     Wallet(QObject * parent = nullptr);
-    Wallet(Monero::Wallet *w, QObject * parent = 0);
+    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
     ~Wallet();
 
     //! initializes wallet

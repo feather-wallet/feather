@@ -32,17 +32,14 @@
 #include "utils/WebsocketNotifier.h"
 #include "utils/Updater.h"
 
-MainWindow * MainWindow::pMainWindow = nullptr;
-
 MainWindow::MainWindow(AppContext *ctx, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_ctx(ctx)
 {
-    pMainWindow = this;
     ui->setupUi(this);
 
-    m_windowSettings = new Settings(this);
+    m_windowSettings = new Settings(m_ctx, this);
     m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
 
@@ -71,7 +68,7 @@ MainWindow::MainWindow(AppContext *ctx, QWidget *parent)
         connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, tickerWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceWidget, &TickerWidget::init);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx, &AppContext::onPreferredFiatCurrencyChanged);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, ui->sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
+    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
     connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx, &AppContext::onAmountPrecisionChanged);
     connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
 
@@ -192,13 +189,20 @@ void MainWindow::initWidgets() {
     connect(ui->historyWidget, &HistoryWidget::viewOnBlockExplorer, this, &MainWindow::onViewOnBlockExplorer);
     connect(ui->historyWidget, &HistoryWidget::resendTransaction, this, &MainWindow::onResendTransaction);
 
+    // [Send]
+    m_sendWidget = new SendWidget(m_ctx, this);
+    ui->sendWidgetLayout->addWidget(m_sendWidget);
+
     // [Receive]
     connect(ui->receiveWidget, &ReceiveWidget::showTransactions, [this](const QString &text) {
         ui->historyWidget->setSearchText(text);
         ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
     });
-    connect(ui->contactWidget, &ContactsWidget::fillAddress, ui->sendWidget, &SendWidget::fillAddress);
+    connect(ui->contactWidget, &ContactsWidget::fillAddress, m_sendWidget, &SendWidget::fillAddress);
 
+    // [Coins]
+    m_coinsWidget = new CoinsWidget(m_ctx, this);
+    ui->coinsWidgetLayout->addWidget(m_coinsWidget);
 
 #ifdef HAS_LOCALMONERO
     m_localMoneroWidget = new LocalMoneroWidget(this, m_ctx);
@@ -618,11 +622,11 @@ void MainWindow::onWalletOpened() {
     ui->historyWidget->setModel(m_ctx->currentWallet->historyModel(), m_ctx->currentWallet);
 
     // contacts widget
-    ui->contactWidget->setModel(m_ctx->currentWallet->addressBookModel());
+    ui->contactWidget->setModel(m_ctx->currentWallet->addressBookModel(), m_ctx->currentWallet);
 
     // coins page
     m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
-    ui->coinsWidget->setModel(m_ctx->currentWallet->coinsModel(), m_ctx->currentWallet->coins());
+    m_coinsWidget->setModel(m_ctx->currentWallet->coinsModel(), m_ctx->currentWallet->coins());
 
     this->touchbarShowWallet();
     this->updatePasswordIcon();
@@ -784,7 +788,7 @@ void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, con
     if (status) { // success
         QString body = QString("Successfully sent %1 transaction(s).").arg(txid.count());
         QMessageBox::information(this, "Transactions sent", body);
-        ui->sendWidget->clearFields();
+        m_sendWidget->clearFields();
     } else {
         auto err = tx->errorString();
         QString body = QString("Error committing transaction: %1").arg(err);
@@ -994,7 +998,7 @@ void MainWindow::donateButtonClicked() {
     if (donation <= 0)
         donation = 0.1337;
 
-    ui->sendWidget->fill(globals::donationAddress, "Donation to the Feather development team", donation);
+    m_sendWidget->fill(globals::donationAddress, "Donation to the Feather development team", donation);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
@@ -1014,7 +1018,7 @@ void MainWindow::showCalcWindow() {
 
 void MainWindow::payToMany() {
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
-    ui->sendWidget->payToMany();
+    m_sendWidget->payToMany();
     QMessageBox::information(this, "Pay to many", "Enter a list of outputs in the 'Pay to' field.\n"
                                                   "One output per line.\n"
                                                   "Format: address, amount\n"
@@ -1022,7 +1026,7 @@ void MainWindow::payToMany() {
 }
 
 void MainWindow::showSendScreen(const CCSEntry &entry) {
-    ui->sendWidget->fill(entry);
+    m_sendWidget->fill(entry);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
@@ -1062,14 +1066,6 @@ void MainWindow::importContacts() {
     }
 
     QMessageBox::information(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
-}
-
-MainWindow *MainWindow::getInstance() {
-    return pMainWindow;
-}
-
-AppContext *MainWindow::getContext(){
-    return pMainWindow->m_ctx;
 }
 
 QString MainWindow::loadStylesheet(const QString &resource) {
@@ -1481,7 +1477,7 @@ void MainWindow::onWalletAboutToClose() {
     ui->historyWidget->resetModel();
     ui->contactWidget->resetModel();
     ui->receiveWidget->resetModel();
-    ui->coinsWidget->resetModel();
+    m_coinsWidget->resetModel();
 }
 
 void MainWindow::onExportHistoryCSV(bool checked) {

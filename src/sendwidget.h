@@ -17,7 +17,7 @@ class SendWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit SendWidget(QWidget *parent = nullptr);
+    explicit SendWidget(AppContext *ctx, QWidget *parent = nullptr);
     void fill(const CCSEntry &entry);
     void fill(const QString &address, const QString& description, double amount = 0);
     void fill(double amount);

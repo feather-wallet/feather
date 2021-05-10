@@ -11,14 +11,14 @@
 #include <QClipboard>
 #include <QMessageBox>
 
-CoinsWidget::CoinsWidget(QWidget *parent)
+CoinsWidget::CoinsWidget(AppContext *ctx, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::CoinsWidget)
+        , m_ctx(ctx)
         , m_headerMenu(new QMenu(this))
         , m_copyMenu(new QMenu("Copy",this))
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     // header context menu
     ui->coins->header()->setContextMenuPolicy(Qt::CustomContextMenu);

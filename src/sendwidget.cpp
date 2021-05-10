@@ -8,12 +8,12 @@
 #include "globals.h"
 #include "utils/AppData.h"
 
-SendWidget::SendWidget(QWidget *parent)
+SendWidget::SendWidget(AppContext *ctx, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SendWidget)
+    , m_ctx(ctx)
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     QString amount_rx = R"(^\d{0,8}[\.,]\d{0,12}|(all)$)";
     QRegExp rx;
