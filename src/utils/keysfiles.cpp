@@ -1,17 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2014-2021, The Monero Project.
 
-#include <QFile>
-#include <QFileInfo>
-#include <QDir>
-#include <QDebug>
-#include <QUrl>
-#include <QtConcurrent/QtConcurrent>
-
-#include "appcontext.h"
+#include "keysfiles.h"
 
 using namespace std::chrono;
-
 
 WalletKeysFiles::WalletKeysFiles(const QFileInfo &info, int networkType, QString address) :
         m_fileName(info.fileName()),
@@ -47,9 +39,8 @@ int WalletKeysFiles::networkType() const {
     return m_networkType;
 }
 
-WalletKeysFilesModel::WalletKeysFilesModel(AppContext *ctx, QObject *parent)
+WalletKeysFilesModel::WalletKeysFilesModel(QObject *parent)
         : QAbstractTableModel(parent)
-        , m_ctx(ctx)
 {
     this->updateDirectories();
     this->m_walletKeysFilesItemModel = qobject_cast<QAbstractItemModel *>(this);
@@ -67,20 +58,15 @@ void WalletKeysFilesModel::refresh() {
     endResetModel();
 }
 
-void WalletKeysFilesModel::updateDirectories() {
+void WalletKeysFilesModel::updateDirectories() { // TODO
     this->walletDirectories.clear();
     QDir defaultWalletDir = QDir(Utils::defaultWalletDir());
     QString walletDir = defaultWalletDir.path();
     defaultWalletDir.cdUp();
     QString walletDirRoot = defaultWalletDir.path();
+
     this->walletDirectories << walletDir;
     this->walletDirectories << walletDirRoot;
-    auto walletPath = config()->get(Config::walletPath).toString();
-    if(!walletPath.isEmpty() && Utils::fileExists(walletPath)) {
-        QDir d = QFileInfo(walletPath).absoluteDir();
-        this->walletDirectories << d.absolutePath();
-    }
-
     this->walletDirectories << QDir::homePath();
     this->walletDirectories.removeDuplicates();
 }

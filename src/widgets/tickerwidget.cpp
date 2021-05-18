@@ -4,16 +4,16 @@
 #include "tickerwidget.h"
 #include "ui_tickerwidget.h"
 
-#include "globals.h"
+#include "constants.h"
 #include "utils/AppData.h"
 
-TickerWidget::TickerWidget(QWidget *parent, AppContext *ctx, QString symbol, QString title, bool convertBalance, bool hidePercent) :
-    QWidget(parent),
-    ui(new Ui::TickerWidget),
-    m_ctx(ctx),
-    m_symbol(std::move(symbol)),
-    m_convertBalance(convertBalance),
-    m_hidePercent(hidePercent)
+TickerWidget::TickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol, QString title, bool convertBalance, bool hidePercent)
+    : QWidget(parent)
+    , ui(new Ui::TickerWidget)
+    , m_ctx(std::move(ctx))
+    , m_symbol(std::move(symbol))
+    , m_convertBalance(convertBalance)
+    , m_hidePercent(hidePercent)
 {
     ui->setupUi(this);
 
@@ -31,8 +31,9 @@ TickerWidget::TickerWidget(QWidget *parent, AppContext *ctx, QString symbol, QSt
 
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &TickerWidget::init);
     connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &TickerWidget::init);
+
     if (convertBalance)
-        connect(m_ctx, &AppContext::balanceUpdated, this, &TickerWidget::init);
+        connect(m_ctx.get(), &AppContext::balanceUpdated, this, &TickerWidget::init);
 }
 
 void TickerWidget::init() {
@@ -46,7 +47,7 @@ void TickerWidget::init() {
         return;
     }
 
-    double walletBalance = m_ctx->currentWallet ? (m_ctx->currentWallet->balance() / globals::cdiv) : 0;
+    double walletBalance = m_ctx->wallet ? (m_ctx->wallet->balance() / constants::cdiv) : 0;
 
     double amount = m_convertBalance ? walletBalance : 1.0;
     double conversion = appData()->prices.convert(m_symbol, fiatCurrency, amount);

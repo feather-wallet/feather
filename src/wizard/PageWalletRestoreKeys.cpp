@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "WalletWizard.h"
 #include "PageWalletRestoreKeys.h"
 #include "ui_PageWalletRestoreKeys.h"
 
 #include <QPlainTextEdit>
 
-PageWalletRestoreKeys::PageWalletRestoreKeys(AppContext *ctx, WizardFields *fields, QWidget *parent)
+#include "WalletWizard.h"
+#include "constants.h"
+
+PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageWalletRestoreKeys)
-    , m_ctx(ctx)
     , m_fields(fields)
 {
     ui->setupUi(this);
@@ -25,9 +26,9 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(AppContext *ctx, WizardFields *fiel
     QGuiApplication::restoreOverrideCursor();
 #endif
 
-    if (m_ctx->networkType == NetworkType::Type::MAINNET) {
+    if (constants::networkType == NetworkType::Type::MAINNET) {
         ui->line_address->setPlaceholderText("4...");
-    } else if (m_ctx->networkType == NetworkType::Type::STAGENET) {
+    } else if (constants::networkType == NetworkType::Type::STAGENET) {
         ui->line_address->setPlaceholderText("5...");
     }
 }
@@ -53,21 +54,21 @@ bool PageWalletRestoreKeys::validatePage() {
     QString viewkey = ui->line_viewkey->text().trimmed();
     QString spendkey = ui->line_spendkey->text().trimmed();
 
-    if(!m_ctx->walletManager->addressValid(address, m_ctx->networkType)){
+    if(!WalletManager::addressValid(address, constants::networkType)){
         ui->label_errorString->show();
         ui->label_errorString->setText("Invalid address.");
         ui->line_address->setStyleSheet(errStyle);
         return false;
     }
 
-    if(!m_ctx->walletManager->keyValid(viewkey, address, true, m_ctx->networkType)) {
+    if(!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
         ui->label_errorString->show();
         ui->label_errorString->setText("Invalid key.");
         ui->line_viewkey->setStyleSheet(errStyle);
         return false;
     }
 
-    if(!spendkey.isEmpty() && !m_ctx->walletManager->keyValid(spendkey, address, false, m_ctx->networkType)) {
+    if(!spendkey.isEmpty() && !WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
         ui->label_errorString->show();
         ui->label_errorString->setText("Invalid key.");
         ui->line_viewkey->setStyleSheet(errStyle);

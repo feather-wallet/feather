@@ -76,6 +76,9 @@ class Wallet : public QObject, public PassprasePrompter
 Q_OBJECT
 
 public:
+    Wallet(QObject * parent = nullptr);
+    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
+    ~Wallet();
 
     enum Status {
         Status_Ok          = Monero::Wallet::Status_Ok,
@@ -138,8 +141,11 @@ public:
     //! returns the subaddress index of the address
     SubaddressIndex subaddressIndex(const QString &address) const;
 
-    //! returns wallet file's path
-    QString path() const;
+    //! returns wallet cache file path
+    QString cachePath() const;
+
+    //! returns wallet keys file path
+    QString keysPath() const;
 
     //! saves wallet to the file by given path
     //! empty path stores in current location
@@ -465,10 +471,6 @@ signals:
     void refreshingChanged() const;
 
 private:
-    Wallet(QObject * parent = nullptr);
-    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
-    ~Wallet();
-
     //! initializes wallet
     bool init(
             const QString &daemonAddress,

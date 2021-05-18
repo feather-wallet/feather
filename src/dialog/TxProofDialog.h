@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "libwalletqt/Wallet.h"
 #include "libwalletqt/TransactionInfo.h"
+#include "appcontext.h"
 
 namespace Ui {
     class TxProofDialog;
@@ -18,7 +18,7 @@ class TxProofDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *txid);
+    explicit TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txid);
     ~TxProofDialog() override;
     void setTxId(const QString &txid);
 
@@ -50,7 +50,7 @@ private:
     TransactionInfo::Direction m_direction;
 
     Ui::TxProofDialog *ui;
-    Wallet *m_wallet;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 #endif //FEATHER_TXPROOFDIALOG_H

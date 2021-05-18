@@ -19,7 +19,7 @@ class PageSetPassword : public QWizardPage
 Q_OBJECT
 
 public:
-    explicit PageSetPassword(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageSetPassword(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -31,7 +31,6 @@ signals:
 private:
     Ui::PageSetPassword *ui;
 
-    AppContext *m_ctx;
     WizardFields *m_fields;
 };
 

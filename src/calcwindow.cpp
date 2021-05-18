@@ -8,9 +8,9 @@
 
 #include "ui_calcwindow.h"
 
-CalcWindow::CalcWindow(QWidget *parent) :
-        QMainWindow(parent),
-        ui(new Ui::CalcWindow)
+CalcWindow::CalcWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::CalcWindow)
 {
     Qt::WindowFlags flags = this->windowFlags();
     this->setWindowFlags(flags|Qt::WindowStaysOnTopHint); // on top

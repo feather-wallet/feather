@@ -5,16 +5,16 @@
 #include "ui_txconfdialog.h"
 #include "model/ModelUtils.h"
 #include "txconfadvdialog.h"
-#include "globals.h"
+#include "constants.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 
 #include <QMessageBox>
 
-TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
+TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TxConfDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
         , m_tx(tx)
         , m_address(address)
         , m_description(description)
@@ -37,9 +37,9 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     int maxLength = Utils::maxLength(amounts);
     std::for_each(amounts.begin(), amounts.end(), [maxLength](QString& amount){amount = amount.rightJustified(maxLength, ' ');});
 
-    QString amount_fiat = convert(tx->amount() / globals::cdiv);
-    QString fee_fiat = convert(tx->fee() / globals::cdiv);
-    QString total_fiat = convert((tx->amount() + tx->fee()) / globals::cdiv);
+    QString amount_fiat = convert(tx->amount() / constants::cdiv);
+    QString fee_fiat = convert(tx->fee() / constants::cdiv);
+    QString total_fiat = convert((tx->amount() + tx->fee()) / constants::cdiv);
     QVector<QString> amounts_fiat = {amount_fiat, fee_fiat, total_fiat};
     int maxLengthFiat = Utils::maxLength(amounts_fiat);
     std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
@@ -52,7 +52,7 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
     ui->label_total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 
-    auto subaddressIndex = m_ctx->currentWallet->subaddressIndex(address);
+    auto subaddressIndex = m_ctx->wallet->subaddressIndex(address);
     QString addressExtra;
 
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));
@@ -76,7 +76,7 @@ TxConfDialog::TxConfDialog(AppContext *ctx, PendingTransaction *tx, const QStrin
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
-    AppContext::txCache[tx->txid()[0]] = tx->signedTxToHex(0);
+    m_ctx->txCache[tx->txid()[0]] = tx->signedTxToHex(0);
     this->adjustSize();
 }
 

@@ -5,10 +5,9 @@
 #include "ui_PageNetworkTor.h"
 #include "WalletWizard.h"
 
-PageNetworkTor::PageNetworkTor(AppContext *ctx, QWidget *parent)
+PageNetworkTor::PageNetworkTor(QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageNetworkTor)
-    , m_ctx(ctx)
 {
     ui->setupUi(this);
 

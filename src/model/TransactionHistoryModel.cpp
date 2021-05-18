@@ -4,7 +4,7 @@
 #include "TransactionHistoryModel.h"
 #include "TransactionHistory.h"
 #include "TransactionInfo.h"
-#include "globals.h"
+#include "constants.h"
 #include "utils/config.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
@@ -147,7 +147,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (role == Qt::UserRole) {
                 return tInfo.balanceDelta();
             }
-            QString amount = QString::number(tInfo.balanceDelta() / globals::cdiv, 'f', this->amountPrecision);
+            QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', this->amountPrecision);
             amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
@@ -160,7 +160,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (usd_price == 0.0)
                 return QVariant("?");
 
-            double usd_amount = usd_price * (tInfo.balanceDelta() / globals::cdiv);
+            double usd_amount = usd_price * (tInfo.balanceDelta() / constants::cdiv);
             if(this->preferredFiatSymbol != "USD")
                 usd_amount = appData()->prices.convert("USD", this->preferredFiatSymbol, usd_amount);
             if (role == Qt::UserRole) {

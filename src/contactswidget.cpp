@@ -11,11 +11,22 @@
 
 #include <QMessageBox>
 
-ContactsWidget::ContactsWidget(QWidget *parent)
+ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::ContactsWidget)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
+
+    m_model = m_ctx->wallet->addressBookModel();
+    m_proxyModel = new AddressBookProxyModel;
+    m_proxyModel->setSourceModel(m_model);
+    ui->contacts->setModel(m_proxyModel);
+
+    ui->contacts->setSortingEnabled(true);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::Stretch);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::ResizeToContents);
+    ui->contacts->header()->setMinimumSectionSize(200);
 
     // header context menu
     ui->contacts->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -68,20 +79,6 @@ void ContactsWidget::payTo() {
     emit fillAddress(address);
 }
 
-void ContactsWidget::setModel(AddressBookModel *model, Wallet *wallet)
-{
-    m_model = model;
-    m_wallet = wallet;
-    m_proxyModel = new AddressBookProxyModel;
-    m_proxyModel->setSourceModel(m_model);
-    ui->contacts->setModel(m_proxyModel);
-
-    ui->contacts->setSortingEnabled(true);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::Stretch);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::ResizeToContents);
-    ui->contacts->header()->setMinimumSectionSize(200);
-}
-
 void ContactsWidget::setShowFullAddresses(bool show) {
     m_model->setShowFullAddresses(show);
 }
@@ -104,11 +101,6 @@ void ContactsWidget::showHeaderMenu(const QPoint& position)
 
 void ContactsWidget::newContact(QString address, QString name)
 {
-    if (!m_wallet) {
-        QMessageBox::warning(this, "Error", "No wallet opened.");
-        return;
-    }
-
     ContactsDialog dialog{this, address, name};
     int ret = dialog.exec();
     if (ret != QDialog::Accepted) {
@@ -118,17 +110,17 @@ void ContactsWidget::newContact(QString address, QString name)
     address = dialog.getAddress();
     name = dialog.getName();
 
-    bool addressValid = WalletManager::addressValid(address, m_wallet->nettype());
+    bool addressValid = WalletManager::addressValid(address, m_ctx->wallet->nettype());
     if (!addressValid) {
         QMessageBox::warning(this, "Invalid address", "Invalid address");
         return;
     }
 
-    int num_addresses = m_wallet->addressBook()->count();
+    int num_addresses = m_ctx->wallet->addressBook()->count();
     QString address_entry;
     QString name_entry;
     for (int i=0; i<num_addresses; i++) {
-        m_wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
+        m_ctx->wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
             address_entry = entry.address();
             name_entry = entry.description();
         });
@@ -145,7 +137,7 @@ void ContactsWidget::newContact(QString address, QString name)
         }
     }
 
-    m_wallet->addressBook()->addRow(address, "", name);
+    m_ctx->wallet->addressBook()->addRow(address, "", name);
 }
 
 void ContactsWidget::deleteContact()

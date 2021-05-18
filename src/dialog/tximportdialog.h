@@ -17,7 +17,7 @@ class TxImportDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxImportDialog(QWidget *parent, AppContext *ctx);
+    explicit TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx);
     ~TxImportDialog() override;
 
 private slots:
@@ -27,7 +27,7 @@ private slots:
 
 private:
     Ui::TxImportDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 
     UtilsNetworking *m_network;
     DaemonRpc *m_rpc;

@@ -21,13 +21,12 @@ class XMRigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit XMRigWidget(AppContext *ctx, QWidget *parent = nullptr);
+    explicit XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~XMRigWidget() override;
     QStandardItemModel *model();
 
 public slots:
     void onWalletClosed();
-    void onWalletOpened();
     void onStartClicked();
     void onStopClicked();
     void onClearClicked();
@@ -51,7 +50,7 @@ private:
     void showContextMenu(const QPoint &pos);
 
     Ui::XMRigWidget *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
     XmRig * m_XMRig;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;

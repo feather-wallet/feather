@@ -5,11 +5,11 @@
 #include "PageSetRestoreHeight.h"
 #include "ui_PageSetRestoreHeight.h"
 #include "WalletWizard.h"
+#include "constants.h"
 
-PageSetRestoreHeight::PageSetRestoreHeight(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageSetRestoreHeight::PageSetRestoreHeight(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageSetRestoreHeight)
-        , m_ctx(ctx)
         , m_fields(fields)
 {
     ui->setupUi(this);
@@ -61,7 +61,7 @@ void PageSetRestoreHeight::onCreationDateEdited() {
     QDateTime restoreDate = date > curDate ? curDate : date;
     int timestamp = restoreDate.toSecsSinceEpoch();
 
-    QString restoreHeight = QString::number(appData()->restoreHeights[m_ctx->networkType]->dateToRestoreHeight(timestamp));
+    QString restoreHeight = QString::number(appData()->restoreHeights[constants::networkType]->dateToRestoreHeight(timestamp));
     ui->line_restoreHeight->setText(restoreHeight);
 
     this->showScanWarning(restoreDate);
@@ -77,7 +77,7 @@ void PageSetRestoreHeight::onRestoreHeightEdited() {
         return;
     }
 
-    int timestamp = appData()->restoreHeights[m_ctx->networkType]->restoreHeightToDate(restoreHeight);
+    int timestamp = appData()->restoreHeights[constants::networkType]->restoreHeightToDate(restoreHeight);
     auto date = QDateTime::fromSecsSinceEpoch(timestamp);
     ui->line_creationDate->setText(date.toString("yyyy-MM-dd"));
 

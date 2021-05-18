@@ -25,7 +25,7 @@ public:
     ~NodeWidget();
     void setWSModel(NodeModel *model);
     void setCustomModel(NodeModel *model);
-    void setupUI(AppContext *ctx);
+    void setupUI(QSharedPointer<AppContext> ctx);
     NodeModel* model();
 
 public slots:
@@ -44,7 +44,7 @@ signals:
     void nodeSourceChanged(NodeSource nodeSource);
 
 private:
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
     Ui::NodeWidget *ui;
     NodeModel* m_customModel;
     NodeModel* m_wsModel;

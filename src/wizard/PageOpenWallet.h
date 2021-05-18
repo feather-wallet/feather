@@ -20,7 +20,7 @@ class PageOpenWallet : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageOpenWallet(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    explicit PageOpenWallet(WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -32,7 +32,6 @@ private:
     void updatePath();
 
     Ui::PageOpenWallet *ui;
-    AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
     QStandardItemModel *m_model;

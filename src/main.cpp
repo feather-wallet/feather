@@ -7,8 +7,10 @@
 #include <QtGui>
 
 #include "config-feather.h"
+#include "constants.h"
 #include "mainwindow.h"
 #include "cli.h"
+#include "WindowManager.h"
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -87,8 +89,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QCommandLineOption bruteforceDictionairy(QStringList() << "bruteforce-dict", "Bruteforce dictionairy", "file");
     parser.addOption(bruteforceDictionairy);
 
-    auto parsed = parser.parse(argv_);
-    if(!parsed) {
+    bool parsed = parser.parse(argv_);
+    if (!parsed) {
         qCritical() << parser.errorText();
         exit(1);
     }
@@ -102,33 +104,15 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     bool bruteforcePassword = parser.isSet(bruteforcePasswordOption);
     bool cliMode = exportContacts || exportTxHistory || bruteforcePassword;
 
-    if(cliMode) {
-        QCoreApplication cli_app(argc, argv);
-        QCoreApplication::setApplicationName("FeatherWallet");
+    // Setup networkType
+    if (stagenet)
+        constants::networkType = NetworkType::STAGENET;
+    else if (testnet)
+        constants::networkType = NetworkType::TESTNET;
+    else
+        constants::networkType = NetworkType::MAINNET;
 
-        auto *ctx = new AppContext(&parser);
-
-        auto *cli = new CLI(ctx, &cli_app);
-        QObject::connect(cli, &CLI::closeApplication, &cli_app, &QCoreApplication::quit);
-
-        if(exportContacts) {
-            if(!quiet)
-                qInfo() << "CLI mode: Address book export";
-            cli->mode = CLIMode::ExportContacts;
-            QTimer::singleShot(0, cli, &CLI::run);
-        } else if(exportTxHistory) {
-            if(!quiet)
-                qInfo() << "CLI mode: Transaction history export";
-            cli->mode = CLIMode::ExportTxHistory;
-            QTimer::singleShot(0, cli, &CLI::run);
-        } else if(bruteforcePassword) {
-            cli->mode = CLIMode::BruteforcePassword;
-            QTimer::singleShot(0, cli, &CLI::run);
-        }
-
-        return QCoreApplication::exec();
-    }
-
+    // Setup QApplication
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication::setAttribute(Qt::AA_DisableWindowContextHelpButton);
     QApplication::setDesktopSettingsAware(true); // use system font
@@ -136,11 +120,70 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     QApplication app(argc, argv);
 
+    QApplication::setQuitOnLastWindowClosed(false);
     QApplication::setApplicationName("FeatherWallet");
+
+    // Setup config directories
+    QString configDir = Config::defaultConfigDir().path();
+    QString config_dir_tor = QString("%1/%2").arg(configDir).arg("tor");
+    QString config_dir_tordata = QString("%1/%2").arg(configDir).arg("tor/data");
+    QStringList createDirs({configDir, config_dir_tor, config_dir_tordata});
+    for (const auto &d: createDirs) {
+        if (!Utils::dirExists(d)) {
+            qDebug() << QString("Creating directory: %1").arg(d);
+            if (!QDir().mkpath(d)) {
+                qCritical() << "Could not create directory " << d;
+            }
+        }
+    }
+
+    // Setup logging
+    QString logPath = QString("%1/daemon.log").arg(configDir);
+    Monero::Utils::onStartup();
+    Monero::Wallet::init("", "feather", logPath.toStdString(), true);
+
+    bool logLevelFromEnv;
+    int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
+
+    if (parser.isSet("quiet"))
+        WalletManager::instance()->setLogLevel(-1);
+    else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max)
+        Monero::WalletManagerFactory::setLogLevel(logLevel);
+
+    // Setup wallet directory
+    QString walletDir = config()->get(Config::walletDirectory).toString();
+    if (walletDir.isEmpty()) {
+        walletDir = Utils::defaultWalletDir();
+        config()->set(Config::walletDirectory, walletDir);
+    }
+    if (!QDir().mkpath(walletDir))
+        qCritical() << "Unable to create dir: " << walletDir;
+
+    // Setup Tor config
+    if (parser.isSet("tor-host"))
+        config()->set(Config::socks5Host, parser.value("tor-host"));
+    if (parser.isSet("tor-port"))
+        config()->set(Config::socks5Port, parser.value("tor-port"));
+    if (parser.isSet("use-local-tor"))
+        config()->set(Config::useLocalTor, true);
+
+    if (cliMode) {
+        CLI::Mode mode = [&]{
+            if (exportContacts)
+                return CLI::Mode::ExportContacts;
+            if (exportTxHistory)
+                return CLI::Mode::ExportTxHistory;
+            if (bruteforcePassword)
+                return CLI::Mode::BruteforcePassword;
+        }();
+
+        CLI cli{mode, &parser, &app};
+        return QCoreApplication::exec();
+    }
 
     parser.process(app); // Parse again for --help and --version
 
-    if(!quiet) {
+    if (!quiet) {
         QMap<QString, QString> info;
         info["Qt"] = QT_VERSION_STR;
         info["Feather"] = FEATHER_VERSION;
@@ -153,8 +196,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
             qWarning().nospace().noquote() << QString("%1: %2").arg(k).arg(info[k]);
     }
 
-    auto *ctx = new AppContext(&parser);
-
 #if defined(Q_OS_MAC)
     // For some odd reason, if we don't do this, QPushButton's
     // need to be clicked *twice* in order to fire ?!
@@ -166,6 +207,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     qInstallMessageHandler(Utils::applicationLogHandler);
     qRegisterMetaType<QVector<QString>>();
 
-    new MainWindow(ctx);
+    WindowManager windowManager;
+
     return QApplication::exec();
 }

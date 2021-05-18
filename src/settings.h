@@ -20,7 +20,7 @@ class Settings : public QDialog
 Q_OBJECT
 
 public:
-    explicit Settings(AppContext *ctx, QWidget *parent = nullptr);
+    explicit Settings(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~Settings() override;
 
 signals:
@@ -50,7 +50,7 @@ private:
     void setupLocalMoneroFrontendCombobox();
 
     Ui::Settings *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};
     QStringList m_dateFormats{"yyyy-MM-dd", "MM-dd-yyyy", "dd-MM-yyyy"};

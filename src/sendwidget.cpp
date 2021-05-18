@@ -5,13 +5,13 @@
 #include "sendwidget.h"
 #include "mainwindow.h"
 #include "ui_sendwidget.h"
-#include "globals.h"
+#include "constants.h"
 #include "utils/AppData.h"
 
-SendWidget::SendWidget(AppContext *ctx, QWidget *parent)
+SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SendWidget)
-    , m_ctx(ctx)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -21,11 +21,10 @@ SendWidget::SendWidget(AppContext *ctx, QWidget *parent)
     QValidator *validator =  new QRegExpValidator(rx, this);
     ui->lineAmount->setValidator(validator);
 
-    connect(m_ctx, &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);
-    connect(m_ctx, &AppContext::endTransaction, this, &SendWidget::onEndTransaction);
-    connect(m_ctx, &AppContext::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
-    connect(m_ctx, &AppContext::openAliasResolveError, this, &SendWidget::onOpenAliasResolveError);
-    connect(m_ctx, &AppContext::walletClosed, this, &SendWidget::onWalletClosed);
+    connect(m_ctx.get(), &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);
+    connect(m_ctx.get(), &AppContext::endTransaction, this, &SendWidget::onEndTransaction);
+    connect(m_ctx.get(), &AppContext::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
+    connect(m_ctx.get(), &AppContext::openAliasResolveError, this, &SendWidget::onOpenAliasResolveError);
 
     connect(ui->btnSend, &QPushButton::clicked, this, &SendWidget::sendClicked);
     connect(ui->btnClear, &QPushButton::clicked, this, &SendWidget::clearClicked);
@@ -48,7 +47,7 @@ SendWidget::SendWidget(AppContext *ctx, QWidget *parent)
                                   "You will be able to review the transaction fee before the transaction is broadcast.\n\n"
                                   "To send all your balance, click the Max button to the right.");
 
-    ui->lineAddress->setNetType(m_ctx->networkType);
+    ui->lineAddress->setNetType(constants::networkType);
     this->setupComboBox();
 }
 
@@ -107,7 +106,7 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::sendClicked() {
-    if (!m_ctx->currentWallet->isConnected()) {
+    if (!m_ctx->wallet->isConnected()) {
         QMessageBox::warning(this, "Error", "Unable to create transaction:\n\n"
                                             "Wallet is not connected to a node.\n"
                                             "Go to File -> Settings -> Node to manually connect to a node.");
@@ -229,7 +228,7 @@ quint64 SendWidget::amount() {
 
 double SendWidget::amountDouble() {
     quint64 amount = this->amount();
-    return amount / globals::cdiv;
+    return amount / constants::cdiv;
 }
 
 void SendWidget::onOpenAliasResolved(const QString &address, const QString &openAlias) {
@@ -250,11 +249,6 @@ void SendWidget::clearFields() {
 
 void SendWidget::payToMany() {
     ui->lineAddress->payToMany();
-}
-
-void SendWidget::onWalletClosed() {
-    this->clearFields();
-    ui->btnSend->setEnabled(true);
 }
 
 void SendWidget::onInitiateTransaction() {

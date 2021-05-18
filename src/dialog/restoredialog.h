@@ -22,7 +22,7 @@ class RestoreDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit RestoreDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit RestoreDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     void initRestoreHeights(RestoreHeightLookup *lookup);
     int getHeight();
     ~RestoreDialog() override;
@@ -33,7 +33,7 @@ signals:
 
 private:
     Ui::RestoreDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 #endif // RESTOREDIALOG_H

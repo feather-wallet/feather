@@ -17,49 +17,62 @@ struct ConfigDirective
 
 static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         // General
-        {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
-        {Config::checkForUpdates,{QS("checkForUpdates"), true}},
+        {Config::firstRun, {QS("firstRun"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
         {Config::warnOnAlpha,{QS("warnOnAlpha"), true}},
+
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
-        {Config::skin,{QS("skin"), "light"}},
-        {Config::preferredFiatCurrency,{QS("preferredFiatCurrency"), "USD"}},
-        {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
+        {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
+
+        {Config::geometry, {QS("geometry"), {}}},
+        {Config::windowState, {QS("windowState"), {}}},
+        {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
+
+        // Wallets
         {Config::walletDirectory,{QS("walletDirectory"), ""}},
         {Config::autoOpenWalletPath,{QS("autoOpenWalletPath"), ""}},
-        {Config::walletPath,{QS("walletPath"), ""}},
-        {Config::xmrigPath,{QS("xmrigPath"), ""}},
-        {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+        {Config::recentlyOpenedWallets, {QS("recentlyOpenedWallets"), {}}},
+
+        // Nodes
         {Config::nodes,{QS("nodes"), "{}"}},
-        {Config::websocketEnabled,{QS("websocketEnabled"), true}},
         {Config::nodeSource,{QS("nodeSource"), 0}},
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
+
+        // Tabs
         {Config::showTabHome,{QS("showTabHome"), true}},
         {Config::showTabCoins,{QS("showTabCoins"), false}},
         {Config::showTabExchange, {QS("showTabExchange"), false}},
         {Config::showTabXMRig,{QS("showTabXMRig"), false}},
         {Config::showTabCalc,{QS("showTabCalc"), true}},
-        {Config::geometry, {QS("geometry"), {}}},
-        {Config::windowState, {QS("windowState"), {}}},
-        {Config::firstRun, {QS("firstRun"), true}},
-        {Config::hideBalance, {QS("hideBalance"), false}},
-        {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
-        {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
-        {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
+
+        // Mining
+        {Config::xmrigPath,{QS("xmrigPath"), ""}},
+        {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+
+        // Settings
+        {Config::preferredFiatCurrency,{QS("preferredFiatCurrency"), "USD"}},
+        {Config::skin,{QS("skin"), "light"}},
         {Config::amountPrecision, {QS("amountPrecision"), 12}},
         {Config::dateFormat, {QS("dateFormat"), "yyyy-MM-dd"}},
         {Config::timeFormat, {QS("timeFormat"), "HH:mm"}},
+
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
+        {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
+        {Config::hideBalance, {QS("hideBalance"), false}},
+
+        {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
+        {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
+        {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}},
+
+        // Tor
         {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
         {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},
         {Config::socks5Port, {QS("socks5Port"), "9050"}},
-        {Config::socks5User, {QS("socks5User"), ""}},
-        {Config::socks5Pass, {QS("socks5Pass"), ""}},
-        {Config::useLocalTor, {QS("useLocalTor"), false}},
-        {Config::networkType, {QS("networkType"), NetworkType::Type::MAINNET}},
-        {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}}
+        {Config::socks5User, {QS("socks5User"), ""}}, // Unused
+        {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
+        {Config::useLocalTor, {QS("useLocalTor"), false}}
 };
 
 

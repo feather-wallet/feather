@@ -20,8 +20,7 @@ class ContactsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ContactsWidget(QWidget *parent = nullptr);
-    void setModel(AddressBookModel *model, Wallet *wallet);
+    explicit ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ContactsWidget() override;
 
 public slots:
@@ -42,6 +41,7 @@ private slots:
 
 private:
     Ui::ContactsWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
 
     QAction *m_showFullAddressesAction;
     QMenu *m_rowMenu;
@@ -49,7 +49,6 @@ private:
     QMenu *m_headerMenu;
     AddressBookModel * m_model;
     AddressBookProxyModel * m_proxyModel;
-    Wallet *m_wallet;
 };
 
 #endif // CONTACTSWIDGET_H

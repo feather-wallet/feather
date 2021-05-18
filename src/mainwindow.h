@@ -36,8 +36,13 @@
 #include "widgets/tickerwidget.h"
 #include "wizard/WalletWizard.h"
 
+#include "contactswidget.h"
+#include "historywidget.h"
 #include "sendwidget.h"
+#include "receivewidget.h"
 #include "coinswidget.h"
+
+#include "WindowManager.h"
 
 #ifdef HAS_LOCALMONERO
 #include "widgets/LocalMoneroWidget.h"
@@ -45,10 +50,6 @@
 
 #ifdef HAS_XMRIG
 #include "widgets/xmrigwidget.h"
-#endif
-
-#ifdef Q_OS_MAC
-#include "src/kdmactouchbar.h"
 #endif
 
 namespace Ui {
@@ -65,13 +66,18 @@ struct ToggleTab {
     Config::ConfigKey configKey;
 };
 
+class WindowManager;
 class MainWindow : public QMainWindow
 {
 Q_OBJECT
 
 public:
-    explicit MainWindow(AppContext *ctx, QWidget *parent = nullptr);
+    explicit MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent = nullptr);
     ~MainWindow() override;
+
+    QString walletName();
+    QString walletCachePath();
+    QString walletKeysPath();
 
     enum Tabs {
         HOME = 0,
@@ -89,44 +95,29 @@ public:
         REDDIT
     };
 
-public slots:
-    void showWizard(WalletWizard::Page startPage);
+    void showOrHide();
+    void bringToFront();
+
+signals:
+    void closed();
+
+private slots:
+    // TODO: use a consistent naming convention for slots
+    // Menu
+    void menuOpenClicked();
     void menuNewRestoreClicked();
     void menuQuitClicked();
     void menuSettingsClicked();
     void menuAboutClicked();
     void menuSignVerifyClicked();
     void menuVerifyTxProof();
-    void showWalletInfoDialog();
-    void showSeedDialog();
-    void showConnectionStatusDialog();
-    void showPasswordDialog();
-    void showKeysDialog();
-    void showViewOnlyDialog();
-    void donateButtonClicked();
-    void showCalcWindow();
-    void payToMany();
-    void showWalletCacheDebugDialog();
-    void showSendTab();
-    void showHistoryTab();
-    void showSendScreen(const CCSEntry &entry);
-    void skinChanged(const QString &skinName);
-    void menuTorClicked();
-    void onBlockchainSync(int height, int target);
-    void onRefreshSync(int height, int target);
-    void onWalletOpenedError(const QString &err);
-    void onWalletCreatedError(const QString &err);
     void menuWalletCloseClicked();
-    void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
-    void onDeviceButtonRequest(quint64 code);
-    void onViewOnBlockExplorer(const QString &txid);
-    void onResendTransaction(const QString &txid);
-    void importContacts();
-    void showRestoreHeightDialog();
-    void importTransaction();
-    void onDeviceError(const QString &error);
-    void menuHwDeviceClicked();
-    void onUpdatesAvailable(const QJsonObject &updates);
+    void menuTorClicked();
+    void menuToggleTabVisible(const QString &key);
+    void onExportHistoryCSV(bool checked);
+    void onExportContactsCSV(bool checked);
+    void onCreateDesktopEntry(bool checked);
+    void onReportBug(bool checked);
 
     // offline tx signing
     void exportKeyImages();
@@ -138,96 +129,98 @@ public slots:
     void loadSignedTx();
     void loadSignedTxFromText();
 
-    // libwalletqt
-    void onBalanceUpdated(quint64 balance, quint64 spendable);
-    void onSynchronized();
-    void onWalletOpened();
-    void onWalletClosed(WalletWizard::Page page = WalletWizard::Page_Menu);
-    void onConnectionStatusChanged(int status);
-    void onCreateTransactionError(const QString &message);
-    void onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
-    void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
-
-signals:
-    void closed();
-
-private slots:
-    void onInitialNetworkConfigured();
+    void onTorConnectionStateChanged(bool connected);
     void onCheckUpdatesComplete(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
     void onShowUpdateCheck(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
-    void onRestartApplication(const QString &binaryFilename);
     void onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version);
     void onShowDonationNag();
     void onInitiateTransaction();
     void onEndTransaction();
     void onCustomRestoreHeightSet(int height);
-    void onWalletAboutToClose();
 
-    // Menu
-    void onExportHistoryCSV(bool checked);
-    void onExportContactsCSV(bool checked);
-    void onCreateDesktopEntry(bool checked);
-    void onReportBug(bool checked);
+    // libwalletqt
+    void onBalanceUpdated(quint64 balance, quint64 spendable);
+    void onSynchronized();
+    void onWalletOpened();
+    void onConnectionStatusChanged(int status);
+    void onCreateTransactionError(const QString &message);
+    void onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
+    void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
+
+    // Dialogs
+    void showWalletInfoDialog();
+    void showSeedDialog();
+    void showConnectionStatusDialog();
+    void showPasswordDialog();
+    void showKeysDialog();
+    void showViewOnlyDialog();
+    void showWalletCacheDebugDialog();
+
+    void donateButtonClicked();
+    void showCalcWindow();
+    void payToMany();
+    void showSendTab();
+    void showHistoryTab();
+    void showSendScreen(const CCSEntry &entry);
+    void skinChanged(const QString &skinName);
+    void onBlockchainSync(int height, int target);
+    void onRefreshSync(int height, int target);
+    void onViewOnBlockExplorer(const QString &txid);
+    void onResendTransaction(const QString &txid);
+    void importContacts();
+    void showRestoreHeightDialog();
+    void importTransaction();
+    void onDeviceError(const QString &error);
+    void menuHwDeviceClicked();
+    void onUpdatesAvailable(const QJsonObject &updates);
 
 private:
-    void initSkins();
     void initStatusBar();
     void initWidgets();
     void initMenu();
-    void initTray();
     void initHome();
-    void initTouchBar();
     void initWalletContext();
-    void initWizard();
     void startupWarning();
-    bool autoOpenWallet();
 
     void closeEvent(QCloseEvent *event) override;
-    void cleanupBeforeClose();
-    QString loadStylesheet(const QString &resource);
+
     void saveGeo();
     void restoreGeo();
     void showDebugInfo();
     void showNodeExhaustedMessage();
     void showWSNodeExhaustedMessage();
     void createUnsignedTxDialog(UnsignedTransaction *tx);
-    void touchbarShowWizard();
-    void touchbarShowWallet();
     void updatePasswordIcon();
     void updateNetStats();
     void rescanSpent();
     void setStatusText(const QString &text, bool override = false, int timeout = 1000);
     void showBalanceDialog();
     QString statusDots();
-    void bringToFront();
     QString getPlatformTag();
     void displayWalletErrorMsg(const QString &err);
     QString getHardwareDevice();
     void setTitle(bool mining);
-
-    WalletWizard *createWizard(WalletWizard::Page startPage);
+    void donationNag();
+    void updateRecentlyOpened(const QString &filename);
 
     Ui::MainWindow *ui;
-    AppContext *m_ctx;
+    WindowManager *m_windowManager;
+    QSharedPointer<AppContext> m_ctx;
 
     Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
     RestoreDialog *m_restoreDialog = nullptr;
-    XMRigWidget *m_xmrig = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 
+    XMRigWidget *m_xmrig = nullptr;
+    ContactsWidget *m_contactsWidget = nullptr;
+    HistoryWidget *m_historyWidget = nullptr;
     SendWidget *m_sendWidget = nullptr;
+    ReceiveWidget *m_receiveWidget = nullptr;
     CoinsWidget *m_coinsWidget = nullptr;
 #ifdef HAS_LOCALMONERO
     LocalMoneroWidget *m_localMoneroWidget = nullptr;
 #endif
-
-    QSystemTrayIcon *m_trayIcon;
-    QMenu m_trayMenu;
-    QAction *m_trayActionCalc;
-    QAction *m_trayActionExit;
-    QAction *m_trayActionSend;
-    QAction *m_trayActionHistory;
 
     QList<TickerWidget*> m_tickerWidgets;
     TickerWidget *m_balanceWidget;
@@ -244,18 +237,8 @@ private:
     StatusBarButton *m_statusBtnTor;
     StatusBarButton *m_statusBtnHwDevice;
 
-#ifdef Q_OS_MAC
-    QAction *m_touchbarActionWelcome;
-    KDMacTouchBar *m_touchbar;
-    QList<QAction *> m_touchbarWalletItems;
-    QList<QAction *> m_touchbarWizardItems;
-#endif
-
     QSignalMapper *m_tabShowHideSignalMapper;
     QMap<QString, ToggleTab*> m_tabShowHideMapper;
-    WalletWizard *m_wizard = nullptr;
-
-    QMap<QString, QString> m_skins;
 
     QTimer m_updateBytes;
 
@@ -266,8 +249,7 @@ private:
     bool m_showDeviceError = false;
     QTimer m_txTimer;
 
-private slots:
-    void menuToggleTabVisible(const QString &key);
+    bool cleanedUp = false;
 };
 
 #endif // MAINWINDOW_H

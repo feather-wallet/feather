@@ -21,7 +21,7 @@ class PageHardwareDevice : public QWizardPage
 Q_OBJECT
 
 public:
-    explicit PageHardwareDevice(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageHardwareDevice(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -29,7 +29,6 @@ public:
 
 private:
     Ui::PageHardwareDevice *ui;
-    AppContext *m_ctx;
     WizardFields *m_fields;
 };
 

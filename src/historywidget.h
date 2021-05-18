@@ -8,6 +8,7 @@
 #include "model/TransactionHistoryProxyModel.h"
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/Wallet.h"
+#include "appcontext.h"
 
 #include <QWidget>
 #include <QMenu>
@@ -21,15 +22,13 @@ class HistoryWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit HistoryWidget(QWidget *parent = nullptr);
-    void setModel(TransactionHistoryProxyModel *model, Wallet *wallet);
+    explicit HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~HistoryWidget() override;
 
 public slots:
     void setSearchText(const QString &text);
     void resetModel();
     void onWalletRefreshed();
-    void onWalletOpened();
 
 signals:
     void viewOnBlockExplorer(QString txid);
@@ -55,11 +54,10 @@ private:
     void showSyncNoticeMsg();
 
     Ui::HistoryWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
     QMenu *m_contextMenu;
     QMenu *m_copyMenu;
-    TransactionHistory *m_txHistory;
     TransactionHistoryProxyModel *m_model;
-    Wallet *m_wallet = nullptr;
 };
 
 #endif //FEATHER_HISTORYWIDGET_H

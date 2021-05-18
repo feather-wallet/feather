@@ -7,10 +7,10 @@
 
 #include <QMessageBox>
 
-BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QString &transactionHex)
+BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex)
         : QDialog(parent)
         , ui(new Ui::BroadcastTxDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

@@ -3,6 +3,9 @@
 
 #include "Wallet.h"
 
+#include <chrono>
+#include <thread>
+
 #include "TransactionHistory.h"
 #include "AddressBook.h"
 #include "Subaddress.h"
@@ -174,9 +177,14 @@ SubaddressIndex Wallet::subaddressIndex(const QString &address) const
     return SubaddressIndex(i.first, i.second);
 }
 
-QString Wallet::path() const
+QString Wallet::cachePath() const
 {
-    return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->path()));
+    return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->filename()));
+}
+
+QString Wallet::keysPath() const
+{
+    return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->keysFilename()));;
 }
 
 //void Wallet::storeAsync(const QJSValue &callback, const QString &path /* = "" */)

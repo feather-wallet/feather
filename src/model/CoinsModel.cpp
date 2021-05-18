@@ -5,7 +5,7 @@
 #include "CoinsInfo.h"
 #include "Coins.h"
 #include "ModelUtils.h"
-#include "globals.h"
+#include "constants.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 
@@ -182,9 +182,9 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case Amount:
         {
             if (role == Qt::UserRole) {
-                return cInfo.amount() / globals::cdiv;
+                return cInfo.amount() / constants::cdiv;
             }
-            return QString::number(cInfo.amount() / globals::cdiv, 'f', 12);
+            return QString::number(cInfo.amount() / constants::cdiv, 'f', 12);
         }
         case Frozen:
             return cInfo.frozen();

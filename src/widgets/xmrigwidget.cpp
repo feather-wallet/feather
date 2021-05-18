@@ -12,10 +12,10 @@
 #include "ui_xmrigwidget.h"
 #include "utils/Icons.h"
 
-XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent)
+XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::XMRigWidget)
-    , m_ctx(ctx)
+    , m_ctx(std::move(ctx))
     , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
     , m_model(new QStandardItemModel(this))
     , m_contextMenu(new QMenu(this))
@@ -28,9 +28,6 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent)
     connect(m_XMRig, &XmRig::output, this, &XMRigWidget::onProcessOutput);
     connect(m_XMRig, &XmRig::error, this, &XMRigWidget::onProcessError);
     connect(m_XMRig, &XmRig::hashrate, this, &XMRigWidget::onHashrate);
-
-    connect(m_ctx, &AppContext::walletClosed, this, &XMRigWidget::onWalletClosed);
-    connect(m_ctx, &AppContext::walletOpened, this, &XMRigWidget::onWalletOpened);
 
     // table
     ui->tableView->setModel(this->m_model);
@@ -92,16 +89,30 @@ XMRigWidget::XMRigWidget(AppContext *ctx, QWidget *parent)
 
     // username/password
     connect(ui->lineEdit_password, &QLineEdit::editingFinished, [=]() {
-        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+        m_ctx->wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
         m_ctx->storeWallet();
     });
     connect(ui->lineEdit_address, &QLineEdit::editingFinished, [=]() {
-        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
+        m_ctx->wallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
         m_ctx->storeWallet();
     });
 
     // checkbox connects
     connect(ui->check_solo, &QCheckBox::stateChanged, this, &XMRigWidget::onSoloChecked);
+
+    // Xmrig username
+    auto username = m_ctx->wallet->getCacheAttribute("feather.xmrig_username");
+    if(!username.isEmpty())
+        ui->lineEdit_address->setText(username);
+
+    // Xmrig passwd
+    auto password = m_ctx->wallet->getCacheAttribute("feather.xmrig_password");
+    if(!password.isEmpty()) {
+        ui->lineEdit_password->setText(password);
+    } else {
+        ui->lineEdit_password->setText("featherwallet");
+        m_ctx->wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+    }
 }
 
 void XMRigWidget::onWalletClosed() {
@@ -109,22 +120,6 @@ void XMRigWidget::onWalletClosed() {
     this->onClearClicked();
     ui->lineEdit_password->setText("");
     ui->lineEdit_address->setText("");
-}
-
-void XMRigWidget::onWalletOpened(){
-    // Xmrig username
-    auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
-    if(!username.isEmpty())
-        ui->lineEdit_address->setText(username);
-
-    // Xmrig passwd
-    auto password = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_password");
-    if(!password.isEmpty()) {
-        ui->lineEdit_password->setText(password);
-    } else {
-        ui->lineEdit_password->setText("featherwallet");
-        m_ctx->currentWallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
-    }
 }
 
 void XMRigWidget::onThreadsValueChanged(int threads) {
@@ -154,8 +149,8 @@ void XMRigWidget::onStartClicked() {
     xmrigPath = config()->get(Config::xmrigPath).toString();
 
     // username is receiving address usually
-    auto username = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_username");
-    auto password = m_ctx->currentWallet->getCacheAttribute("feather.xmrig_password");
+    auto username = m_ctx->wallet->getCacheAttribute("feather.xmrig_username");
+    auto password = m_ctx->wallet->getCacheAttribute("feather.xmrig_password");
 
     if(username.isEmpty()) {
         QString err = "Please specify a receiving address on the Settings screen";
@@ -172,7 +167,7 @@ void XMRigWidget::onStartClicked() {
 
     if(address.contains("cryptonote.social") && !username.contains(".")) {
         // cryptonote social requires <addr>.<username>, we'll just grab a few chars from primary addy
-        username = QString("%1.%2").arg(username, m_ctx->currentWallet->address(0, 0).mid(0, 6));
+        username = QString("%1.%2").arg(username, m_ctx->wallet->address(0, 0).mid(0, 6));
     }
 
     m_XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());

@@ -10,11 +10,30 @@
 #include <QMenu>
 #include <QMessageBox>
 
-ReceiveWidget::ReceiveWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::ReceiveWidget)
+ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::ReceiveWidget)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
+
+    m_model = m_ctx->wallet->subaddressModel();
+    m_proxyModel = new SubaddressProxyModel(this, m_ctx->wallet->subaddress());
+    m_proxyModel->setSourceModel(m_model);
+    m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
+
+    ui->addresses->setModel(m_proxyModel);
+    ui->addresses->setColumnHidden(SubaddressModel::isUsed, true);
+    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Address, QHeaderView::Stretch);
+    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::ResizeToContents);
+    ui->addresses->header()->setMinimumSectionSize(200);
+
+    connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentChanged, [=](QModelIndex current, QModelIndex prev){
+        this->updateQrCode();
+    });
+    connect(m_model, &SubaddressModel::modelReset, [this](){
+        this->updateQrCode();
+    });
 
     // header context menu
     ui->addresses->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -38,29 +57,6 @@ ReceiveWidget::ReceiveWidget(QWidget *parent) :
 
     connect(ui->check_showUsed, &QCheckBox::clicked, this, &ReceiveWidget::setShowUsedAddresses);
     connect(ui->check_showHidden, &QCheckBox::clicked, this, &ReceiveWidget::setShowHiddenAddresses);
-}
-
-void ReceiveWidget::setModel(SubaddressModel * model, Wallet * wallet) {
-    m_wallet = wallet;
-    m_subaddress = wallet->subaddress();
-    m_model = model;
-    m_proxyModel = new SubaddressProxyModel(this, m_subaddress);
-    m_proxyModel->setSourceModel(m_model);
-    m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
-
-    ui->addresses->setModel(m_proxyModel);
-
-    ui->addresses->setColumnHidden(SubaddressModel::isUsed, true);
-    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Address, QHeaderView::Stretch);
-    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::ResizeToContents);
-    ui->addresses->header()->setMinimumSectionSize(200);
-
-    connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentChanged, [=](QModelIndex current, QModelIndex prev){
-        this->updateQrCode();
-    });
-    connect(m_model, &SubaddressModel::modelReset, [this](){
-        this->updateQrCode();
-    });
 }
 
 void ReceiveWidget::copyAddress() {
@@ -103,7 +99,7 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
         menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
     }
 
-    if (m_wallet->isHwBacked()) {
+    if (m_ctx->wallet->isHwBacked()) {
         menu->addAction("Show on device", this, &ReceiveWidget::showOnDevice);
     }
 
@@ -172,15 +168,13 @@ void ReceiveWidget::showAddress()
 void ReceiveWidget::showOnDevice() {
     Monero::SubaddressRow* row = this->currentEntry();
     if (!row) return;
-    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRowId(), "");
+    m_ctx->wallet->deviceShowAddressAsync(m_ctx->wallet->currentSubaddressAccount(), row->getRowId(), "");
 }
 
 void ReceiveWidget::generateSubaddress() {
-    if (!m_wallet) return;
-
-    bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
+    bool r = m_ctx->wallet->subaddress()->addRow(m_ctx->wallet->currentSubaddressAccount(), "");
     if (!r) {
-        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_wallet->subaddress()->errorString()));
+        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_ctx->wallet->subaddress()->errorString()));
     }
 }
 
@@ -213,7 +207,7 @@ void ReceiveWidget::showQrCodeDialog() {
 }
 
 QStringList ReceiveWidget::getHiddenAddresses() {
-    QString data = m_wallet->getCacheAttribute("feather.hiddenaddresses");
+    QString data = m_ctx->wallet->getCacheAttribute("feather.hiddenaddresses");
     return data.split(",");
 }
 
@@ -223,14 +217,14 @@ void ReceiveWidget::addHiddenAddress(const QString& address) {
         hiddenAddresses.append(address);
     }
     QString data = hiddenAddresses.join(",");
-    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
+    m_ctx->wallet->setCacheAttribute("feather.hiddenaddresses", data);
 }
 
 void ReceiveWidget::removeHiddenAddress(const QString &address) {
     QStringList hiddenAddresses = this->getHiddenAddresses();
     hiddenAddresses.removeAll(address);
     QString data = hiddenAddresses.join(",");
-    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
+    m_ctx->wallet->setCacheAttribute("feather.hiddenaddresses", data);
 }
 
 Monero::SubaddressRow* ReceiveWidget::currentEntry() {

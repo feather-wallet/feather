@@ -3,12 +3,15 @@
 
 #include "splashdialog.h"
 #include "ui_splashdialog.h"
+#include "utils/Icons.h"
 
 SplashDialog::SplashDialog(QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::SplashDialog)
 {
     ui->setupUi(this);
+
+    this->setWindowIcon(icons()->icon("appicon/64x64"));
 
     QPixmap pixmap = QPixmap(":/assets/images/key.png");
     ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));

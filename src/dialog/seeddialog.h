@@ -5,7 +5,7 @@
 #define FEATHER_SEEDDIALOG_H
 
 #include <QDialog>
-#include "libwalletqt/Wallet.h"
+#include "appcontext.h"
 
 namespace Ui {
     class SeedDialog;
@@ -16,13 +16,14 @@ class SeedDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit SeedDialog(Wallet *wallet, QWidget *parent = nullptr);
+    explicit SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~SeedDialog() override;
 
 private:
     void setSeed(const QString &seed);
 
     Ui::SeedDialog *ui;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 

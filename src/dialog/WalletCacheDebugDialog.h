@@ -16,13 +16,13 @@ class WalletCacheDebugDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit WalletCacheDebugDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit WalletCacheDebugDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~WalletCacheDebugDialog() override;
 
 private:
     void setOutput(const QString &output);
     Ui::WalletCacheDebugDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 

@@ -9,7 +9,6 @@
 #include <QWidget>
 
 #include "utils/utils.h"
-#include "appcontext.h"
 
 namespace Ui {
     class PageWalletSeed;
@@ -20,7 +19,7 @@ class PageWalletSeed : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageWalletSeed(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageWalletSeed(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -36,7 +35,6 @@ signals:
     void createWallet();
 
 private:
-    AppContext *m_ctx;
     Ui::PageWalletSeed *ui;
 
     WizardFields *m_fields;

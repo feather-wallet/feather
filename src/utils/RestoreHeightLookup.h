@@ -31,9 +31,9 @@ struct RestoreHeightLookup {
         int blocksPerDay = 86400 / blockTime;
         int blockCalcClearance = blocksPerDay * 5;
         QList<int> values = this->data.keys();
-        if(date <= values.at(0))
+        if (date <= values.at(0))
             return this->data[values.at(0)];
-        for(int i = 0; i != values.count(); i++) {
+        for (int i = 0; i != values.count(); i++) {
             if(values[i] > date) {
                 return i - 1 < 0 ? this->data[values[i]] : this->data[values[i-1]] - blockCalcClearance;
             }

@@ -11,11 +11,13 @@
 
 #include <QMessageBox>
 
-HistoryWidget::HistoryWidget(QWidget *parent)
-        : QWidget(parent)
-        , ui(new Ui::HistoryWidget)
-        , m_contextMenu(new QMenu(this))
-        , m_copyMenu(new QMenu("Copy", this))
+HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::HistoryWidget)
+    , m_ctx(std::move(ctx))
+    , m_contextMenu(new QMenu(this))
+    , m_copyMenu(new QMenu("Copy", this))
+    , m_model(m_ctx->wallet->historyModel())
 {
     ui->setupUi(this);
     m_contextMenu->addMenu(m_copyMenu);
@@ -45,6 +47,18 @@ HistoryWidget::HistoryWidget(QWidget *parent)
         config()->set(Config::showHistorySyncNotice, false);
         ui->syncNotice->hide();
     });
+
+    connect(m_ctx.get(), &AppContext::walletRefreshed, this, &HistoryWidget::onWalletRefreshed);
+
+    ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
+    ui->history->setHistoryModel(m_model);
+    m_ctx->wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
+
+    // Load view state
+    QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
+    if (!historyViewState.isEmpty()) {
+        ui->history->setViewState(historyViewState);
+    }
 }
 
 void HistoryWidget::showContextMenu(const QPoint &point) {
@@ -59,7 +73,7 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     if (!tx) return;
 
     bool unconfirmed = tx->isFailed() || tx->isPending();
-    if (AppContext::txCache.contains(tx->hash()) && unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
+    if (m_ctx->txCache.contains(tx->hash()) && unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
         menu.addAction(icons()->icon("info2.svg"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
@@ -79,22 +93,6 @@ void HistoryWidget::onResendTransaction() {
     }
 }
 
-void HistoryWidget::setModel(TransactionHistoryProxyModel *model, Wallet *wallet)
-{
-    m_model = model;
-    m_wallet = wallet;
-    m_txHistory = m_wallet->history();
-    ui->history->setHistoryModel(m_model);
-    m_wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
-
-    // Load view state
-    QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
-
-    if (!historyViewState.isEmpty()) {
-      ui->history->setViewState(historyViewState);
-    }
-}
-
 void HistoryWidget::resetModel()
 {
     // Save view state
@@ -108,7 +106,7 @@ void HistoryWidget::showTxDetails() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TransactionInfoDialog(m_wallet, tx, this);
+    auto *dialog = new TransactionInfoDialog(m_ctx, tx, this);
     connect(dialog, &TransactionInfoDialog::resendTranscation, [this](const QString &txid){
        emit resendTransaction(txid);
     });
@@ -128,7 +126,6 @@ void HistoryWidget::setSearchText(const QString &text) {
 }
 
 void HistoryWidget::setSearchFilter(const QString &filter) {
-    if (!m_model) return;
     m_model->setSearchFilter(filter);
     ui->history->setSearchMode(!filter.isEmpty());
 }
@@ -137,7 +134,7 @@ void HistoryWidget::createTxProof() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TxProofDialog(this, m_wallet, tx);
+    auto *dialog = new TxProofDialog(this, m_ctx, tx);
     dialog->exec();
     dialog->deleteLater();
 }
@@ -160,10 +157,6 @@ void HistoryWidget::copy(copyField field) {
     }();
 
     Utils::copyToClipboard(data);
-}
-
-void HistoryWidget::onWalletOpened() {
-    ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
 }
 
 void HistoryWidget::onWalletRefreshed() {

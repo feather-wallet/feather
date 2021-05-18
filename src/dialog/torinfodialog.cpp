@@ -9,11 +9,12 @@
 #include <QMessageBox>
 
 #include "utils/TorManager.h"
+#include "utils/tails.h"
 
-TorInfoDialog::TorInfoDialog(QWidget *parent, AppContext *ctx)
+TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TorInfoDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

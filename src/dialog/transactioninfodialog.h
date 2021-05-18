@@ -7,9 +7,7 @@
 #include <QDialog>
 #include <QTextCharFormat>
 #include <QtSvg/QSvgWidget>
-#include "libwalletqt/Coins.h"
-#include "libwalletqt/TransactionInfo.h"
-#include "libwalletqt/Wallet.h"
+#include "appcontext.h"
 #include "dialog/TxProofDialog.h"
 
 namespace Ui {
@@ -21,7 +19,7 @@ class TransactionInfoDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TransactionInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent = nullptr);
+    explicit TransactionInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent = nullptr);
     ~TransactionInfoDialog() override;
 
 signals:
@@ -35,7 +33,7 @@ private:
 
     Ui::TransactionInfoDialog *ui;
 
-    Wallet *m_wallet;
+    QSharedPointer<AppContext> m_ctx;
     TransactionInfo *m_txInfo;
     TxProofDialog *m_txProofDialog;
     QString m_txKey;

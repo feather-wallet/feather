@@ -15,7 +15,7 @@
 #include "utils/tails.h"
 #include "utils/whonix.h"
 #include "utils/ColorScheme.h"
-#include "globals.h"
+#include "constants.h"
 
 QByteArray Utils::fileGetContents(const QString &path)
 {
@@ -454,7 +454,7 @@ int Utils::maxLength(const QVector<QString> &array) {
 }
 
 QString Utils::balanceFormat(quint64 balance) {
-    QString str = QString::number(balance / globals::cdiv, 'f', 4);
+    QString str = QString::number(balance / constants::cdiv, 'f', 4);
 
     str.remove(QRegExp("0+$"));
     str.remove(QRegExp("\\.$"));

@@ -10,12 +10,11 @@
 
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
 #include "utils/FeatherSeed.h"
-#include "globals.h"
+#include "constants.h"
 
-PageWalletRestoreSeed::PageWalletRestoreSeed(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageWalletRestoreSeed)
-    , m_ctx(ctx)
     , m_fields(fields)
 {
     ui->setupUi(this);
@@ -110,7 +109,7 @@ bool PageWalletRestoreSeed::validatePage() {
         }
     }
 
-    auto _seed = FeatherSeed(m_ctx->networkType, QString::fromStdString(globals::coinName), m_ctx->seedLanguage, seedSplit);
+    auto _seed = FeatherSeed(constants::networkType, QString::fromStdString(constants::coinName), constants::seedLanguage, seedSplit);
     if (!_seed.errorString.isEmpty()) {
         QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));
         ui->seedEdit->setStyleSheet(errStyle);

@@ -38,7 +38,7 @@ public:
         Modified
     };
 
-    explicit WalletKeysFilesModel(AppContext *ctx, QObject *parent = nullptr);
+    explicit WalletKeysFilesModel(QObject *parent = nullptr);
 
     Q_INVOKABLE void refresh();
     Q_INVOKABLE void clear();
@@ -55,7 +55,6 @@ public:
 private:
     void updateDirectories();
 
-    AppContext *m_ctx;
     QList<WalletKeysFiles> m_walletKeyFiles;
     QAbstractItemModel *m_walletKeysFilesItemModel;
     QSortFilterProxyModel m_walletKeysFilesModelProxy;

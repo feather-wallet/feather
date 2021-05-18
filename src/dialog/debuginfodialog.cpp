@@ -7,11 +7,12 @@
 #include "utils/WebsocketClient.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
+#include "utils/tails.h"
 
-DebugInfoDialog::DebugInfoDialog(AppContext *ctx, QWidget *parent)
+DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::DebugInfoDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -28,7 +29,7 @@ void DebugInfoDialog::updateInfo() {
     QString torStatus;
 
     // Special case for Tails because we know the status of the daemon by polling tails-tor-has-bootstrapped.target
-    if(m_ctx->isTails) {
+    if (TailsOS::detect()) {
         if(torManager()->torConnected)
             torStatus = "Connected";
         else
@@ -46,32 +47,32 @@ void DebugInfoDialog::updateInfo() {
     ui->label_featherVersion->setText(QString("%1-%2").arg(FEATHER_VERSION, FEATHER_BRANCH));
     ui->label_moneroVersion->setText(QString("%1-%2").arg(MONERO_VERSION, MONERO_BRANCH));
 
-    ui->label_walletHeight->setText(QString::number(m_ctx->currentWallet->blockChainHeight()));
-    ui->label_daemonHeight->setText(QString::number(m_ctx->currentWallet->daemonBlockChainHeight()));
-    ui->label_targetHeight->setText(QString::number(m_ctx->currentWallet->daemonBlockChainTargetHeight()));
-    ui->label_restoreHeight->setText(QString::number(m_ctx->currentWallet->getWalletCreationHeight()));
-    ui->label_synchronized->setText(m_ctx->currentWallet->isSynchronized() ? "True" : "False");
+    ui->label_walletHeight->setText(QString::number(m_ctx->wallet->blockChainHeight()));
+    ui->label_daemonHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainHeight()));
+    ui->label_targetHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainTargetHeight()));
+    ui->label_restoreHeight->setText(QString::number(m_ctx->wallet->getWalletCreationHeight()));
+    ui->label_synchronized->setText(m_ctx->wallet->isSynchronized() ? "True" : "False");
 
     auto node = m_ctx->nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
-    ui->label_walletStatus->setText(this->statusToString(m_ctx->currentWallet->connectionStatus()));
+    ui->label_walletStatus->setText(this->statusToString(m_ctx->wallet->connectionStatus()));
     ui->label_torStatus->setText(torStatus);
     ui->label_websocketStatus->setText(Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State"));
 
     QString seedType = [this](){
-        if (m_ctx->currentWallet->isHwBacked())
+        if (m_ctx->wallet->isHwBacked())
             return "Hardware";
-        if (m_ctx->currentWallet->getCacheAttribute("feather.seed").isEmpty())
+        if (m_ctx->wallet->getCacheAttribute("feather.seed").isEmpty())
             return "25 word";
         else
             return "14 word";
     }();
 
     QString deviceType = [this](){
-        if (m_ctx->currentWallet->isHwBacked()) {
-            if (m_ctx->currentWallet->isLedger())
+        if (m_ctx->wallet->isHwBacked()) {
+            if (m_ctx->wallet->isLedger())
                 return "Ledger";
-            else if (m_ctx->currentWallet->isTrezor())
+            else if (m_ctx->wallet->isTrezor())
                 return "Trezor";
             else
                 return "Unknown";
@@ -81,17 +82,17 @@ void DebugInfoDialog::updateInfo() {
         }
     }();
 
-    ui->label_netType->setText(Utils::QtEnumToString(m_ctx->currentWallet->nettype()));
+    ui->label_netType->setText(Utils::QtEnumToString(m_ctx->wallet->nettype()));
     ui->label_seedType->setText(seedType);
     ui->label_deviceType->setText(deviceType);
-    ui->label_viewOnly->setText(m_ctx->currentWallet->viewOnly() ? "True" : "False");
-    ui->label_primaryOnly->setText(m_ctx->currentWallet->balance(0) == m_ctx->currentWallet->balanceAll() ? "True" : "False");
+    ui->label_viewOnly->setText(m_ctx->wallet->viewOnly() ? "True" : "False");
+    ui->label_primaryOnly->setText(m_ctx->wallet->balance(0) == m_ctx->wallet->balanceAll() ? "True" : "False");
 
     QString os = QSysInfo::prettyProductName();
-    if (m_ctx->isTails) {
+    if (TailsOS::detect()) {
         os = QString("Tails %1").arg(TailsOS::version());
     }
-    if (m_ctx->isWhonix) {
+    if (WhonixOS::detect()) {
         os = QString("Whonix %1").arg(WhonixOS::version());
     }
     ui->label_OS->setText(os);

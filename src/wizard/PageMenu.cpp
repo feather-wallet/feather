@@ -7,10 +7,9 @@
 
 #include <QFileDialog>
 
-PageMenu::PageMenu(AppContext *ctx, WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
+PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageMenu)
-        , m_ctx(ctx)
         , m_walletKeysFilesModel(wallets)
         , m_fields(fields)
 {

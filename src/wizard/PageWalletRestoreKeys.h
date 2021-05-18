@@ -11,6 +11,7 @@
 #include <QCompleter>
 
 #include "appcontext.h"
+#include "WalletWizard.h"
 
 namespace Ui {
     class PageWalletRestoreKeys;
@@ -21,14 +22,13 @@ class PageWalletRestoreKeys : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageWalletRestoreKeys(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageWalletRestoreKeys(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
 
 private:
     Ui::PageWalletRestoreKeys *ui;
-    AppContext *m_ctx;
     WizardFields *m_fields;
 };
 

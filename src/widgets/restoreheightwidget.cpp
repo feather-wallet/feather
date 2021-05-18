@@ -8,9 +8,9 @@
 #include "restoreheightwidget.h"
 #include "ui_restoreheightwidget.h"
 
-RestoreHeightWidget::RestoreHeightWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::RestoreHeightWidget)
+RestoreHeightWidget::RestoreHeightWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::RestoreHeightWidget)
 {
     ui->setupUi(this);
     ui->lineEdit_restoreHeight->setValidator(new QIntValidator(0, 2147483647, this));

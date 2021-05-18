@@ -161,8 +161,8 @@
         <property name="verticalSpacing">
          <number>9</number>
         </property>
-        <item row="1" column="0">
-         <widget class="HistoryWidget" name="historyWidget" native="true"/>
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="historyWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -208,14 +208,7 @@
          </widget>
         </item>
         <item>
-         <widget class="ContactsWidget" name="contactWidget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="contactsWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -229,7 +222,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
-         <widget class="ReceiveWidget" name="receiveWidget" native="true"/>
+         <layout class="QVBoxLayout" name="receiveWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -349,6 +342,14 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuRecently_open">
+     <property name="title">
+      <string>Recently open</string>
+     </property>
+    </widget>
+    <addaction name="menuRecently_open"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionNew_Restore"/>
     <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
     <addaction name="separator"/>
@@ -548,7 +549,7 @@
   </action>
   <action name="actionClose">
    <property name="text">
-    <string>Close current wallet</string>
+    <string>Close wallet</string>
    </property>
   </action>
   <action name="actionVerifyTxProof">
@@ -721,26 +722,29 @@
     <string>Pay to many</string>
    </property>
   </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open wallet</string>
+   </property>
+  </action>
+  <action name="actionNew_Restore">
+   <property name="text">
+    <string>New/Restore</string>
+   </property>
+  </action>
+  <action name="actionRecently_open">
+   <property name="text">
+    <string>Recently open</string>
+   </property>
+  </action>
+  <action name="actiont">
+   <property name="text">
+    <string>t</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>ContactsWidget</class>
-   <extends>QWidget</extends>
-   <header>contactswidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ReceiveWidget</class>
-   <extends>QWidget</extends>
-   <header>receivewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>HistoryWidget</class>
-   <extends>QWidget</extends>
-   <header>historywidget.h</header>
-  </customwidget>
   <customwidget>
    <class>CalcWidget</class>
    <extends>QWidget</extends>

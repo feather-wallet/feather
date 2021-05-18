@@ -22,10 +22,10 @@ public:
     explicit WebsocketNotifier(QObject *parent);
 
     QMap<NetworkType::Type, int> heights;
-
     WebsocketClient websocketClient;
 
     static WebsocketNotifier* instance();
+    void emitCache();
 
 signals:
     void BlockHeightsReceived(int mainnet, int stagenet);
@@ -52,6 +52,8 @@ private slots:
 
 private:
     static QPointer<WebsocketNotifier> m_instance;
+
+    QHash<QString, QJsonObject> m_cache;
 };
 
 inline WebsocketNotifier* websocketNotifier()

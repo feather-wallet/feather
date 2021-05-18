@@ -12,10 +12,10 @@
 #include <QMessageBox>
 #include <QMenu>
 
-LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, AppContext *ctx)
+LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx)
     : QWidget(parent)
     , ui(new Ui::LocalMoneroWidget)
-    , m_ctx(ctx)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

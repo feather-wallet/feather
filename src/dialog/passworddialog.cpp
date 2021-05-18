@@ -4,7 +4,7 @@
 #include "passworddialog.h"
 #include "ui_passworddialog.h"
 
-PasswordDialog::PasswordDialog(QWidget *parent, const QString &walletName, bool incorrectPassword)
+PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::PasswordDialog)
 {

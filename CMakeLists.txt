@@ -9,15 +9,17 @@ set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
 set(VERSION "beta-6")
 
+option(STATIC "Link libraries statically, requires static Qt")
+
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
+
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
-
-option(STATIC "Link libraries statically, requires static Qt")
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
+
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
@@ -33,7 +35,7 @@ endif()
 
 set(MONERO_HEAD "36fb05da3394505f8033ceb8806b28909617696f")
 set(BUILD_GUI_DEPS ON)
-set(ARCH "x86-64")
+set(ARCH "x86-64" CACHE STRING "Target architecture")
 set(BUILD_64 ON)
 set(INSTALL_VENDORED_LIBUNBOUND ${STATIC})
 set(USE_SINGLE_BUILDDIR ON)

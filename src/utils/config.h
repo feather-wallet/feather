@@ -20,50 +20,56 @@ public:
 
     enum ConfigKey
     {
-        warnOnExternalLink,
-        checkForUpdates,
+        firstRun,
         warnOnStagenet,
         warnOnTestnet,
         warnOnAlpha,
+
         homeWidget,
         donateBeg,
+        showHistorySyncNotice,
+
+        geometry,
+        windowState,
+        GUI_HistoryViewState,
+
+        walletDirectory, // Directory where wallet files are stored
         autoOpenWalletPath,
-        skin,
-        preferredFiatCurrency,
-        blockExplorer,
-        walletDirectory,
-        walletPath,
-        xmrigPath,
-        xmrigPool,
+        recentlyOpenedWallets,
+
         nodes,
-        websocketEnabled,
         nodeSource,
         useOnionNodes,
+
         showTabHome,
         showTabCoins,
         showTabExchange,
         showTabCalc,
         showTabXMRig,
-        geometry,
-        windowState,
-        firstRun,
-        hideBalance,
-        redditFrontend,
-        showHistorySyncNotice,
-        GUI_HistoryViewState,
+
+        xmrigPath,
+        xmrigPool,
+
+        preferredFiatCurrency,
+        skin,
         amountPrecision,
-        portableMode,
         dateFormat,
         timeFormat,
+
         multiBroadcast,
+        warnOnExternalLink,
+        hideBalance,
+
+        blockExplorer,
+        redditFrontend,
+        localMoneroFrontend,
+
         torPrivacyLevel,
         socks5Host,
         socks5Port,
         socks5User,
         socks5Pass,
         useLocalTor, // Prevents Feather from starting bundled Tor daemon
-        networkType,
-        localMoneroFrontend
     };
 
     enum PrivacyLevel {

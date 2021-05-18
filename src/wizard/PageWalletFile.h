@@ -20,7 +20,7 @@ class PageWalletFile : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageWalletFile(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -35,7 +35,6 @@ private:
     bool validateWidgets();
 
     Ui::PageWalletFile *ui;
-    AppContext *m_ctx;
     WizardFields *m_fields;
     bool m_validated;
 };

@@ -7,10 +7,10 @@
 
 #include <QMessageBox>
 
-TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
+TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
         : QDialog(parent)
         , ui(new Ui::TxImportDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
         , m_loadTimer(new QTimer(this))
 {
     ui->setupUi(this);
@@ -88,7 +88,7 @@ void TxImportDialog::onImport() {
     bool pool = tx.value("in_pool").toBool();
     bool double_spend_seen = tx.value("double_spend_seen").toBool();
 
-    if (m_ctx->currentWallet->importTransaction(tx.value("tx_hash").toString(), output_indices, height, timestamp, false, pool, double_spend_seen)) {
+    if (m_ctx->wallet->importTransaction(tx.value("tx_hash").toString(), output_indices, height, timestamp, false, pool, double_spend_seen)) {
         QMessageBox::information(this, "Import transaction", "Transaction imported successfully.");
     } else {
         QMessageBox::warning(this, "Import transaction", "Transaction import failed.");

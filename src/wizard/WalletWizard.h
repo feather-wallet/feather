@@ -9,6 +9,7 @@
 #include <QRadioButton>
 
 #include "appcontext.h"
+#include "utils/keysfiles.h"
 #include "utils/RestoreHeightLookup.h"
 #include "utils/config.h"
 
@@ -54,7 +55,8 @@ public:
         Page_NetworkTor
     };
 
-    explicit WalletWizard(AppContext *ctx, WalletWizard::Page startPage = WalletWizard::Page::Page_Menu, QWidget *parent = nullptr);
+    explicit WalletWizard(QWidget *parent = nullptr);
+    ~WalletWizard() override;
 
 signals:
     void initialNetworkConfigured();
@@ -62,12 +64,16 @@ signals:
     void openWallet(QString path, QString password);
     void defaultWalletDirChanged(QString walletDir);
 
+    void createWalletFromDevice(const QString &path, const QString &password, int restoreHeight);
+    void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
+    void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset = "");
+
+private slots:
+    void onCreateWallet();
+
 private:
-    AppContext *m_ctx;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WizardFields m_wizardFields;
-
-    void createWallet();
 };
 
 #endif // WALLETWIZARD_H

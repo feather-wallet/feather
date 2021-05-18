@@ -9,9 +9,9 @@
 #include "utils/AppData.h"
 #include "utils/config.h"
 
-CalcWidget::CalcWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::CalcWidget)
+CalcWidget::CalcWidget(QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::CalcWidget)
 {
     ui->setupUi(this);
 

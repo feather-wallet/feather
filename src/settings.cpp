@@ -7,10 +7,10 @@
 
 #include <QFileDialog>
 
-Settings::Settings(AppContext *ctx, QWidget *parent)
+Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::Settings)
-    , m_ctx(ctx)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -89,11 +89,12 @@ Settings::Settings(AppContext *ctx, QWidget *parent)
     // setup paths tab
     this->updatePaths();
     connect(ui->btn_browseDefaultWalletDir, &QPushButton::clicked, [this]{
-        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
-        if (walletDir.isEmpty()) return;
-        m_ctx->defaultWalletDir = walletDir;
+        QString walletDirOld = config()->get(Config::walletDirectory).toString();
+        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", walletDirOld, QFileDialog::ShowDirsOnly);
+        if (walletDir.isEmpty())
+            return;
         config()->set(Config::walletDirectory, walletDir);
-        ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+        ui->lineEdit_defaultWalletDir->setText(walletDir);
     });
 
     // Links tab
@@ -110,7 +111,7 @@ Settings::Settings(AppContext *ctx, QWidget *parent)
 }
 
 void Settings::updatePaths() {
-    ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+    ui->lineEdit_defaultWalletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
     ui->lineEdit_applicationDir->setText(QCoreApplication::applicationDirPath());
 }

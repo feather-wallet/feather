@@ -9,6 +9,7 @@
 #include <QRegularExpression>
 
 #include "utils/utils.h"
+#include "utils/tails.h"
 #include "appcontext.h"
 #include "config-feather.h"
 
