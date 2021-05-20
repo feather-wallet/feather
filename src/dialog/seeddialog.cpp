@@ -3,6 +3,7 @@
 
 #include "ui_seeddialog.h"
 #include "seeddialog.h"
+#include "constants.h"
 
 SeedDialog::SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)
@@ -13,6 +14,11 @@ SeedDialog::SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->label_seedIcon->setPixmap(QPixmap(":/assets/images/seed.png").scaledToWidth(64, Qt::SmoothTransformation));
 
     ui->label_restoreHeight->setText(QString::number(m_ctx->wallet->getWalletCreationHeight()));
+
+    if (m_ctx->wallet->getSeedLanguage().isEmpty()) {
+        qDebug() << "No seed language set, using default";
+        m_ctx->wallet->setSeedLanguage(constants::seedLanguage);
+    }
 
     QString seedOffset = m_ctx->wallet->getCacheAttribute("feather.seedoffset");
     QString seed_14_words = m_ctx->wallet->getCacheAttribute("feather.seed");
