@@ -453,15 +453,6 @@ int Utils::maxLength(const QVector<QString> &array) {
     return maxLength;
 }
 
-QString Utils::balanceFormat(quint64 balance) {
-    QString str = QString::number(balance / constants::cdiv, 'f', 4);
-
-    str.remove(QRegExp("0+$"));
-    str.remove(QRegExp("\\.$"));
-
-    return str;
-}
-
 QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index) {
     if (index.isPrimary()) {
         QTextCharFormat rec;

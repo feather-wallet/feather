@@ -465,14 +465,9 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
     bool hide = config()->get(Config::hideBalance).toBool();
 
-    QString balance_str = WalletManager::displayAmount(spendable);
-    balance_str.remove(QRegExp("0+$"));
-
-    QString label_str = QString("Balance: %1 XMR").arg(balance_str);
+    QString label_str = QString("Balance: %1 XMR").arg(WalletManager::displayAmount(spendable, false));
     if (balance > spendable) {
-        QString unconfirmed_str = WalletManager::displayAmount(spendable);
-        unconfirmed_str.remove(QRegExp("0+$"));
-        label_str += QString(" (+%1 XMR unconfirmed)").arg(Utils::balanceFormat(balance - spendable));
+        label_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false));
     }
 
     if (hide)
@@ -1077,7 +1072,6 @@ void MainWindow::updateNetStats() {
         m_statusLabelNetStats->setText("");
         return;
     }
-
     if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected) {
         m_statusLabelNetStats->setText("");
         return;

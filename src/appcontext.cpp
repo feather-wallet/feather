@@ -56,26 +56,9 @@ AppContext::AppContext(Wallet *wallet)
     this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
 }
 
-void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address) {
-    // tx cancelled by user
-    double amount = tx->amount() / constants::cdiv;
-    emit createTransactionCancelled(address, amount);
-    this->wallet->disposeTransaction(tx);
-}
-
-void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) {
-    if (churn) {
-        address = this->wallet->address(0, 0); // primary address
-    }
-
-    qCritical() << "Creating transaction";
-    this->wallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
-
-    emit initiateTransaction();
-}
+// ################## Transaction creation ##################
 
 void AppContext::onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
-    // tx creation
     this->tmpTxDescription = description;
 
     if (!all && amount == 0) {
@@ -83,16 +66,16 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
         return;
     }
 
-    auto unlocked_balance = this->wallet->unlockedBalance();
-    if(!all && amount > unlocked_balance) {
+    quint64 unlocked_balance = this->wallet->unlockedBalance();
+    if (!all && amount > unlocked_balance) {
         emit createTransactionError("Not enough money to spend");
         return;
-    } else if(unlocked_balance == 0) {
+    } else if (unlocked_balance == 0) {
         emit createTransactionError("No money to spend");
         return;
     }
 
-    qDebug() << "Creating tx";
+    qInfo() << "Creating transaction";
     if (all)
         this->wallet->createTransactionAllAsync(address, "", constants::mixin, this->tx_priority);
     else
@@ -114,8 +97,19 @@ void AppContext::onCreateTransactionMultiDest(const QVector<QString> &addresses,
         emit createTransactionError("Not enough money to spend");
     }
 
-    qDebug() << "Creating tx";
+    qInfo() << "Creating transaction";
     this->wallet->createTransactionMultiDestAsync(addresses, amounts, this->tx_priority);
+
+    emit initiateTransaction();
+}
+
+void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) {
+    if (churn) {
+        address = this->wallet->address(0, 0); // primary address
+    }
+
+    qInfo() << "Creating transaction";
+    this->wallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
 
     emit initiateTransaction();
 }
@@ -125,17 +119,10 @@ void AppContext::onCreateTransactionError(const QString &msg) {
     emit endTransaction();
 }
 
-void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (model != nullptr) {
-        model->preferredFiatSymbol = symbol;
-    }
-}
-
-void AppContext::onAmountPrecisionChanged(int precision) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (!model) return;
-    model->amountPrecision = precision;
+void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address) {
+    // tx cancelled by user
+    emit createTransactionCancelled(address, tx->amount());
+    this->wallet->disposeTransaction(tx);
 }
 
 void AppContext::commitTransaction(PendingTransaction *tx) {
@@ -164,6 +151,23 @@ void AppContext::onMultiBroadcast(PendingTransaction *tx) {
     }
 }
 
+// ################## Models ##################
+
+void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
+    auto *model = this->wallet->transactionHistoryModel();
+    if (model != nullptr) {
+        model->preferredFiatSymbol = symbol;
+    }
+}
+
+void AppContext::onAmountPrecisionChanged(int precision) {
+    auto *model = this->wallet->transactionHistoryModel();
+    if (!model) return;
+    model->amountPrecision = precision;
+}
+
+// ################## Device ##################
+
 void AppContext::onDeviceButtonRequest(quint64 code) {
     emit deviceButtonRequest(code);
 }
@@ -172,6 +176,8 @@ void AppContext::onDeviceError(const QString &message) {
     qCritical() << "Device error: " << message;
     emit deviceError(message);
 }
+
+// ################## Misc ##################
 
 void AppContext::onTorSettingsChanged() {
     if (Utils::isTorsocks()) {
@@ -247,23 +253,21 @@ void AppContext::onOpenAliasResolve(const QString &openAlias) {
 // ########################################## LIBWALLET QT SIGNALS ####################################################
 
 void AppContext::onMoneySpent(const QString &txId, quint64 amount) {
-    auto amount_num = amount / constants::cdiv;
-    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+    // Outgoing tx included in a block
+    qDebug() << Q_FUNC_INFO << txId << " " << WalletManager::displayAmount(amount);
 }
 
 void AppContext::onMoneyReceived(const QString &txId, quint64 amount) {
     // Incoming tx included in a block.
-    auto amount_num = amount / constants::cdiv;
-    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+    qDebug() << Q_FUNC_INFO << txId << " " << WalletManager::displayAmount(amount);
 }
 
 void AppContext::onUnconfirmedMoneyReceived(const QString &txId, quint64 amount) {
-    // Incoming transaction in pool
-    auto amount_num = amount / constants::cdiv;
-    qDebug() << Q_FUNC_INFO << txId << " " << QString::number(amount_num);
+    // Incoming tx in pool
+    qDebug() << Q_FUNC_INFO << txId << " " << WalletManager::displayAmount(amount);
 
-    if(this->wallet->synchronized()) {
-        auto notify = QString("%1 XMR (pending)").arg(amount_num);
+    if (this->wallet->synchronized()) {
+        auto notify = QString("%1 XMR (pending)").arg(WalletManager::displayAmount(amount, false));
         Utils::desktopNotify("Payment received", notify, 5000);
     }
 }
@@ -353,7 +357,7 @@ void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, con
     this->updateBalance();
 
     // this tx was a donation to Feather, stop our nagging
-    if(this->donationSending) {
+    if (this->donationSending) {
         this->donationSending = false;
         config()->set(Config::donateBeg, -1);
     }

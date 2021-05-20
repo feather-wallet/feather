@@ -82,7 +82,7 @@ signals:
     void walletRefreshed();
     void transactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
     void createTransactionError(QString message);
-    void createTransactionCancelled(const QVector<QString> &address, double amount);
+    void createTransactionCancelled(const QVector<QString> &address, quint64 amount);
     void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
     void openAliasResolveError(const QString &msg);
     void openAliasResolved(const QString &address, const QString &openAlias);
