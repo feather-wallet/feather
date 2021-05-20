@@ -79,10 +79,6 @@ WalletWizard::WalletWizard(QWidget *parent)
     });
 }
 
-WalletWizard::~WalletWizard() {
-    qDebug() << "We're killing the walletwizard";
-}
-
 void WalletWizard::onCreateWallet() {
     auto walletPath = QString("%1/%2").arg(m_wizardFields.walletDir, m_wizardFields.walletName);
 

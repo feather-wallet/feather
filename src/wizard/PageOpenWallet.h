@@ -9,7 +9,7 @@
 #include <QWidget>
 
 #include "appcontext.h"
-#include "utils/keysfiles.h"
+#include "model/WalletKeysFilesModel.h"
 
 namespace Ui {
     class PageOpenWallet;

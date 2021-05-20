@@ -1,49 +1,41 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2014-2021, The Monero Project.
 
-#include "keysfiles.h"
+#include "WalletKeysFilesModel.h"
+
+#include "utils/utils.h"
+#include <QDir>
+#include <QDateTime>
+#include "config.h"
 
 using namespace std::chrono;
 
-WalletKeysFiles::WalletKeysFiles(const QFileInfo &info, int networkType, QString address) :
-        m_fileName(info.fileName()),
-        m_modified(info.lastModified().toSecsSinceEpoch()),
-        m_path(QDir::toNativeSeparators(info.absoluteFilePath())),
-        m_networkType(networkType),
-        m_address(std::move(address))
+WalletKeysFile::WalletKeysFile(const QFileInfo &info, int networkType, QString address)
+    : m_fileName(info.fileName())
+    , m_modified(getModified(info))
+    , m_path(QDir::toNativeSeparators(info.absoluteFilePath()))
+    , m_networkType(networkType)
+    , m_address(std::move(address))
 {
+}
+
+qint64 WalletKeysFile::getModified(const QFileInfo &info) {
+    qint64 m = info.lastModified().toSecsSinceEpoch();
+
     QFileInfo cacheFile = QFileInfo(info.absoluteFilePath().replace(QRegExp(".keys$"), ""));
     qint64 cacheLastModified = cacheFile.lastModified().toSecsSinceEpoch();
-    if (cacheFile.exists()) {
-        m_modified = (cacheLastModified > m_modified) ? cacheLastModified : m_modified;
+    if (cacheFile.exists() && cacheLastModified > m) {
+        m = cacheLastModified;
     }
+    return m;
 }
 
-QString WalletKeysFiles::fileName() const {
-    return m_fileName;
-}
-
-qint64 WalletKeysFiles::modified() const {
-    return m_modified;
-}
-
-QString WalletKeysFiles::address() const {
-    return m_address;
-}
-
-QString WalletKeysFiles::path() const {
-    return m_path;
-}
-
-int WalletKeysFiles::networkType() const {
-    return m_networkType;
-}
+// Model
 
 WalletKeysFilesModel::WalletKeysFilesModel(QObject *parent)
-        : QAbstractTableModel(parent)
+    : QAbstractTableModel(parent)
 {
     this->updateDirectories();
-    this->m_walletKeysFilesItemModel = qobject_cast<QAbstractItemModel *>(this);
 }
 
 void WalletKeysFilesModel::clear() {
@@ -58,17 +50,23 @@ void WalletKeysFilesModel::refresh() {
     endResetModel();
 }
 
-void WalletKeysFilesModel::updateDirectories() { // TODO
-    this->walletDirectories.clear();
+void WalletKeysFilesModel::updateDirectories() {
+    m_walletDirectories.clear();
+
     QDir defaultWalletDir = QDir(Utils::defaultWalletDir());
     QString walletDir = defaultWalletDir.path();
     defaultWalletDir.cdUp();
     QString walletDirRoot = defaultWalletDir.path();
 
-    this->walletDirectories << walletDir;
-    this->walletDirectories << walletDirRoot;
-    this->walletDirectories << QDir::homePath();
-    this->walletDirectories.removeDuplicates();
+    m_walletDirectories << walletDir;
+    m_walletDirectories << walletDirRoot;
+    m_walletDirectories << QDir::homePath();
+
+    QString walletDirectory = config()->get(Config::walletDirectory).toString();
+    if (!walletDirectory.isEmpty())
+        m_walletDirectories << walletDirectory;
+
+    m_walletDirectories.removeDuplicates();
 }
 
 void WalletKeysFilesModel::findWallets() {
@@ -79,9 +77,9 @@ void WalletKeysFilesModel::findWallets() {
     rx.setPatternSyntax(QRegExp::Wildcard);
     QStringList walletPaths;
 
-    for(auto i = 0; i != this->walletDirectories.length(); i++) {
+    for(auto i = 0; i != m_walletDirectories.length(); i++) {
         // Scan default wallet dir (~/Monero/)
-        walletPaths << Utils::fileFind(rx, this->walletDirectories[i], 0, i == 0 ? 2 : 0, 200);
+        walletPaths << Utils::fileFind(rx, m_walletDirectories[i], 0, i == 0 ? 2 : 0, 200);
     }
 
     walletPaths.removeDuplicates();
@@ -113,16 +111,16 @@ void WalletKeysFilesModel::findWallets() {
             file.close();
         }
 
-        this->addWalletKeysFile(WalletKeysFiles(fileInfo, networkType, std::move(addr)));
+        this->addWalletKeysFile(WalletKeysFile(fileInfo, networkType, std::move(addr)));
     }
 
     auto duration = duration_cast<milliseconds>(high_resolution_clock::now() - now).count();
     qDebug() << QString("wallet .keys search completed in %1 ms").arg(duration);
 }
 
-void WalletKeysFilesModel::addWalletKeysFile(const WalletKeysFiles &walletKeysFile) {
+void WalletKeysFilesModel::addWalletKeysFile(const WalletKeysFile &walletKeysFile) {
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
-    m_walletKeyFiles << walletKeysFile;
+    m_walletKeyFiles.append(walletKeysFile);
     endInsertRows();
 }
 
@@ -131,7 +129,7 @@ int WalletKeysFilesModel::rowCount(const QModelIndex & parent) const {
 }
 
 int WalletKeysFilesModel::columnCount(const QModelIndex &) const {
-    return 4;
+    return Column::COUNT;
 }
 
 QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
@@ -142,7 +140,7 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
 
     if (role == Qt::DisplayRole) {
         switch(index.column()) {
-            case ModelColumns::NetworkType: {
+            case Column::NetworkType: {
                 auto c = static_cast<NetworkType::Type>(walletKeyFile.networkType());
                 if (c == NetworkType::Type::STAGENET)
                     return QString("stage");
@@ -150,9 +148,10 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
                     return QString("test");
                 return QString("main");
             }
-            case ModelColumns::FileName:
+            case Column::FileName: {
                 return walletKeyFile.fileName().replace(".keys", "");
-            case ModelColumns::Path: {
+            }
+            case Column::Path: {
                 auto fp = walletKeyFile.path();
 #if defined(Q_OS_MAC) || defined(Q_OS_LINUX)
                 if (fp.startsWith(QDir::homePath())) {
@@ -161,20 +160,20 @@ QVariant WalletKeysFilesModel::data(const QModelIndex &index, int role) const {
 #endif
                 return fp;
             }
-            case ModelColumns::Modified:
+            case Column::Modified:
                 return walletKeyFile.modified();
             default:
                 break;
         }
     } else if(role == Qt::UserRole) {
         switch(index.column()) {
-            case ModelColumns::NetworkType:
+            case Column::NetworkType:
                 return static_cast<int>(walletKeyFile.networkType());
-            case ModelColumns::FileName:
+            case Column::FileName:
                 return walletKeyFile.fileName();
-            case ModelColumns::Modified:
+            case Column::Modified:
                 return (int)walletKeyFile.modified();
-            case ModelColumns::Path:
+            case Column::Path:
                 return walletKeyFile.path();
             default:
                 break;
@@ -201,6 +200,8 @@ QVariant WalletKeysFilesModel::headerData(int section, Qt::Orientation orientati
     }
     return QVariant();
 }
+
+// ProxyModel
 
 WalletKeysFilesProxyModel::WalletKeysFilesProxyModel(QObject *parent, NetworkType::Type nettype)
     : QSortFilterProxyModel(parent)

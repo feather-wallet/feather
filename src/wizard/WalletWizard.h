@@ -9,7 +9,7 @@
 #include <QRadioButton>
 
 #include "appcontext.h"
-#include "utils/keysfiles.h"
+#include "model/WalletKeysFilesModel.h"
 #include "utils/RestoreHeightLookup.h"
 #include "utils/config.h"
 
@@ -56,7 +56,6 @@ public:
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);
-    ~WalletWizard() override;
 
 signals:
     void initialNetworkConfigured();

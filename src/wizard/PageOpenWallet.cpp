@@ -91,7 +91,7 @@ bool PageOpenWallet::validatePage() {
         QMessageBox::warning(this, "Wallet not selected", "Please select a wallet from the list.");
         return false;
     }
-    QString walletPath = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::ModelColumns::Path), Qt::UserRole).toString();
+    QString walletPath = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Column::Path), Qt::UserRole).toString();
 
     auto autoWallet = ui->openOnStartup->isChecked() ? QString("%1%2").arg(constants::networkType).arg(walletPath) : "";
     config()->set(Config::autoOpenWalletPath, autoWallet);
