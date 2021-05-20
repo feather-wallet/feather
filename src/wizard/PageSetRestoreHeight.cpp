@@ -86,7 +86,7 @@ void PageSetRestoreHeight::onRestoreHeightEdited() {
 }
 
 void PageSetRestoreHeight::showScanWarning(const QDateTime &date) {
-    QString dateString = date.toString("yyyy-MM-dd");
+    QString dateString = date.toString("MMMM dd, yyyy");
     ui->label_scanWarning->setText(QString("Wallet will not scan for transactions before %1").arg(dateString));
     ui->frame_scanWarning->show();
 }
