@@ -17,17 +17,6 @@ CalcWindow::CalcWindow(QWidget *parent)
 
     ui->setupUi(this);
     this->setWindowIcon(icons()->icon("gnome-calc.png"));
-
-    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &CalcWindow::initFiat);
-    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &CalcWindow::initCrypto);
-}
-
-void CalcWindow::initFiat() {
-    this->ui->calcWidget->initFiat();
-}
-
-void CalcWindow::initCrypto() {
-    this->ui->calcWidget->initCrypto();
 }
 
 void CalcWindow::closeEvent(QCloseEvent *foo) {

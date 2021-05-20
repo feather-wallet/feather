@@ -21,10 +21,6 @@ public:
 signals:
     void closed();
 
-public slots:
-    void initFiat();
-    void initCrypto();
-
 private:
     void closeEvent(QCloseEvent *bar) override;
 
