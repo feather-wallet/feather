@@ -116,7 +116,7 @@ void WalletKeysFilesModel::findWallets() {
         this->addWalletKeysFile(WalletKeysFiles(fileInfo, networkType, std::move(addr)));
     }
 
-    auto duration = duration_cast<microseconds>(high_resolution_clock::now() - now).count();
+    auto duration = duration_cast<milliseconds>(high_resolution_clock::now() - now).count();
     qDebug() << QString("wallet .keys search completed in %1 ms").arg(duration);
 }
 
