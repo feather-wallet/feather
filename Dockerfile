@@ -88,8 +88,6 @@ RUN apt-get update && \
 # build tools
     software-properties-common automake pkg-config python \
     libtool-bin wget zip \
-# dependencies
-    libusb-1.0-0-dev \
 # Qt
     libgl1-mesa-dev libglib2.0-dev mesa-common-dev \
 # libusb
@@ -111,6 +109,11 @@ RUN add-apt-repository ppa:git-core/ppa && \
     apt-get update && \
     apt-get install -y git && \
     rm -rf /var/lib/apt/lists/*
+
+RUN wget http://archive.ubuntu.com/ubuntu/pool/main/s/systemd/libudev-dev_229-4ubuntu21.31_amd64.deb && \
+    echo "f1f72bd814d1e8ca2828ac004924fba0b54a3299e60f089c6d818262b11750f7 libudev-dev_229-4ubuntu21.31_amd64.deb" | sha256sum -c && \
+    apt install ./libudev-dev_229-4ubuntu21.31_amd64.deb && \
+    rm libudev-dev_229-4ubuntu21.31_amd64.deb
 
 RUN mkdir appimagetool && \
     cd appimagetool && \
