@@ -69,7 +69,7 @@ RUN git clone -b tor-0.4.5.7 --depth 1 https://git.torproject.org/tor.git && \
 FROM ubuntu:16.04
 
 ARG THREADS=1
-ARG QT_VERSION=5.15.2
+ARG QT_VERSION=v5.15.2
 
 ENV CFLAGS="-fPIC"
 ENV CPPFLAGS="-fPIC"
