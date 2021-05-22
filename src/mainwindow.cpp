@@ -565,10 +565,10 @@ void MainWindow::onConnectionStatusChanged(int status)
 
 void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
     auto tx_status = tx->status();
-    auto err = QString("Can't create transaction: ");
+    QString err{"Can't create transaction: "};
 
-    if(tx_status != PendingTransaction::Status_Ok){
-        auto tx_err = tx->errorString();
+    if (tx_status != PendingTransaction::Status_Ok){
+        QString tx_err = tx->errorString();
         qCritical() << tx_err;
 
         if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
@@ -576,15 +576,25 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         else
             err = QString("%1 %2").arg(err).arg(tx_err);
 
+        if (tx_err.contains("Daemon response did not include the requested real output")) {
+            QString currentNode = m_ctx->nodes->connection().toAddress();
+
+            err += QString("\nYou are currently connected to: %1\n\n"
+                           "This node may be acting maliciously. You are strongly recommended to disconnect from this node."
+                           "Please report this incident to dev@featherwallet.org, #feather on OFTC or /r/FeatherWallet.").arg(currentNode);
+        }
+
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
-    } else if (tx->txCount() == 0) {
+    }
+    else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
-    } else {
+    }
+    else {
         const auto &description = m_ctx->tmpTxDescription;
 
         // Show advanced dialog on multi-destination transactions

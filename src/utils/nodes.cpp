@@ -229,7 +229,7 @@ void Nodes::autoConnect(bool forceReconnect) {
         }
 
         // try a connect
-        auto node = this->pickEligibleNode();
+        FeatherNode node = this->pickEligibleNode();
         this->connectToNode(node);
         return;
     }

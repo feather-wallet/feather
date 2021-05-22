@@ -69,7 +69,15 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
             }
         }
     }
-    else if(role == Qt::BackgroundRole) {
+    else if (role == Qt::ToolTipRole) {
+        switch (index.column()) {
+            case NodeModel::URL: {
+                if (node.isActive)
+                    return QString("Feather is connected to this node.");
+            }
+        }
+    }
+    else if (role == Qt::BackgroundRole) {
         if (node.isConnecting)
             return QBrush(ColorScheme::YELLOW.asColor(true));
         else if (node.isActive)
