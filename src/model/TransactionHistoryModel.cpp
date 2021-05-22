@@ -137,6 +137,9 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
     {
         case Column::Date:
         {
+            if (role == Qt::UserRole) {
+                return tInfo.timestamp();
+            }
             return tInfo.timestamp().toString(QString("%1 %2 ").arg(config()->get(Config::dateFormat).toString(),
                                                                     config()->get(Config::timeFormat).toString()));
         }
