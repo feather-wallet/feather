@@ -104,7 +104,6 @@ void TransactionHistory::refresh(quint32 accountIndex)
 void TransactionHistory::setTxNote(const QString &txid, const QString &note)
 {
     m_pimpl->setTxNote(txid.toStdString(), note.toStdString());
-    this->refresh(0); // todo: get actual account index
     emit txNoteChanged();
 }
 

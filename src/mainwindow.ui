@@ -403,6 +403,7 @@
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
     <addaction name="separator"/>
+    <addaction name="actionAccount"/>
     <addaction name="actionPassword"/>
     <addaction name="actionSeed"/>
     <addaction name="actionKeys"/>
@@ -740,6 +741,30 @@
   <action name="actiont">
    <property name="text">
     <string>t</string>
+   </property>
+  </action>
+  <action name="actiond">
+   <property name="text">
+    <string>d</string>
+   </property>
+  </action>
+  <action name="actionPrimary_account">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Primary account</string>
+   </property>
+  </action>
+  <action name="actionAccount">
+   <property name="text">
+    <string>Account</string>
    </property>
   </action>
  </widget>

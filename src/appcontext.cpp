@@ -41,6 +41,9 @@ AppContext::AppContext(Wallet *wallet)
     connect(this->wallet.get(), &Wallet::connectionStatusChanged, [this]{
         this->nodes->autoConnect();
     });
+    connect(this->wallet.get(), &Wallet::currentSubaddressAccountChanged, [this]{
+        this->updateBalance();
+    });
 
     connect(this, &AppContext::createTransactionError, this, &AppContext::onCreateTransactionError);
 
@@ -54,6 +57,10 @@ AppContext::AppContext(Wallet *wallet)
 
     // force trigger preferredFiat signal for history model
     this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
+
+    connect(this->wallet->history(), &TransactionHistory::txNoteChanged, [this]{
+        this->wallet->history()->refresh(this->wallet->currentSubaddressAccount());
+    });
 }
 
 // ################## Transaction creation ##################

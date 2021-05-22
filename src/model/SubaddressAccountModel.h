@@ -4,35 +4,44 @@
 #ifndef SUBADDRESSACCOUNTMODEL_H
 #define SUBADDRESSACCOUNTMODEL_H
 
-#include <QAbstractListModel>
+#include "Subaddress.h"
+#include <QAbstractTableModel>
 
 class SubaddressAccount;
 
-class SubaddressAccountModel : public QAbstractListModel
+class SubaddressAccountModel : public QAbstractTableModel
 {
     Q_OBJECT
 
 public:
-    enum SubaddressAccountRowRole {
-        SubaddressAccountRole = Qt::UserRole + 1, // for the SubaddressAccountRow object;
-        SubaddressAccountAddressRole,
-        SubaddressAccountLabelRole,
-        SubaddressAccountBalanceRole,
-        SubaddressAccountUnlockedBalanceRole,
+    enum Column {
+        Number,
+        Address,
+        Label,
+        Balance,
+        UnlockedBalance,
+        COUNT
     };
-    Q_ENUM(SubaddressAccountRowRole)
 
     SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-    QHash<int, QByteArray> roleNames() const  override;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
+
+    Monero::SubaddressAccountRow* entryFromIndex(const QModelIndex &index) const;
 
 public slots:
     void startReset();
     void endReset();
 
 private:
+    QVariant parseSubaddressAccountRow(const Monero::SubaddressAccountRow &row, const QModelIndex &index, int role) const;
+
     SubaddressAccount *m_subaddressAccount;
 };
 

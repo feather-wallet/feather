@@ -60,6 +60,7 @@ private:
     // history contains locked transfers
     mutable bool m_locked;
 
+    quint32 lastAccountIndex = 0;
 };
 
 #endif // TRANSACTIONHISTORY_H

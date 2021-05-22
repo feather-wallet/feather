@@ -155,6 +155,7 @@ private slots:
     void showKeysDialog();
     void showViewOnlyDialog();
     void showWalletCacheDebugDialog();
+    void showAccountSwitcherDialog();
 
     void donateButtonClicked();
     void showCalcWindow();
@@ -230,6 +231,7 @@ private:
     ClickableLabel *m_statusLabelBalance;
     QLabel *m_statusLabelStatus;
     QLabel *m_statusLabelNetStats;
+    StatusBarButton *m_statusAccountSwitcher;
     StatusBarButton *m_statusBtnConnectionStatusIndicator;
     StatusBarButton *m_statusBtnPassword;
     StatusBarButton *m_statusBtnPreferences;

@@ -22,6 +22,7 @@ public:
     Q_INVOKABLE void setLabel(quint32 accountIndex, const QString &label) const;
     Q_INVOKABLE void refresh() const;
     quint64 count() const;
+    Monero::SubaddressAccountRow* row(int index) const;
 
 signals:
     void refreshStarted() const;

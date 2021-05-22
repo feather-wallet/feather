@@ -62,3 +62,8 @@ quint64 SubaddressAccount::count() const
 
     return m_rows.size();
 }
+
+Monero::SubaddressAccountRow* SubaddressAccount::row(int index) const
+{
+    return m_rows.value(index);
+}

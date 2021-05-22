@@ -20,6 +20,7 @@
 #include "dialog/balancedialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
 #include "dialog/UpdateDialog.h"
+#include "dialog/AccountSwitcherDialog.h"
 #include "constants.h"
 #include "libwalletqt/AddressBook.h"
 #include "utils/AsyncTask.h"
@@ -128,6 +129,10 @@ void MainWindow::initStatusBar() {
     connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, this, &MainWindow::showConnectionStatusDialog);
     this->statusBar()->addPermanentWidget(m_statusBtnConnectionStatusIndicator);
 
+    m_statusAccountSwitcher = new StatusBarButton(icons()->icon("change_account.png"), "Account switcher", this);
+    connect(m_statusAccountSwitcher, &StatusBarButton::clicked, this, &MainWindow::showAccountSwitcherDialog);
+    this->statusBar()->addPermanentWidget(m_statusAccountSwitcher);
+
     m_statusBtnPassword = new StatusBarButton(icons()->icon("lock.svg"), "Password", this);
     connect(m_statusBtnPassword, &StatusBarButton::clicked, this, &MainWindow::showPasswordDialog);
     this->statusBar()->addPermanentWidget(m_statusBtnPassword);
@@ -212,6 +217,7 @@ void MainWindow::initMenu() {
 
     // [Wallet]
     connect(ui->actionInformation,  &QAction::triggered, this, &MainWindow::showWalletInfoDialog);
+    connect(ui->actionAccount,      &QAction::triggered, this, &MainWindow::showAccountSwitcherDialog);
     connect(ui->actionPassword,     &QAction::triggered, this, &MainWindow::showPasswordDialog);
     connect(ui->actionSeed,         &QAction::triggered, this, &MainWindow::showSeedDialog);
     connect(ui->actionKeys,         &QAction::triggered, this, &MainWindow::showKeysDialog);
@@ -439,12 +445,13 @@ void MainWindow::onWalletOpened() {
         this->setStatusText("Wallet opened - Searching for node");
 
     // receive page
-    m_ctx->wallet->subaddress()->refresh( m_ctx->wallet->currentSubaddressAccount());
+    m_ctx->wallet->subaddress()->refresh(m_ctx->wallet->currentSubaddressAccount());
     if (m_ctx->wallet->subaddress()->count() == 1) {
         for (int i = 0; i < 10; i++) {
             m_ctx->wallet->subaddress()->addRow(m_ctx->wallet->currentSubaddressAccount(), "");
         }
     }
+    m_ctx->wallet->subaddressModel()->setCurrentSubaddressAcount(m_ctx->wallet->currentSubaddressAccount());
 
     // history page
     m_ctx->wallet->history()->refresh(m_ctx->wallet->currentSubaddressAccount());
@@ -900,6 +907,11 @@ void MainWindow::showDebugInfo() {
 
 void MainWindow::showWalletCacheDebugDialog() {
     WalletCacheDebugDialog dialog{m_ctx, this};
+    dialog.exec();
+}
+
+void MainWindow::showAccountSwitcherDialog() {
+    AccountSwitcherDialog dialog{m_ctx, this};
     dialog.exec();
 }
 
