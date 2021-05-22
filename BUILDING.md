@@ -49,8 +49,10 @@ The resulting binary can be found in `build/bin/feather`.
 First create the standalone binary using the Docker command in the previous step.
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:linux contrib/build-appimage.sh
+docker run --rm -it -v $PWD:/feather -w /feather/build feather:linux ../contrib/build-appimage.sh
 ```
+
+The resulting AppImage will be located in `./build`.
 
 ### Windows (reproducible)
 
