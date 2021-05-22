@@ -30,12 +30,6 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
 
     connect(ui->accounts->selectionModel(), &QItemSelectionModel::currentChanged, this, &AccountSwitcherDialog::switchAccount);
     connect(ui->accounts, &QTreeView::customContextMenuRequested, this, &AccountSwitcherDialog::showContextMenu);
-    connect(ui->accounts, &QTreeView::doubleClicked, [this](QModelIndex index){
-        if (!m_model) return;
-        if (!(m_model->flags(index) & Qt::ItemIsEditable)) {
-            this->switchAccount();
-        }
-    });
 
     connect(ui->btn_newAccount, &QPushButton::clicked, [this]{
        m_ctx->wallet->addSubaddressAccount("New account");
@@ -89,7 +83,6 @@ void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
 
     auto *menu = new QMenu(ui->accounts);
 
-    menu->addAction("Switch to account", this, &AccountSwitcherDialog::switchAccount);
     menu->addAction("Copy label", this, &AccountSwitcherDialog::copyLabel);
     menu->addAction("Copy balance", this, &AccountSwitcherDialog::copyBalance);
     menu->addAction("Edit label", this, &AccountSwitcherDialog::editLabel);
