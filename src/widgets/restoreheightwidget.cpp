@@ -33,7 +33,7 @@ void RestoreHeightWidget::setHeight(int height) {
     ui->lineEdit_restoreHeight->setText(QString::number(height));
 
     // Update slider
-    int date = m_restoreHeightLookup->restoreHeightToDate(height);
+    int date = m_restoreHeightLookup->heightToTimestamp(height);
     ui->restoreSlider->setValue(date);
 
     this->updateTimestamp(date);
@@ -49,7 +49,7 @@ void RestoreHeightWidget::initRestoreHeights(RestoreHeightLookup *lookup) {
 
     connect(ui->restoreSlider, &QSlider::sliderMoved, [this](int date){
         // Update lineEdit
-        int blockHeight = m_restoreHeightLookup->dateToRestoreHeight(date);
+        int blockHeight = m_restoreHeightLookup->dateToHeight(date);
         ui->lineEdit_restoreHeight->setText(QString::number(blockHeight));
 
         this->updateTimestamp(date);

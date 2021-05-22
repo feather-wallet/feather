@@ -93,13 +93,13 @@ struct FeatherSeed {
         if (this->time == 0)
             this->restoreHeight = 1;
 
-        this->restoreHeight = appData()->restoreHeights[netType]->dateToRestoreHeight(this->time);
+        this->restoreHeight = appData()->restoreHeights[netType]->dateToHeight(this->time);
     }
 
     int setRestoreHeight(int height) {
         auto now = std::time(nullptr);
         auto nowClearance = 3600 * 24;
-        auto currentBlockHeight = appData()->restoreHeights[netType]->dateToRestoreHeight(now - nowClearance);
+        auto currentBlockHeight = appData()->restoreHeights[netType]->dateToHeight(now - nowClearance);
         if (height >= currentBlockHeight + nowClearance) {
             qCritical() << "unrealistic restore height detected, setting to current blockheight instead: " << currentBlockHeight;
             this->restoreHeight = currentBlockHeight;

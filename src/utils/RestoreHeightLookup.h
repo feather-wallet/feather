@@ -17,7 +17,7 @@ struct RestoreHeightLookup {
     QMap<int, int> data;
     explicit RestoreHeightLookup(NetworkType::Type type) : type(type) {}
 
-    int dateToRestoreHeight(int date) {
+    int dateToHeight(int date) {
         // restore height based on a given timestamp using a lookup
         // table. If it cannot find the date in the lookup table, it
         // will calculate the blockheight based off the last known
@@ -49,7 +49,7 @@ struct RestoreHeightLookup {
         return blockHeight;
     }
 
-    int restoreHeightToDate(int height) {
+    int heightToTimestamp(int height) {
         // @TODO: most likely inefficient, refactor
         QMap<int, int>::iterator i;
         int timestamp = 0;
@@ -68,6 +68,10 @@ struct RestoreHeightLookup {
         }
 
         return timestamp;
+    }
+
+    QDateTime heightToDate(int height) {
+        return QDateTime::fromSecsSinceEpoch(this->heightToTimestamp(height));
     }
 
     static RestoreHeightLookup *fromFile(const QString &fn, NetworkType::Type type) {

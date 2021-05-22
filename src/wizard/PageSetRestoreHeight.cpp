@@ -61,7 +61,7 @@ void PageSetRestoreHeight::onCreationDateEdited() {
     QDateTime restoreDate = date > curDate ? curDate : date;
     int timestamp = restoreDate.toSecsSinceEpoch();
 
-    QString restoreHeight = QString::number(appData()->restoreHeights[constants::networkType]->dateToRestoreHeight(timestamp));
+    QString restoreHeight = QString::number(appData()->restoreHeights[constants::networkType]->dateToHeight(timestamp));
     ui->line_restoreHeight->setText(restoreHeight);
 
     this->showScanWarning(restoreDate);
@@ -77,8 +77,7 @@ void PageSetRestoreHeight::onRestoreHeightEdited() {
         return;
     }
 
-    int timestamp = appData()->restoreHeights[constants::networkType]->restoreHeightToDate(restoreHeight);
-    auto date = QDateTime::fromSecsSinceEpoch(timestamp);
+    QDateTime date = appData()->restoreHeights[constants::networkType]->heightToDate(restoreHeight);
     ui->line_creationDate->setText(date.toString("yyyy-MM-dd"));
 
     this->showScanWarning(date);
