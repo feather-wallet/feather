@@ -40,6 +40,7 @@ public slots:
     void comboBox_amountPrecisionChanged(int pos);
     void comboBox_dateFormatChanged(int pos);
     void comboBox_timeFormatChanged(int pos);
+    void comboBox_balanceDisplayChanged(int pos);
 
     void comboBox_blockExplorerChanged(int pos);
     void comboBox_redditFrontendChanged(int pos);

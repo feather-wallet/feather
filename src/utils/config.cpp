@@ -57,6 +57,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::amountPrecision, {QS("amountPrecision"), 12}},
         {Config::dateFormat, {QS("dateFormat"), "yyyy-MM-dd"}},
         {Config::timeFormat, {QS("timeFormat"), "HH:mm"}},
+        {Config::balanceDisplay, {QS("balanceDisplay"), Config::BalanceDisplay::spendablePlusUnconfirmed}},
 
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},

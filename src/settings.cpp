@@ -74,7 +74,11 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->comboBox_dateFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_dateFormatChanged);
     connect(ui->comboBox_timeFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_timeFormatChanged);
 
-    // setup preferred fiat currency combobox
+    // Balance display combobox
+    ui->comboBox_balanceDisplay->setCurrentIndex(config()->get(Config::balanceDisplay).toInt());
+    connect(ui->comboBox_balanceDisplay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_balanceDisplayChanged);
+
+    // Preferred fiat currency combobox
     QStringList fiatCurrencies;
     for (int index = 0; index < ui->comboBox_fiatCurrency->count(); index++)
         fiatCurrencies << ui->comboBox_fiatCurrency->itemText(index);
@@ -153,6 +157,11 @@ void Settings::comboBox_dateFormatChanged(int pos) {
 
 void Settings::comboBox_timeFormatChanged(int pos) {
     config()->set(Config::timeFormat, m_timeFormats.at(pos));
+}
+
+void Settings::comboBox_balanceDisplayChanged(int pos) {
+    config()->set(Config::balanceDisplay, pos);
+    m_ctx->updateBalance();
 }
 
 void Settings::copyToClipboard() {

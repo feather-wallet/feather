@@ -162,6 +162,32 @@
          <item row="4" column="1">
           <widget class="QComboBox" name="comboBox_timeFormat"/>
          </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Balance display:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QComboBox" name="comboBox_balanceDisplay">
+           <item>
+            <property name="text">
+             <string>Total balance</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Spendable balance (+ unconfirmed balance)</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Spendable balance</string>
+            </property>
+           </item>
+          </widget>
+         </item>
         </layout>
        </item>
        <item>

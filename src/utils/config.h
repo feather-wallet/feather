@@ -55,6 +55,7 @@ public:
         amountPrecision,
         dateFormat,
         timeFormat,
+        balanceDisplay,
 
         multiBroadcast,
         warnOnExternalLink,
@@ -76,6 +77,12 @@ public:
         allTorExceptNode = 0,
         allTorExceptInitSync,
         allTor
+    };
+
+    enum BalanceDisplay {
+        totalBalance = 0,
+        spendablePlusUnconfirmed,
+        spendable
     };
 
     ~Config() override;

@@ -470,18 +470,27 @@ void MainWindow::onWalletOpened() {
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     qDebug() << Q_FUNC_INFO;
-    bool hide = config()->get(Config::hideBalance).toBool();
 
-    QString label_str = QString("Balance: %1 XMR").arg(WalletManager::displayAmount(spendable, false));
-    if (balance > spendable) {
-        label_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false));
+    bool hide = config()->get(Config::hideBalance).toBool();
+    int displaySetting = config()->get(Config::balanceDisplay).toInt();
+
+    QString balance_str = "Balance: ";
+    if (hide) {
+        balance_str += "HIDDEN";
+    }
+    else if (displaySetting == Config::totalBalance) {
+        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(balance, false));
+    }
+    else if (displaySetting == Config::spendable || displaySetting == Config::spendablePlusUnconfirmed) {
+        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(spendable, false));
+
+        if (displaySetting == Config::spendablePlusUnconfirmed && balance > spendable) {
+            balance_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false));
+        }
     }
 
-    if (hide)
-        label_str = "Balance: HIDDEN";
-
     m_statusLabelBalance->setToolTip("Click for details");
-    m_statusLabelBalance->setText(label_str);
+    m_statusLabelBalance->setText(balance_str);
     m_balanceWidget->setHidden(hide);
 }
 
