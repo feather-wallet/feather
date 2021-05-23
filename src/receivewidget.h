@@ -25,6 +25,9 @@ public:
     explicit ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ReceiveWidget() override;
 
+    void setSearchbarVisible(bool visible);
+    void focusSearchbar();
+
 public slots:
     void copyAddress();
     void copyLabel();

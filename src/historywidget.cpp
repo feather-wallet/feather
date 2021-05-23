@@ -61,6 +61,15 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     }
 }
 
+void HistoryWidget::setSearchbarVisible(bool visible) {
+    ui->search->setVisible(visible);
+}
+
+void HistoryWidget::focusSearchbar() {
+    ui->search->setFocusPolicy(Qt::StrongFocus);
+    ui->search->setFocus();
+}
+
 void HistoryWidget::showContextMenu(const QPoint &point) {
     QModelIndex index = ui->history->indexAt(point);
     if (!index.isValid()) {

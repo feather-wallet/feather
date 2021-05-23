@@ -461,6 +461,8 @@
     <addaction name="actionShow_calc"/>
     <addaction name="actionShow_Exchange"/>
     <addaction name="actionShow_XMRig"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Searchbar"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWallet"/>
@@ -765,6 +767,17 @@
   <action name="actionAccount">
    <property name="text">
     <string>Account</string>
+   </property>
+  </action>
+  <action name="actionShow_Searchbar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Searchbar</string>
    </property>
   </action>
  </widget>

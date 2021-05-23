@@ -46,6 +46,7 @@ public:
         showTabExchange,
         showTabCalc,
         showTabXMRig,
+        showSearchbar,
 
         xmrigPath,
         xmrigPool,

@@ -23,6 +23,9 @@ public:
     explicit ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ContactsWidget() override;
 
+    void setSearchbarVisible(bool visible);
+    void focusSearchbar();
+
 public slots:
     void copyAddress();
     void copyName();

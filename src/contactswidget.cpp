@@ -63,6 +63,15 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->search, &QLineEdit::textChanged, this, &ContactsWidget::setSearchFilter);
 }
 
+void ContactsWidget::setSearchbarVisible(bool visible) {
+    ui->search->setVisible(visible);
+}
+
+void ContactsWidget::focusSearchbar() {
+    ui->search->setFocusPolicy(Qt::StrongFocus);
+    ui->search->setFocus();
+}
+
 void ContactsWidget::copyAddress() {
     QModelIndex index = ui->contacts->currentIndex();
     ModelUtils::copyColumn(&index, AddressBookModel::Address);

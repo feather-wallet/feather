@@ -248,6 +248,8 @@ void MainWindow::initMenu() {
 
     // [View]
     m_tabShowHideSignalMapper = new QSignalMapper(this);
+    connect(ui->actionShow_Searchbar, &QAction::toggled, this, &MainWindow::toggleSearchbar);
+    ui->actionShow_Searchbar->setChecked(config()->get(Config::showSearchbar).toBool());
 
     // Show/Hide Home
     connect(ui->actionShow_Home, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
@@ -325,6 +327,7 @@ void MainWindow::initMenu() {
     ui->actionShow_debug_info->setShortcut(QKeySequence("Ctrl+D"));
     ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
     ui->actionUpdate_balance->setShortcut(QKeySequence("Ctrl+U"));
+    ui->actionShow_Searchbar->setShortcut(QKeySequence("Ctrl+F"));
 }
 
 void MainWindow::initHome() {
@@ -1418,6 +1421,22 @@ void MainWindow::updateRecentlyOpened(const QString &keysFile) {
         QFileInfo fileInfo{path};
         ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, path, ""));
     }
+}
+
+void MainWindow::toggleSearchbar(bool visible) {
+    config()->set(Config::showSearchbar, visible);
+
+    m_historyWidget->setSearchbarVisible(visible);
+    m_receiveWidget->setSearchbarVisible(visible);
+    m_contactsWidget->setSearchbarVisible(visible);
+
+    int currentTab = ui->tabWidget->currentIndex();
+    if (currentTab == Tabs::HISTORY)
+        m_historyWidget->focusSearchbar();
+    else if (currentTab == Tabs::SEND)
+        m_contactsWidget->focusSearchbar();
+    else if (currentTab == Tabs::RECEIVE)
+        m_receiveWidget->focusSearchbar();
 }
 
 MainWindow::~MainWindow() {

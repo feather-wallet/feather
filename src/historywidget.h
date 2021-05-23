@@ -25,6 +25,9 @@ public:
     explicit HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~HistoryWidget() override;
 
+    void setSearchbarVisible(bool visible);
+    void focusSearchbar();
+
 public slots:
     void setSearchText(const QString &text);
     void resetModel();

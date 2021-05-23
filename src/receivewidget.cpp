@@ -53,10 +53,19 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->btn_generateSubaddress, &QPushButton::clicked, this, &ReceiveWidget::generateSubaddress);
 
     connect(ui->qrCode, &ClickableLabel::clicked, this, &ReceiveWidget::showQrCodeDialog);
-    connect(ui->label_addressSearch, &QLineEdit::textChanged, this, &ReceiveWidget::setSearchFilter);
+    connect(ui->search, &QLineEdit::textChanged, this, &ReceiveWidget::setSearchFilter);
 
     connect(ui->check_showUsed, &QCheckBox::clicked, this, &ReceiveWidget::setShowUsedAddresses);
     connect(ui->check_showHidden, &QCheckBox::clicked, this, &ReceiveWidget::setShowHiddenAddresses);
+}
+
+void ReceiveWidget::setSearchbarVisible(bool visible) {
+    ui->search->setVisible(visible);
+}
+
+void ReceiveWidget::focusSearchbar() {
+    ui->search->setFocusPolicy(Qt::StrongFocus);
+    ui->search->setFocus();
 }
 
 void ReceiveWidget::copyAddress() {

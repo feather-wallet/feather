@@ -46,6 +46,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::showTabExchange, {QS("showTabExchange"), false}},
         {Config::showTabXMRig,{QS("showTabXMRig"), false}},
         {Config::showTabCalc,{QS("showTabCalc"), true}},
+        {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // Mining
         {Config::xmrigPath,{QS("xmrigPath"), ""}},

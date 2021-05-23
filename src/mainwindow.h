@@ -174,6 +174,7 @@ private slots:
     void onDeviceError(const QString &error);
     void menuHwDeviceClicked();
     void onUpdatesAvailable(const QJsonObject &updates);
+    void toggleSearchbar(bool enabled);
 
 private:
     void initStatusBar();
