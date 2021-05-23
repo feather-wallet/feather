@@ -3,6 +3,7 @@
 
 #include "passworddialog.h"
 #include "ui_passworddialog.h"
+#include "utils/Icons.h"
 
 PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent)
         : QDialog(parent)
@@ -10,6 +11,7 @@ PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword
 {
     ui->setupUi(this);
 
+    this->setWindowIcon(icons()->icon("appicons/64x64.png"));
     ui->label_wallet->setText(QString("Please enter password for wallet: %1").arg(walletName));
     ui->label_incorrectPassword->setVisible(incorrectPassword);
 
