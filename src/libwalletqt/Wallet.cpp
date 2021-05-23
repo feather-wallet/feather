@@ -1267,18 +1267,18 @@ void Wallet::onPassphraseEntered(const QString &passphrase, bool enter_on_device
 Wallet::Wallet(Monero::Wallet *w, QObject *parent)
         : QObject(parent)
         , m_walletImpl(w)
-        , m_history(nullptr)
+        , m_history(new TransactionHistory(m_walletImpl->history(), this))
         , m_historyModel(nullptr)
-        , m_addressBook(nullptr)
+        , m_addressBook(new AddressBook(m_walletImpl->addressBook(), this))
         , m_addressBookModel(nullptr)
         , m_daemonBlockChainHeight(0)
         , m_daemonBlockChainTargetHeight(0)
         , m_connectionStatus(Wallet::ConnectionStatus_Disconnected)
         , m_disconnected(true)
         , m_currentSubaddressAccount(0)
-        , m_subaddress(nullptr)
+        , m_subaddress(new Subaddress(m_walletImpl->subaddress(), this))
         , m_subaddressModel(nullptr)
-        , m_subaddressAccount(nullptr)
+        , m_subaddressAccount(new SubaddressAccount(m_walletImpl->subaddressAccount(), this))
         , m_subaddressAccountModel(nullptr)
         , m_coinsModel(nullptr)
         , m_refreshNow(false)
@@ -1286,12 +1286,8 @@ Wallet::Wallet(Monero::Wallet *w, QObject *parent)
         , m_refreshing(false)
         , m_scheduler(this)
         , m_useSSL(true)
+        , m_coins(new Coins(m_walletImpl->coins(), this))
 {
-    m_history = new TransactionHistory(m_walletImpl->history(), this);
-    m_addressBook = new AddressBook(m_walletImpl->addressBook(), this);
-    m_subaddress = new Subaddress(m_walletImpl->subaddress(), this);
-    m_subaddressAccount = new SubaddressAccount(m_walletImpl->subaddressAccount(), this);
-    m_coins = new Coins(m_walletImpl->coins(), this);
     m_walletListener = new WalletListenerImpl(this);
     m_walletImpl->setListener(m_walletListener);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
@@ -1314,19 +1310,6 @@ Wallet::~Wallet()
 
     m_scheduler.shutdownWaitForFinished();
 
-    delete m_addressBook;
-    m_addressBook = NULL;
-
-    delete m_history;
-    m_history = NULL;
-    delete m_addressBook;
-    m_addressBook = NULL;
-    delete m_subaddress;
-    m_subaddress = NULL;
-    delete m_subaddressAccount;
-    m_subaddressAccount = NULL;
-    delete m_coins;
-    m_coins = NULL;
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if(status() == Status_Critical || status() == Status_BadPassword)
         qDebug("Not storing wallet cache");
