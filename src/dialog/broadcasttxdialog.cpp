@@ -14,7 +14,7 @@ BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, QSharedPointer<AppContext>
 {
     ui->setupUi(this);
 
-    auto node = ctx->nodes->connection();
+    auto node = m_ctx->nodes->connection();
     m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_Broadcast, &QPushButton::clicked, this, &BroadcastTxDialog::broadcastTx);
