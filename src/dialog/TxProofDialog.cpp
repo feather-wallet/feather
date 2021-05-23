@@ -8,6 +8,7 @@
 
 #include "libwalletqt/Transfer.h"
 #include "utils/utils.h"
+#include "utils/Icons.h"
 
 TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
     : QDialog(parent)
@@ -44,6 +45,10 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     ui->radio_SpendProof->setChecked(true);
     ui->label_txid->setText(m_txid);
 
+    ui->btn_copyAddress->setIcon(icons()->icon("copy.png"));
+    connect(ui->btn_copyAddress, &QPushButton::clicked, [this]{
+        Utils::copyToClipboard(ui->combo_address->currentText());
+    });
     ui->group_summary->hide(); // todo
 
     this->adjustSize();

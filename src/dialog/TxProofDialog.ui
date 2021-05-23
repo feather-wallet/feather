@@ -30,7 +30,7 @@
       <item>
        <widget class="QRadioButton" name="radio_OutProof">
         <property name="text">
-         <string>Prove a payment to an address (OutProof)</string>
+         <string>Prove payment to an address (OutProof)</string>
         </property>
        </widget>
       </item>
@@ -226,7 +226,31 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="combo_address"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QComboBox" name="combo_address">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btn_copyAddress">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>Copy</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
