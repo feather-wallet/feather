@@ -35,6 +35,8 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
         this->updateQrCode();
     });
 
+    ui->qrCode->setCursor(Qt::PointingHandCursor);
+
     // header context menu
     ui->addresses->header()->setContextMenuPolicy(Qt::CustomContextMenu);
     m_headerMenu = new QMenu(this);
