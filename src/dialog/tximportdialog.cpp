@@ -17,7 +17,7 @@ TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
     ui->resp->hide();
     ui->label_loading->hide();
 
-    auto node = ctx->nodes->connection();
+    auto node = m_ctx->nodes->connection();
     m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_load, &QPushButton::clicked, this, &TxImportDialog::loadTx);
