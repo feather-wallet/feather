@@ -34,12 +34,16 @@ TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
 
 void TxImportDialog::loadTx() {
     QString txid = ui->line_txid->text();
-    QString node = m_ctx->nodes->connection().toAddress();
+    FeatherNode node = m_ctx->nodes->connection();
 
-    if (!node.startsWith("http://"))
-        node = QString("http://%1").arg(node);
+    if (node.isLocal()) {
+        m_rpc->setNetwork(getNetworkClearnet());
+    } else {
+        m_rpc->setNetwork(getNetworkTor());
+    }
 
-    m_rpc->setDaemonAddress(node);
+    qDebug() << node.toURL();
+    m_rpc->setDaemonAddress(node.toURL());
     m_rpc->getTransactions(QStringList() << txid, false, true);
 
     ui->label_loading->setText("Loading transaction");

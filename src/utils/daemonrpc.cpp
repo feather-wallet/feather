@@ -93,3 +93,7 @@ QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {
 void DaemonRpc::setDaemonAddress(const QString &daemonAddress) {
     m_daemonAddress = daemonAddress;
 }
+
+void DaemonRpc::setNetwork(QNetworkAccessManager *network) {
+    m_network = new UtilsNetworking(network, this);
+}

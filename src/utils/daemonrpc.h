@@ -33,6 +33,7 @@ public:
     void getTransactions(const QStringList &txs_hashes, bool decode_as_json = false, bool prune = false);
 
     void setDaemonAddress(const QString &daemonAddress);
+    void setNetwork(QNetworkAccessManager *network);
 
 signals:
     void ApiResponse(DaemonResponse resp);
