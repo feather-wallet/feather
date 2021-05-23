@@ -986,8 +986,6 @@ QPushButton {
   border-radius: 4px;
   padding: 3px;
   outline: none;
-  /* Issue #194 - Special case of QPushButton inside dialogs, for better UI */
-  min-width: 80px;
 }
 
 QPushButton:disabled {
@@ -2150,10 +2148,6 @@ PlotWidget {
 QComboBox::item:checked {
     font-weight: bold;
     max-height: 30px;
-}
-
-QPushButton {
-    min-width: default;
 }
 
 QPushButton:flat {
