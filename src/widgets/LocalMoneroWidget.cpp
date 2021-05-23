@@ -19,8 +19,6 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext>
 {
     ui->setupUi(this);
 
-//    this->adjustSize();
-
     QPixmap logo(":/assets/images/localMonero_logo.png");
     ui->logo->setPixmap(logo.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
@@ -68,6 +66,7 @@ void LocalMoneroWidget::skinChanged() {
 void LocalMoneroWidget::onSearchClicked() {
     m_model->clearData();
     m_currentPage = 0;
+    ui->btn_search->setEnabled(false);
 
     this->searchOffers();
 }
@@ -78,7 +77,7 @@ void LocalMoneroWidget::onSignUpClicked() {
 }
 
 void LocalMoneroWidget::onApiResponse(const LocalMoneroApi::LocalMoneroResponse &resp) {
-    qDebug() << "We got a response";
+    ui->btn_search->setEnabled(true);
 
     if (!resp.ok) {
         QMessageBox::warning(this, "LocalMonero error", QString("Request failed:\n\n%1").arg(resp.message));

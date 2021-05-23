@@ -41,11 +41,11 @@ private:
     void viewOfferDetails();
     void updatePaymentMethods();
 
+    Ui::LocalMoneroWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
+
     int m_currentPage = 0;
 
-    Ui::LocalMoneroWidget *ui;
-
-    QSharedPointer<AppContext> m_ctx;
     LocalMoneroApi *m_api;
     LocalMoneroModel *m_model;
     UtilsNetworking *m_network;
