@@ -199,8 +199,8 @@ void MainWindow::initWidgets() {
     m_xmrig = new XMRigWidget(m_ctx, this);
     ui->xmrRigLayout->addWidget(m_xmrig);
 
-    connect(m_xmrig, &XMRigWidget::miningStarted, [this]{ this->setTitle(true); });
-    connect(m_xmrig, &XMRigWidget::miningEnded, [this]{ this->setTitle(false); });
+    connect(m_xmrig, &XMRigWidget::miningStarted, [this]{ this->updateTitle(); });
+    connect(m_xmrig, &XMRigWidget::miningEnded, [this]{ this->updateTitle(); });
 #else
     ui->tabWidget->setTabVisible(Tabs::XMRIG, false);
 #endif
@@ -361,6 +361,7 @@ void MainWindow::initWalletContext() {
 
     // Wallet
     connect(m_ctx->wallet.get(), &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
+    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, [this]{this->updateTitle();});
 }
 
 void MainWindow::startupWarning() {
@@ -461,7 +462,7 @@ void MainWindow::onWalletOpened() {
     m_coinsWidget->setModel(m_ctx->wallet->coinsModel(), m_ctx->wallet->coins());
 
     this->updatePasswordIcon();
-    this->setTitle(false);
+    this->updateTitle();
     m_ctx->nodes->connectToNode();
     m_updateBytes.start(250);
 
@@ -1354,12 +1355,15 @@ QString MainWindow::getHardwareDevice() {
     return "Unknown";
 }
 
-void MainWindow::setTitle(bool mining) {
-    auto title = QString("Feather - [%1]").arg(this->walletName());
-    if (m_ctx->wallet && m_ctx->wallet->viewOnly())
+void MainWindow::updateTitle() {
+    QString title = QString("%1 (#%2)").arg(this->walletName(), QString::number(m_ctx->wallet->currentSubaddressAccount()));
+
+    if (m_ctx->wallet->viewOnly())
         title += " [view-only]";
-    if (mining)
+    if (m_xmrig->isMining())
         title += " [mining]";
+
+    title += " - Feather";
 
     this->setWindowTitle(title);
 }

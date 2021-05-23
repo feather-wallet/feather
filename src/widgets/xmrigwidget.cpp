@@ -115,6 +115,10 @@ XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     }
 }
 
+bool XMRigWidget::isMining() {
+    return m_isMining;
+}
+
 void XMRigWidget::onWalletClosed() {
     this->onStopClicked();
     this->onClearClicked();
@@ -173,6 +177,7 @@ void XMRigWidget::onStartClicked() {
     m_XMRig->start(xmrigPath, m_threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked());
     ui->btn_start->setEnabled(false);
     ui->btn_stop->setEnabled(true);
+    m_isMining = true;
     emit miningStarted();
 }
 
@@ -181,6 +186,7 @@ void XMRigWidget::onStopClicked() {
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
     ui->label_status->hide();
+    m_isMining = false;
     emit miningEnded();
 }
 
@@ -200,6 +206,7 @@ void XMRigWidget::onProcessError(const QString &msg) {
     ui->btn_start->setEnabled(true);
     ui->btn_stop->setEnabled(false);
     ui->label_status->hide();
+    m_isMining = false;
     emit miningEnded();
 }
 

@@ -200,7 +200,7 @@ private:
     QString getPlatformTag();
     void displayWalletErrorMsg(const QString &err);
     QString getHardwareDevice();
-    void setTitle(bool mining);
+    void updateTitle();
     void donationNag();
     void updateRecentlyOpened(const QString &filename);
 
