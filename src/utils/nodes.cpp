@@ -13,8 +13,7 @@
 
 bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeList::Type source) {
     // We can't obtain references to QJsonObjects...
-
-    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+    QJsonObject obj = this->getConfigData();
     this->ensureStructure(obj, networkType);
 
     QString networkTypeStr = QString::number(networkType);
@@ -37,7 +36,7 @@ bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeL
 }
 
 void NodeList::setNodes(const QStringList &nodes, NetworkType::Type networkType, NodeList::Type source) {
-    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+    QJsonObject obj = this->getConfigData();
     this->ensureStructure(obj, networkType);
 
     QString networkTypeStr = QString::number(networkType);
@@ -53,7 +52,8 @@ void NodeList::setNodes(const QStringList &nodes, NetworkType::Type networkType,
 }
 
 QStringList NodeList::getNodes(NetworkType::Type networkType, NodeList::Type source) {
-    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+    QJsonObject obj = this->getConfigData();
+    this->ensureStructure(obj, networkType);
 
     QString networkTypeStr = QString::number(networkType);
     QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
@@ -68,12 +68,23 @@ QStringList NodeList::getNodes(NetworkType::Type networkType, NodeList::Type sou
     return nodes;
 }
 
+QJsonObject NodeList::getConfigData() {
+    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+
+    // Load old config format
+    if (obj.isEmpty()) {
+        auto jsonData = config()->get(Config::nodes).toByteArray();
+        if (Utils::validateJSON(jsonData)) {
+            QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+            obj = doc.object();
+        }
+    }
+
+    return obj;
+}
+
 void NodeList::ensureStructure(QJsonObject &obj, NetworkType::Type networkType) {
     QString networkTypeStr = QString::number(networkType);
-
-    if (!obj.contains(networkTypeStr))
-        obj[networkTypeStr] = QJsonObject();
-
     QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
     if (!netTypeObj.contains("ws"))
         netTypeObj["ws"] = QJsonArray();
