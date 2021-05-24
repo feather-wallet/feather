@@ -7,7 +7,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
-set(VERSION "beta-6")
+set(VERSION "beta-7")
 
 option(STATIC "Link libraries statically, requires static Qt")
 

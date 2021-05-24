@@ -22,7 +22,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-6`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-7`) to build the release binary.
 
 #### 2. Base image
 
@@ -63,7 +63,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-4`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-7`) to build the release binary.
 
 #### 2. Base image
 
