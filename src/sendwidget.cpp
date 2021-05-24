@@ -70,8 +70,6 @@ void SendWidget::addressEdited() {
     if (outputs.size() > 0) {
         ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal()));
         ui->comboCurrencySelection->setCurrentIndex(0);
-    } else {
-        ui->lineAmount->setText("");
     }
 
     ui->btn_openAlias->setVisible(ui->lineAddress->isOpenAlias());
