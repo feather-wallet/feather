@@ -32,19 +32,15 @@ BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, QSharedPointer<AppContext>
 void BroadcastTxDialog::broadcastTx() {
     QString tx = ui->transaction->toPlainText();
 
-    QString node = [this]{
-        QString node;
-        if (ui->radio_useCustom->isChecked())
-            node = ui->customNode->text();
-        else if (ui->radio_useDefault->isChecked())
-            node = m_ctx->nodes->connection().toAddress();
+    FeatherNode node = ui->radio_useCustom->isChecked() ? FeatherNode(ui->customNode->text()) : m_ctx->nodes->connection();
 
-        if (!node.startsWith("http://"))
-            node = QString("http://%1").arg(node);
-        return node;
-    }();
+    if (node.isLocal()) {
+        m_rpc->setNetwork(getNetworkClearnet());
+    } else {
+        m_rpc->setNetwork(getNetworkTor());
+    }
 
-    m_rpc->setDaemonAddress(node);
+    m_rpc->setDaemonAddress(node.toURL());
     m_rpc->sendRawTransaction(tx);
 }
 
