@@ -68,9 +68,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     websocketNotifier()->emitCache(); // Get cached data
 
     // Settings
-    for (auto tickerWidget: m_tickerWidgets)
-        connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, tickerWidget, &TickerWidget::init);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceWidget, &TickerWidget::init);
+    for (const auto &widget: m_priceTickerWidgets)
+        connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
+    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx.get(), &AppContext::onPreferredFiatCurrencyChanged);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
     connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx.get(), &AppContext::onAmountPrecisionChanged);
@@ -332,13 +332,14 @@ void MainWindow::initMenu() {
 
 void MainWindow::initHome() {
     // Ticker widgets
-    m_tickerWidgets.append(new TickerWidget(this, m_ctx, "XMR"));
-    m_tickerWidgets.append(new TickerWidget(this, m_ctx, "BTC"));
-    for (auto tickerWidget: m_tickerWidgets) {
-        ui->tickerLayout->addWidget(tickerWidget);
+    m_priceTickerWidgets.append(new PriceTickerWidget(this, m_ctx, "XMR"));
+    m_priceTickerWidgets.append(new PriceTickerWidget(this, m_ctx, "BTC"));
+    for (const auto &widget : m_priceTickerWidgets) {
+        ui->tickerLayout->addWidget(widget);
     }
-    m_balanceWidget = new TickerWidget(this, m_ctx, "XMR", "Balance", true, true);
-    ui->fiatTickerLayout->addWidget(m_balanceWidget);
+
+    m_balanceTickerWidget = new BalanceTickerWidget(this, m_ctx, false);
+    ui->fiatTickerLayout->addWidget(m_balanceTickerWidget);
 
     connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
     connect(ui->redditWidget, &RedditWidget::setStatusText, this, &MainWindow::setStatusText);
@@ -495,7 +496,7 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
 
     m_statusLabelBalance->setToolTip("Click for details");
     m_statusLabelBalance->setText(balance_str);
-    m_balanceWidget->setHidden(hide);
+    m_balanceTickerWidget->setHidden(hide);
 }
 
 void MainWindow::onSetStatusText(const QString &text) {

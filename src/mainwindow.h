@@ -33,7 +33,7 @@
 #include "utils/config.h"
 #include "widgets/ccswidget.h"
 #include "widgets/redditwidget.h"
-#include "widgets/tickerwidget.h"
+#include "widgets/TickerWidget.h"
 #include "wizard/WalletWizard.h"
 
 #include "contactswidget.h"
@@ -225,8 +225,8 @@ private:
     LocalMoneroWidget *m_localMoneroWidget = nullptr;
 #endif
 
-    QList<TickerWidget*> m_tickerWidgets;
-    TickerWidget *m_balanceWidget;
+    QList<PriceTickerWidget*> m_priceTickerWidgets;
+    BalanceTickerWidget *m_balanceTickerWidget;
 
     // lower status bar
     QPushButton *m_statusUpdateAvailable;
