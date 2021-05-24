@@ -48,7 +48,7 @@ void WindowManager::quitAfterLastWindow() {
     }
 
     qDebug() << "No wizards in progress and no wallets open, quitting application.";
-    QApplication::quit();
+    this->close();
 }
 
 void WindowManager::close() {
