@@ -104,7 +104,7 @@ void TransactionInfoDialog::setData(TransactionInfo* tx) {
     }
 
     QString direction = tx->direction() == TransactionInfo::Direction_In ? "received" : "sent";
-    ui->label_amount->setText(QString("Amount %1: %2").arg(direction, tx->displayAmount()));
+    ui->label_amount->setText(QString("Amount %1: %2 XMR").arg(direction, tx->displayAmount()));
 
     QString fee;
     if (tx->isCoinbase())
