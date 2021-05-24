@@ -359,10 +359,18 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 
 void Nodes::onWalletRefreshed() {
     if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
+        // Don't reconnect if we're connected to a local node (traffic will not be routed through Tor)
         if (m_connection.isLocal())
             return;
+
+        // Don't reconnect if we're already connected to an .onion node
+        if (m_connection.isOnion())
+            return;
+
+        // Don't reconnect on Tails or Whonix (all traffic is already routed through Tor)
         if (TailsOS::detect() || WhonixOS::detect())
             return;
+
         this->autoConnect(true);
     }
 }
@@ -372,9 +380,24 @@ bool Nodes::useOnionNodes() {
         return true;
     }
     auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
-    if (privacyLevel == Config::allTor || (privacyLevel == Config::allTorExceptInitSync && m_ctx->refreshed)) {
+    if (privacyLevel == Config::allTor) {
         return true;
     }
+
+    if (privacyLevel == Config::allTorExceptInitSync) {
+        if (m_ctx->refreshed)
+            return true;
+
+        if (appData()->heights.contains(constants::networkType)) {
+            int initSyncThreshold = config()->get(Config::initSyncThreshold).toInt();
+            int networkHeight = appData()->heights[constants::networkType];
+
+            if (m_ctx->wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 

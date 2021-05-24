@@ -72,6 +72,7 @@ public:
         socks5User,
         socks5Pass,
         useLocalTor, // Prevents Feather from starting bundled Tor daemon
+        initSyncThreshold
     };
 
     enum PrivacyLevel {

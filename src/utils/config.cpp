@@ -74,7 +74,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::socks5Port, {QS("socks5Port"), "9050"}},
         {Config::socks5User, {QS("socks5User"), ""}}, // Unused
         {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
-        {Config::useLocalTor, {QS("useLocalTor"), false}}
+        {Config::useLocalTor, {QS("useLocalTor"), false}},
+        {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}}
 };
 
 
