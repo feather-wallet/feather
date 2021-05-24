@@ -358,13 +358,13 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::customRestoreHeightSet,   this, &MainWindow::onCustomRestoreHeightSet);
 
     // Nodes
-    connect(m_ctx->nodes, &Nodes::updateStatus, [=](const QString &msg){this->setStatusText(msg);});
+    connect(m_ctx->nodes, &Nodes::updateStatus,    this, &MainWindow::onSetStatusText);
     connect(m_ctx->nodes, &Nodes::nodeExhausted,   this, &MainWindow::showNodeExhaustedMessage);
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
 
     // Wallet
     connect(m_ctx->wallet.get(), &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
-    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, [this]{this->updateTitle();});
+    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
 }
 
 void MainWindow::startupWarning() {
@@ -496,6 +496,10 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     m_statusLabelBalance->setToolTip("Click for details");
     m_statusLabelBalance->setText(balance_str);
     m_balanceWidget->setHidden(hide);
+}
+
+void MainWindow::onSetStatusText(const QString &text) {
+    this->setStatusText(text);
 }
 
 void MainWindow::setStatusText(const QString &text, bool override, int timeout) {
