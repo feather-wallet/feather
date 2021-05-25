@@ -263,6 +263,10 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     }
     if (message.contains("Unable to open device")) {
         errMsg += "\n\nThe device might be in use by a different application.";
+#if defined(Q_OS_LINUX)
+        errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
+                  "<a>https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues</a>";
+#endif
     }
 
     if (message.contains("SW_CLIENT_NOT_SUPPORTED")) {
