@@ -1,93 +1,74 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QStandardPaths>
-#include <QScreen>
-#include <QDesktopWidget>
-
 #include "utils/prices.h"
 
 Prices::Prices(QObject *parent) : QObject(parent) {
     this->rates = QMap<QString, double>();
     this->markets = QMap<QString, marketStruct>();
-    this->fiat = QMap<QString, QString>();
-    fiat["USD"] = "$";
-    fiat["EUR"] = "€";
-    fiat["JPY"] = "¥";
-    fiat["KRW"] = "₩";
-    fiat["MXN"] = "$";
-    fiat["RUB"] = "\u20BD";
-    fiat["CAD"] = "$";
-    fiat["GBP"] = "£";
-    fiat["SEK"] = "kr";
-    fiat["ZAR"] = "R";
-    fiat["THB"] = "฿";
-    fiat["TRY"] = "₺";
-    fiat["CHF"] = "Fr";
-    fiat["CNY"] = "¥";
-    fiat["CZK"] = "Kč";
-    fiat["AUD"] = "$";
-    fiat["NZD"] = "$";
 }
 
 void Prices::cryptoPricesReceived(const QJsonArray &data) {
-    QStringList filter = QStringList() << "XMR" << "ZEC" << "BTC" << "ETH" << "BCH" << "LTC";
-    filter << "EOS" << "ADA" << "XLM" << "TRX" << "DASH" << "DCR" << "VET" << "DOGE" << "XRP" << "WOW";
+    this->markets.clear();
 
-    QMap<QString, marketStruct> msMap;
-    for(auto &&entry: data) {
-        marketStruct ms;
+    for (const auto &entry : data) {
         QJsonObject obj = entry.toObject();
+        marketStruct ms;
         ms.symbol = obj.value("symbol").toString();
         ms.image = obj.value("image").toString();
         ms.name = obj.value("name").toString();
         ms.price_usd = obj.value("current_price").toDouble();
         ms.price_usd_change_pct_24h = obj.value("price_change_percentage_24h").toDouble();
+        if (ms.price_usd <= 0)
+            continue;
 
-        if(ms.price_usd <= 0) continue;
-        if(filter.contains(ms.symbol.toUpper()))
-            msMap.insert(ms.symbol.toUpper(), ms);
+        this->markets.insert(ms.symbol.toUpper(), ms);
     }
-
-    if(msMap.count() > 0)
-        this->markets = msMap;
 
     emit cryptoPricesUpdated();
 }
 
-double Prices::convert(const QString &symbolFrom, const QString &symbolTo, double amount) {
-    if(symbolFrom == symbolTo) return amount;
-    if(amount <= 0.0) return 0.0;
+void Prices::fiatPricesReceived(const QJsonObject &data) {
+    QJsonObject ratesData = data.value("rates").toObject();
+    for (const auto &currency : ratesData) {
+        QString currencyStr = currency.toString();
+        this->rates.insert(currencyStr, ratesData.value(currencyStr).toDouble());
+    }
+    emit fiatPricesUpdated();
+}
 
-    double usd_from;
-    QString from = symbolFrom.toUpper();
-    QString to = symbolTo.toUpper();
-
-    if(this->markets.contains(from))
-        usd_from = this->markets[from].price_usd * amount;
-    else if(this->rates.contains(from)) {
-        if(from == "USD")
-            usd_from = amount;
-        else
-            usd_from = amount / this->rates[from];
-    } else
+double Prices::convert(QString symbolFrom, QString symbolTo, double amount) {
+    if (symbolFrom == symbolTo)
+        return amount;
+    if (amount <= 0.0)
         return 0.0;
 
-    if(to == "USD")
-        return usd_from;
+    symbolFrom = symbolFrom.toUpper();
+    symbolTo = symbolTo.toUpper();
 
-    if(this->markets.contains(to))
-        return usd_from / this->markets[to].price_usd;
-    else if(this->rates.contains(to))
-        return usd_from * this->rates[to];
+    double usdPrice;
+    if (this->markets.contains(symbolFrom)) {
+        usdPrice = this->markets[symbolFrom].price_usd * amount;
+    }
+    else if (this->rates.contains(symbolFrom)) {
+        if (symbolFrom == "USD") {
+            usdPrice = amount;
+        } else {
+            usdPrice = amount / this->rates[symbolFrom];
+        }
+    }
+    else {
+        return 0.0;
+    }
+
+    if (symbolTo == "USD")
+        return usdPrice;
+
+    if (this->markets.contains(symbolTo))
+        return usdPrice / this->markets[symbolTo].price_usd;
+    else if (this->rates.contains(symbolTo))
+        return usdPrice * this->rates[symbolTo];
 
     return 0.0;
 }
 
-void Prices::fiatPricesReceived(const QJsonObject &data) {
-    QJsonObject rates = data.value("rates").toObject();
-    for(const auto &currency: fiat.keys())
-        if(rates.contains(currency))
-            this->rates.insert(currency, rates.value(currency).toDouble());
-    emit fiatPricesUpdated();
-}

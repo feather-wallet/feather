@@ -5,8 +5,6 @@
 #define FEATHER_PRICES_H
 
 #include <QObject>
-#include <QProcess>
-#include <QNetworkAccessManager>
 
 #include "utils/utils.h"
 
@@ -26,13 +24,12 @@ public:
     explicit Prices(QObject *parent = nullptr);
     QMap<QString, double> rates;
     QMap<QString, marketStruct> markets;
-    QMap<QString, QString> fiat;  // symbol:sign
 
 public slots:
     void cryptoPricesReceived(const QJsonArray &data);
     void fiatPricesReceived(const QJsonObject &data);
 
-    double convert(const QString &symbolFrom, const QString &symbolTo, double amount);
+    double convert(QString symbolFrom, QString symbolTo, double amount);
 
 signals:
     void fiatPricesUpdated();
