@@ -6,7 +6,7 @@
 #include "dialog/passworddialog.h"
 #include "dialog/splashdialog.h"
 #include "utils/WebsocketNotifier.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
 #include "utils/TorManager.h"

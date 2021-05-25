@@ -12,8 +12,8 @@
 
 #include "utils.h"
 #include "utils/config.h"
-#include "utils/tails.h"
-#include "utils/whonix.h"
+#include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 #include "utils/ColorScheme.h"
 #include "constants.h"
 

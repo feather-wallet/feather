@@ -9,7 +9,7 @@
 #include <QMessageBox>
 
 #include "utils/TorManager.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 
 TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)

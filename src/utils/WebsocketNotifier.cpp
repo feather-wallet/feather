@@ -3,8 +3,8 @@
 
 #include "WebsocketNotifier.h"
 #include "utils.h"
-#include "tails.h"
-#include "whonix.h"
+#include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 
 #include <QJsonObject>
 

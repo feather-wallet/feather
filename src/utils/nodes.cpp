@@ -5,7 +5,7 @@
 
 #include "nodes.h"
 #include "utils/utils.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 #include "appcontext.h"
 #include "constants.h"
 #include "utils/WebsocketNotifier.h"

@@ -7,7 +7,7 @@
 #include "utils/WebsocketClient.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 
 DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)

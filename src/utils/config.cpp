@@ -5,7 +5,7 @@
 
 #include "config.h"
 #include "utils/utils.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 
 #define QS QStringLiteral
 

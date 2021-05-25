@@ -7,7 +7,7 @@
 #include <QObject>
 #include <QTimer>
 
-#include "utils/whonix.h"
+#include "utils/os/whonix.h"
 #include "utils/networking.h"
 #include "utils/wsclient.h"
 #include "utils/FeatherSeed.h"

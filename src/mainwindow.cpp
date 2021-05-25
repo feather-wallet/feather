@@ -31,7 +31,7 @@
 #include "utils/Icons.h"
 #include "utils/WebsocketNotifier.h"
 #include "utils/Updater.h"
-#include "utils/tails.h"
+#include "utils/os/tails.h"
 #include "utils/TorManager.h"
 
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
