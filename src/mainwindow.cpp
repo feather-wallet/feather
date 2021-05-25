@@ -824,6 +824,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (!this->cleanedUp) {
         this->cleanedUp = true;
 
+        m_historyWidget->resetModel();
+
         m_updateBytes.stop();
         m_txTimer.stop();
 
