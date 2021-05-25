@@ -6,6 +6,7 @@
 
 #include "libwalletqt/SubaddressAccount.h"
 #include "utils/Icons.h"
+#include "model/ModelUtils.h"
 #include <QMenu>
 
 AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
@@ -13,15 +14,22 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
     , ui(new Ui::AccountSwitcherDialog)
     , m_ctx(std::move(ctx))
     , m_model(m_ctx->wallet->subaddressAccountModel())
+    , m_proxyModel(new SubaddressAccountProxyModel(this))
 {
     ui->setupUi(this);
 
-    ui->accounts->setContextMenuPolicy(Qt::CustomContextMenu);
-
     m_ctx->wallet->subaddressAccount()->refresh();
-    ui->accounts->setModel(m_ctx->wallet->subaddressAccountModel());
+    m_proxyModel->setSourceModel(m_model);
+
+    ui->label_totalBalance->setFont(ModelUtils::getMonospaceFont());
+    ui->label_totalBalance->setText(WalletManager::displayAmount(m_ctx->wallet->balanceAll()));
+
+    ui->accounts->setModel(m_proxyModel);
+    ui->accounts->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->accounts->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->accounts->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->accounts->setSortingEnabled(true);
+    ui->accounts->sortByColumn(SubaddressAccountModel::Column::Number, Qt::AscendingOrder);
     ui->accounts->hideColumn(SubaddressAccountModel::Column::Address);
     ui->accounts->hideColumn(SubaddressAccountModel::Column::UnlockedBalance);
     ui->accounts->setColumnWidth(SubaddressAccountModel::Column::Label, 200);

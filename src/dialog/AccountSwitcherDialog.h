@@ -36,6 +36,7 @@ private:
     Ui::AccountSwitcherDialog *ui;
     QSharedPointer<AppContext> m_ctx;
     SubaddressAccountModel *m_model;
+    SubaddressAccountProxyModel *m_proxyModel;
 };
 
 #endif //FEATHER_ACCOUNTSWITCHERDIALOG_H

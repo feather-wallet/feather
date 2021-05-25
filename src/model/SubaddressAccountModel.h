@@ -6,6 +6,7 @@
 
 #include "Subaddress.h"
 #include <QAbstractTableModel>
+#include <QSortFilterProxyModel>
 
 class SubaddressAccount;
 
@@ -43,6 +44,14 @@ private:
     QVariant parseSubaddressAccountRow(const Monero::SubaddressAccountRow &row, const QModelIndex &index, int role) const;
 
     SubaddressAccount *m_subaddressAccount;
+};
+
+class SubaddressAccountProxyModel : public QSortFilterProxyModel
+{
+    Q_OBJECT
+
+public:
+    explicit SubaddressAccountProxyModel(QObject *parent = nullptr);
 };
 
 #endif // SUBADDRESSACCOUNTMODEL_H

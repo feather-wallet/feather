@@ -5,6 +5,8 @@
 #include "SubaddressAccount.h"
 
 #include <QDebug>
+#include <QFont>
+#include "ModelUtils.h"
 
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
     : QAbstractTableModel(parent)
@@ -49,6 +51,11 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
     bool found = m_subaddressAccount->getRow(index.row(), [this, &index, &result, &role](const Monero::SubaddressAccountRow &row) {
         if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseSubaddressAccountRow(row, index, role);
+        }
+        else if (role == Qt::FontRole) {
+            if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
+                result = ModelUtils::getMonospaceFont();
+            }
         }
     });
 
@@ -135,4 +142,9 @@ Qt::ItemFlags SubaddressAccountModel::flags(const QModelIndex &index) const
 Monero::SubaddressAccountRow* SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_subaddressAccount->count());
     return m_subaddressAccount->row(index.row());
+}
+
+SubaddressAccountProxyModel::SubaddressAccountProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
 }
