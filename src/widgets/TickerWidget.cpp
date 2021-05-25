@@ -68,7 +68,7 @@ BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, QSharedPointer<AppCont
 }
 
 void BalanceTickerWidget::updateDisplay() {
-    double balance = (m_totalBalance ? m_ctx->wallet->balanceAll() : m_ctx->wallet->balanceAll()) / constants::cdiv;
+    double balance = (m_totalBalance ? m_ctx->wallet->balanceAll() : m_ctx->wallet->balance()) / constants::cdiv;
     QString fiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
     double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance);
     if (balanceFiatAmount < 0)
