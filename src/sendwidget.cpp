@@ -60,15 +60,15 @@ void SendWidget::currencyComboChanged(int index) {
 void SendWidget::addressEdited() {
     QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
 
-    bool freezeAmounts = outputs.size() > 0;
+    bool freezeAmounts = !outputs.empty();
 
     ui->lineAmount->setReadOnly(freezeAmounts);
     ui->lineAmount->setFrame(!freezeAmounts);
     ui->btnMax->setDisabled(freezeAmounts);
     ui->comboCurrencySelection->setDisabled(freezeAmounts);
 
-    if (outputs.size() > 0) {
-        ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal()));
+    if (!outputs.empty()) {
+        ui->lineAmount->setText(WalletManager::displayAmount(ui->lineAddress->getTotal(), false));
         ui->comboCurrencySelection->setCurrentIndex(0);
     }
 
