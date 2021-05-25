@@ -478,19 +478,20 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
 
     bool hide = config()->get(Config::hideBalance).toBool();
     int displaySetting = config()->get(Config::balanceDisplay).toInt();
+    int decimals = config()->get(Config::amountPrecision).toInt();
 
     QString balance_str = "Balance: ";
     if (hide) {
         balance_str += "HIDDEN";
     }
     else if (displaySetting == Config::totalBalance) {
-        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(balance, false));
+        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(balance, false, decimals));
     }
     else if (displaySetting == Config::spendable || displaySetting == Config::spendablePlusUnconfirmed) {
-        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(spendable, false));
+        balance_str += QString("%1 XMR").arg(WalletManager::displayAmount(spendable, false, decimals));
 
         if (displaySetting == Config::spendablePlusUnconfirmed && balance > spendable) {
-            balance_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false));
+            balance_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false, decimals));
         }
     }
 

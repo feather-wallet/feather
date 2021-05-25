@@ -148,6 +148,7 @@ void Settings::comboBox_localMoneroFrontendChanged(int pos) {
 
 void Settings::comboBox_amountPrecisionChanged(int pos) {
     config()->set(Config::amountPrecision, pos);
+    m_ctx->updateBalance();
     emit amountPrecisionChanged(pos);
 }
 

@@ -108,7 +108,7 @@ public:
     Q_INVOKABLE QString errorString() const;
 
     //! since we can't call static method from QML, move it to this class
-    Q_INVOKABLE static QString displayAmount(quint64 amount, bool trailing_zeroes = true);
+    Q_INVOKABLE static QString displayAmount(quint64 amount, bool trailing_zeroes = true, int decimals = 12);
     Q_INVOKABLE static quint64 amountFromString(const QString &amount);
     Q_INVOKABLE static quint64 amountFromDouble(double amount);
     Q_INVOKABLE quint64 maximumAllowedAmount() const;

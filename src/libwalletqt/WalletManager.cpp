@@ -208,9 +208,14 @@ QString WalletManager::maximumAllowedAmountAsString() const
     return WalletManager::displayAmount(WalletManager::maximumAllowedAmount());
 }
 
-QString WalletManager::displayAmount(quint64 amount, bool trailing_zeroes)
+QString WalletManager::displayAmount(quint64 amount, bool trailing_zeroes, int decimals)
 {
     auto amountStr = QString::fromStdString(Monero::Wallet::displayAmount(amount));
+
+    if (decimals < 12) {
+        int i = amountStr.indexOf(".");
+        amountStr.remove(i+decimals+1, 12);
+    }
 
     if (!trailing_zeroes) {
         amountStr.remove(QRegExp("0+$"));
