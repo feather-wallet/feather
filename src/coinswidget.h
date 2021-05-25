@@ -26,9 +26,6 @@ public:
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
 
-public slots:
-    void resetModel();
-
 private slots:
     void showHeaderMenu(const QPoint& position);
     void setShowSpent(bool show);

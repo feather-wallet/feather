@@ -97,11 +97,6 @@ void ContactsWidget::setSearchFilter(const QString &filter) {
     m_proxyModel->setSearchFilter(filter);
 }
 
-void ContactsWidget::resetModel()
-{
-    ui->contacts->setModel(nullptr);
-}
-
 void ContactsWidget::showHeaderMenu(const QPoint& position)
 {
     m_showFullAddressesAction->setChecked(m_model->isShowFullAddresses());

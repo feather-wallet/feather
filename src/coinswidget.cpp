@@ -186,10 +186,6 @@ void CoinsWidget::onSweepOutput() {
     dialog->deleteLater();
 }
 
-void CoinsWidget::resetModel() {
-    ui->coins->setModel(nullptr);
-}
-
 void CoinsWidget::copy(copyField field) {
     CoinsInfo* c = this->currentEntry();
     if (!c) return;
