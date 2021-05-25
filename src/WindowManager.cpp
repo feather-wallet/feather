@@ -56,7 +56,10 @@ void WindowManager::close() {
     for (const auto &window: m_windows) {
         window->close();
     }
+
     torManager()->stop();
+    m_tray->hide();
+
     QApplication::quit();
 }
 
