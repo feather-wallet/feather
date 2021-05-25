@@ -21,7 +21,7 @@
 #include "dialog/passwordchangedialog.h"
 #include "dialog/keysdialog.h"
 #include "dialog/aboutdialog.h"
-#include "dialog/restoredialog.h"
+#include "dialog/RestoreHeightDialog.h"
 #include "dialog/splashdialog.h"
 #include "libwalletqt/Wallet.h"
 #include "model/SubaddressModel.h"
@@ -212,7 +212,6 @@ private:
 
     Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
-    RestoreDialog *m_restoreDialog = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 
     XMRigWidget *m_xmrig = nullptr;

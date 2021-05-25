@@ -735,26 +735,17 @@ void MainWindow::updatePasswordIcon() {
 void MainWindow::showRestoreHeightDialog() {
     // settings custom restore height is only available for 25 word seeds
     auto seed = m_ctx->wallet->getCacheAttribute("feather.seed");
-    if(!seed.isEmpty()) {
+    if(!seed.isEmpty()) { // TODO: update this warning (import tx, delete cache, restore from seed)
         const auto msg = "This wallet has a 14 word mnemonic seed which has the restore height embedded.";
         QMessageBox::warning(this, "Cannot set custom restore height", msg);
         return;
     }
 
-    m_restoreDialog = new RestoreDialog(m_ctx, this);
-    m_restoreDialog->show();
-
-    connect(m_restoreDialog, &RestoreDialog::accepted, [=]{
-        auto height = m_restoreDialog->getHeight();
-        m_restoreDialog->disconnect();
-        m_restoreDialog->deleteLater();
-        m_ctx->onSetRestoreHeight(height);
-    });
-
-    connect(m_restoreDialog, &RestoreDialog::rejected, [=]{
-        m_restoreDialog->disconnect();
-        m_restoreDialog->deleteLater();
-    });
+    RestoreHeightDialog dialog{this, m_ctx->wallet->getWalletCreationHeight()};
+    if (dialog.exec() == QDialog::Accepted) {
+        int restoreHeight = dialog.getHeight();
+        m_ctx->onSetRestoreHeight(restoreHeight);
+    }
 }
 
 void MainWindow::showKeysDialog() {
