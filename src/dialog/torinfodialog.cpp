@@ -119,7 +119,7 @@ void TorInfoDialog::initPrivacyLevel() {
     }
 
     if (m_ctx->nodes->connection().isLocal()) {
-        ui->label_notice->setText("You are connected to a local node. Traffic is not routed over Tor.");
+        ui->label_notice->setText("You are connected to a local node. Traffic to node is not routed over Tor.");
     }
     else if (Utils::isTorsocks()) {
         ui->label_notice->setText("Feather was started with torsocks, all traffic is routed over Tor");
