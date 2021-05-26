@@ -119,6 +119,8 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
         return;
     }
 
+    this->onInitialNetworkConfigured();
+
     // Create new mainwindow with wallet
 
     m_splashDialog->hide();
@@ -328,8 +330,11 @@ void WindowManager::buildTrayMenu() {
 // ######################## NETWORKING ########################
 
 void WindowManager::onInitialNetworkConfigured() {
-    this->initTor();
-    this->initWS();
+    if (!m_initialNetworkConfigured) {
+        m_initialNetworkConfigured = true;
+        this->initTor();
+        this->initWS();
+    }
 }
 
 void WindowManager::initTor() {

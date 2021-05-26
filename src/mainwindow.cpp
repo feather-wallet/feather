@@ -89,7 +89,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     });
 
     config()->set(Config::firstRun, false);
-    
+
     this->onWalletOpened();
 
 #ifdef DONATE_BEG
