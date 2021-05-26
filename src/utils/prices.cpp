@@ -3,9 +3,9 @@
 
 #include "utils/prices.h"
 
-Prices::Prices(QObject *parent) : QObject(parent) {
-    this->rates = QMap<QString, double>();
-    this->markets = QMap<QString, marketStruct>();
+Prices::Prices(QObject *parent)
+    : QObject(parent)
+{
 }
 
 void Prices::cryptoPricesReceived(const QJsonArray &data) {
@@ -30,9 +30,8 @@ void Prices::cryptoPricesReceived(const QJsonArray &data) {
 
 void Prices::fiatPricesReceived(const QJsonObject &data) {
     QJsonObject ratesData = data.value("rates").toObject();
-    for (const auto &currency : ratesData) {
-        QString currencyStr = currency.toString();
-        this->rates.insert(currencyStr, ratesData.value(currencyStr).toDouble());
+    for (const auto &currency : ratesData.keys()) {
+        this->rates.insert(currency, ratesData.value(currency).toDouble());
     }
     emit fiatPricesUpdated();
 }

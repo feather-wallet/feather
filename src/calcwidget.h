@@ -5,6 +5,7 @@
 #define FEATHER_CALCWIDGET_H
 
 #include <QWidget>
+#include <QComboBox>
 
 namespace Ui {
     class CalcWidget;
@@ -23,9 +24,12 @@ public slots:
 
 private slots:
     void initComboBox();
+    void showCalcConfigureDialog();
+    void onPricesReceived();
 
 private:
     void convert(bool reverse);
+    void setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat);
 
     Ui::CalcWidget *ui;
     bool m_comboBoxInit = false;

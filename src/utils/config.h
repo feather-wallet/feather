@@ -20,6 +20,7 @@ public:
 
     enum ConfigKey
     {
+        // General
         firstRun,
         warnOnStagenet,
         warnOnTestnet,
@@ -33,14 +34,17 @@ public:
         windowState,
         GUI_HistoryViewState,
 
+        // Wallets
         walletDirectory, // Directory where wallet files are stored
         autoOpenWalletPath,
         recentlyOpenedWallets,
 
+        // Nodes
         nodes,
         nodeSource,
         useOnionNodes,
 
+        // Tabs
         showTabHome,
         showTabCoins,
         showTabExchange,
@@ -48,9 +52,11 @@ public:
         showTabXMRig,
         showSearchbar,
 
+        // Mining
         xmrigPath,
         xmrigPool,
 
+        // Settings
         preferredFiatCurrency,
         skin,
         amountPrecision,
@@ -66,6 +72,10 @@ public:
         redditFrontend,
         localMoneroFrontend,
 
+        fiatSymbols,
+        cryptoSymbols,
+
+        // Tor
         torPrivacyLevel,
         socks5Host,
         socks5Port,

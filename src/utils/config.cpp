@@ -68,6 +68,9 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}},
 
+        {Config::fiatSymbols, {QS("fiatSymbols"), QStringList{"USD", "EUR", "GBP", "CAD", "AUD", "RUB"}}},
+        {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
+
         // Tor
         {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
         {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},

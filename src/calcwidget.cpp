@@ -8,6 +8,7 @@
 #include "utils/ColorScheme.h"
 #include "utils/AppData.h"
 #include "utils/config.h"
+#include "dialog/CalcConfigDialog.h"
 
 CalcWidget::CalcWidget(QWidget *parent)
     : QWidget(parent)
@@ -29,14 +30,20 @@ CalcWidget::CalcWidget(QWidget *parent)
     ui->lineFrom->setValidator(dv);
     ui->lineTo->setValidator(dv);
 
-    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &CalcWidget::initComboBox);
-    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &CalcWidget::initComboBox);
+    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &CalcWidget::onPricesReceived);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &CalcWidget::onPricesReceived);
 
     connect(ui->lineFrom, &QLineEdit::textEdited, this, [this]{this->convert(false);});
     connect(ui->lineTo,   &QLineEdit::textEdited, this, [this]{this->convert(true);});
 
     connect(ui->comboCalcFrom, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{this->convert(false);});
-    connect(ui->comboCalcTo,   QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{this->convert(true);});
+    connect(ui->comboCalcTo,   QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{this->convert(false);});
+
+    connect(ui->btn_configure, &QPushButton::clicked, this, &CalcWidget::showCalcConfigureDialog);
+
+    QTimer::singleShot(1, [this]{
+        this->skinChanged();
+    });
 }
 
 void CalcWidget::convert(bool reverse) {
@@ -67,31 +74,74 @@ void CalcWidget::convert(bool reverse) {
     lineTo->setText(QString::number(result, 'f', precision));
 }
 
-void CalcWidget::initComboBox() {
+void CalcWidget::onPricesReceived() {
     if (m_comboBoxInit)
         return;
 
-    QList<QString> marketsKeys = appData()->prices.markets.keys();
-    QList<QString> ratesKeys = appData()->prices.rates.keys();
-    if(marketsKeys.count() <= 0 || ratesKeys.count() <= 0) return;
+    QList<QString> cryptoKeys = appData()->prices.markets.keys();
+    QList<QString> fiatKeys = appData()->prices.rates.keys();
+    if (cryptoKeys.empty() || fiatKeys.empty())
+        return;
 
-    ui->comboCalcFrom->addItems(marketsKeys);
-    ui->comboCalcFrom->insertSeparator(marketsKeys.count());
-    ui->comboCalcFrom->addItems(ratesKeys);
-    ui->comboCalcFrom->setCurrentIndex(marketsKeys.indexOf("XMR"));
+    ui->btn_configure->setEnabled(true);
+    this->initComboBox();
+    m_comboBoxInit = true;
+}
 
-    ui->comboCalcTo->addItems(marketsKeys);
-    ui->comboCalcTo->insertSeparator(marketsKeys.count());
-    ui->comboCalcTo->addItems(ratesKeys);
+void CalcWidget::initComboBox() {
+    QList<QString> cryptoKeys = appData()->prices.markets.keys();
+    QList<QString> fiatKeys = appData()->prices.rates.keys();
 
+    QStringList enabledCrypto = config()->get(Config::cryptoSymbols).toStringList();
+    QStringList filteredCryptoKeys;
+    for (const auto& symbol : cryptoKeys) {
+        if (enabledCrypto.contains(symbol)) {
+            filteredCryptoKeys.append(symbol);
+        }
+    }
+
+    QStringList enabledFiat = config()->get(Config::fiatSymbols).toStringList();
     auto preferredFiat = config()->get(Config::preferredFiatCurrency).toString();
-    ui->comboCalcTo->setCurrentText(preferredFiat);
+    if (!enabledFiat.contains(preferredFiat) && fiatKeys.contains(preferredFiat)) {
+        enabledFiat.append(preferredFiat);
+        config()->set(Config::fiatSymbols, enabledFiat);
+    }
+    QStringList filteredFiatKeys;
+    for (const auto &symbol : fiatKeys) {
+        if (enabledFiat.contains(symbol)) {
+            filteredFiatKeys.append(symbol);
+        }
+    }
 
-    this->m_comboBoxInit = true;
+    this->setupComboBox(ui->comboCalcFrom, filteredCryptoKeys, filteredFiatKeys);
+    this->setupComboBox(ui->comboCalcTo,   filteredCryptoKeys, filteredFiatKeys);
+
+    ui->comboCalcFrom->setCurrentIndex(ui->comboCalcFrom->findText("XMR"));
+
+    if (!preferredFiat.isEmpty()) {
+        ui->comboCalcTo->setCurrentIndex(ui->comboCalcTo->findText(preferredFiat));
+    } else {
+        ui->comboCalcTo->setCurrentIndex(ui->comboCalcTo->findText("USD"));
+    }
 }
 
 void CalcWidget::skinChanged() {
     ui->imageExchange->setMode(ColorScheme::hasDarkBackground(this));
+}
+
+void CalcWidget::showCalcConfigureDialog() {
+    CalcConfigDialog dialog{this};
+
+    if (dialog.exec() == QDialog::Accepted) {
+        this->initComboBox();
+    }
+}
+
+void CalcWidget::setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat) {
+    comboBox->clear();
+    comboBox->addItems(crypto);
+    comboBox->insertSeparator(comboBox->count());
+    comboBox->addItems(fiat);
 }
 
 CalcWidget::~CalcWidget() {
