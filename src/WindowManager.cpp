@@ -35,6 +35,8 @@ WindowManager::WindowManager() {
         this->onInitialNetworkConfigured();
     }
 
+    this->startupWarning();
+
     if (!this->autoOpenWallet()) {
         this->initWizard();
     }
@@ -70,6 +72,39 @@ void WindowManager::closeWindow(MainWindow *window) {
 void WindowManager::restartApplication(const QString &binaryFilename) {
     QProcess::startDetached(binaryFilename, qApp->arguments());
     this->close();
+}
+
+void WindowManager::startupWarning() {
+    // Stagenet / Testnet
+    auto worthlessWarning = QString("Feather wallet is currently running in %1 mode. This is meant "
+                                    "for developers only. Your coins are WORTHLESS.");
+    if (constants::networkType == NetworkType::STAGENET && config()->get(Config::warnOnStagenet).toBool()) {
+        this->showWarningMessageBox("Warning", worthlessWarning.arg("stagenet"));
+        config()->set(Config::warnOnStagenet, false);
+    }
+    else if (constants::networkType == NetworkType::TESTNET && config()->get(Config::warnOnTestnet).toBool()){
+        this->showWarningMessageBox("Warning", worthlessWarning.arg("testnet"));
+        config()->set(Config::warnOnTestnet, false);
+    }
+
+    // Beta
+    if (config()->get(Config::warnOnAlpha).toBool()) {
+        QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
+                          "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
+        this->showWarningMessageBox("Beta warning", warning);
+        config()->set(Config::warnOnAlpha, false);
+    }
+}
+
+void WindowManager::showWarningMessageBox(const QString &title, const QString &message) {
+    QMessageBox msgBox;
+    msgBox.setWindowIcon(icons()->icon("appicons/64x64.png"));
+    msgBox.setIcon(QMessageBox::Warning);
+    msgBox.setText(message);
+    msgBox.setWindowTitle(title);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.exec();
 }
 
 // ######################## WALLET OPEN ########################

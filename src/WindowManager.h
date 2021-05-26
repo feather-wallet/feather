@@ -58,6 +58,8 @@ private:
     void initSkins();
     QString loadStylesheet(const QString &resource);
     void buildTrayMenu();
+    void startupWarning();
+    void showWarningMessageBox(const QString &title, const QString &message);
 
     void quitAfterLastWindow();
 

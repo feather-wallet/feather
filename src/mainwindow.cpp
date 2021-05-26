@@ -50,7 +50,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     m_splashDialog = new SplashDialog(this);
 
     this->restoreGeo();
-    this->startupWarning();
 
     this->initStatusBar();
     this->initWidgets();
@@ -368,28 +367,6 @@ void MainWindow::initWalletContext() {
     // Wallet
     connect(m_ctx->wallet.get(), &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
-}
-
-void MainWindow::startupWarning() {
-    // Stagenet / Testnet
-    auto worthlessWarning = QString("Feather wallet is currently running in %1 mode. This is meant "
-                                    "for developers only. Your coins are WORTHLESS.");
-    if (constants::networkType == NetworkType::STAGENET && config()->get(Config::warnOnStagenet).toBool()) {
-        QMessageBox::warning(this, "Warning", worthlessWarning.arg("stagenet"));
-        config()->set(Config::warnOnStagenet, false);
-    }
-    else if (constants::networkType == NetworkType::TESTNET && config()->get(Config::warnOnTestnet).toBool()){
-        QMessageBox::warning(this, "Warning", worthlessWarning.arg("testnet"));
-        config()->set(Config::warnOnTestnet, false);
-    }
-
-    // Beta
-    if (config()->get(Config::warnOnAlpha).toBool()) {
-        QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
-                          "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
-        QMessageBox::warning(this, "Beta Warning", warning);
-        config()->set(Config::warnOnAlpha, false);
-    }
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
