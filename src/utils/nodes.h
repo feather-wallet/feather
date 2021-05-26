@@ -20,6 +20,25 @@ enum NodeSource {
     custom
 };
 
+class NodeList : public QObject {
+Q_OBJECT
+
+public:
+    enum Type {
+        ws = 0,
+        custom
+    };
+    Q_ENUM(Type)
+
+    bool addNode(const QString &node, NetworkType::Type networkType, NodeList::Type source);
+    void setNodes(const QStringList &nodes, NetworkType::Type networkType, NodeList::Type source);
+    QStringList getNodes(NetworkType::Type networkType, NodeList::Type source);
+
+private:
+    void ensureStructure(QJsonObject &obj, NetworkType::Type networkType);
+    QJsonObject getConfigData();
+};
+
 struct FeatherNode {
     explicit FeatherNode(QString address = "", int height = 0, int target_height = 0, bool online = false)
             : height(height)
@@ -56,7 +75,8 @@ struct FeatherNode {
     }
 
     bool isLocal() const {
-        return (url.host() == "127.0.0.1" || url.host() == "localhost");
+        QRegularExpression localNetwork(R"((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))");
+        return (localNetwork.match(url.host()).hasMatch() || url.host() == "localhost");
     }
 
     bool isOnion() const {
@@ -92,7 +112,6 @@ class Nodes : public QObject {
 public:
     explicit Nodes(AppContext *ctx, QObject *parent = nullptr);
     void loadConfig();
-    void writeConfig();
 
     NodeSource source();
     FeatherNode connection();
@@ -122,8 +141,10 @@ private slots:
     void onWalletRefreshed();
 
 private:
-    AppContext *m_ctx = nullptr;
+    AppContext *m_ctx;
     QJsonObject m_configJson;
+
+    NodeList m_nodes;
 
     QStringList m_recentFailures;
 

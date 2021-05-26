@@ -34,6 +34,8 @@ signals:
 private:
     void setStatus(const QString &msg, bool success = false);
 
+    Ui::UpdateDialog *ui;
+
     QString m_version;
     QString m_downloadUrl;
     QString m_hash;
@@ -44,8 +46,6 @@ private:
     std::string m_updateZipArchive;
 
     QNetworkReply *m_reply = nullptr;
-
-    Ui::UpdateDialog *ui;
 };
 
 #endif //FEATHER_UPDATEDIALOG_H

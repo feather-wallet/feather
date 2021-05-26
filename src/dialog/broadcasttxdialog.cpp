@@ -7,14 +7,14 @@
 
 #include <QMessageBox>
 
-BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QString &transactionHex)
+BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex)
         : QDialog(parent)
-        , m_ctx(ctx)
         , ui(new Ui::BroadcastTxDialog)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
-    auto node = ctx->nodes->connection();
+    auto node = m_ctx->nodes->connection();
     m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_Broadcast, &QPushButton::clicked, this, &BroadcastTxDialog::broadcastTx);
@@ -32,19 +32,15 @@ BroadcastTxDialog::BroadcastTxDialog(QWidget *parent, AppContext *ctx, const QSt
 void BroadcastTxDialog::broadcastTx() {
     QString tx = ui->transaction->toPlainText();
 
-    QString node = [this]{
-        QString node;
-        if (ui->radio_useCustom->isChecked())
-            node = ui->customNode->text();
-        else if (ui->radio_useDefault->isChecked())
-            node = m_ctx->nodes->connection().toAddress();
+    FeatherNode node = ui->radio_useCustom->isChecked() ? FeatherNode(ui->customNode->text()) : m_ctx->nodes->connection();
 
-        if (!node.startsWith("http://"))
-            node = QString("http://%1").arg(node);
-        return node;
-    }();
+    if (node.isLocal()) {
+        m_rpc->setNetwork(getNetworkClearnet());
+    } else {
+        m_rpc->setNetwork(getNetworkTor());
+    }
 
-    m_rpc->setDaemonAddress(node);
+    m_rpc->setDaemonAddress(node.toURL());
     m_rpc->sendRawTransaction(tx);
 }
 

@@ -4,13 +4,14 @@ set -e
 unset SOURCE_DATE_EPOCH
 
 APPDIR="$PWD/feather.AppDir"
+rm -rf $APPDIR
 mkdir -p "$APPDIR"
 mkdir -p "$APPDIR/usr/share/applications/"
 mkdir -p "$APPDIR/usr/bin"
 
-cp "$PWD/src/assets/feather.desktop" "$APPDIR/usr/share/applications/feather.desktop"
-cp "$PWD/src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
-cp "$PWD/build/bin/feather" "$APPDIR/usr/bin/feather"
+cp "$PWD/../src/assets/feather.desktop" "$APPDIR/usr/share/applications/feather.desktop"
+cp "$PWD/../src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
+cp "$PWD/bin/feather" "$APPDIR/usr/bin/feather"
 
 LD_LIBRARY_PATH=/usr/local/lib /linuxdeployqt/squashfs-root/AppRun feather.AppDir/usr/share/applications/feather.desktop -bundle-non-qt-libs
 

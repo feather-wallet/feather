@@ -3,8 +3,8 @@
 
 #include "WebsocketNotifier.h"
 #include "utils.h"
-#include "tails.h"
-#include "whonix.h"
+#include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 
 #include <QJsonObject>
 
@@ -19,6 +19,8 @@ QPointer<WebsocketNotifier> WebsocketNotifier::m_instance(nullptr);
 
 void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
     QString cmd = msg.value("cmd").toString();
+
+    m_cache[cmd] = msg;
 
     if (cmd == "blockheights") {
         QJsonObject data = msg.value("data").toObject();
@@ -84,6 +86,12 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
 #endif
 }
 
+void WebsocketNotifier::emitCache() {
+    for (const auto &msg : m_cache) {
+        this->onWSMessage(msg);
+    }
+}
+
 void WebsocketNotifier::onWSNodes(const QJsonArray &nodes) {
     // TODO: Refactor, should be filtered client side
 
@@ -93,7 +101,7 @@ void WebsocketNotifier::onWSNodes(const QJsonArray &nodes) {
         auto nettype = obj.value("nettype");
         auto type = obj.value("type");
 
-        auto networkType = config()->get(Config::networkType).toInt();
+        auto networkType = constants::networkType;
 
         // filter remote node network types
         if(nettype == "mainnet" && networkType != NetworkType::MAINNET)

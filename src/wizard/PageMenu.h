@@ -19,7 +19,7 @@ class PageMenu : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageMenu(AppContext *ctx, WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    explicit PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -28,9 +28,8 @@ signals:
     void enableDarkMode(bool enable);
 
 private:
-    AppContext *m_ctx;
-    WalletKeysFilesModel *m_walletKeysFilesModel;
     Ui::PageMenu *ui;
+    WalletKeysFilesModel *m_walletKeysFilesModel;
     WizardFields *m_fields;
 };
 

@@ -31,7 +31,6 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
     Q_INVOKABLE bool deleteRow(int row);
-    Q_INVOKABLE int lookupPaymentID(const QString &payment_id) const;
 
     bool isShowFullAddresses() const;
     void setShowFullAddresses(bool show);

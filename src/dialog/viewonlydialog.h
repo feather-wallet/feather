@@ -16,7 +16,7 @@ class ViewOnlyDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit ViewOnlyDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ViewOnlyDialog() override;
 
 private slots:
@@ -24,7 +24,7 @@ private slots:
 
 private:
     Ui::ViewOnlyDialog *ui;
-    AppContext *m_ctx = nullptr;
+    QSharedPointer<AppContext> m_ctx;
     void copyToClipboad();
 };
 

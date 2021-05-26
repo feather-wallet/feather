@@ -28,7 +28,6 @@ public:
     quint64 count() const;
     Q_INVOKABLE QString errorString() const;
     Q_INVOKABLE int errorCode() const;
-    Q_INVOKABLE int lookupPaymentID(const QString &payment_id) const;
     Q_INVOKABLE QString getDescription(const QString &address) const;
 
     enum ErrorCode {

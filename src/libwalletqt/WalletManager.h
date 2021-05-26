@@ -93,16 +93,7 @@ public:
                                                 const QString &deviceName,
                                                 quint64 restoreHeight = 0,
                                                 const QString &subaddressLookahead = "");
-    /*!
-     * \brief closeWallet - closes current open wallet and frees memory
-     * \return wallet address
-     */
-    Q_INVOKABLE QString closeWallet();
 
-    /*!
-     * \brief closeWalletAsync - asynchronous version of "closeWallet"
-     */
-    //Q_INVOKABLE void closeWalletAsync(const QJSValue& callback);
 
     //! checks is given filename is a wallet;
     Q_INVOKABLE bool walletExists(const QString &path) const;
@@ -117,7 +108,7 @@ public:
     Q_INVOKABLE QString errorString() const;
 
     //! since we can't call static method from QML, move it to this class
-    Q_INVOKABLE static QString displayAmount(quint64 amount);
+    Q_INVOKABLE static QString displayAmount(quint64 amount, bool trailing_zeroes = true, int decimals = 12);
     Q_INVOKABLE static quint64 amountFromString(const QString &amount);
     Q_INVOKABLE static quint64 amountFromDouble(double amount);
     Q_INVOKABLE quint64 maximumAllowedAmount() const;
@@ -127,7 +118,7 @@ public:
 
     Q_INVOKABLE bool paymentIdValid(const QString &payment_id) const;
     Q_INVOKABLE static bool addressValid(const QString &address, NetworkType::Type nettype);
-    Q_INVOKABLE bool keyValid(const QString &key, const QString &address, bool isViewKey, NetworkType::Type nettype) const;
+    Q_INVOKABLE static bool keyValid(const QString &key, const QString &address, bool isViewKey, NetworkType::Type nettype);
 
     Q_INVOKABLE QString paymentIdFromAddress(const QString &address, NetworkType::Type nettype) const;
 
@@ -136,13 +127,8 @@ public:
     Q_INVOKABLE quint64 networkDifficulty() const;
     Q_INVOKABLE quint64 blockchainHeight() const;
     Q_INVOKABLE quint64 blockchainTargetHeight() const;
-    Q_INVOKABLE double miningHashRate() const;
     Q_INVOKABLE bool localDaemonSynced() const;
     Q_INVOKABLE bool isDaemonLocal(const QString &daemon_address) const;
-
-    Q_INVOKABLE void miningStatusAsync();
-    Q_INVOKABLE bool startMining(const QString &address, quint32 threads, bool backgroundMining, bool ignoreBattery);
-    Q_INVOKABLE bool stopMining();
 
     // QML missing such functionality, implementing these helpers here
     Q_INVOKABLE QString urlToLocalPath(const QUrl &url) const;
@@ -159,10 +145,9 @@ public:
     Q_INVOKABLE QString resolveOpenAlias(const QString &address) const;
     Q_INVOKABLE bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
     Q_INVOKABLE QVariantMap parse_uri_to_object(const QString &uri) const;
-//    Q_INVOKABLE bool saveQrCode(const QString &, const QString &) const;
 
     // clear/rename wallet cache
-    Q_INVOKABLE bool clearWalletCache(const QString &fileName) const;
+    Q_INVOKABLE static bool clearWalletCache(const QString &fileName);
 
     Q_INVOKABLE void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
     virtual void onWalletPassphraseNeeded(bool on_device) override;
@@ -171,7 +156,6 @@ public:
     void setProxyAddress(QString address);
 
 signals:
-
     void walletOpened(Wallet * wallet);
     void walletCreated(Wallet * wallet);
     void walletPassphraseNeeded(bool onDevice);
@@ -185,16 +169,13 @@ public slots:
 private:
     friend class WalletPassphraseListenerImpl;
 
-    explicit WalletManager(QObject *parent = 0);
-    ~WalletManager();
+    explicit WalletManager(QObject *parent = nullptr);
+    ~WalletManager() override;
 
-    bool isMining() const;
-
-    static WalletManager * m_instance;
-    Monero::WalletManager * m_pimpl;
+    static WalletManager *m_instance;
+    Monero::WalletManager *m_pimpl;
     mutable QMutex m_mutex;
-    QPointer<Wallet> m_currentWallet;
-    PassphraseReceiver * m_passphraseReceiver;
+    PassphraseReceiver *m_passphraseReceiver;
     QMutex m_mutex_passphraseReceiver;
     QString m_proxyAddress;
     mutable QMutex m_proxyMutex;

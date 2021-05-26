@@ -20,56 +20,81 @@ public:
 
     enum ConfigKey
     {
-        warnOnExternalLink,
-        checkForUpdates,
+        // General
+        firstRun,
         warnOnStagenet,
         warnOnTestnet,
         warnOnAlpha,
+
         homeWidget,
         donateBeg,
+        showHistorySyncNotice,
+
+        geometry,
+        windowState,
+        GUI_HistoryViewState,
+
+        // Wallets
+        walletDirectory, // Directory where wallet files are stored
         autoOpenWalletPath,
-        skin,
-        preferredFiatCurrency,
-        blockExplorer,
-        walletDirectory,
-        walletPath,
-        xmrigPath,
-        xmrigPool,
+        recentlyOpenedWallets,
+
+        // Nodes
         nodes,
-        websocketEnabled,
         nodeSource,
         useOnionNodes,
+
+        // Tabs
         showTabHome,
         showTabCoins,
         showTabExchange,
         showTabCalc,
         showTabXMRig,
-        geometry,
-        windowState,
-        firstRun,
-        hideBalance,
-        redditFrontend,
-        showHistorySyncNotice,
-        GUI_HistoryViewState,
+        showSearchbar,
+
+        // Mining
+        xmrigPath,
+        xmrigPool,
+
+        // Settings
+        preferredFiatCurrency,
+        skin,
         amountPrecision,
-        portableMode,
         dateFormat,
         timeFormat,
+        balanceDisplay,
+
         multiBroadcast,
+        warnOnExternalLink,
+        hideBalance,
+
+        blockExplorer,
+        redditFrontend,
+        localMoneroFrontend,
+
+        fiatSymbols,
+        cryptoSymbols,
+
+        // Tor
         torPrivacyLevel,
         socks5Host,
         socks5Port,
         socks5User,
         socks5Pass,
         useLocalTor, // Prevents Feather from starting bundled Tor daemon
-        networkType,
-        localMoneroFrontend
+        initSyncThreshold
     };
 
     enum PrivacyLevel {
         allTorExceptNode = 0,
         allTorExceptInitSync,
         allTor
+    };
+
+    enum BalanceDisplay {
+        totalBalance = 0,
+        spendablePlusUnconfirmed,
+        spendable
     };
 
     ~Config() override;

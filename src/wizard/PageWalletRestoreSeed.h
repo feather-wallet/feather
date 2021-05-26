@@ -22,7 +22,7 @@ class PageWalletRestoreSeed : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageWalletRestoreSeed(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageWalletRestoreSeed(WizardFields *fields, QWidget *parent = nullptr);
     bool validatePage() override;
     void initializePage() override;
     int nextId() const override;
@@ -50,7 +50,6 @@ private:
 
     void onSeedTypeToggled();
 
-    AppContext *m_ctx;
     Ui::PageWalletRestoreSeed *ui;
     WizardFields *m_fields;
 

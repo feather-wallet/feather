@@ -8,9 +8,9 @@
 #include "utils/Icons.h"
 
 AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
-    : QAbstractTableModel(parent),
-    m_addressBook(addressBook),
-    m_showFullAddresses(false)
+    : QAbstractTableModel(parent)
+    , m_addressBook(addressBook)
+    , m_showFullAddresses(false)
 {
     connect(m_addressBook, &AddressBook::refreshStarted, this, &AddressBookModel::startReset);
     connect(m_addressBook, &AddressBook::refreshFinished, this, &AddressBookModel::endReset);
@@ -148,11 +148,6 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
 bool AddressBookModel::deleteRow(int row)
 {
     return m_addressBook->deleteRow(row);
-}
-
-int AddressBookModel::lookupPaymentID(const QString &payment_id) const
-{
-    return m_addressBook->lookupPaymentID(payment_id);
 }
 
 bool AddressBookModel::writeCSV(const QString &path) {

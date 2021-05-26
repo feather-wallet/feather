@@ -9,8 +9,8 @@
 
 SignVerifyDialog::SignVerifyDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)
-        , m_wallet(wallet)
         , ui(new Ui::SignVerifyDialog)
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 

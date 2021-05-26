@@ -156,7 +156,7 @@ void NodeWidget::onCustomAddClicked(){
     m_ctx->nodes->setCustomNodes(nodesList);
 }
 
-void NodeWidget::setupUI(AppContext *ctx) {
+void NodeWidget::setupUI(QSharedPointer<AppContext> ctx) {
     m_ctx = ctx;
 
     auto nodeSource = m_ctx->nodes->source();

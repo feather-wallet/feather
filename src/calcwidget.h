@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef CALC_H
-#define CALC_H
+#ifndef FEATHER_CALCWIDGET_H
+#define FEATHER_CALCWIDGET_H
 
 #include <QWidget>
+#include <QComboBox>
 
 namespace Ui {
     class CalcWidget;
@@ -18,23 +19,20 @@ public:
     explicit CalcWidget(QWidget *parent = nullptr);
     ~CalcWidget() override;
 
-signals:
-    void closed();
-
 public slots:
-    void fromChanged(const QString& data);
-    void toChanged(const QString& data);
-    void toComboChanged(const QString& data);
-    void initFiat();
-    void initCrypto();
     void skinChanged();
 
-private:
-    Ui::CalcWidget *ui;
-
-    bool m_comboBoxInit = false;
+private slots:
     void initComboBox();
-    bool m_changing = false;
+    void showCalcConfigureDialog();
+    void onPricesReceived();
+
+private:
+    void convert(bool reverse);
+    void setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat);
+
+    Ui::CalcWidget *ui;
+    bool m_comboBoxInit = false;
 };
 
-#endif // CALC_H
+#endif // FEATHER_CALCWIDGET_H

@@ -20,9 +20,11 @@ class ContactsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ContactsWidget(QWidget *parent = nullptr);
-    void setModel(AddressBookModel * model);
+    explicit ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ContactsWidget() override;
+
+    void setSearchbarVisible(bool visible);
+    void focusSearchbar();
 
 public slots:
     void copyAddress();
@@ -32,7 +34,6 @@ public slots:
     void deleteContact();
     void setShowFullAddresses(bool show);
     void setSearchFilter(const QString &filter);
-    void resetModel();
 
 signals:
     void fillAddress(QString &address);
@@ -42,7 +43,7 @@ private slots:
 
 private:
     Ui::ContactsWidget *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 
     QAction *m_showFullAddressesAction;
     QMenu *m_rowMenu;

@@ -7,17 +7,17 @@
 
 #include <QMessageBox>
 
-TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
+TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
         : QDialog(parent)
-        , m_ctx(ctx)
-        , m_loadTimer(new QTimer(this))
         , ui(new Ui::TxImportDialog)
+        , m_ctx(std::move(ctx))
+        , m_loadTimer(new QTimer(this))
 {
     ui->setupUi(this);
     ui->resp->hide();
     ui->label_loading->hide();
 
-    auto node = ctx->nodes->connection();
+    auto node = m_ctx->nodes->connection();
     m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
 
     connect(ui->btn_load, &QPushButton::clicked, this, &TxImportDialog::loadTx);
@@ -34,12 +34,16 @@ TxImportDialog::TxImportDialog(QWidget *parent, AppContext *ctx)
 
 void TxImportDialog::loadTx() {
     QString txid = ui->line_txid->text();
-    QString node = m_ctx->nodes->connection().toAddress();
+    FeatherNode node = m_ctx->nodes->connection();
 
-    if (!node.startsWith("http://"))
-        node = QString("http://%1").arg(node);
+    if (node.isLocal()) {
+        m_rpc->setNetwork(getNetworkClearnet());
+    } else {
+        m_rpc->setNetwork(getNetworkTor());
+    }
 
-    m_rpc->setDaemonAddress(node);
+    qDebug() << node.toURL();
+    m_rpc->setDaemonAddress(node.toURL());
     m_rpc->getTransactions(QStringList() << txid, false, true);
 
     ui->label_loading->setText("Loading transaction");
@@ -88,7 +92,7 @@ void TxImportDialog::onImport() {
     bool pool = tx.value("in_pool").toBool();
     bool double_spend_seen = tx.value("double_spend_seen").toBool();
 
-    if (m_ctx->currentWallet->importTransaction(tx.value("tx_hash").toString(), output_indices, height, timestamp, false, pool, double_spend_seen)) {
+    if (m_ctx->wallet->importTransaction(tx.value("tx_hash").toString(), output_indices, height, timestamp, false, pool, double_spend_seen)) {
         QMessageBox::information(this, "Import transaction", "Transaction imported successfully.");
     } else {
         QMessageBox::warning(this, "Import transaction", "Transaction import failed.");

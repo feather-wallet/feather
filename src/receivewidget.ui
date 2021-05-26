@@ -27,7 +27,7 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLineEdit" name="label_addressSearch">
+    <widget class="QLineEdit" name="search">
      <property name="enabled">
       <bool>true</bool>
      </property>

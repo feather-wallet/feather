@@ -15,7 +15,7 @@ class PasswordDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit PasswordDialog(QWidget *parent, const QString &walletName, bool incorrectPassword);
+    explicit PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent = nullptr);
     ~PasswordDialog() override;
 
     QString password = "";

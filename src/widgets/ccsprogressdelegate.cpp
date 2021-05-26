@@ -6,10 +6,9 @@
 #include <QApplication>
 
 CCSProgressDelegate::CCSProgressDelegate(CCSModel *model, QWidget *parent)
-    : m_model(model)
-    , QStyledItemDelegate(parent)
+    : QStyledItemDelegate(parent)
+    , m_model(model)
 {
-
 }
 
 void CCSProgressDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option,

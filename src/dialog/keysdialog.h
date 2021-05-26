@@ -16,7 +16,7 @@ class KeysDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit KeysDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~KeysDialog() override;
 
 private:

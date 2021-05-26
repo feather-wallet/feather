@@ -23,11 +23,11 @@ signals:
 private:
     void loadDatabase();
     void writeDatabase();
+    int m_genesis_timestamp;
     QString m_databasePath;
     QString m_configDirectory;
     bool m_initialized = false;
     QMap<QString, double> m_database;
-    int m_genesis_timestamp;
 };
 
 #endif //FEATHER_TXFIATHISTORY_H

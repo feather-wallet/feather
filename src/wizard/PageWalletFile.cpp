@@ -10,10 +10,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-PageWalletFile::PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageWalletFile)
-    , m_ctx(ctx)
     , m_fields(fields)
 {
     ui->setupUi(this);
@@ -23,9 +22,9 @@ PageWalletFile::PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *p
     ui->lockIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     connect(ui->btnChange, &QPushButton::clicked, [=] {
-        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
+        QString currentWalletDir = config()->get(Config::walletDirectory).toString();
+        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", currentWalletDir, QFileDialog::ShowDirsOnly);
         if(walletDir.isEmpty()) return;
-        m_ctx->defaultWalletDir = walletDir;
         ui->line_walletDir->setText(walletDir);
         config()->set(Config::walletDirectory, walletDir);
         emit defaultWalletDirChanged(walletDir);
@@ -37,7 +36,7 @@ PageWalletFile::PageWalletFile(AppContext *ctx, WizardFields *fields, QWidget *p
 
 void PageWalletFile::initializePage() {
     this->setTitle(m_fields->modeText);
-    ui->line_walletDir->setText(m_ctx->defaultWalletDir);
+    ui->line_walletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->line_walletName->setText(this->defaultWalletName());
 }
 

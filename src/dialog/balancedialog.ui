@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Balance</string>
+   <string>Account Balance</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

@@ -19,7 +19,7 @@ class LocalMoneroWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit LocalMoneroWidget(QWidget *parent, AppContext *ctx);
+    explicit LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx);
     ~LocalMoneroWidget() override;
 
 public slots:
@@ -41,11 +41,11 @@ private:
     void viewOfferDetails();
     void updatePaymentMethods();
 
+    Ui::LocalMoneroWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
+
     int m_currentPage = 0;
 
-    Ui::LocalMoneroWidget *ui;
-
-    AppContext *m_ctx;
     LocalMoneroApi *m_api;
     LocalMoneroModel *m_model;
     UtilsNetworking *m_network;

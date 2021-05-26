@@ -4,13 +4,12 @@
 #include "WalletWizard.h"
 #include "PageWalletSeed.h"
 #include "ui_PageWalletSeed.h"
-#include "globals.h"
+#include "constants.h"
 
 #include <QMessageBox>
 
-PageWalletSeed::PageWalletSeed(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
-    , m_ctx(ctx)
     , ui(new Ui::PageWalletSeed)
     , m_fields(fields)
 {
@@ -50,7 +49,7 @@ void PageWalletSeed::seedRoulette(int count) {
 
 void PageWalletSeed::generateSeed() {
     do {
-        FeatherSeed seed = FeatherSeed(m_ctx->networkType, QString::fromStdString(globals::coinName), m_ctx->seedLanguage);
+        FeatherSeed seed = FeatherSeed(constants::networkType, QString::fromStdString(constants::coinName), constants::seedLanguage);
         m_mnemonic = seed.mnemonic.join(" ");
         m_restoreHeight = seed.restoreHeight;
     } while (m_mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2

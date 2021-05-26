@@ -19,7 +19,7 @@ class PageSetRestoreHeight : public QWizardPage
 Q_OBJECT
 
 public:
-    explicit PageSetRestoreHeight(AppContext *ctx, WizardFields *fields, QWidget *parent = nullptr);
+    explicit PageSetRestoreHeight(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -33,9 +33,8 @@ private:
     void showScanWarning(const QDateTime &date);
     void showWalletAgeWarning(const QDateTime &date);
 
-    AppContext *m_ctx;
-    WizardFields *m_fields;
     Ui::PageSetRestoreHeight *ui;
+    WizardFields *m_fields;
 };
 
 #endif //FEATHER_PAGESETRESTOREHEIGHT_H

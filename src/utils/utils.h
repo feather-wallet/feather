@@ -75,7 +75,6 @@ public:
     static QString amountToCurrencyString(double amount, const QString &currencyCode);
     static int maxLength(const QVector<QString> &array);
     static QMap<QString, QLocale> localeCache;
-    static QString balanceFormat(quint64 balance);
     static QTextCharFormat addressTextFormat(const SubaddressIndex &index);
     static bool isTorsocks();
     static QString defaultWalletDir();

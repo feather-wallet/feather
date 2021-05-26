@@ -7,10 +7,11 @@
 #include "txfiathistory.h"
 #include "utils/utils.h"
 
-TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirectory, QObject *parent) :
-        QObject(parent),
-        m_genesis_timestamp(genesis_timestamp),
-        m_configDirectory(configDirectory) {
+TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirectory, QObject *parent)
+    : QObject(parent)
+    , m_genesis_timestamp(genesis_timestamp)
+    , m_configDirectory(configDirectory)
+{
     m_databasePath = QString("%1/fiatHistory.db").arg(configDirectory);
     this->loadDatabase();
 }
@@ -70,7 +71,7 @@ void TxFiatHistory::onUpdateDatabase() {
     }
 
     // keep local fiatTxHistory database up to date, loop for missing dates
-    for(year; year != yearCurrent + 1; year += 1){
+    for(; year != yearCurrent + 1; year += 1){
         for(int month = 1; month != 13; month++) {
             if(year == yearCurrent && month == now.month() && now.day() == 1) break;
             QDateTime _now;

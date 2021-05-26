@@ -11,9 +11,9 @@
 #include <QBrush>
 
 SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
-    : QAbstractTableModel(parent),
-    m_subaddress(subaddress),
-    m_showFullAddresses(false)
+    : QAbstractTableModel(parent)
+    , m_subaddress(subaddress)
+    , m_showFullAddresses(false)
 {
     connect(m_subaddress, &Subaddress::refreshStarted, this, &SubaddressModel::startReset);
     connect(m_subaddress, &Subaddress::refreshFinished, this, &SubaddressModel::endReset);
@@ -143,7 +143,7 @@ bool SubaddressModel::setData(const QModelIndex &index, const QVariant &value, i
 
         switch (index.column()) {
             case Label:
-                m_subaddress->setLabel(0, row, value.toString()); // Todo: get actual account index
+                m_subaddress->setLabel(m_currentSubaddressAcount, row, value.toString());
                 break;
             default:
                 return false;
@@ -178,6 +178,10 @@ bool SubaddressModel::isShowFullAddresses() const {
 
 int SubaddressModel::unusedLookahead() const {
     return m_subaddress->unusedLookahead();
+}
+
+void SubaddressModel::setCurrentSubaddressAcount(quint32 accountIndex) {
+    m_currentSubaddressAcount = accountIndex;
 }
 
 Monero::SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {

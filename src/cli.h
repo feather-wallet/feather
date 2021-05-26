@@ -7,37 +7,28 @@
 #include <QtCore>
 #include "appcontext.h"
 
-enum CLIMode {
-    ExportContacts,
-    ExportTxHistory,
-    BruteforcePassword
-};
-
 class CLI : public QObject
 {
     Q_OBJECT
+
 public:
-    CLIMode mode;
-    explicit CLI(AppContext *ctx, QObject *parent = nullptr);
-    ~CLI() override;
+    enum Mode {
+        ExportContacts,
+        ExportTxHistory,
+        BruteforcePassword
+    };
 
-public slots:
-    void run();
-
-    //libwalletqt
-    void onWalletOpened();
-    void onWalletOpenedError(const QString& err);
-    void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
-
-private:
-    AppContext *ctx;
+    explicit CLI(Mode mode, QCommandLineParser *cmdargs, QObject *parent = nullptr);
 
 private slots:
-    void finished(const QString &msg);
-    void finishedError(const QString &err);
+    void onWalletOpened(Wallet *wallet);
 
-signals:
-    void closeApplication();
+private:
+    void finished(const QString &message);
+
+    Mode m_mode;
+    QCommandLineParser *m_cmdargs;
+    WalletManager *m_walletManager;
 };
 
 #endif //FEATHER_CLI_H

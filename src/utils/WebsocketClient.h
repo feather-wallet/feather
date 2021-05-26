@@ -8,7 +8,7 @@
 #include <QWebSocket>
 #include <QTimer>
 #include <QPointer>
-#include "globals.h"
+#include "constants.h"
 
 class WebsocketClient : public QObject {
     Q_OBJECT
@@ -36,7 +36,7 @@ private slots:
 
 private:
     bool m_connect = false;
-    QUrl m_url = globals::websocketUrl;
+    QUrl m_url = constants::websocketUrl;
     QTimer m_connectionTimer;
     QTimer m_pingTimer;
 };

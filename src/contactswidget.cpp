@@ -11,12 +11,22 @@
 
 #include <QMessageBox>
 
-ContactsWidget::ContactsWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::ContactsWidget)
+ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::ContactsWidget)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
+
+    m_model = m_ctx->wallet->addressBookModel();
+    m_proxyModel = new AddressBookProxyModel;
+    m_proxyModel->setSourceModel(m_model);
+    ui->contacts->setModel(m_proxyModel);
+
+    ui->contacts->setSortingEnabled(true);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::Stretch);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::ResizeToContents);
+    ui->contacts->header()->setMinimumSectionSize(200);
 
     // header context menu
     ui->contacts->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -53,6 +63,15 @@ ContactsWidget::ContactsWidget(QWidget *parent) :
     connect(ui->search, &QLineEdit::textChanged, this, &ContactsWidget::setSearchFilter);
 }
 
+void ContactsWidget::setSearchbarVisible(bool visible) {
+    ui->search->setVisible(visible);
+}
+
+void ContactsWidget::focusSearchbar() {
+    ui->search->setFocusPolicy(Qt::StrongFocus);
+    ui->search->setFocus();
+}
+
 void ContactsWidget::copyAddress() {
     QModelIndex index = ui->contacts->currentIndex();
     ModelUtils::copyColumn(&index, AddressBookModel::Address);
@@ -69,19 +88,6 @@ void ContactsWidget::payTo() {
     emit fillAddress(address);
 }
 
-void ContactsWidget::setModel(AddressBookModel *model)
-{
-    m_model = model;
-    m_proxyModel = new AddressBookProxyModel;
-    m_proxyModel->setSourceModel(m_model);
-    ui->contacts->setModel(m_proxyModel);
-
-    ui->contacts->setSortingEnabled(true);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::Stretch);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::ResizeToContents);
-    ui->contacts->header()->setMinimumSectionSize(200);
-}
-
 void ContactsWidget::setShowFullAddresses(bool show) {
     m_model->setShowFullAddresses(show);
 }
@@ -89,11 +95,6 @@ void ContactsWidget::setShowFullAddresses(bool show) {
 void ContactsWidget::setSearchFilter(const QString &filter) {
     if(!m_proxyModel) return;
     m_proxyModel->setSearchFilter(filter);
-}
-
-void ContactsWidget::resetModel()
-{
-    ui->contacts->setModel(nullptr);
 }
 
 void ContactsWidget::showHeaderMenu(const QPoint& position)
@@ -104,24 +105,26 @@ void ContactsWidget::showHeaderMenu(const QPoint& position)
 
 void ContactsWidget::newContact(QString address, QString name)
 {
-    auto * dialog = new ContactsDialog(this, address, name);
-    int ret = dialog->exec();
-    if (!ret) return;
+    ContactsDialog dialog{this, address, name};
+    int ret = dialog.exec();
+    if (ret != QDialog::Accepted) {
+        return;
+    }
 
-    address = dialog->getAddress();
-    name = dialog->getName();
+    address = dialog.getAddress();
+    name = dialog.getName();
 
-    bool addressValid = WalletManager::addressValid(address, m_ctx->currentWallet->nettype());
+    bool addressValid = WalletManager::addressValid(address, m_ctx->wallet->nettype());
     if (!addressValid) {
         QMessageBox::warning(this, "Invalid address", "Invalid address");
         return;
     }
 
-    int num_addresses = m_ctx->currentWallet->addressBook()->count();
+    int num_addresses = m_ctx->wallet->addressBook()->count();
     QString address_entry;
     QString name_entry;
     for (int i=0; i<num_addresses; i++) {
-        m_ctx->currentWallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
+        m_ctx->wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
             address_entry = entry.address();
             name_entry = entry.description();
         });
@@ -138,7 +141,7 @@ void ContactsWidget::newContact(QString address, QString name)
         }
     }
 
-    m_ctx->currentWallet->addressBook()->addRow(address, "", name);
+    m_ctx->wallet->addressBook()->addRow(address, "", name);
 }
 
 void ContactsWidget::deleteContact()

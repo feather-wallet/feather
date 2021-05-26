@@ -22,6 +22,8 @@ file(GLOB SOURCE_FILES
         "api/*.cpp"
         "utils/*.h"
         "utils/*.cpp"
+        "utils/os/*.h"
+        "utils/os/*.cpp"
         "libwalletqt/*.h"
         "libwalletqt/*.cpp"
         "daemon/*.h"

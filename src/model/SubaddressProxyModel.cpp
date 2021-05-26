@@ -4,11 +4,11 @@
 #include "SubaddressProxyModel.h"
 
 SubaddressProxyModel::SubaddressProxyModel(QObject *parent, Subaddress *subaddress, bool hidePrimary)
-    : QSortFilterProxyModel(parent),
-    m_searchRegExp(""),
-    m_searchCaseSensitiveRegExp(""),
-    m_subaddress(subaddress),
-    m_hidePrimary(hidePrimary)
+    : QSortFilterProxyModel(parent)
+    , m_subaddress(subaddress)
+    , m_searchRegExp("")
+    , m_searchCaseSensitiveRegExp("")
+    , m_hidePrimary(hidePrimary)
 {
     m_searchRegExp.setCaseSensitivity(Qt::CaseInsensitive);
     m_searchRegExp.setPatternSyntax(QRegExp::FixedString);

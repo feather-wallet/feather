@@ -12,12 +12,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-TxConfAdvDialog::TxConfAdvDialog(AppContext *ctx, const QString &description, QWidget *parent)
-        : QDialog(parent)
-        , ui(new Ui::TxConfAdvDialog)
-        , m_ctx(ctx)
-        , m_exportUnsignedMenu(new QMenu(this))
-        , m_exportSignedMenu(new QMenu(this))
+TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::TxConfAdvDialog)
+    , m_ctx(std::move(ctx))
+    , m_exportUnsignedMenu(new QMenu(this))
+    , m_exportSignedMenu(new QMenu(this))
 {
     ui->setupUi(this);
 
@@ -30,7 +30,7 @@ TxConfAdvDialog::TxConfAdvDialog(AppContext *ctx, const QString &description, QW
     m_exportSignedMenu->addAction("Save to file", this, &TxConfAdvDialog::signedSaveFile);
     ui->btn_exportSigned->setMenu(m_exportSignedMenu);
 
-    if (m_ctx->currentWallet->viewOnly()) {
+    if (m_ctx->wallet->viewOnly()) {
         ui->btn_exportSigned->hide();
         ui->btn_send->hide();
     }
@@ -61,7 +61,7 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx) {
     ui->total->setText(WalletManager::displayAmount(tx->amount() + ptx->fee()));
 
     auto size_str = [this]{
-        if (m_ctx->currentWallet->viewOnly()) {
+        if (m_ctx->wallet->viewOnly()) {
             return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
         } else {
             auto size = m_tx->signedTxToHex(0).size() / 2;
@@ -108,7 +108,7 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     for (const auto& o: outputs) {
         auto address = o->address();
         auto amount = WalletManager::displayAmount(o->amount());
-        auto index = m_ctx->currentWallet->subaddressIndex(address);
+        auto index = m_ctx->wallet->subaddressIndex(address);
         cursor.insertText(address, Utils::addressTextFormat(index));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
@@ -177,9 +177,9 @@ void TxConfAdvDialog::broadcastTransaction() {
 
 void TxConfAdvDialog::closeDialog() {
     if (m_tx != nullptr)
-        m_ctx->currentWallet->disposeTransaction(m_tx);
+        m_ctx->wallet->disposeTransaction(m_tx);
     if (m_utx != nullptr)
-        m_ctx->currentWallet->disposeTransaction(m_utx);
+        m_ctx->wallet->disposeTransaction(m_utx);
     QDialog::reject();
 }
 

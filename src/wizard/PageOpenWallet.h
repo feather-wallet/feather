@@ -9,7 +9,7 @@
 #include <QWidget>
 
 #include "appcontext.h"
-#include "utils/keysfiles.h"
+#include "model/WalletKeysFilesModel.h"
 
 namespace Ui {
     class PageOpenWallet;
@@ -20,7 +20,7 @@ class PageOpenWallet : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageOpenWallet(AppContext *ctx, WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
+    explicit PageOpenWallet(WalletKeysFilesModel *wallets, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -31,10 +31,9 @@ signals:
 private:
     void updatePath();
 
-    AppContext *m_ctx;
+    Ui::PageOpenWallet *ui;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
-    Ui::PageOpenWallet *ui;
     QStandardItemModel *m_model;
 };
 

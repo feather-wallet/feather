@@ -22,7 +22,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-6`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-7`) to build the release binary.
 
 #### 2. Base image
 
@@ -49,8 +49,10 @@ The resulting binary can be found in `build/bin/feather`.
 First create the standalone binary using the Docker command in the previous step.
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:linux contrib/build-appimage.sh
+docker run --rm -it -v $PWD:/feather -w /feather/build feather:linux ../contrib/build-appimage.sh
 ```
+
+The resulting AppImage will be located in `./build`.
 
 ### Windows (reproducible)
 
@@ -61,7 +63,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-4`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `beta-7`) to build the release binary.
 
 #### 2. Base image
 

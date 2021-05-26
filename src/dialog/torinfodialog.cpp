@@ -7,13 +7,16 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "utils/TorManager.h"
+#include "utils/os/tails.h"
+#include "utils/Icons.h"
 
-TorInfoDialog::TorInfoDialog(QWidget *parent, AppContext *ctx)
+TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::TorInfoDialog)
-        , m_ctx(ctx)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -44,6 +47,9 @@ TorInfoDialog::TorInfoDialog(QWidget *parent, AppContext *ctx)
     connect(ui->btnGroup_privacyLevel, &QButtonGroup::idToggled, this, &TorInfoDialog::onSettingsChanged);
 
     ui->label_changes->hide();
+
+    ui->btn_configureInitSync->setIcon(icons()->icon("preferences.svg"));
+    connect(ui->btn_configureInitSync, &QPushButton::clicked, this, &TorInfoDialog::onShowInitSyncConfigDialog);
 
 #ifndef HAS_TOR_BIN
     ui->check_useLocalTor->setChecked(true);
@@ -118,7 +124,7 @@ void TorInfoDialog::initPrivacyLevel() {
     }
 
     if (m_ctx->nodes->connection().isLocal()) {
-        ui->label_notice->setText("You are connected to a local node. Traffic is not routed over Tor.");
+        ui->label_notice->setText("You are connected to a local node. Traffic to node is not routed over Tor.");
     }
     else if (Utils::isTorsocks()) {
         ui->label_notice->setText("Feather was started with torsocks, all traffic is routed over Tor");
@@ -143,6 +149,20 @@ void TorInfoDialog::initPrivacyLevel() {
 
 void TorInfoDialog::onStopTor() {
     torManager()->stop();
+}
+
+void TorInfoDialog::onShowInitSyncConfigDialog() {
+
+    int threshold = config()->get(Config::initSyncThreshold).toInt();
+
+    bool ok;
+    int newThreshold = QInputDialog::getInt(this, "Sync threshold",
+                                            "Synchronize over clearnet if wallet is behind more than x blocks: ",
+                                            threshold, 0, 10000, 10, &ok);
+
+    if (ok) {
+        config()->set(Config::initSyncThreshold, newThreshold);
+    }
 }
 
 TorInfoDialog::~TorInfoDialog() {

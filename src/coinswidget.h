@@ -22,12 +22,9 @@ class CoinsWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit CoinsWidget(QWidget *parent = nullptr);
+    explicit CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
-
-public slots:
-    void resetModel();
 
 private slots:
     void showHeaderMenu(const QPoint& position);
@@ -54,11 +51,12 @@ private:
     };
 
     Ui::CoinsWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
 
     QMenu *m_contextMenu;
+    QMenu *m_headerMenu;
     QMenu *m_copyMenu;
     QAction *m_showSpentAction;
-    QMenu *m_headerMenu;
     QAction *m_freezeOutputAction;
     QAction *m_freezeAllSelectedAction;
     QAction *m_thawOutputAction;
@@ -68,7 +66,6 @@ private:
     Coins *m_coins;
     CoinsModel * m_model;
     CoinsProxyModel * m_proxyModel;
-    AppContext *m_ctx;
 
     void showContextMenu(const QPoint & point);
     void copy(copyField field);

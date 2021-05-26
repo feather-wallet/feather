@@ -6,13 +6,14 @@
 
 #include "libwalletqt/WalletManager.h"
 #include "utils/utils.h"
+#include "model/ModelUtils.h"
 
 #include <QMessageBox>
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)
-        , m_wallet(wallet)
         , ui(new Ui::VerifyProofDialog)
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -48,6 +49,8 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
                 break;
         }
     });
+
+    ui->input_formattedProof->setFont(ModelUtils::getMonospaceFont());
 }
 
 VerifyProofDialog::~VerifyProofDialog()

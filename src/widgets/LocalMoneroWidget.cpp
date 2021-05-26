@@ -12,14 +12,12 @@
 #include <QMessageBox>
 #include <QMenu>
 
-LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, AppContext *ctx)
+LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx)
     : QWidget(parent)
     , ui(new Ui::LocalMoneroWidget)
-    , m_ctx(ctx)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
-
-//    this->adjustSize();
 
     QPixmap logo(":/assets/images/localMonero_logo.png");
     ui->logo->setPixmap(logo.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -52,7 +50,9 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, AppContext *ctx)
 
     ui->frame_loadMore->hide();
 
-    this->skinChanged();
+    QTimer::singleShot(1, [this]{
+        this->skinChanged();
+    });
 }
 
 void LocalMoneroWidget::skinChanged() {
@@ -68,6 +68,7 @@ void LocalMoneroWidget::skinChanged() {
 void LocalMoneroWidget::onSearchClicked() {
     m_model->clearData();
     m_currentPage = 0;
+    ui->btn_search->setEnabled(false);
 
     this->searchOffers();
 }
@@ -78,7 +79,7 @@ void LocalMoneroWidget::onSignUpClicked() {
 }
 
 void LocalMoneroWidget::onApiResponse(const LocalMoneroApi::LocalMoneroResponse &resp) {
-    qDebug() << "We got a response";
+    ui->btn_search->setEnabled(true);
 
     if (!resp.ok) {
         QMessageBox::warning(this, "LocalMonero error", QString("Request failed:\n\n%1").arg(resp.message));

@@ -5,9 +5,12 @@
 #include "SubaddressAccount.h"
 
 #include <QDebug>
+#include <QFont>
+#include "ModelUtils.h"
 
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
-    : QAbstractListModel(parent), m_subaddressAccount(subaddressAccount)
+    : QAbstractTableModel(parent)
+    , m_subaddressAccount(subaddressAccount)
 {
     connect(m_subaddressAccount, &SubaddressAccount::refreshStarted, this, &SubaddressAccountModel::startReset);
     connect(m_subaddressAccount, &SubaddressAccount::refreshFinished, this, &SubaddressAccountModel::endReset);
@@ -16,13 +19,26 @@ SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccoun
 void SubaddressAccountModel::startReset(){
     beginResetModel();
 }
+
 void SubaddressAccountModel::endReset(){
     endResetModel();
 }
 
-int SubaddressAccountModel::rowCount(const QModelIndex &) const
+int SubaddressAccountModel::rowCount(const QModelIndex &parent) const
 {
-    return m_subaddressAccount->count();
+    if (parent.isValid()) {
+        return 0;
+    } else {
+        return m_subaddressAccount->count();
+    }
+}
+
+int SubaddressAccountModel::columnCount(const QModelIndex &parent) const
+{
+    if (parent.isValid()) {
+        return 0;
+    }
+    return Column::COUNT;
 }
 
 QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
@@ -32,24 +48,17 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
 
     QVariant result;
 
-    bool found = m_subaddressAccount->getRow(index.row(), [&result, &role](const Monero::SubaddressAccountRow &row) {
-        switch (role) {
-        case SubaddressAccountAddressRole:
-            result = QString::fromStdString(row.getAddress());
-            break;
-        case SubaddressAccountLabelRole:
-            result = QString::fromStdString(row.getLabel());
-            break;
-        case SubaddressAccountBalanceRole:
-            result = QString::fromStdString(row.getBalance());
-            break;
-        case SubaddressAccountUnlockedBalanceRole:
-            result = QString::fromStdString(row.getUnlockedBalance());
-            break;
-        default:
-            qCritical() << "Unimplemented role" << role;
+    bool found = m_subaddressAccount->getRow(index.row(), [this, &index, &result, &role](const Monero::SubaddressAccountRow &row) {
+        if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+            result = parseSubaddressAccountRow(row, index, role);
+        }
+        else if (role == Qt::FontRole) {
+            if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
+                result = ModelUtils::getMonospaceFont();
+            }
         }
     });
+
     if (!found) {
         qCritical("%s: internal error: invalid index %d", __FUNCTION__, index.row());
     }
@@ -57,15 +66,85 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QHash<int, QByteArray> SubaddressAccountModel::roleNames() const
+QVariant SubaddressAccountModel::parseSubaddressAccountRow(const Monero::SubaddressAccountRow &row,
+                                                           const QModelIndex &index, int role) const
 {
-    static QHash<int, QByteArray> roleNames;
-    if (roleNames.empty())
-    {
-        roleNames.insert(SubaddressAccountAddressRole, "address");
-        roleNames.insert(SubaddressAccountLabelRole, "label");
-        roleNames.insert(SubaddressAccountBalanceRole, "balance");
-        roleNames.insert(SubaddressAccountUnlockedBalanceRole, "unlockedBalance");
+    switch (index.column()) {
+        case Number:
+            return QString("#%1").arg(QString::number(index.row()));
+        case Address:
+            return QString::fromStdString(row.getAddress());
+        case Label:
+            return QString::fromStdString(row.getLabel());
+        case Balance:
+            return QString::fromStdString(row.getBalance());
+        case UnlockedBalance:
+            return QString::fromStdString(row.getUnlockedBalance());
+        default:
+            return QVariant();
     }
-    return roleNames;
+}
+
+QVariant SubaddressAccountModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole) {
+        return QVariant();
+    }
+    if (orientation == Qt::Horizontal)
+    {
+        switch (section) {
+            case Address:
+                return QString("Address");
+            case Label:
+                return QString("Label");
+            case Balance:
+                return QString("Balance");
+            case UnlockedBalance:
+                return QString("Spendable balance");
+            default:
+                return QVariant();
+        }
+    }
+    return QVariant();
+}
+
+bool SubaddressAccountModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() && role == Qt::EditRole) {
+        const int row = index.row();
+
+        switch (index.column()) {
+            case Label:
+                m_subaddressAccount->setLabel(row, value.toString());
+                break;
+            default:
+                return false;
+        }
+        emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+
+        return true;
+    }
+    return false;
+}
+
+
+Qt::ItemFlags SubaddressAccountModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::ItemIsEnabled;
+
+    if (index.column() == Label)
+        return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+
+    return QAbstractTableModel::flags(index);
+}
+
+Monero::SubaddressAccountRow* SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
+    Q_ASSERT(index.isValid() && index.row() < m_subaddressAccount->count());
+    return m_subaddressAccount->row(index.row());
+}
+
+SubaddressAccountProxyModel::SubaddressAccountProxyModel(QObject *parent)
+    : QSortFilterProxyModel(parent)
+{
 }

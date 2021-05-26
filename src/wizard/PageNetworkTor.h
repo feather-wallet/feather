@@ -17,7 +17,7 @@ class PageNetworkTor : public QWizardPage
 Q_OBJECT
 
 public:
-    explicit PageNetworkTor(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageNetworkTor(QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -26,7 +26,6 @@ signals:
     void initialNetworkConfigured();
 
 private:
-    AppContext *m_ctx;
     Ui::PageNetworkTor *ui;
 };
 

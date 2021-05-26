@@ -17,7 +17,7 @@ class DebugInfoDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit DebugInfoDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~DebugInfoDialog() override;
 
 private:
@@ -25,10 +25,10 @@ private:
     void copyToClipboad();
     void updateInfo();
 
-    QTimer m_updateTimer;
-    AppContext *m_ctx;
-
     Ui::DebugInfoDialog *ui;
+    QSharedPointer<AppContext> m_ctx;
+
+    QTimer m_updateTimer;
 };
 
 #endif //FEATHER_DEBUGINFODIALOG_H

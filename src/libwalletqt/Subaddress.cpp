@@ -5,7 +5,9 @@
 #include <QDebug>
 
 Subaddress::Subaddress(Monero::Subaddress *subaddressImpl, QObject *parent)
-  : QObject(parent), m_subaddressImpl(subaddressImpl), m_unusedLookahead(0)
+    : QObject(parent)
+    , m_subaddressImpl(subaddressImpl)
+    , m_unusedLookahead(0)
 {
     getAll();
 }

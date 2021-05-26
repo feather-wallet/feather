@@ -22,7 +22,7 @@ class TxConfAdvDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxConfAdvDialog(AppContext *ctx, const QString &description, QWidget *parent = nullptr);
+    explicit TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent = nullptr);
     ~TxConfAdvDialog() override;
 
     void setTransaction(PendingTransaction *tx);
@@ -43,7 +43,7 @@ private:
     void signedSaveFile();
 
     Ui::TxConfAdvDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
     PendingTransaction *m_tx = nullptr;
     UnsignedTransaction *m_utx = nullptr;
     QMenu *m_exportUnsignedMenu;

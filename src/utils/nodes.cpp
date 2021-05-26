@@ -5,63 +5,128 @@
 
 #include "nodes.h"
 #include "utils/utils.h"
-#include "utils/WebsocketClient.h"
+#include "utils/os/tails.h"
 #include "appcontext.h"
+#include "constants.h"
+#include "utils/WebsocketNotifier.h"
+#include "utils/TorManager.h"
 
+bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeList::Type source) {
+    // We can't obtain references to QJsonObjects...
+    QJsonObject obj = this->getConfigData();
+    this->ensureStructure(obj, networkType);
+
+    QString networkTypeStr = QString::number(networkType);
+    QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
+
+    QString sourceStr = Utils::QtEnumToString(source);
+    QJsonArray sourceArray = netTypeObj.value(sourceStr).toArray();
+
+    if (sourceArray.contains(node)) {
+        return false;
+    }
+
+    sourceArray.append(node);
+
+    netTypeObj[sourceStr] = sourceArray;
+    obj[networkTypeStr] = netTypeObj;
+
+    config()->set(Config::nodes, obj);
+    return true;
+}
+
+void NodeList::setNodes(const QStringList &nodes, NetworkType::Type networkType, NodeList::Type source) {
+    QJsonObject obj = this->getConfigData();
+    this->ensureStructure(obj, networkType);
+
+    QString networkTypeStr = QString::number(networkType);
+    QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
+
+    QString sourceStr = Utils::QtEnumToString(source);
+    QJsonArray sourceArray = QJsonArray::fromStringList(nodes);
+
+    netTypeObj[sourceStr] = sourceArray;
+    obj[networkTypeStr] = netTypeObj;
+
+    config()->set(Config::nodes, obj);
+}
+
+QStringList NodeList::getNodes(NetworkType::Type networkType, NodeList::Type source) {
+    QJsonObject obj = this->getConfigData();
+    this->ensureStructure(obj, networkType);
+
+    QString networkTypeStr = QString::number(networkType);
+    QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
+
+    QString sourceStr = Utils::QtEnumToString(source);
+    QJsonArray sourceArray = netTypeObj.value(sourceStr).toArray();
+
+    QStringList nodes;
+    for (const auto &node : sourceArray) {
+        nodes << node.toString();
+    }
+    return nodes;
+}
+
+QJsonObject NodeList::getConfigData() {
+    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+
+    // Load old config format
+    if (obj.isEmpty()) {
+        auto jsonData = config()->get(Config::nodes).toByteArray();
+        if (Utils::validateJSON(jsonData)) {
+            QJsonDocument doc = QJsonDocument::fromJson(jsonData);
+            obj = doc.object();
+        }
+    }
+
+    return obj;
+}
+
+void NodeList::ensureStructure(QJsonObject &obj, NetworkType::Type networkType) {
+    QString networkTypeStr = QString::number(networkType);
+    QJsonObject netTypeObj = obj.value(networkTypeStr).toObject();
+    if (!netTypeObj.contains("ws"))
+        netTypeObj["ws"] = QJsonArray();
+    if (!netTypeObj.contains("custom"))
+        netTypeObj["custom"] = QJsonArray();
+
+    obj[networkTypeStr] = netTypeObj;
+}
 
 Nodes::Nodes(AppContext *ctx, QObject *parent)
     : QObject(parent)
-    , m_ctx(ctx)
-    , m_connection(FeatherNode())
     , modelWebsocket(new NodeModel(NodeSource::websocket, this))
     , modelCustom(new NodeModel(NodeSource::custom, this))
+    , m_ctx(ctx)
+    , m_connection(FeatherNode())
 {
     this->loadConfig();
     connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);
+    connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this, &Nodes::onWSNodesReceived);
 }
 
 void Nodes::loadConfig() {
-    auto configNodes = config()->get(Config::nodes).toByteArray();
-    auto key = QString::number(m_ctx->networkType);
-    if (!Utils::validateJSON(configNodes)) {
-        m_configJson[key] = QJsonObject();
-        qCritical() << "Fixed malformed config key \"nodes\"";
-    }
-
-    QJsonDocument doc = QJsonDocument::fromJson(configNodes);
-    m_configJson = doc.object();
-
-    if (!m_configJson.contains(key))
-        m_configJson[key] = QJsonObject();
-
-    auto obj = m_configJson.value(key).toObject();
-    if (!obj.contains("custom"))
-        obj["custom"] = QJsonArray();
-    if (!obj.contains("ws"))
-        obj["ws"] = QJsonArray();
-
-    // load custom nodes
-    auto nodes = obj.value("custom").toArray();
-    for (auto value: nodes) {
-        auto customNode = FeatherNode(value.toString());
+    QStringList customNodes = m_nodes.getNodes(constants::networkType, NodeList::custom);
+    for (const auto &node : customNodes) {
+        FeatherNode customNode{node};
         customNode.custom = true;
 
-        if(m_connection == customNode) {
-            if(m_connection.isActive)
+        if (m_connection == customNode) {
+            if (m_connection.isActive)
                 customNode.isActive = true;
-            else if(m_connection.isConnecting)
+            else if (m_connection.isConnecting)
                 customNode.isConnecting = true;
         }
 
         m_customNodes.append(customNode);
     }
 
-    // load cached websocket nodes
-    auto ws = obj.value("ws").toArray();
-    for (auto value: ws) {
-        auto wsNode = FeatherNode(value.toString());
+    QStringList websocketNodes = m_nodes.getNodes(constants::networkType, NodeList::ws);
+    for (const auto &node : websocketNodes) {
+        FeatherNode wsNode{node};
         wsNode.custom = false;
-        wsNode.online = true;  // assume online
+        wsNode.online = true; // assume online
 
         if (m_connection == wsNode) {
             if (m_connection.isActive)
@@ -88,9 +153,9 @@ void Nodes::loadConfig() {
         QJsonObject nodes_obj = nodes_json.object();
 
         QString netKey;
-        if (m_ctx->networkType == NetworkType::MAINNET) {
+        if (constants::networkType == NetworkType::MAINNET) {
             netKey = "mainnet";
-        } else if (m_ctx->networkType == NetworkType::STAGENET) {
+        } else if (constants::networkType == NetworkType::STAGENET) {
             netKey = "stagenet";
         }
 
@@ -98,28 +163,20 @@ void Nodes::loadConfig() {
             QJsonArray nodes_list;
             nodes_list = nodes_json[netKey].toObject()["tor"].toArray();
             nodes_list.append(nodes_list = nodes_json[netKey].toObject()["clearnet"].toArray());
+
             for (auto node: nodes_list) {
-                auto wsNode = FeatherNode(node.toString());
+                FeatherNode wsNode(node.toString());
                 wsNode.custom = false;
                 wsNode.online = true;
                 m_websocketNodes.append(wsNode);
+                m_nodes.addNode(node.toString(), constants::networkType, NodeList::Type::ws);
             }
         }
 
         qDebug() << QString("Loaded %1 nodes from hardcoded list").arg(m_websocketNodes.count());
     }
 
-    m_configJson[key] = obj;
-    this->writeConfig();
     this->updateModels();
-}
-
-void Nodes::writeConfig() {
-    QJsonDocument doc(m_configJson);
-    QString output(doc.toJson(QJsonDocument::Compact));
-    config()->set(Config::nodes, output);
-
-    qDebug() << "Saved node config.";
 }
 
 void Nodes::connectToNode() {
@@ -137,10 +194,10 @@ void Nodes::connectToNode(const FeatherNode &node) {
     qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress()).arg(node.custom ? "custom" : "ws");
 
     if (!node.url.userName().isEmpty() && !node.url.password().isEmpty())
-        m_ctx->currentWallet->setDaemonLogin(node.url.userName(), node.url.password());
+        m_ctx->wallet->setDaemonLogin(node.url.userName(), node.url.password());
 
     // Don't use SSL over Tor
-    m_ctx->currentWallet->setUseSSL(!node.isOnion());
+    m_ctx->wallet->setUseSSL(!node.isOnion());
 
     QString proxyAddress;
     if (useTorProxy(node)) {
@@ -152,7 +209,7 @@ void Nodes::connectToNode(const FeatherNode &node) {
         }
     }
 
-    m_ctx->currentWallet->initAsync(node.toAddress(), true, 0, false, false, 0, proxyAddress);
+    m_ctx->wallet->initAsync(node.toAddress(), true, 0, false, false, 0, proxyAddress);
 
     m_connection = node;
     m_connection.isActive = false;
@@ -164,11 +221,11 @@ void Nodes::connectToNode(const FeatherNode &node) {
 
 void Nodes::autoConnect(bool forceReconnect) {
     // this function is responsible for automatically connecting to a daemon.
-    if (m_ctx->currentWallet == nullptr || !m_enableAutoconnect) {
+    if (m_ctx->wallet == nullptr || !m_enableAutoconnect) {
         return;
     }
 
-    Wallet::ConnectionStatus status = m_ctx->currentWallet->connectionStatus();
+    Wallet::ConnectionStatus status = m_ctx->wallet->connectionStatus();
     bool wsMode = (this->source() == NodeSource::websocket);
 
     if (wsMode && !m_wsNodesReceived && websocketNodes().count() == 0) {
@@ -183,7 +240,7 @@ void Nodes::autoConnect(bool forceReconnect) {
         }
 
         // try a connect
-        auto node = this->pickEligibleNode();
+        FeatherNode node = this->pickEligibleNode();
         this->connectToNode(node);
         return;
     }
@@ -278,15 +335,12 @@ void Nodes::onWSNodesReceived(QList<FeatherNode> &nodes) {
     }
 
     // cache into config
-    auto key = QString::number(m_ctx->networkType);
-    auto obj = m_configJson.value(key).toObject();
-    auto ws = QJsonArray();
-    for (auto const &node: m_websocketNodes)
-        ws.push_back(node.toAddress());
+    QStringList wsNodeList;
+    for (const auto &node : m_websocketNodes) {
+        wsNodeList << node.toAddress();
+    }
+    m_nodes.setNodes(wsNodeList, constants::networkType, NodeList::ws);
 
-    obj["ws"] = ws;
-    m_configJson[key] = obj;
-    this->writeConfig();
     this->resetLocalState();
     this->updateModels();
 }
@@ -299,30 +353,35 @@ void Nodes::onNodeSourceChanged(NodeSource nodeSource) {
 
 void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
     m_customNodes.clear();
-    auto key = QString::number(m_ctx->networkType);
-    auto obj = m_configJson.value(key).toObject();
 
     QStringList nodesList;
     for (auto const &node: nodes) {
-        if (nodesList.contains(node.toAddress())) continue;
+        if (nodesList.contains(node.toAddress())) // skip duplicates
+            continue;
         nodesList.append(node.toAddress());
         m_customNodes.append(node);
     }
 
-    auto arr = QJsonArray::fromStringList(nodesList);
-    obj["custom"] = arr;
-    m_configJson[key] = obj;
-    this->writeConfig();
+    m_nodes.setNodes(nodesList, constants::networkType, NodeList::Type::custom);
+
     this->resetLocalState();
     this->updateModels();
 }
 
 void Nodes::onWalletRefreshed() {
     if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
+        // Don't reconnect if we're connected to a local node (traffic will not be routed through Tor)
         if (m_connection.isLocal())
             return;
+
+        // Don't reconnect if we're already connected to an .onion node
+        if (m_connection.isOnion())
+            return;
+
+        // Don't reconnect on Tails or Whonix (all traffic is already routed through Tor)
         if (TailsOS::detect() || WhonixOS::detect())
             return;
+
         this->autoConnect(true);
     }
 }
@@ -332,9 +391,24 @@ bool Nodes::useOnionNodes() {
         return true;
     }
     auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
-    if (privacyLevel == Config::allTor || (privacyLevel == Config::allTorExceptInitSync && m_ctx->refreshed)) {
+    if (privacyLevel == Config::allTor) {
         return true;
     }
+
+    if (privacyLevel == Config::allTorExceptInitSync) {
+        if (m_ctx->refreshed)
+            return true;
+
+        if (appData()->heights.contains(constants::networkType)) {
+            int initSyncThreshold = config()->get(Config::initSyncThreshold).toInt();
+            int networkHeight = appData()->heights[constants::networkType];
+
+            if (m_ctx->wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 

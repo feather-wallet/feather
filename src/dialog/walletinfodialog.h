@@ -17,14 +17,14 @@ class WalletInfoDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit WalletInfoDialog(AppContext *ctx, QWidget *parent = nullptr);
+    explicit WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~WalletInfoDialog() override;
 
 private:
     void openWalletDir();
 
     Ui::WalletInfoDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 #endif //FEATHER_WALLETINFODIALOG_H

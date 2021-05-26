@@ -11,14 +11,14 @@
 #include <QClipboard>
 #include <QMessageBox>
 
-CoinsWidget::CoinsWidget(QWidget *parent)
-        : QWidget(parent)
-        , ui(new Ui::CoinsWidget)
-        , m_headerMenu(new QMenu(this))
-        , m_copyMenu(new QMenu("Copy",this))
+CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+    : QWidget(parent)
+    , ui(new Ui::CoinsWidget)
+    , m_ctx(std::move(ctx))
+    , m_headerMenu(new QMenu(this))
+    , m_copyMenu(new QMenu("Copy",this))
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     // header context menu
     ui->coins->header()->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -69,7 +69,7 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     ui->coins->setColumnHidden(CoinsModel::SpentHeight, true);
     ui->coins->setColumnHidden(CoinsModel::Frozen, true);
 
-    if (!m_ctx->currentWallet->viewOnly()) {
+    if (!m_ctx->wallet->viewOnly()) {
         ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, true);
     } else {
         ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, false);
@@ -186,10 +186,6 @@ void CoinsWidget::onSweepOutput() {
     dialog->deleteLater();
 }
 
-void CoinsWidget::resetModel() {
-    ui->coins->setModel(nullptr);
-}
-
 void CoinsWidget::copy(copyField field) {
     CoinsInfo* c = this->currentEntry();
     if (!c) return;
@@ -233,17 +229,17 @@ CoinsInfo* CoinsWidget::currentEntry() {
 
 void CoinsWidget::freezeCoins(const QVector<int>& indexes) {
     for (int i : indexes) {
-        m_ctx->currentWallet->coins()->freeze(i);
+        m_ctx->wallet->coins()->freeze(i);
     }
-    m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
+    m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();
 }
 
 void CoinsWidget::thawCoins(const QVector<int> &indexes) {
     for (int i : indexes) {
-        m_ctx->currentWallet->coins()->thaw(i);
+        m_ctx->wallet->coins()->thaw(i);
     }
-    m_ctx->currentWallet->coins()->refresh(m_ctx->currentWallet->currentSubaddressAccount());
+    m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();
 }
 

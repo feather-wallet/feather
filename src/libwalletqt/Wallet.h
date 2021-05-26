@@ -76,6 +76,9 @@ class Wallet : public QObject, public PassprasePrompter
 Q_OBJECT
 
 public:
+    Wallet(QObject * parent = nullptr);
+    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
+    ~Wallet();
 
     enum Status {
         Status_Ok          = Monero::Wallet::Status_Ok,
@@ -138,8 +141,11 @@ public:
     //! returns the subaddress index of the address
     SubaddressIndex subaddressIndex(const QString &address) const;
 
-    //! returns wallet file's path
-    QString path() const;
+    //! returns wallet cache file path
+    QString cachePath() const;
+
+    //! returns wallet keys file path
+    QString keysPath() const;
 
     //! saves wallet to the file by given path
     //! empty path stores in current location
@@ -423,7 +429,7 @@ public:
 
     // Passphrase entry for hardware wallets
     void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
-    virtual void onWalletPassphraseNeeded(bool on_device) override;
+    void onWalletPassphraseNeeded(bool on_device) override;
 
     quint64 getBytesReceived() const;
     quint64 getBytesSent() const;
@@ -465,10 +471,6 @@ signals:
     void refreshingChanged() const;
 
 private:
-    Wallet(QObject * parent = nullptr);
-    Wallet(Monero::Wallet *w, QObject * parent = 0);
-    ~Wallet();
-
     //! initializes wallet
     bool init(
             const QString &daemonAddress,

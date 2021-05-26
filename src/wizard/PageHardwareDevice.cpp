@@ -7,10 +7,9 @@
 
 #include <QMessageBox>
 
-PageHardwareDevice::PageHardwareDevice(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageHardwareDevice)
-        , m_ctx(ctx)
         , m_fields(fields)
 {
     ui->setupUi(this);

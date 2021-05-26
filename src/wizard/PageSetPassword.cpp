@@ -5,10 +5,9 @@
 #include "ui_PageSetPassword.h"
 #include "WalletWizard.h"
 
-PageSetPassword::PageSetPassword(AppContext *ctx, WizardFields *fields, QWidget *parent)
+PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageSetPassword)
-    , m_ctx(ctx)
     , m_fields(fields)
 {
     ui->setupUi(this);

@@ -32,9 +32,9 @@ public:
 
 private:
     QList<FeatherNode> m_nodes;
+    int m_nodeSource;
     QIcon m_offline;
     QIcon m_online;
-    int m_nodeSource;
 };
 
 #endif //FEATHER_NODEMODEL_H

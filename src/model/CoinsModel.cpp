@@ -5,9 +5,10 @@
 #include "CoinsInfo.h"
 #include "Coins.h"
 #include "ModelUtils.h"
-#include "globals.h"
+#include "constants.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
+#include "libwalletqt/WalletManager.h"
 
 #include <QBrush>
 
@@ -182,9 +183,9 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case Amount:
         {
             if (role == Qt::UserRole) {
-                return cInfo.amount() / globals::cdiv;
+                return cInfo.amount();
             }
-            return QString::number(cInfo.amount() / globals::cdiv, 'f', 12);
+            return cInfo.displayAmount();
         }
         case Frozen:
             return cInfo.frozen();

@@ -18,7 +18,7 @@ class TorInfoDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit TorInfoDialog(QWidget *parent, AppContext *ctx);
+    explicit TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~TorInfoDialog() override;
 
 public slots:
@@ -29,6 +29,7 @@ private slots:
     void onApplySettings();
     void onSettingsChanged();
     void onStopTor();
+    void onShowInitSyncConfigDialog();
 
 signals:
     void torSettingsChanged();
@@ -38,7 +39,7 @@ private:
     void initPrivacyLevel();
 
     Ui::TorInfoDialog *ui;
-    AppContext *m_ctx;
+    QSharedPointer<AppContext> m_ctx;
 };
 
 

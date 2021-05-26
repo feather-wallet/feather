@@ -7,17 +7,19 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
-set(VERSION "beta-6")
+set(VERSION "beta-7")
+
+option(STATIC "Link libraries statically, requires static Qt")
 
 option(FETCH_DEPS "Download dependencies if they are not found" ON)
+
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
-
-option(STATIC "Link libraries statically, requires static Qt")
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
+
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)

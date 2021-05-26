@@ -7,12 +7,12 @@
 
 #include <QFileDialog>
 
-Settings::Settings(QWidget *parent) :
-        QDialog(parent),
-        ui(new Ui::Settings)
+Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::Settings)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
-    m_ctx = MainWindow::getContext();
 
     this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
 
@@ -74,7 +74,11 @@ Settings::Settings(QWidget *parent) :
     connect(ui->comboBox_dateFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_dateFormatChanged);
     connect(ui->comboBox_timeFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_timeFormatChanged);
 
-    // setup preferred fiat currency combobox
+    // Balance display combobox
+    ui->comboBox_balanceDisplay->setCurrentIndex(config()->get(Config::balanceDisplay).toInt());
+    connect(ui->comboBox_balanceDisplay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_balanceDisplayChanged);
+
+    // Preferred fiat currency combobox
     QStringList fiatCurrencies;
     for (int index = 0; index < ui->comboBox_fiatCurrency->count(); index++)
         fiatCurrencies << ui->comboBox_fiatCurrency->itemText(index);
@@ -89,11 +93,12 @@ Settings::Settings(QWidget *parent) :
     // setup paths tab
     this->updatePaths();
     connect(ui->btn_browseDefaultWalletDir, &QPushButton::clicked, [this]{
-        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", m_ctx->defaultWalletDir, QFileDialog::ShowDirsOnly);
-        if (walletDir.isEmpty()) return;
-        m_ctx->defaultWalletDir = walletDir;
+        QString walletDirOld = config()->get(Config::walletDirectory).toString();
+        QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", walletDirOld, QFileDialog::ShowDirsOnly);
+        if (walletDir.isEmpty())
+            return;
         config()->set(Config::walletDirectory, walletDir);
-        ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+        ui->lineEdit_defaultWalletDir->setText(walletDir);
     });
 
     // Links tab
@@ -110,7 +115,7 @@ Settings::Settings(QWidget *parent) :
 }
 
 void Settings::updatePaths() {
-    ui->lineEdit_defaultWalletDir->setText(m_ctx->defaultWalletDir);
+    ui->lineEdit_defaultWalletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
     ui->lineEdit_applicationDir->setText(QCoreApplication::applicationDirPath());
 }
@@ -143,6 +148,7 @@ void Settings::comboBox_localMoneroFrontendChanged(int pos) {
 
 void Settings::comboBox_amountPrecisionChanged(int pos) {
     config()->set(Config::amountPrecision, pos);
+    m_ctx->updateBalance();
     emit amountPrecisionChanged(pos);
 }
 
@@ -152,6 +158,11 @@ void Settings::comboBox_dateFormatChanged(int pos) {
 
 void Settings::comboBox_timeFormatChanged(int pos) {
     config()->set(Config::timeFormat, m_timeFormats.at(pos));
+}
+
+void Settings::comboBox_balanceDisplayChanged(int pos) {
+    config()->set(Config::balanceDisplay, pos);
+    m_ctx->updateBalance();
 }
 
 void Settings::copyToClipboard() {

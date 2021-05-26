@@ -4,11 +4,11 @@
 #include "PageNetwork.h"
 #include "ui_PageNetwork.h"
 #include "WalletWizard.h"
+#include "constants.h"
 
-PageNetwork::PageNetwork(AppContext *ctx, QWidget *parent)
+PageNetwork::PageNetwork(QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageNetwork)
-    , m_ctx(ctx)
 {
     ui->setupUi(this);
     this->setTitle("Welcome to Feather");
@@ -35,10 +35,8 @@ bool PageNetwork::validatePage() {
     config()->set(Config::nodeSource, id);
 
     if (id == 1) {
-        QList<FeatherNode> nodes;
-        FeatherNode node{ui->line_customNode->text()};
-        nodes.append(node);
-        m_ctx->nodes->setCustomNodes(nodes);
+        NodeList nodeList;
+        nodeList.addNode(ui->line_customNode->text(), constants::networkType, NodeList::Type::custom);
     }
 
     return true;

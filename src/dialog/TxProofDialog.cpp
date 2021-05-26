@@ -8,16 +8,17 @@
 
 #include "libwalletqt/Transfer.h"
 #include "utils/utils.h"
+#include "utils/Icons.h"
 
-TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *txInfo)
-        : QDialog(parent)
-        , ui(new Ui::TxProofDialog)
-        , m_wallet(wallet)
+TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
+    : QDialog(parent)
+    , ui(new Ui::TxProofDialog)
+    , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
     m_txid = txInfo->hash();
-    m_txKey = m_wallet->getTxKey(m_txid);
+    m_txKey = m_ctx->wallet->getTxKey(m_txid);
     m_direction = txInfo->direction();
 
     for (auto const &t: txInfo->transfers()) {
@@ -25,7 +26,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *t
     }
 
     for (auto const &s: txInfo->subaddrIndex()) {
-        m_InDestinations.push_back(wallet->address(txInfo->subaddrAccount(), s));
+        m_InDestinations.push_back(m_ctx->wallet->address(txInfo->subaddrAccount(), s));
     }
 
     // Due to some logic in core we can't create OutProofs
@@ -44,6 +45,10 @@ TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *t
     ui->radio_SpendProof->setChecked(true);
     ui->label_txid->setText(m_txid);
 
+    ui->btn_copyAddress->setIcon(icons()->icon("copy.png"));
+    connect(ui->btn_copyAddress, &QPushButton::clicked, [this]{
+        Utils::copyToClipboard(ui->combo_address->currentText());
+    });
     ui->group_summary->hide(); // todo
 
     this->adjustSize();
@@ -127,7 +132,7 @@ void TxProofDialog::showWarning(const QString &message) {
 void TxProofDialog::getFormattedProof() {
     QString message = ui->message->toPlainText();
     QString address = ui->combo_address->currentText();
-    QString nettype = Utils::QtEnumToString(m_wallet->nettype()).toLower();
+    QString nettype = Utils::QtEnumToString(m_ctx->wallet->nettype()).toLower();
     nettype = nettype.replace(0, 1, nettype[0].toUpper()); // Capitalize first letter
 
     TxProof proof = this->getProof();
@@ -208,12 +213,12 @@ TxProof TxProofDialog::getProof() {
     TxProof proof = [this, message, address]{
         switch (m_mode) {
             case Mode::SpendProof: {
-                return m_wallet->getSpendProof(m_txid, message);
+                return m_ctx->wallet->getSpendProof(m_txid, message);
             }
             case Mode::OutProof:
             case Mode::InProof:
             default: { // Todo: split this into separate functions
-                return m_wallet->getTxProof(m_txid, address, message);
+                return m_ctx->wallet->getTxProof(m_txid, address, message);
             }
         }
     }();

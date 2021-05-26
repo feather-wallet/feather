@@ -21,13 +21,14 @@ class XMRigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit XMRigWidget(AppContext *ctx, QWidget *parent = nullptr);
+    explicit XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~XMRigWidget() override;
     QStandardItemModel *model();
 
+    bool isMining();
+
 public slots:
     void onWalletClosed();
-    void onWalletOpened();
     void onStartClicked();
     void onStopClicked();
     void onClearClicked();
@@ -50,12 +51,13 @@ signals:
 private:
     void showContextMenu(const QPoint &pos);
 
-    AppContext *m_ctx;
     Ui::XMRigWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
+    XmRig * m_XMRig;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
-    XmRig * m_XMRig;
 
+    bool m_isMining = false;
     int m_threads;
     QStringList m_urls;
     QStringList m_pools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};

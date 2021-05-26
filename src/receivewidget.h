@@ -22,10 +22,11 @@ class ReceiveWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit ReceiveWidget(QWidget *parent = nullptr);
-    void setModel(SubaddressModel * model, Wallet * wallet);
+    explicit ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~ReceiveWidget() override;
 
+    void setSearchbarVisible(bool visible);
+    void focusSearchbar();
 
 public slots:
     void copyAddress();
@@ -37,7 +38,6 @@ public slots:
     void setShowHiddenAddresses(bool show);
     void setSearchFilter(const QString &filter);
     void onShowTransactions();
-    void resetModel();
 
 signals:
     void showTransactions(const QString& address);
@@ -51,14 +51,13 @@ private slots:
 
 private:
     Ui::ReceiveWidget *ui;
+    QSharedPointer<AppContext> m_ctx;
     QMenu *m_headerMenu;
     QAction *m_showFullAddressesAction;
     QAction *m_showUsedAddressesAction;
     QAction *m_showTransactionsAction;
-    Subaddress * m_subaddress;
     SubaddressModel * m_model;
     SubaddressProxyModel * m_proxyModel;
-    Wallet * m_wallet;
 
     void updateQrCode();
     void showQrCodeDialog();

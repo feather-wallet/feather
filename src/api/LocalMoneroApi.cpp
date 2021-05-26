@@ -60,21 +60,6 @@ void LocalMoneroApi::onResponse(QNetworkReply *reply, LocalMoneroApi::Endpoint e
     const QString err = reply->errorString();
 
     QByteArray data = reply->readAll();
-
-    qDebug() << "Response";
-    qDebug() << data;
-    for (const auto header : reply->rawHeaderList()) {
-        qDebug() << header << ": " << reply->rawHeader(header);
-    }
-
-    qDebug() << reply->rawHeaderPairs();
-
-    qDebug() << "Request";
-    for (const auto header : reply->request().rawHeaderList()) {
-        qDebug() << "header: " << header << ": " << reply->request().rawHeader(header);
-    }
-    qDebug() << reply->request().url();
-
     reply->deleteLater();
 
     QJsonObject obj;

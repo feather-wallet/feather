@@ -12,10 +12,10 @@
 
 #include "utils.h"
 #include "utils/config.h"
-#include "utils/tails.h"
-#include "utils/whonix.h"
+#include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 #include "utils/ColorScheme.h"
-#include "globals.h"
+#include "constants.h"
 
 QByteArray Utils::fileGetContents(const QString &path)
 {
@@ -142,7 +142,7 @@ void Utils::desktopNotify(const QString &title, const QString &message, int dura
     QString stderr = process.readAllStandardError();
 #elif defined(Q_OS_MACOS)
     QProcess process;
-    // @TODO: need to escape special chars with \
+    // @TODO: need to escape special chars with "\"
     process.start("osascript", macos);
     process.waitForFinished(-1);
     QString stdout = process.readAllStandardOutput();
@@ -451,15 +451,6 @@ int Utils::maxLength(const QVector<QString> &array) {
         }
     }
     return maxLength;
-}
-
-QString Utils::balanceFormat(quint64 balance) {
-    QString str = QString::number(balance / globals::cdiv, 'f', 4);
-
-    str.remove(QRegExp("0+$"));
-    str.remove(QRegExp("\\.$"));
-
-    return str;
 }
 
 QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index) {

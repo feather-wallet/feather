@@ -20,7 +20,7 @@ class Settings : public QDialog
 Q_OBJECT
 
 public:
-    explicit Settings(QWidget *parent = nullptr);
+    explicit Settings(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
     ~Settings() override;
 
 signals:
@@ -40,6 +40,7 @@ public slots:
     void comboBox_amountPrecisionChanged(int pos);
     void comboBox_dateFormatChanged(int pos);
     void comboBox_timeFormatChanged(int pos);
+    void comboBox_balanceDisplayChanged(int pos);
 
     void comboBox_blockExplorerChanged(int pos);
     void comboBox_redditFrontendChanged(int pos);
@@ -49,8 +50,8 @@ private:
     void setupSkinCombobox();
     void setupLocalMoneroFrontendCombobox();
 
-    AppContext *m_ctx;
     Ui::Settings *ui;
+    QSharedPointer<AppContext> m_ctx;
 
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};
     QStringList m_dateFormats{"yyyy-MM-dd", "MM-dd-yyyy", "dd-MM-yyyy"};

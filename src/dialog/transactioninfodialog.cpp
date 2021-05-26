@@ -17,18 +17,18 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
-        : QDialog(parent)
-        , ui(new Ui::TransactionInfoDialog)
-        , m_wallet(wallet)
-        , m_txInfo(txInfo)
+TransactionInfoDialog::TransactionInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
+    : QDialog(parent)
+    , ui(new Ui::TransactionInfoDialog)
+    , m_ctx(std::move(ctx))
+    , m_txInfo(txInfo)
 {
     ui->setupUi(this);
 
     m_txid = txInfo->hash();
     ui->label_txid->setText(m_txid);
 
-    m_txKey = m_wallet->getTxKey(txInfo->hash());
+    m_txKey = m_ctx->wallet->getTxKey(txInfo->hash());
     if (m_txKey.isEmpty()) {
         ui->btn_CopyTxKey->setEnabled(false);
         ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
@@ -37,11 +37,11 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
     connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TransactionInfoDialog::copyTxKey);
     connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TransactionInfoDialog::createTxProof);
 
-    connect(m_wallet, &Wallet::newBlock, this, &TransactionInfoDialog::updateData);
+    connect(m_ctx->wallet.get(), &Wallet::newBlock, this, &TransactionInfoDialog::updateData);
 
     this->setData(txInfo);
 
-    if (AppContext::txCache.contains(txInfo->hash()) && (txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionInfo::Direction_In) {
+    if (m_ctx->txCache.contains(txInfo->hash()) && (txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionInfo::Direction_In) {
         connect(ui->btn_rebroadcastTx, &QPushButton::pressed, [this]{
             emit resendTranscation(m_txid);
         });
@@ -53,7 +53,7 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
     for (const auto& transfer : txInfo->transfers()) {
         auto address = transfer->address();
         auto amount = WalletManager::displayAmount(transfer->amount());
-        auto index = m_wallet->subaddressIndex(address);
+        auto index = m_ctx->wallet->subaddressIndex(address);
         cursor.insertText(address, Utils::addressTextFormat(index));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
@@ -63,7 +63,7 @@ TransactionInfoDialog::TransactionInfoDialog(Wallet *wallet, TransactionInfo *tx
         ui->frameDestinations->hide();
     }
 
-    m_txProofDialog = new TxProofDialog(this, m_wallet, txInfo);
+    m_txProofDialog = new TxProofDialog(this, m_ctx, txInfo);
 
     QCoreApplication::processEvents();
 
@@ -104,7 +104,7 @@ void TransactionInfoDialog::setData(TransactionInfo* tx) {
     }
 
     QString direction = tx->direction() == TransactionInfo::Direction_In ? "received" : "sent";
-    ui->label_amount->setText(QString("Amount %1: %2").arg(direction, tx->displayAmount()));
+    ui->label_amount->setText(QString("Amount %1: %2 XMR").arg(direction, tx->displayAmount()));
 
     QString fee;
     if (tx->isCoinbase())
@@ -121,8 +121,7 @@ void TransactionInfoDialog::setData(TransactionInfo* tx) {
 }
 
 void TransactionInfoDialog::updateData() {
-    if (!m_wallet) return;
-    TransactionInfo* tx = m_wallet->history()->transaction(m_txid);
+    TransactionInfo* tx = m_ctx->wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
 }

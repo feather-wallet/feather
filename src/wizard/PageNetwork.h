@@ -20,13 +20,12 @@ class PageNetwork : public QWizardPage
     Q_OBJECT
 
 public:
-    explicit PageNetwork(AppContext *ctx, QWidget *parent = nullptr);
+    explicit PageNetwork(QWidget *parent = nullptr);
     bool validatePage() override;
     int nextId() const override;
     bool isComplete() const override;
 
 private:
-    AppContext *m_ctx;
     Ui::PageNetwork *ui;
 };
 

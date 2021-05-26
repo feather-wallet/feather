@@ -161,8 +161,8 @@
         <property name="verticalSpacing">
          <number>9</number>
         </property>
-        <item row="1" column="0">
-         <widget class="HistoryWidget" name="historyWidget" native="true"/>
+        <item row="0" column="0">
+         <layout class="QVBoxLayout" name="historyWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -188,29 +188,11 @@
          <number>11</number>
         </property>
         <item>
-         <widget class="SendWidget" name="sendWidget" native="true">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+         <layout class="QVBoxLayout" name="sendWidgetLayout">
+          <property name="spacing">
+           <number>0</number>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>100</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true"/>
-          </property>
-         </widget>
+         </layout>
         </item>
         <item>
          <widget class="Line" name="line_3">
@@ -226,7 +208,7 @@
          </widget>
         </item>
         <item>
-         <widget class="ContactsWidget" name="contactWidget" native="true"/>
+         <layout class="QVBoxLayout" name="contactsWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -240,7 +222,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
         <item row="0" column="0">
-         <widget class="ReceiveWidget" name="receiveWidget" native="true"/>
+         <layout class="QVBoxLayout" name="receiveWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -254,7 +236,7 @@
        </attribute>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="CoinsWidget" name="coinsWidget" native="true"/>
+         <layout class="QVBoxLayout" name="coinsWidgetLayout"/>
         </item>
        </layout>
       </widget>
@@ -266,9 +248,26 @@
        <attribute name="title">
         <string>Calc</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0">
-         <widget class="CalcWidget" name="conversionWidget" native="true"/>
+       <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="CalcWidget" name="conversionWidget" native="true"/>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
@@ -360,6 +359,14 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuRecently_open">
+     <property name="title">
+      <string>Recently open</string>
+     </property>
+    </widget>
+    <addaction name="menuRecently_open"/>
+    <addaction name="actionOpen"/>
+    <addaction name="actionNew_Restore"/>
     <addaction name="actionClose"/>
     <addaction name="actionQuit"/>
     <addaction name="separator"/>
@@ -413,6 +420,7 @@
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
     <addaction name="separator"/>
+    <addaction name="actionAccount"/>
     <addaction name="actionPassword"/>
     <addaction name="actionSeed"/>
     <addaction name="actionKeys"/>
@@ -470,6 +478,8 @@
     <addaction name="actionShow_calc"/>
     <addaction name="actionShow_Exchange"/>
     <addaction name="actionShow_XMRig"/>
+    <addaction name="separator"/>
+    <addaction name="actionShow_Searchbar"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuWallet"/>
@@ -559,7 +569,7 @@
   </action>
   <action name="actionClose">
    <property name="text">
-    <string>Close current wallet</string>
+    <string>Close wallet</string>
    </property>
   </action>
   <action name="actionVerifyTxProof">
@@ -732,38 +742,64 @@
     <string>Pay to many</string>
    </property>
   </action>
+  <action name="actionOpen">
+   <property name="text">
+    <string>Open wallet</string>
+   </property>
+  </action>
+  <action name="actionNew_Restore">
+   <property name="text">
+    <string>New/Restore</string>
+   </property>
+  </action>
+  <action name="actionRecently_open">
+   <property name="text">
+    <string>Recently open</string>
+   </property>
+  </action>
+  <action name="actiont">
+   <property name="text">
+    <string>t</string>
+   </property>
+  </action>
+  <action name="actiond">
+   <property name="text">
+    <string>d</string>
+   </property>
+  </action>
+  <action name="actionPrimary_account">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Primary account</string>
+   </property>
+  </action>
+  <action name="actionAccount">
+   <property name="text">
+    <string>Account</string>
+   </property>
+  </action>
+  <action name="actionShow_Searchbar">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Show Searchbar</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>SendWidget</class>
-   <extends>QWidget</extends>
-   <header>sendwidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ContactsWidget</class>
-   <extends>QWidget</extends>
-   <header>contactswidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>ReceiveWidget</class>
-   <extends>QWidget</extends>
-   <header>receivewidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CoinsWidget</class>
-   <extends>QWidget</extends>
-   <header>coinswidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>HistoryWidget</class>
-   <extends>QWidget</extends>
-   <header>historywidget.h</header>
-  </customwidget>
   <customwidget>
    <class>CalcWidget</class>
    <extends>QWidget</extends>
