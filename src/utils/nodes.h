@@ -36,6 +36,7 @@ public:
 
 private:
     void ensureStructure(QJsonObject &obj, NetworkType::Type networkType);
+    QJsonObject getConfigData();
 };
 
 struct FeatherNode {
