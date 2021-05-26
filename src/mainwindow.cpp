@@ -417,6 +417,7 @@ void MainWindow::onWalletOpened() {
     qDebug() << Q_FUNC_INFO;
     m_splashDialog->hide();
 
+    m_ctx->updateBalance();
     if (m_ctx->wallet->isHwBacked()) {
         m_statusBtnHwDevice->show();
     }
