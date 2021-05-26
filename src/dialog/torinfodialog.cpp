@@ -7,9 +7,11 @@
 #include <QPushButton>
 #include <QDesktopServices>
 #include <QMessageBox>
+#include <QInputDialog>
 
 #include "utils/TorManager.h"
 #include "utils/os/tails.h"
+#include "utils/Icons.h"
 
 TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
@@ -45,6 +47,9 @@ TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->btnGroup_privacyLevel, &QButtonGroup::idToggled, this, &TorInfoDialog::onSettingsChanged);
 
     ui->label_changes->hide();
+
+    ui->btn_configureInitSync->setIcon(icons()->icon("preferences.svg"));
+    connect(ui->btn_configureInitSync, &QPushButton::clicked, this, &TorInfoDialog::onShowInitSyncConfigDialog);
 
 #ifndef HAS_TOR_BIN
     ui->check_useLocalTor->setChecked(true);
@@ -144,6 +149,20 @@ void TorInfoDialog::initPrivacyLevel() {
 
 void TorInfoDialog::onStopTor() {
     torManager()->stop();
+}
+
+void TorInfoDialog::onShowInitSyncConfigDialog() {
+
+    int threshold = config()->get(Config::initSyncThreshold).toInt();
+
+    bool ok;
+    int newThreshold = QInputDialog::getInt(this, "Sync threshold",
+                                            "Synchronize over clearnet if wallet is behind more than x blocks: ",
+                                            threshold, 0, 10000, 10, &ok);
+
+    if (ok) {
+        config()->set(Config::initSyncThreshold, newThreshold);
+    }
 }
 
 TorInfoDialog::~TorInfoDialog() {

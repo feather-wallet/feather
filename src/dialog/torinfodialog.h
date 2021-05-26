@@ -29,6 +29,7 @@ private slots:
     void onApplySettings();
     void onSettingsChanged();
     void onStopTor();
+    void onShowInitSyncConfigDialog();
 
 signals:
     void torSettingsChanged();
