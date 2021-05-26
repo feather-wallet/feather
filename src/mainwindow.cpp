@@ -88,6 +88,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
         m_statusLabelStatus->setText("Constructing transaction" + this->statusDots());
     });
 
+    config()->set(Config::firstRun, false);
+    
     this->onWalletOpened();
 
 #ifdef DONATE_BEG
