@@ -145,7 +145,7 @@ void MainWindow::initStatusBar() {
     connect(m_statusBtnSeed, &StatusBarButton::clicked, this, &MainWindow::showSeedDialog);
     this->statusBar()->addPermanentWidget(m_statusBtnSeed);
 
-    m_statusBtnTor = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Tor", this);
+    m_statusBtnTor = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Tor settings", this);
     connect(m_statusBtnTor, &StatusBarButton::clicked, this, &MainWindow::menuTorClicked);
     this->statusBar()->addPermanentWidget(m_statusBtnTor);
 
