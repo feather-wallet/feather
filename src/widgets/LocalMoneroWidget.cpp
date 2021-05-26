@@ -50,7 +50,9 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext>
 
     ui->frame_loadMore->hide();
 
-    this->skinChanged();
+    QTimer::singleShot(1, [this]{
+        this->skinChanged();
+    });
 }
 
 void LocalMoneroWidget::skinChanged() {
