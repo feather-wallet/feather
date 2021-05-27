@@ -58,6 +58,8 @@ private:
     void initSkins();
     QString loadStylesheet(const QString &resource);
     void buildTrayMenu();
+    void startupWarning();
+    void showWarningMessageBox(const QString &title, const QString &message);
 
     void quitAfterLastWindow();
 
@@ -73,6 +75,7 @@ private:
 
     bool m_openWalletTriedOnce = false;
     bool m_openingWallet = false;
+    bool m_initialNetworkConfigured = false;
 };
 
 

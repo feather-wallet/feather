@@ -183,7 +183,6 @@ private:
     void initMenu();
     void initHome();
     void initWalletContext();
-    void startupWarning();
 
     void closeEvent(QCloseEvent *event) override;
 

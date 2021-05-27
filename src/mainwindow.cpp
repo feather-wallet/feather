@@ -50,7 +50,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     m_splashDialog = new SplashDialog(this);
 
     this->restoreGeo();
-    this->startupWarning();
 
     this->initStatusBar();
     this->initWidgets();
@@ -87,6 +86,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(&m_txTimer, &QTimer::timeout, [this]{
         m_statusLabelStatus->setText("Constructing transaction" + this->statusDots());
     });
+
+    config()->set(Config::firstRun, false);
 
     this->onWalletOpened();
 
@@ -368,28 +369,6 @@ void MainWindow::initWalletContext() {
     connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
 }
 
-void MainWindow::startupWarning() {
-    // Stagenet / Testnet
-    auto worthlessWarning = QString("Feather wallet is currently running in %1 mode. This is meant "
-                                    "for developers only. Your coins are WORTHLESS.");
-    if (constants::networkType == NetworkType::STAGENET && config()->get(Config::warnOnStagenet).toBool()) {
-        QMessageBox::warning(this, "Warning", worthlessWarning.arg("stagenet"));
-        config()->set(Config::warnOnStagenet, false);
-    }
-    else if (constants::networkType == NetworkType::TESTNET && config()->get(Config::warnOnTestnet).toBool()){
-        QMessageBox::warning(this, "Warning", worthlessWarning.arg("testnet"));
-        config()->set(Config::warnOnTestnet, false);
-    }
-
-    // Beta
-    if (config()->get(Config::warnOnAlpha).toBool()) {
-        QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
-                          "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
-        QMessageBox::warning(this, "Beta Warning", warning);
-        config()->set(Config::warnOnAlpha, false);
-    }
-}
-
 void MainWindow::menuToggleTabVisible(const QString &key){
     const auto toggleTab = m_tabShowHideMapper[key];
     bool show = config()->get(toggleTab->configKey).toBool();
@@ -438,6 +417,7 @@ void MainWindow::onWalletOpened() {
     qDebug() << Q_FUNC_INFO;
     m_splashDialog->hide();
 
+    m_ctx->updateBalance();
     if (m_ctx->wallet->isHwBacked()) {
         m_statusBtnHwDevice->show();
     }
