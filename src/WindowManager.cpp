@@ -31,7 +31,7 @@ WindowManager::WindowManager() {
 
     this->initSkins();
 
-    if (!config()->get(Config::firstRun).toBool()) {
+    if (!config()->get(Config::firstRun).toBool() || TailsOS::detect() || WhonixOS::detect()) {
         this->onInitialNetworkConfigured();
     }
 
