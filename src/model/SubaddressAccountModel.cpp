@@ -57,6 +57,11 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
                 result = ModelUtils::getMonospaceFont();
             }
         }
+        else if (role == Qt::TextAlignmentRole) {
+            if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
+                result = Qt::AlignRight;
+            }
+        }
     });
 
     if (!found) {
