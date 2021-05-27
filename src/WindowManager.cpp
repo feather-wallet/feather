@@ -367,6 +367,7 @@ void WindowManager::buildTrayMenu() {
 void WindowManager::onInitialNetworkConfigured() {
     if (!m_initialNetworkConfigured) {
         m_initialNetworkConfigured = true;
+        appData();
         this->initTor();
         this->initWS();
     }
