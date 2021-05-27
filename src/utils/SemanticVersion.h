@@ -64,8 +64,8 @@ struct SemanticVersion
     static SemanticVersion fromString(const QString &ver) {
         SemanticVersion version;
 
-        if (ver.contains("Beta")) {
-            QRegularExpression verRe("Beta-(?<minor>\\d+)");
+        if (ver.contains("beta")) {
+            QRegularExpression verRe("beta-(?<minor>\\d+)");
             QRegularExpressionMatch match = verRe.match(ver);
             version.minor = match.captured("minor").toInt();
             return version;
