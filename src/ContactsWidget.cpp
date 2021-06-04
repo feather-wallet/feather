@@ -36,6 +36,12 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(ui->contacts->header(), &QHeaderView::customContextMenuRequested, this, &ContactsWidget::showHeaderMenu);
 
+    connect(ui->contacts, &QTreeView::doubleClicked, [this](QModelIndex index){
+        if (!(m_model->flags(index) & Qt::ItemIsEditable)) {
+            this->payTo();
+        }
+    });
+
     // context menu
     ui->contacts->setContextMenuPolicy(Qt::CustomContextMenu);
     m_contextMenu = new QMenu(ui->contacts);
@@ -45,8 +51,7 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     // row context menu
     m_rowMenu = new QMenu(ui->contacts);
-    m_rowMenu->addAction(icons()->icon("copy.png"), "Copy address", this, &ContactsWidget::copyAddress);
-    m_rowMenu->addAction(icons()->icon("copy.png"), "Copy name", this, &ContactsWidget::copyName);
+    m_rowMenu->addAction("Copy address", this, &ContactsWidget::copyAddress);
     m_rowMenu->addAction("Pay to", this, &ContactsWidget::payTo);
     m_rowMenu->addAction("Delete", this, &ContactsWidget::deleteContact);
 
