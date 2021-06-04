@@ -212,6 +212,7 @@ private:
     void addToRecentlyOpened(const QString &filename);
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
+    bool verifyPassword();
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();

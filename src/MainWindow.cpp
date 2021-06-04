@@ -701,6 +701,10 @@ void MainWindow::showSeedDialog() {
         return;
     }
 
+    if (!this->verifyPassword()) {
+        return;
+    }
+
     SeedDialog dialog{m_ctx, this};
     dialog.exec();
 }
@@ -772,6 +776,10 @@ void MainWindow::showRestoreHeightDialog() {
 }
 
 void MainWindow::showKeysDialog() {
+    if (!this->verifyPassword()) {
+        return;
+    }
+
     KeysDialog dialog{m_ctx, this};
     dialog.exec();
 }
@@ -1555,6 +1563,22 @@ void MainWindow::updateRecentlyOpenedMenu() {
     }
     ui->menuRecently_open->addSeparator();
     ui->menuRecently_open->addAction(m_clearRecentlyOpenAction);
+}
+
+bool MainWindow::verifyPassword() {
+    bool ok;
+    while (true) {
+        QString password = QInputDialog::getText(this, "Enter password", "Please enter your password:", QLineEdit::EchoMode::Password, "", &ok);
+        if (!ok) { // Dialog cancelled
+            return false;
+        }
+        if (password != m_ctx->wallet->getPassword()) {
+            QMessageBox::warning(this, "Error", "Incorrect password");
+            continue;
+        }
+        break;
+    }
+    return true;
 }
 
 void MainWindow::toggleSearchbar(bool visible) {
