@@ -16,8 +16,8 @@ class AddressBookModel : public QAbstractTableModel
 public:
     enum ModelColumn
     {
-        Address = 0,
-        Description,
+        Description = 0,
+        Address,
         COUNT
     };
 

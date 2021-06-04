@@ -24,8 +24,8 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->contacts->setModel(m_proxyModel);
 
     ui->contacts->setSortingEnabled(true);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::Stretch);
-    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::ResizeToContents);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Address, QHeaderView::ResizeToContents);
+    ui->contacts->header()->setSectionResizeMode(AddressBookModel::Description, QHeaderView::Stretch);
     ui->contacts->header()->setMinimumSectionSize(200);
 
     // header context menu
