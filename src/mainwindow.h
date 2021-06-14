@@ -213,7 +213,9 @@ private:
     CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 
+#ifdef HAS_XMRIG
     XMRigWidget *m_xmrig = nullptr;
+#endif
     ContactsWidget *m_contactsWidget = nullptr;
     HistoryWidget *m_historyWidget = nullptr;
     SendWidget *m_sendWidget = nullptr;

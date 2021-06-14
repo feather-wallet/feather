@@ -1342,8 +1342,10 @@ void MainWindow::updateTitle() {
 
     if (m_ctx->wallet->viewOnly())
         title += " [view-only]";
+#ifdef HAS_XMRIG
     if (m_xmrig->isMining())
         title += " [mining]";
+#endif
 
     title += " - Feather";
 
