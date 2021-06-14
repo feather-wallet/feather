@@ -20,7 +20,7 @@ preferred CMake options/definitions.
 apt install -y git cmake libqrencode-dev build-essential cmake libboost-all-dev \
 miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev \
 libzmq3-dev libsodium-dev libhidapi-dev libnorm-dev libusb-1.0-0-dev libpgm-dev \
-libprotobuf-dev protobuf-compiler libgcrypt20-dev
+libprotobuf-dev protobuf-compiler libgcrypt20-dev libzip-dev
 ```
 
 ## Mac OS
