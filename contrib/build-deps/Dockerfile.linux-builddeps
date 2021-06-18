@@ -1,0 +1,35 @@
+FROM ubuntu:18.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+WORKDIR /deps
+
+COPY sources.list /etc/apt/sources.list
+RUN apt-get update && \
+    apt-get install -y wget xz-utils nano
+
+COPY get-packages.sh .
+RUN bash get-packages.sh
+
+RUN apt-get install -y --no-install-recommends --no-install-suggests --reinstall --download-only \
+# build tools
+    software-properties-common python3 build-essential automake libtool-bin git \
+# ninja
+    unzip \
+# GStreamer plugins
+    libjpeg-dev libvpx-dev libvorbis-dev \
+# fontconfig
+    autopoint gettext gperf libpng-dev \
+# libxkbcommon
+    bison \
+# Qt 5.15
+    libx11-dev libx11-xcb-dev \
+# libwallet
+# libudev.so is included in AppImage
+    libudev1 libudev-dev \
+# GStreamer
+    gstreamer1.0-plugins-good \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+# git dependency
+    libpsl5
