@@ -23,7 +23,25 @@ RUN apt-get install -y --no-install-recommends --no-install-suggests --reinstall
 # libxkbcommon
     bison \
 # Qt 5.15
-    libx11-dev libx11-xcb-dev \
+# https://doc.qt.io/qt-5/linux-requirements.html
+    libx11-dev \
+    libx11-xcb-dev \
+    libxext-dev \
+    libxfixes-dev \
+    libxi-dev \
+    libxrender-dev \
+    libxcb1-dev \
+    libxcb-keysyms1-dev \
+    libxcb-image0-dev \
+    libxcb-icccm4-dev \
+    libxcb-xfixes0-dev \
+    libxcb-render-util0-dev \
+    libxcb-xinerama0-dev \
+    libxkbcommon-dev \
+    libxkbcommon-x11-dev \
+    xutils-dev \
+    libxcb-util-dev \
+    libxcb-xinput-dev \
 # libwallet
 # libudev.so is included in AppImage
     libudev1 libudev-dev \
