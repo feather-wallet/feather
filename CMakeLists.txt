@@ -19,6 +19,7 @@ option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" OFF)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
+option(WITH_SCANNER "Enable webcam QR scanner" OFF)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
@@ -56,33 +57,7 @@ if(STATIC)
 
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
-    add_definitions(-DMONERO_GUI_STATIC)
 endif()
-
-function (add_c_flag_if_supported flag var)
-    string(REPLACE "-" "_" supported ${flag}_c)
-    check_c_compiler_flag(${flag} ${supported})
-    if(${${supported}})
-        set(${var} "${${var}} ${flag}" PARENT_SCOPE)
-    endif()
-endfunction()
-
-function (add_cxx_flag_if_supported flag var)
-    string(REPLACE "-" "_" supported ${flag}_cxx)
-    check_cxx_compiler_flag(${flag} ${supported})
-    if(${${supported}})
-        set(${var} "${${var}} ${flag}" PARENT_SCOPE)
-    endif()
-endfunction()
-
-function (add_linker_flag_if_supported flag var)
-    string(REPLACE "-" "_" supported ${flag}_ld)
-    string(REPLACE "," "_" supported ${flag}_ld)
-    check_linker_flag(${flag} ${supported})
-    if(${${supported}})
-        set(${var} "${${var}} ${flag}" PARENT_SCOPE)
-    endif()
-endfunction()
 
 find_package(Git)
 if(GIT_FOUND)
@@ -124,6 +99,13 @@ set(HIDAPI_FOUND OFF)
 
 # QrEncode
 find_package(QREncode REQUIRED)
+
+# Qr scanner
+if (WITH_SCANNER)
+    find_package(ZBAR REQUIRED)
+    message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
+    message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
+endif()
 
 # Tevador 14 word Monero seed
 find_package(monero-seed CONFIG)
@@ -199,9 +181,10 @@ if(TOR_BIN)
 
     execute_process(COMMAND bash -c "${TOR_BIN} --version --quiet" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE out RESULT_VARIABLE ret)
     if (ret EQUAL "0")
-        set(TOR_VERSION "${out}")
+        string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]" version ${out})
+        set(TOR_VERSION "${version}")
     endif()
-    message(STATUS "${TOR_VERSION}")
+    message(STATUS "Embedded Tor version: ${TOR_VERSION}")
     configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
     # on the buildbot Tor is baked into the image
@@ -245,7 +228,7 @@ if(MINGW)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
     set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
     if(DEPENDS)
-	set(ICU_LIBRARIES iconv)
+        set(ICU_LIBRARIES iconv)
     else()
         set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
     endif()

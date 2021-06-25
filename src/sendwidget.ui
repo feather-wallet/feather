@@ -52,17 +52,51 @@
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="PayToEdit" name="lineAddress">
-     <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOff</enum>
+    <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <property name="spacing">
+      <number>10</number>
      </property>
-     <property name="tabChangesFocus">
-      <bool>true</bool>
-     </property>
-     <property name="lineWrapMode">
-      <enum>QPlainTextEdit::NoWrap</enum>
-     </property>
-    </widget>
+     <item>
+      <widget class="PayToEdit" name="lineAddress">
+       <property name="horizontalScrollBarPolicy">
+        <enum>Qt::ScrollBarAlwaysOff</enum>
+       </property>
+       <property name="tabChangesFocus">
+        <bool>true</bool>
+       </property>
+       <property name="lineWrapMode">
+        <enum>QPlainTextEdit::NoWrap</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Preferred</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>0</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnScan">
+         <property name="text">
+          <string>Scan</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+    </layout>
    </item>
    <item row="1" column="0">
     <widget class="HelpLabel" name="label_Description">
@@ -208,6 +242,17 @@
    <header>widgets/PayToEdit.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>lineAddress</tabstop>
+  <tabstop>lineDescription</tabstop>
+  <tabstop>lineAmount</tabstop>
+  <tabstop>comboCurrencySelection</tabstop>
+  <tabstop>btnMax</tabstop>
+  <tabstop>btn_openAlias</tabstop>
+  <tabstop>btnClear</tabstop>
+  <tabstop>btnSend</tabstop>
+  <tabstop>btnScan</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

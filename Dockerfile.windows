@@ -3,13 +3,21 @@ FROM ubuntu:20.04
 ARG THREADS=1
 ARG QT_VERSION=5.15.2
 ENV SOURCE_DATE_EPOCH=1397818193
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Feather build flags
+ENV CHECK_UPDATES=ON
+ENV WITH_SCANNER=ON
 
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
 ENV TOR_BIN=/usr/local/tor/bin/tor.exe
 
 RUN apt update && \
-    DEBIAN_FRONTEND=noninteractive apt install -y curl wget zip automake build-essential cmake gcc-mingw-w64 g++-mingw-w64 gettext git libtool pkg-config \
-    python && \
+    apt install -y \
+    curl wget zip automake build-essential cmake gcc-mingw-w64 g++-mingw-w64 gettext git libtool pkg-config \
+    python \
+# zbar
+    autopoint && \
     rm -rf /var/lib/apt/lists/*
 
 RUN update-alternatives --set x86_64-w64-mingw32-g++ $(which x86_64-w64-mingw32-g++-posix) && \
@@ -190,3 +198,11 @@ RUN git clone https://github.com/nih-at/libzip.git && \
           -DCMAKE_PREFIX_PATH=/usr/x86_64-w64-mingw32 && \
     make -j$THREADS && \
     make -j$THREADS install
+
+RUN git clone -b 0.23.92 --depth 1 --recursive https://github.com/mchehab/zbar.git && \
+    cd zbar && \
+    git reset --hard aac86d5f08d64ab4c3da78188eb622fa3cb07182 && \
+    autoreconf -vfi && \
+    ./configure --enable-static --disable-shared --without-imagemagick --disable-video --without-xv --with-gtk=no --with-python=no --enable-doc=no --host=x86_64-w64-mingw32 && \
+    make -j$THREADS && \
+    make install

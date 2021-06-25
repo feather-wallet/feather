@@ -14,6 +14,7 @@
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
+#include <vfw.h>
 #endif
 
 #if defined(Q_OS_LINUX) && defined(STATIC)

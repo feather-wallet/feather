@@ -26,6 +26,8 @@ public:
     ~SendWidget() override;
 
 public slots:
+    void skinChanged();
+    void scanClicked();
     void sendClicked();
     void clearClicked();
     void aliasClicked();

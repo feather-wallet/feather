@@ -5,11 +5,24 @@ set(CMAKE_AUTOUIC ON)
 # pthread
 find_package(Threads REQUIRED)
 
-find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui Network Svg Xml WebSockets)
+set(QT5_COMPONENTS
+        Core
+        Widgets
+        Gui
+        Network
+        Svg
+        Xml
+        WebSockets
+)
 
-add_subdirectory(libwalletqt)
-add_subdirectory(model)
-add_subdirectory(utils)
+if (WITH_SCANNER)
+    list(APPEND QT5_COMPONENTS
+            Multimedia
+            MultimediaWidgets)
+endif()
+
+find_package(Qt5 REQUIRED COMPONENTS ${QT5_COMPONENTS})
+
 add_subdirectory(openpgp)
 
 qt5_add_resources(RESOURCES assets.qrc)
@@ -45,6 +58,15 @@ file(GLOB SOURCE_FILES
         "dialog/*.h"
         "dialog/*.cpp"
         )
+
+if (WITH_SCANNER)
+    file(GLOB SCANNER_FILES
+            "qrcode_scanner/*.h"
+            "qrcode_scanner/*.cpp")
+
+    list(APPEND SOURCE_FILES
+            ${SCANNER_FILES})
+endif()
 
 if(TOR_BIN)
     if(APPLE)
@@ -90,11 +112,8 @@ set_target_properties(feather PROPERTIES
 
 set_property(TARGET feather PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-target_include_directories(feather PUBLIC ${OPENGL_INCLUDE_DIR})
+#target_include_directories(feather PUBLIC ${OPENGL_INCLUDE_DIR})
 target_include_directories(feather PUBLIC ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
-
-file(GLOB_RECURSE SRC_SOURCES *.cpp)
-file(GLOB_RECURSE SRC_HEADERS *.h)
 
 target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
@@ -124,6 +143,14 @@ target_include_directories(feather PUBLIC
         ${LIBZIP_INCLUDE_DIRS}
         )
 
+if(WITH_SCANNER)
+    target_include_directories(feather PUBLIC
+            ${ZBAR_INCLUDE_DIR}
+            ${Qt5Multimedia_INCLUDE_DIRS}
+            ${Qt5MultimediaWidgets_INCLUDE_DIRS}
+    )
+endif()
+
 if(DONATE_BEG)
     target_compile_definitions(feather PRIVATE DONATE_BEG=1)
 endif()
@@ -142,6 +169,10 @@ endif()
 
 if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
+endif()
+
+if(WITH_SCANNER)
+    target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
 # TODO: PLACEHOLDER
@@ -172,7 +203,14 @@ target_compile_definitions(feather
         ${Qt5Svg_DEFINITIONS}
         ${Qt5Xml_DEFINITIONS}
         ${Qt5WebSockets_DEFINITIONS}
-        )
+)
+
+if (WITH_SCANNER)
+    target_compile_definitions(feather PUBLIC
+            ${Qt5Multimedia_DEFINITIONS}
+            ${Qt5MultimediaWidgets_DEFINITIONS}
+    )
+endif()
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 
@@ -212,6 +250,14 @@ target_link_libraries(feather
         ${LIBZIP_LIBRARIES}
         )
 
+if (WITH_SCANNER)
+    target_link_libraries(feather
+            Qt5::Multimedia
+            Qt5::MultimediaWidgets
+            ${ZBAR_LIBRARIES}
+    )
+endif()
+
 if(APPLE)
     target_link_libraries(feather
             KDMacTouchBar
@@ -247,4 +293,4 @@ endif()
 
 install(TARGETS feather
         DESTINATION ${CMAKE_INSTALL_PREFIX}
-        )
+)

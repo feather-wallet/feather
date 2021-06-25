@@ -1,7 +1,7 @@
 # bionic-20210615.1 (18.04)
 FROM ubuntu@sha256:ce1e17c0e0aa9db95cf19fb6ba297eb2a52b9ba71768f32a74ab39213c416600
 
-ARG THREADS=1
+ARG THREADS=4
 
 ENV CFLAGS="-fPIC"
 ENV CPPFLAGS="-fPIC"
@@ -11,6 +11,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Feather build flags
 ENV CHECK_UPDATES=ON
+ENV WITH_SCANNER=ON
 
 COPY --from=featherwallet/feather-deps:linux-beta-8 /deps /deps
 COPY --from=featherwallet/feather-deps:linux-beta-8 /var/cache/apt/archives /archives

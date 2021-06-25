@@ -7,6 +7,12 @@
 #include "ui_sendwidget.h"
 #include "constants.h"
 #include "utils/AppData.h"
+#include "Icons.h"
+#include "ColorScheme.h"
+
+#ifdef WITH_SCANNER
+#include "qrcode_scanner/QrCodeScanDialog.h"
+#endif
 
 SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QWidget(parent)
@@ -26,6 +32,7 @@ SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(m_ctx.get(), &AppContext::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
     connect(m_ctx.get(), &AppContext::openAliasResolveError, this, &SendWidget::onOpenAliasResolveError);
 
+    connect(ui->btnScan, &QPushButton::clicked, this, &SendWidget::scanClicked);
     connect(ui->btnSend, &QPushButton::clicked, this, &SendWidget::sendClicked);
     connect(ui->btnClear, &QPushButton::clicked, this, &SendWidget::clearClicked);
     connect(ui->btnMax, &QPushButton::clicked, this, &SendWidget::btnMaxClicked);
@@ -101,6 +108,17 @@ void SendWidget::fill(const QString &address, const QString &description, double
 void SendWidget::fillAddress(const QString &address) {
     ui->lineAddress->setText(address);
     ui->lineAddress->moveCursor(QTextCursor::Start);
+}
+
+void SendWidget::scanClicked() {
+#ifdef WITH_SCANNER
+    auto *dialog = new QrCodeScanDialog(this);
+    dialog->exec();
+    ui->lineAddress->setText(dialog->decodedString);
+    dialog->deleteLater();
+#else
+    QMessageBox::warning(this, "QR scanner", "Feather was built without webcam QR scanner support.");
+#endif
 }
 
 void SendWidget::sendClicked() {
@@ -274,6 +292,14 @@ void SendWidget::setupComboBox() {
 void SendWidget::onPreferredFiatCurrencyChanged() {
     this->updateConversionLabel();
     this->setupComboBox();
+}
+
+void SendWidget::skinChanged() {
+    if (ColorScheme::hasDarkBackground(this)) {
+        ui->btnScan->setIcon(icons()->icon("camera_white.png"));
+    } else {
+        ui->btnScan->setIcon(icons()->icon("camera_dark.png"));
+    }
 }
 
 SendWidget::~SendWidget() {
