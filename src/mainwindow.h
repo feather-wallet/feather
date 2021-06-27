@@ -7,7 +7,6 @@
 #include <QMainWindow>
 #include <QSystemTrayIcon>
 #include <QMenu>
-#include <utility>
 
 #include "appcontext.h"
 #include "components.h"
@@ -31,8 +30,8 @@
 #include "model/CoinsProxyModel.h"
 #include "utils/networking.h"
 #include "utils/config.h"
-#include "widgets/ccswidget.h"
-#include "widgets/redditwidget.h"
+#include "widgets/CCSWidget.h"
+#include "widgets/RedditWidget.h"
 #include "widgets/TickerWidget.h"
 #include "wizard/WalletWizard.h"
 
@@ -49,7 +48,7 @@
 #endif
 
 #ifdef HAS_XMRIG
-#include "widgets/xmrigwidget.h"
+#include "widgets/XMRigWidget.h"
 #endif
 
 namespace Ui {

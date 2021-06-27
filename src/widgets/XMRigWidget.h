@@ -8,9 +8,9 @@
 #include <QWidget>
 #include <QItemSelection>
 
+#include "appcontext.h"
 #include "utils/xmrig.h"
 #include "utils/config.h"
-#include "appcontext.h"
 
 namespace Ui {
     class XMRigWidget;

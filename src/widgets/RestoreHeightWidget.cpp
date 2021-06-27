@@ -10,8 +10,8 @@
 #include "constants.h"
 
 RestoreHeightWidget::RestoreHeightWidget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::RestoreHeightWidget)
+        : QWidget(parent)
+        , ui(new Ui::RestoreHeightWidget)
 {
     ui->setupUi(this);
 

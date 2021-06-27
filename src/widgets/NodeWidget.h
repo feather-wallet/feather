@@ -4,9 +4,10 @@
 #ifndef FEATHER_NODEWIDGET_H
 #define FEATHER_NODEWIDGET_H
 
-#include <QWidget>
-#include <QTreeView>
 #include <QItemSelection>
+#include <QTreeView>
+#include <QWidget>
+
 #include "appcontext.h"
 #include "model/NodeModel.h"
 #include "utils/nodes.h"
@@ -44,10 +45,13 @@ signals:
     void nodeSourceChanged(NodeSource nodeSource);
 
 private:
+    void showContextMenu(const QPoint &pos, const FeatherNode &node);
+    FeatherNode selectedNode();
+
     QScopedPointer<Ui::NodeWidget> ui;
     QSharedPointer<AppContext> m_ctx;
-    NodeModel* m_customModel;
-    NodeModel* m_wsModel;
+    NodeModel  *m_customModel;
+    NodeModel *m_wsModel;
 
     QTreeView *m_activeView;
 
@@ -55,9 +59,6 @@ private:
     QAction *m_contextActionRemove;
     QAction *m_contextActionOpenStatusURL;
     QAction *m_contextActionCopy;
-
-    void showContextMenu(const QPoint &pos, const FeatherNode &node);
-    FeatherNode selectedNode();
 };
 
 #endif // FEATHER_NODEWIDGET_H

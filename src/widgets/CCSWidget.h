@@ -4,15 +4,15 @@
 #ifndef FEATHER_CSSWIDGET_H
 #define FEATHER_CSSWIDGET_H
 
+#include <QItemDelegate>
 #include <QMenu>
 #include <QObject>
-#include <QWidget>
 #include <QProgressBar>
-#include <QItemDelegate>
+#include <QWidget>
 
-#include "widgets/CCSEntry.h"
-#include "model/CCSModel.h"
 #include "appcontext.h"
+#include "model/CCSModel.h"
+#include "widgets/CCSEntry.h"
 
 namespace Ui {
     class CSSWidget;

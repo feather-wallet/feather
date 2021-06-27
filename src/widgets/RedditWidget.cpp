@@ -1,21 +1,22 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "RedditWidget.h"
+#include "ui_RedditWidget.h"
+
+#include <QDesktopServices>
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QDesktopServices>
 
 #include "model/RedditModel.h"
-#include "redditwidget.h"
-#include "ui_redditwidget.h"
 #include "utils/utils.h"
 #include "utils/config.h"
 
-RedditWidget::RedditWidget(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::RedditWidget),
-    m_model(new RedditModel(this)),
-    m_contextMenu(new QMenu(this))
+RedditWidget::RedditWidget(QWidget *parent)
+        : QWidget(parent)
+        , ui(new Ui::RedditWidget)
+        , m_model(new RedditModel(this))
+        , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
     ui->tableView->setModel(m_model);

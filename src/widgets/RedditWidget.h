@@ -4,9 +4,9 @@
 #ifndef FEATHER_REDDITWIDGET_H
 #define FEATHER_REDDITWIDGET_H
 
+#include <QItemSelection>
 #include <QMenu>
 #include <QWidget>
-#include <QItemSelection>
 
 #include "model/RedditModel.h"
 

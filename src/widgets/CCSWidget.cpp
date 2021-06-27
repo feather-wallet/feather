@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "CCSWidget.h"
+#include "ui_CCSWidget.h"
+
+#include <QDesktopServices>
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QDesktopServices>
 
-#include "ccswidget.h"
-#include "ui_ccswidget.h"
-#include "ccsprogressdelegate.h"
+#include "CCSProgressDelegate.h"
 
-CCSWidget::CCSWidget(QWidget *parent) :
-        QWidget(parent),
-        ui(new Ui::CSSWidget),
-        m_model(new CCSModel(this)),
-        m_contextMenu(new QMenu(this))
+CCSWidget::CCSWidget(QWidget *parent)
+        : QWidget(parent)
+        , ui(new Ui::CSSWidget)
+        , m_model(new CCSModel(this))
+        , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
     auto progressDelegate = new CCSProgressDelegate(m_model, this);

@@ -5,8 +5,9 @@
 #define FEATHER_SENDWIDGET_H
 
 #include <QWidget>
+
 #include "appcontext.h"
-#include "widgets/ccswidget.h"
+#include "widgets/CCSWidget.h"
 
 namespace Ui {
     class SendWidget;

@@ -5,6 +5,7 @@
 #define FEATHER_CSSPROGRESSDELEGATE_H
 
 #include <QStyledItemDelegate>
+
 #include "model/CCSModel.h"
 
 class CCSProgressDelegate : public QStyledItemDelegate

@@ -4,12 +4,12 @@
 #ifndef FEATHER_SETTINGS_H
 #define FEATHER_SETTINGS_H
 
+#include <QAbstractButton>
 #include <QDialog>
 #include <QSettings>
-#include <QAbstractButton>
 
 #include "appcontext.h"
-#include "widgets/nodewidget.h"
+#include "widgets/NodeWidget.h"
 
 namespace Ui {
     class Settings;

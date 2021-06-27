@@ -1,24 +1,25 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "XMRigWidget.h"
+#include "ui_XMRigWidget.h"
+
+#include <QDesktopServices>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QScrollBar>
 #include <QStandardItemModel>
 #include <QTableWidget>
-#include <QMessageBox>
-#include <QDesktopServices>
-#include <QScrollBar>
-#include <QFileDialog>
 
-#include "xmrigwidget.h"
-#include "ui_xmrigwidget.h"
 #include "utils/Icons.h"
 
 XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::XMRigWidget)
-    , m_ctx(std::move(ctx))
-    , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
-    , m_model(new QStandardItemModel(this))
-    , m_contextMenu(new QMenu(this))
+        : QWidget(parent)
+        , ui(new Ui::XMRigWidget)
+        , m_ctx(std::move(ctx))
+        , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
+        , m_model(new QStandardItemModel(this))
+        , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
 

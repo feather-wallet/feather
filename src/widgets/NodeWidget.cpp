@@ -1,15 +1,17 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QInputDialog>
-#include <QTableWidget>
-#include <QMessageBox>
+#include "NodeWidget.h"
+#include "ui_NodeWidget.h"
+
+#include <QAction>
 #include <QDesktopServices>
+#include <QInputDialog>
+#include <QMenu>
+#include <QMessageBox>
+#include <QTableWidget>
 
 #include "model/NodeModel.h"
-#include "nodewidget.h"
-#include "ui_nodewidget.h"
-#include "mainwindow.h"
 #include "utils/Icons.h"
 
 NodeWidget::NodeWidget(QWidget *parent)

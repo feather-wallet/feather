@@ -670,7 +670,7 @@
   <customwidget>
    <class>NodeWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/nodewidget.h</header>
+   <header>widgets/NodeWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

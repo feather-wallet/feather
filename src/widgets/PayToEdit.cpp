@@ -7,10 +7,8 @@
 #include <QtGlobal>
 #include <QScrollBar>
 
-#include "utils/utils.h"
-#include "model/ModelUtils.h"
-
 #include "libwalletqt/WalletManager.h"
+#include "model/ModelUtils.h"
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
