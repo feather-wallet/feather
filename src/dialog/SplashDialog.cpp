@@ -3,6 +3,7 @@
 
 #include "SplashDialog.h"
 #include "ui_SplashDialog.h"
+
 #include "utils/Icons.h"
 
 SplashDialog::SplashDialog(QWidget *parent)

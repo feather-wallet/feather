@@ -5,6 +5,7 @@
 #define FEATHER_SEEDDIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 
 namespace Ui {

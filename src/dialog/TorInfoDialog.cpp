@@ -4,14 +4,14 @@
 #include "TorInfoDialog.h"
 #include "ui_TorInfoDialog.h"
 
-#include <QPushButton>
 #include <QDesktopServices>
-#include <QMessageBox>
 #include <QInputDialog>
+#include <QMessageBox>
+#include <QPushButton>
 
-#include "utils/TorManager.h"
-#include "utils/os/tails.h"
 #include "utils/Icons.h"
+#include "utils/os/tails.h"
+#include "utils/TorManager.h"
 
 TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)

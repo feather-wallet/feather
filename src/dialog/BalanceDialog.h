@@ -4,9 +4,9 @@
 #ifndef FEATHER_BALANCEDIALOG_H
 #define FEATHER_BALANCEDIALOG_H
 
-#include "libwalletqt/Wallet.h"
-
 #include <QDialog>
+
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class BalanceDialog;

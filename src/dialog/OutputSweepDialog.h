@@ -5,6 +5,7 @@
 #define FEATHER_OUTPUTSWEEPDIALOG_H
 
 #include <QDialog>
+
 #include "libwalletqt/CoinsInfo.h"
 
 namespace Ui {

@@ -4,11 +4,11 @@
 #include "VerifyProofDialog.h"
 #include "ui_VerifyProofDialog.h"
 
-#include "libwalletqt/WalletManager.h"
-#include "utils/utils.h"
-#include "model/ModelUtils.h"
-
 #include <QMessageBox>
+
+#include "libwalletqt/WalletManager.h"
+#include "model/ModelUtils.h"
+#include "utils/utils.h"
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)

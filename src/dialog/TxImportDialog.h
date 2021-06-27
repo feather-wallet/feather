@@ -5,6 +5,7 @@
 #define FEATHER_TXIMPORTDIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 #include "utils/daemonrpc.h"
 

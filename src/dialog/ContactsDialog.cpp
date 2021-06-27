@@ -5,8 +5,8 @@
 #include "ContactsDialog.h"
 
 ContactsDialog::ContactsDialog(QWidget *parent, const QString &address, const QString &name)
-    : QDialog(parent)
-    , ui(new Ui::ContactsDialog)
+        : QDialog(parent)
+        , ui(new Ui::ContactsDialog)
 {
     ui->setupUi(this);
     setMinimumWidth(400);

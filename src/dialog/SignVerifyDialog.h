@@ -5,6 +5,7 @@
 #define FEATHER_SIGNVERIFYDIALOG_H
 
 #include <QDialog>
+
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {

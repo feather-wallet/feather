@@ -5,6 +5,7 @@
 #define FEATHER_VIEWONLYDIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 
 namespace Ui {

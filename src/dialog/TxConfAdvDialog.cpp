@@ -4,14 +4,14 @@
 #include "TxConfAdvDialog.h"
 #include "ui_TxConfAdvDialog.h"
 
-#include "qrcode/QrCode.h"
-#include "dialog/QrCodeDialog.h"
-#include "libwalletqt/Transfer.h"
-#include "libwalletqt/Input.h"
-#include "model/ModelUtils.h"
-
 #include <QFileDialog>
 #include <QMessageBox>
+
+#include "dialog/QrCodeDialog.h"
+#include "libwalletqt/Input.h"
+#include "libwalletqt/Transfer.h"
+#include "model/ModelUtils.h"
+#include "qrcode/QrCode.h"
 
 TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent)
     : QDialog(parent)

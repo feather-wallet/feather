@@ -3,6 +3,7 @@
 
 #include "OutputSweepDialog.h"
 #include "ui_OutputSweepDialog.h"
+
 #include "libwalletqt/WalletManager.h"
 
 OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo* coin)

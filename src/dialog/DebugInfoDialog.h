@@ -5,6 +5,7 @@
 #define FEATHER_DEBUGINFODIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 #include "libwalletqt/Wallet.h"
 

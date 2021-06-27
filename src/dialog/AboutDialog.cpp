@@ -3,8 +3,9 @@
 
 #include "AboutDialog.h"
 #include "ui_AboutDialog.h"
-#include "utils/utils.h"
+
 #include "config-feather.h"
+#include "utils/utils.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
         : QDialog(parent)

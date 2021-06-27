@@ -6,9 +6,9 @@
 
 #include <QMessageBox>
 
+#include "constants.h"
 #include "model/ModelUtils.h"
 #include "TxConfAdvDialog.h"
-#include "constants.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 

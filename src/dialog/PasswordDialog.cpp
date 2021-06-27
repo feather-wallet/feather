@@ -3,6 +3,7 @@
 
 #include "PasswordDialog.h"
 #include "ui_PasswordDialog.h"
+
 #include "utils/Icons.h"
 
 PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent)

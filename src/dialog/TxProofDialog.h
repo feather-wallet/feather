@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "libwalletqt/TransactionInfo.h"
 #include "appcontext.h"
+#include "libwalletqt/TransactionInfo.h"
 
 namespace Ui {
     class TxProofDialog;

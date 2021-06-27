@@ -3,11 +3,12 @@
 
 #include "DebugInfoDialog.h"
 #include "ui_DebugInfoDialog.h"
+
 #include "config-feather.h"
-#include "utils/WebsocketClient.h"
-#include "utils/TorManager.h"
-#include "utils/WebsocketNotifier.h"
 #include "utils/os/tails.h"
+#include "utils/TorManager.h"
+#include "utils/WebsocketClient.h"
+#include "utils/WebsocketNotifier.h"
 
 DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)

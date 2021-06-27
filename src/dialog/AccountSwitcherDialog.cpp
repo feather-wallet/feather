@@ -4,10 +4,11 @@
 #include "AccountSwitcherDialog.h"
 #include "ui_AccountSwitcherDialog.h"
 
-#include "libwalletqt/SubaddressAccount.h"
-#include "utils/Icons.h"
-#include "model/ModelUtils.h"
 #include <QMenu>
+
+#include "libwalletqt/SubaddressAccount.h"
+#include "model/ModelUtils.h"
+#include "utils/Icons.h"
 
 AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)

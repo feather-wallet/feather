@@ -6,6 +6,7 @@
 
 #include <QDialog>
 #include <QLabel>
+
 #include "model/LocalMoneroModel.h"
 
 namespace Ui {

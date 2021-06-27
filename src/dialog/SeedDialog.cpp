@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "ui_SeedDialog.h"
 #include "SeedDialog.h"
+#include "ui_SeedDialog.h"
+
 #include "constants.h"
 
 SeedDialog::SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent)

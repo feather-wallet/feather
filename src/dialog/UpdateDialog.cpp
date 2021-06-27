@@ -5,11 +5,10 @@
 #include "ui_UpdateDialog.h"
 
 #include <QFileDialog>
-#include <utility>
 
+#include "utils/AsyncTask.h"
 #include "utils/networking.h"
 #include "utils/NetworkManager.h"
-#include "utils/AsyncTask.h"
 #include "utils/Updater.h"
 #include "utils/utils.h"
 

@@ -5,6 +5,7 @@
 #define FEATHER_PASSWORDCHANGEDIALOG_H
 
 #include <QDialog>
+
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {

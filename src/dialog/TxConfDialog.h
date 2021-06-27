@@ -5,9 +5,10 @@
 #define FEATHER_TXCONFDIALOG_H
 
 #include <QDialog>
+
+#include "appcontext.h"
 #include "libwalletqt/PendingTransaction.h"
 #include "libwalletqt/WalletManager.h"
-#include "appcontext.h"
 
 namespace Ui {
     class TxConfDialog;

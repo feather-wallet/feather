@@ -4,7 +4,6 @@
 #ifndef FEATHER_ABOUT_H
 #define FEATHER_ABOUT_H
 
-#include <QAbstractButton>
 #include <QDialog>
 #include <QStringListModel>
 

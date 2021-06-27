@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "ViewOnlyDialog.h"
+#include "ui_ViewOnlyDialog.h"
+
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
-
-#include "ViewOnlyDialog.h"
-#include "ui_ViewOnlyDialog.h"
 
 ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)

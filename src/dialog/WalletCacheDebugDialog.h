@@ -5,6 +5,7 @@
 #define FEATHER_WALLETCACHEDEBUGDIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 
 namespace Ui {

@@ -5,7 +5,6 @@
 #define FEATHER_TORINFODIALOG_H
 
 #include <QDialog>
-#include <QAbstractButton>
 
 #include "appcontext.h"
 

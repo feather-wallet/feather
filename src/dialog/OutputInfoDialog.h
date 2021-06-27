@@ -5,6 +5,7 @@
 #define FEATHER_OUTPUTINFODIALOG_H
 
 #include <QDialog>
+
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/CoinsInfo.h"
 

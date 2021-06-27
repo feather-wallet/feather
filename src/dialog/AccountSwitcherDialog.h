@@ -5,8 +5,8 @@
 #define FEATHER_ACCOUNTSWITCHERDIALOG_H
 
 #include <QDialog>
-#include "appcontext.h"
 
+#include "appcontext.h"
 #include "model/SubaddressAccountModel.h"
 
 namespace Ui {

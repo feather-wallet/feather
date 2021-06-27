@@ -5,6 +5,7 @@
 #define FEATHER_KEYSDIALOG_H
 
 #include <QDialog>
+
 #include "appcontext.h"
 
 namespace Ui {

@@ -4,18 +4,16 @@
 #include "TxInfoDialog.h"
 #include "ui_TxInfoDialog.h"
 
-#include "libwalletqt/CoinsInfo.h"
-#include "libwalletqt/WalletManager.h"
-#include "libwalletqt/Transfer.h"
-#include "libwalletqt/TransactionHistory.h"
-#include "utils.h"
-#include "utils/ColorScheme.h"
-#include "model/ModelUtils.h"
-#include "config.h"
-#include "appcontext.h"
-
 #include <QMessageBox>
 #include <QScrollBar>
+
+#include "appcontext.h"
+#include "config.h"
+#include "libwalletqt/TransactionHistory.h"
+#include "libwalletqt/Transfer.h"
+#include "libwalletqt/WalletManager.h"
+#include "model/ModelUtils.h"
+#include "utils.h"
 
 TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)

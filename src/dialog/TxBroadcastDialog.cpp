@@ -3,9 +3,10 @@
 
 #include "TxBroadcastDialog.h"
 #include "ui_TxBroadcastDialog.h"
-#include "utils/NetworkManager.h"
 
 #include <QMessageBox>
+
+#include "utils/NetworkManager.h"
 
 TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex)
         : QDialog(parent)

@@ -3,9 +3,10 @@
 
 #include "TxImportDialog.h"
 #include "ui_TxImportDialog.h"
-#include "utils/NetworkManager.h"
 
 #include <QMessageBox>
+
+#include "utils/NetworkManager.h"
 
 TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
         : QDialog(parent)

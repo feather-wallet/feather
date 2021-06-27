@@ -5,13 +5,12 @@
 #define FEATHER_TXCONFADVDIALOG_H
 
 #include <QDialog>
-#include <QStandardItemModel>
-#include <QAbstractButton>
 #include <QMenu>
+#include <QStandardItemModel>
 #include <QTextCharFormat>
 
-#include "libwalletqt/PendingTransaction.h"
 #include "appcontext.h"
+#include "libwalletqt/PendingTransaction.h"
 
 namespace Ui {
     class TxConfAdvDialog;

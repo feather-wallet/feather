@@ -6,6 +6,7 @@
 
 #include <QDialog>
 #include <QIcon>
+
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {

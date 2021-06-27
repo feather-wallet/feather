@@ -5,6 +5,7 @@
 #define FEATHER_RESTOREHEIGHTDIALOG_H
 
 #include <QDialog>
+
 #include "widgets/RestoreHeightWidget.h"
 
 class RestoreHeightDialog : public QDialog

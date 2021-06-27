@@ -3,6 +3,7 @@
 
 #ifndef FEATHER_QRCODEDIALOG_H
 #define FEATHER_QRCODEDIALOG_H
+
 #include <QDialog>
 
 #include "qrcode/QrCode.h"

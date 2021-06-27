@@ -3,6 +3,7 @@
 
 #include "CalcConfigDialog.h"
 #include "ui_CalcConfigDialog.h"
+
 #include "AppData.h"
 #include "utils/config.h"
 
