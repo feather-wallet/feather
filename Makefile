@@ -59,6 +59,7 @@ depends:
 mac-release: CMAKEFLAGS += -DSTATIC=Off
 mac-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN},OFF)
 mac-release: CMAKEFLAGS += -DCHECK_UPDATES=$(or ${CHECK_UPDATES}, Off)
+mac-release: CMAKEFLAGS += -DWITH_SCANNER=$(or ${WITH_SCANNER}, On)
 mac-release: CMAKEFLAGS += -DBUILD_TAG="mac-x64"
 mac-release: CMAKEFLAGS += -DCMAKE_BUILD_TYPE=Release
 mac-release:

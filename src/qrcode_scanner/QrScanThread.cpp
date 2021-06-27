@@ -33,7 +33,7 @@ void QrScanThread::processZImage(zbar::Image &image)
 
 bool QrScanThread::zimageFromQImage(const QImage &qimg, zbar::Image &dst)
 {
-    switch( qimg.format() ){
+    switch (qimg.format()) {
         case QImage::Format_RGB32 :
         case QImage::Format_ARGB32 :
         case QImage::Format_ARGB32_Premultiplied :
@@ -69,34 +69,28 @@ void QrScanThread::processQImage(const QImage &qimg)
     }
 }
 
-void QrScanThread::processVideoFrame(const QVideoFrame &frame)
-{
-    processQImage(frame.image());
-}
-
 void QrScanThread::stop()
 {
     m_running = false;
     m_waitCondition.wakeOne();
 }
 
-void QrScanThread::addFrame(const QVideoFrame &frame)
+void QrScanThread::addImage(const QImage &img)
 {
     QMutexLocker locker(&m_mutex);
-    m_queue.append(frame);
+    m_queue.append(img);
     m_waitCondition.wakeOne();
 }
 
 void QrScanThread::run()
 {
-    QVideoFrame frame;
     while (m_running) {
         QMutexLocker locker(&m_mutex);
         while (m_queue.isEmpty() && m_running) {
             m_waitCondition.wait(&m_mutex);
         }
         if (!m_queue.isEmpty()) {
-            processVideoFrame(m_queue.takeFirst());
+            processQImage(m_queue.takeFirst());
         }
     }
 }

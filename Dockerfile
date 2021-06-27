@@ -42,7 +42,7 @@ RUN git clone -b v3.18.4 --depth 1 https://github.com/Kitware/CMake && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-# freetype2: Required for Qt 5.15
+# freetype2: Required for Qt 5.15, fontconfig
 RUN git clone -b VER-2-10-2 --depth 1 https://git.savannah.gnu.org/git/freetype/freetype2.git && \
     cd freetype2 && \
     git reset --hard 132f19b779828b194b3fede187cee719785db4d8 && \

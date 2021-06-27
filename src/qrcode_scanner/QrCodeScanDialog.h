@@ -6,8 +6,11 @@
 
 #include <QDialog>
 #include <QCamera>
+#include <QCameraImageCapture>
+#include <QTimer>
+#include <QVideoFrame>
 
-#include "QrCodeScanner.h"
+#include "QrScanThread.h"
 
 namespace Ui {
     class QrCodeScanDialog;
@@ -29,11 +32,19 @@ private slots:
     void notifyError(const QString &msg);
 
 private:
+    void processAvailableImage(int id, const QVideoFrame &frame);
+    void displayCaptureError(int, QCameraImageCapture::Error, const QString &errorString);
+    void displayCameraError();
+    void takeImage();
+
     Ui::QrCodeScanDialog *ui;
 
+    QScopedPointer<QCamera> m_camera;
+    QScopedPointer<QCameraImageCapture> m_imageCapture;
+
+    QrScanThread *m_thread;
+    QTimer m_imageTimer;
     QList<QCameraInfo> m_cameras;
-    QCamera *m_camera = nullptr;
-    QrCodeScanner *m_scanner;
 };
 
 #endif //FEATHER_QRCODESCANDIALOG_H
