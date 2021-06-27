@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef ECHOCLIENT_H
-#define ECHOCLIENT_H
+#ifndef FEATHER_WSCLIENT_H
+#define FEATHER_WSCLIENT_H
 
 #include <QObject>
 #include <QtWebSockets/QWebSocket>
@@ -39,4 +39,4 @@ private:
     QTimer m_pingTimer;
 };
 
-#endif // ECHOCLIENT_H
+#endif // FEATHER_WSCLIENT_H

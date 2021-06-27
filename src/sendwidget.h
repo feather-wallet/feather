@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef SENDWIDGET_H
-#define SENDWIDGET_H
+#ifndef FEATHER_SENDWIDGET_H
+#define FEATHER_SENDWIDGET_H
 
 #include <QWidget>
 #include "appcontext.h"
@@ -54,4 +54,4 @@ private:
     double conversionAmount();
 };
 
-#endif // SENDWIDGET_H
+#endif // FEATHER_SENDWIDGET_H

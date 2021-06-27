@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#ifndef FEATHER_SETTINGS_H
+#define FEATHER_SETTINGS_H
 
 #include <QDialog>
 #include <QSettings>
@@ -58,4 +58,4 @@ private:
     QStringList m_timeFormats{"hh:mm", "hh:mm ap"};
 };
 
-#endif // SETTINGS_H
+#endif // FEATHER_SETTINGS_H

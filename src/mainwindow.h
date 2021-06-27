@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef FEATHER_MAINWINDOW_H
+#define FEATHER_MAINWINDOW_H
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
@@ -257,4 +257,4 @@ private:
     bool cleanedUp = false;
 };
 
-#endif // MAINWINDOW_H
+#endif // FEATHER_MAINWINDOW_H

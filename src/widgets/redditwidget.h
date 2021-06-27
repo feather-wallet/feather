@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef REDDITWIDGET_H
-#define REDDITWIDGET_H
+#ifndef FEATHER_REDDITWIDGET_H
+#define FEATHER_REDDITWIDGET_H
 
 #include <QMenu>
 #include <QWidget>
@@ -40,4 +40,4 @@ private:
     QMenu *m_contextMenu;
 };
 
-#endif // REDDITWIDGET_H
+#endif // FEATHER_REDDITWIDGET_H

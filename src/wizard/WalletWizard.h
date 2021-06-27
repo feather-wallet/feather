@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef WALLETWIZARD_H
-#define WALLETWIZARD_H
+#ifndef FEATHER_WALLETWIZARD_H
+#define FEATHER_WALLETWIZARD_H
 
 #include <QWizard>
 #include <QLabel>
@@ -75,4 +75,4 @@ private:
     WizardFields m_wizardFields;
 };
 
-#endif // WALLETWIZARD_H
+#endif // FEATHER_WALLETWIZARD_H

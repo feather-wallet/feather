@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef NODEWIDGET_H
-#define NODEWIDGET_H
+#ifndef FEATHER_NODEWIDGET_H
+#define FEATHER_NODEWIDGET_H
 
 #include <QWidget>
 #include <QTreeView>
@@ -60,4 +60,4 @@ private:
     FeatherNode selectedNode();
 };
 
-#endif // NODEWIDGET_H
+#endif // FEATHER_NODEWIDGET_H

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef CONTACTSWIDGET_H
-#define CONTACTSWIDGET_H
+#ifndef FEATHER_CONTACTSWIDGET_H
+#define FEATHER_CONTACTSWIDGET_H
 
 #include "model/AddressBookModel.h"
 #include "model/AddressBookProxyModel.h"
@@ -53,4 +53,4 @@ private:
     AddressBookProxyModel * m_proxyModel;
 };
 
-#endif // CONTACTSWIDGET_H
+#endif // FEATHER_CONTACTSWIDGET_H

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef XMRIGWIDGET_H
-#define XMRIGWIDGET_H
+#ifndef FEATHER_XMRIGWIDGET_H
+#define FEATHER_XMRIGWIDGET_H
 
 #include <QMenu>
 #include <QWidget>
@@ -63,4 +63,4 @@ private:
     QStringList m_pools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};
 };
 
-#endif // REDDITWIDGET_H
+#endif // FEATHER_XMRWIDGET_H

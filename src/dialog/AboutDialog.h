@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef ABOUT_H
-#define ABOUT_H
+#ifndef FEATHER_ABOUT_H
+#define FEATHER_ABOUT_H
 
+#include <QAbstractButton>
 #include <QDialog>
 #include <QStringListModel>
-#include <QAbstractButton>
 
 namespace Ui {
     class AboutDialog;
@@ -25,4 +25,4 @@ private:
     QStringListModel *m_model;
 };
 
-#endif // ABOUT_H
+#endif // FEATHER_ABOUT_H

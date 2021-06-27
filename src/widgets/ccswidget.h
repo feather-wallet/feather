@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef CSSWIDGET_H
-#define CSSWIDGET_H
+#ifndef FEATHER_CSSWIDGET_H
+#define FEATHER_CSSWIDGET_H
 
 #include <QMenu>
 #include <QObject>
@@ -45,4 +45,4 @@ private:
     QMenu *m_contextMenu;
 };
 
-#endif // CSSWIDGET_H
+#endif // FEATHER_CSSWIDGET_H
