@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "torinfodialog.h"
-#include "ui_torinfodialog.h"
+#include "TorInfoDialog.h"
+#include "ui_TorInfoDialog.h"
 
 #include <QPushButton>
 #include <QDesktopServices>

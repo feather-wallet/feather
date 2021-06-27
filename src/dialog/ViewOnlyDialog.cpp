@@ -5,8 +5,8 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "viewonlydialog.h"
-#include "ui_viewonlydialog.h"
+#include "ViewOnlyDialog.h"
+#include "ui_ViewOnlyDialog.h"
 
 ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)

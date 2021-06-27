@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "splashdialog.h"
-#include "ui_splashdialog.h"
+#include "SplashDialog.h"
+#include "ui_SplashDialog.h"
 #include "utils/Icons.h"
 
 SplashDialog::SplashDialog(QWidget *parent)

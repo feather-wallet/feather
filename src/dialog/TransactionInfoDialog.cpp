@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "transactioninfodialog.h"
-#include "ui_transactioninfodialog.h"
+#include "TransactionInfoDialog.h"
+#include "ui_TransactionInfoDialog.h"
 
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/WalletManager.h"

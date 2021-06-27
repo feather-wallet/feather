@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "verifyproofdialog.h"
-#include "ui_verifyproofdialog.h"
+#include "VerifyProofDialog.h"
+#include "ui_VerifyProofDialog.h"
 
 #include "libwalletqt/WalletManager.h"
 #include "utils/utils.h"

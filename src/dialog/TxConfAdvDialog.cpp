@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "txconfadvdialog.h"
-#include "ui_txconfadvdialog.h"
+#include "TxConfAdvDialog.h"
+#include "ui_TxConfAdvDialog.h"
+
 #include "qrcode/QrCode.h"
-#include "dialog/qrcodedialog.h"
+#include "dialog/QrCodeDialog.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/Input.h"
 #include "model/ModelUtils.h"

@@ -3,7 +3,7 @@
 
 #include "contactswidget.h"
 #include "ui_contactswidget.h"
-#include "dialog/contactsdialog.h"
+#include "dialog/ContactsDialog.h"
 #include "model/ModelUtils.h"
 #include "mainwindow.h"
 #include "libwalletqt/AddressBook.h"

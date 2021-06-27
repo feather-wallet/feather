@@ -8,7 +8,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "wizard/WalletWizard.h"
-#include "dialog/torinfodialog.h"
+#include "dialog/TorInfoDialog.h"
 #include "mainwindow.h"
 
 class MainWindow;

@@ -4,7 +4,7 @@
 #include "ui_receivewidget.h"
 #include "receivewidget.h"
 #include "model/ModelUtils.h"
-#include "dialog/qrcodedialog.h"
+#include "dialog/QrCodeDialog.h"
 #include "utils/Icons.h"
 
 #include <QMenu>

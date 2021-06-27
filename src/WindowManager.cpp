@@ -3,8 +3,8 @@
 
 #include "WindowManager.h"
 #include "constants.h"
-#include "dialog/passworddialog.h"
-#include "dialog/splashdialog.h"
+#include "dialog/PasswordDialog.h"
+#include "dialog/SplashDialog.h"
 #include "utils/WebsocketNotifier.h"
 #include "utils/os/tails.h"
 #include "utils/Icons.h"

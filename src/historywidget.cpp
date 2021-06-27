@@ -3,7 +3,7 @@
 
 #include "historywidget.h"
 #include "ui_historywidget.h"
-#include "dialog/transactioninfodialog.h"
+#include "dialog/TransactionInfoDialog.h"
 #include "dialog/TxProofDialog.h"
 #include "utils/Icons.h"
 #include "utils/config.h"

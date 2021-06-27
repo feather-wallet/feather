@@ -1,15 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "txconfdialog.h"
-#include "ui_txconfdialog.h"
+#include "TxConfDialog.h"
+#include "ui_TxConfDialog.h"
+
+#include <QMessageBox>
+
 #include "model/ModelUtils.h"
-#include "txconfadvdialog.h"
+#include "TxConfAdvDialog.h"
 #include "constants.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
-
-#include <QMessageBox>
 
 TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
         : QDialog(parent)

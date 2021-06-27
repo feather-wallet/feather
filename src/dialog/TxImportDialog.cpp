@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "tximportdialog.h"
-#include "ui_tximportdialog.h"
+#include "TxImportDialog.h"
+#include "ui_TxImportDialog.h"
 #include "utils/NetworkManager.h"
 
 #include <QMessageBox>

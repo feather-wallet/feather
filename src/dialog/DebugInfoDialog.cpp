@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "debuginfodialog.h"
-#include "ui_debuginfodialog.h"
+#include "DebugInfoDialog.h"
+#include "ui_DebugInfoDialog.h"
 #include "config-feather.h"
 #include "utils/WebsocketClient.h"
 #include "utils/TorManager.h"

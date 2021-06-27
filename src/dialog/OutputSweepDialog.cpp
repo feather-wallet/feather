@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "ui_outputsweepdialog.h"
-#include "outputsweepdialog.h"
+#include "OutputSweepDialog.h"
+#include "ui_OutputSweepDialog.h"
 #include "libwalletqt/WalletManager.h"
 
 OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo* coin)

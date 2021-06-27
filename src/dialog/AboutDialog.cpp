@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "aboutdialog.h"
-#include "ui_aboutdialog.h"
+#include "AboutDialog.h"
+#include "ui_AboutDialog.h"
 #include "utils/utils.h"
 #include "config-feather.h"
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "passworddialog.h"
-#include "ui_passworddialog.h"
+#include "PasswordDialog.h"
+#include "ui_PasswordDialog.h"
 #include "utils/Icons.h"
 
 PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent)

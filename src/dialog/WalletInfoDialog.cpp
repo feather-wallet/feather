@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "walletinfodialog.h"
-#include "ui_walletinfodialog.h"
+#include "WalletInfoDialog.h"
+#include "ui_WalletInfoDialog.h"
 
 #include <QDesktopServices>
 

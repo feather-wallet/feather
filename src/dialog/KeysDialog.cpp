@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "keysdialog.h"
-#include "ui_keysdialog.h"
+#include "KeysDialog.h"
+#include "ui_KeysDialog.h"
 
 KeysDialog::KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)

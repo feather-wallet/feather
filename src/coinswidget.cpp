@@ -3,8 +3,8 @@
 
 #include "coinswidget.h"
 #include "ui_coinswidget.h"
-#include "dialog/outputinfodialog.h"
-#include "dialog/outputsweepdialog.h"
+#include "dialog/OutputInfoDialog.h"
+#include "dialog/OutputSweepDialog.h"
 #include "mainwindow.h"
 #include "utils/Icons.h"
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "outputinfodialog.h"
-#include "ui_outputinfodialog.h"
+#include "OutputInfoDialog.h"
+#include "ui_OutputInfoDialog.h"
 #include "model/ModelUtils.h"
 #include "utils/utils.h"
 

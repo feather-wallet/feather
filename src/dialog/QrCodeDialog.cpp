@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "qrcodedialog.h"
-#include "ui_qrcodedialog.h"
+#include "QrCodeDialog.h"
+#include "ui_QrCodeDialog.h"
 
 #include <QClipboard>
 #include <QFileDialog>
