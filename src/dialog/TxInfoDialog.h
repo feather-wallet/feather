@@ -33,13 +33,11 @@ private:
     void updateData();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
-
     QSharedPointer<AppContext> m_ctx;
     TransactionInfo *m_txInfo;
     TxProofDialog *m_txProofDialog;
     QString m_txKey;
     QString m_txid;
-    QTimer m_updateTimer;
 };
 
 #endif //FEATHER_TXINFODIALOG_H

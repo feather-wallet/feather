@@ -30,7 +30,6 @@ private:
     QScopedPointer<Ui::TxImportDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 
-    UtilsNetworking *m_network;
     DaemonRpc *m_rpc;
     QTimer *m_loadTimer;
 

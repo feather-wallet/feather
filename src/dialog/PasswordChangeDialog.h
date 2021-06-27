@@ -21,11 +21,11 @@ public:
     ~PasswordChangeDialog() override;
 
 private:
-    QScopedPointer<Ui::PasswordChangeDialog> ui;
-    Wallet *m_wallet;
-
     void passwordsMatch();
     void setPassword();
+
+    QScopedPointer<Ui::PasswordChangeDialog> ui;
+    Wallet *m_wallet;
 };
 
 #endif //FEATHER_PASSWORDCHANGEDIALOG_H

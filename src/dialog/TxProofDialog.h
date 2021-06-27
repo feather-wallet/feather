@@ -42,15 +42,15 @@ private:
     void toggleButtons(bool enabled);
     void showWarning(const QString &message);
 
+    QScopedPointer<Ui::TxProofDialog> ui;
+    QSharedPointer<AppContext> m_ctx;
+
     QStringList m_OutDestinations;
     QStringList m_InDestinations;
     QString m_txid;
     QString m_txKey;
     Mode m_mode;
     TransactionInfo::Direction m_direction;
-
-    QScopedPointer<Ui::TxProofDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
 };
 
 #endif //FEATHER_TXPROOFDIALOG_H

@@ -28,7 +28,6 @@ private slots:
 private:
     QScopedPointer<Ui::TxBroadcastDialog> ui;
     QSharedPointer<AppContext> m_ctx;
-    UtilsNetworking *m_network;
     DaemonRpc *m_rpc;
 };
 

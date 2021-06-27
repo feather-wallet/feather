@@ -20,14 +20,14 @@ public:
     explicit SignVerifyDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~SignVerifyDialog() override;
 
-private:
-    QScopedPointer<Ui::SignVerifyDialog> ui;
-    Wallet *m_wallet;
-
 private slots:
     void signMessage();
     void verifyMessage();
     void copyToClipboard();
+
+private:
+    QScopedPointer<Ui::SignVerifyDialog> ui;
+    Wallet *m_wallet;
 };
 
 
