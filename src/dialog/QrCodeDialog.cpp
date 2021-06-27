@@ -27,10 +27,7 @@ QrCodeDialog::QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString 
     this->adjustSize();
 }
 
-QrCodeDialog::~QrCodeDialog()
-{
-    delete ui;
-}
+QrCodeDialog::~QrCodeDialog() = default;
 
 void QrCodeDialog::setQrCode(const QrCode &qrCode) {
     m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);

@@ -32,7 +32,7 @@ private:
     void fillListWidgets();
     QListWidget* getVisibleListWidget();
 
-    Ui::CalcConfigDialog *ui;
+    QScopedPointer<Ui::CalcConfigDialog> ui;
 };
 
 

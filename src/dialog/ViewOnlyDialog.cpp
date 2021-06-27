@@ -54,7 +54,4 @@ void ViewOnlyDialog::copyToClipboad() {
     Utils::copyToClipboard(text);
 }
 
-ViewOnlyDialog::~ViewOnlyDialog()
-{
-    delete ui;
-}
+ViewOnlyDialog::~ViewOnlyDialog() = default;

@@ -29,6 +29,4 @@ void SplashDialog::setIcon(const QPixmap &icon) {
     ui->icon->setPixmap(icon.scaledToWidth(32, Qt::SmoothTransformation));
 }
 
-SplashDialog::~SplashDialog() {
-    delete ui;
-}
+SplashDialog::~SplashDialog() = default;

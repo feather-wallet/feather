@@ -21,7 +21,7 @@ public:
     ~BalanceDialog() override;
 
 private:
-    Ui::BalanceDialog *ui;
+    QScopedPointer<Ui::BalanceDialog> ui;
 };
 
 #endif //FEATHER_BALANCEDIALOG_H

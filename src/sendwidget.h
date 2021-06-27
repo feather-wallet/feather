@@ -48,7 +48,7 @@ private:
     void setupComboBox();
     double amountDouble();
 
-    Ui::SendWidget *ui;
+    QScopedPointer<Ui::SendWidget> ui;
     QSharedPointer<AppContext> m_ctx;
     quint64 amount();
     double conversionAmount();

@@ -56,7 +56,7 @@ private:
     void showContextMenu(const QPoint &point);
     void showSyncNoticeMsg();
 
-    Ui::HistoryWidget *ui;
+    QScopedPointer<Ui::HistoryWidget> ui;
     QSharedPointer<AppContext> m_ctx;
     QMenu *m_contextMenu;
     QMenu *m_copyMenu;

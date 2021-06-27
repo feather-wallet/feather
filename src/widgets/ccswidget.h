@@ -40,7 +40,7 @@ private:
     void setupTable();
     void showContextMenu(const QPoint &pos);
 
-    Ui::CSSWidget *ui;
+    QScopedPointer<Ui::CSSWidget> ui;
     CCSModel *m_model;
     QMenu *m_contextMenu;
 };

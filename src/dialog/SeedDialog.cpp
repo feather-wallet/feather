@@ -62,7 +62,4 @@ void SeedDialog::setSeed(const QString &seed) {
                                        "</ul>").arg(words));
 }
 
-SeedDialog::~SeedDialog()
-{
-    delete ui;
-}
+SeedDialog::~SeedDialog() = default;

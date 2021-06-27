@@ -23,7 +23,7 @@ public:
 private:
     void openWalletDir();
 
-    Ui::WalletInfoDialog *ui;
+    QScopedPointer<Ui::WalletInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 };
 

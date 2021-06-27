@@ -300,6 +300,4 @@ QStandardItemModel *XMRigWidget::model() {
     return m_model;
 }
 
-XMRigWidget::~XMRigWidget() {
-    delete ui;
-}
+XMRigWidget::~XMRigWidget() = default;

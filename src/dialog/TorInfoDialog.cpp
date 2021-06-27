@@ -165,6 +165,4 @@ void TorInfoDialog::onShowInitSyncConfigDialog() {
     }
 }
 
-TorInfoDialog::~TorInfoDialog() {
-    delete ui;
-}
+TorInfoDialog::~TorInfoDialog() = default;

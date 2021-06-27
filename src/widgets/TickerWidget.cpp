@@ -21,9 +21,7 @@ TickerWidgetBase::TickerWidgetBase(QWidget *parent, QSharedPointer<AppContext> c
     ui->tickerFiat->setText("...");
 }
 
-TickerWidgetBase::~TickerWidgetBase() {
-    delete ui;
-}
+TickerWidgetBase::~TickerWidgetBase() = default;
 
 void TickerWidgetBase::setTitle(const QString &title) {
     ui->tickerBox->setTitle(title);

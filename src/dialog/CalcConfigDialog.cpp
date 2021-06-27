@@ -97,6 +97,4 @@ void CalcConfigDialog::fillListWidgets() {
     setChecked(ui->list_fiat, checkedFiatCurrencies);
 }
 
-CalcConfigDialog::~CalcConfigDialog() {
-    delete ui;
-}
+CalcConfigDialog::~CalcConfigDialog() = default;

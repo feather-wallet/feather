@@ -26,7 +26,7 @@ private slots:
 private:
     void setLabelText(QLabel *label, LocalMoneroModel::Column column);
 
-    Ui::LocalMoneroInfoDialog *ui;
+    QScopedPointer<Ui::LocalMoneroInfoDialog> ui;
     LocalMoneroModel *m_model;
     int m_row;
 };

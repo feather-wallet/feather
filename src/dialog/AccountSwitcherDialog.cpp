@@ -103,6 +103,4 @@ Monero::SubaddressAccountRow* AccountSwitcherDialog::currentEntry() {
     return m_ctx->wallet->subaddressAccountModel()->entryFromIndex(index);
 }
 
-AccountSwitcherDialog::~AccountSwitcherDialog() {
-    delete ui;
-}
+AccountSwitcherDialog::~AccountSwitcherDialog() = default;

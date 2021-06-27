@@ -38,7 +38,5 @@ AboutDialog::AboutDialog(QWidget *parent)
     this->adjustSize();
 }
 
-AboutDialog::~AboutDialog() {
-    delete ui;
-}
+AboutDialog::~AboutDialog() = default;
 

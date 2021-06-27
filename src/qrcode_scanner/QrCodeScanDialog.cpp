@@ -119,5 +119,4 @@ QrCodeScanDialog::~QrCodeScanDialog()
         m_thread->terminate();
         m_thread->wait();
     }
-    delete ui;
 }

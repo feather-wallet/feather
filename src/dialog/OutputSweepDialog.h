@@ -24,7 +24,7 @@ public:
     int outputs() const;
 
 private:
-    Ui::OutputSweepDialog *ui;
+    QScopedPointer<Ui::OutputSweepDialog> ui;
 
     uint64_t m_amount;
 

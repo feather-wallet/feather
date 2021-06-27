@@ -144,6 +144,4 @@ void CalcWidget::setupComboBox(QComboBox *comboBox, const QStringList &crypto, c
     comboBox->addItems(fiat);
 }
 
-CalcWidget::~CalcWidget() {
-    delete ui;
-}
+CalcWidget::~CalcWidget() = default;

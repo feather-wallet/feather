@@ -31,7 +31,7 @@ private:
     void setData(TransactionInfo* tx);
     void updateData();
 
-    Ui::TransactionInfoDialog *ui;
+    QScopedPointer<Ui::TransactionInfoDialog> ui;
 
     QSharedPointer<AppContext> m_ctx;
     TransactionInfo *m_txInfo;

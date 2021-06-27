@@ -226,7 +226,5 @@ TxProof TxProofDialog::getProof() {
     return proof;
 }
 
-TxProofDialog::~TxProofDialog() {
-    delete ui;
-}
+TxProofDialog::~TxProofDialog() = default;
 

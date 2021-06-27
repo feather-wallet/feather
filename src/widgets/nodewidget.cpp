@@ -188,6 +188,4 @@ NodeModel* NodeWidget::model() {
     return m_wsModel;
 }
 
-NodeWidget::~NodeWidget() {
-    delete ui;
-}
+NodeWidget::~NodeWidget() = default;

@@ -53,10 +53,7 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
     ui->input_formattedProof->setFont(ModelUtils::getMonospaceFont());
 }
 
-VerifyProofDialog::~VerifyProofDialog()
-{
-    delete ui;
-}
+VerifyProofDialog::~VerifyProofDialog() = default;
 
 void VerifyProofDialog::checkProof() {
     switch (ui->tabWidget->currentIndex()) {

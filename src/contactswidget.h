@@ -42,7 +42,7 @@ private slots:
     void showHeaderMenu(const QPoint &position);
 
 private:
-    Ui::ContactsWidget *ui;
+    QScopedPointer<Ui::ContactsWidget> ui;
     QSharedPointer<AppContext> m_ctx;
 
     QAction *m_showFullAddressesAction;

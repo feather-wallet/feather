@@ -223,6 +223,4 @@ void UpdateDialog::setStatus(const QString &msg, bool success) {
         ui->label_body->setStyleSheet("");
 }
 
-UpdateDialog::~UpdateDialog() {
-    delete ui;
-}
+UpdateDialog::~UpdateDialog() = default;

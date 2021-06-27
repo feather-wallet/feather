@@ -243,6 +243,4 @@ Monero::SubaddressRow* ReceiveWidget::currentEntry() {
     }
 }
 
-ReceiveWidget::~ReceiveWidget() {
-    delete ui;
-}
+ReceiveWidget::~ReceiveWidget() = default;

@@ -50,7 +50,7 @@ private slots:
     void generateSubaddress();
 
 private:
-    Ui::ReceiveWidget *ui;
+    QScopedPointer<Ui::ReceiveWidget> ui;
     QSharedPointer<AppContext> m_ctx;
     QMenu *m_headerMenu;
     QAction *m_showFullAddressesAction;

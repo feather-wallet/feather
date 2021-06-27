@@ -56,6 +56,4 @@ void BroadcastTxDialog::onApiResponse(const DaemonRpc::DaemonResponse &resp) {
     }
 }
 
-BroadcastTxDialog::~BroadcastTxDialog() {
-    delete ui;
-}
+BroadcastTxDialog::~BroadcastTxDialog() = default;

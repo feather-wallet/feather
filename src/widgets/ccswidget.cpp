@@ -69,6 +69,4 @@ void CCSWidget::showContextMenu(const QPoint &pos) {
     m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
 }
 
-CCSWidget::~CCSWidget() {
-    delete ui;
-}
+CCSWidget::~CCSWidget() = default;

@@ -146,6 +146,4 @@ void DebugInfoDialog::copyToClipboad() {
     Utils::copyToClipboard(text);
 }
 
-DebugInfoDialog::~DebugInfoDialog() {
-    delete ui;
-}
+DebugInfoDialog::~DebugInfoDialog() = default;

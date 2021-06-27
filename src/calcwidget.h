@@ -31,7 +31,7 @@ private:
     void convert(bool reverse);
     void setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat);
 
-    Ui::CalcWidget *ui;
+    QScopedPointer<Ui::CalcWidget> ui;
     bool m_comboBoxInit = false;
 };
 

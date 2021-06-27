@@ -22,7 +22,4 @@ KeysDialog::KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     this->adjustSize();
 }
 
-KeysDialog::~KeysDialog()
-{
-    delete ui;
-}
+KeysDialog::~KeysDialog() = default;

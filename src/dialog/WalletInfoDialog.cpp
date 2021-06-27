@@ -27,9 +27,7 @@ WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *pare
     this->adjustSize();
 }
 
-WalletInfoDialog::~WalletInfoDialog() {
-    delete ui;
-}
+WalletInfoDialog::~WalletInfoDialog() = default;
 
 void WalletInfoDialog::openWalletDir() {
     QFileInfo file(m_ctx->wallet->keysPath());

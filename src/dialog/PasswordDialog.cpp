@@ -22,7 +22,4 @@ PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword
     this->adjustSize();
 }
 
-PasswordDialog::~PasswordDialog()
-{
-    delete ui;
-}
+PasswordDialog::~PasswordDialog() = default;

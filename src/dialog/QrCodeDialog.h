@@ -24,7 +24,7 @@ private:
     void copyImage();
     void saveImage();
 
-    Ui::QrCodeDialog *ui;
+    QScopedPointer<Ui::QrCodeDialog> ui;
     QPixmap m_pixmap;
 };
 

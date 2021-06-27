@@ -31,7 +31,7 @@ private:
     void checkFormattedProof();
     void proofStatus(bool success, const QString &message);
 
-    Ui::VerifyProofDialog *ui;
+    QScopedPointer<Ui::VerifyProofDialog> ui;
     Wallet *m_wallet;
 
     QPixmap m_success;

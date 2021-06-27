@@ -30,7 +30,7 @@ public slots:
     virtual void updateDisplay() = 0;
 
 private:
-    Ui::TickerWidget *ui;
+    QScopedPointer<Ui::TickerWidget> ui;
 
 protected:
     QSharedPointer<AppContext> m_ctx;

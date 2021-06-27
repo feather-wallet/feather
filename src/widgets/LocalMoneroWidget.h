@@ -41,7 +41,7 @@ private:
     void viewOfferDetails();
     void updatePaymentMethods();
 
-    Ui::LocalMoneroWidget *ui;
+    QScopedPointer<Ui::LocalMoneroWidget> ui;
     QSharedPointer<AppContext> m_ctx;
 
     int m_currentPage = 0;

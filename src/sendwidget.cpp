@@ -302,6 +302,4 @@ void SendWidget::skinChanged() {
     }
 }
 
-SendWidget::~SendWidget() {
-    delete ui;
-}
+SendWidget::~SendWidget() = default;

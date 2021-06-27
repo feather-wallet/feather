@@ -26,7 +26,7 @@ private slots:
     void onRestoreHeightChanged();
 
 private:
-    Ui::RestoreHeightWidget *ui;
+    QScopedPointer<Ui::RestoreHeightWidget> ui;
 };
 
 

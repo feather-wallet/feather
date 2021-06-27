@@ -150,7 +150,4 @@ void ContactsWidget::deleteContact()
     m_model->deleteRow(m_proxyModel->mapToSource(index).row());
 }
 
-ContactsWidget::~ContactsWidget()
-{
-    delete ui;
-}
+ContactsWidget::~ContactsWidget() = default;

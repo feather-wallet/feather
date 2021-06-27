@@ -21,7 +21,7 @@ public:
 
 private:
     void setOutput(const QString &output);
-    Ui::WalletCacheDebugDialog *ui;
+    QScopedPointer<Ui::WalletCacheDebugDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 };
 

@@ -38,7 +38,7 @@ private:
     void initConnectionSettings();
     void initPrivacyLevel();
 
-    Ui::TorInfoDialog *ui;
+    QScopedPointer<Ui::TorInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 };
 

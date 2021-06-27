@@ -20,7 +20,7 @@ public:
     ~SignVerifyDialog() override;
 
 private:
-    Ui::SignVerifyDialog *ui;
+    QScopedPointer<Ui::SignVerifyDialog> ui;
     Wallet *m_wallet;
 
 private slots:

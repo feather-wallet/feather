@@ -26,7 +26,7 @@ private slots:
     void onApiResponse(const DaemonRpc::DaemonResponse &resp);
 
 private:
-    Ui::TxImportDialog *ui;
+    QScopedPointer<Ui::TxImportDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 
     UtilsNetworking *m_network;

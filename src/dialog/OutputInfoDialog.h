@@ -21,7 +21,7 @@ public:
     ~OutputInfoDialog() override;
 
 private:
-    Ui::OutputInfoDialog *ui;
+    QScopedPointer<Ui::OutputInfoDialog> ui;
 };
 
 

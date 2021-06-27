@@ -49,7 +49,7 @@ private:
     Mode m_mode;
     TransactionInfo::Direction m_direction;
 
-    Ui::TxProofDialog *ui;
+    QScopedPointer<Ui::TxProofDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 };
 

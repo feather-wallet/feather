@@ -22,7 +22,7 @@ public:
     QString getName();
 
 private:
-    Ui::ContactsDialog *ui;
+    QScopedPointer<Ui::ContactsDialog> ui;
 
     QString m_address;
     QString m_name;

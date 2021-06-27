@@ -143,10 +143,6 @@ void LocalMoneroWidget::searchOffers(int page) {
         m_api->sellMoneroOnline(currencyCode, countryCode, paymentMethod, amount, page);
 }
 
-LocalMoneroWidget::~LocalMoneroWidget() {
-    delete ui;
-}
-
 void LocalMoneroWidget::showContextMenu(const QPoint &point) {
     QModelIndex index = ui->treeView->indexAt(point);
     if (!index.isValid()) {
@@ -208,3 +204,5 @@ void LocalMoneroWidget::updatePaymentMethods() {
         }
     }
 }
+
+LocalMoneroWidget::~LocalMoneroWidget() = default;

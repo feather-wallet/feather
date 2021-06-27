@@ -1424,6 +1424,4 @@ void MainWindow::toggleSearchbar(bool visible) {
         m_receiveWidget->focusSearchbar();
 }
 
-MainWindow::~MainWindow() {
-    delete ui;
-}
+MainWindow::~MainWindow() = default;

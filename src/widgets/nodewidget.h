@@ -44,8 +44,8 @@ signals:
     void nodeSourceChanged(NodeSource nodeSource);
 
 private:
+    QScopedPointer<Ui::NodeWidget> ui;
     QSharedPointer<AppContext> m_ctx;
-    Ui::NodeWidget *ui;
     NodeModel* m_customModel;
     NodeModel* m_wsModel;
 

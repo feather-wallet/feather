@@ -25,7 +25,7 @@ private:
     void copyToClipboad();
     void updateInfo();
 
-    Ui::DebugInfoDialog *ui;
+    QScopedPointer<Ui::DebugInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 
     QTimer m_updateTimer;

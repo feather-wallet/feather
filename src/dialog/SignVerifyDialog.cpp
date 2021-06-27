@@ -52,7 +52,4 @@ void SignVerifyDialog::copyToClipboard() {
     Utils::copyToClipboard(sig.join("\n"));
 }
 
-SignVerifyDialog::~SignVerifyDialog()
-{
-    delete ui;
-}
+SignVerifyDialog::~SignVerifyDialog() = default;

@@ -25,10 +25,7 @@ ContactsDialog::ContactsDialog(QWidget *parent, const QString &address, const QS
     this->adjustSize();
 }
 
-ContactsDialog::~ContactsDialog()
-{
-    delete ui;
-}
+ContactsDialog::~ContactsDialog() = default;
 
 QString ContactsDialog::getAddress() {
     return m_address;

@@ -22,7 +22,7 @@ public:
     void setIcon(const QPixmap &icon);
 
 private:
-    Ui::SplashDialog *ui;
+    QScopedPointer<Ui::SplashDialog> ui;
 };
 
 #endif //FEATHER_SPLASHDIALOG_H

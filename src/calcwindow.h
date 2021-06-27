@@ -25,7 +25,7 @@ private:
     void closeEvent(QCloseEvent *bar) override;
 
 private:
-    Ui::CalcWindow *ui;
+    QScopedPointer<Ui::CalcWindow> ui;
 };
 
 #endif // CalcWindow_H

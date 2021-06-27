@@ -50,7 +50,7 @@ private:
     void setupSkinCombobox();
     void setupLocalMoneroFrontendCombobox();
 
-    Ui::Settings *ui;
+    QScopedPointer<Ui::Settings> ui;
     QSharedPointer<AppContext> m_ctx;
 
     QStringList m_skins{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};

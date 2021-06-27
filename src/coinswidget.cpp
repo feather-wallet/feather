@@ -243,6 +243,4 @@ void CoinsWidget::thawCoins(const QVector<int> &indexes) {
     m_ctx->updateBalance();
 }
 
-CoinsWidget::~CoinsWidget() {
-    delete ui;
-}
+CoinsWidget::~CoinsWidget() = default;

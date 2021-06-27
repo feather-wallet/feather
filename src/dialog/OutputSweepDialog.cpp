@@ -40,11 +40,6 @@ OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo* coin)
     this->adjustSize();
 }
 
-OutputSweepDialog::~OutputSweepDialog()
-{
-    delete ui;
-}
-
 QString OutputSweepDialog::address() {
     return m_address;
 }
@@ -56,3 +51,5 @@ bool OutputSweepDialog::churn() const {
 int OutputSweepDialog::outputs() const {
     return m_outputs;
 }
+
+OutputSweepDialog::~OutputSweepDialog() = default;

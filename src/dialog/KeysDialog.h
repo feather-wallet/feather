@@ -20,7 +20,7 @@ public:
     ~KeysDialog() override;
 
 private:
-    Ui::KeysDialog *ui;
+    QScopedPointer<Ui::KeysDialog> ui;
 };
 
 

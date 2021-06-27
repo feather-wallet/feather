@@ -26,7 +26,7 @@ public:
 private:
     void setShowAdvanced();
 
-    Ui::TxConfDialog *ui;
+    QScopedPointer<Ui::TxConfDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     PendingTransaction *m_tx;
     QString m_address;

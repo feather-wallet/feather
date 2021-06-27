@@ -181,6 +181,4 @@ void HistoryWidget::showSyncNoticeMsg() {
                              "To update the history page during synchronization press Ctrl+R.");
 }
 
-HistoryWidget::~HistoryWidget() {
-    delete ui;
-}
+HistoryWidget::~HistoryWidget() = default;

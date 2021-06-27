@@ -22,6 +22,4 @@ BalanceDialog::BalanceDialog(QWidget *parent, Wallet *wallet)
     this->adjustSize();
 }
 
-BalanceDialog::~BalanceDialog() {
-    delete ui;
-}
+BalanceDialog::~BalanceDialog() = default;

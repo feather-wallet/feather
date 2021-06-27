@@ -35,7 +35,7 @@ private:
     void copyUrl();
     QString getLink(const QString &permaLink);
 
-    Ui::RedditWidget *ui;
+    QScopedPointer<Ui::RedditWidget> ui;
     RedditModel* const m_model;
     QMenu *m_contextMenu;
 };

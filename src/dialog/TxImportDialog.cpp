@@ -100,6 +100,4 @@ void TxImportDialog::onImport() {
     m_ctx->refreshModels();
 }
 
-TxImportDialog::~TxImportDialog() {
-    delete ui;
-}
+TxImportDialog::~TxImportDialog() = default;

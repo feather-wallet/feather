@@ -134,6 +134,4 @@ void TransactionInfoDialog::createTxProof() {
     m_txProofDialog->show();
 }
 
-TransactionInfoDialog::~TransactionInfoDialog() {
-    delete ui;
-}
+TransactionInfoDialog::~TransactionInfoDialog() = default;

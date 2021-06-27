@@ -194,6 +194,4 @@ void Settings::setupLocalMoneroFrontendCombobox() {
     ui->combo_localMoneroFrontend->setCurrentIndex(ui->combo_localMoneroFrontend->findData(config()->get(Config::localMoneroFrontend).toString()));
 }
 
-Settings::~Settings() {
-    delete ui;
-}
+Settings::~Settings() = default;

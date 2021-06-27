@@ -21,7 +21,7 @@ public:
     QString password = "";
 
 private:
-    Ui::PasswordDialog *ui;
+    QScopedPointer<Ui::PasswordDialog> ui;
 };
 
 #endif //FEATHER_PASSWORDDIALOG_H

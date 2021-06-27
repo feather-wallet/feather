@@ -23,6 +23,4 @@ void CalcWindow::closeEvent(QCloseEvent *foo) {
     emit closed();
 }
 
-CalcWindow::~CalcWindow() {
-    delete ui;
-}
+CalcWindow::~CalcWindow() = default;

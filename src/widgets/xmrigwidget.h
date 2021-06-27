@@ -51,7 +51,7 @@ signals:
 private:
     void showContextMenu(const QPoint &pos);
 
-    Ui::XMRigWidget *ui;
+    QScopedPointer<Ui::XMRigWidget> ui;
     QSharedPointer<AppContext> m_ctx;
     XmRig * m_XMRig;
     QStandardItemModel *m_model;

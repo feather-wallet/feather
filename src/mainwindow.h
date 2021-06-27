@@ -206,7 +206,7 @@ private:
     void updateRecentlyOpened(const QString &filename);
     void updateWidgetIcons();
 
-    Ui::MainWindow *ui;
+    QScopedPointer<Ui::MainWindow> ui;
     WindowManager *m_windowManager;
     QSharedPointer<AppContext> m_ctx;
 

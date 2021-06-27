@@ -42,7 +42,7 @@ private:
     void signedQrCode();
     void signedSaveFile();
 
-    Ui::TxConfAdvDialog *ui;
+    QScopedPointer<Ui::TxConfAdvDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     PendingTransaction *m_tx = nullptr;
     UnsignedTransaction *m_utx = nullptr;

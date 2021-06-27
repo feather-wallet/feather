@@ -37,6 +37,4 @@ OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
     this->adjustSize();
 }
 
-OutputInfoDialog::~OutputInfoDialog() {
-    delete ui;
-}
+OutputInfoDialog::~OutputInfoDialog() = default;

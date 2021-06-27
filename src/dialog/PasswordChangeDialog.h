@@ -20,7 +20,7 @@ public:
     ~PasswordChangeDialog() override;
 
 private:
-    Ui::PasswordChangeDialog *ui;
+    QScopedPointer<Ui::PasswordChangeDialog> ui;
     Wallet *m_wallet;
 
     void passwordsMatch();

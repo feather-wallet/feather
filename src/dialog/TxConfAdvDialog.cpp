@@ -184,6 +184,4 @@ void TxConfAdvDialog::closeDialog() {
     QDialog::reject();
 }
 
-TxConfAdvDialog::~TxConfAdvDialog() {
-    delete ui;
-}
+TxConfAdvDialog::~TxConfAdvDialog() = default;

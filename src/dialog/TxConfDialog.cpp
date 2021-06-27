@@ -86,6 +86,4 @@ void TxConfDialog::setShowAdvanced() {
     QDialog::reject();
 }
 
-TxConfDialog::~TxConfDialog() {
-    delete ui;
-}
+TxConfDialog::~TxConfDialog() = default;

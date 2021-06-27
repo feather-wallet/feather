@@ -56,6 +56,4 @@ void RestoreHeightWidget::onRestoreHeightChanged() {
     ui->line_creationDate->setText(date.toString("yyyy-MM-dd"));
 }
 
-RestoreHeightWidget::~RestoreHeightWidget() {
-    delete ui;
-}
+RestoreHeightWidget::~RestoreHeightWidget() = default;

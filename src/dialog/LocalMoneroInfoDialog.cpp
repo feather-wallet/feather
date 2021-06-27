@@ -46,6 +46,4 @@ void LocalMoneroInfoDialog::onGoToOffer() {
     Utils::externalLinkWarning(this, offerUrl);
 }
 
-LocalMoneroInfoDialog::~LocalMoneroInfoDialog() {
-    delete ui;
-}
+LocalMoneroInfoDialog::~LocalMoneroInfoDialog() = default;

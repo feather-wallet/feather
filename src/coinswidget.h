@@ -50,7 +50,7 @@ private:
         Amount
     };
 
-    Ui::CoinsWidget *ui;
+    QScopedPointer<Ui::CoinsWidget> ui;
     QSharedPointer<AppContext> m_ctx;
 
     QMenu *m_contextMenu;

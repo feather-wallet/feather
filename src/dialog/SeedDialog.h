@@ -22,7 +22,7 @@ public:
 private:
     void setSeed(const QString &seed);
 
-    Ui::SeedDialog *ui;
+    QScopedPointer<Ui::SeedDialog> ui;
     QSharedPointer<AppContext> m_ctx;
 };
 

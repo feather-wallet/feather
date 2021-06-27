@@ -33,7 +33,7 @@ private:
 
     Monero::SubaddressAccountRow* currentEntry();
 
-    Ui::AccountSwitcherDialog *ui;
+    QScopedPointer<Ui::AccountSwitcherDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     SubaddressAccountModel *m_model;
     SubaddressAccountProxyModel *m_proxyModel;

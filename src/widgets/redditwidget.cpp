@@ -74,6 +74,4 @@ QString RedditWidget::getLink(const QString &permaLink) {
     return QString("https://%1%2").arg(redditFrontend, permaLink);
 }
 
-RedditWidget::~RedditWidget() {
-    delete ui;
-}
+RedditWidget::~RedditWidget() = default;

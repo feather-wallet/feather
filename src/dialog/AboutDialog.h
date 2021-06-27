@@ -21,7 +21,7 @@ public:
     ~AboutDialog() override;
 
 private:
-    Ui::AboutDialog *ui;
+    QScopedPointer<Ui::AboutDialog> ui;
     QStringListModel *m_model;
 };
 
