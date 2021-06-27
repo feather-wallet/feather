@@ -27,10 +27,10 @@ WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *pare
     this->adjustSize();
 }
 
-WalletInfoDialog::~WalletInfoDialog() = default;
-
 void WalletInfoDialog::openWalletDir() {
     QFileInfo file(m_ctx->wallet->keysPath());
 
     QDesktopServices::openUrl(QUrl(QString("file://%1").arg(file.absolutePath()), QUrl::TolerantMode));
 }
+
+WalletInfoDialog::~WalletInfoDialog() = default;

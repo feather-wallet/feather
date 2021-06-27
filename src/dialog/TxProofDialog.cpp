@@ -227,4 +227,3 @@ TxProof TxProofDialog::getProof() {
 }
 
 TxProofDialog::~TxProofDialog() = default;
-

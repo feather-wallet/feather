@@ -53,8 +53,6 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
     ui->input_formattedProof->setFont(ModelUtils::getMonospaceFont());
 }
 
-VerifyProofDialog::~VerifyProofDialog() = default;
-
 void VerifyProofDialog::checkProof() {
     switch (ui->tabWidget->currentIndex()) {
         case 0:
@@ -171,3 +169,5 @@ void VerifyProofDialog::proofStatus(bool success, const QString &message) {
                 : QMessageBox::warning(this, "Warning", message);
     }
 }
+
+VerifyProofDialog::~VerifyProofDialog() = default;

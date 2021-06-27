@@ -27,8 +27,6 @@ QrCodeDialog::QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString 
     this->adjustSize();
 }
 
-QrCodeDialog::~QrCodeDialog() = default;
-
 void QrCodeDialog::setQrCode(const QrCode &qrCode) {
     m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
     ui->QrCode->setPixmap(m_pixmap);
@@ -50,3 +48,5 @@ void QrCodeDialog::saveImage() {
     m_pixmap.save(&file, "PNG");
     QMessageBox::information(this, "Information", "QR code saved to file");
 }
+
+QrCodeDialog::~QrCodeDialog() = default;

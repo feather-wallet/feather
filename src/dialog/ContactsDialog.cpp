@@ -25,8 +25,6 @@ ContactsDialog::ContactsDialog(QWidget *parent, const QString &address, const QS
     this->adjustSize();
 }
 
-ContactsDialog::~ContactsDialog() = default;
-
 QString ContactsDialog::getAddress() {
     return m_address;
 }
@@ -34,3 +32,5 @@ QString ContactsDialog::getAddress() {
 QString ContactsDialog::getName() {
     return m_name;
 }
+
+ContactsDialog::~ContactsDialog() = default;

@@ -40,8 +40,6 @@ PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)
     this->adjustSize();
 }
 
-PasswordChangeDialog::~PasswordChangeDialog() = default;
-
 void PasswordChangeDialog::passwordsMatch() {
     bool match = ui->lineEdit_newPassword->text() == ui->lineEdit_confirmPassword->text();
     ui->btn_OK->setEnabled(match);
@@ -67,3 +65,5 @@ void PasswordChangeDialog::setPassword() {
         QMessageBox::warning(this, "Error", QString("Error: %1").arg(m_wallet->errorString()));
     }
 }
+
+PasswordChangeDialog::~PasswordChangeDialog() = default;
