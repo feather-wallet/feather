@@ -78,7 +78,6 @@ void AccountSwitcherDialog::editLabel() {
 }
 
 void AccountSwitcherDialog::updateSelection() {
-    qDebug() << "test";
     QModelIndex index = m_model->index(m_ctx->wallet->currentSubaddressAccount(), 0);
     ui->accounts->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }

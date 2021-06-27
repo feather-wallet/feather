@@ -1,35 +1,35 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef FEATHER_BROADCASTTXDIALOG_H
-#define FEATHER_BROADCASTTXDIALOG_H
+#ifndef FEATHER_TXBROADCASTDIALOG_H
+#define FEATHER_TXBROADCASTDIALOG_H
 
 #include <QDialog>
 #include "appcontext.h"
 #include "utils/daemonrpc.h"
 
 namespace Ui {
-    class BroadcastTxDialog;
+    class TxBroadcastDialog;
 }
 
-class BroadcastTxDialog : public QDialog
+class TxBroadcastDialog : public QDialog
 {
     Q_OBJECT
 
 public:
-    explicit BroadcastTxDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex = "");
-    ~BroadcastTxDialog() override;
+    explicit TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex = "");
+    ~TxBroadcastDialog() override;
 
 private slots:
     void broadcastTx();
     void onApiResponse(const DaemonRpc::DaemonResponse &resp);
 
 private:
-    QScopedPointer<Ui::BroadcastTxDialog> ui;
+    QScopedPointer<Ui::TxBroadcastDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     UtilsNetworking *m_network;
     DaemonRpc *m_rpc;
 };
 
 
-#endif //FEATHER_BROADCASTTXDIALOG_H
+#endif //FEATHER_TXBROADCASTDIALOG_H

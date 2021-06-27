@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "TransactionInfoDialog.h"
-#include "ui_TransactionInfoDialog.h"
+#include "TxInfoDialog.h"
+#include "ui_TxInfoDialog.h"
 
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/WalletManager.h"
@@ -17,9 +17,9 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-TransactionInfoDialog::TransactionInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
+TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)
-    , ui(new Ui::TransactionInfoDialog)
+    , ui(new Ui::TxInfoDialog)
     , m_ctx(std::move(ctx))
     , m_txInfo(txInfo)
 {
@@ -34,10 +34,10 @@ TransactionInfoDialog::TransactionInfoDialog(QSharedPointer<AppContext> ctx, Tra
         ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
     }
 
-    connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TransactionInfoDialog::copyTxKey);
-    connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TransactionInfoDialog::createTxProof);
+    connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TxInfoDialog::copyTxKey);
+    connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TxInfoDialog::createTxProof);
 
-    connect(m_ctx->wallet.get(), &Wallet::newBlock, this, &TransactionInfoDialog::updateData);
+    connect(m_ctx->wallet.get(), &Wallet::newBlock, this, &TxInfoDialog::updateData);
 
     this->setData(txInfo);
 
@@ -78,7 +78,7 @@ TransactionInfoDialog::TransactionInfoDialog(QSharedPointer<AppContext> ctx, Tra
     this->adjustSize();
 }
 
-void TransactionInfoDialog::setData(TransactionInfo* tx) {
+void TxInfoDialog::setData(TransactionInfo* tx) {
     QString blockHeight = QString::number(tx->blockHeight());
 
     if (tx->isFailed()) {
@@ -120,18 +120,18 @@ void TransactionInfoDialog::setData(TransactionInfo* tx) {
 
 }
 
-void TransactionInfoDialog::updateData() {
+void TxInfoDialog::updateData() {
     TransactionInfo* tx = m_ctx->wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
 }
 
-void TransactionInfoDialog::copyTxKey() {
+void TxInfoDialog::copyTxKey() {
     Utils::copyToClipboard(m_txKey);
 }
 
-void TransactionInfoDialog::createTxProof() {
+void TxInfoDialog::createTxProof() {
     m_txProofDialog->show();
 }
 
-TransactionInfoDialog::~TransactionInfoDialog() = default;
+TxInfoDialog::~TxInfoDialog() = default;

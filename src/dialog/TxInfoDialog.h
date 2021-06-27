@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef FEATHER_TRANSACTIONINFODIALOG_H
-#define FEATHER_TRANSACTIONINFODIALOG_H
+#ifndef FEATHER_TXINFODIALOG_H
+#define FEATHER_TXINFODIALOG_H
 
 #include <QDialog>
 #include <QTextCharFormat>
@@ -11,16 +11,16 @@
 #include "dialog/TxProofDialog.h"
 
 namespace Ui {
-    class TransactionInfoDialog;
+    class TxInfoDialog;
 }
 
-class TransactionInfoDialog : public QDialog
+class TxInfoDialog : public QDialog
 {
 Q_OBJECT
 
 public:
-    explicit TransactionInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent = nullptr);
-    ~TransactionInfoDialog() override;
+    explicit TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent = nullptr);
+    ~TxInfoDialog() override;
 
 signals:
     void resendTranscation(const QString &txid);
@@ -31,7 +31,7 @@ private:
     void setData(TransactionInfo* tx);
     void updateData();
 
-    QScopedPointer<Ui::TransactionInfoDialog> ui;
+    QScopedPointer<Ui::TxInfoDialog> ui;
 
     QSharedPointer<AppContext> m_ctx;
     TransactionInfo *m_txInfo;
@@ -41,4 +41,4 @@ private:
     QTimer m_updateTimer;
 };
 
-#endif //FEATHER_TRANSACTIONINFODIALOG_H
+#endif //FEATHER_TXINFODIALOG_H

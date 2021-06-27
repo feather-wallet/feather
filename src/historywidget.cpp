@@ -3,7 +3,7 @@
 
 #include "historywidget.h"
 #include "ui_historywidget.h"
-#include "dialog/TransactionInfoDialog.h"
+#include "dialog/TxInfoDialog.h"
 #include "dialog/TxProofDialog.h"
 #include "utils/Icons.h"
 #include "utils/config.h"
@@ -115,8 +115,8 @@ void HistoryWidget::showTxDetails() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TransactionInfoDialog(m_ctx, tx, this);
-    connect(dialog, &TransactionInfoDialog::resendTranscation, [this](const QString &txid){
+    auto *dialog = new TxInfoDialog(m_ctx, tx, this);
+    connect(dialog, &TxInfoDialog::resendTranscation, [this](const QString &txid){
        emit resendTransaction(txid);
     });
     dialog->show();

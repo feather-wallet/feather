@@ -14,7 +14,7 @@
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/TorInfoDialog.h"
 #include "dialog/ViewOnlyDialog.h"
-#include "dialog/BroadcastTxDialog.h"
+#include "dialog/TxBroadcastDialog.h"
 #include "dialog/TxImportDialog.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/BalanceDialog.h"
@@ -872,7 +872,7 @@ void MainWindow::onResendTransaction(const QString &txid) {
     // Connect to a different node so chances of successful relay are higher
     m_ctx->nodes->autoConnect(true);
 
-    BroadcastTxDialog dialog{this, m_ctx, m_ctx->txCache[txid]};
+    TxBroadcastDialog dialog{this, m_ctx, m_ctx->txCache[txid]};
     dialog.exec();
 }
 
@@ -1034,7 +1034,7 @@ void MainWindow::loadSignedTx() {
 }
 
 void MainWindow::loadSignedTxFromText() {
-    BroadcastTxDialog dialog{this, m_ctx};
+    TxBroadcastDialog dialog{this, m_ctx};
     dialog.exec();
 }
 

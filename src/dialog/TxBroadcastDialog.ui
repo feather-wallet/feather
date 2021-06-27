@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BroadcastTxDialog</class>
- <widget class="QDialog" name="BroadcastTxDialog">
+ <class>TxBroadcastDialog</class>
+ <widget class="QDialog" name="TxBroadcastDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
