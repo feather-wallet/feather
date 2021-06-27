@@ -76,7 +76,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     this->adjustSize();
 }
 
-void TxInfoDialog::setData(TransactionInfo* tx) {
+void TxInfoDialog::setData(TransactionInfo *tx) {
     QString blockHeight = QString::number(tx->blockHeight());
 
     if (tx->isFailed()) {
@@ -119,7 +119,7 @@ void TxInfoDialog::setData(TransactionInfo* tx) {
 }
 
 void TxInfoDialog::updateData() {
-    TransactionInfo* tx = m_ctx->wallet->history()->transaction(m_txid);
+    TransactionInfo *tx = m_ctx->wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
 }

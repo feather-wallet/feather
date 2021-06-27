@@ -29,7 +29,7 @@ signals:
 private:
     void copyTxKey();
     void createTxProof();
-    void setData(TransactionInfo* tx);
+    void setData(TransactionInfo *tx);
     void updateData();
 
     QScopedPointer<Ui::TxInfoDialog> ui;

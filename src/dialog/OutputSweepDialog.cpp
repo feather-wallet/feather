@@ -6,7 +6,7 @@
 
 #include "libwalletqt/WalletManager.h"
 
-OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo* coin)
+OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo *coin)
         : QDialog(parent)
         , ui(new Ui::OutputSweepDialog)
 {
