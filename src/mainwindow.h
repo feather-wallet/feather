@@ -204,6 +204,7 @@ private:
     void updateTitle();
     void donationNag();
     void updateRecentlyOpened(const QString &filename);
+    void updateWidgetIcons();
 
     Ui::MainWindow *ui;
     WindowManager *m_windowManager;

@@ -8,20 +8,35 @@ rm -rf $APPDIR
 mkdir -p "$APPDIR"
 mkdir -p "$APPDIR/usr/share/applications/"
 mkdir -p "$APPDIR/usr/bin"
+mkdir -p "$APPDIR/usr/lib"
+mkdir -p "$APPDIR/usr/plugins"
 
 cp "$PWD/../src/assets/feather.desktop" "$APPDIR/usr/share/applications/feather.desktop"
 cp "$PWD/../src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
 cp "$PWD/bin/feather" "$APPDIR/usr/bin/feather"
+chmod +x "$APPDIR/usr/bin/feather"
 
-LD_LIBRARY_PATH=/usr/local/lib /linuxdeployqt/squashfs-root/AppRun feather.AppDir/usr/share/applications/feather.desktop -bundle-non-qt-libs
+export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu/:/usr/local/lib/$LD_LIBRARY_PATH
+linuxdeployqt feather.AppDir/usr/share/applications/feather.desktop -bundle-non-qt-libs
+
+pushd feather.AppDir/usr/plugins
+ln -s ../lib/ gstreamer
+popd
+
+cp -r /usr/lib/x86_64-linux-gnu/gstreamer-1.0/* feather.AppDir/usr/plugins/gstreamer/
+cp /usr/lib/x86_64-linux-gnu/gstreamer1.0/gstreamer-1.0/gst-plugin-scanner feather.AppDir/usr/plugins/gstreamer/
+
+rm "$APPDIR/AppRun"
+cp "$PWD/../contrib/AppImage/AppRun" "$APPDIR/"
+chmod +x "$APPDIR/AppRun"
 
 find feather.AppDir/ -exec touch -h -a -m -t 202101010100.00 {} \;
 
 # Manually create AppImage (reproducibly)
 
 # download runtime
-wget -nc https://github.com/AppImage/AppImageKit/releases/download/12/runtime-x86_64
-echo "24da8e0e149b7211cbfb00a545189a1101cb18d1f27d4cfc1895837d2c30bc30 runtime-x86_64" | sha256sum -c
+wget -nc https://github.com/AppImage/AppImageKit/releases/download/13/runtime-x86_64
+echo "328e0d745c5c6817048c27bc3e8314871703f8f47ffa81a37cb06cd95a94b323 runtime-x86_64" | sha256sum -c
 
 mksquashfs feather.AppDir feather.squashfs -info -root-owned -no-xattrs -noappend -fstime 0
 # mksquashfs writes a timestamp to the header

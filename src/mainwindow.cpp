@@ -74,6 +74,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
     connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx.get(), &AppContext::onAmountPrecisionChanged);
     connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
+    QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
 
     connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
@@ -791,11 +792,14 @@ void MainWindow::menuVerifyTxProof() {
 void MainWindow::skinChanged(const QString &skinName) {
     m_windowManager->changeSkin(skinName);
     ColorScheme::updateFromWidget(this);
+    this->updateWidgetIcons();
+}
 
+void MainWindow::updateWidgetIcons() {
+    m_sendWidget->skinChanged();
 #ifdef HAS_LOCALMONERO
     m_localMoneroWidget->skinChanged();
 #endif
-
     ui->conversionWidget->skinChanged();
 }
 

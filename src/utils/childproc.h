@@ -15,7 +15,7 @@ class ChildProcess : public QProcess {
     Q_OBJECT
 public:
     explicit ChildProcess(QObject* parent = nullptr);
-    ~ChildProcess();
+    ~ChildProcess() override;
 protected:
     void setupChildProcess() override;
 };
