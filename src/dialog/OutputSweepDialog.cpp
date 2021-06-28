@@ -6,13 +6,12 @@
 
 #include "libwalletqt/WalletManager.h"
 
-OutputSweepDialog::OutputSweepDialog(QWidget *parent, CoinsInfo *coin)
+OutputSweepDialog::OutputSweepDialog(QWidget *parent, quint64 amount)
         : QDialog(parent)
         , ui(new Ui::OutputSweepDialog)
+        , m_amount(amount)
 {
     ui->setupUi(this);
-
-    m_amount = coin->amount();
 
     connect(ui->checkBox_churn, &QCheckBox::toggled, [&](bool toggled){
        ui->lineEdit_address->setEnabled(!toggled);

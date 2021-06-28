@@ -47,10 +47,12 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     m_viewOutputAction = new QAction(icons()->icon("info2.svg"), "Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
+    m_sweepOutputsAction = new QAction("Sweep selected outputs", this);
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
     connect(m_sweepOutputAction, &QAction::triggered, this, &CoinsWidget::onSweepOutput);
+    connect(m_sweepOutputsAction, &QAction::triggered, this, &CoinsWidget::onSweepMulti);
 
     connect(m_freezeAllSelectedAction, &QAction::triggered, this, &CoinsWidget::freezeAllSelected);
     connect(m_thawAllSelectedAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
@@ -88,6 +90,7 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
     if (list.size() > 1) {
         menu->addAction(m_freezeAllSelectedAction);
         menu->addAction(m_thawAllSelectedAction);
+        menu->addAction(m_sweepOutputsAction);
     }
     else {
         CoinsInfo* c = this->currentEntry();
@@ -178,12 +181,36 @@ void CoinsWidget::onSweepOutput() {
         return;
     }
 
-    auto *dialog = new OutputSweepDialog(this, c);
+    auto *dialog = new OutputSweepDialog(this, c->amount());
     int ret = dialog->exec();
     if (!ret) return;
 
     m_ctx->onSweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
     dialog->deleteLater();
+}
+
+void CoinsWidget::onSweepMulti() {
+    QVector<CoinsInfo*> selectedCoins = this->currentEntries();
+    QVector<QString> keyImages;
+
+    quint64 totalAmount = 0;
+    for (const auto coin : selectedCoins) {
+        if (!coin) return;
+
+        QString keyImage = coin->keyImage();
+        if (!coin->keyImageKnown()) {
+            QMessageBox::warning(this, "Unable to sweep output", "Unable to sweep output: key image unknown");
+            return;
+        }
+        keyImages.push_back(keyImage);
+        totalAmount += coin->amount();
+    }
+
+    OutputSweepDialog dialog{this, totalAmount};
+    int ret = dialog.exec();
+    if (!ret) return;
+
+    m_ctx->onSweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
 }
 
 void CoinsWidget::copy(copyField field) {
@@ -225,6 +252,15 @@ CoinsInfo* CoinsWidget::currentEntry() {
     } else {
         return nullptr;
     }
+}
+
+QVector<CoinsInfo*> CoinsWidget::currentEntries() {
+    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
+    QVector<CoinsInfo*> selectedCoins;
+    for (const auto index : list) {
+        selectedCoins.push_back(m_model->entryFromIndex(m_proxyModel->mapToSource(index)));
+    }
+    return selectedCoins;
 }
 
 void CoinsWidget::freezeCoins(const QVector<int>& indexes) {

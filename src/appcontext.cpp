@@ -121,6 +121,17 @@ void AppContext::onSweepOutput(const QString &keyImage, QString address, bool ch
     emit initiateTransaction();
 }
 
+void AppContext::onSweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs) {
+    if (churn) {
+        address = this->wallet->address(0, 0);
+    }
+
+    qInfo() << "Creating transaction";
+    this->wallet->createTransactionSelectedAsync(keyImages, address, outputs, this->tx_priority);
+
+    emit initiateTransaction();
+}
+
 void AppContext::onCreateTransactionError(const QString &msg) {
     this->tmpTxDescription = "";
     emit endTransaction();

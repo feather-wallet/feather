@@ -17,7 +17,7 @@ class OutputSweepDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit OutputSweepDialog(QWidget *parent, CoinsInfo *coin);
+    explicit OutputSweepDialog(QWidget *parent, quint64 amount);
     ~OutputSweepDialog() override;
 
     QString address();

@@ -723,6 +723,29 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
     });
 }
 
+PendingTransaction *Wallet::createTransactionSelected(const QVector<QString> &key_images, const QString &dst_addr,
+                                                      size_t outputs, PendingTransaction::Priority priority)
+{
+    std::vector<std::string> kis;
+    for (const auto &key_image : key_images) {
+        kis.push_back(key_image.toStdString());
+    }
+    Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis, dst_addr.toStdString(), outputs, static_cast<Monero::PendingTransaction::Priority>(priority));
+    PendingTransaction *result = new PendingTransaction(ptImpl, this);
+
+    return result;
+}
+
+void Wallet::createTransactionSelectedAsync(const QVector<QString> &key_images, const QString &dst_addr,
+                                            size_t outputs, PendingTransaction::Priority priority)
+{
+    m_scheduler.run([this, key_images, dst_addr, outputs, priority] {
+        PendingTransaction *tx = createTransactionSelected(key_images, dst_addr, outputs, priority);
+        QVector<QString> address {dst_addr};
+        emit transactionCreated(tx, address);
+    });
+}
+
 PendingTransaction *Wallet::createSweepUnmixableTransaction()
 {
 //    pauseRefresh();

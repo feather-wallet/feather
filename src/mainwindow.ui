@@ -809,13 +809,13 @@
   <customwidget>
    <class>CCSWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/ccswidget.h</header>
+   <header>widgets/CCSWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>RedditWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/redditwidget.h</header>
+   <header>widgets/RedditWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

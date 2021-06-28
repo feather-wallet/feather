@@ -35,6 +35,7 @@ private slots:
     void thawAllSelected();
     void viewOutput();
     void onSweepOutput();
+    void onSweepMulti();
 
 private:
     void freezeCoins(const QVector<int>& indexes);
@@ -63,6 +64,7 @@ private:
     QAction *m_thawAllSelectedAction;
     QAction *m_viewOutputAction;
     QAction *m_sweepOutputAction;
+    QAction *m_sweepOutputsAction;
     Coins *m_coins;
     CoinsModel * m_model;
     CoinsProxyModel * m_proxyModel;
@@ -70,6 +72,7 @@ private:
     void showContextMenu(const QPoint & point);
     void copy(copyField field);
     CoinsInfo* currentEntry();
+    QVector<CoinsInfo*> currentEntries();
 };
 
 

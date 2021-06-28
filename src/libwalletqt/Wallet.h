@@ -298,6 +298,14 @@ public:
     void createTransactionSingleAsync(const QString &key_image, const QString &dst_addr,
             size_t outputs, PendingTransaction::Priority priority);
 
+    //! creates transaction with selected inputs
+    PendingTransaction * createTransactionSelected(const QVector<QString> &key_images, const QString &dst_addr,
+                                                   size_t outputs, PendingTransaction::Priority priority);
+
+    //! creates async transaction with selected inputs
+    void createTransactionSelectedAsync(const QVector<QString> &key_images, const QString &dst_addr,
+                                        size_t outputs, PendingTransaction::Priority priority);
+
     //! creates sweep unmixable transaction
     PendingTransaction * createSweepUnmixableTransaction();
 
