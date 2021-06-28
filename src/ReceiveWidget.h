@@ -4,14 +4,15 @@
 #ifndef FEATHER_RECEIVEWIDGET_H
 #define FEATHER_RECEIVEWIDGET_H
 
+#include <QMenu>
+#include <QWidget>
+#include <QtSvg/QSvgWidget>
+
 #include "appcontext.h"
-#include "qrcode/QrCode.h"
 #include "libwalletqt/Subaddress.h"
 #include "model/SubaddressProxyModel.h"
 #include "model/SubaddressModel.h"
-
-#include <QWidget>
-#include <QtSvg/QSvgWidget>
+#include "qrcode/QrCode.h"
 
 namespace Ui {
     class ReceiveWidget;

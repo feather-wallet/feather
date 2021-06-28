@@ -1,12 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "calcwindow.h"
-#include "mainwindow.h"
-#include "utils/Icons.h"
-#include "utils/AppData.h"
+#include "CalcWindow.h"
+#include "ui_CalcWindow.h"
 
-#include "ui_calcwindow.h"
+#include "utils/AppData.h"
+#include "utils/Icons.h"
 
 CalcWindow::CalcWindow(QWidget *parent)
     : QMainWindow(parent)

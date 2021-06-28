@@ -1,20 +1,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "contactswidget.h"
-#include "ui_contactswidget.h"
-#include "dialog/ContactsDialog.h"
-#include "model/ModelUtils.h"
-#include "mainwindow.h"
-#include "libwalletqt/AddressBook.h"
-#include "utils/Icons.h"
+#include "ContactsWidget.h"
+#include "ui_ContactsWidget.h"
 
 #include <QMessageBox>
 
+#include "dialog/ContactsDialog.h"
+#include "libwalletqt/AddressBook.h"
+#include "model/ModelUtils.h"
+#include "utils/Icons.h"
+
 ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::ContactsWidget)
-    , m_ctx(std::move(ctx))
+        : QWidget(parent)
+        , ui(new Ui::ContactsWidget)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

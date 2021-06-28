@@ -10,8 +10,8 @@
 
 #include "appcontext.h"
 #include "components.h"
-#include "calcwindow.h"
-#include "settings.h"
+#include "CalcWindow.h"
+#include "SettingsDialog.h"
 
 #include "dialog/AboutDialog.h"
 #include "dialog/SignVerifyDialog.h"
@@ -35,11 +35,11 @@
 #include "widgets/TickerWidget.h"
 #include "wizard/WalletWizard.h"
 
-#include "contactswidget.h"
-#include "historywidget.h"
-#include "sendwidget.h"
-#include "receivewidget.h"
-#include "coinswidget.h"
+#include "ContactsWidget.h"
+#include "HistoryWidget.h"
+#include "SendWidget.h"
+#include "ReceiveWidget.h"
+#include "CoinsWidget.h"
 
 #include "WindowManager.h"
 

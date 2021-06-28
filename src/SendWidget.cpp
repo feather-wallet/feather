@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "SendWidget.h"
+#include "ui_SendWidget.h"
+
 #include <QMessageBox>
-#include "sendwidget.h"
-#include "mainwindow.h"
-#include "ui_sendwidget.h"
+
+#include "ColorScheme.h"
 #include "constants.h"
 #include "utils/AppData.h"
 #include "Icons.h"
-#include "ColorScheme.h"
 
 #ifdef WITH_SCANNER
 #include "qrcode_scanner/QrCodeScanDialog.h"

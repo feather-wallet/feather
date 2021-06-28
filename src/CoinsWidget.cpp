@@ -1,22 +1,21 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "coinswidget.h"
-#include "ui_coinswidget.h"
-#include "dialog/OutputInfoDialog.h"
-#include "dialog/OutputSweepDialog.h"
-#include "mainwindow.h"
-#include "utils/Icons.h"
+#include "CoinsWidget.h"
+#include "ui_CoinsWidget.h"
 
-#include <QClipboard>
 #include <QMessageBox>
 
+#include "dialog/OutputInfoDialog.h"
+#include "dialog/OutputSweepDialog.h"
+#include "utils/Icons.h"
+
 CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::CoinsWidget)
-    , m_ctx(std::move(ctx))
-    , m_headerMenu(new QMenu(this))
-    , m_copyMenu(new QMenu("Copy",this))
+        : QWidget(parent)
+        , ui(new Ui::CoinsWidget)
+        , m_ctx(std::move(ctx))
+        , m_headerMenu(new QMenu(this))
+        , m_copyMenu(new QMenu("Copy",this))
 {
     ui->setupUi(this);
 

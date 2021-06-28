@@ -1,14 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
+#include "CalcWidget.h"
+#include "ui_CalcWidget.h"
+
 #include <QList>
 
-#include "calcwidget.h"
-#include "ui_calcwidget.h"
-#include "utils/ColorScheme.h"
-#include "utils/AppData.h"
-#include "utils/config.h"
 #include "dialog/CalcConfigDialog.h"
+#include "utils/AppData.h"
+#include "utils/ColorScheme.h"
+#include "utils/config.h"
 
 CalcWidget::CalcWidget(QWidget *parent)
     : QWidget(parent)

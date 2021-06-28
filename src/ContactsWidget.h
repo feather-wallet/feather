@@ -4,12 +4,12 @@
 #ifndef FEATHER_CONTACTSWIDGET_H
 #define FEATHER_CONTACTSWIDGET_H
 
-#include "model/AddressBookModel.h"
-#include "model/AddressBookProxyModel.h"
-#include "appcontext.h"
-
 #include <QWidget>
 #include <QMenu>
+
+#include "appcontext.h"
+#include "model/AddressBookModel.h"
+#include "model/AddressBookProxyModel.h"
 
 namespace Ui {
 class ContactsWidget;

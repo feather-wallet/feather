@@ -1,23 +1,24 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "historywidget.h"
-#include "ui_historywidget.h"
-#include "dialog/TxInfoDialog.h"
-#include "dialog/TxProofDialog.h"
-#include "utils/Icons.h"
-#include "utils/config.h"
-#include "appcontext.h"
+#include "HistoryWidget.h"
+#include "ui_HistoryWidget.h"
 
 #include <QMessageBox>
 
+#include "appcontext.h"
+#include "dialog/TxInfoDialog.h"
+#include "dialog/TxProofDialog.h"
+#include "utils/config.h"
+#include "utils/Icons.h"
+
 HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::HistoryWidget)
-    , m_ctx(std::move(ctx))
-    , m_contextMenu(new QMenu(this))
-    , m_copyMenu(new QMenu("Copy", this))
-    , m_model(m_ctx->wallet->historyModel())
+        : QWidget(parent)
+        , ui(new Ui::HistoryWidget)
+        , m_ctx(std::move(ctx))
+        , m_contextMenu(new QMenu(this))
+        , m_copyMenu(new QMenu("Copy", this))
+        , m_model(m_ctx->wallet->historyModel())
 {
     ui->setupUi(this);
     m_contextMenu->addMenu(m_copyMenu);

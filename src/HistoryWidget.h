@@ -4,14 +4,14 @@
 #ifndef FEATHER_HISTORYWIDGET_H
 #define FEATHER_HISTORYWIDGET_H
 
-#include "model/TransactionHistoryModel.h"
-#include "model/TransactionHistoryProxyModel.h"
-#include "libwalletqt/Coins.h"
-#include "libwalletqt/Wallet.h"
-#include "appcontext.h"
-
 #include <QWidget>
 #include <QMenu>
+
+#include "appcontext.h"
+#include "libwalletqt/Coins.h"
+#include "libwalletqt/Wallet.h"
+#include "model/TransactionHistoryModel.h"
+#include "model/TransactionHistoryProxyModel.h"
 
 namespace Ui {
     class HistoryWidget;

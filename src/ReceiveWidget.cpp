@@ -1,19 +1,20 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "ui_receivewidget.h"
-#include "receivewidget.h"
-#include "model/ModelUtils.h"
-#include "dialog/QrCodeDialog.h"
-#include "utils/Icons.h"
+#include "ReceiveWidget.h"
+#include "ui_ReceiveWidget.h"
 
 #include <QMenu>
 #include <QMessageBox>
 
+#include "dialog/QrCodeDialog.h"
+#include "model/ModelUtils.h"
+#include "utils/Icons.h"
+
 ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::ReceiveWidget)
-    , m_ctx(std::move(ctx))
+        : QWidget(parent)
+        , ui(new Ui::ReceiveWidget)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

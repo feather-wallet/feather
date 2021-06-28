@@ -5,11 +5,12 @@
 #define FEATHER_WINDOWMANAGER_H
 
 #include <QObject>
+
+#include "dialog/TorInfoDialog.h"
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
+#include "MainWindow.h"
 #include "wizard/WalletWizard.h"
-#include "dialog/TorInfoDialog.h"
-#include "mainwindow.h"
 
 class MainWindow;
 class WindowManager : public QObject {

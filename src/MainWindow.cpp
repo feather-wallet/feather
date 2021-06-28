@@ -1,38 +1,38 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
 
-#include <QMessageBox>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "config-feather.h"
-#include "dialog/TxConfDialog.h"
-#include "dialog/TxConfAdvDialog.h"
-#include "dialog/DebugInfoDialog.h"
-#include "dialog/WalletInfoDialog.h"
-#include "dialog/TorInfoDialog.h"
-#include "dialog/ViewOnlyDialog.h"
-#include "dialog/TxBroadcastDialog.h"
-#include "dialog/TxImportDialog.h"
-#include "dialog/PasswordDialog.h"
+#include "constants.h"
+#include "dialog/AccountSwitcherDialog.h"
 #include "dialog/BalanceDialog.h"
+#include "dialog/DebugInfoDialog.h"
+#include "dialog/PasswordDialog.h"
+#include "dialog/TorInfoDialog.h"
+#include "dialog/TxBroadcastDialog.h"
+#include "dialog/TxConfAdvDialog.h"
+#include "dialog/TxConfDialog.h"
+#include "dialog/TxImportDialog.h"
+#include "dialog/ViewOnlyDialog.h"
+#include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
 #include "dialog/UpdateDialog.h"
-#include "dialog/AccountSwitcherDialog.h"
-#include "constants.h"
 #include "libwalletqt/AddressBook.h"
-#include "utils/AsyncTask.h"
 #include "utils/AppData.h"
+#include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
-#include "utils/SemanticVersion.h"
-#include "utils/NetworkManager.h"
 #include "utils/Icons.h"
-#include "utils/WebsocketNotifier.h"
-#include "utils/Updater.h"
+#include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
+#include "utils/SemanticVersion.h"
 #include "utils/TorManager.h"
+#include "utils/Updater.h"
+#include "utils/WebsocketNotifier.h"
 
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
     : QMainWindow(parent)

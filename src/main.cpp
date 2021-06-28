@@ -6,10 +6,10 @@
 #include <QtCore>
 #include <QtGui>
 
+#include "cli.h"
 #include "config-feather.h"
 #include "constants.h"
-#include "mainwindow.h"
-#include "cli.h"
+#include "MainWindow.h"
 #include "WindowManager.h"
 
 #if defined(Q_OS_WIN)

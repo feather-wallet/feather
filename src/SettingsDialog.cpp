@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "settings.h"
-#include "ui_settings.h"
-#include "mainwindow.h"
+#include "SettingsDialog.h"
+#include "ui_SettingsDialog.h"
 
 #include <QFileDialog>
 
 Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::Settings)
-    , m_ctx(std::move(ctx))
+        : QDialog(parent)
+        , ui(new Ui::Settings)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 

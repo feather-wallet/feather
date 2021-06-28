@@ -2,16 +2,17 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "WindowManager.h"
+
+#include <QMessageBox>
+
 #include "constants.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/SplashDialog.h"
-#include "utils/WebsocketNotifier.h"
-#include "utils/os/tails.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
+#include "utils/os/tails.h"
 #include "utils/TorManager.h"
-
-#include <QMessageBox>
+#include "utils/WebsocketNotifier.h"
 
 WindowManager::WindowManager() {
     m_walletManager = WalletManager::instance();

@@ -4,14 +4,14 @@
 #ifndef FEATHER_COINSWIDGET_H
 #define FEATHER_COINSWIDGET_H
 
+#include <QMenu>
+#include <QWidget>
+#include <QtSvg/QSvgWidget>
+
 #include "appcontext.h"
 #include "model/CoinsModel.h"
 #include "model/CoinsProxyModel.h"
 #include "libwalletqt/Coins.h"
-
-#include <QMenu>
-#include <QWidget>
-#include <QtSvg/QSvgWidget>
 
 namespace Ui {
     class CoinsWidget;
