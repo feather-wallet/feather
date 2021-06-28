@@ -30,6 +30,13 @@
     <number>0</number>
    </property>
    <item>
+    <widget class="QLineEdit" name="search">
+     <property name="placeholderText">
+      <string>Search..</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QTreeView" name="coins">
      <property name="selectionMode">
       <enum>QAbstractItemView::ExtendedSelection</enum>

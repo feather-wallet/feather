@@ -4,11 +4,10 @@
 #ifndef FEATHER_TRANSACTIONHISTORYPROXYMODEL_H
 #define FEATHER_TRANSACTIONHISTORYPROXYMODEL_H
 
+#include <QSortFilterProxyModel>
+
 #include "libwalletqt/TransactionHistory.h"
 #include "libwalletqt/Wallet.h"
-#include "libwalletqt/TransactionHistory.h"
-
-#include <QSortFilterProxyModel>
 
 class TransactionHistoryProxyModel : public QSortFilterProxyModel
 {
@@ -28,7 +27,7 @@ private:
     Wallet *m_wallet;
     TransactionHistory *m_history;
 
-    QRegExp m_searchRegExp;
+    QRegularExpression m_searchRegExp;
 };
 
 #endif //FEATHER_TRANSACTIONHISTORYPROXYMODEL_H

@@ -6,19 +6,32 @@
 #include "libwalletqt/CoinsInfo.h"
 
 CoinsProxyModel::CoinsProxyModel(QObject *parent, Coins *coins)
-    : QSortFilterProxyModel(parent), m_coins(coins)
+        : QSortFilterProxyModel(parent)
+        , m_coins(coins)
+        , m_searchRegExp("")
 {
+    m_searchRegExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     setSortRole(Qt::UserRole);
+}
+
+void CoinsProxyModel::setShowSpent(const bool showSpent) {
+    m_showSpent = showSpent;
+    invalidateFilter();
+}
+
+void CoinsProxyModel::setSearchFilter(const QString &searchString) {
+    m_searchRegExp.setPattern(searchString);
+    invalidateFilter();
 }
 
 bool CoinsProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    bool isSpent;
-    int accountIndex;
-    m_coins->coin(sourceRow, [&isSpent, &accountIndex](const CoinsInfo &c){
-        isSpent = c.spent();
-        accountIndex = c.subaddrAccount();
-    });
+    CoinsInfo* coin = m_coins->coin(sourceRow);
 
-    return !(!m_showSpent && isSpent) && accountIndex == 0;
+    if (!m_searchRegExp.pattern().isEmpty()) {
+        return coin->pubKey().contains(m_searchRegExp) || coin->address().contains(m_searchRegExp)
+                || coin->hash().contains(m_searchRegExp) || coin->addressLabel().contains(m_searchRegExp);
+    }
+
+    return !(!m_showSpent && coin->spent()) && coin->subaddrAccount() == 0;
 }

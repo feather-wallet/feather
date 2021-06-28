@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include <QMessageBox>
-#include <QFileDialog>
-
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+
+#include <QMessageBox>
+#include <QFileDialog>
 
 #include "config-feather.h"
 #include "dialog/TxConfDialog.h"
@@ -1414,6 +1414,7 @@ void MainWindow::toggleSearchbar(bool visible) {
     m_historyWidget->setSearchbarVisible(visible);
     m_receiveWidget->setSearchbarVisible(visible);
     m_contactsWidget->setSearchbarVisible(visible);
+    m_coinsWidget->setSearchbarVisible(visible);
 
     int currentTab = ui->tabWidget->currentIndex();
     if (currentTab == Tabs::HISTORY)

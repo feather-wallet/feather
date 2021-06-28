@@ -7,12 +7,11 @@
 #include "libwalletqt/TransactionInfo.h"
 
 TransactionHistoryProxyModel::TransactionHistoryProxyModel(Wallet *wallet, QObject *parent)
-        : QSortFilterProxyModel(parent),
-        m_wallet(wallet),
-        m_searchRegExp("")
+        : QSortFilterProxyModel(parent)
+        , m_wallet(wallet)
+        , m_searchRegExp("")
 {
-    m_searchRegExp.setCaseSensitivity(Qt::CaseInsensitive);
-    m_searchRegExp.setPatternSyntax(QRegExp::RegExp);
+    m_searchRegExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
     m_history = m_wallet->history();
 }
 

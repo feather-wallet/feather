@@ -26,6 +26,9 @@ public:
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
 
+public slots:
+    void setSearchbarVisible(bool visible);
+
 private slots:
     void showHeaderMenu(const QPoint& position);
     void setShowSpent(bool show);
@@ -36,6 +39,7 @@ private slots:
     void viewOutput();
     void onSweepOutput();
     void onSweepMulti();
+    void setSearchFilter(const QString &filter);
 
 private:
     void freezeCoins(const QVector<int>& indexes);

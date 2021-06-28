@@ -59,6 +59,8 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(ui->coins, &QTreeView::customContextMenuRequested, this, &CoinsWidget::showContextMenu);
     connect(ui->coins, &QTreeView::doubleClicked, this, &CoinsWidget::viewOutput);
+
+    connect(ui->search, &QLineEdit::textChanged, this, &CoinsWidget::setSearchFilter);
 }
 
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
@@ -81,6 +83,10 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     ui->coins->header()->setSectionResizeMode(CoinsModel::AddressLabel, QHeaderView::Stretch);
     ui->coins->header()->setSortIndicator(CoinsModel::BlockHeight, Qt::DescendingOrder);
     ui->coins->setSortingEnabled(true);
+}
+
+void CoinsWidget::setSearchbarVisible(bool visible) {
+    ui->search->setVisible(visible);
 }
 
 void CoinsWidget::showContextMenu(const QPoint &point) {
@@ -128,6 +134,11 @@ void CoinsWidget::setShowSpent(bool show)
 {
     if(!m_proxyModel) return;
     m_proxyModel->setShowSpent(show);
+}
+
+void CoinsWidget::setSearchFilter(const QString &filter) {
+    if (!m_proxyModel) return;
+    m_proxyModel->setSearchFilter(filter);
 }
 
 void CoinsWidget::freezeOutput() {
