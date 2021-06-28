@@ -110,7 +110,7 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
         auto address = o->address();
         auto amount = WalletManager::displayAmount(o->amount());
         auto index = m_ctx->wallet->subaddressIndex(address);
-        cursor.insertText(address, Utils::addressTextFormat(index));
+        cursor.insertText(address, Utils::addressTextFormat(index, o->amount()));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
     }

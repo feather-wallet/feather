@@ -453,20 +453,21 @@ int Utils::maxLength(const QVector<QString> &array) {
     return maxLength;
 }
 
-QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index) {
+QTextCharFormat Utils::addressTextFormat(const SubaddressIndex &index, quint64 amount) {
+    QTextCharFormat rec;
     if (index.isPrimary()) {
-        QTextCharFormat rec;
         rec.setBackground(QBrush(ColorScheme::YELLOW.asColor(true)));
         rec.setToolTip("Wallet change/primary address");
-        return rec;
     }
-    if (index.isValid()) {
-        QTextCharFormat rec;
+    else if (index.isValid()) {
         rec.setBackground(QBrush(ColorScheme::GREEN.asColor(true)));
         rec.setToolTip("Wallet receive address");
-        return rec;
     }
-    return QTextCharFormat();
+    else if (amount == 0) {
+        rec.setBackground(QBrush(ColorScheme::GRAY.asColor(true)));
+        rec.setToolTip("Dummy output (Min. 2 outs consensus rule)");
+    }
+    return rec;
 }
 
 bool Utils::isTorsocks() {

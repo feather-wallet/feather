@@ -52,7 +52,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
         auto address = transfer->address();
         auto amount = WalletManager::displayAmount(transfer->amount());
         auto index = m_ctx->wallet->subaddressIndex(address);
-        cursor.insertText(address, Utils::addressTextFormat(index));
+        cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
     }
