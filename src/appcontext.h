@@ -59,6 +59,7 @@ public slots:
     void onAmountPrecisionChanged(int precision);
     void onMultiBroadcast(PendingTransaction *tx);
     void onDeviceButtonRequest(quint64 code);
+    void onDeviceButtonPressed();
     void onDeviceError(const QString &message);
 
     void onTorSettingsChanged(); // should not be here
@@ -92,6 +93,7 @@ signals:
     void initiateTransaction();
     void endTransaction();
     void deviceButtonRequest(quint64 code);
+    void deviceButtonPressed();
     void deviceError(const QString &message);
 
 private:

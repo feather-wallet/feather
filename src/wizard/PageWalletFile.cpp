@@ -98,7 +98,14 @@ QString PageWalletFile::defaultWalletName() {
     do {
         QString walletStr = QString("wallet_%1");
         if (m_fields->mode == WizardMode::CreateWalletFromDevice) {
-            walletStr = QString("ledger_%1");
+            switch (m_fields->deviceType) {
+                case DeviceType::LEDGER_NANO_S:
+                case DeviceType::LEDGER_NANO_X:
+                    walletStr = QString("ledger_%1");
+                    break;
+                case DeviceType::TREZOR_MODEL_T:
+                    walletStr = QString("trezor_%1");
+            }
         }
         walletName = walletStr.arg(count);
         count++;

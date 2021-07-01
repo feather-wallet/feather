@@ -171,6 +171,8 @@ private slots:
     void showRestoreHeightDialog();
     void importTransaction();
     void onDeviceError(const QString &error);
+    void onDeviceButtonRequest(quint64 code);
+    void onDeviceButtonPressed();
     void menuHwDeviceClicked();
     void onUpdatesAvailable(const QJsonObject &updates);
     void toggleSearchbar(bool enabled);
@@ -204,6 +206,9 @@ private:
     void donationNag();
     void updateRecentlyOpened(const QString &filename);
     void updateWidgetIcons();
+
+    QIcon hardwareDevicePairedIcon();
+    QIcon hardwareDeviceUnpairedIcon();
 
     QScopedPointer<Ui::MainWindow> ui;
     WindowManager *m_windowManager;

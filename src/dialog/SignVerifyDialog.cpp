@@ -26,6 +26,12 @@ SignVerifyDialog::SignVerifyDialog(Wallet *wallet, QWidget *parent)
     ui->address->setText(m_wallet->address(0, 0));
     ui->address->setCursorPosition(0);
 
+    if (m_wallet->isHwBacked()) {
+        // We don't have the secret spend key to sign messages
+        ui->btn_Sign->setEnabled(false);
+        ui->btn_Sign->setToolTip("Message signing is not supported on this hardware device.");
+    }
+
     ui->btn_Copy->setVisible(false);
 }
 

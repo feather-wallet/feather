@@ -13,6 +13,10 @@ PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
         , m_fields(fields)
 {
     ui->setupUi(this);
+
+    ui->combo_deviceType->addItem("Ledger Nano S", DeviceType::LEDGER_NANO_S);
+    ui->combo_deviceType->addItem("Ledger Nano X", DeviceType::LEDGER_NANO_X);
+    ui->combo_deviceType->addItem("Trezor Model T", DeviceType::TREZOR_MODEL_T);
 }
 
 void PageHardwareDevice::initializePage() {
@@ -28,6 +32,7 @@ int PageHardwareDevice::nextId() const {
 }
 
 bool PageHardwareDevice::validatePage() {
+    m_fields->deviceType = static_cast<DeviceType>(ui->combo_deviceType->currentData().toInt());
     return true;
 }
 

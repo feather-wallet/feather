@@ -43,7 +43,7 @@ private slots:
 
 private:
     void tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset);
-    void tryCreateWalletFromDevice(const QString &path, const QString &password, int restoreHeight);
+    void tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
     void tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight);
 
     bool autoOpenWallet();

@@ -151,7 +151,7 @@ void MainWindow::initStatusBar() {
     connect(m_statusBtnTor, &StatusBarButton::clicked, this, &MainWindow::menuTorClicked);
     this->statusBar()->addPermanentWidget(m_statusBtnTor);
 
-    m_statusBtnHwDevice = new StatusBarButton(icons()->icon("ledger.png"), "Ledger", this);
+    m_statusBtnHwDevice = new StatusBarButton(this->hardwareDevicePairedIcon(), this->getHardwareDevice(), this);
     connect(m_statusBtnHwDevice, &StatusBarButton::clicked, this, &MainWindow::menuHwDeviceClicked);
     this->statusBar()->addPermanentWidget(m_statusBtnHwDevice);
     m_statusBtnHwDevice->hide();
@@ -356,6 +356,8 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::createTransactionSuccess, this, &MainWindow::onCreateTransactionSuccess);
     connect(m_ctx.get(), &AppContext::transactionCommitted,     this, &MainWindow::onTransactionCommitted);
     connect(m_ctx.get(), &AppContext::deviceError,              this, &MainWindow::onDeviceError);
+    connect(m_ctx.get(), &AppContext::deviceButtonRequest,      this, &MainWindow::onDeviceButtonRequest);
+    connect(m_ctx.get(), &AppContext::deviceButtonPressed,      this, &MainWindow::onDeviceButtonPressed);
     connect(m_ctx.get(), &AppContext::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
     connect(m_ctx.get(), &AppContext::endTransaction,           this, &MainWindow::onEndTransaction);
     connect(m_ctx.get(), &AppContext::customRestoreHeightSet,   this, &MainWindow::onCustomRestoreHeightSet);
@@ -801,6 +803,26 @@ void MainWindow::updateWidgetIcons() {
     m_localMoneroWidget->skinChanged();
 #endif
     ui->conversionWidget->skinChanged();
+
+    m_statusBtnHwDevice->setIcon(this->hardwareDevicePairedIcon());
+}
+
+QIcon MainWindow::hardwareDevicePairedIcon() {
+    QString filename;
+    if (m_ctx->wallet->isLedger())
+        filename = "ledger.png";
+    else if (m_ctx->wallet->isTrezor())
+        filename = ColorScheme::darkScheme ? "trezor_white.png" : "trezor.png";
+    return icons()->icon(filename);
+}
+
+QIcon MainWindow::hardwareDeviceUnpairedIcon() {
+    QString filename;
+    if (m_ctx->wallet->isLedger())
+        filename = "ledger_unpaired.png";
+    else if (m_ctx->wallet->isTrezor())
+        filename = ColorScheme::darkScheme ? "trezor_unpaired_white.png" : "trezor_unpaired.png";
+    return icons()->icon(filename);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
@@ -1065,7 +1087,8 @@ void MainWindow::onDeviceError(const QString &error) {
     if (m_showDeviceError) {
         return;
     }
-    m_statusBtnHwDevice->setIcon(icons()->icon("ledger_unpaired.png"));
+
+    m_statusBtnHwDevice->setIcon(this->hardwareDeviceUnpairedIcon());
     while (true) {
         m_showDeviceError = true;
         auto result = QMessageBox::question(this, "Hardware device", "Lost connection to hardware device. Attempt to reconnect?");
@@ -1080,9 +1103,36 @@ void MainWindow::onDeviceError(const QString &error) {
             return;
         }
     }
-    m_statusBtnHwDevice->setIcon(icons()->icon("ledger.png"));
+    m_statusBtnHwDevice->setIcon(this->hardwareDevicePairedIcon());
     m_ctx->wallet->startRefresh();
     m_showDeviceError = false;
+}
+
+void MainWindow::onDeviceButtonRequest(quint64 code) {
+    if (m_ctx->wallet->isTrezor()) {
+        switch (code) {
+            case 8: // Confirm refresh: Do you really want to start refresh?
+            {
+                if (m_constructingTransaction) { // This code is also used when signing a tx...
+                    break;
+                }
+
+                m_splashDialog->setMessage("Confirm refresh on device to proceed.");
+                m_splashDialog->setIcon(QPixmap(":/assets/images/confirmed.png"));
+                m_splashDialog->show();
+                m_splashDialog->setEnabled(true);
+                break;
+            }
+        }
+    }
+}
+
+void MainWindow::onDeviceButtonPressed() {
+    if (m_constructingTransaction) {
+        return;
+    }
+
+    m_splashDialog->hide();
 }
 
 void MainWindow::updateNetStats() {

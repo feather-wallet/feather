@@ -38,6 +38,7 @@ AppContext::AppContext(Wallet *wallet)
     connect(this->wallet.get(), &Wallet::transactionCreated,       this, &AppContext::onTransactionCreated);
     connect(this->wallet.get(), &Wallet::deviceError,              this, &AppContext::onDeviceError);
     connect(this->wallet.get(), &Wallet::deviceButtonRequest,      this, &AppContext::onDeviceButtonRequest);
+    connect(this->wallet.get(), &Wallet::deviceButtonPressed,      this, &AppContext::onDeviceButtonPressed);
     connect(this->wallet.get(), &Wallet::connectionStatusChanged, [this]{
         this->nodes->autoConnect();
     });
@@ -188,6 +189,10 @@ void AppContext::onAmountPrecisionChanged(int precision) {
 
 void AppContext::onDeviceButtonRequest(quint64 code) {
     emit deviceButtonRequest(code);
+}
+
+void AppContext::onDeviceButtonPressed() {
+    emit deviceButtonPressed();
 }
 
 void AppContext::onDeviceError(const QString &message) {

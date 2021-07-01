@@ -266,9 +266,11 @@ RUN git clone -b v4.1.1 --depth 1 https://github.com/fukuchi/libqrencode.git && 
 
 # monero-seed: Required for Feather
 # Tevador's 14 word seed library
+ADD contrib/monero-seed.patch .
 RUN git clone https://git.featherwallet.org/feather/monero-seed.git && \
     cd monero-seed && \
     git reset --hard 4674ef09b6faa6fe602ab5ae0b9ca8e1fd7d5e1b && \
+    git apply /monero-seed.patch && \
     cmake -DCMAKE_BUILD_TYPE=Release -Bbuild && \
     make -Cbuild -j$THREADS && \
     make -Cbuild install && \

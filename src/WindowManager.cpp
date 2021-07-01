@@ -228,7 +228,7 @@ void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const
     this->onWalletOpened(wallet);
 }
 
-void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, int restoreHeight)
+void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight)
 {
     if (Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
@@ -237,7 +237,7 @@ void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString
     }
 
     m_openingWallet = true;
-    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, "Ledger", restoreHeight);
+    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, deviceName, restoreHeight);
 }
 
 void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address,
@@ -294,16 +294,36 @@ void WindowManager::handleWalletError(const QString &message) {
 }
 
 void WindowManager::displayWalletErrorMessage(const QString &message) {
-    QString errMsg = message;
+    QString errMsg = QString("Error: %1").arg(message);
+
+    // Ledger
     if (message.contains("No device found")) {
-        errMsg += "\n\nThis wallet is backed by a hardware device. Make sure the Monero app is opened on the device.\n"
+        errMsg += "\n\nThis wallet is backed by a Ledger hardware device. Make sure the Monero app is opened on the device.\n"
                   "You may need to restart Feather before the device can get detected.";
     }
     if (message.contains("Unable to open device")) {
         errMsg += "\n\nThe device might be in use by a different application.";
 #if defined(Q_OS_LINUX)
         errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
-                  "<a>https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues</a>";
+                  "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
+#endif
+    }
+
+    // TREZOR
+    if (message.contains("Unable to claim libusb device")) {
+        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Feather was unable to access the device. "
+                  "Please make sure it is not opened by another program and try again.";
+    }
+    if (message.contains("Cannot get a device address")) {
+        errMsg += "\n\nRestart the Trezor hardware device and try again.";
+    }
+
+    if (message.contains("Could not connect to the device Trezor") || message.contains("Device connect failed")) {
+        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Make sure the device is connected to your computer and unlocked.\n"
+                  "You may need to restart Feather before the device can be detected.";
+#if defined(Q_OS_LINUX)
+        errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
+                  "https://wiki.trezor.io/Udev_rules";
 #endif
     }
 
@@ -330,7 +350,19 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
 // ######################## DEVICE ########################
 
 void WindowManager::onDeviceButtonRequest(quint64 code) {
-    m_splashDialog->setMessage("Action required on device: Export the view key to open the wallet.");
+    QString message;
+    switch (code) {
+        case 1: // Trezor
+            message = "Action required on device: enter your PIN to continue.";
+            break;
+        case 8: // Trezor
+            message = "Action required on device: Export watch-only credentials to open the wallet.";
+            break;
+        default:
+            message = "Action required on device: Export the view key to open the wallet.";
+    }
+
+    m_splashDialog->setMessage(message);
     m_splashDialog->setIcon(QPixmap(":/assets/images/key.png"));
     m_splashDialog->show();
     m_splashDialog->setEnabled(true);
