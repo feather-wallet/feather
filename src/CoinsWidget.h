@@ -28,6 +28,7 @@ public:
 
 public slots:
     void setSearchbarVisible(bool visible);
+    void focusSearchbar();
 
 private slots:
     void showHeaderMenu(const QPoint& position);

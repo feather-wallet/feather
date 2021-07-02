@@ -1483,6 +1483,8 @@ void MainWindow::toggleSearchbar(bool visible) {
         m_contactsWidget->focusSearchbar();
     else if (currentTab == Tabs::RECEIVE)
         m_receiveWidget->focusSearchbar();
+    else if (currentTab == Tabs::COINS)
+        m_coinsWidget->focusSearchbar();
 }
 
 MainWindow::~MainWindow() = default;

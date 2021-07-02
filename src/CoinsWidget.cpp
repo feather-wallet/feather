@@ -93,6 +93,11 @@ void CoinsWidget::setSearchbarVisible(bool visible) {
     ui->search->setVisible(visible);
 }
 
+void CoinsWidget::focusSearchbar() {
+    ui->search->setFocusPolicy(Qt::StrongFocus);
+    ui->search->setFocus();
+}
+
 void CoinsWidget::showContextMenu(const QPoint &point) {
     QModelIndexList list = ui->coins->selectionModel()->selectedRows();
 
