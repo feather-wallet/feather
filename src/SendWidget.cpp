@@ -87,22 +87,20 @@ void SendWidget::amountEdited(const QString &text) {
     this->updateConversionLabel();
 }
 
-void SendWidget::fill(const CCSEntry &entry) {
-    this->fill(entry.address, QString("CCS: %1").arg(entry.title), 0.0);
-}
-
 void SendWidget::fill(double amount) {
     ui->lineAmount->setText(QString::number(amount));
 }
 
 void SendWidget::fill(const QString &address, const QString &description, double amount) {
-    ui->lineDescription->setText(description);
     ui->lineAddress->setText(address);
-
     ui->lineAddress->moveCursor(QTextCursor::Start);
+
+    ui->lineDescription->setText(description);
 
     if (amount > 0)
         ui->lineAmount->setText(QString::number(amount));
+    ui->lineAmount->setFocus();
+
     this->updateConversionLabel();
 }
 

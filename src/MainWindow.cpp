@@ -885,8 +885,8 @@ void MainWindow::payToMany() {
                                                   "A maximum of 16 addresses may be specified.");
 }
 
-void MainWindow::showSendScreen(const CCSEntry &entry) {
-    m_sendWidget->fill(entry);
+void MainWindow::showSendScreen(const CCSEntry &entry) { // TODO: rename this function
+    m_sendWidget->fill(entry.address, QString("CCS: %1").arg(entry.title));
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
