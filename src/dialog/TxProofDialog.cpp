@@ -75,6 +75,11 @@ void TxProofDialog::selectSpendProof() {
         return;
     }
 
+    if (m_ctx->wallet->isHwBacked()) {
+        this->showWarning("SpendProof creation is not supported on this hardware device.");
+        return;
+    }
+
     ui->frame_message->show();
     ui->label_summary->setText("This proof shows you created a transaction with the txid shown above.");
 }
