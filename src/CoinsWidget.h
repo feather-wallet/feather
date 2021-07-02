@@ -38,8 +38,7 @@ private slots:
     void thawOutput();
     void thawAllSelected();
     void viewOutput();
-    void onSweepOutput();
-    void onSweepMulti();
+    void onSweepOutputs();
     void setSearchFilter(const QString &filter);
     void editLabel();
 

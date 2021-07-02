@@ -54,8 +54,8 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
-    connect(m_sweepOutputAction, &QAction::triggered, this, &CoinsWidget::onSweepOutput);
-    connect(m_sweepOutputsAction, &QAction::triggered, this, &CoinsWidget::onSweepMulti);
+    connect(m_sweepOutputAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
+    connect(m_sweepOutputsAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
 
     connect(m_freezeAllSelectedAction, &QAction::triggered, this, &CoinsWidget::freezeAllSelected);
     connect(m_thawAllSelectedAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
@@ -195,26 +195,7 @@ void CoinsWidget::viewOutput() {
     dialog->show();
 }
 
-void CoinsWidget::onSweepOutput() {
-    CoinsInfo* c = this->currentEntry();
-    if (!c) return;
-
-    QString keyImage = c->keyImage();
-
-    if (!c->keyImageKnown()) {
-        QMessageBox::warning(this, "Unable to sweep output", "Unable to sweep output: key image unknown");
-        return;
-    }
-
-    auto *dialog = new OutputSweepDialog(this, c->amount());
-    int ret = dialog->exec();
-    if (!ret) return;
-
-    m_ctx->onSweepOutput(keyImage, dialog->address(), dialog->churn(), dialog->outputs());
-    dialog->deleteLater();
-}
-
-void CoinsWidget::onSweepMulti() {
+void CoinsWidget::onSweepOutputs() {
     QVector<CoinsInfo*> selectedCoins = this->currentEntries();
     QVector<QString> keyImages;
 
@@ -224,9 +205,27 @@ void CoinsWidget::onSweepMulti() {
 
         QString keyImage = coin->keyImage();
         if (!coin->keyImageKnown()) {
-            QMessageBox::warning(this, "Unable to sweep output", "Unable to sweep output: key image unknown");
+            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output has unknown key image");
             return;
         }
+
+        if (coin->spent()) {
+            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output was already spent");
+            return;
+        }
+
+        if (coin->frozen()) {
+            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output is frozen.\n\n"
+                                                                  "Thaw the selected output(s) before spending.");
+            return;
+        }
+
+        if (!coin->unlocked()) {
+            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output is locked.\n\n"
+                                                                  "Wait until the output has reached the required number of confirmation before spending.");
+            return;
+        }
+
         keyImages.push_back(keyImage);
         totalAmount += coin->amount();
     }
