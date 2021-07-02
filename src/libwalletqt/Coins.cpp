@@ -96,6 +96,13 @@ QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
     return coins;
 }
 
+void Coins::setDescription(int index, quint32 accountIndex, const QString &description)
+{
+    m_pimpl->setDescription(index, description.toStdString());
+    this->refresh(accountIndex);
+    emit descriptionChanged();
+}
+
 Coins::Coins(Monero::Coins *pimpl, QObject *parent)
         : QObject(parent)
         , m_pimpl(pimpl)

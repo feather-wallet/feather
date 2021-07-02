@@ -57,7 +57,12 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(m_thawAllSelectedAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
 
     connect(ui->coins, &QTreeView::customContextMenuRequested, this, &CoinsWidget::showContextMenu);
-    connect(ui->coins, &QTreeView::doubleClicked, this, &CoinsWidget::viewOutput);
+    connect(ui->coins, &QTreeView::doubleClicked, [this](QModelIndex index){
+       if (!m_model) return;
+       if (!(m_model->flags(index) & Qt::ItemIsEditable)) {
+           this->viewOutput();
+       }
+    });
 
     connect(ui->search, &QLineEdit::textChanged, this, &CoinsWidget::setSearchFilter);
 }
@@ -79,7 +84,7 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     }
 
     ui->coins->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->coins->header()->setSectionResizeMode(CoinsModel::AddressLabel, QHeaderView::Stretch);
+    ui->coins->header()->setSectionResizeMode(CoinsModel::Label, QHeaderView::Stretch);
     ui->coins->header()->setSortIndicator(CoinsModel::BlockHeight, Qt::DescendingOrder);
     ui->coins->setSortingEnabled(true);
 }
@@ -241,9 +246,13 @@ void CoinsWidget::copy(copyField field) {
         case Address:
             data = c->address();
             break;
-        case Label:
-            data = c->addressLabel();
+        case Label: {
+            if (!c->description().isEmpty())
+                data = c->description();
+            else
+                data = c->addressLabel();
             break;
+        }
         case Height:
             data = QString::number(c->blockHeight());
             break;

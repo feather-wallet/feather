@@ -104,6 +104,10 @@ bool CoinsInfo::coinbase() const {
     return m_coinbase;
 }
 
+QString CoinsInfo::description() const {
+    return m_description;
+}
+
 CoinsInfo::CoinsInfo(const Monero::CoinsInfo *pimpl, QObject *parent)
         : QObject(parent)
         , m_blockHeight(pimpl->blockHeight())
@@ -126,6 +130,7 @@ CoinsInfo::CoinsInfo(const Monero::CoinsInfo *pimpl, QObject *parent)
         , m_unlocked(pimpl->unlocked())
         , m_pubKey(QString::fromStdString(pimpl->pubKey()))
         , m_coinbase(pimpl->coinbase())
+        , m_description(QString::fromStdString(pimpl->description()))
 {
 
 }

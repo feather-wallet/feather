@@ -31,6 +31,7 @@ public:
     Q_INVOKABLE void freeze(int index) const;
     Q_INVOKABLE void thaw(int index) const;
     Q_INVOKABLE QVector<CoinsInfo*> coins_from_txid(const QString &txid);
+    Q_INVOKABLE void setDescription(int index, quint32 accountIndex, const QString &description);
 
     quint64 count() const;
 
@@ -39,6 +40,7 @@ signals:
     void refreshFinished() const;
     void coinFrozen() const;
     void coinThawed() const;
+    void descriptionChanged() const;
 
 private:
     explicit Coins(Monero::Coins * pimpl, QObject *parent = nullptr);

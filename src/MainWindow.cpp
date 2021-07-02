@@ -447,6 +447,16 @@ void MainWindow::onWalletOpened() {
     // coins page
     m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_coinsWidget->setModel(m_ctx->wallet->coinsModel(), m_ctx->wallet->coins());
+    m_ctx->wallet->coinsModel()->setCurrentSubaddressAccount(m_ctx->wallet->currentSubaddressAccount());
+
+    // Coin labeling uses set_tx_note, so we need to refresh history too
+    connect(m_ctx->wallet->coins(), &Coins::descriptionChanged, [this] {
+        m_ctx->wallet->history()->refresh(m_ctx->wallet->currentSubaddressAccount());
+    });
+    // Vice versa
+    connect(m_ctx->wallet->history(), &TransactionHistory::txNoteChanged, [this] {
+        m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
+    });
 
     this->updatePasswordIcon();
     this->updateTitle();
