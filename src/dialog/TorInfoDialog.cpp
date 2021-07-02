@@ -8,6 +8,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QRegularExpressionValidator>
 
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
@@ -36,6 +37,9 @@ TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     initConnectionSettings();
     initPrivacyLevel();
     onConnectionStatusChanged(torManager()->torConnected);
+
+    auto *portValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]")};
+    ui->line_port->setValidator(portValidator);
 
     connect(torManager(), &TorManager::connectionStateChanged, this, &TorInfoDialog::onConnectionStatusChanged);
     connect(torManager(), &TorManager::logsUpdated, this, &TorInfoDialog::onLogsUpdated);
