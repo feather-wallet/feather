@@ -61,7 +61,7 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
     QVariant result;
 
     bool found = m_coins->coin(index.row(), [this, &index, &result, &role](const CoinsInfo &cInfo) {
-        if(role == Qt::DisplayRole || role == Qt::UserRole) {
+        if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseTransactionInfo(cInfo, index.column(), role);
         }
         else if (role == Qt::BackgroundRole) {
@@ -118,6 +118,9 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             }
             else if (!cInfo.unlocked()) {
                 result = "Output is locked (needs more confirmations)";
+            }
+            else if (cInfo.spent()) {
+                result = "Output is spent";
             }
         }
     });

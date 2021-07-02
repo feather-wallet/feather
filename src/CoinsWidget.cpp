@@ -38,6 +38,9 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     // context menu
     ui->coins->setContextMenuPolicy(Qt::CustomContextMenu);
 
+    m_editLabelAction = new QAction("Edit Label", this);
+    connect(m_editLabelAction, &QAction::triggered, this, &CoinsWidget::editLabel);
+
     m_thawOutputAction = new QAction("Thaw output", this);
     m_freezeOutputAction = new QAction("Freeze output", this);
 
@@ -47,6 +50,7 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_viewOutputAction = new QAction(icons()->icon("info2.svg"), "Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
     m_sweepOutputsAction = new QAction("Sweep selected outputs", this);
+
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
@@ -116,6 +120,7 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
         bool isUnlocked = c->unlocked();
 
         menu->addMenu(m_copyMenu);
+        menu->addAction(m_editLabelAction);
 
         if (!isSpent) {
             isFrozen ? menu->addAction(m_thawOutputAction) : menu->addAction(m_freezeOutputAction);
@@ -301,6 +306,12 @@ void CoinsWidget::thawCoins(const QVector<int> &indexes) {
     }
     m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();
+}
+
+void CoinsWidget::editLabel() {
+    QModelIndex index = ui->coins->currentIndex().siblingAtColumn(m_model->ModelColumn::Label);
+    ui->coins->setCurrentIndex(index);
+    ui->coins->edit(index);
 }
 
 CoinsWidget::~CoinsWidget() = default;

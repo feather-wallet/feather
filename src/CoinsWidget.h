@@ -41,6 +41,7 @@ private slots:
     void onSweepOutput();
     void onSweepMulti();
     void setSearchFilter(const QString &filter);
+    void editLabel();
 
 private:
     void freezeCoins(const QVector<int>& indexes);
@@ -70,6 +71,7 @@ private:
     QAction *m_viewOutputAction;
     QAction *m_sweepOutputAction;
     QAction *m_sweepOutputsAction;
+    QAction *m_editLabelAction;
     Coins *m_coins;
     CoinsModel * m_model;
     CoinsProxyModel * m_proxyModel;
