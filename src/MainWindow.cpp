@@ -1121,13 +1121,17 @@ void MainWindow::onDeviceError(const QString &error) {
 void MainWindow::onDeviceButtonRequest(quint64 code) {
     if (m_ctx->wallet->isTrezor()) {
         switch (code) {
-            case 8: // Confirm refresh: Do you really want to start refresh?
+            case 8:
             {
-                if (m_constructingTransaction) { // This code is also used when signing a tx...
+                // Annoyingly, this code is used for a variety of actions, including:
+                // Confirm refresh: Do you really want to start refresh?
+                // Confirm export: Do you really want to export tx_key?
+
+                if (m_constructingTransaction) { // This code is also used when signing a tx, we handle this elsewhere
                     break;
                 }
 
-                m_splashDialog->setMessage("Confirm refresh on device to proceed.");
+                m_splashDialog->setMessage("Confirm action on device to proceed");
                 m_splashDialog->setIcon(QPixmap(":/assets/images/confirmed.png"));
                 m_splashDialog->show();
                 m_splashDialog->setEnabled(true);
