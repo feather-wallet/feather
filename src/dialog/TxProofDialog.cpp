@@ -18,7 +18,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     ui->setupUi(this);
 
     m_txid = txInfo->hash();
-    m_txKey = m_ctx->wallet->getTxKey(m_txid);
+
     m_direction = txInfo->direction();
 
     for (auto const &t: txInfo->transfers()) {
@@ -52,6 +52,14 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     ui->group_summary->hide(); // todo
 
     this->adjustSize();
+}
+
+void TxProofDialog::getTxKey() {
+    if (!m_txKey.isEmpty()) return;
+
+    m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
+        m_txKey = map.value("tx_key").toString();
+    });
 }
 
 void TxProofDialog::setTxId(const QString &txid) {

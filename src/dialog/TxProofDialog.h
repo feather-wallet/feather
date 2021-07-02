@@ -21,6 +21,7 @@ public:
     explicit TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txid);
     ~TxProofDialog() override;
     void setTxId(const QString &txid);
+    void getTxKey();
 
 private slots:
     void selectSpendProof();

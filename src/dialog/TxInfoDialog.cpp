@@ -20,17 +20,12 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     , ui(new Ui::TxInfoDialog)
     , m_ctx(std::move(ctx))
     , m_txInfo(txInfo)
+    , m_txProofDialog(new TxProofDialog(this, m_ctx, txInfo))
 {
     ui->setupUi(this);
 
     m_txid = txInfo->hash();
     ui->label_txid->setText(m_txid);
-
-    m_txKey = m_ctx->wallet->getTxKey(txInfo->hash());
-    if (m_txKey.isEmpty()) {
-        ui->btn_CopyTxKey->setEnabled(false);
-        ui->btn_CopyTxKey->setToolTip("Transaction key unknown");
-    }
 
     connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TxInfoDialog::copyTxKey);
     connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TxInfoDialog::createTxProof);
@@ -60,8 +55,6 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     if (txInfo->transfers().size() == 0) {
         ui->frameDestinations->hide();
     }
-
-    m_txProofDialog = new TxProofDialog(this, m_ctx, txInfo);
 
     QCoreApplication::processEvents();
 
@@ -125,11 +118,20 @@ void TxInfoDialog::updateData() {
 }
 
 void TxInfoDialog::copyTxKey() {
-    Utils::copyToClipboard(m_txKey);
+    m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
+        QString txKey = map.value("tx_key").toString();
+        if (txKey.isEmpty()) {
+            QMessageBox::warning(this, "Unable to copy transaction key", "Transaction key unknown");
+        } else {
+            Utils::copyToClipboard(txKey);
+            QMessageBox::information(this, "Transaction key copied", "Transaction key copied to clipboard.");
+        }
+    });
 }
 
 void TxInfoDialog::createTxProof() {
     m_txProofDialog->show();
+    m_txProofDialog->getTxKey();
 }
 
 TxInfoDialog::~TxInfoDialog() = default;

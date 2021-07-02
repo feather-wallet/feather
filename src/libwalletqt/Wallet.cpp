@@ -969,12 +969,14 @@ QString Wallet::getTxKey(const QString &txid) const
     return QString::fromStdString(m_walletImpl->getTxKey(txid.toStdString()));
 }
 
-//void Wallet::getTxKeyAsync(const QString &txid, const QJSValue &callback)
-//{
-//    m_scheduler.run([this, txid] {
-//        return QJSValueList({txid, getTxKey(txid)});
-//    }, callback);
-//}
+void Wallet::getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback)
+{
+    m_scheduler.run([this, txid] {
+        QVariantMap map;
+        map["tx_key"] = getTxKey(txid);
+        return map;
+    }, callback);
+}
 
 QString Wallet::checkTxKey(const QString &txid, const QString &tx_key, const QString &address)
 {

@@ -393,7 +393,8 @@ public:
     bool setUserNote(const QString &txid, const QString &note);
     QString getUserNote(const QString &txid) const;
     QString getTxKey(const QString &txid) const;
-    //void getTxKeyAsync(const QString &txid, const QJSValue &callback);
+    void getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback);
+
     QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
     TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
    // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);

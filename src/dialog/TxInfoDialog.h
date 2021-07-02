@@ -36,7 +36,6 @@ private:
     QSharedPointer<AppContext> m_ctx;
     TransactionInfo *m_txInfo;
     TxProofDialog *m_txProofDialog;
-    QString m_txKey;
     QString m_txid;
 };
 

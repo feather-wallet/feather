@@ -45,32 +45,27 @@ QPair<bool, QFuture<void>> FutureScheduler::run(std::function<void()> function) 
     });
 }
 
-//QPair<bool, QFuture<QJSValueList>> FutureScheduler::run(std::function<QJSValueList()> function, const QJSValue &callback)
-//{
-//    if (!callback.isCallable())
-//    {
-//        throw std::runtime_error("js callback must be callable");
-//    }
-
-//    return execute<QJSValueList>([this, function, callback](QFutureWatcher<QJSValueList> *watcher) {
-//        connect(watcher, &QFutureWatcher<QJSValueList>::finished, [watcher, callback] {
-//            QJSValue(callback).call(watcher->future().result());
-//        });
-//        return QtConcurrent::run([this, function] {
-//            QJSValueList result;
-//            try
-//            {
-//                result = function();
-//            }
-//            catch (const std::exception &exception)
-//            {
-//                qWarning() << "Exception thrown from async function: " << exception.what();
-//            }
-//            done();
-//            return result;
-//        });
-//    });
-//}
+QPair<bool, QFuture<QVariantMap>> FutureScheduler::run(const std::function<QVariantMap()> &function, const std::function<void (QVariantMap)> &callback) noexcept
+{
+    return execute<QVariantMap>([this, function, callback](QFutureWatcher<QVariantMap> *watcher) {
+        connect(watcher, &QFutureWatcher<QVariantMap>::finished, [watcher, callback] {
+            callback(watcher->future().result());
+        });
+        return QtConcurrent::run([this, function] {
+            QVariantMap result;
+            try
+            {
+                result = function();
+            }
+            catch (const std::exception &exception)
+            {
+                qWarning() << "Exception thrown from async function: " << exception.what();
+            }
+            done();
+            return result;
+        });
+    });
+}
 
 bool FutureScheduler::stopping() const noexcept
 {
