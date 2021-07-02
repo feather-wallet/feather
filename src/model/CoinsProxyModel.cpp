@@ -30,7 +30,8 @@ bool CoinsProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceP
 
     if (!m_searchRegExp.pattern().isEmpty()) {
         return coin->pubKey().contains(m_searchRegExp) || coin->address().contains(m_searchRegExp)
-                || coin->hash().contains(m_searchRegExp) || coin->addressLabel().contains(m_searchRegExp);
+                || coin->hash().contains(m_searchRegExp) || coin->addressLabel().contains(m_searchRegExp)
+                || coin->description().contains(m_searchRegExp);
     }
 
     return !(!m_showSpent && coin->spent()) && coin->subaddrAccount() == 0;
