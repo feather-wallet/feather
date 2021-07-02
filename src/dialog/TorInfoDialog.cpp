@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include <QPushButton>
 
+#include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 #include "utils/os/tails.h"
 #include "utils/TorManager.h"
@@ -139,9 +140,10 @@ void TorInfoDialog::initPrivacyLevel() {
         ui->frame_notice->hide();
     }
 
-    QPixmap iconNoTor(":/assets/images/securityLevelStandardWhite.png");
-    QPixmap iconNoSync(":/assets/images/securityLevelSaferWhite.png");
-    QPixmap iconAllTor(":/assets/images/securityLevelSafestWhite.png");
+    bool dark = ColorScheme::darkScheme;
+    QPixmap iconNoTor(dark ? ":/assets/images/securityLevelStandardWhite.png" : ":/assets/images/securityLevelStandard.png");
+    QPixmap iconNoSync(dark ? ":/assets/images/securityLevelSaferWhite.png" : ":/assets/images/securityLevelSafer.png");
+    QPixmap iconAllTor(dark ? ":/assets/images/securityLevelSafestWhite.png" : ":/assets/images/securityLevelSafest.png");
     ui->icon_noTor->setPixmap(iconNoTor.scaledToHeight(16, Qt::SmoothTransformation));
     ui->icon_noSync->setPixmap(iconNoSync.scaledToHeight(16, Qt::SmoothTransformation));
     ui->icon_allTor->setPixmap(iconAllTor.scaledToHeight(16, Qt::SmoothTransformation));
