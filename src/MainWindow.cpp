@@ -428,9 +428,7 @@ void MainWindow::onWalletOpened() {
     this->bringToFront();
     this->setEnabled(true);
     if (!torManager()->torConnected)
-        this->setStatusText("Wallet opened - Starting Tor (may take a while)");
-    else
-        this->setStatusText("Wallet opened - Searching for node");
+        this->setStatusText("Starting Tor (may take a while)");
 
     // receive page
     m_ctx->wallet->subaddress()->refresh(m_ctx->wallet->currentSubaddressAccount());
