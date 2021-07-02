@@ -61,8 +61,9 @@ void PageOpenWallet::updatePath() {
         return;
     }
 
-    m_walletFile = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Path), Qt::DisplayRole).toString();
-    ui->linePath->setText(m_walletFile);
+    m_walletFile = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Path), Qt::UserRole).toString();
+    QString path = index.model()->data(index.siblingAtColumn(WalletKeysFilesModel::Path), Qt::DisplayRole).toString();
+    ui->linePath->setText(path);
 }
 
 int PageOpenWallet::nextId() const {
