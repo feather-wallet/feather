@@ -2,7 +2,6 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include <QDir>
-#include <QMessageBox>
 
 #include "appcontext.h"
 #include "constants.h"
@@ -107,17 +106,6 @@ void AppContext::onCreateTransactionMultiDest(const QVector<QString> &addresses,
 
     qInfo() << "Creating transaction";
     this->wallet->createTransactionMultiDestAsync(addresses, amounts, this->tx_priority);
-
-    emit initiateTransaction();
-}
-
-void AppContext::onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs) {
-    if (churn) {
-        address = this->wallet->address(0, 0); // primary address
-    }
-
-    qInfo() << "Creating transaction";
-    this->wallet->createTransactionSingleAsync(keyImage, address, outputs, this->tx_priority);
 
     emit initiateTransaction();
 }
