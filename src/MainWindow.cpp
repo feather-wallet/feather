@@ -18,6 +18,7 @@
 #include "dialog/TxConfAdvDialog.h"
 #include "dialog/TxConfDialog.h"
 #include "dialog/TxImportDialog.h"
+#include "dialog/TxInfoDialog.h"
 #include "dialog/ViewOnlyDialog.h"
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
@@ -629,8 +630,22 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
 
 void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid) {
     if (status) { // success
+        QMessageBox msgBox{this};
+        QPushButton *showDetailsButton = msgBox.addButton("Show details", QMessageBox::ActionRole);
+        msgBox.addButton(QMessageBox::Ok);
         QString body = QString("Successfully sent %1 transaction(s).").arg(txid.count());
-        QMessageBox::information(this, "Transactions sent", body);
+        msgBox.setText(body);
+        msgBox.setWindowTitle("Transaction sent");
+        msgBox.setIcon(QMessageBox::Icon::Information);
+        msgBox.exec();
+        if (msgBox.clickedButton() == showDetailsButton) {
+            this->showHistoryTab();
+            TransactionInfo *txInfo = m_ctx->wallet->history()->transaction(txid.first());
+            TxInfoDialog dialog{m_ctx, txInfo, this};
+            connect(&dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
+            dialog.exec();
+        }
+
         m_sendWidget->clearFields();
     } else {
         auto err = tx->errorString();
@@ -845,7 +860,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         m_txTimer.stop();
 
         this->saveGeo();
-        m_ctx->stopTimers();
         m_windowManager->closeWindow(this);
     }
 
