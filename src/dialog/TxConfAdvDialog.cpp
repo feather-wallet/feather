@@ -154,9 +154,8 @@ void TxConfAdvDialog::unsignedQrCode() {
     }
 
     QrCode qr(m_tx->unsignedTxToBin(), QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::LOW);
-    auto *dialog = new QrCodeDialog(this, qr, "Unsigned Transaction");
-    dialog->exec();
-    dialog->deleteLater();
+    QrCodeDialog dialog{this, &qr, "Unsigned Transaction"};
+    dialog.exec();
 }
 
 void TxConfAdvDialog::unsignedCopy() {

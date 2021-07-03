@@ -165,3 +165,19 @@ QPixmap QrCode::toPixmap(const int margin) const
 
     return pixmap;
 }
+
+int QrCode::width() {
+    if (!isValid()) {
+        return 0;
+    }
+
+    return d_ptr->m_qrcode->width;
+}
+
+unsigned char* QrCode::data() {
+    if (!isValid()) {
+        return nullptr;
+    }
+
+    return d_ptr->m_qrcode->data;
+}

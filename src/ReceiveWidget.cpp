@@ -209,9 +209,8 @@ void ReceiveWidget::showQrCodeDialog() {
     }
     QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
     QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
-    auto *dialog = new QrCodeDialog(this, qr, "Address");
-    dialog->exec();
-    dialog->deleteLater();
+    QrCodeDialog dialog{this, &qr, "Address"};
+    dialog.exec();
 }
 
 QStringList ReceiveWidget::getHiddenAddresses() {

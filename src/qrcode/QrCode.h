@@ -71,6 +71,9 @@ public:
     void writeSvg(QIODevice* outputDevice, const int dpi, const int margin = 4) const;
     QPixmap toPixmap(const int margin = 4) const;
 
+    int width();
+    unsigned char* data();
+
 private:
     void init(const QString& data, const Version version, const ErrorCorrectionLevel ecl, const bool caseSensitive);
 

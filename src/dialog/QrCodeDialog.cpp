@@ -8,15 +8,16 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-QrCodeDialog::QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString &title)
+QrCodeDialog::QrCodeDialog(QWidget *parent, QrCode *qrCode, const QString &title)
         : QDialog(parent)
         , ui(new Ui::QrCodeDialog)
 {
     ui->setupUi(this);
     this->setWindowTitle(title);
 
-    m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
-    ui->QrCode->setPixmap(m_pixmap);
+    ui->qrWidget->setQrCode(qrCode);
+
+    m_pixmap = qrCode->toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
 
     connect(ui->btn_CopyImage, &QPushButton::clicked, this, &QrCodeDialog::copyImage);
     connect(ui->btn_Save, &QPushButton::clicked, this, &QrCodeDialog::saveImage);
@@ -24,12 +25,7 @@ QrCodeDialog::QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString 
         accept();
     });
 
-    this->adjustSize();
-}
-
-void QrCodeDialog::setQrCode(const QrCode &qrCode) {
-    m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
-    ui->QrCode->setPixmap(m_pixmap);
+    this->resize(500, 500);
 }
 
 void QrCodeDialog::copyImage() {

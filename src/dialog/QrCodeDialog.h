@@ -7,6 +7,7 @@
 #include <QDialog>
 
 #include "qrcode/QrCode.h"
+#include "widgets/QrCodeWidget.h"
 
 namespace Ui {
     class QrCodeDialog;
@@ -17,9 +18,8 @@ class QrCodeDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit QrCodeDialog(QWidget *parent, const QrCode &qrCode, const QString &title = "Qr Code");
+    explicit QrCodeDialog(QWidget *parent, QrCode *qrCode, const QString &title = "Qr Code");
     ~QrCodeDialog() override;
-    void setQrCode(const QrCode &qrCode);
 
 private:
     void copyImage();
@@ -28,6 +28,5 @@ private:
     QScopedPointer<Ui::QrCodeDialog> ui;
     QPixmap m_pixmap;
 };
-
 
 #endif //FEATHER_QRCODEDIALOG_H
