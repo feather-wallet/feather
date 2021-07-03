@@ -45,7 +45,7 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
        m_ctx->wallet->subaddressAccount()->refresh();
     });
 
-    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
+    connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
     connect(m_ctx->wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
 
     this->updateSelection();

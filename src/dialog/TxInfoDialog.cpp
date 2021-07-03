@@ -30,7 +30,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TxInfoDialog::copyTxKey);
     connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TxInfoDialog::createTxProof);
 
-    connect(m_ctx->wallet.get(), &Wallet::newBlock, this, &TxInfoDialog::updateData);
+    connect(m_ctx->wallet, &Wallet::newBlock, this, &TxInfoDialog::updateData);
 
     this->setData(txInfo);
 

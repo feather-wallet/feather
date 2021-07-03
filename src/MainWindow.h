@@ -179,6 +179,8 @@ private slots:
     void onSetStatusText(const QString &text);
 
 private:
+    friend WindowManager;
+
     void initStatusBar();
     void initWidgets();
     void initMenu();

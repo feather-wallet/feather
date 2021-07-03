@@ -77,6 +77,8 @@ private:
     bool m_openWalletTriedOnce = false;
     bool m_openingWallet = false;
     bool m_initialNetworkConfigured = false;
+
+    QThread *m_cleanupThread;
 };
 
 

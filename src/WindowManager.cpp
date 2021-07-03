@@ -17,6 +17,7 @@
 WindowManager::WindowManager() {
     m_walletManager = WalletManager::instance();
     m_splashDialog = new SplashDialog;
+    m_cleanupThread = new QThread();
 
     connect(m_walletManager, &WalletManager::walletOpened,        this, &WindowManager::onWalletOpened);
     connect(m_walletManager, &WalletManager::walletCreated,       this, &WindowManager::onWalletCreated);
@@ -68,6 +69,11 @@ void WindowManager::close() {
 
 void WindowManager::closeWindow(MainWindow *window) {
     m_windows.removeOne(window);
+
+    // Move Wallet to a different thread for cleanup so it doesn't block GUI thread
+    window->m_ctx->wallet->moveToThread(m_cleanupThread);
+    m_cleanupThread->start();
+    window->m_ctx->wallet->deleteLater();
 }
 
 void WindowManager::restartApplication(const QString &binaryFilename) {

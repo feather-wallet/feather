@@ -25,7 +25,7 @@ Q_OBJECT
 public:
     explicit AppContext(Wallet *wallet);
 
-    QScopedPointer<Wallet> wallet;
+    Wallet *wallet;
     Nodes *nodes;
 
     bool donationSending = false;
@@ -45,6 +45,8 @@ public:
     void refreshModels();
 
     void storeWallet();
+
+    void stopTimers();
 
 public slots:
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);

@@ -368,8 +368,8 @@ void MainWindow::initWalletContext() {
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
 
     // Wallet
-    connect(m_ctx->wallet.get(), &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
-    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
+    connect(m_ctx->wallet, &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
+    connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -714,7 +714,7 @@ void MainWindow::showConnectionStatusDialog() {
 }
 
 void MainWindow::showPasswordDialog() {
-    PasswordChangeDialog dialog{this, m_ctx->wallet.get()};
+    PasswordChangeDialog dialog{this, m_ctx->wallet};
     dialog.exec();
     this->updatePasswordIcon();
 }
@@ -790,12 +790,12 @@ void MainWindow::menuSettingsClicked() {
 }
 
 void MainWindow::menuSignVerifyClicked() {
-    SignVerifyDialog dialog{m_ctx->wallet.get(), this};
+    SignVerifyDialog dialog{m_ctx->wallet, this};
     dialog.exec();
 }
 
 void MainWindow::menuVerifyTxProof() {
-    VerifyProofDialog dialog{m_ctx->wallet.get(), this};
+    VerifyProofDialog dialog{m_ctx->wallet, this};
     dialog.exec();
 }
 
@@ -845,6 +845,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         m_txTimer.stop();
 
         this->saveGeo();
+        m_ctx->stopTimers();
         m_windowManager->closeWindow(this);
     }
 
@@ -1175,7 +1176,7 @@ void MainWindow::rescanSpent() {
 }
 
 void MainWindow::showBalanceDialog() {
-    BalanceDialog dialog{this, m_ctx->wallet.get()};
+    BalanceDialog dialog{this, m_ctx->wallet};
     dialog.exec();
 }
 

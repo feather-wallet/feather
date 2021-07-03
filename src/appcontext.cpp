@@ -27,22 +27,22 @@ AppContext::AppContext(Wallet *wallet)
     , networkType(constants::networkType)
     , m_rpc(new DaemonRpc{this, getNetworkTor(), ""})
 {
-    connect(this->wallet.get(), &Wallet::moneySpent,               this, &AppContext::onMoneySpent);
-    connect(this->wallet.get(), &Wallet::moneyReceived,            this, &AppContext::onMoneyReceived);
-    connect(this->wallet.get(), &Wallet::unconfirmedMoneyReceived, this, &AppContext::onUnconfirmedMoneyReceived);
-    connect(this->wallet.get(), &Wallet::newBlock,                 this, &AppContext::onWalletNewBlock);
-    connect(this->wallet.get(), &Wallet::updated,                  this, &AppContext::onWalletUpdate);
-    connect(this->wallet.get(), &Wallet::refreshed,                this, &AppContext::onWalletRefreshed);
-    connect(this->wallet.get(), &Wallet::transactionCommitted,     this, &AppContext::onTransactionCommitted);
-    connect(this->wallet.get(), &Wallet::heightRefreshed,          this, &AppContext::onHeightRefreshed);
-    connect(this->wallet.get(), &Wallet::transactionCreated,       this, &AppContext::onTransactionCreated);
-    connect(this->wallet.get(), &Wallet::deviceError,              this, &AppContext::onDeviceError);
-    connect(this->wallet.get(), &Wallet::deviceButtonRequest,      this, &AppContext::onDeviceButtonRequest);
-    connect(this->wallet.get(), &Wallet::deviceButtonPressed,      this, &AppContext::onDeviceButtonPressed);
-    connect(this->wallet.get(), &Wallet::connectionStatusChanged, [this]{
+    connect(this->wallet, &Wallet::moneySpent,               this, &AppContext::onMoneySpent);
+    connect(this->wallet, &Wallet::moneyReceived,            this, &AppContext::onMoneyReceived);
+    connect(this->wallet, &Wallet::unconfirmedMoneyReceived, this, &AppContext::onUnconfirmedMoneyReceived);
+    connect(this->wallet, &Wallet::newBlock,                 this, &AppContext::onWalletNewBlock);
+    connect(this->wallet, &Wallet::updated,                  this, &AppContext::onWalletUpdate);
+    connect(this->wallet, &Wallet::refreshed,                this, &AppContext::onWalletRefreshed);
+    connect(this->wallet, &Wallet::transactionCommitted,     this, &AppContext::onTransactionCommitted);
+    connect(this->wallet, &Wallet::heightRefreshed,          this, &AppContext::onHeightRefreshed);
+    connect(this->wallet, &Wallet::transactionCreated,       this, &AppContext::onTransactionCreated);
+    connect(this->wallet, &Wallet::deviceError,              this, &AppContext::onDeviceError);
+    connect(this->wallet, &Wallet::deviceButtonRequest,      this, &AppContext::onDeviceButtonRequest);
+    connect(this->wallet, &Wallet::deviceButtonPressed,      this, &AppContext::onDeviceButtonPressed);
+    connect(this->wallet, &Wallet::connectionStatusChanged, [this]{
         this->nodes->autoConnect();
     });
-    connect(this->wallet.get(), &Wallet::currentSubaddressAccountChanged, [this]{
+    connect(this->wallet, &Wallet::currentSubaddressAccountChanged, [this]{
         this->updateBalance();
     });
 
@@ -271,6 +271,10 @@ void AppContext::onOpenAliasResolve(const QString &openAlias) {
         msg += QString(" Perhaps it is of the wrong network type."
                        "\n\nOpenAlias: %1\nAddress: %2").arg(openAlias).arg(address);
     emit openAliasResolveError(msg);
+}
+
+void AppContext::stopTimers() {
+    m_storeTimer.stop();
 }
 
 // ########################################## LIBWALLET QT SIGNALS ####################################################
