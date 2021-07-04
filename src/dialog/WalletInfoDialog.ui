@@ -85,14 +85,31 @@
       </widget>
      </item>
      <item row="4" column="0">
-      <widget class="QLabel" name="label_5">
+      <widget class="HelpLabel" name="label_keysFileLabel">
        <property name="text">
-        <string>Path:</string>
+        <string>Keys file:</string>
        </property>
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QLabel" name="label_path">
+      <widget class="QLabel" name="label_keysFile">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLabel" name="label_6">
+       <property name="text">
+        <string>Cache size:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <widget class="QLabel" name="label_cacheSize">
        <property name="text">
         <string>TextLabel</string>
        </property>
@@ -102,19 +119,16 @@
       </widget>
      </item>
      <item row="5" column="0">
-      <widget class="QLabel" name="label_6">
+      <widget class="HelpLabel" name="label_cacheFileLabel">
        <property name="text">
-        <string>Cache size:</string>
+        <string>Cache file:</string>
        </property>
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QLabel" name="label_cacheSize">
+      <widget class="QLabel" name="label_cacheFile">
        <property name="text">
         <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
        </property>
       </widget>
      </item>
@@ -143,6 +157,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>HelpLabel</class>
+   <extends>QLabel</extends>
+   <header>components.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
