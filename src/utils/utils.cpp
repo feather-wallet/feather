@@ -10,12 +10,13 @@
 #include <QtWidgets/QStyle>
 #include <QPushButton>
 
+#include "constants.h"
+#include "networktype.h"
 #include "utils.h"
+#include "utils/ColorScheme.h"
 #include "utils/config.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "utils/ColorScheme.h"
-#include "constants.h"
 
 QByteArray Utils::fileGetContents(const QString &path)
 {
@@ -506,4 +507,16 @@ QString Utils::defaultWalletDir() {
 #elif defined(Q_OS_WIN)
     return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/Monero/wallets";
 #endif
+}
+
+quint16 Utils::getDefaultRpcPort(NetworkType::Type type) {
+    switch (type) {
+        case NetworkType::Type::MAINNET:
+            return 18081;
+        case NetworkType::Type::TESTNET:
+            return 28081;
+        case NetworkType::Type::STAGENET:
+            return 38081;
+    }
+    return 18081;
 }

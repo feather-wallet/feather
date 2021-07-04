@@ -26,7 +26,13 @@ public:
     bool isComplete() const override;
 
 private:
+    enum Button {
+        AUTO=0,
+        CUSTOM
+    };
+
     Ui::PageNetwork *ui;
+    QFutureWatcher<QPair<bool, QString>> *m_portOpenWatcher;
 };
 
 #endif //FEATHER_WIZARDNETWORK_H

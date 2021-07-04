@@ -78,6 +78,7 @@ public:
     static QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount);
     static bool isTorsocks();
     static QString defaultWalletDir();
+    static quint16 getDefaultRpcPort(NetworkType::Type type);
 
     template<typename QEnum>
     static QString QtEnumToString (const QEnum value)
