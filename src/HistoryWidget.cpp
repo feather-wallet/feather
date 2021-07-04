@@ -83,7 +83,7 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     if (!tx) return;
 
     bool unconfirmed = tx->isFailed() || tx->isPending();
-    if (m_ctx->txCache.contains(tx->hash()) && unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
+    if (unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
         menu.addAction(icons()->icon("info2.svg"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 

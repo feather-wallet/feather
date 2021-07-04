@@ -77,7 +77,7 @@ TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *t
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
-    m_ctx->txCache[tx->txid()[0]] = tx->signedTxToHex(0);
+    m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0)); // Todo: Iterate over all txs
     this->adjustSize();
 }
 

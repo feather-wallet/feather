@@ -909,7 +909,8 @@ void MainWindow::onViewOnBlockExplorer(const QString &txid) {
 }
 
 void MainWindow::onResendTransaction(const QString &txid) {
-    if (!m_ctx->txCache.contains(txid)) {
+    QString txHex = m_ctx->getCacheTransaction(txid);
+    if (txHex.isEmpty()) {
         QMessageBox::warning(this, "Unable to resend transaction", "Transaction was not found in transaction cache. Unable to resend.");
         return;
     }
@@ -917,7 +918,7 @@ void MainWindow::onResendTransaction(const QString &txid) {
     // Connect to a different node so chances of successful relay are higher
     m_ctx->nodes->autoConnect(true);
 
-    TxBroadcastDialog dialog{this, m_ctx, m_ctx->txCache[txid]};
+    TxBroadcastDialog dialog{this, m_ctx, txHex};
     dialog.exec();
 }
 

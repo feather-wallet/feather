@@ -34,7 +34,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
 
     this->setData(txInfo);
 
-    if (m_ctx->txCache.contains(txInfo->hash()) && (txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionInfo::Direction_In) {
+    if ((txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionInfo::Direction_In) {
         connect(ui->btn_rebroadcastTx, &QPushButton::pressed, [this]{
             emit resendTranscation(m_txid);
         });

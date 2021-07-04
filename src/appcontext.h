@@ -34,7 +34,6 @@ public:
 
     NetworkType::Type networkType;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
-    QMap<QString, QString> txCache;
 
     // libwalletqt
     bool refreshed = false;
@@ -47,6 +46,9 @@ public:
     void storeWallet();
 
     void stopTimers();
+
+    void addCacheTransaction(const QString &txid, const QString &txHex) const;
+    QString getCacheTransaction(const QString &txid) const;
 
 public slots:
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);

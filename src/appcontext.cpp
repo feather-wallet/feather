@@ -158,6 +158,15 @@ void AppContext::onMultiBroadcast(PendingTransaction *tx) {
     }
 }
 
+void AppContext::addCacheTransaction(const QString &txid, const QString &txHex) const {
+    this->wallet->setCacheAttribute(QString("tx:%1").arg(txid), txHex);
+}
+
+QString AppContext::getCacheTransaction(const QString &txid) const {
+    QString txHex = this->wallet->getCacheAttribute(QString("tx:%1").arg(txid));
+    return txHex;
+}
+
 // ################## Models ##################
 
 void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
