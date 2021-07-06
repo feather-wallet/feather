@@ -34,7 +34,9 @@
     ]
   },
   "stagenet": {
-    "tor": [],
+    "tor": [
+      "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081"
+    ],
     "clearnet": [
       "super.fast.node.xmr.pm:38089",
       "stagenet.melo.tools:38081"
