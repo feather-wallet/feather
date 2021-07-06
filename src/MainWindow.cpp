@@ -1187,21 +1187,14 @@ void MainWindow::onDeviceButtonPressed() {
 }
 
 void MainWindow::updateNetStats() {
-    if (m_ctx->wallet == nullptr) {
-        m_statusLabelNetStats->setText("");
-        return;
-    }
-    if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected) {
-        m_statusLabelNetStats->setText("");
-        return;
-    }
-
-    if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Synchronized) {
-        m_statusLabelNetStats->setText("");
+    if (!m_ctx->wallet || m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected
+                       || m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Synchronized)
+    {
+        m_statusLabelNetStats->hide();
         return;
     }
 
-
+    m_statusLabelNetStats->show();
     m_statusLabelNetStats->setText(QString("(D: %1)").arg(Utils::formatBytes(m_ctx->wallet->getBytesReceived())));
 }
 
