@@ -4,7 +4,7 @@
 #include "WebsocketClient.h"
 
 #include <QCoreApplication>
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)

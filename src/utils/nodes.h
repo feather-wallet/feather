@@ -12,7 +12,7 @@
 #include <QNetworkReply>
 
 #include "model/NodeModel.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/config.h"
 
 enum NodeSource {
@@ -106,6 +106,7 @@ struct FeatherNode {
     }
 };
 
+class AppContext;
 class Nodes : public QObject {
     Q_OBJECT
 

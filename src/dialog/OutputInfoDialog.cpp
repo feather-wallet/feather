@@ -5,7 +5,7 @@
 #include "ui_OutputInfoDialog.h"
 
 #include "model/ModelUtils.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
         : QDialog(parent)

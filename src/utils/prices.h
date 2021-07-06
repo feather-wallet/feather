@@ -6,7 +6,7 @@
 
 #include <QObject>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 struct marketStruct {
     QString symbol;

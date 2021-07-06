@@ -7,7 +7,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "constants.h"
-#include "utils.h"
+#include "Utils.h"
 #include "WalletWizard.h"
 
 PageNetwork::PageNetwork(QWidget *parent)

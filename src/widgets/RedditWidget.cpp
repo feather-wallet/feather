@@ -9,7 +9,7 @@
 #include <QTableWidget>
 
 #include "model/RedditModel.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/config.h"
 
 RedditWidget::RedditWidget(QWidget *parent)

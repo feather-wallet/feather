@@ -2,7 +2,7 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "WebsocketNotifier.h"
-#include "utils.h"
+#include "Utils.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
 

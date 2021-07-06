@@ -6,7 +6,7 @@
 
 #include <QMessageBox>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 SignVerifyDialog::SignVerifyDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)

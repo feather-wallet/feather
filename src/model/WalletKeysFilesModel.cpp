@@ -3,7 +3,7 @@
 
 #include "WalletKeysFilesModel.h"
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include <QDir>
 #include <QDateTime>
 #include "config.h"

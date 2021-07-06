@@ -5,7 +5,7 @@
 #include "PageWalletFile.h"
 #include "ui_PageWalletFile.h"
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include <QFileDialog>
 #include <QMessageBox>

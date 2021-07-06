@@ -8,7 +8,7 @@
 #include <QWizardPage>
 #include <QWidget>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 namespace Ui {
     class PageWalletSeed;

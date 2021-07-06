@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include "WalletWizard.h"
 #include "PageMenu.h"

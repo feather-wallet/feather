@@ -8,7 +8,7 @@
 
 #include "libwalletqt/Transfer.h"
 #include "utils/Icons.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
     : QDialog(parent)

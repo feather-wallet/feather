@@ -4,7 +4,7 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "config.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/os/tails.h"
 
 #define QS QStringLiteral

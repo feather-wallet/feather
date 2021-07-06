@@ -10,7 +10,7 @@
 #include "utils/networking.h"
 #include "utils/NetworkManager.h"
 #include "utils/Updater.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include "zip.h"
 

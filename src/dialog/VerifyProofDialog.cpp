@@ -8,7 +8,7 @@
 
 #include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
         : QDialog(parent)

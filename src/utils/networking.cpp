@@ -4,7 +4,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/networking.h"
 
 UtilsNetworking::UtilsNetworking(QNetworkAccessManager *networkAccessManager, QObject *parent) :

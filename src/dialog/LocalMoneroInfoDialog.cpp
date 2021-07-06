@@ -5,7 +5,7 @@
 #include "ui_LocalMoneroInfoDialog.h"
 
 #include "utils/config.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 LocalMoneroInfoDialog::LocalMoneroInfoDialog(QWidget *parent, LocalMoneroModel *model, int row)
         : QDialog(parent)

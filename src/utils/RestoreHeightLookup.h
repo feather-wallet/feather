@@ -10,7 +10,7 @@
 #include <monero_seed/monero_seed.hpp>
 
 #include "networktype.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 struct RestoreHeightLookup {
     NetworkType::Type type;

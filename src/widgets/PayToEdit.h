@@ -8,7 +8,7 @@
 #include <QObject>
 #include <QPlainTextEdit>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 struct PartialTxOutput {
     explicit PartialTxOutput(QString address = "", quint64 amount = 0)
