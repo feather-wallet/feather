@@ -94,7 +94,51 @@
     </spacer>
    </item>
    <item>
-    <widget class="QFrame" name="frameDestinations">
+    <widget class="QFrame" name="frameInputs">
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_inputs">
+        <property name="text">
+         <string>Inputs:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTextEdit" name="inputs">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frameOutputs">
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
@@ -115,7 +159,7 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_destinations">
+       <widget class="QLabel" name="label_outputs">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
           <horstretch>0</horstretch>
@@ -128,7 +172,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QTextEdit" name="destinations">
+       <widget class="QTextEdit" name="outputs">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
           <horstretch>0</horstretch>

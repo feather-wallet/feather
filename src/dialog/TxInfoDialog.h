@@ -6,6 +6,7 @@
 
 #include <QDialog>
 #include <QTextCharFormat>
+#include <QTextEdit>
 #include <QtSvg/QSvgWidget>
 
 #include "appcontext.h"
@@ -31,6 +32,7 @@ private:
     void createTxProof();
     void setData(TransactionInfo *tx);
     void updateData();
+    void adjustHeight(QTextEdit *textEdit, qreal docHeight);
 
     QScopedPointer<Ui::TxInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;

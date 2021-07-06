@@ -9,6 +9,8 @@
 
 #include "appcontext.h"
 #include "config.h"
+#include "libwalletqt/Coins.h"
+#include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/TransactionHistory.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/WalletManager.h"
@@ -42,31 +44,52 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
         ui->btn_rebroadcastTx->hide();
     }
 
-    QTextCursor cursor = ui->destinations->textCursor();
-    for (const auto& transfer : txInfo->transfers()) {
-        auto address = transfer->address();
-        auto amount = WalletManager::displayAmount(transfer->amount());
-        auto index = m_ctx->wallet->subaddressIndex(address);
-        cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
-        cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
-        cursor.insertBlock();
+    if (txInfo->direction() == TransactionInfo::Direction_Out) {
+        // TODO: this will not properly represent coinjoin-like transactions.
+        QVector<CoinsInfo*> coins = m_ctx->wallet->coins()->coins_from_txid(m_txid);
+        QTextCursor c_i = ui->inputs->textCursor();
+        QString inputs_str;
+        for (const auto &coin : coins) {
+            inputs_str += QString("%1 %2\n").arg(coin->pubKey(), coin->displayAmount());
+        }
+        ui->inputs->setText(inputs_str);
+        ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(coins.size())));
+        this->adjustHeight(ui->inputs, coins.size());
+    } else {
+        ui->frameInputs->hide();
     }
 
-    if (txInfo->transfers().size() == 0) {
-        ui->frameDestinations->hide();
+    QTextCursor cursor = ui->outputs->textCursor();
+
+    auto transfers = txInfo->transfers();
+    if (!transfers.isEmpty()) {
+        for (const auto& transfer : transfers) {
+            auto address = transfer->address();
+            auto amount = WalletManager::displayAmount(transfer->amount());
+            auto index = m_ctx->wallet->subaddressIndex(address);
+            cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
+            cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
+            cursor.insertBlock();
+        }
+        ui->label_outputs->setText(QString("Destinations (%2)").arg(QString::number(transfers.size())));
+        this->adjustHeight(ui->outputs, transfers.size());
+    } else {
+        ui->frameOutputs->hide();
     }
-
-    QCoreApplication::processEvents();
-
-    qreal lineHeight = QFontMetrics(ui->destinations->document()->defaultFont()).height();
-    qreal docHeight = txInfo->transfers().size();
-    int h = int(docHeight * (lineHeight + 2) + 11);
-    h = qMin(qMax(h, 100), 600);
-    ui->destinations->setMinimumHeight(h);
-    ui->destinations->setMaximumHeight(h);
-    ui->destinations->verticalScrollBar()->hide();
 
     this->adjustSize();
+}
+
+void TxInfoDialog::adjustHeight(QTextEdit *textEdit, qreal docHeight) {
+    QCoreApplication::processEvents();
+
+    qreal lineHeight = QFontMetrics(ui->outputs->document()->defaultFont()).height();
+
+    int h = int(docHeight * (lineHeight + 2) + 11);
+    h = qMin(qMax(h, 100), 600);
+    textEdit->setMinimumHeight(h);
+    textEdit->setMaximumHeight(h);
+    textEdit->verticalScrollBar()->hide();
 }
 
 void TxInfoDialog::setData(TransactionInfo *tx) {
