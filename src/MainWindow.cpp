@@ -5,6 +5,7 @@
 #include "ui_MainWindow.h"
 
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 
 #include "config-feather.h"
@@ -305,6 +306,7 @@ void MainWindow::initMenu() {
     connect(ui->actionLoadSignedTxFromText,        &QAction::triggered, this, &MainWindow::loadSignedTxFromText);
     connect(ui->actionImport_transaction,          &QAction::triggered, this, &MainWindow::importTransaction);
     connect(ui->actionPay_to_many,                 &QAction::triggered, this, &MainWindow::payToMany);
+    connect(ui->actionAddress_checker,             &QAction::triggered, this, &MainWindow::showAddressChecker);
     connect(ui->actionCalculator,                  &QAction::triggered, this, &MainWindow::showCalcWindow);
     connect(ui->actionCreateDesktopEntry,          &QAction::triggered, this, &MainWindow::onCreateDesktopEntry);
 
@@ -965,6 +967,27 @@ void MainWindow::showWalletCacheDebugDialog() {
 void MainWindow::showAccountSwitcherDialog() {
     AccountSwitcherDialog dialog{m_ctx, this};
     dialog.exec();
+}
+
+void MainWindow::showAddressChecker() {
+    QString address = QInputDialog::getText(this, "Address Checker", "Address:                                      ");
+    if (address.isEmpty()) {
+        return;
+    }
+
+    if (!WalletManager::addressValid(address, constants::networkType)) {
+        QMessageBox::warning(this, "Address Checker", "Invalid address.");
+        return;
+    }
+
+    SubaddressIndex index = m_ctx->wallet->subaddressIndex(address);
+    if (!index.isValid()) {
+        // TODO: probably mention lookahead here
+        QMessageBox::warning(this, "Address Checker", "This address does not belong to this wallet.");
+        return;
+    } else {
+        QMessageBox::information(this, "Address Checker", QString("This address belongs to Account #%1").arg(index.major));
+    }
 }
 
 void MainWindow::showNodeExhaustedMessage() {

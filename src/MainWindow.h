@@ -155,6 +155,7 @@ private slots:
     void showViewOnlyDialog();
     void showWalletCacheDebugDialog();
     void showAccountSwitcherDialog();
+    void showAddressChecker();
 
     void donateButtonClicked();
     void showCalcWindow();
