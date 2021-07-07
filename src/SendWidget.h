@@ -44,6 +44,9 @@ public slots:
     void onInitiateTransaction();
     void onEndTransaction();
 
+private slots:
+    void onDataPasted(const QString &data);
+
 private:
     void setupComboBox();
     double amountDouble();

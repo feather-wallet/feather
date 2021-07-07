@@ -41,6 +41,7 @@ SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->lineAmount, &QLineEdit::textChanged, this, &SendWidget::amountEdited);
     connect(ui->lineAddress, &QPlainTextEdit::textChanged, this, &SendWidget::addressEdited);
     connect(ui->btn_openAlias, &QPushButton::clicked, this, &SendWidget::aliasClicked);
+    connect(ui->lineAddress, &PayToEdit::dataPasted, this, &SendWidget::onDataPasted);
     ui->label_conversionAmount->setText("");
     ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
@@ -272,6 +273,25 @@ void SendWidget::onInitiateTransaction() {
 
 void SendWidget::onEndTransaction() {
     ui->btnSend->setEnabled(true);
+}
+
+void SendWidget::onDataPasted(const QString &data) {
+    if (!data.isEmpty()) {
+        QVariantMap uriData = m_ctx->wallet->parse_uri_to_object(data);
+        if (!uriData.contains("error")) {
+            if (uriData.contains("address"))
+                ui->lineAddress->setText(uriData.value("address").toString());
+            if (uriData.contains("amount"))
+                ui->lineAmount->setText(uriData.value("amount").toString());
+            if (uriData.contains("tx_description"))
+                ui->lineDescription->setText(uriData.value("tx_description").toString());
+        } else {
+            ui->lineAddress->setText(data);
+        }
+    }
+    else {
+        QMessageBox::warning(this, "Error", "No Qr Code found.");
+    }
 }
 
 void SendWidget::setupComboBox() {

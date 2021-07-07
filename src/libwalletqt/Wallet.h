@@ -76,9 +76,9 @@ class Wallet : public QObject, public PassprasePrompter
 Q_OBJECT
 
 public:
-    Wallet(QObject * parent = nullptr);
-    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
-    ~Wallet();
+    explicit Wallet(QObject *parent = nullptr);
+    explicit Wallet(Monero::Wallet *w, QObject * parent = nullptr);
+    ~Wallet() override;
 
     enum Status {
         Status_Ok          = Monero::Wallet::Status_Ok,
@@ -384,7 +384,8 @@ public:
     bool verifySignedMessage(const QString &message, const QString &address, const QString &signature, bool filename = false) const;
 
     //! Parse URI
-    bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error);
+    bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
+    QVariantMap parse_uri_to_object(const QString &uri) const;
 
     //! Namespace your cacheAttribute keys to avoid collisions
     bool setCacheAttribute(const QString &key, const QString &val);

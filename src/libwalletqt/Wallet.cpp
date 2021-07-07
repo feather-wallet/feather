@@ -1102,7 +1102,8 @@ bool Wallet::verifySignedMessage(const QString &message, const QString &address,
     return m_walletImpl->verifySignedMessage(message.toStdString(), address.toStdString(), signature.toStdString());
   }
 }
-bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error)
+
+bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const
 {
    std::string s_address, s_payment_id, s_tx_description, s_recipient_name, s_error;
    std::vector<std::string> s_unknown_parameters;
@@ -1118,6 +1119,30 @@ bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id
    }
    error = QString::fromStdString(s_error);
    return res;
+}
+
+QVariantMap Wallet::parse_uri_to_object(const QString &uri) const
+{
+    QString address;
+    QString payment_id;
+    uint64_t amount = 0;
+    QString tx_description;
+    QString recipient_name;
+    QVector<QString> unknown_parameters;
+    QString error;
+
+    QVariantMap result;
+    if (this->parse_uri(uri, address, payment_id, amount, tx_description, recipient_name, unknown_parameters, error)) {
+        result.insert("address", address);
+        result.insert("payment_id", payment_id);
+        result.insert("amount", amount > 0 ? QString::fromStdString(Monero::Wallet::displayAmount(amount)) : "");
+        result.insert("tx_description", tx_description);
+        result.insert("recipient_name", recipient_name);
+    } else {
+        result.insert("error", error);
+    }
+
+    return result;
 }
 
 bool Wallet::rescanSpent()

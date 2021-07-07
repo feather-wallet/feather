@@ -48,9 +48,17 @@ public:
     void payToMany();
     bool isOpenAlias();
 
+signals:
+    void dataPasted(const QString &data);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 private:
     void checkText();
     void updateSize();
+
+    void pasteEvent(const QMimeData *mimeData);
 
     PartialTxOutput parseAddressAndAmount(const QString &line);
     quint64 parseAmount(QString amount);

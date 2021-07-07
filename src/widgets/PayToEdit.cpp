@@ -4,11 +4,15 @@
 
 #include "PayToEdit.h"
 
-#include <QtGlobal>
+#include <QApplication>
+#include <QClipboard>
+#include <QMimeData>
 #include <QScrollBar>
+#include <QtGlobal>
 
 #include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
+#include "qrcode_scanner/QrCodeUtils.h"
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -70,6 +74,45 @@ bool PayToEdit::isOpenAlias() {
         return false;
     }
     return true;
+}
+
+void PayToEdit::keyPressEvent(QKeyEvent *event) {
+    if (event->matches(QKeySequence::Paste)) {
+        this->pasteEvent(QApplication::clipboard()->mimeData());
+        event->accept();
+    }
+
+    QPlainTextEdit::keyPressEvent(event);
+}
+
+void PayToEdit::pasteEvent(const QMimeData *mimeData) {
+    QImage image;
+    if (mimeData->hasImage()) {
+        image = qvariant_cast<QImage>(mimeData->imageData());
+    }
+    else if (mimeData->hasUrls()) {
+        QList<QUrl> urlList = mimeData->urls();
+        if (urlList.count() > 1) {
+            return;
+        }
+        QFileInfo file(urlList.at(0).toLocalFile());
+        if (file.exists()) {
+            image = QImage{file.absoluteFilePath()};
+        }
+    }
+    else {
+        return;
+    }
+
+    if (image.isNull()) {
+        qDebug() << "Invalid image";
+        return;
+    }
+
+    image.convertTo(QImage::Format_RGB32);
+    QString result = QrCodeUtils::scanImage(image);
+
+    dataPasted(result);
 }
 
 void PayToEdit::checkText() {
