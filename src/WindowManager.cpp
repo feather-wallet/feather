@@ -302,6 +302,7 @@ void WindowManager::handleWalletError(const QString &message) {
 
 void WindowManager::displayWalletErrorMessage(const QString &message) {
     QString errMsg = QString("Error: %1").arg(message);
+    QString link;
 
     // Ledger
     if (message.contains("No device found")) {
@@ -313,6 +314,7 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
 #if defined(Q_OS_LINUX)
         errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
                   "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
+        link = "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
 #endif
     }
 
@@ -326,11 +328,11 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     }
 
     if (message.contains("Could not connect to the device Trezor") || message.contains("Device connect failed")) {
-        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Make sure the device is connected to your computer and unlocked.\n"
-                  "You may need to restart Feather before the device can be detected.";
+        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Make sure the device is connected to your computer and unlocked.";
 #if defined(Q_OS_LINUX)
         errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
                   "https://wiki.trezor.io/Udev_rules";
+        link = "https://wiki.trezor.io/Udev_rules";
 #endif
     }
 
@@ -351,7 +353,14 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     msgBox.setWindowTitle("Wallet error");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
+    QPushButton *openLinkButton = nullptr;
+    if (!link.isEmpty()) {
+        openLinkButton = msgBox.addButton("Open link", QMessageBox::ActionRole);
+    }
     msgBox.exec();
+    if (openLinkButton && msgBox.clickedButton() == openLinkButton) {
+        Utils::externalLinkWarning(nullptr, link);
+    }
 }
 
 // ######################## DEVICE ########################
