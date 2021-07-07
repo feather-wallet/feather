@@ -22,6 +22,7 @@ WindowManager::WindowManager() {
     connect(m_walletManager, &WalletManager::walletOpened,        this, &WindowManager::onWalletOpened);
     connect(m_walletManager, &WalletManager::walletCreated,       this, &WindowManager::onWalletCreated);
     connect(m_walletManager, &WalletManager::deviceButtonRequest, this, &WindowManager::onDeviceButtonRequest);
+    connect(m_walletManager, &WalletManager::deviceButtonPressed, this, &WindowManager::onDeviceButtonPressed);
     connect(m_walletManager, &WalletManager::deviceError,         this, &WindowManager::onDeviceError);
 
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
@@ -372,6 +373,10 @@ void WindowManager::onDeviceButtonRequest(quint64 code) {
     m_splashDialog->setIcon(QPixmap(":/assets/images/key.png"));
     m_splashDialog->show();
     m_splashDialog->setEnabled(true);
+}
+
+void WindowManager::onDeviceButtonPressed() {
+    m_splashDialog->hide();
 }
 
 void WindowManager::onDeviceError(const QString &errorMessage) {

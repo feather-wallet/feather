@@ -39,6 +39,7 @@ private slots:
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
     void onInitialNetworkConfigured();
     void onDeviceButtonRequest(quint64 code);
+    void onDeviceButtonPressed();
     void onDeviceError(const QString &errorMessage);
 
 private:

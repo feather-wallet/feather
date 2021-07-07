@@ -36,11 +36,11 @@ public:
         emit m_mgr->deviceButtonRequest(code);
     }
 //
-//    virtual void onDeviceButtonPressed() override
-//    {
-//        qDebug() << __FUNCTION__;
-//        emit m_mgr->deviceButtonPressed();
-//    }
+    virtual void onDeviceButtonPressed() override
+    {
+        qDebug() << __FUNCTION__;
+        emit m_mgr->deviceButtonPressed();
+    }
 
     virtual void onDeviceError(const std::string &message) override
     {
