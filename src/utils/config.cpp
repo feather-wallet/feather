@@ -51,6 +51,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         // Mining
         {Config::xmrigPath,{QS("xmrigPath"), ""}},
         {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+        {Config::pools,{QS("pools"), {}}},
 
         // Settings
         {Config::preferredFiatCurrency,{QS("preferredFiatCurrency"), "USD"}},

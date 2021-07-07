@@ -6,6 +6,7 @@
 
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QScrollBar>
 #include <QStandardItemModel>
@@ -69,15 +70,22 @@ XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     // pools
     ui->poolFrame->show();
-    ui->combo_pools->insertItems(0, m_pools);
-    auto preferredPool = config()->get(Config::xmrigPool).toString();
-    if (m_pools.contains(preferredPool))
-        ui->combo_pools->setCurrentIndex(m_pools.indexOf(preferredPool));
-    else {
-        preferredPool = m_pools.at(0);
-        config()->set(Config::xmrigPool, preferredPool);
-    }
-    connect(ui->combo_pools, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XMRigWidget::onPoolChanged);
+    this->updatePools();
+    connect(ui->combo_pools, &QComboBox::currentTextChanged, this, &XMRigWidget::onPoolChanged);
+
+    connect(ui->btn_poolConfig, &QPushButton::clicked, [this]{
+        QStringList pools = config()->get(Config::pools).toStringList();
+        bool ok;
+        QString poolStr = QInputDialog::getMultiLineText(this, "Pool addresses", "Set pool addresses (one per line):", pools.join("\n"), &ok);
+        if (!ok) {
+            return;
+        }
+        QStringList newPools = poolStr.split("\n");
+        newPools.removeAll("");
+        newPools.removeDuplicates();
+        config()->set(Config::pools, newPools);
+        this->updatePools();
+    });
 
     // info
     ui->console->appendPlainText(QString("Detected %1 CPU threads.").arg(threads));
@@ -132,8 +140,10 @@ void XMRigWidget::onThreadsValueChanged(int threads) {
     ui->label_threads->setText(QString("CPU threads: %1").arg(m_threads));
 }
 
-void XMRigWidget::onPoolChanged(int pos) {
-    config()->set(Config::xmrigPool, m_pools.at(pos));
+void XMRigWidget::onPoolChanged(const QString &pool) {
+    if (!pool.isEmpty()) {
+        config()->set(Config::xmrigPool, pool);
+    }
 }
 
 void XMRigWidget::onBrowseClicked() {
@@ -277,6 +287,24 @@ void XMRigWidget::showContextMenu(const QPoint &pos) {
         return;
     }
     m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
+}
+
+void XMRigWidget::updatePools() {
+    QStringList pools = config()->get(Config::pools).toStringList();
+    if (pools.isEmpty()) {
+        pools = m_defaultPools;
+        config()->set(Config::pools, pools);
+    }
+    ui->combo_pools->clear();
+    ui->combo_pools->insertItems(0, pools);
+
+    QString preferredPool = config()->get(Config::xmrigPool).toString();
+    if (pools.contains(preferredPool)) {
+        ui->combo_pools->setCurrentIndex(pools.indexOf(preferredPool));
+    } else {
+        preferredPool = pools.at(0);
+        config()->set(Config::xmrigPool, preferredPool);
+    }
 }
 
 void XMRigWidget::onSoloChecked(int state) {

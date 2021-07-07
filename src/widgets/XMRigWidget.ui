@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -26,12 +26,12 @@
    <property name="bottomMargin">
     <number>0</number>
    </property>
-   <item row="0" column="0">
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>1</number>
      </property>
-     <widget class="QWidget" name="tab">
+     <widget class="QWidget" name="tabMining">
       <attribute name="title">
        <string>Mining</string>
       </attribute>
@@ -121,7 +121,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_3">
+     <widget class="QWidget" name="tabSettings">
       <attribute name="title">
        <string>Settings</string>
       </attribute>
@@ -241,56 +241,52 @@
                <property name="frameShadow">
                 <enum>QFrame::Plain</enum>
                </property>
-               <layout class="QGridLayout" name="gridLayout_4">
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item row="0" column="0">
-                 <layout class="QVBoxLayout" name="verticalLayout_4">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_4">
-                    <item>
-                     <widget class="QLabel" name="label_4">
-                      <property name="text">
-                       <string>Pool</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QComboBox" name="combo_pools">
-                      <property name="sizePolicy">
-                       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                        <horstretch>0</horstretch>
-                        <verstretch>0</verstretch>
-                       </sizepolicy>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_3">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
+                <item>
+                 <widget class="QLabel" name="label_4">
+                  <property name="text">
+                   <string>Pool</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QComboBox" name="combo_pools">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="btn_poolConfig">
+                  <property name="text">
+                   <string>Configure</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>414</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -303,53 +299,42 @@
                <property name="frameShadow">
                 <enum>QFrame::Plain</enum>
                </property>
-               <layout class="QGridLayout" name="gridLayout_5">
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <property name="leftMargin">
                  <number>0</number>
                 </property>
                 <property name="topMargin">
                  <number>0</number>
                 </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
                 <property name="bottomMargin">
                  <number>0</number>
                 </property>
-                <item row="0" column="0">
-                 <layout class="QVBoxLayout" name="verticalLayout_8">
-                  <item>
-                   <layout class="QHBoxLayout" name="horizontalLayout_8">
-                    <item>
-                     <widget class="QLabel" name="label_3">
-                      <property name="text">
-                       <string>Node address</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLineEdit" name="lineEdit_solo">
-                      <property name="text">
-                       <string>127.0.0.1:18081</string>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <spacer name="horizontalSpacer_5">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-                   </layout>
-                  </item>
-                 </layout>
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>Node address</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_solo">
+                  <property name="text">
+                   <string>127.0.0.1:18081</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_5">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>173</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
                 </item>
                </layout>
               </widget>
@@ -464,12 +449,12 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="tab_2">
+     <widget class="QWidget" name="tabDownloads">
       <attribute name="title">
        <string>Downloads</string>
       </attribute>
-      <layout class="QGridLayout" name="gridLayout">
-       <item row="0" column="0">
+      <layout class="QVBoxLayout" name="verticalLayout_7">
+       <item>
         <layout class="QHBoxLayout" name="horizontalLayout_7">
          <item>
           <widget class="QLabel" name="label_latest_version">
@@ -493,7 +478,7 @@
          </item>
         </layout>
        </item>
-       <item row="1" column="0">
+       <item>
         <widget class="QTableView" name="tableView">
          <property name="contextMenuPolicy">
           <enum>Qt::CustomContextMenu</enum>

@@ -55,6 +55,7 @@ public:
         // Mining
         xmrigPath,
         xmrigPool,
+        pools,
 
         // Settings
         preferredFiatCurrency,
