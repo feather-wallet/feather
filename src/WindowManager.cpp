@@ -148,7 +148,7 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             // Don't show incorrect password when we try with empty password for the first time
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
-            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->cachePath());
+            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
             qCritical() << errMsg;
