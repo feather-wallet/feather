@@ -208,6 +208,10 @@ void MainWindow::initWidgets() {
 #else
     ui->tabWidget->setTabVisible(Tabs::XMRIG, false);
 #endif
+
+#if defined(Q_OS_MACOS)
+    ui->line->hide();
+#endif
 }
 
 void MainWindow::initMenu() {
