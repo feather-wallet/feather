@@ -76,9 +76,9 @@ class Wallet : public QObject, public PassprasePrompter
 Q_OBJECT
 
 public:
-    Wallet(QObject * parent = nullptr);
-    Wallet(Monero::Wallet *w, QObject * parent = nullptr);
-    ~Wallet();
+    explicit Wallet(QObject *parent = nullptr);
+    explicit Wallet(Monero::Wallet *w, QObject * parent = nullptr);
+    ~Wallet() override;
 
     enum Status {
         Status_Ok          = Monero::Wallet::Status_Ok,
@@ -298,6 +298,14 @@ public:
     void createTransactionSingleAsync(const QString &key_image, const QString &dst_addr,
             size_t outputs, PendingTransaction::Priority priority);
 
+    //! creates transaction with selected inputs
+    PendingTransaction * createTransactionSelected(const QVector<QString> &key_images, const QString &dst_addr,
+                                                   size_t outputs, PendingTransaction::Priority priority);
+
+    //! creates async transaction with selected inputs
+    void createTransactionSelectedAsync(const QVector<QString> &key_images, const QString &dst_addr,
+                                        size_t outputs, PendingTransaction::Priority priority);
+
     //! creates sweep unmixable transaction
     PendingTransaction * createSweepUnmixableTransaction();
 
@@ -376,7 +384,8 @@ public:
     bool verifySignedMessage(const QString &message, const QString &address, const QString &signature, bool filename = false) const;
 
     //! Parse URI
-    bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error);
+    bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
+    QVariantMap parse_uri_to_object(const QString &uri) const;
 
     //! Namespace your cacheAttribute keys to avoid collisions
     bool setCacheAttribute(const QString &key, const QString &val);
@@ -385,7 +394,8 @@ public:
     bool setUserNote(const QString &txid, const QString &note);
     QString getUserNote(const QString &txid) const;
     QString getTxKey(const QString &txid) const;
-    //void getTxKeyAsync(const QString &txid, const QJSValue &callback);
+    void getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback);
+
     QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
     TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
    // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);

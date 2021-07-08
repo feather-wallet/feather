@@ -8,9 +8,9 @@
 #include "utils/AppData.h"
 
 TickerWidgetBase::TickerWidgetBase(QWidget *parent, QSharedPointer<AppContext> ctx)
-    : QWidget(parent)
-    , ui(new Ui::TickerWidget)
-    , m_ctx(std::move(ctx))
+        : QWidget(parent)
+        , ui(new Ui::TickerWidget)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -21,9 +21,7 @@ TickerWidgetBase::TickerWidgetBase(QWidget *parent, QSharedPointer<AppContext> c
     ui->tickerFiat->setText("...");
 }
 
-TickerWidgetBase::~TickerWidgetBase() {
-    delete ui;
-}
+TickerWidgetBase::~TickerWidgetBase() = default;
 
 void TickerWidgetBase::setTitle(const QString &title) {
     ui->tickerBox->setTitle(title);
@@ -52,8 +50,8 @@ void TickerWidgetBase::setFiatText(double amount, const QString &fiatCurrency) {
 
 // BalanceTickerWidget
 BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, bool totalBalance)
-    : TickerWidgetBase(parent, std::move(ctx))
-    , m_totalBalance(totalBalance)
+        : TickerWidgetBase(parent, std::move(ctx))
+        , m_totalBalance(totalBalance)
 {
     if (totalBalance)
         this->setTitle("Total balance");
@@ -78,8 +76,8 @@ void BalanceTickerWidget::updateDisplay() {
 
 // PriceTickerWidget
 PriceTickerWidget::PriceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol)
-    : TickerWidgetBase(parent, std::move(ctx))
-    , m_symbol(std::move(symbol))
+        : TickerWidgetBase(parent, std::move(ctx))
+        , m_symbol(std::move(symbol))
 {
     this->setTitle(m_symbol);
 

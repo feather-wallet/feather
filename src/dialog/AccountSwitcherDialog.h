@@ -5,8 +5,8 @@
 #define FEATHER_ACCOUNTSWITCHERDIALOG_H
 
 #include <QDialog>
-#include "appcontext.h"
 
+#include "appcontext.h"
 #include "model/SubaddressAccountModel.h"
 
 namespace Ui {
@@ -33,7 +33,7 @@ private:
 
     Monero::SubaddressAccountRow* currentEntry();
 
-    Ui::AccountSwitcherDialog *ui;
+    QScopedPointer<Ui::AccountSwitcherDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     SubaddressAccountModel *m_model;
     SubaddressAccountProxyModel *m_proxyModel;

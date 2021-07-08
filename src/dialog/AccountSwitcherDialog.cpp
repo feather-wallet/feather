@@ -4,10 +4,11 @@
 #include "AccountSwitcherDialog.h"
 #include "ui_AccountSwitcherDialog.h"
 
-#include "libwalletqt/SubaddressAccount.h"
-#include "utils/Icons.h"
-#include "model/ModelUtils.h"
 #include <QMenu>
+
+#include "libwalletqt/SubaddressAccount.h"
+#include "model/ModelUtils.h"
+#include "utils/Icons.h"
 
 AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     : QDialog(parent)
@@ -44,7 +45,7 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
        m_ctx->wallet->subaddressAccount()->refresh();
     });
 
-    connect(m_ctx->wallet.get(), &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
+    connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
     connect(m_ctx->wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
 
     this->updateSelection();
@@ -78,7 +79,6 @@ void AccountSwitcherDialog::editLabel() {
 }
 
 void AccountSwitcherDialog::updateSelection() {
-    qDebug() << "test";
     QModelIndex index = m_model->index(m_ctx->wallet->currentSubaddressAccount(), 0);
     ui->accounts->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
@@ -103,6 +103,4 @@ Monero::SubaddressAccountRow* AccountSwitcherDialog::currentEntry() {
     return m_ctx->wallet->subaddressAccountModel()->entryFromIndex(index);
 }
 
-AccountSwitcherDialog::~AccountSwitcherDialog() {
-    delete ui;
-}
+AccountSwitcherDialog::~AccountSwitcherDialog() = default;

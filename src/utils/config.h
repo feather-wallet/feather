@@ -3,8 +3,8 @@
 // Copyright (C) 2011 Felix Geyer <debfx@fobos.de>
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef FEATHER_SETTINGS_H
-#define FEATHER_SETTINGS_H
+#ifndef FEATHER_CONFIG_H
+#define FEATHER_CONFIG_H
 
 #include <QObject>
 #include <QSettings>
@@ -55,6 +55,7 @@ public:
         // Mining
         xmrigPath,
         xmrigPool,
+        pools,
 
         // Settings
         preferredFiatCurrency,
@@ -101,6 +102,7 @@ public:
     QVariant get(ConfigKey key);
     QString getFileName();
     void set(ConfigKey key, const QVariant& value);
+    void remove(ConfigKey key);
     void sync();
     void resetToDefaults();
 
@@ -128,4 +130,4 @@ inline Config* config()
     return Config::instance();
 }
 
-#endif //FEATHER_SETTINGS_H
+#endif //FEATHER_CONFIG_H

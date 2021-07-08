@@ -25,6 +25,8 @@ public:
     void shutdownWaitForFinished() noexcept;
 
     QPair<bool, QFuture<void>> run(std::function<void()> function) noexcept;
+    QPair<bool, QFuture<QVariantMap>> run(const std::function<QVariantMap()>& function, const std::function<void (QVariantMap)>& callback) noexcept;
+
    // QPair<bool, QFuture<QJSValueList>> run(std::function<QJSValueList()> function, const QJSValue &callback);
    bool stopping() const noexcept;
 
@@ -57,7 +59,7 @@ private:
     }
 
     QFutureWatcher<void> schedule(std::function<void()> function);
-    //QFutureWatcher<QJSValueList> schedule(std::function<QJSValueList() noexcept> function, const QJSValue &callback);
+//    QFutureWatcher<QVariantMap> schedule(std::function<QVariantMap() noexcept> function, std::function<void> &callback);
 
 private:
     size_t Alive;

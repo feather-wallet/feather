@@ -3,7 +3,7 @@
 
 #include "whonix.h"
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 bool WhonixOS::detect() {
     return !QString::fromLocal8Bit(qgetenv("WHONIX")).isEmpty();

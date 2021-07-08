@@ -23,9 +23,9 @@ public:
     {
         KeyImageKnown = 0,
         PubKey,
-        OutputPoint,
+        TxID,
         Address,
-        AddressLabel,
+        Label,
         BlockHeight,
         SpentHeight,
         Amount,
@@ -42,8 +42,15 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
     CoinsInfo* entryFromIndex(const QModelIndex &index) const;
+
+    void setCurrentSubaddressAccount(quint32 accountIndex);
+
+signals:
+    void descriptionChanged();
 
 public slots:
     void startReset();
@@ -53,6 +60,7 @@ private:
     QVariant parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const;
 
     Coins *m_coins;
+    quint32 m_currentSubaddressAccount;
 };
 
 #endif //FEATHER_COINSMODEL_H

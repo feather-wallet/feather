@@ -3,19 +3,20 @@
 
 #include "LocalMoneroWidget.h"
 #include "ui_LocalMoneroWidget.h"
-#include "utils/ColorScheme.h"
-#include "utils/Icons.h"
-#include "utils/NetworkManager.h"
-#include "utils/WebsocketNotifier.h"
-#include "dialog/LocalMoneroInfoDialog.h"
 
 #include <QMessageBox>
 #include <QMenu>
 
+#include "dialog/LocalMoneroInfoDialog.h"
+#include "utils/ColorScheme.h"
+#include "utils/Icons.h"
+#include "utils/NetworkManager.h"
+#include "utils/WebsocketNotifier.h"
+
 LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx)
-    : QWidget(parent)
-    , ui(new Ui::LocalMoneroWidget)
-    , m_ctx(std::move(ctx))
+        : QWidget(parent)
+        , ui(new Ui::LocalMoneroWidget)
+        , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
 
@@ -143,10 +144,6 @@ void LocalMoneroWidget::searchOffers(int page) {
         m_api->sellMoneroOnline(currencyCode, countryCode, paymentMethod, amount, page);
 }
 
-LocalMoneroWidget::~LocalMoneroWidget() {
-    delete ui;
-}
-
 void LocalMoneroWidget::showContextMenu(const QPoint &point) {
     QModelIndex index = ui->treeView->indexAt(point);
     if (!index.isValid()) {
@@ -208,3 +205,5 @@ void LocalMoneroWidget::updatePaymentMethods() {
         }
     }
 }
+
+LocalMoneroWidget::~LocalMoneroWidget() = default;

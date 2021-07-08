@@ -5,6 +5,7 @@
 #define FEATHER_COINSPROXYMODEL_H
 
 #include <QSortFilterProxyModel>
+
 #include "libwalletqt/Coins.h"
 
 class CoinsProxyModel : public QSortFilterProxyModel
@@ -12,17 +13,16 @@ class CoinsProxyModel : public QSortFilterProxyModel
 Q_OBJECT
 public:
     explicit CoinsProxyModel(QObject* parent, Coins *coins);
-    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const;
+    bool filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const override;
 
 public slots:
-    void setShowSpent(const bool showSpent){
-        m_showSpent = showSpent;
-        invalidateFilter();
-    }
+    void setSearchFilter(const QString &searchString);
+    void setShowSpent(bool showSpent);
 
 private:
-    bool m_showSpent = false;
     Coins *m_coins;
+    bool m_showSpent = false;
+    QRegularExpression m_searchRegExp;
 };
 
 #endif //FEATHER_COINSPROXYMODEL_H

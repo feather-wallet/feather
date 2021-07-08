@@ -4,7 +4,7 @@
 #include <QObject>
 
 #include "nodes.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/os/tails.h"
 #include "appcontext.h"
 #include "constants.h"

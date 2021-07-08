@@ -123,6 +123,14 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                 }
             }
         }
+        else if (role == Qt::FontRole) {
+            switch(index.column()) {
+                case Column::TxID:
+                {
+                    result = ModelUtils::getMonospaceFont();
+                }
+            }
+        }
     });
 
     if (!found) {

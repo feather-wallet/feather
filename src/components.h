@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef COMP_H
-#define COMP_H
+#ifndef FEATHER_COMPONENTS_H
+#define FEATHER_COMPONENTS_H
 
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -120,4 +120,5 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 };
-#endif
+
+#endif //FEATHER_COMPONENTS_H

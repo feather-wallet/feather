@@ -37,7 +37,7 @@ private:
     void displayCameraError();
     void takeImage();
 
-    Ui::QrCodeScanDialog *ui;
+    QScopedPointer<Ui::QrCodeScanDialog> ui;
 
     QScopedPointer<QCamera> m_camera;
     QScopedPointer<QCameraImageCapture> m_imageCapture;

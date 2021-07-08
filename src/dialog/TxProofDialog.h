@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "libwalletqt/TransactionInfo.h"
 #include "appcontext.h"
+#include "libwalletqt/TransactionInfo.h"
 
 namespace Ui {
     class TxProofDialog;
@@ -21,6 +21,7 @@ public:
     explicit TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txid);
     ~TxProofDialog() override;
     void setTxId(const QString &txid);
+    void getTxKey();
 
 private slots:
     void selectSpendProof();
@@ -42,15 +43,15 @@ private:
     void toggleButtons(bool enabled);
     void showWarning(const QString &message);
 
+    QScopedPointer<Ui::TxProofDialog> ui;
+    QSharedPointer<AppContext> m_ctx;
+
     QStringList m_OutDestinations;
     QStringList m_InDestinations;
     QString m_txid;
     QString m_txKey;
     Mode m_mode;
     TransactionInfo::Direction m_direction;
-
-    Ui::TxProofDialog *ui;
-    QSharedPointer<AppContext> m_ctx;
 };
 
 #endif //FEATHER_TXPROOFDIALOG_H

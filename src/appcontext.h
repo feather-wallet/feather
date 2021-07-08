@@ -25,7 +25,7 @@ Q_OBJECT
 public:
     explicit AppContext(Wallet *wallet);
 
-    QScopedPointer<Wallet> wallet;
+    Wallet *wallet;
     Nodes *nodes;
 
     bool donationSending = false;
@@ -34,7 +34,6 @@ public:
 
     NetworkType::Type networkType;
     PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
-    QMap<QString, QString> txCache;
 
     // libwalletqt
     bool refreshed = false;
@@ -46,11 +45,16 @@ public:
 
     void storeWallet();
 
+    void stopTimers();
+
+    void addCacheTransaction(const QString &txid, const QString &txHex) const;
+    QString getCacheTransaction(const QString &txid) const;
+
 public slots:
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
     void onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
     void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
-    void onSweepOutput(const QString &keyImage, QString address, bool churn, int outputs);
+    void onSweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
     void onCreateTransactionError(const QString &msg);
     void onOpenAliasResolve(const QString &openAlias);
     void onSetRestoreHeight(quint64 height);
@@ -58,6 +62,7 @@ public slots:
     void onAmountPrecisionChanged(int precision);
     void onMultiBroadcast(PendingTransaction *tx);
     void onDeviceButtonRequest(quint64 code);
+    void onDeviceButtonPressed();
     void onDeviceError(const QString &message);
 
     void onTorSettingsChanged(); // should not be here
@@ -91,6 +96,7 @@ signals:
     void initiateTransaction();
     void endTransaction();
     void deviceButtonRequest(quint64 code);
+    void deviceButtonPressed();
     void deviceError(const QString &message);
 
 private:

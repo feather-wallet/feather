@@ -377,6 +377,7 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex)
         m_history->refresh(m_currentSubaddressAccount);
         m_coins->refresh(m_currentSubaddressAccount);
         this->subaddressModel()->setCurrentSubaddressAcount(m_currentSubaddressAccount);
+        this->coinsModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         emit currentSubaddressAccountChanged();
     }
 }
@@ -723,6 +724,29 @@ void Wallet::createTransactionSingleAsync(const QString &key_image, const QStrin
     });
 }
 
+PendingTransaction *Wallet::createTransactionSelected(const QVector<QString> &key_images, const QString &dst_addr,
+                                                      size_t outputs, PendingTransaction::Priority priority)
+{
+    std::vector<std::string> kis;
+    for (const auto &key_image : key_images) {
+        kis.push_back(key_image.toStdString());
+    }
+    Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis, dst_addr.toStdString(), outputs, static_cast<Monero::PendingTransaction::Priority>(priority));
+    PendingTransaction *result = new PendingTransaction(ptImpl, this);
+
+    return result;
+}
+
+void Wallet::createTransactionSelectedAsync(const QVector<QString> &key_images, const QString &dst_addr,
+                                            size_t outputs, PendingTransaction::Priority priority)
+{
+    m_scheduler.run([this, key_images, dst_addr, outputs, priority] {
+        PendingTransaction *tx = createTransactionSelected(key_images, dst_addr, outputs, priority);
+        QVector<QString> address {dst_addr};
+        emit transactionCreated(tx, address);
+    });
+}
+
 PendingTransaction *Wallet::createSweepUnmixableTransaction()
 {
 //    pauseRefresh();
@@ -945,12 +969,14 @@ QString Wallet::getTxKey(const QString &txid) const
     return QString::fromStdString(m_walletImpl->getTxKey(txid.toStdString()));
 }
 
-//void Wallet::getTxKeyAsync(const QString &txid, const QJSValue &callback)
-//{
-//    m_scheduler.run([this, txid] {
-//        return QJSValueList({txid, getTxKey(txid)});
-//    }, callback);
-//}
+void Wallet::getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback)
+{
+    m_scheduler.run([this, txid] {
+        QVariantMap map;
+        map["tx_key"] = getTxKey(txid);
+        return map;
+    }, callback);
+}
 
 QString Wallet::checkTxKey(const QString &txid, const QString &tx_key, const QString &address)
 {
@@ -1076,7 +1102,8 @@ bool Wallet::verifySignedMessage(const QString &message, const QString &address,
     return m_walletImpl->verifySignedMessage(message.toStdString(), address.toStdString(), signature.toStdString());
   }
 }
-bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error)
+
+bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const
 {
    std::string s_address, s_payment_id, s_tx_description, s_recipient_name, s_error;
    std::vector<std::string> s_unknown_parameters;
@@ -1092,6 +1119,30 @@ bool Wallet::parse_uri(const QString &uri, QString &address, QString &payment_id
    }
    error = QString::fromStdString(s_error);
    return res;
+}
+
+QVariantMap Wallet::parse_uri_to_object(const QString &uri) const
+{
+    QString address;
+    QString payment_id;
+    uint64_t amount = 0;
+    QString tx_description;
+    QString recipient_name;
+    QVector<QString> unknown_parameters;
+    QString error;
+
+    QVariantMap result;
+    if (this->parse_uri(uri, address, payment_id, amount, tx_description, recipient_name, unknown_parameters, error)) {
+        result.insert("address", address);
+        result.insert("payment_id", payment_id);
+        result.insert("amount", amount > 0 ? QString::fromStdString(Monero::Wallet::displayAmount(amount)) : "");
+        result.insert("tx_description", tx_description);
+        result.insert("recipient_name", recipient_name);
+    } else {
+        result.insert("error", error);
+    }
+
+    return result;
 }
 
 bool Wallet::rescanSpent()

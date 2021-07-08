@@ -5,7 +5,7 @@
 #include <iomanip>
 
 #include "txfiathistory.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirectory, QObject *parent)
     : QObject(parent)

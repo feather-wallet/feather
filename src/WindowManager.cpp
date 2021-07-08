@@ -2,25 +2,30 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "WindowManager.h"
+
+#include <QInputDialog>
+#include <QMessageBox>
+
 #include "constants.h"
-#include "dialog/passworddialog.h"
-#include "dialog/splashdialog.h"
-#include "utils/WebsocketNotifier.h"
-#include "utils/os/tails.h"
+#include "dialog/PasswordDialog.h"
+#include "dialog/SplashDialog.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
+#include "utils/os/tails.h"
 #include "utils/TorManager.h"
-
-#include <QMessageBox>
+#include "utils/WebsocketNotifier.h"
 
 WindowManager::WindowManager() {
     m_walletManager = WalletManager::instance();
     m_splashDialog = new SplashDialog;
+    m_cleanupThread = new QThread();
 
     connect(m_walletManager, &WalletManager::walletOpened,        this, &WindowManager::onWalletOpened);
     connect(m_walletManager, &WalletManager::walletCreated,       this, &WindowManager::onWalletCreated);
     connect(m_walletManager, &WalletManager::deviceButtonRequest, this, &WindowManager::onDeviceButtonRequest);
+    connect(m_walletManager, &WalletManager::deviceButtonPressed, this, &WindowManager::onDeviceButtonPressed);
     connect(m_walletManager, &WalletManager::deviceError,         this, &WindowManager::onDeviceError);
+    connect(m_walletManager, &WalletManager::walletPassphraseNeeded, this, &WindowManager::onWalletPassphraseNeeded);
 
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
 
@@ -67,6 +72,11 @@ void WindowManager::close() {
 
 void WindowManager::closeWindow(MainWindow *window) {
     m_windows.removeOne(window);
+
+    // Move Wallet to a different thread for cleanup so it doesn't block GUI thread
+    window->m_ctx->wallet->moveToThread(m_cleanupThread);
+    m_cleanupThread->start();
+    window->m_ctx->wallet->deleteLater();
 }
 
 void WindowManager::restartApplication(const QString &binaryFilename) {
@@ -141,7 +151,7 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             // Don't show incorrect password when we try with empty password for the first time
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
-            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->cachePath());
+            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
             qCritical() << errMsg;
@@ -227,7 +237,7 @@ void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const
     this->onWalletOpened(wallet);
 }
 
-void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, int restoreHeight)
+void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight)
 {
     if (Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
@@ -236,7 +246,7 @@ void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString
     }
 
     m_openingWallet = true;
-    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, "Ledger", restoreHeight);
+    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, deviceName, restoreHeight);
 }
 
 void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address,
@@ -293,16 +303,38 @@ void WindowManager::handleWalletError(const QString &message) {
 }
 
 void WindowManager::displayWalletErrorMessage(const QString &message) {
-    QString errMsg = message;
+    QString errMsg = QString("Error: %1").arg(message);
+    QString link;
+
+    // Ledger
     if (message.contains("No device found")) {
-        errMsg += "\n\nThis wallet is backed by a hardware device. Make sure the Monero app is opened on the device.\n"
+        errMsg += "\n\nThis wallet is backed by a Ledger hardware device. Make sure the Monero app is opened on the device.\n"
                   "You may need to restart Feather before the device can get detected.";
     }
     if (message.contains("Unable to open device")) {
         errMsg += "\n\nThe device might be in use by a different application.";
 #if defined(Q_OS_LINUX)
         errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
-                  "<a>https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues</a>";
+                  "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
+        link = "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
+#endif
+    }
+
+    // TREZOR
+    if (message.contains("Unable to claim libusb device")) {
+        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Feather was unable to access the device. "
+                  "Please make sure it is not opened by another program and try again.";
+    }
+    if (message.contains("Cannot get a device address")) {
+        errMsg += "\n\nRestart the Trezor hardware device and try again.";
+    }
+
+    if (message.contains("Could not connect to the device Trezor") || message.contains("Device connect failed")) {
+        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Make sure the device is connected to your computer and unlocked.";
+#if defined(Q_OS_LINUX)
+        errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
+                  "https://wiki.trezor.io/Udev_rules";
+        link = "https://wiki.trezor.io/Udev_rules";
 #endif
     }
 
@@ -323,21 +355,66 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     msgBox.setWindowTitle("Wallet error");
     msgBox.setStandardButtons(QMessageBox::Ok);
     msgBox.setDefaultButton(QMessageBox::Ok);
+    QPushButton *openLinkButton = nullptr;
+    if (!link.isEmpty()) {
+        openLinkButton = msgBox.addButton("Open link", QMessageBox::ActionRole);
+    }
     msgBox.exec();
+    if (openLinkButton && msgBox.clickedButton() == openLinkButton) {
+        Utils::externalLinkWarning(nullptr, link);
+    }
 }
 
 // ######################## DEVICE ########################
 
 void WindowManager::onDeviceButtonRequest(quint64 code) {
-    m_splashDialog->setMessage("Action required on device: Export the view key to open the wallet.");
+    QString message;
+    switch (code) {
+        case 1: // Trezor
+            message = "Action required on device: enter your PIN to continue.";
+            break;
+        case 8: // Trezor
+            message = "Action required on device: Export watch-only credentials to open the wallet.";
+            break;
+        case 19: // Trezor
+            message = "Action required on device: Enter passphrase to open the wallet.";
+            break;
+        default:
+            message = "Action required on device: Export the view key to open the wallet.";
+    }
+
+    m_splashDialog->setMessage(message);
     m_splashDialog->setIcon(QPixmap(":/assets/images/key.png"));
     m_splashDialog->show();
     m_splashDialog->setEnabled(true);
 }
 
+void WindowManager::onDeviceButtonPressed() {
+    m_splashDialog->hide();
+}
+
 void WindowManager::onDeviceError(const QString &errorMessage) {
     // TODO: when does this get called?
     qCritical() << Q_FUNC_INFO << errorMessage;
+}
+
+void WindowManager::onWalletPassphraseNeeded(bool on_device) {
+    auto button = QMessageBox::question(nullptr, "Wallet Passphrase Needed", "Enter passphrase on hardware wallet?\n\n"
+                                                                             "It is recommended to enter passphrase on "
+                                                                             "the hardware wallet for better security.",
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (button == QMessageBox::Yes) {
+        m_walletManager->onPassphraseEntered("", true, false);
+        return;
+    }
+
+    bool ok;
+    QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
+    if (ok) {
+        m_walletManager->onPassphraseEntered(passphrase, false, false);
+    } else {
+        m_walletManager->onPassphraseEntered(passphrase, false, true);
+    }
 }
 
 // ######################## TRAY ########################

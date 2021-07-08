@@ -10,8 +10,8 @@
 #include "constants.h"
 
 RestoreHeightWidget::RestoreHeightWidget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::RestoreHeightWidget)
+        : QWidget(parent)
+        , ui(new Ui::RestoreHeightWidget)
 {
     ui->setupUi(this);
 
@@ -56,6 +56,4 @@ void RestoreHeightWidget::onRestoreHeightChanged() {
     ui->line_creationDate->setText(date.toString("yyyy-MM-dd"));
 }
 
-RestoreHeightWidget::~RestoreHeightWidget() {
-    delete ui;
-}
+RestoreHeightWidget::~RestoreHeightWidget() = default;

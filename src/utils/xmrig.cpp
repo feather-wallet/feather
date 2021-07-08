@@ -5,7 +5,7 @@
 #include <QDesktopWidget>
 #include <QDesktopServices>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/xmrig.h"
 #include "utils/TorManager.h"
 #include "appcontext.h"

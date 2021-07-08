@@ -1,7 +1,6 @@
 {
   "mainnet": {
     "tor": [
-      "xmrtolujkxnlinre.onion:18081",
       "xmrag4hf5xlabmob.onion:18081",
       "monero26mmldsallmxok2kwamne4ve3mybvvn2yijsvss7ey63hc4yyd.onion:18081",
       "monero5sjoz5xmjn.onion:18081",
@@ -24,14 +23,23 @@
       "node.xmr.ru:18081",
       "selsta1.featherwallet.net:18081",
       "selsta2.featherwallet.net:18081",
-      "node-1.sethsimmons.me:18089"
+      "node-1.sethsimmons.me:18089",
+      "node.melo.tools:18081"
+    ]
+  },
+  "testnet": {
+    "tor": [],
+    "clearnet": [
+      "testnet.melo.tools:28081"
     ]
   },
   "stagenet": {
-    "tor": [],
+    "tor": [
+      "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081"
+    ],
     "clearnet": [
-      "run.your.own.node.xmr.pm:38089",
-      "super.fast.node.xmr.pm:38089"
+      "super.fast.node.xmr.pm:38089",
+      "stagenet.melo.tools:38081"
     ]
   }
 }

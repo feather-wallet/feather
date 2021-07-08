@@ -22,13 +22,7 @@
     </widget>
    </item>
    <item>
-    <widget class="QComboBox" name="comboBox">
-     <item>
-      <property name="text">
-       <string>Ledger Nano S/X</string>
-      </property>
-     </item>
-    </widget>
+    <widget class="QComboBox" name="combo_deviceType"/>
    </item>
    <item>
     <widget class="Line" name="line">

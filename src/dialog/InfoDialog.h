@@ -19,7 +19,7 @@ public:
     ~InfoDialog() override;
 
 private:
-    Ui::InfoDialog *ui;
+    QScopedPointer<Ui::InfoDialog> ui;
 };
 
 

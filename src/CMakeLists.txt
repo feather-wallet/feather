@@ -250,6 +250,10 @@ target_link_libraries(feather
         ${LIBZIP_LIBRARIES}
         )
 
+if(DEVICE_TREZOR_READY)
+    target_link_libraries(feather ${TREZOR_DEP_LIBS})
+endif()
+
 if (WITH_SCANNER)
     target_link_libraries(feather
             Qt5::Multimedia

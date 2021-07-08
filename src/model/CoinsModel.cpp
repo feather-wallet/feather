@@ -13,8 +13,8 @@
 #include <QBrush>
 
 CoinsModel::CoinsModel(QObject *parent, Coins *coins)
-        : QAbstractTableModel(parent),
-          m_coins(coins)
+        : QAbstractTableModel(parent)
+        , m_coins(coins)
 {
     connect(m_coins, &Coins::refreshStarted, this, &CoinsModel::startReset);
     connect(m_coins, &Coins::refreshFinished, this, &CoinsModel::endReset);
@@ -61,7 +61,7 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
     QVariant result;
 
     bool found = m_coins->coin(index.row(), [this, &index, &result, &role](const CoinsInfo &cInfo) {
-        if(role == Qt::DisplayRole || role == Qt::UserRole) {
+        if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseTransactionInfo(cInfo, index.column(), role);
         }
         else if (role == Qt::BackgroundRole) {
@@ -97,7 +97,7 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
         else if (role == Qt::FontRole) {
             switch(index.column()) {
                 case PubKey:
-                case OutputPoint:
+                case TxID:
                 case Address:
                     result = ModelUtils::getMonospaceFont();
             }
@@ -119,6 +119,9 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             else if (!cInfo.unlocked()) {
                 result = "Output is locked (needs more confirmations)";
             }
+            else if (cInfo.spent()) {
+                result = "Output is spent";
+            }
         }
     });
     if (!found) {
@@ -137,13 +140,13 @@ QVariant CoinsModel::headerData(int section, Qt::Orientation orientation, int ro
         switch(section) {
             case PubKey:
                 return QString("Pub Key");
-            case OutputPoint:
-                return QString("Output point");
+            case TxID:
+                return QString("TxID");
             case BlockHeight:
                 return QString("Height");
             case Address:
                 return QString("Address");
-            case AddressLabel:
+            case Label:
                 return QString("Label");
             case SpentHeight:
                 return QString("Spent Height");
@@ -160,6 +163,38 @@ QVariant CoinsModel::headerData(int section, Qt::Orientation orientation, int ro
     return QVariant();
 }
 
+Qt::ItemFlags CoinsModel::flags(const QModelIndex &index) const
+{
+    if (!index.isValid())
+        return Qt::ItemIsEnabled;
+
+    if (index.column() == Label)
+        return QAbstractTableModel::flags(index) | Qt::ItemIsEditable;
+
+    return QAbstractTableModel::flags(index);
+}
+
+bool CoinsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (index.isValid() && role == Qt::EditRole) {
+        const int row = index.row();
+
+        switch (index.column()) {
+            case Label:
+                m_coins->setDescription(row, m_currentSubaddressAccount, value.toString());
+                emit descriptionChanged();
+                break;
+            default:
+                return false;
+        }
+        emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
+
+        return true;
+    }
+
+    return false;
+}
+
 QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const
 {
     switch (column)
@@ -168,14 +203,17 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
             return "";
         case PubKey:
             return cInfo.pubKey().mid(0,8);
-        case OutputPoint:
-            return cInfo.hash().mid(0, 8) + ":" + QString::number(cInfo.internalOutputIndex());
+        case TxID:
+            return cInfo.hash().mid(0, 8) + " ";
         case BlockHeight:
             return cInfo.blockHeight();
         case Address:
             return ModelUtils::displayAddress(cInfo.address(), 1, "");
-        case AddressLabel:
+        case Label: {
+            if (!cInfo.description().isEmpty())
+                return cInfo.description();
             return cInfo.addressLabel();
+        }
         case Spent:
             return cInfo.spent();
         case SpentHeight:
@@ -195,6 +233,10 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
             return QVariant();
         }
     }
+}
+
+void CoinsModel::setCurrentSubaddressAccount(quint32 accountIndex) {
+    m_currentSubaddressAccount = accountIndex;
 }
 
 CoinsInfo* CoinsModel::entryFromIndex(const QModelIndex &index) const {

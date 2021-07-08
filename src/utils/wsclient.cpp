@@ -4,7 +4,7 @@
 #include <QNetworkAccessManager>
 #include <utility>
 #include "wsclient.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 WSClient::WSClient(QUrl url, QObject *parent)
     : QObject(parent)

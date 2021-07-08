@@ -14,6 +14,4 @@ InfoDialog::InfoDialog(QWidget *parent, const QString &title, const QString &inf
     ui->info->setPlainText(infoData);
 }
 
-InfoDialog::~InfoDialog() {
-    delete ui;
-}
+InfoDialog::~InfoDialog() = default;

@@ -6,10 +6,10 @@
 #include <common/util.h>
 #include <openpgp/hash.h>
 
-#include "utils.h"
+#include "Utils.h"
 
 Updater::Updater() {
-    std::string featherWallet = Utils::fileGetContents(":/assets/gpg_keys/featherwallet.asc").toStdString();
+    std::string featherWallet = Utils::fileOpen(":/assets/gpg_keys/featherwallet.asc").toStdString();
     m_maintainers.emplace_back(featherWallet);
 }
 

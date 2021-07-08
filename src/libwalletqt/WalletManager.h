@@ -143,8 +143,6 @@ public:
     Q_INVOKABLE qint64 subi(qint64 x, qint64 y) const { return x - y; }
 
     Q_INVOKABLE QString resolveOpenAlias(const QString &address) const;
-    Q_INVOKABLE bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
-    Q_INVOKABLE QVariantMap parse_uri_to_object(const QString &uri) const;
 
     // clear/rename wallet cache
     Q_INVOKABLE static bool clearWalletCache(const QString &fileName);

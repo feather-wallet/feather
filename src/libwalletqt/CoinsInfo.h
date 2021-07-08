@@ -35,6 +35,7 @@ Q_OBJECT
     Q_PROPERTY(bool unlocked READ unlocked)
     Q_PROPERTY(QString pubKey READ pubKey)
     Q_PROPERTY(bool coinbase READ coinbase)
+    Q_PROPERTY(QString description READ description)
 
 public:
     quint64 blockHeight() const;
@@ -58,6 +59,7 @@ public:
     bool unlocked() const;
     QString pubKey() const;
     bool coinbase() const;
+    QString description() const;
 
     void setUnlocked(bool unlocked);
 
@@ -86,6 +88,7 @@ private:
     bool m_unlocked;
     QString m_pubKey;
     bool m_coinbase;
+    QString m_description;
 };
 
 #endif //FEATHER_COINSINFO_H

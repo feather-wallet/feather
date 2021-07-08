@@ -5,7 +5,7 @@
 #include <QMessageBox>
 
 #include "tails.h"
-#include "utils.h"
+#include "Utils.h"
 
 bool TailsOS::detected = false;
 bool TailsOS::isTails = false;

@@ -9,7 +9,7 @@
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 class UtilsNetworking : public QObject
 {

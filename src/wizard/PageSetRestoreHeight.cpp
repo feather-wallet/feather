@@ -29,9 +29,6 @@ PageSetRestoreHeight::PageSetRestoreHeight(WizardFields *fields, QWidget *parent
     ui->warningIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
     ui->infoIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
 
-    ui->frame_scanWarning->hide();
-    ui->frame_walletAgeWarning->hide();
-
     connect(ui->line_creationDate, &QLineEdit::textEdited, [this]{
         this->onCreationDateEdited();
         this->completeChanged();
@@ -46,6 +43,8 @@ void PageSetRestoreHeight::initializePage() {
     this->setTitle("Restore height");
     ui->line_creationDate->setText("");
     ui->line_restoreHeight->setText("");
+    ui->frame_scanWarning->hide();
+    ui->frame_walletAgeWarning->hide();
 }
 
 void PageSetRestoreHeight::onCreationDateEdited() {
@@ -71,10 +70,7 @@ void PageSetRestoreHeight::onCreationDateEdited() {
 void PageSetRestoreHeight::onRestoreHeightEdited() {
     int restoreHeight = ui->line_restoreHeight->text().toInt();
     if (restoreHeight == 0) {
-        ui->frame_walletAgeWarning->hide();
-        ui->frame_scanWarning->hide();
-        ui->line_creationDate->setText("");
-        return;
+        restoreHeight = 1;
     }
 
     QDateTime date = appData()->restoreHeights[constants::networkType]->heightToDate(restoreHeight);
@@ -96,7 +92,7 @@ void PageSetRestoreHeight::showWalletAgeWarning(const QDateTime &date) {
 }
 
 bool PageSetRestoreHeight::validatePage() {
-    m_fields->restoreHeight = ui->line_restoreHeight->text().toInt();
+    m_fields->restoreHeight = std::max(1, ui->line_restoreHeight->text().toInt());
     return true;
 }
 

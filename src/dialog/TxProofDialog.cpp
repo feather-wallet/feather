@@ -7,8 +7,8 @@
 #include <QMessageBox>
 
 #include "libwalletqt/Transfer.h"
-#include "utils/utils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
 TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
     : QDialog(parent)
@@ -18,7 +18,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     ui->setupUi(this);
 
     m_txid = txInfo->hash();
-    m_txKey = m_ctx->wallet->getTxKey(m_txid);
+
     m_direction = txInfo->direction();
 
     for (auto const &t: txInfo->transfers()) {
@@ -54,6 +54,14 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     this->adjustSize();
 }
 
+void TxProofDialog::getTxKey() {
+    if (!m_txKey.isEmpty()) return;
+
+    m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
+        m_txKey = map.value("tx_key").toString();
+    });
+}
+
 void TxProofDialog::setTxId(const QString &txid) {
     ui->label_txid->setText(txid);
 }
@@ -64,6 +72,11 @@ void TxProofDialog::selectSpendProof() {
 
     if (m_direction == TransactionInfo::Direction_In) {
         this->showWarning("Your wallet did not construct this transaction. Creating a SpendProof is not possible.");
+        return;
+    }
+
+    if (m_ctx->wallet->isHwBacked()) {
+        this->showWarning("SpendProof creation is not supported on this hardware device.");
         return;
     }
 
@@ -226,7 +239,4 @@ TxProof TxProofDialog::getProof() {
     return proof;
 }
 
-TxProofDialog::~TxProofDialog() {
-    delete ui;
-}
-
+TxProofDialog::~TxProofDialog() = default;

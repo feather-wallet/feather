@@ -1,0 +1,69 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// Copyright (c) 2020-2021, The Monero Project.
+
+#ifndef FEATHER_UTILS_H
+#define FEATHER_UTILS_H
+
+#include <QRegExp>
+#include <QStandardItemModel>
+#include <QApplication>
+#include <QTextCharFormat>
+
+#include "libwalletqt/Wallet.h"
+#include "networktype.h"
+
+namespace Utils
+{
+    bool fileExists(const QString &path);
+    QByteArray fileOpen(const QString &path);
+    QByteArray fileOpenQRC(const QString &path);
+    bool fileWrite(const QString &path, const QString &data);
+    bool pixmapWrite(const QString &path, const QPixmap &pixmap);
+    QStringList fileFind(const QRegExp &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
+
+    bool dirExists(const QString &path);
+    QString defaultWalletDir();
+
+    bool validateJSON(const QByteArray &blob);
+    bool readJsonFile(QIODevice &device, QSettings::SettingsMap &map);
+    bool writeJsonFile(QIODevice &device, const QSettings::SettingsMap &map);
+
+    void copyToClipboard(const QString &string);
+    QString copyFromClipboard();
+
+    QString xdgDesktopEntry();
+    bool xdgDesktopEntryWrite(const QString &path);
+    void xdgRefreshApplications();
+    bool xdgDesktopEntryRegister();
+
+    bool portOpen(const QString &hostname, quint16 port);
+    quint16 getDefaultRpcPort(NetworkType::Type type);
+    bool isTorsocks();
+
+    double roundSignificant(double N, double n);
+    int maxLength(const QVector<QString> &array);
+    QString formatBytes(quint64 bytes);
+
+    QLocale getCurrencyLocale(const QString &currencyCode);
+    QString amountToCurrencyString(double amount, const QString &currencyCode);
+
+    QStandardItem *qStandardItem(const QString &text);
+    QStandardItem *qStandardItem(const QString &text, QFont &font);
+
+    QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid);
+    void externalLinkWarning(QWidget *parent, const QString &url);
+
+    void desktopNotify(const QString &title, const QString &message, int duration);
+    QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount);
+    void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+    QString barrayToString(const QByteArray &data);
+    QString getAccountName();
+    QFont relativeFont(int delta);
+
+    template<typename QEnum>
+    QString QtEnumToString (QEnum value) {
+        return QString::fromStdString(std::string(QMetaEnum::fromType<QEnum>().valueToKey(value)));
+    }
+}
+
+#endif //FEATHER_UTILS_H

@@ -3,7 +3,7 @@
 
 #include "LocalMoneroModel.h"
 #include <QColor>
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 LocalMoneroModel::LocalMoneroModel(QObject *parent)
     : QAbstractTableModel(parent)

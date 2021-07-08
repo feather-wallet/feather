@@ -34,7 +34,7 @@ signals:
 private:
     void setStatus(const QString &msg, bool success = false);
 
-    Ui::UpdateDialog *ui;
+    QScopedPointer<Ui::UpdateDialog> ui;
 
     QString m_version;
     QString m_downloadUrl;

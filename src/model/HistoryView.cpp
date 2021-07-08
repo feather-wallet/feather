@@ -5,7 +5,7 @@
 
 #include "TransactionHistoryProxyModel.h"
 #include "libwalletqt/TransactionInfo.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include <QHeaderView>
 #include <QMenu>

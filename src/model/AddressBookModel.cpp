@@ -4,7 +4,7 @@
 #include "AddressBookModel.h"
 #include "AddressBook.h"
 #include "ModelUtils.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/Icons.h"
 
 AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)

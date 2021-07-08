@@ -29,7 +29,7 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
 void PageSetPassword::initializePage() {
     this->setTitle(m_fields->modeText);
     ui->line_password->setText("");
-    ui->line_password->setText("");
+    ui->line_confirmPassword->setText("");
 }
 
 bool PageSetPassword::validatePage() {

@@ -3,9 +3,10 @@
 
 #include "WalletCacheDebugDialog.h"
 #include "ui_WalletCacheDebugDialog.h"
-#include "model/ModelUtils.h"
 
 #include <QRadioButton>
+
+#include "model/ModelUtils.h"
 
 WalletCacheDebugDialog::WalletCacheDebugDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
@@ -91,7 +92,4 @@ void WalletCacheDebugDialog::setOutput(const QString &output) {
     ui->output->setPlainText(output);
 }
 
-WalletCacheDebugDialog::~WalletCacheDebugDialog() {
-    delete ui;
-}
-
+WalletCacheDebugDialog::~WalletCacheDebugDialog() = default;

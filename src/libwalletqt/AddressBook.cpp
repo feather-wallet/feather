@@ -4,7 +4,7 @@
 #include "AddressBook.h"
 #include <QDebug>
 
-AddressBook::AddressBook(Monero::AddressBook *abImpl,QObject *parent)
+AddressBook::AddressBook(Monero::AddressBook *abImpl, QObject *parent)
   : QObject(parent), m_addressBookImpl(abImpl)
 {
     getAll();
@@ -126,4 +126,17 @@ QString AddressBook::getDescription(const QString &address) const
         return {};
     }
     return m_rows.value(*it)->description();
+}
+
+QString AddressBook::getAddress(const QString &description) const
+{
+    QReadLocker locker(&m_lock);
+
+    for (const auto &row : m_rows) {
+        if (row->description() == description) {
+            return row->address();
+        }
+    }
+
+    return QString();
 }

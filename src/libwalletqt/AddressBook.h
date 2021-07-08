@@ -29,6 +29,7 @@ public:
     Q_INVOKABLE QString errorString() const;
     Q_INVOKABLE int errorCode() const;
     Q_INVOKABLE QString getDescription(const QString &address) const;
+    Q_INVOKABLE QString getAddress(const QString &description) const;
 
     enum ErrorCode {
         Status_Ok,
@@ -46,9 +47,6 @@ signals:
     void refreshStarted() const;
     void refreshFinished() const;
     void descriptionChanged() const;
-
-
-public slots:
 
 private:
     explicit AddressBook(Monero::AddressBook * abImpl, QObject *parent);

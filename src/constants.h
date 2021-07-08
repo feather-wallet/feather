@@ -11,8 +11,7 @@
 
 namespace constants
 {
-    // application constants
-    static NetworkType::Type networkType; // TODO: compiler moans, also not really a const
+    extern NetworkType::Type networkType; // TODO: not really a const
 
     // coin constants
     const std::string coinName = "monero";

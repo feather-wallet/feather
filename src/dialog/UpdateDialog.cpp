@@ -5,13 +5,12 @@
 #include "ui_UpdateDialog.h"
 
 #include <QFileDialog>
-#include <utility>
 
+#include "utils/AsyncTask.h"
 #include "utils/networking.h"
 #include "utils/NetworkManager.h"
-#include "utils/AsyncTask.h"
 #include "utils/Updater.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include "zip.h"
 
@@ -223,6 +222,4 @@ void UpdateDialog::setStatus(const QString &msg, bool success) {
         ui->label_body->setStyleSheet("");
 }
 
-UpdateDialog::~UpdateDialog() {
-    delete ui;
-}
+UpdateDialog::~UpdateDialog() = default;

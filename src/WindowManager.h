@@ -5,11 +5,12 @@
 #define FEATHER_WINDOWMANAGER_H
 
 #include <QObject>
+
+#include "dialog/TorInfoDialog.h"
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
+#include "MainWindow.h"
 #include "wizard/WalletWizard.h"
-#include "dialog/torinfodialog.h"
-#include "mainwindow.h"
 
 class MainWindow;
 class WindowManager : public QObject {
@@ -38,11 +39,13 @@ private slots:
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);
     void onInitialNetworkConfigured();
     void onDeviceButtonRequest(quint64 code);
+    void onDeviceButtonPressed();
     void onDeviceError(const QString &errorMessage);
+    void onWalletPassphraseNeeded(bool on_device);
 
 private:
     void tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset);
-    void tryCreateWalletFromDevice(const QString &path, const QString &password, int restoreHeight);
+    void tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
     void tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight);
 
     bool autoOpenWallet();
@@ -76,6 +79,8 @@ private:
     bool m_openWalletTriedOnce = false;
     bool m_openingWallet = false;
     bool m_initialNetworkConfigured = false;
+
+    QThread *m_cleanupThread;
 };
 
 

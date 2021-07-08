@@ -28,6 +28,9 @@ public:
 signals:
     void openWallet(QString path);
 
+private slots:
+    void nextPage();
+
 private:
     void updatePath();
 
@@ -35,6 +38,7 @@ private:
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WalletKeysFilesProxyModel *m_keysProxy;
     QStandardItemModel *m_model;
+    QString m_walletFile;
 };
 
 #endif //FEATHER_OPENWALLET_H

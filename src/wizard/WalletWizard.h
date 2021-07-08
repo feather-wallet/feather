@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#ifndef WALLETWIZARD_H
-#define WALLETWIZARD_H
+#ifndef FEATHER_WALLETWIZARD_H
+#define FEATHER_WALLETWIZARD_H
 
 #include <QWizard>
 #include <QLabel>
@@ -21,6 +21,12 @@ enum WizardMode {
     CreateWalletFromDevice
 };
 
+enum DeviceType {
+    LEDGER_NANO_S = 0,
+    LEDGER_NANO_X,
+    TREZOR_MODEL_T
+};
+
 struct WizardFields {
     QString walletName;
     QString walletDir;
@@ -34,6 +40,7 @@ struct WizardFields {
     WizardMode mode;
     int restoreHeight = 0;
     SeedType seedType;
+    DeviceType deviceType;
 };
 
 class WalletWizard : public QWizard
@@ -63,7 +70,7 @@ signals:
     void openWallet(QString path, QString password);
     void defaultWalletDirChanged(QString walletDir);
 
-    void createWalletFromDevice(const QString &path, const QString &password, int restoreHeight);
+    void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
     void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset = "");
 
@@ -75,4 +82,4 @@ private:
     WizardFields m_wizardFields;
 };
 
-#endif // WALLETWIZARD_H
+#endif // FEATHER_WALLETWIZARD_H

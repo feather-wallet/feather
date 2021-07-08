@@ -9,40 +9,40 @@
 class WalletPassphraseListenerImpl : public  Monero::WalletListener, public PassphraseReceiver
 {
 public:
-    WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
+    explicit WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
 
-    virtual void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void newBlock(uint64_t height) override { (void) height; };
-    virtual void updated() override {};
-    virtual void refreshed(bool success) override {};
+    void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void newBlock(uint64_t height) override { (void) height; };
+    void updated() override {};
+    void refreshed(bool success) override {};
 
-    virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override
+    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override
     {
         qDebug() << __FUNCTION__;
         m_phelper.onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
 
-//    virtual Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
-//    {
-//        qDebug() << __FUNCTION__;
-//        return m_phelper.onDevicePassphraseRequest(on_device);
-//    }
-//
-    virtual void onDeviceButtonRequest(uint64_t code) override
+    Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
+    {
+        qDebug() << __FUNCTION__;
+        return m_phelper.onDevicePassphraseRequest(on_device);
+    }
+
+    void onDeviceButtonRequest(uint64_t code) override
     {
         qDebug() << __FUNCTION__;
         emit m_mgr->deviceButtonRequest(code);
     }
-//
-//    virtual void onDeviceButtonPressed() override
-//    {
-//        qDebug() << __FUNCTION__;
-//        emit m_mgr->deviceButtonPressed();
-//    }
 
-    virtual void onDeviceError(const std::string &message) override
+    void onDeviceButtonPressed() override
+    {
+        qDebug() << __FUNCTION__;
+        emit m_mgr->deviceButtonPressed();
+    }
+
+    void onDeviceError(const std::string &message) override
     {
         qDebug() << __FUNCTION__;
         emit m_mgr->deviceError(QString::fromStdString(message));
@@ -303,38 +303,6 @@ QString WalletManager::resolveOpenAlias(const QString &address) const
     std::string res = m_pimpl->resolveOpenAlias(address.toStdString(), dnssec_valid);
     res = std::string(dnssec_valid ? "true" : "false") + "|" + res;
     return QString::fromStdString(res);
-}
-bool WalletManager::parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const
-{
-    QMutexLocker locker(&m_mutex);
-    // TODO: FIXME
-//    if (m_currentWallet)
-//        return m_currentWallet->parse_uri(uri, address, payment_id, amount, tx_description, recipient_name, unknown_parameters, error);
-    return false;
-}
-
-QVariantMap WalletManager::parse_uri_to_object(const QString &uri) const
-{
-    QString address;
-    QString payment_id;
-    uint64_t amount = 0;
-    QString tx_description;
-    QString recipient_name;
-    QVector<QString> unknown_parameters;
-    QString error;
-
-    QVariantMap result;
-    if (this->parse_uri(uri, address, payment_id, amount, tx_description, recipient_name, unknown_parameters, error)) {
-        result.insert("address", address);
-        result.insert("payment_id", payment_id);
-        result.insert("amount", amount > 0 ? displayAmount(amount) : "");
-        result.insert("tx_description", tx_description);
-        result.insert("recipient_name", recipient_name);
-    } else {
-        result.insert("error", error);
-    }
-    
-    return result;
 }
 
 void WalletManager::setLogLevel(int logLevel)

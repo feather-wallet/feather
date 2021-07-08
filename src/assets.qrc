@@ -107,7 +107,9 @@
     <file>assets/images/tor_logo_disabled.png</file>
     <file>assets/images/tor_logo.png</file>
     <file>assets/images/trezor.png</file>
+    <file>assets/images/trezor_white.png</file>
     <file>assets/images/trezor_unpaired.png</file>
+    <file>assets/images/trezor_unpaired_white.png</file>
     <file>assets/images/unconfirmed.png</file>
     <file>assets/images/unlock.png</file>
     <file>assets/images/unlock.svg</file>

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // Copyright (c) 2020-2021, The Monero Project.
 
-#include "utils/utils.h"
+#include "utils/Utils.h"
 
 #include "WalletWizard.h"
 #include "PageMenu.h"
@@ -93,7 +93,17 @@ void WalletWizard::onCreateWallet() {
             restoreHeight = m_wizardFields.restoreHeight;
         }
 
-        emit createWalletFromDevice(walletPath, m_wizardFields.password, restoreHeight);
+        QString deviceName;
+        switch (m_wizardFields.deviceType) {
+            case DeviceType::LEDGER_NANO_S:
+            case DeviceType::LEDGER_NANO_X:
+                deviceName = "Ledger";
+                break;
+            case DeviceType::TREZOR_MODEL_T:
+                deviceName = "Trezor";
+        }
+
+        emit createWalletFromDevice(walletPath, m_wizardFields.password, deviceName, restoreHeight);
         return;
     }
 

@@ -4,7 +4,7 @@
 // Copyright (c) 2020-2021, The Monero Project.
 
 #include "config.h"
-#include "utils/utils.h"
+#include "utils/Utils.h"
 #include "utils/os/tails.h"
 
 #define QS QStringLiteral
@@ -51,6 +51,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         // Mining
         {Config::xmrigPath,{QS("xmrigPath"), ""}},
         {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+        {Config::pools,{QS("pools"), {}}},
 
         // Settings
         {Config::preferredFiatCurrency,{QS("preferredFiatCurrency"), "USD"}},
@@ -107,6 +108,14 @@ void Config::set(ConfigKey key, const QVariant& value)
     m_settings->setValue(cfg.name, value);
 
     this->sync();
+    emit changed(key);
+}
+
+void Config::remove(ConfigKey key)
+{
+    auto cfg = configStrings[key];
+    m_settings->remove(cfg.name);
+
     emit changed(key);
 }
 
