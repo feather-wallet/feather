@@ -111,6 +111,14 @@ void Config::set(ConfigKey key, const QVariant& value)
     emit changed(key);
 }
 
+void Config::remove(ConfigKey key)
+{
+    auto cfg = configStrings[key];
+    m_settings->remove(cfg.name);
+
+    emit changed(key);
+}
+
 /**
  * Sync configuration with persistent storage.
  *

@@ -113,6 +113,7 @@ private slots:
     void menuWalletCloseClicked();
     void menuTorClicked();
     void menuToggleTabVisible(const QString &key);
+    void menuClearHistoryClicked();
     void onExportHistoryCSV(bool checked);
     void onExportContactsCSV(bool checked);
     void onCreateDesktopEntry(bool checked);
@@ -208,7 +209,8 @@ private:
     QString getHardwareDevice();
     void updateTitle();
     void donationNag();
-    void updateRecentlyOpened(const QString &filename);
+    void addToRecentlyOpened(const QString &filename);
+    void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
 
     QIcon hardwareDevicePairedIcon();
@@ -236,6 +238,8 @@ private:
 
     QList<PriceTickerWidget*> m_priceTickerWidgets;
     BalanceTickerWidget *m_balanceTickerWidget;
+
+    QPointer<QAction> m_clearRecentlyOpenAction;
 
     // lower status bar
     QPushButton *m_statusUpdateAvailable;

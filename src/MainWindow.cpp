@@ -223,6 +223,10 @@ void MainWindow::initMenu() {
     connect(ui->actionQuit,        &QAction::triggered, this, &MainWindow::menuQuitClicked);        // Quit application
     connect(ui->actionSettings,    &QAction::triggered, this, &MainWindow::menuSettingsClicked);
 
+    // [File] -> [Recently open]
+    m_clearRecentlyOpenAction = new QAction("Clear history", ui->menuFile);
+    connect(m_clearRecentlyOpenAction, &QAction::triggered, this, &MainWindow::menuClearHistoryClicked);
+
     // [Wallet]
     connect(ui->actionInformation,  &QAction::triggered, this, &MainWindow::showWalletInfoDialog);
     connect(ui->actionAccount,      &QAction::triggered, this, &MainWindow::showAccountSwitcherDialog);
@@ -389,6 +393,11 @@ void MainWindow::menuToggleTabVisible(const QString &key){
     toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
 }
 
+void MainWindow::menuClearHistoryClicked() {
+    config()->remove(Config::recentlyOpenedWallets);
+    this->updateRecentlyOpenedMenu();
+}
+
 QString MainWindow::walletName() {
     return QFileInfo(m_ctx->wallet->cachePath()).fileName();
 }
@@ -469,7 +478,7 @@ void MainWindow::onWalletOpened() {
     m_ctx->nodes->connectToNode();
     m_updateBytes.start(250);
 
-    this->updateRecentlyOpened(m_ctx->wallet->cachePath());
+    this->addToRecentlyOpened(m_ctx->wallet->cachePath());
 }
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
@@ -1497,7 +1506,7 @@ void MainWindow::donationNag() {
     config()->set(Config::donateBeg, donationCounter);
 }
 
-void MainWindow::updateRecentlyOpened(const QString &keysFile) {
+void MainWindow::addToRecentlyOpened(const QString &keysFile) {
     auto recent = config()->get(Config::recentlyOpenedWallets).toList();
 
     if (recent.contains(keysFile)) {
@@ -1518,12 +1527,19 @@ void MainWindow::updateRecentlyOpened(const QString &keysFile) {
     }
 
     config()->set(Config::recentlyOpenedWallets, recent_);
+
+    this->updateRecentlyOpenedMenu();
+}
+
+void MainWindow::updateRecentlyOpenedMenu() {
     ui->menuRecently_open->clear();
-    for (const auto &var : recent_) {
-        QString path = var.toString();
-        QFileInfo fileInfo{path};
-        ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, path, ""));
+    const QStringList recentWallets = config()->get(Config::recentlyOpenedWallets).toStringList();
+    for (const auto &walletPath : recentWallets) {
+        QFileInfo fileInfo{walletPath};
+        ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, walletPath, ""));
     }
+    ui->menuRecently_open->addSeparator();
+    ui->menuRecently_open->addAction(m_clearRecentlyOpenAction);
 }
 
 void MainWindow::toggleSearchbar(bool visible) {

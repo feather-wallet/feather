@@ -102,6 +102,7 @@ public:
     QVariant get(ConfigKey key);
     QString getFileName();
     void set(ConfigKey key, const QVariant& value);
+    void remove(ConfigKey key);
     void sync();
     void resetToDefaults();
 
