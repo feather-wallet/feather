@@ -376,6 +376,9 @@ void WindowManager::onDeviceButtonRequest(quint64 code) {
         case 8: // Trezor
             message = "Action required on device: Export watch-only credentials to open the wallet.";
             break;
+        case 19: // Trezor
+            message = "Action required on device: Enter passphrase to open the wallet.";
+            break;
         default:
             message = "Action required on device: Export the view key to open the wallet.";
     }
