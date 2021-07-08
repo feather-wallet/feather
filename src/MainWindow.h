@@ -174,6 +174,7 @@ private slots:
     void onDeviceError(const QString &error);
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
+    void onWalletPassphraseNeeded(bool on_device);
     void menuHwDeviceClicked();
     void onUpdatesAvailable(const QJsonObject &updates);
     void toggleSearchbar(bool enabled);

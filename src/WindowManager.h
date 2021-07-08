@@ -41,6 +41,7 @@ private slots:
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
     void onDeviceError(const QString &errorMessage);
+    void onWalletPassphraseNeeded(bool on_device);
 
 private:
     void tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset);

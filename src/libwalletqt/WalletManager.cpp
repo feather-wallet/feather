@@ -9,40 +9,40 @@
 class WalletPassphraseListenerImpl : public  Monero::WalletListener, public PassphraseReceiver
 {
 public:
-    WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
+    explicit WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
 
-    virtual void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    virtual void newBlock(uint64_t height) override { (void) height; };
-    virtual void updated() override {};
-    virtual void refreshed(bool success) override {};
+    void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void newBlock(uint64_t height) override { (void) height; };
+    void updated() override {};
+    void refreshed(bool success) override {};
 
-    virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override
+    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override
     {
         qDebug() << __FUNCTION__;
         m_phelper.onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
 
-//    virtual Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
-//    {
-//        qDebug() << __FUNCTION__;
-//        return m_phelper.onDevicePassphraseRequest(on_device);
-//    }
-//
-    virtual void onDeviceButtonRequest(uint64_t code) override
+    Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
+    {
+        qDebug() << __FUNCTION__;
+        return m_phelper.onDevicePassphraseRequest(on_device);
+    }
+
+    void onDeviceButtonRequest(uint64_t code) override
     {
         qDebug() << __FUNCTION__;
         emit m_mgr->deviceButtonRequest(code);
     }
-//
-    virtual void onDeviceButtonPressed() override
+
+    void onDeviceButtonPressed() override
     {
         qDebug() << __FUNCTION__;
         emit m_mgr->deviceButtonPressed();
     }
 
-    virtual void onDeviceError(const std::string &message) override
+    void onDeviceError(const std::string &message) override
     {
         qDebug() << __FUNCTION__;
         emit m_mgr->deviceError(QString::fromStdString(message));

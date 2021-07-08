@@ -3,6 +3,7 @@
 
 #include "WindowManager.h"
 
+#include <QInputDialog>
 #include <QMessageBox>
 
 #include "constants.h"
@@ -24,6 +25,7 @@ WindowManager::WindowManager() {
     connect(m_walletManager, &WalletManager::deviceButtonRequest, this, &WindowManager::onDeviceButtonRequest);
     connect(m_walletManager, &WalletManager::deviceButtonPressed, this, &WindowManager::onDeviceButtonPressed);
     connect(m_walletManager, &WalletManager::deviceError,         this, &WindowManager::onDeviceError);
+    connect(m_walletManager, &WalletManager::walletPassphraseNeeded, this, &WindowManager::onWalletPassphraseNeeded);
 
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
 
@@ -391,6 +393,25 @@ void WindowManager::onDeviceButtonPressed() {
 void WindowManager::onDeviceError(const QString &errorMessage) {
     // TODO: when does this get called?
     qCritical() << Q_FUNC_INFO << errorMessage;
+}
+
+void WindowManager::onWalletPassphraseNeeded(bool on_device) {
+    auto button = QMessageBox::question(nullptr, "Wallet Passphrase Needed", "Enter passphrase on hardware wallet?\n\n"
+                                                                             "It is recommended to enter passphrase on "
+                                                                             "the hardware wallet for better security.",
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (button == QMessageBox::Yes) {
+        m_walletManager->onPassphraseEntered("", true, false);
+        return;
+    }
+
+    bool ok;
+    QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
+    if (ok) {
+        m_walletManager->onPassphraseEntered(passphrase, false, false);
+    } else {
+        m_walletManager->onPassphraseEntered(passphrase, false, true);
+    }
 }
 
 // ######################## TRAY ########################

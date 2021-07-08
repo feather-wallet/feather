@@ -377,6 +377,7 @@ void MainWindow::initWalletContext() {
     // Wallet
     connect(m_ctx->wallet, &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
     connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
+    connect(m_ctx->wallet, &Wallet::walletPassphraseNeeded, this, &MainWindow::onWalletPassphraseNeeded);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -1188,6 +1189,25 @@ void MainWindow::onDeviceButtonPressed() {
     }
 
     m_splashDialog->hide();
+}
+
+void MainWindow::onWalletPassphraseNeeded(bool on_device) {
+    auto button = QMessageBox::question(nullptr, "Wallet Passphrase Needed", "Enter passphrase on hardware wallet?\n\n"
+                                                                             "It is recommended to enter passphrase on "
+                                                                             "the hardware wallet for better security.",
+                                        QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+    if (button == QMessageBox::Yes) {
+        m_ctx->wallet->onPassphraseEntered("", true, false);
+        return;
+    }
+
+    bool ok;
+    QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
+    if (ok) {
+        m_ctx->wallet->onPassphraseEntered(passphrase, false, false);
+    } else {
+        m_ctx->wallet->onPassphraseEntered(passphrase, false, true);
+    }
 }
 
 void MainWindow::updateNetStats() {
