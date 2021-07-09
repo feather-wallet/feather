@@ -874,6 +874,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
         m_updateBytes.stop();
         m_txTimer.stop();
+        m_ctx->stopTimers();
+
+        // Wallet signal may fire after AppContext is gone, causing segv
+        m_ctx->wallet->disconnect();
 
         this->saveGeo();
         m_windowManager->closeWindow(this);
