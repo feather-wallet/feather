@@ -1,13 +1,10 @@
 {
   "mainnet": {
     "tor": [
-      "xmrag4hf5xlabmob.onion:18081",
       "monero26mmldsallmxok2kwamne4ve3mybvvn2yijsvss7ey63hc4yyd.onion:18081",
-      "monero5sjoz5xmjn.onion:18081",
       "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
       "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
       "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
-      "aytzr6aoxsegx2y6.onion:18081",
       "rbpgdckle3h3vi4wwwrh75usqtoc5r3alohy7yyx57isynvay63nacyd.onion:18089"
     ],
     "clearnet": [
