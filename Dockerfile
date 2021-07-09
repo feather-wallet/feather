@@ -230,9 +230,9 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
 # Tor: Optional for Feather (-DTOR_BIN)
 # Binary can be embedded in Feather
 ENV TOR_BIN=/usr/local/tor/bin/tor
-RUN git clone -b tor-0.4.5.7 --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.6.6 --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
-    git reset --hard 83f895c015de55201e5f226f84a866f30f5ee14b && \
+    git reset --hard 60d1fb3d37274e29e9e88620d77e1636ef922561 && \
     ./autogen.sh && \
     ./configure \
     --disable-asciidoc \
