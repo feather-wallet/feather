@@ -30,14 +30,14 @@ Replace `master` with the desired version tag (e.g. `beta-8`) to build the relea
 docker build --tag feather:linux --build-arg THREADS=4 .
 ```
 
-Building the base image takes a while. You only need to build the base image once.
+Building the base image takes a while. You only need to build the base image once per release.
 
 #### 3. Build
 
 ##### Standalone binary
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'CHECK_UPDATES=On make release-static -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'WITH_SCANNER=Off make release-static -j8'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.
@@ -46,9 +46,9 @@ The resulting binary can be found in `build/bin/feather`.
 
 ##### AppImage
 
-First create the standalone binary using the Docker command in the previous step.
-
 ```bash
+rm -rf build
+docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'make release-static -j8'
 docker run --rm -it -v $PWD:/feather -w /feather/build feather:linux ../contrib/build-appimage.sh
 ```
 
@@ -77,7 +77,7 @@ Building the base image takes a while. You only need to build the base image onc
 #### 3. Build
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'CHECK_UPDATES=On make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.
