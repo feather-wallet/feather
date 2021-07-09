@@ -279,12 +279,9 @@ void SendWidget::onDataPasted(const QString &data) {
     if (!data.isEmpty()) {
         QVariantMap uriData = m_ctx->wallet->parse_uri_to_object(data);
         if (!uriData.contains("error")) {
-            if (uriData.contains("address"))
-                ui->lineAddress->setText(uriData.value("address").toString());
-            if (uriData.contains("amount"))
-                ui->lineAmount->setText(uriData.value("amount").toString());
-            if (uriData.contains("tx_description"))
-                ui->lineDescription->setText(uriData.value("tx_description").toString());
+            ui->lineAddress->setText(uriData.value("address").toString());
+            ui->lineDescription->setText(uriData.value("tx_description").toString());
+            ui->lineAmount->setText(uriData.value("amount").toString());
         } else {
             ui->lineAddress->setText(data);
         }
