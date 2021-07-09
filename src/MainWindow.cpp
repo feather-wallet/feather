@@ -1170,9 +1170,20 @@ void MainWindow::onDeviceError(const QString &error) {
 }
 
 void MainWindow::onDeviceButtonRequest(quint64 code) {
+    qDebug() << "DeviceButtonRequest, code: " << code;
+
     if (m_ctx->wallet->isTrezor()) {
         switch (code) {
+            case 1:
+            {
+                m_splashDialog->setMessage("Action required on device: Enter your PIN to continue");
+                m_splashDialog->setIcon(QPixmap(":/assets/images/key.png"));
+                m_splashDialog->show();
+                m_splashDialog->setEnabled(true);
+                break;
+            }
             case 8:
+            default:
             {
                 // Annoyingly, this code is used for a variety of actions, including:
                 // Confirm refresh: Do you really want to start refresh?
