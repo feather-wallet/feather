@@ -22,6 +22,7 @@ QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
     if (m_cameras.count() < 1) {
         QMessageBox::warning(parent, "QR code scanner", "No available cameras found.");
         this->close();
+        return;
     }
 
     for (const auto &camera : m_cameras) {
