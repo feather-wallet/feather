@@ -181,11 +181,6 @@ if(TOR_BIN)
         execute_process(COMMAND bash -c "touch ${CMAKE_CURRENT_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
     endif()
 
-    execute_process(COMMAND bash -c "${TOR_BIN} --version --quiet" OUTPUT_STRIP_TRAILING_WHITESPACE OUTPUT_VARIABLE out RESULT_VARIABLE ret)
-    if (ret EQUAL "0")
-        string(REGEX MATCH "[0-9]+\.[0-9]+\.[0-9]+\.[0-9]" version ${out})
-        set(TOR_VERSION "${version}")
-    endif()
     message(STATUS "Embedded Tor version: ${TOR_VERSION}")
     configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
