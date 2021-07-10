@@ -30,7 +30,7 @@ release-static:
 
 depends:
 	mkdir -p build/$(target)/release
-	cd build/$(target)/release && cmake -D STATIC=ON -DREPRODUCIBLE=$(or ${SOURCE_DATE_EPOCH},OFF) -DTOR_VERSION=$(or ${TOR_VERSION}, OFF) -DTOR_BIN=$(or ${TOR_BIN},OFF) -DCHECK_UPDATES=$(or ${CHECK_UPDATES}, OFF) -D DEV_MODE=$(or ${DEV_MODE},OFF) -D BUILD_TAG=$(tag) -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake ../../.. && $(MAKE)
+	cd build/$(target)/release && cmake -D STATIC=ON -DREPRODUCIBLE=$(or ${SOURCE_DATE_EPOCH},OFF) -DTOR_VERSION=$(or ${TOR_VERSION}, OFF) -DTOR_BIN=$(or ${TOR_BIN},OFF) -DCHECK_UPDATES=$(or ${CHECK_UPDATES}, OFF) -DWITH_SCANNER=$(or ${WITH_SCANNER}, Off) -D DEV_MODE=$(or ${DEV_MODE},OFF) -D BUILD_TAG=$(tag) -D CMAKE_BUILD_TYPE=Release -D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake ../../.. && $(MAKE)
 
 mac-release: CMAKEFLAGS += -DSTATIC=Off
 mac-release: CMAKEFLAGS += -DTOR_BIN=$(or ${TOR_BIN}, Off)
