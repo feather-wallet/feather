@@ -57,6 +57,8 @@ file(GLOB SOURCE_FILES
         "qrcode/*.cpp"
         "dialog/*.h"
         "dialog/*.cpp"
+        "qrcode_scanner/QrCodeUtils.cpp"
+        "qrcode_scanner/QrCodeUtils.h"
         )
 
 if (WITH_SCANNER)
@@ -141,11 +143,11 @@ target_include_directories(feather PUBLIC
         ${Qt5WebSockets_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
+        ${ZBAR_INCLUDE_DIR}
         )
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
-            ${ZBAR_INCLUDE_DIR}
             ${Qt5Multimedia_INCLUDE_DIRS}
             ${Qt5MultimediaWidgets_INCLUDE_DIRS}
     )
@@ -248,6 +250,7 @@ target_link_libraries(feather
         ${QRENCODE_LIBRARY}
         ${ZLIB_LIBRARIES}
         ${LIBZIP_LIBRARIES}
+        ${ZBAR_LIBRARIES}
         )
 
 if(DEVICE_TREZOR_READY)
@@ -258,7 +261,6 @@ if (WITH_SCANNER)
     target_link_libraries(feather
             Qt5::Multimedia
             Qt5::MultimediaWidgets
-            ${ZBAR_LIBRARIES}
     )
 endif()
 
