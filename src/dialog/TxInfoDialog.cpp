@@ -43,21 +43,21 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     } else {
         ui->btn_rebroadcastTx->hide();
     }
-
-    if (txInfo->direction() == TransactionInfo::Direction_Out) {
-        // TODO: this will not properly represent coinjoin-like transactions.
-        QVector<CoinsInfo*> coins = m_ctx->wallet->coins()->coins_from_txid(m_txid);
-        QTextCursor c_i = ui->inputs->textCursor();
-        QString inputs_str;
-        for (const auto &coin : coins) {
-            inputs_str += QString("%1 %2\n").arg(coin->pubKey(), coin->displayAmount());
-        }
-        ui->inputs->setText(inputs_str);
-        ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(coins.size())));
-        this->adjustHeight(ui->inputs, coins.size());
-    } else {
-        ui->frameInputs->hide();
-    }
+//
+//    if (txInfo->direction() == TransactionInfo::Direction_Out) {
+//        // TODO: this will not properly represent coinjoin-like transactions.
+//        QVector<CoinsInfo*> coins = m_ctx->wallet->coins()->coins_from_txid(m_txid);
+//        QTextCursor c_i = ui->inputs->textCursor();
+//        QString inputs_str;
+//        for (const auto &coin : coins) {
+//            inputs_str += QString("%1 %2\n").arg(coin->pubKey(), coin->displayAmount());
+//        }
+//        ui->inputs->setText(inputs_str);
+//        ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(coins.size())));
+//        this->adjustHeight(ui->inputs, coins.size());
+//    } else {
+    ui->frameInputs->hide();
+//    }
 
     QTextCursor cursor = ui->outputs->textCursor();
 
