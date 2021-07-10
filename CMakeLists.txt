@@ -24,7 +24,6 @@ option(WITH_SCANNER "Enable webcam QR scanner" OFF)
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
-include(CheckLinkerFlag)
 include(FetchContent)
 include(FindCcache)
 include(CheckIncludeFile)
@@ -103,11 +102,9 @@ set(HIDAPI_FOUND OFF)
 find_package(QREncode REQUIRED)
 
 # Qr scanner
-if (WITH_SCANNER)
-    find_package(ZBAR REQUIRED)
-    message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
-    message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
-endif()
+find_package(ZBAR REQUIRED)
+message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
+message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
 
 # Tevador 14 word Monero seed
 find_package(monero-seed CONFIG)
