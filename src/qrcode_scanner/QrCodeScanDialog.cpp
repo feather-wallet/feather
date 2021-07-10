@@ -19,11 +19,6 @@ QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
     ui->icon_warning->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     m_cameras = QCameraInfo::availableCameras();
-    if (m_cameras.count() < 1) {
-        QMessageBox::warning(parent, "QR code scanner", "No available cameras found.");
-        this->close();
-        return;
-    }
 
     for (const auto &camera : m_cameras) {
 #ifdef Q_OS_WIN

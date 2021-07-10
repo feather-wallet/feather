@@ -13,6 +13,7 @@
 
 #ifdef WITH_SCANNER
 #include "qrcode_scanner/QrCodeScanDialog.h"
+#include <QtMultimedia/QCameraInfo>
 #endif
 
 SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
@@ -112,6 +113,12 @@ void SendWidget::fillAddress(const QString &address) {
 
 void SendWidget::scanClicked() {
 #ifdef WITH_SCANNER
+    auto cameras = QCameraInfo::availableCameras();
+    if (cameras.count() < 1) {
+        QMessageBox::warning(this, "QR code scanner", "No available cameras found.");
+        return;
+    }
+
     auto *dialog = new QrCodeScanDialog(this);
     dialog->exec();
     ui->lineAddress->setText(dialog->decodedString);
