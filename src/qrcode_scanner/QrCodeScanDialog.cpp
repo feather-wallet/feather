@@ -26,7 +26,11 @@ QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
     }
 
     for (const auto &camera : m_cameras) {
+#ifdef Q_OS_WIN
+        ui->combo_camera->addItem(camera.description());
+#else
         ui->combo_camera->addItem(camera.deviceName());
+#endif
     }
 
     connect(ui->combo_camera, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QrCodeScanDialog::onCameraSwitched);
