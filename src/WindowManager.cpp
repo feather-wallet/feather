@@ -47,6 +47,12 @@ WindowManager::WindowManager() {
     }
 }
 
+WindowManager::~WindowManager() {
+    qDebug() << "~WindowManager";
+    m_cleanupThread->quit();
+    m_cleanupThread->wait();
+}
+
 // ######################## APPLICATION LIFECYCLE ########################
 
 void WindowManager::quitAfterLastWindow() {

@@ -18,6 +18,7 @@ Q_OBJECT
 
 public:
     explicit WindowManager();
+    ~WindowManager() override;
 
     void wizardOpenWallet();
     void close();
