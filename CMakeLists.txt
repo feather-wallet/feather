@@ -3,7 +3,6 @@ project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
-set(THREADS_PREFER_PTHREAD_FLAG ON)
 set(VERSION_MAJOR "0")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "0")
@@ -37,7 +36,6 @@ set(MONERO_HEAD "d0662146e12d9c0ac9905b4423bb27bd68a4444e")
 set(BUILD_GUI_DEPS ON)
 set(ARCH "x86-64")
 set(BUILD_64 ON)
-set(INSTALL_VENDORED_LIBUNBOUND ${STATIC})
 set(USE_SINGLE_BUILDDIR ON)
 
 check_include_file(sys/prctl.h HAVE_SYS_PRCTL_H)
