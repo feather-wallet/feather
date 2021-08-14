@@ -21,19 +21,30 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>Transaction ID:</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Transaction ID:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="txid">
+       <property name="text">
+        <string>txid</string>
+       </property>
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
-    <widget class="QLineEdit" name="txid">
-     <property name="text">
-      <string>txid</string>
-     </property>
-     <property name="readOnly">
-      <bool>true</bool>
+    <widget class="Line" name="line_3">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -252,6 +263,16 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="btn_exportTxKey">
+       <property name="text">
+        <string>Export tx key</string>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::InstantPopup</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -272,16 +293,16 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_send">
+      <widget class="QPushButton" name="btn_close">
        <property name="text">
-        <string>Send</string>
+        <string>Cancel</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_close">
+      <widget class="QPushButton" name="btn_send">
        <property name="text">
-        <string>Close</string>
+        <string>Send</string>
        </property>
       </widget>
      </item>
