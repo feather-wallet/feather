@@ -139,7 +139,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
 
     // Setup logging
-    QString logPath = QString("%1/daemon.log").arg(configDir);
+    QString logPath = QString("%1/libwallet.log").arg(configDir);
     Monero::Utils::onStartup();
     Monero::Wallet::init("", "feather", logPath.toStdString(), true);
 
