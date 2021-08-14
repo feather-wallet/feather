@@ -7,7 +7,8 @@
       "3hvpnd4xejtzcuowvru2wfjum5wjf7synigm44rrizr3k4v5vzam2bad.onion:18081",
       "rbpgdckle3h3vi4wwwrh75usqtoc5r3alohy7yyx57isynvay63nacyd.onion:18089",
       "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
-      "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089"
+      "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089",
+      "melo7jwjspngus3xhbt5kxeqc4njhokyvh55jfmehplglgmb7a6rb6yd.onion:18081"
     ],
     "clearnet": [
       "node.melo.tools:18081",
@@ -25,14 +26,17 @@
     ]
   },
   "testnet": {
-    "tor": [],
+    "tor": [
+      "melot6vncfusj5gfi73gaosea2mc572n3n7f7gof75zkwg6oibkhk3id.onion:28081"
+    ],
     "clearnet": [
       "testnet.melo.tools:28081"
     ]
   },
   "stagenet": {
     "tor": [
-      "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081"
+      "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081",
+      "melos2hbwolcavwbgytdwbmcx7t3uh2eu36p3vnbttibosnpzmtp6hqd.onion:38081"
     ],
     "clearnet": [
       "super.fast.node.xmr.pm:38089",
