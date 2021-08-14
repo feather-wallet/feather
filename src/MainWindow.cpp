@@ -600,11 +600,11 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         qCritical() << tx_err;
 
         if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
-            err = QString("%1 Wrong daemon version: %2").arg(err).arg(tx_err);
+            err = QString("%1 Wrong node version: %2").arg(err).arg(tx_err);
         else
             err = QString("%1 %2").arg(err).arg(tx_err);
 
-        if (tx_err.contains("Daemon response did not include the requested real output")) {
+        if (tx_err.contains("Node response did not include the requested real output")) {
             QString currentNode = m_ctx->nodes->connection().toAddress();
 
             err += QString("\nYou are currently connected to: %1\n\n"
@@ -726,7 +726,7 @@ void MainWindow::showConnectionStatusDialog() {
     QString statusMsg;
     switch(status){
         case Wallet::ConnectionStatus_Disconnected:
-            statusMsg = "Wallet is disconnected from daemon.";
+            statusMsg = "Wallet is disconnected from node.";
             break;
         case Wallet::ConnectionStatus_Connecting: {
             auto node = m_ctx->nodes->connection();
@@ -734,7 +734,7 @@ void MainWindow::showConnectionStatusDialog() {
             break;
         }
         case Wallet::ConnectionStatus_WrongVersion:
-            statusMsg = "Wallet is connected to incompatible daemon.";
+            statusMsg = "Wallet is connected to incompatible node.";
             break;
         case Wallet::ConnectionStatus_Synchronizing:
         case Wallet::ConnectionStatus_Synchronized: {
