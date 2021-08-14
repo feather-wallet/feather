@@ -236,7 +236,7 @@ void MainWindow::initMenu() {
     connect(ui->actionViewOnly,     &QAction::triggered, this, &MainWindow::showViewOnlyDialog);
 
     // [Wallet] -> [Advanced]
-    connect(ui->actionStore_wallet,          &QAction::triggered, [this]{m_ctx->wallet->store();});
+    connect(ui->actionStore_wallet,          &QAction::triggered, this, &MainWindow::tryStoreWallet);
     connect(ui->actionUpdate_balance,        &QAction::triggered, [this]{m_ctx->updateBalance();});
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_ctx->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
@@ -528,6 +528,16 @@ void MainWindow::setStatusText(const QString &text, bool override, int timeout) 
     if (!m_statusOverrideActive && !m_constructingTransaction) {
         m_statusLabelStatus->setText(text);
     }
+}
+
+void MainWindow::tryStoreWallet() {
+    if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus::ConnectionStatus_Synchronizing) {
+        QMessageBox::warning(this, "Save wallet", "Unable to save wallet during synchronization.\n\n"
+                                                  "Wait until synchronization is finished and try again.");
+        return;
+    }
+
+    m_ctx->wallet->store();
 }
 
 void MainWindow::onSynchronized() {
