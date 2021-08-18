@@ -20,7 +20,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::firstRun, {QS("firstRun"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
-        {Config::warnOnAlpha,{QS("warnOnAlpha"), true}},
 
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
