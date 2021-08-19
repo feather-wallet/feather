@@ -72,12 +72,10 @@ TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *t
         ui->label_address->setToolTip("Wallet change/primary address");
     }
 
-
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
-    m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0)); // Todo: Iterate over all txs
     this->adjustSize();
 }
 

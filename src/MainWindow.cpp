@@ -592,10 +592,8 @@ void MainWindow::onConnectionStatusChanged(int status)
 }
 
 void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
-    auto tx_status = tx->status();
     QString err{"Can't create transaction: "};
-
-    if (tx_status != PendingTransaction::Status_Ok){
+    if (tx->status() != PendingTransaction::Status_Ok) {
         QString tx_err = tx->errorString();
         qCritical() << tx_err;
 
@@ -615,42 +613,43 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
+        return;
     }
     else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
+        return;
     }
-    else {
-        const auto &description = m_ctx->tmpTxDescription;
 
-        // Show advanced dialog on multi-destination transactions
-        if (address.size() > 1) {
-            TxConfAdvDialog dialog_adv{m_ctx, description, this};
-            dialog_adv.setTransaction(tx);
-            dialog_adv.exec();
-            return;
-        }
+    m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
-        TxConfDialog dialog{m_ctx, tx, address[0], description, this};
-        switch (dialog.exec()) {
-            case QDialog::Rejected:
-            {
-                if (!dialog.showAdvanced)
-                    m_ctx->onCancelTransaction(tx, address);
-                break;
-            }
-            case QDialog::Accepted:
-                m_ctx->commitTransaction(tx);
-                break;
-        }
+    // Show advanced dialog on multi-destination transactions
+    if (address.size() > 1) {
+        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx);
+        dialog_adv.exec();
+        return;
+    }
 
-        if (dialog.showAdvanced) {
-            TxConfAdvDialog dialog_adv{m_ctx, description, this};
-            dialog_adv.setTransaction(tx);
-            dialog_adv.exec();
+    TxConfDialog dialog{m_ctx, tx, address[0], m_ctx->tmpTxDescription, this};
+    switch (dialog.exec()) {
+        case QDialog::Rejected:
+        {
+            if (!dialog.showAdvanced)
+                m_ctx->onCancelTransaction(tx, address);
+            break;
         }
+        case QDialog::Accepted:
+            m_ctx->commitTransaction(tx);
+            break;
+    }
+
+    if (dialog.showAdvanced) {
+        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx);
+        dialog_adv.exec();
     }
 }
 
