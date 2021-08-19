@@ -100,7 +100,7 @@ bool dirExists(const QString &path) {
 
 QString defaultWalletDir() {
     QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
-    if (QFile::exists(portablePath.arg(".portable"))) {
+    if (QFile::exists(portablePath.arg(".portable")) || QFile::exists(portablePath.arg(".portable.txt"))) {
         return portablePath.arg("feather_data/wallets");
     }
 
