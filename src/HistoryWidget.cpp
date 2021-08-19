@@ -144,9 +144,9 @@ void HistoryWidget::createTxProof() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TxProofDialog(this, m_ctx, tx);
-    dialog->exec();
-    dialog->deleteLater();
+    TxProofDialog dialog{this, m_ctx, tx};
+    dialog.getTxKey();
+    dialog.exec();
 }
 
 void HistoryWidget::copy(copyField field) {
