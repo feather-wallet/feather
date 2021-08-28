@@ -10,7 +10,7 @@ Static builds via Docker are done in 3 steps:
 2. Creating a base Docker image
 3. Using the base image to compile a build
 
-### Linux (reproducible)
+### Linux x86-64 (reproducible)
 
 The docker image for reproducible Linux static builds uses Ubuntu 16.04 and compiles the required libraries statically 
 so that the resulting Feather binary is static. For more information, check the Dockerfile: `Dockerfile`.
@@ -54,6 +54,41 @@ docker run --rm -it -v $PWD:/feather -w /feather/build feather:linux ../contrib/
 
 The resulting AppImage will be located in `./build`.
 
+### Linux arm64
+
+#### 1. Clone
+
+```bash
+git clone https://git.featherwallet.org/feather/feather.git
+cd feather
+git checkout master
+git submodule update --init --recursive
+```
+
+Replace `master` with the desired version tag (e.g. `beta-8`) to build the release binary.
+
+#### 2. Base image
+
+```bash
+docker build --tag feather:linux-arm64 -f Dockerfile.linux-arm64 --build-arg THREADS=16 .
+```
+
+Building the base image takes a while (especially when emulated on x86-64). You only need to build the base image once per release.
+
+#### 3. Build
+
+```bash
+docker run --platform linux/arm64/v8 --rm -it -v $PWD:/feather -w /feather feather:linux-arm64 sh -c 'WITH_SCANNER=Off make release-static-linux-arm64 -j8'
+```
+
+Note: If you intend to run Feather on a Raspberry Pi or any device without AES hardware acceleration, use the following command instead:
+
+```bash
+docker run --platform linux/arm64/v8 --rm -it -v $PWD:/feather -w /feather feather:linux-arm64 sh -c 'WITH_SCANNER=Off make release-static-linux-arm64-rpi -j8'
+```
+
+The resulting binary can be found in `build/bin/`.
+
 ### Windows (reproducible)
 
 #### 1. Clone
@@ -86,7 +121,7 @@ The resulting binary can be found in `build/x86_64-w64-mingw32/release/bin/feath
 
 ## macOS
 
-For MacOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies. 
+For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies. 
 
 ```bash
 HOMEBREW_OPTFLAGS="-march=core2" HOMEBREW_OPTIMIZATION_LEVEL="O0" \
@@ -107,4 +142,4 @@ Build Feather.
 CMAKE_PREFIX_PATH=~/Qt5.15.1/5.15.1/clang_64 make mac-release
 ```
 
-The resulting Mac OS application can be found `build/bin/feather.app` and will **not** have Tor embedded.
+The resulting macOS application can be found `build/bin/feather.app` and will **not** have Tor embedded.

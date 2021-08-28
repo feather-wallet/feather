@@ -2,7 +2,6 @@
 # Copyright (c) 2020-2021, The Monero Project.
 
 CMAKEFLAGS = \
-	-DARCH=x86_64 \
 	-DTOR_BIN=$(or ${TOR_BIN}, Off) \
 	-DTOR_VERSION=$(or ${TOR_VERSION}, Off) \
 	-DCHECK_UPDATES=$(or ${CHECK_UPDATES}, Off) \
@@ -19,7 +18,33 @@ release-static:
 	mkdir -p build/release && \
 	cd build/release && \
 	cmake \
+		-DARCH=x86_64 \
 		-D BUILD_TAG="linux-x64" \
+		-D CMAKE_BUILD_TYPE=Release \
+		-D STATIC=On \
+		$(CMAKEFLAGS) \
+		../.. && \
+	$(MAKE)
+
+release-static-linux-arm64:
+	mkdir -p build/release && \
+	cd build/release && \
+	cmake \
+		-D ARCH="armv8-a" \
+		-D BUILD_TAG="linux-armv8" \
+		-D CMAKE_BUILD_TYPE=Release \
+		-D STATIC=On \
+		$(CMAKEFLAGS) \
+		../.. && \
+	$(MAKE)
+
+release-static-linux-arm64-rpi:
+	mkdir -p build/release && \
+	cd build/release && \
+	cmake \
+		-D ARCH="armv8-a" \
+		-D NO_AES=On \
+		-D BUILD_TAG="linux-armv8-noaes" \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=On \
 		$(CMAKEFLAGS) \
@@ -30,6 +55,7 @@ depends:
 	mkdir -p build/$(target)/release && \
 	cd build/$(target)/release && \
 	cmake \
+	    -DARCH=x86_64 \
 		-D BUILD_TAG=$(tag) \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=ON \
@@ -42,6 +68,7 @@ mac-release:
 	mkdir -p build && \
 	cd build && \
 	cmake \
+	    -DARCH=x86_64 \
         -D BUILD_TAG="mac-x64" \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=Off \
