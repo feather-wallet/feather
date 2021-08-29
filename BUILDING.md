@@ -94,6 +94,26 @@ docker run --platform linux/arm64/v8 --rm -it -v $PWD:/feather -w /feather feath
 
 The resulting binary can be found in `./build/bin/`.
 
+##### AppImage
+
+##### ARMv8-a (with AES hardware acceleration)
+
+```bash
+rm -rf build
+docker run --rm -it -v $PWD:/feather --platform linux/arm64/v8 -w /feather feather:linux-arm64 sh -c 'make release-static-linux-arm64 -j8'
+docker run --rm -it -v $PWD:/feather --platform linux/arm64/v8 -w /feather/build feather:linux-arm64 ../contrib/build-appimage-arm64.sh
+```
+
+##### Raspberry Pi
+
+```bash
+rm -rf build
+docker run --rm -it -v $PWD:/feather --platform linux/arm64/v8 -w /feather feather:linux-arm64 sh -c 'make release-static-linux-arm64-rpi -j8'
+docker run --rm -it -v $PWD:/feather --platform linux/arm64/v8 -w /feather/build feather:linux-arm64 ../contrib/build-appimage-arm64.sh
+```
+
+The resulting AppImage will be located in `./build`.
+
 ### Windows (reproducible)
 
 #### 1. Clone
