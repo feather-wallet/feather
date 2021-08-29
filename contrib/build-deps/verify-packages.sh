@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
+arch="amd64"
+if [ "$(uname -m)" = "aarch64" ]; then
+  arch="arm64"
+fi
+
 cd /deps
 for target in bionic bionic-updates bionic-security
 do
@@ -14,7 +19,7 @@ do
     pushd "$repo"
 
     # Verify Packages.xz
-    sha256=`cat ../Release | grep "$repo/binary-amd64/Packages.xz" | tail -n 1 | awk '{print $1}'`
+    sha256=`cat ../Release | grep "$repo/binary-$arch/Packages.xz" | tail -n 1 | awk '{print $1}'`
     echo "$sha256 Packages.xz" | sha256sum -c
 
     xz -d -c Packages.xz >> ../../Packages-all
@@ -30,5 +35,3 @@ for deb in *.deb; do
   sha256=`sed -n "/\/${file_name}$"'/{:start /SHA256: /!{N;b start};//p}' /deps/Packages-all | tail -n 1 | awk '{print $2}'`
   echo "$sha256 $deb" | sha256sum -c
 done
-
-dpkg -i --force-depends *.deb

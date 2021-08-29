@@ -1,4 +1,4 @@
-FROM arm64v8/ubuntu:18.04
+FROM ubuntu:bionic-20210723
 
 ARG THREADS=4
 
@@ -13,37 +13,18 @@ ENV CHECK_UPDATES=ON
 ENV WITH_SCANNER=ON
 ENV TOR_VERSION=0.4.6.6
 
-RUN apt update && \
-    apt install -y software-properties-common python3 build-essential automake libtool-bin git \
-        unzip \
-        libjpeg-dev libvpx-dev libvorbis-dev \
-        autopoint gettext gperf libpng-dev \
-        bison \
-        libx11-dev \
-        libx11-xcb-dev \
-        libxext-dev \
-        libxfixes-dev \
-        libxi-dev \
-        libxrender-dev \
-        libxcb1-dev \
-        libxcb-keysyms1-dev \
-        libxcb-image0-dev \
-        libxcb-icccm4-dev \
-        libxcb-xfixes0-dev \
-        libxcb-render-util0-dev \
-        libxcb-xinerama0-dev \
-        libxkbcommon-dev \
-        libxkbcommon-x11-dev \
-        libxcb-randr0-dev \
-        libxcb-sync-dev \
-        xutils-dev \
-        libxcb-util-dev \
-        libxcb-xinput-dev \
-        libudev1 libudev-dev \
-        gstreamer1.0-plugins-good \
-        libgstreamer1.0-dev \
-        libgstreamer-plugins-base1.0-dev \
-        libpsl5
+COPY --from=featherwallet/feather-deps:linux-1.0.0 /deps /deps
+COPY --from=featherwallet/feather-deps:linux-1.0.0 /var/cache/apt/archives /archives
+
+RUN apt-get update && \
+    apt-get install -y gpg xz-utils ca-certificates wget && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY contrib/build-deps/verify-packages.sh .
+RUN bash verify-packages.sh && \
+    cd /archives && \
+    dpkg -i --force-depends *.deb && \
+    rm -rf /deps /archives
 
 # OpenSSL: Required for CMake, Qt 5.15.2, libwallet, Tor
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
@@ -108,11 +89,19 @@ RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
     sed -ri s/\(Libs:.*\)/\\1\ -lz/ /usr/local/lib/pkgconfig/freetype2.pc && \
     sed -i s/\\/usr\\/X11R6\\/lib64/\\/usr\\/local\\/lib/ qtbase/mkspecs/linux-g++-64/qmake.conf
 
+RUN if [ "$(uname -m)" = "aarch64" ]; then \
+        export LIBDIR="/usr/lib/aarch64-linux-gnu"; \
+        export QT_PLATFORM="linux-aarch64-gnu-g++"; \
+    else \
+        export LIBDIR="/usr/lib/x86_64-linux-gnu"; \
+        export QT_PLATFORM="linux-g++-64"; \
+    fi
+
 RUN cd qt5 && \
-    rm /usr/lib/aarch64-linux-gnu/libX11.a && \
-    rm /usr/lib/aarch64-linux-gnu/libX11-xcb.a && \
+    rm $LIBDIR/libX11.a && \
+    rm $LIBDIR/libX11-xcb.a && \
     OPENSSL_LIBS="-lssl -lcrypto -lpthread -ldl" \
-    ./configure --prefix=/usr -platform linux-aarch64-gnu-g++ -opensource -confirm-license -release -static -no-avx \
+    ./configure --prefix=/usr -platform $QT_PLATFORM -opensource -confirm-license -release -static -no-avx \
         -no-opengl -qpa xcb --xcb -xcb-xlib -feature-xlib -openssl-linked -I /usr/local/openssl/include \
         -L /usr/local/openssl/lib -system-freetype -fontconfig -glib \
         -no-dbus -no-sql-sqlite -no-use-gold-linker -no-kms \
@@ -129,8 +118,6 @@ RUN cd qt5 && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)
-
-RUN apt update && apt install -y wget
 
 # boost: Required for libwallet
 RUN wget https://downloads.sourceforge.net/project/boost/boost/1.73.0/boost_1_73_0.tar.bz2 && \
@@ -191,15 +178,6 @@ RUN git clone -b v3.10.0 --depth 1 https://github.com/protocolbuffers/protobuf &
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-# appimagetool: Used to created Feather AppImage
-#RUN mkdir appimagetool && \
-#    cd appimagetool && \
-#    wget https://github.com/AppImage/AppImageKit/releases/download/13/appimagetool-aarch64.AppImage && \
-#    echo "334e77beb67fc1e71856c29d5f3f324ca77b0fde7a840fdd14bd3b88c25c341f appimagetool-aarch64.AppImage" | sha256sum -c && \
-#    chmod +x appimagetool-aarch64.AppImage && \
-#    ./appimagetool-aarch64.AppImage --appimage-extract && \
-#    rm appimagetool-aarch64.AppImage
-
 # squashfs-tools: Used to create Feather AppImage
 RUN git clone https://github.com/plougher/squashfs-tools.git && \
     cd squashfs-tools/squashfs-tools && \
@@ -219,7 +197,7 @@ RUN git clone -b 0.12 --depth 1 https://github.com/NixOS/patchelf.git && \
     rm -rf $(pwd)
 
 # linuxdeployqt: Used to create Feather AppImage
-# build from source because latest release does not allow glib 2.27
+# build from source because latest release does not allow glibc 2.27
 RUN git clone https://github.com/probonopd/linuxdeployqt.git && \
     cd linuxdeployqt && \
     git reset --hard b4697483c98120007019c3456914cfd1dba58384 && \
