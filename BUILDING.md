@@ -1,48 +1,47 @@
-## Buildbot builds
+## Building with Docker
 
-The docker build bins can be found here: https://build.featherwallet.org/files/
-
-## Docker static builds
-
-Static builds via Docker are done in 3 steps:
+Builds with Docker are done in 3 steps:
 
 1. Cloning this repository (+submodules)
-2. Creating a base Docker image
-3. Using the base image to compile a build
+2. Creating a base image containing the build environment
+3. Building Feather using the base image
 
 ### Linux x86-64 (reproducible)
 
-The docker image for reproducible Linux static builds uses Ubuntu 16.04 and compiles the required libraries statically 
-so that the resulting Feather binary is static. For more information, check the Dockerfile: `Dockerfile`.
+The instructions in this section are for 64-bit AMD/Intel processors. For ARM64 platforms see the next section.
+
+Binaries produced in this section are reproducible and their digests should match those of release binaries.
 
 #### 1. Clone
 
-```bash
-git clone --branch master --recursive https://git.featherwallet.org/feather/feather.git
-cd feather
-```
-
 Replace `master` with the desired version tag (e.g. `beta-8`) to build the release binary.
+
+```bash
+git clone https://git.featherwallet.org/feather/feather.git
+cd feather
+git checkout master
+git submodule update --init --recursive
+```
 
 #### 2. Base image
 
 ```bash
-docker build --tag feather:linux --build-arg THREADS=4 .
+docker build -t feather:linux -f Dockerfile.linux --build-arg THREADS=8 .
 ```
 
 Building the base image takes a while. You only need to build the base image once per release.
 
 #### 3. Build
 
-##### Standalone binary
+##### Standalone static binary
+
+If you're re-running a build make sure to `rm -rf build/` first.
 
 ```bash
 docker run --rm -it -v $PWD:/feather -w /feather feather:linux sh -c 'WITH_SCANNER=Off make release-static -j8'
 ```
 
-If you're re-running a build make sure to `rm -rf build/` first.
-
-The resulting binary can be found in `build/bin/feather`.
+The resulting binary can be found in `./build/bin/`.
 
 ##### AppImage
 
@@ -54,9 +53,15 @@ docker run --rm -it -v $PWD:/feather -w /feather/build feather:linux ../contrib/
 
 The resulting AppImage will be located in `./build`.
 
-### Linux arm64
+### Linux ARM64 (reproducible)
+
+This section describes how to build Feather for ARM64 based platforms (including Raspberry Pi 3 and later, running 64-bit Rasbian).
+
+Binaries produced in this section are not yet reproducible.
 
 #### 1. Clone
+
+Replace `master` with the desired version tag (e.g. `beta-8`) to build the release binary.
 
 ```bash
 git clone https://git.featherwallet.org/feather/feather.git
@@ -65,17 +70,17 @@ git checkout master
 git submodule update --init --recursive
 ```
 
-Replace `master` with the desired version tag (e.g. `beta-8`) to build the release binary.
-
 #### 2. Base image
 
 ```bash
-docker build --tag feather:linux-arm64 -f Dockerfile.linux-arm64 --build-arg THREADS=16 .
+docker build --tag feather:linux-arm64 --platform linux/arm64 -f Dockerfile.linux --build-arg THREADS=8 .
 ```
 
 Building the base image takes a while (especially when emulated on x86-64). You only need to build the base image once per release.
 
 #### 3. Build
+
+##### Standalone static binary
 
 ```bash
 docker run --platform linux/arm64/v8 --rm -it -v $PWD:/feather -w /feather feather:linux-arm64 sh -c 'WITH_SCANNER=Off make release-static-linux-arm64 -j8'
@@ -87,7 +92,7 @@ Note: If you intend to run Feather on a Raspberry Pi or any device without AES h
 docker run --platform linux/arm64/v8 --rm -it -v $PWD:/feather -w /feather feather:linux-arm64 sh -c 'WITH_SCANNER=Off make release-static-linux-arm64-rpi -j8'
 ```
 
-The resulting binary can be found in `build/bin/`.
+The resulting binary can be found in `./build/bin/`.
 
 ### Windows (reproducible)
 
@@ -117,9 +122,11 @@ docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make depends
 
 If you're re-running a build make sure to `rm -rf build/` first.
 
-The resulting binary can be found in `build/x86_64-w64-mingw32/release/bin/feather.exe`.
+The resulting binary can be found in `./build/x86_64-w64-mingw32/release/bin/`.
 
-## macOS
+---
+
+## Building on macOS
 
 For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies. 
 
