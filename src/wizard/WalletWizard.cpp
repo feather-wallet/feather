@@ -127,5 +127,5 @@ void WalletWizard::onCreateWallet() {
     if (m_wizardFields.mode == WizardMode::RestoreFromSeed && m_wizardFields.seedType == SeedType::MONERO)
         seed.setRestoreHeight(m_wizardFields.restoreHeight);
 
-    emit createWallet(seed, walletPath, m_wizardFields.password, m_wizardFields.seedOffsetPassphrase);
+    emit createWallet(seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase);
 }

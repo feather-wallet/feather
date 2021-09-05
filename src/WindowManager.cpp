@@ -212,7 +212,7 @@ bool WindowManager::autoOpenWallet() {
 
 // ######################## WALLET CREATION ########################
 
-void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password,
+void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedLanguage,
                                     const QString &seedOffset) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);

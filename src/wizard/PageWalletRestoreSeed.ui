@@ -47,6 +47,18 @@
     </widget>
    </item>
    <item>
+    <widget class="QGroupBox" name="group_seedLanguage">
+     <property name="title">
+      <string>Select seed language:</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="QComboBox" name="combo_seedLanguage"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
     <widget class="TextEdit" name="seedEdit">
      <property name="acceptRichText">
       <bool>false</bool>
