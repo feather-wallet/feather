@@ -103,8 +103,8 @@ bool PageWalletRestoreSeed::validatePage() {
     ui->seedEdit->setStyleSheet("");
 
     auto errStyle = "QTextEdit{border: 1px solid red;}";
-    auto seed = ui->seedEdit->toPlainText().replace("\n", "").replace("\r", "").trimmed();
-    auto seedSplit = seed.split(" ");
+    auto seed = ui->seedEdit->toPlainText().replace("\n", " ").replace("\r", "").trimmed();
+    QStringList seedSplit = seed.split(" ", Qt::SkipEmptyParts);
 
     if (seedSplit.length() != m_mode->length) {
         ui->label_errorString->show();
@@ -138,7 +138,7 @@ bool PageWalletRestoreSeed::validatePage() {
         QMessageBox::information(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
     }
 
-    m_fields->seed = seed;
+    m_fields->seed = seedSplit.join(" ");
     m_fields->seedOffsetPassphrase = ui->line_seedOffset->text();
 
     return true;
