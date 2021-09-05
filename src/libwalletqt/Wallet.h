@@ -246,6 +246,9 @@ public:
     QString printAddressBook();
     QString printScannedPoolTxs();
 
+    //! does wallet have txid
+    bool haveTransaction(const QString &txid);
+
     //! refreshes the wallet
     bool refresh(bool historyAndSubaddresses = false);
 
