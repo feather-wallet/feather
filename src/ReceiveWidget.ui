@@ -106,7 +106,7 @@
        <item>
         <widget class="QPushButton" name="btn_generateSubaddress">
          <property name="text">
-          <string>Generate Subaddress</string>
+          <string>Create new address</string>
          </property>
         </widget>
        </item>
