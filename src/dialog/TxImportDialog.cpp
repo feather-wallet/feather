@@ -35,6 +35,14 @@ TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
 
 void TxImportDialog::loadTx() {
     QString txid = ui->line_txid->text();
+
+    if (m_ctx->wallet->haveTransaction(txid)) {
+        QMessageBox::warning(this, "Warning", "This transaction already exists in the wallet. "
+                                              "If you can't find it in your history, "
+                                              "check if it belongs to a different account (Wallet -> Account)");
+        return;
+    }
+
     FeatherNode node = m_ctx->nodes->connection();
 
     if (node.isLocal()) {
@@ -94,6 +102,10 @@ void TxImportDialog::onImport() {
     bool double_spend_seen = tx.value("double_spend_seen").toBool();
 
     if (m_ctx->wallet->importTransaction(tx.value("tx_hash").toString(), output_indices, height, timestamp, false, pool, double_spend_seen)) {
+        if (!m_ctx->wallet->haveTransaction(txid)) {
+            QMessageBox::warning(this, "Import transaction", "This transaction does not belong to this wallet.");
+            return;
+        }
         QMessageBox::information(this, "Import transaction", "Transaction imported successfully.");
     } else {
         QMessageBox::warning(this, "Import transaction", "Transaction import failed.");

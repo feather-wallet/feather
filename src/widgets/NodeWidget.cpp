@@ -135,8 +135,9 @@ void NodeWidget::onCustomAddClicked(){
     auto currentNodes = m_ctx->nodes->customNodes();
     QString currentNodesText;
 
-    for (auto &entry: currentNodes)
-        currentNodesText += QString("%1\n").arg(entry.url.toString());
+    for (auto &entry: currentNodes) {
+        currentNodesText += QString("%1\n").arg(entry.toFullAddress());
+    }
 
     bool ok;
     QString text = QInputDialog::getMultiLineText(this, "Add custom node(s).", "E.g: user:password@127.0.0.1:18081", currentNodesText, &ok);
@@ -145,9 +146,9 @@ void NodeWidget::onCustomAddClicked(){
 
     QList<FeatherNode> nodesList;
     auto newNodesList = text.split("\n");
-    for(auto &newNodeText: newNodesList) {
+    for (auto &newNodeText: newNodesList) {
         newNodeText = newNodeText.replace("\r", "").trimmed();
-        if(newNodeText.isEmpty())
+        if (newNodeText.isEmpty())
             continue;
 
         auto node = FeatherNode(newNodeText);

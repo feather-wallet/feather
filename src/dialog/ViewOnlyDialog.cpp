@@ -22,7 +22,11 @@ ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboad);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
 
-    ui->btn_Save->setEnabled(!m_ctx->wallet->viewOnly());
+    if (m_ctx->wallet->viewOnly()) {
+        ui->btn_Save->setEnabled(false);
+        ui->btn_Save->setToolTip("Wallet is already view-only");
+    }
+
     this->adjustSize();
 }
 

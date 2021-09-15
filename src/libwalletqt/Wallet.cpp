@@ -601,6 +601,11 @@ QString Wallet::printScannedPoolTxs()
     return QString::fromStdString(m_walletImpl->printScannedPoolTxs());
 }
 
+bool Wallet::haveTransaction(const QString &txid)
+{
+    return m_walletImpl->haveTransaction(txid.toStdString());
+}
+
 void Wallet::startRefresh()
 {
     m_refreshEnabled = true;

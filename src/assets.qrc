@@ -119,7 +119,6 @@
     <file>assets/images/xmrig.ico</file>
     <file>assets/images/xmrig.svg</file>
     <file>assets/images/zoom.png</file>
-    <file>assets/mnemonic_25_english.txt</file>
     <file>assets/restore_heights_monero_mainnet.txt</file>
     <file>assets/restore_heights_monero_stagenet.txt</file>
 </qresource>

@@ -100,7 +100,7 @@ bool dirExists(const QString &path) {
 
 QString defaultWalletDir() {
     QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
-    if (QFile::exists(portablePath.arg(".portable"))) {
+    if (QFile::exists(portablePath.arg(".portable")) || QFile::exists(portablePath.arg(".portable.txt"))) {
         return portablePath.arg("feather_data/wallets");
     }
 
@@ -355,6 +355,21 @@ QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettyp
     else if (blockExplorer == "blockchair.com") {
         if (nettype == NetworkType::MAINNET) {
             return QString("https://blockchair.com/monero/transaction/%1").arg(txid);
+        }
+    }
+    else if (blockExplorer == "melo.tools") {
+        switch (nettype) {
+            case NetworkType::MAINNET:
+                return QString("https://melo.tools/explorer/mainnet/tx/%1").arg(txid);
+            case NetworkType::STAGENET:
+                return QString("https://melo.tools/explorer/stagenet/tx/%1").arg(txid);
+            case NetworkType::TESTNET:
+                return QString("https://melo.tools/explorer/testnet/tx/%1").arg(txid);
+        }
+    }
+    else if (blockExplorer == "blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion") {
+        if (nettype == NetworkType::MAINNET) {
+            return QString("http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%1").arg(txid);
         }
     }
 

@@ -41,12 +41,15 @@ private:
     void signedQrCode();
     void signedSaveFile();
 
+    void txKeyCopy();
+
     QScopedPointer<Ui::TxConfAdvDialog> ui;
     QSharedPointer<AppContext> m_ctx;
     PendingTransaction *m_tx = nullptr;
     UnsignedTransaction *m_utx = nullptr;
     QMenu *m_exportUnsignedMenu;
     QMenu *m_exportSignedMenu;
+    QMenu *m_exportTxKeyMenu;
 };
 
 #endif //FEATHER_TXCONFADVDIALOG_H

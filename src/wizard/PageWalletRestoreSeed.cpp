@@ -12,13 +12,27 @@
 #include "utils/FeatherSeed.h"
 #include "constants.h"
 
+#include <mnemonics/electrum-words.h>
+
 PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageWalletRestoreSeed)
     , m_fields(fields)
 {
     ui->setupUi(this);
-    ui->label_errorString->hide();
+
+    std::vector<const Language::Base*> wordlists = crypto::ElectrumWords::get_language_list();
+    for (const auto& wordlist: wordlists) {
+        QStringList words_qt;
+        std::vector<std::string> words_std = wordlist->get_word_list();
+        for (const auto& word: words_std) {
+            words_qt += QString::fromStdString(word);
+        }
+
+        QString language = QString::fromStdString(wordlist->get_english_language_name());
+        ui->combo_seedLanguage->addItem(language);
+        m_wordlists[language] = words_qt;
+    }
 
     QStringList bip39English;
     for (int i = 0; i != 2048; i++)
@@ -27,26 +41,18 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     // (illegible word with a known location). This can be tested by replacing a word with xxxx
     bip39English << "xxxx";
 
-    QByteArray data = Utils::fileOpen(":/assets/mnemonic_25_english.txt");
-    QStringList moneroEnglish;
-    for (const auto &seed_word: data.split('\n'))
-        moneroEnglish << seed_word;
-
     m_tevador.length = 14;
     m_tevador.setWords(bip39English);
 
     m_legacy.length = 25;
-    m_legacy.setWords(moneroEnglish);
+    m_legacy.setWords(m_wordlists["English"]);
+    ui->combo_seedLanguage->setCurrentText("English");
 
     ui->seedEdit->setAcceptRichText(false);
     ui->seedEdit->setMaximumHeight(150);
 
-#ifndef QT_NO_CURSOR
-    QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QGuiApplication::restoreOverrideCursor();
-#endif
-
     connect(ui->seedBtnGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &PageWalletRestoreSeed::onSeedTypeToggled);
+    connect(ui->combo_seedLanguage, &QComboBox::currentTextChanged, this, &PageWalletRestoreSeed::onSeedLanguageChanged);
 
     this->onSeedTypeToggled();
 }
@@ -56,17 +62,24 @@ void PageWalletRestoreSeed::onSeedTypeToggled() {
         m_mode = &m_tevador;
         m_fields->seedType = SeedType::TEVADOR;
         ui->seedEdit->setPlaceholderText("Enter 14 word seed..");
+        ui->group_seedLanguage->hide();
     }
     else if (ui->radio25->isChecked()) {
         m_mode = &m_legacy;
         m_fields->seedType = SeedType::MONERO;
         ui->seedEdit->setPlaceholderText("Enter 25 word seed..");
+        ui->group_seedLanguage->show();
     }
 
     ui->label_errorString->hide();
     ui->seedEdit->setStyleSheet("");
     ui->seedEdit->setCompleter(&m_mode->completer);
     ui->seedEdit->setText("");
+}
+
+void PageWalletRestoreSeed::onSeedLanguageChanged(const QString &language) {
+    m_legacy.setWords(m_wordlists[language]);
+    m_fields->seedLanguage = language;
 }
 
 int PageWalletRestoreSeed::nextId() const {
@@ -90,8 +103,8 @@ bool PageWalletRestoreSeed::validatePage() {
     ui->seedEdit->setStyleSheet("");
 
     auto errStyle = "QTextEdit{border: 1px solid red;}";
-    auto seed = ui->seedEdit->toPlainText().replace("\n", "").replace("\r", "").trimmed();
-    auto seedSplit = seed.split(" ");
+    auto seed = ui->seedEdit->toPlainText().replace("\n", " ").replace("\r", "").trimmed();
+    QStringList seedSplit = seed.split(" ", Qt::SkipEmptyParts);
 
     if (seedSplit.length() != m_mode->length) {
         ui->label_errorString->show();
@@ -100,8 +113,14 @@ bool PageWalletRestoreSeed::validatePage() {
         return false;
     }
 
+    // libwallet will accept e.g. "brötchen" or "BRÖTCHEN" instead of "Brötchen"
+    QStringList lowercaseWords;
+    for (const auto &word : m_mode->words) {
+        lowercaseWords << word.toLower();
+    }
+
     for (const auto &word : seedSplit) {
-        if (!m_mode->words.contains(word)) {
+        if (!lowercaseWords.contains(word.toLower())) {
             ui->label_errorString->show();
             ui->label_errorString->setText(QString("Mnemonic seed contains an unknown word: %1").arg(word));
             ui->seedEdit->setStyleSheet(errStyle);
@@ -119,7 +138,7 @@ bool PageWalletRestoreSeed::validatePage() {
         QMessageBox::information(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
     }
 
-    m_fields->seed = seed;
+    m_fields->seed = seedSplit.join(" ");
     m_fields->seedOffsetPassphrase = ui->line_seedOffset->text();
 
     return true;

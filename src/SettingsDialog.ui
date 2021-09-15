@@ -415,12 +415,22 @@
          </item>
          <item>
           <property name="text">
+           <string>melo.tools</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
            <string>moneroblocks.info</string>
           </property>
          </item>
          <item>
           <property name="text">
            <string>blockchair.com</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion</string>
           </property>
          </item>
         </widget>

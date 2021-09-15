@@ -12,6 +12,7 @@
 #include "model/WalletKeysFilesModel.h"
 #include "utils/RestoreHeightLookup.h"
 #include "utils/config.h"
+#include "constants.h"
 
 enum WizardMode {
     CreateWallet = 0,
@@ -32,6 +33,7 @@ struct WizardFields {
     QString walletDir;
     QString seed;
     QString seedOffsetPassphrase;
+    QString seedLanguage = constants::seedLanguage;
     QString password;
     QString modeText;
     QString address;
@@ -72,7 +74,7 @@ signals:
 
     void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
-    void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedOffset = "");
+    void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset = "");
 
 private slots:
     void onCreateWallet();

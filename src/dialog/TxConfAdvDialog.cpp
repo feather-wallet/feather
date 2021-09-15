@@ -19,6 +19,7 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     , m_ctx(std::move(ctx))
     , m_exportUnsignedMenu(new QMenu(this))
     , m_exportSignedMenu(new QMenu(this))
+    , m_exportTxKeyMenu(new QMenu(this))
 {
     ui->setupUi(this);
 
@@ -30,6 +31,9 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     m_exportSignedMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::signedCopy);
     m_exportSignedMenu->addAction("Save to file", this, &TxConfAdvDialog::signedSaveFile);
     ui->btn_exportSigned->setMenu(m_exportSignedMenu);
+
+    m_exportTxKeyMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::txKeyCopy);
+    ui->btn_exportTxKey->setMenu(m_exportTxKeyMenu);
 
     if (m_ctx->wallet->viewOnly()) {
         ui->btn_exportSigned->hide();
@@ -80,6 +84,7 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
 
     ui->btn_exportUnsigned->hide();
     ui->btn_exportSigned->hide();
+    ui->btn_exportTxKey->hide();
     ui->btn_sign->show();
     ui->btn_send->hide();
 
@@ -164,6 +169,10 @@ void TxConfAdvDialog::unsignedCopy() {
 
 void TxConfAdvDialog::signedCopy() {
     Utils::copyToClipboard(m_tx->signedTxToHex(0));
+}
+
+void TxConfAdvDialog::txKeyCopy() {
+    Utils::copyToClipboard(m_tx->transaction(0)->txKey());
 }
 
 void TxConfAdvDialog::signedQrCode() {

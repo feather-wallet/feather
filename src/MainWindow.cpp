@@ -236,7 +236,7 @@ void MainWindow::initMenu() {
     connect(ui->actionViewOnly,     &QAction::triggered, this, &MainWindow::showViewOnlyDialog);
 
     // [Wallet] -> [Advanced]
-    connect(ui->actionStore_wallet,          &QAction::triggered, [this]{m_ctx->wallet->store();});
+    connect(ui->actionStore_wallet,          &QAction::triggered, this, &MainWindow::tryStoreWallet);
     connect(ui->actionUpdate_balance,        &QAction::triggered, [this]{m_ctx->updateBalance();});
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_ctx->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
@@ -530,6 +530,16 @@ void MainWindow::setStatusText(const QString &text, bool override, int timeout) 
     }
 }
 
+void MainWindow::tryStoreWallet() {
+    if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus::ConnectionStatus_Synchronizing) {
+        QMessageBox::warning(this, "Save wallet", "Unable to save wallet during synchronization.\n\n"
+                                                  "Wait until synchronization is finished and try again.");
+        return;
+    }
+
+    m_ctx->wallet->store();
+}
+
 void MainWindow::onSynchronized() {
     this->updateNetStats();
     this->setStatusText("Synchronized");
@@ -582,19 +592,17 @@ void MainWindow::onConnectionStatusChanged(int status)
 }
 
 void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
-    auto tx_status = tx->status();
     QString err{"Can't create transaction: "};
-
-    if (tx_status != PendingTransaction::Status_Ok){
+    if (tx->status() != PendingTransaction::Status_Ok) {
         QString tx_err = tx->errorString();
         qCritical() << tx_err;
 
         if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
-            err = QString("%1 Wrong daemon version: %2").arg(err).arg(tx_err);
+            err = QString("%1 Wrong node version: %2").arg(err).arg(tx_err);
         else
             err = QString("%1 %2").arg(err).arg(tx_err);
 
-        if (tx_err.contains("Daemon response did not include the requested real output")) {
+        if (tx_err.contains("Node response did not include the requested real output")) {
             QString currentNode = m_ctx->nodes->connection().toAddress();
 
             err += QString("\nYou are currently connected to: %1\n\n"
@@ -605,42 +613,43 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
+        return;
     }
     else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
+        return;
     }
-    else {
-        const auto &description = m_ctx->tmpTxDescription;
 
-        // Show advanced dialog on multi-destination transactions
-        if (address.size() > 1) {
-            TxConfAdvDialog dialog_adv{m_ctx, description, this};
-            dialog_adv.setTransaction(tx);
-            dialog_adv.exec();
-            return;
-        }
+    m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
-        TxConfDialog dialog{m_ctx, tx, address[0], description, this};
-        switch (dialog.exec()) {
-            case QDialog::Rejected:
-            {
-                if (!dialog.showAdvanced)
-                    m_ctx->onCancelTransaction(tx, address);
-                break;
-            }
-            case QDialog::Accepted:
-                m_ctx->commitTransaction(tx);
-                break;
-        }
+    // Show advanced dialog on multi-destination transactions
+    if (address.size() > 1) {
+        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx);
+        dialog_adv.exec();
+        return;
+    }
 
-        if (dialog.showAdvanced) {
-            TxConfAdvDialog dialog_adv{m_ctx, description, this};
-            dialog_adv.setTransaction(tx);
-            dialog_adv.exec();
+    TxConfDialog dialog{m_ctx, tx, address[0], m_ctx->tmpTxDescription, this};
+    switch (dialog.exec()) {
+        case QDialog::Rejected:
+        {
+            if (!dialog.showAdvanced)
+                m_ctx->onCancelTransaction(tx, address);
+            break;
         }
+        case QDialog::Accepted:
+            m_ctx->commitTransaction(tx);
+            break;
+    }
+
+    if (dialog.showAdvanced) {
+        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx);
+        dialog_adv.exec();
     }
 }
 
@@ -716,7 +725,7 @@ void MainWindow::showConnectionStatusDialog() {
     QString statusMsg;
     switch(status){
         case Wallet::ConnectionStatus_Disconnected:
-            statusMsg = "Wallet is disconnected from daemon.";
+            statusMsg = "Wallet is disconnected from node.";
             break;
         case Wallet::ConnectionStatus_Connecting: {
             auto node = m_ctx->nodes->connection();
@@ -724,7 +733,7 @@ void MainWindow::showConnectionStatusDialog() {
             break;
         }
         case Wallet::ConnectionStatus_WrongVersion:
-            statusMsg = "Wallet is connected to incompatible daemon.";
+            statusMsg = "Wallet is connected to incompatible node.";
             break;
         case Wallet::ConnectionStatus_Synchronizing:
         case Wallet::ConnectionStatus_Synchronized: {

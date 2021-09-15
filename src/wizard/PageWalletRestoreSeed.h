@@ -32,8 +32,8 @@ private:
         seedType()
         {
             completer.setModel(&completerModel);
-            completer.setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-            completer.setCaseSensitivity(Qt::CaseInsensitive);
+            completer.setModelSorting(QCompleter::CaseSensitivelySortedModel);
+            completer.setCaseSensitivity(Qt::CaseSensitive);
             completer.setWrapAround(false);
         }
 
@@ -49,6 +49,7 @@ private:
     };
 
     void onSeedTypeToggled();
+    void onSeedLanguageChanged(const QString &language);
 
     Ui::PageWalletRestoreSeed *ui;
     WizardFields *m_fields;
@@ -57,6 +58,8 @@ private:
     seedType m_legacy;
 
     seedType *m_mode;
+
+    QMap<QString, QStringList> m_wordlists;
 };
 
 #endif

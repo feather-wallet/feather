@@ -84,7 +84,7 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
 
     bool unconfirmed = tx->isFailed() || tx->isPending();
     if (unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
-        menu.addAction(icons()->icon("info2.svg"), "Resend transaction", this, &HistoryWidget::onResendTransaction);
+        menu.addAction("Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
     menu.addMenu(m_copyMenu);
@@ -144,9 +144,9 @@ void HistoryWidget::createTxProof() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TxProofDialog(this, m_ctx, tx);
-    dialog->exec();
-    dialog->deleteLater();
+    TxProofDialog dialog{this, m_ctx, tx};
+    dialog.getTxKey();
+    dialog.exec();
 }
 
 void HistoryWidget::copy(copyField field) {
