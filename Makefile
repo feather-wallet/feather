@@ -18,7 +18,7 @@ release-static:
 	mkdir -p build/release && \
 	cd build/release && \
 	cmake \
-		-DARCH=x86_64 \
+		-DARCH=x86-64 \
 		-D BUILD_TAG="linux-x64" \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=On \
@@ -55,7 +55,7 @@ depends:
 	mkdir -p build/$(target)/release && \
 	cd build/$(target)/release && \
 	cmake \
-	    -DARCH=x86_64 \
+	    -DARCH=x86-64 \
 		-D BUILD_TAG=$(tag) \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=ON \
@@ -68,7 +68,7 @@ mac-release:
 	mkdir -p build && \
 	cd build && \
 	cmake \
-	    -DARCH=x86_64 \
+	    -DARCH=x86-64 \
         -D BUILD_TAG="mac-x64" \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=Off \
