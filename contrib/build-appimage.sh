@@ -13,7 +13,7 @@ mkdir -p "$APPDIR/usr/plugins"
 
 cp "$PWD/../src/assets/feather.desktop" "$APPDIR/usr/share/applications/feather.desktop"
 cp "$PWD/../src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
-cp "$PWD/bin/feather" "$APPDIR/usr/bin/feather"
+cp "$PWD/release/bin/feather" "$APPDIR/usr/bin/feather"
 chmod +x "$APPDIR/usr/bin/feather"
 
 export LD_LIBRARY_PATH=/usr/local/lib/x86_64-linux-gnu/:/usr/local/lib/$LD_LIBRARY_PATH
