@@ -71,15 +71,15 @@ quint64 Coins::count() const
     return m_tinfo.count();
 }
 
-void Coins::freeze(int index) const
+void Coins::freeze(QString &publicKey) const
 {
-    m_pimpl->setFrozen(index);
+    m_pimpl->setFrozen(publicKey.toStdString());
     emit coinFrozen();
 }
 
-void Coins::thaw(int index) const
+void Coins::thaw(QString &publicKey) const
 {
-    m_pimpl->thaw(index);
+    m_pimpl->thaw(publicKey.toStdString());
     emit coinThawed();
 }
 

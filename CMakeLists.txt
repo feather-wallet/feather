@@ -32,7 +32,7 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(MONERO_HEAD "d4257af2e7503fc6dc09fc704606230d353a0a02")
+set(MONERO_HEAD "ed8859318349a5f01e9fd90e898603d4142b0951")
 set(BUILD_GUI_DEPS ON)
 option(ARCH "Target architecture" "x86-64")
 set(BUILD_64 ON)
