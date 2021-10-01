@@ -1150,6 +1150,14 @@ QVariantMap Wallet::parse_uri_to_object(const QString &uri) const
     return result;
 }
 
+QString Wallet::make_uri(const QString &address, quint64 &amount, const QString &description,
+                         const QString &recipient) const
+{
+    std::string error;
+    std::string uri = m_walletImpl->make_uri(address.toStdString(), "", amount, description.toStdString(), recipient.toStdString(), error);
+    return QString::fromStdString(uri);
+}
+
 bool Wallet::rescanSpent()
 {
     QMutexLocker locker(&m_asyncMutex);

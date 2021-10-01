@@ -26,7 +26,7 @@ SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     QString amount_rx = R"(^\d{0,8}[\.,]\d{0,12}|(all)$)";
     QRegExp rx;
     rx.setPattern(amount_rx);
-    QValidator *validator =  new QRegExpValidator(rx, this);
+    QValidator *validator = new QRegExpValidator(rx, this);
     ui->lineAmount->setValidator(validator);
 
     connect(m_ctx.get(), &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);

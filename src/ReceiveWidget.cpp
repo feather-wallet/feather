@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QMessageBox>
 
+#include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"
 #include "model/ModelUtils.h"
 #include "utils/Icons.h"
@@ -60,6 +61,8 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(ui->check_showUsed, &QCheckBox::clicked, this, &ReceiveWidget::setShowUsedAddresses);
     connect(ui->check_showHidden, &QCheckBox::clicked, this, &ReceiveWidget::setShowHiddenAddresses);
+
+    connect(ui->btn_createPaymentRequest, &QPushButton::clicked, this, &ReceiveWidget::createPaymentRequest);
 }
 
 void ReceiveWidget::setSearchbarVisible(bool visible) {
@@ -116,6 +119,18 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
     }
 
     menu->popup(ui->addresses->viewport()->mapToGlobal(point));
+}
+
+void ReceiveWidget::createPaymentRequest() {
+    QModelIndex index = ui->addresses->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+
+    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+
+    PaymentRequestDialog dialog{this, m_ctx, address};
+    dialog.exec();
 }
 
 void ReceiveWidget::onShowTransactions() {
@@ -190,6 +205,7 @@ void ReceiveWidget::updateQrCode(){
     QModelIndex index = ui->addresses->currentIndex();
     if (!index.isValid()) {
         ui->qrCode->clear();
+        ui->btn_createPaymentRequest->hide();
         return;
     }
 
@@ -199,6 +215,7 @@ void ReceiveWidget::updateQrCode(){
     int width = ui->qrCode->width() - 4;
     if (qrc.isValid()) {
         ui->qrCode->setPixmap(qrc.toPixmap(1).scaled(width, width, Qt::KeepAspectRatio));
+        ui->btn_createPaymentRequest->show();
     }
 }
 

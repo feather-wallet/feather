@@ -39,6 +39,7 @@ public slots:
     void setShowHiddenAddresses(bool show);
     void setSearchFilter(const QString &filter);
     void onShowTransactions();
+    void createPaymentRequest();
 
 signals:
     void showTransactions(const QString& address);

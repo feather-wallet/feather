@@ -390,6 +390,8 @@ public:
     bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
     QVariantMap parse_uri_to_object(const QString &uri) const;
 
+    QString make_uri(const QString &address, quint64 &amount, const QString &description, const QString &recipient) const;
+
     //! Namespace your cacheAttribute keys to avoid collisions
     bool setCacheAttribute(const QString &key, const QString &val);
     QString getCacheAttribute(const QString &key) const;
