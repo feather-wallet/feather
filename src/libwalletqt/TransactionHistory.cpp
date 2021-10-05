@@ -6,6 +6,8 @@
 #include "utils/Utils.h"
 #include "utils/AppData.h"
 #include "utils/config.h"
+#include "constants.h"
+#include "WalletManager.h"
 
 bool TransactionHistory::transaction(int index, std::function<void (TransactionInfo &)> callback)
 {
@@ -147,13 +149,16 @@ TransactionHistory::TransactionHistory(Monero::TransactionHistory *pimpl, QObjec
 }
 
 bool TransactionHistory::writeCSV(const QString &path) {
-    auto data = QString("");
+    QString data;
     QReadLocker locker(&m_lock);
-    for (const auto &tx : m_pimpl->getAll()) {
-        if (tx->subaddrAccount() != 0) { // only account 0
-            continue;
-        }
 
+    auto transactions = m_pimpl->getAll();
+
+    std::sort(transactions.begin(), transactions.end(), [](const Monero::TransactionInfo *info1, const Monero::TransactionInfo *info2){
+        return info1->blockHeight() < info2->blockHeight();
+    });
+
+    for (const auto &tx : transactions) {
         TransactionInfo info(tx, this);
 
         // collect column data
@@ -166,47 +171,46 @@ bool TransactionHistory::writeCSV(const QString &path) {
         const double usd_price = appData()->txFiatHistory->get(timeStamp.toString("yyyyMMdd"));
         double fiat_price = usd_price * amount;
 
-        if(preferredFiatSymbol != "USD")
+        if (preferredFiatSymbol != "USD")
             fiat_price = appData()->prices.convert("USD", preferredFiatSymbol, fiat_price);
         double fiat_rounded = ceil(Utils::roundSignificant(fiat_price, 3) * 100.0) / 100.0;
-        if(fiat_price != 0)
-            fiatAmount = QString("%1 %2").arg(QString::number(fiat_rounded)).arg(preferredFiatSymbol);
+        if (usd_price != 0)
+            fiatAmount = QString::number(fiat_rounded);
+        else
+            fiatAmount = "\"?\"";
 
-        // collect some more column data
-        quint64 atomicAmount = info.atomicAmount();
-        quint32 subaddrAccount = info.subaddrAccount();
-        QString fee = info.fee();
         QString direction = QString("");
-        TransactionInfo::Direction _direction = info.direction();
-        if(_direction == TransactionInfo::Direction_In)
+        if (info.direction() == TransactionInfo::Direction_In)
             direction = QString("in");
-        else if(_direction == TransactionInfo::Direction_Out)
+        else if (info.direction() == TransactionInfo::Direction_Out)
             direction = QString("out");
         else
             continue;  // skip TransactionInfo::Direction_Both
 
-        QString label = info.label();
-        label.remove(QChar('"'));  // reserved
-        quint64 blockHeight = info.blockHeight();
-        QString date = info.date() + " " + info.time();
-        uint epoch = timeStamp.toTime_t();
         QString displayAmount = info.displayAmount();
         QString paymentId = info.paymentId();
-        if(paymentId == "0000000000000000")
+        if (paymentId == "0000000000000000") {
             paymentId = "";
+        }
+
+        QString date = QString("%1T%2Z").arg(info.date(), info.time()); // ISO 8601
+
+        QString balanceDelta = WalletManager::displayAmount(info.balanceDelta());
+        if (info.direction() == TransactionInfo::Direction_Out) {
+            balanceDelta = "-" + balanceDelta;
+        }
 
         // format and write
-        QString line = QString("%1,%2,%3,%4,%5,\"%6\",%7,%8,%9,\"%10\",%11,%12\n")
-            .arg(QString::number(blockHeight), QString::number(epoch), date)
-            .arg(direction, QString::number(amount), fiatAmount, QString::number(atomicAmount))
-            .arg(info.fee(), info.hash(), label, QString::number(subaddrAccount))
-            .arg(paymentId);
+        QString line = QString("\n%1,%2,\"%3\",%4,\"%5\",%6,%7,%8,\"%9\",\"%10\",\"%11\",%12,\"%13\"")
+                .arg(QString::number(info.blockHeight()), QString::number(timeStamp.toTime_t()), date,
+                     QString::number(info.subaddrAccount()), direction, balanceDelta, info.displayAmount(),
+                     info.fee(), info.hash(), info.description(), paymentId, fiatAmount, preferredFiatSymbol);
         data += line;
     }
 
-    if(data.isEmpty())
+    if (data.isEmpty())
         return false;
 
-    data = QString("blockHeight,epoch,date,direction,amount,fiat,atomicAmount,fee,txid,label,subaddrAccount,paymentId\n%1").arg(data);
+    data = QString("blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId,fiatAmount,fiatCurrency%1").arg(data);
     return Utils::fileWrite(path, data);
 }
