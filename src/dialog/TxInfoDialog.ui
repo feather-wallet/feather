@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>929</width>
-    <height>631</height>
+    <height>715</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -206,9 +206,16 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout_4">
      <item>
+      <widget class="QPushButton" name="btn_copyTxID">
+       <property name="text">
+        <string>Copy Tx ID/hash</string>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QPushButton" name="btn_CopyTxKey">
        <property name="text">
-        <string>Copy Transaction Key</string>
+        <string>Copy Tx Secret Key</string>
        </property>
       </widget>
      </item>

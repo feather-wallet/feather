@@ -28,6 +28,7 @@ signals:
     void resendTranscation(const QString &txid);
 
 private:
+    void copyTxID();
     void copyTxKey();
     void createTxProof();
     void setData(TransactionInfo *tx);

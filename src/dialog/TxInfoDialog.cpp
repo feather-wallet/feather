@@ -29,8 +29,9 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     m_txid = txInfo->hash();
     ui->label_txid->setText(m_txid);
 
-    connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TxInfoDialog::copyTxKey);
-    connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TxInfoDialog::createTxProof);
+    connect(ui->btn_copyTxID, &QPushButton::clicked, this, &TxInfoDialog::copyTxID);
+    connect(ui->btn_CopyTxKey, &QPushButton::clicked, this, &TxInfoDialog::copyTxKey);
+    connect(ui->btn_createTxProof, &QPushButton::clicked, this, &TxInfoDialog::createTxProof);
 
     connect(m_ctx->wallet, &Wallet::newBlock, this, &TxInfoDialog::updateData);
 
@@ -138,6 +139,10 @@ void TxInfoDialog::updateData() {
     TransactionInfo *tx = m_ctx->wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
+}
+
+void TxInfoDialog::copyTxID() {
+    Utils::copyToClipboard(m_txid);
 }
 
 void TxInfoDialog::copyTxKey() {
