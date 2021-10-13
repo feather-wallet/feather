@@ -4,6 +4,7 @@
 #ifndef FEATHER_CONTACTSWIDGET_H
 #define FEATHER_CONTACTSWIDGET_H
 
+#include <QPushButton>
 #include <QWidget>
 #include <QMenu>
 
@@ -51,6 +52,7 @@ private:
     QMenu *m_headerMenu;
     AddressBookModel * m_model;
     AddressBookProxyModel * m_proxyModel;
+    QPushButton *m_btn_addContact;
 };
 
 #endif // FEATHER_CONTACTSWIDGET_H

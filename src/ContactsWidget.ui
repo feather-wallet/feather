@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>589</width>
-    <height>416</height>
+    <width>914</width>
+    <height>763</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,14 +30,24 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLineEdit" name="search">
-     <property name="placeholderText">
-      <string>Search contacts...</string>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="searchLayout">
+     <item>
+      <widget class="QLineEdit" name="search">
+       <property name="placeholderText">
+        <string>Search contacts...</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QTreeView" name="contacts">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
      <property name="rootIsDecorated">
       <bool>false</bool>
      </property>
