@@ -628,7 +628,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
     // Show advanced dialog on multi-destination transactions
     if (address.size() > 1 || m_ctx->wallet->viewOnly()) {
         TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
-        dialog_adv.setTransaction(tx);
+        dialog_adv.setTransaction(tx, !m_ctx->wallet->viewOnly());
         dialog_adv.exec();
         return;
     }

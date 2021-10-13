@@ -35,11 +35,6 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     m_exportTxKeyMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::txKeyCopy);
     ui->btn_exportTxKey->setMenu(m_exportTxKeyMenu);
 
-    if (m_ctx->wallet->viewOnly()) {
-        ui->btn_exportSigned->hide();
-        ui->btn_send->hide();
-    }
-
     ui->label_description->setText(QString("Description: %1").arg(description));
 
     connect(ui->btn_sign, &QPushButton::clicked, this, &TxConfAdvDialog::signTransaction);
@@ -52,12 +47,22 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     this->adjustSize();
 }
 
-void TxConfAdvDialog::setTransaction(PendingTransaction *tx) {
+void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
     ui->btn_sign->hide();
+
+    if (!isSigned) {
+        ui->btn_exportSigned->hide();
+        ui->btn_send->hide();
+    }
 
     m_tx = tx;
     m_tx->refresh();
     PendingTransactionInfo *ptx = m_tx->transaction(0); //Todo: support split transactions
+
+    // TODO: implement hasTxKey()
+    if (!m_ctx->wallet->isHwBacked() && m_tx->transaction(0)->txKey() == "0100000000000000000000000000000000000000000000000000000000000000") {
+        ui->btn_exportTxKey->hide();
+    }
 
     ui->txid->setText(tx->txid().first());
 
@@ -65,12 +70,13 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx) {
     ui->fee->setText(WalletManager::displayAmount(ptx->fee()));
     ui->total->setText(WalletManager::displayAmount(tx->amount() + ptx->fee()));
 
-    auto size_str = [this]{
-        if (m_ctx->wallet->viewOnly()) {
-            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
-        } else {
+    auto size_str = [this, isSigned]{
+        if (isSigned) {
             auto size = m_tx->signedTxToHex(0).size() / 2;
             return QString("Size: %1 bytes (%2 bytes unsigned)").arg(QString::number(size), QString::number(m_tx->unsignedTxToBin().size()));
+        } else {
+
+            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
         }
     }();
     ui->label_size->setText(size_str);

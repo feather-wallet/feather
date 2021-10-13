@@ -24,7 +24,7 @@ public:
     explicit TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent = nullptr);
     ~TxConfAdvDialog() override;
 
-    void setTransaction(PendingTransaction *tx);
+    void setTransaction(PendingTransaction *tx, bool isSigned = true); // #TODO: have libwallet return a UnsignedTransaction, this is just dumb
     void setUnsignedTransaction(UnsignedTransaction *utx);
 
 private:
