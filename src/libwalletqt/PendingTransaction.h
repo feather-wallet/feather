@@ -11,11 +11,6 @@
 #include <wallet/api/wallet2_api.h>
 #include "PendingTransactionInfo.h"
 
-
-//namespace Monero {
-//class PendingTransaction;
-//}
-
 class PendingTransaction : public QObject
 {
     Q_OBJECT
