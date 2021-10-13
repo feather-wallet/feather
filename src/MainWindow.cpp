@@ -626,7 +626,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
     m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
     // Show advanced dialog on multi-destination transactions
-    if (address.size() > 1) {
+    if (address.size() > 1 || m_ctx->wallet->viewOnly()) {
         TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
         dialog_adv.setTransaction(tx);
         dialog_adv.exec();
@@ -1042,7 +1042,7 @@ void MainWindow::showWSNodeExhaustedMessage() {
 }
 
 void MainWindow::exportKeyImages() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QDir::homePath(), "Key Images (*_keyImages)");
+    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_keyImages")) fn += "_keyImages";
     m_ctx->wallet->exportKeyImages(fn, true);
@@ -1068,7 +1068,7 @@ void MainWindow::importKeyImages() {
 }
 
 void MainWindow::exportOutputs() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QDir::homePath(), "Outputs (*_outputs)");
+    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_outputs")) fn += "_outputs";
     m_ctx->wallet->exportOutputs(fn, true);
