@@ -121,6 +121,7 @@ void HistoryWidget::showTxDetails() {
        emit resendTransaction(txid);
     });
     dialog->show();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void HistoryWidget::onViewOnBlockExplorer() {
