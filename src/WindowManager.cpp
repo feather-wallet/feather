@@ -460,8 +460,6 @@ void WindowManager::initTor() {
     torManager()->init();
     torManager()->start();
 
-    connect(torManager(), &TorManager::connectionStateChanged, &websocketNotifier()->websocketClient, &WebsocketClient::onToggleConnect);
-
     this->onTorSettingsChanged();
 }
 

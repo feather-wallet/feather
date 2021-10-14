@@ -20,24 +20,18 @@ public:
 
     QWebSocket webSocket;
 
-public slots:
-    void onToggleConnect(bool connect);
-
 signals:
-    void closed();
     void connectionEstablished();
     void WSMessage(QJsonObject message);
 
 private slots:
     void onConnected();
+    void onDisconnected();
     void onbinaryMessageReceived(const QByteArray &message);
-    void checkConnection();
     void onError(QAbstractSocket::SocketError error);
 
 private:
-    bool m_connect = false;
     QUrl m_url = constants::websocketUrl;
-    QTimer m_connectionTimer;
     QTimer m_pingTimer;
 };
 
