@@ -9,7 +9,7 @@
 #include <QCoreApplication>
 
 #include "prices.h"
-#include "txfiathistory.h"
+#include "TxFiatHistory.h"
 #include "RestoreHeightLookup.h"
 
 class AppData : public QObject {

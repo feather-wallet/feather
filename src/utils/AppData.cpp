@@ -11,15 +11,11 @@ AppData::AppData(QObject *parent)
     this->initRestoreHeights();
 
     auto genesis_timestamp = this->restoreHeights[NetworkType::Type::MAINNET]->data.firstKey();
-    this->txFiatHistory = new TxFiatHistory(genesis_timestamp, Config::defaultConfigDir().path());
+    this->txFiatHistory = new TxFiatHistory(genesis_timestamp, Config::defaultConfigDir().path(), this);
 
     connect(&websocketNotifier()->websocketClient, &WebsocketClient::connectionEstablished, this->txFiatHistory, &TxFiatHistory::onUpdateDatabase);
     connect(this->txFiatHistory, &TxFiatHistory::requestYear, [](int year){
         QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1}})").arg(year).toUtf8();
-        websocketNotifier()->websocketClient.sendMsg(data);
-    });
-    connect(this->txFiatHistory, &TxFiatHistory::requestYearMonth, [](int year, int month){
-        QByteArray data = QString(R"({"cmd": "txFiatHistory", "data": {"year": %1, "month": %2}})").arg(year).arg(month).toUtf8();
         websocketNotifier()->websocketClient.sendMsg(data);
     });
 

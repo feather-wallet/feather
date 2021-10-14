@@ -4,6 +4,10 @@
 #ifndef FEATHER_TXFIATHISTORY_H
 #define FEATHER_TXFIATHISTORY_H
 
+#include <QDate>
+#include <QObject>
+#include <QMap>
+
 class TxFiatHistory : public QObject {
     Q_OBJECT
 
@@ -18,14 +22,14 @@ public slots:
 
 signals:
     void requestYear(int year);
-    void requestYearMonth(int year, int month);
 
 private:
     void loadDatabase();
     void writeDatabase();
+    QString dateToKey(const QDate &date);
+
     int m_genesis_timestamp;
     QString m_databasePath;
-    QString m_configDirectory;
     bool m_initialized = false;
     QMap<QString, double> m_database;
 };
