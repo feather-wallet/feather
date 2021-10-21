@@ -43,7 +43,7 @@
        <item>
         <widget class="QLabel" name="label">
          <property name="text">
-          <string>a free, open-source Monero wallet</string>
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Feather&lt;/span&gt;: a free, open-source Monero wallet&lt;/p&gt;&lt;p&gt;Created by dsc, tobtoht and contributors&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
@@ -66,23 +66,6 @@
          </property>
          <property name="readOnly">
           <bool>true</bool>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="Authors">
-      <attribute name="title">
-       <string>Authors</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
-       <item>
-        <widget class="QTreeView" name="authorView">
-         <property name="editTriggers">
-          <set>QAbstractItemView::NoEditTriggers</set>
-         </property>
-         <property name="rootIsDecorated">
-          <bool>false</bool>
          </property>
         </widget>
        </item>

@@ -21,7 +21,6 @@ public:
 
 private:
     QScopedPointer<Ui::AboutDialog> ui;
-    QStringListModel *m_model;
 };
 
 #endif // FEATHER_ABOUT_H
