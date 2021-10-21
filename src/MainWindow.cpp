@@ -666,9 +666,10 @@ void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, con
         if (msgBox.clickedButton() == showDetailsButton) {
             this->showHistoryTab();
             TransactionInfo *txInfo = m_ctx->wallet->history()->transaction(txid.first());
-            TxInfoDialog dialog{m_ctx, txInfo, this};
-            connect(&dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
-            dialog.exec();
+            auto *dialog = new TxInfoDialog(m_ctx, txInfo, this);
+            connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
+            dialog->show();
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
         }
 
         m_sendWidget->clearFields();
