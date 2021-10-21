@@ -157,6 +157,8 @@ void HistoryWidget::copy(copyField field) {
         switch(field) {
             case copyField::TxID:
                 return tx->hash();
+            case copyField::Description:
+                return tx->description();
             case copyField::Date:
                 return tx->timestamp().toString("yyyy-MM-dd HH:mm");
             case copyField::Amount:
