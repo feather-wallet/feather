@@ -44,6 +44,12 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     } else {
         ui->btn_rebroadcastTx->hide();
     }
+
+    if (txInfo->direction() == TransactionInfo::Direction_In) {
+        ui->btn_CopyTxKey->setDisabled(true);
+        ui->btn_CopyTxKey->setToolTip("No tx secret key available for incoming transactions.");
+    }
+
 //
 //    if (txInfo->direction() == TransactionInfo::Direction_Out) {
 //        // TODO: this will not properly represent coinjoin-like transactions.
