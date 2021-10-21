@@ -117,6 +117,7 @@ private slots:
     void onExportHistoryCSV(bool checked);
     void onExportContactsCSV(bool checked);
     void onCreateDesktopEntry(bool checked);
+    void onShowDocumentaton();
     void onReportBug(bool checked);
 
     // offline tx signing

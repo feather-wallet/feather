@@ -325,6 +325,7 @@ void MainWindow::initMenu() {
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
+    connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentaton);
     connect(ui->actionReport_bug,        &QAction::triggered, this, &MainWindow::onReportBug);
     connect(ui->actionShow_debug_info,   &QAction::triggered, this, &MainWindow::showDebugInfo);
 
@@ -339,6 +340,7 @@ void MainWindow::initMenu() {
     ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
     ui->actionUpdate_balance->setShortcut(QKeySequence("Ctrl+U"));
     ui->actionShow_Searchbar->setShortcut(QKeySequence("Ctrl+F"));
+    ui->actionDocumentation->setShortcut(QKeySequence("F1"));
 }
 
 void MainWindow::initHome() {
@@ -1463,14 +1465,12 @@ void MainWindow::onCreateDesktopEntry(bool checked) {
     QMessageBox::information(this, "Desktop entry", msg);
 }
 
+void MainWindow::onShowDocumentaton() {
+    Utils::externalLinkWarning(this, "https://docs.featherwallet.org");
+}
+
 void MainWindow::onReportBug(bool checked) {
-    QMessageBox::information(this, "Reporting Bugs",
-                             "<body>Please report any bugs as issues on our git repo:<br>\n"
-                             "<a href=\"https://git.featherwallet.org/feather/feather/issues\" style=\"color: #33A4DF\">https://git.featherwallet.org/feather/feather/issues</a><br/><br/>"
-                             "\n"
-                             "Before reporting a bug, upgrade to the most recent version of Feather "
-                             "(latest release or git HEAD), and include the version number in your report. "
-                             "Try to explain not only what the bug is, but how it occurs.</body>");
+    Utils::externalLinkWarning(this, "https://docs.featherwallet.org/guides/report-an-issue");
 }
 
 QString MainWindow::getPlatformTag() {

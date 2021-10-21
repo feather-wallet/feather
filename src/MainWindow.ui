@@ -467,6 +467,7 @@
     <addaction name="actionOfficialWebsite"/>
     <addaction name="actionDonate_to_Feather"/>
     <addaction name="separator"/>
+    <addaction name="actionDocumentation"/>
     <addaction name="actionReport_bug"/>
     <addaction name="actionShow_debug_info"/>
    </widget>
@@ -801,6 +802,11 @@
   <action name="actionAddress_checker">
    <property name="text">
     <string>Address checker</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
    </property>
   </action>
  </widget>
