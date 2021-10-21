@@ -26,7 +26,6 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_contextMenu->addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
 
     // copy menu
-    m_copyMenu->setIcon(icons()->icon("copy.png"));
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Description", this, [this]{copy(copyField::Description);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
@@ -87,8 +86,8 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     }
 
     menu.addMenu(m_copyMenu);
-    menu.addAction(icons()->icon("info2.svg"), "Show details", this, &HistoryWidget::showTxDetails);
-    menu.addAction(icons()->icon("network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+    menu.addAction("Show details", this, &HistoryWidget::showTxDetails);
+    menu.addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
     menu.addAction("Create tx proof", this, &HistoryWidget::createTxProof);
 
     menu.exec(ui->history->viewport()->mapToGlobal(point));
