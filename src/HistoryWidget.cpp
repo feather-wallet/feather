@@ -160,7 +160,7 @@ void HistoryWidget::copy(copyField field) {
             case copyField::Date:
                 return tx->timestamp().toString("yyyy-MM-dd HH:mm");
             case copyField::Amount:
-                return tx->displayAmount();
+                return WalletManager::displayAmount(tx->balanceDelta());
             default:
                 return QString("");
         }
