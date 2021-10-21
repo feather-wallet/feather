@@ -72,9 +72,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     for (const auto &widget: m_priceTickerWidgets)
         connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx.get(), &AppContext::onPreferredFiatCurrencyChanged);
     connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
-    connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx.get(), &AppContext::onAmountPrecisionChanged);
     connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
     QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
 

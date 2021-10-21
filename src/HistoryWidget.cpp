@@ -53,7 +53,6 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
     ui->history->setHistoryModel(m_model);
-    m_ctx->wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
 
     // Load view state
     QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());

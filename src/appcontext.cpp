@@ -55,9 +55,6 @@ AppContext::AppContext(Wallet *wallet)
 
     this->updateBalance();
 
-    // force trigger preferredFiat signal for history model
-    this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
-
     connect(this->wallet->history(), &TransactionHistory::txNoteChanged, [this]{
         this->wallet->history()->refresh(this->wallet->currentSubaddressAccount());
     });
@@ -165,21 +162,6 @@ void AppContext::addCacheTransaction(const QString &txid, const QString &txHex) 
 QString AppContext::getCacheTransaction(const QString &txid) const {
     QString txHex = this->wallet->getCacheAttribute(QString("tx:%1").arg(txid));
     return txHex;
-}
-
-// ################## Models ##################
-
-void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (model != nullptr) {
-        model->preferredFiatSymbol = symbol;
-    }
-}
-
-void AppContext::onAmountPrecisionChanged(int precision) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (!model) return;
-    model->amountPrecision = precision;
 }
 
 // ################## Device ##################

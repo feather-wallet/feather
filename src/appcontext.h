@@ -57,8 +57,6 @@ public slots:
     void onCreateTransactionError(const QString &msg);
     void onOpenAliasResolve(const QString &openAlias);
     void onSetRestoreHeight(quint64 height);
-    void onPreferredFiatCurrencyChanged(const QString &symbol);
-    void onAmountPrecisionChanged(int precision);
     void onMultiBroadcast(PendingTransaction *tx);
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();

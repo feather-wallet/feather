@@ -35,9 +35,6 @@ public:
     TransactionHistory * transactionHistory() const;
     TransactionInfo* entryFromIndex(const QModelIndex& index) const;
 
-    QString preferredFiatSymbol = "USD";
-    int amountPrecision = 4;
-
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex & index, int role = Qt::DisplayRole) const override;
