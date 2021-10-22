@@ -193,6 +193,7 @@ void SendWidget::sendClicked() {
 }
 
 void SendWidget::aliasClicked() {
+    ui->btn_openAlias->setEnabled(false);
     auto alias = ui->lineAddress->text();
     WalletManager::instance()->resolveOpenAliasAsync(alias);
 }
@@ -255,6 +256,8 @@ double SendWidget::amountDouble() {
 }
 
 void SendWidget::onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid) {
+    ui->btn_openAlias->setEnabled(true);
+
     if (address.isEmpty()) {
         this->onOpenAliasResolveError("Could not resolve OpenAlias.");
         return;
