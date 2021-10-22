@@ -11,7 +11,7 @@
 #include "utils/Utils.h"
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::VerifyProofDialog)
         , m_wallet(wallet)
 {

@@ -7,13 +7,14 @@
 #include <QDialog>
 #include <QIcon>
 
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class VerifyProofDialog;
 }
 
-class VerifyProofDialog : public QDialog
+class VerifyProofDialog : public WindowModalDialog
 {
 Q_OBJECT
 

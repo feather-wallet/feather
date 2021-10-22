@@ -10,13 +10,14 @@
 #include <QTextCharFormat>
 
 #include "appcontext.h"
+#include "components.h"
 #include "libwalletqt/PendingTransaction.h"
 
 namespace Ui {
     class TxConfAdvDialog;
 }
 
-class TxConfAdvDialog : public QDialog
+class TxConfAdvDialog : public WindowModalDialog
 {
 Q_OBJECT
 

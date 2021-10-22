@@ -7,11 +7,13 @@
 #include <QDialog>
 #include <QStringListModel>
 
+#include "components.h"
+
 namespace Ui {
     class AboutDialog;
 }
 
-class AboutDialog : public QDialog
+class AboutDialog : public WindowModalDialog
 {
 Q_OBJECT
 

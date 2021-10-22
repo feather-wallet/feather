@@ -7,13 +7,14 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "utils/daemonrpc.h"
 
 namespace Ui {
     class TxBroadcastDialog;
 }
 
-class TxBroadcastDialog : public QDialog
+class TxBroadcastDialog : public WindowModalDialog
 {
     Q_OBJECT
 

@@ -6,13 +6,14 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class SignVerifyDialog;
 }
 
-class SignVerifyDialog : public QDialog
+class SignVerifyDialog : public WindowModalDialog
 {
 Q_OBJECT
 

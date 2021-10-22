@@ -7,12 +7,13 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 
 namespace Ui {
     class SeedDialog;
 }
 
-class SeedDialog : public QDialog
+class SeedDialog : public WindowModalDialog
 {
 Q_OBJECT
 

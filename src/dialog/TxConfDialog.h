@@ -7,6 +7,7 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "libwalletqt/PendingTransaction.h"
 #include "libwalletqt/WalletManager.h"
 
@@ -14,7 +15,7 @@ namespace Ui {
     class TxConfDialog;
 }
 
-class TxConfDialog : public QDialog
+class TxConfDialog : public WindowModalDialog
 {
 Q_OBJECT
 

@@ -8,7 +8,7 @@
 #include "utils/Utils.h"
 
 LocalMoneroInfoDialog::LocalMoneroInfoDialog(QWidget *parent, LocalMoneroModel *model, int row)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::LocalMoneroInfoDialog)
         , m_model(model)
         , m_row(row)

@@ -7,7 +7,7 @@
 #include <QMessageBox>
 
 PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::PasswordChangeDialog)
         , m_wallet(wallet)
 {

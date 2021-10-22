@@ -7,13 +7,14 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class DebugInfoDialog;
 }
 
-class DebugInfoDialog : public QDialog
+class DebugInfoDialog : public WindowModalDialog
 {
     Q_OBJECT
 

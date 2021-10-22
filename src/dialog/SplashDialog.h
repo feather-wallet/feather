@@ -6,11 +6,13 @@
 
 #include <QDialog>
 
+#include "components.h"
+
 namespace Ui {
     class SplashDialog;
 }
 
-class SplashDialog : public QDialog
+class SplashDialog : public WindowModalDialog
 {
 Q_OBJECT
 

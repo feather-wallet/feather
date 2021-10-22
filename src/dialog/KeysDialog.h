@@ -7,12 +7,13 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 
 namespace Ui {
     class KeysDialog;
 }
 
-class KeysDialog : public QDialog
+class KeysDialog : public WindowModalDialog
 {
 Q_OBJECT
 

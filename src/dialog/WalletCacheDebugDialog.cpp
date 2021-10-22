@@ -9,7 +9,7 @@
 #include "model/ModelUtils.h"
 
 WalletCacheDebugDialog::WalletCacheDebugDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::WalletCacheDebugDialog)
         , m_ctx(std::move(ctx))
 {

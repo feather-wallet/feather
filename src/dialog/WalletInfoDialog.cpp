@@ -7,7 +7,7 @@
 #include <QDesktopServices>
 
 WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::WalletInfoDialog)
     , m_ctx(std::move(ctx))
 {

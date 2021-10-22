@@ -7,7 +7,7 @@
 #include "utils/Icons.h"
 
 PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::PasswordDialog)
 {
     ui->setupUi(this);

@@ -8,7 +8,7 @@
 #include "utils/Utils.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::AboutDialog)
 {
     ui->setupUi(this);

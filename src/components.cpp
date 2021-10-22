@@ -114,3 +114,9 @@ ClickableLabel::~ClickableLabel() = default;
 void ClickableLabel::mousePressEvent(QMouseEvent* event) {
     emit clicked();
 }
+
+WindowModalDialog::WindowModalDialog(QWidget *parent)
+    : QDialog(parent)
+{
+    this->setWindowModality(Qt::WindowModal);
+}

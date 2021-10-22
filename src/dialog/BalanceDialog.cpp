@@ -8,7 +8,7 @@
 #include "model/ModelUtils.h"
 
 BalanceDialog::BalanceDialog(QWidget *parent, Wallet *wallet)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::BalanceDialog)
 {
     ui->setupUi(this);

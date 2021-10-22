@@ -6,6 +6,7 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "qrcode/QrCode.h"
 #include "widgets/QrCodeWidget.h"
 
@@ -13,7 +14,7 @@ namespace Ui {
     class QrCodeDialog;
 }
 
-class QrCodeDialog : public QDialog
+class QrCodeDialog : public WindowModalDialog
 {
 Q_OBJECT
 

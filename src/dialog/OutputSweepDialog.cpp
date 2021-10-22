@@ -7,7 +7,7 @@
 #include "libwalletqt/WalletManager.h"
 
 OutputSweepDialog::OutputSweepDialog(QWidget *parent, quint64 amount)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::OutputSweepDialog)
         , m_amount(amount)
 {

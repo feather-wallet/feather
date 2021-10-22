@@ -11,7 +11,7 @@
 #include "utils/WebsocketNotifier.h"
 
 DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::DebugInfoDialog)
         , m_ctx(std::move(ctx))
 {

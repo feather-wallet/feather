@@ -14,7 +14,7 @@
 #include "qrcode/QrCode.h"
 
 TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::TxConfAdvDialog)
     , m_ctx(std::move(ctx))
     , m_exportUnsignedMenu(new QMenu(this))

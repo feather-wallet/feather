@@ -12,7 +12,7 @@
 #include "WalletManager.h"
 
 PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, QSharedPointer<AppContext> ctx, QString address)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::PaymentRequestDialog)
     , m_ctx(std::move(ctx))
     , m_address(std::move(address))

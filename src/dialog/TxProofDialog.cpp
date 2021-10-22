@@ -11,7 +11,7 @@
 #include "utils/Utils.h"
 
 TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::TxProofDialog)
     , m_ctx(std::move(ctx))
 {

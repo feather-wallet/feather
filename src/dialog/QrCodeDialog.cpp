@@ -9,7 +9,7 @@
 #include <QMessageBox>
 
 QrCodeDialog::QrCodeDialog(QWidget *parent, QrCode *qrCode, const QString &title)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::QrCodeDialog)
 {
     ui->setupUi(this);

@@ -8,7 +8,7 @@
 #include "utils/config.h"
 
 CalcConfigDialog::CalcConfigDialog(QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::CalcConfigDialog)
 {
     ui->setupUi(this);

@@ -9,7 +9,7 @@
 #include "utils/NetworkManager.h"
 
 TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::TxImportDialog)
         , m_ctx(std::move(ctx))
         , m_loadTimer(new QTimer(this))

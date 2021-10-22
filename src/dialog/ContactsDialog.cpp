@@ -5,7 +5,7 @@
 #include "ContactsDialog.h"
 
 ContactsDialog::ContactsDialog(QWidget *parent, const QString &address, const QString &name)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::ContactsDialog)
 {
     ui->setupUi(this);

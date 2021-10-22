@@ -7,13 +7,14 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "libwalletqt/TransactionInfo.h"
 
 namespace Ui {
     class TxProofDialog;
 }
 
-class TxProofDialog : public QDialog
+class TxProofDialog : public WindowModalDialog
 {
     Q_OBJECT
 

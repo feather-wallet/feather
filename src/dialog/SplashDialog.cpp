@@ -7,7 +7,7 @@
 #include "utils/Icons.h"
 
 SplashDialog::SplashDialog(QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::SplashDialog)
 {
     ui->setupUi(this);

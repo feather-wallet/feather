@@ -7,13 +7,14 @@
 #include <QDialog>
 #include <QLabel>
 
+#include "components.h"
 #include "model/LocalMoneroModel.h"
 
 namespace Ui {
     class LocalMoneroInfoDialog;
 }
 
-class LocalMoneroInfoDialog : public QDialog
+class LocalMoneroInfoDialog : public WindowModalDialog
 {
     Q_OBJECT
 

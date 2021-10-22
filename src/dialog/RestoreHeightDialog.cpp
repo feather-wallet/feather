@@ -8,7 +8,7 @@
 #include <QDialogButtonBox>
 
 RestoreHeightDialog::RestoreHeightDialog(QWidget *parent, quint64 currentRestoreHeight)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , m_restoreHeightWidget(new RestoreHeightWidget(this))
 {
     auto *layout = new QVBoxLayout(this);

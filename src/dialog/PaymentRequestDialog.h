@@ -7,13 +7,14 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "qrcode/QrCode.h"
 
 namespace Ui {
     class PaymentRequestDialog;
 }
 
-class PaymentRequestDialog : public QDialog
+class PaymentRequestDialog : public WindowModalDialog
 {
     Q_OBJECT
 
