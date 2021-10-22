@@ -11,6 +11,7 @@
 #include "dialog/TxProofDialog.h"
 #include "utils/config.h"
 #include "utils/Icons.h"
+#include "WebsocketNotifier.h"
 
 HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QWidget(parent)
@@ -52,6 +53,10 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
     ui->history->setHistoryModel(m_model);
+
+    connect(websocketNotifier(), &WebsocketNotifier::FiatRatesReceived, [this]{
+        ui->history->update();
+    });
 
     // Load view state
     QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
