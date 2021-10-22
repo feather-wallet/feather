@@ -34,6 +34,7 @@ private:
     void setData(TransactionInfo *tx);
     void updateData();
     void adjustHeight(QTextEdit *textEdit, qreal docHeight);
+    void viewOnBlockExplorer();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;

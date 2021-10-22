@@ -9,6 +9,7 @@
 
 #include "appcontext.h"
 #include "config.h"
+#include "constants.h"
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/TransactionHistory.h"
@@ -16,6 +17,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
 #include "Utils.h"
+#include "utils/Icons.h"
 
 TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)
@@ -25,6 +27,10 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     , m_txProofDialog(new TxProofDialog(this, m_ctx, txInfo))
 {
     ui->setupUi(this);
+
+    ui->btn_viewOnBlockExplorer->setIcon(icons()->icon("external-link.svg"));
+    ui->btn_viewOnBlockExplorer->setToolTip("View on block explorer");
+    connect(ui->btn_viewOnBlockExplorer, &QPushButton::clicked, this, &TxInfoDialog::viewOnBlockExplorer);
 
     m_txid = txInfo->hash();
     ui->label_txid->setText(m_txid);
@@ -85,6 +91,9 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     }
 
     this->adjustSize();
+
+    // Don't autofocus any of the buttons. There is probably a better way for this.
+    ui->label_txid->setFocus();
 }
 
 void TxInfoDialog::adjustHeight(QTextEdit *textEdit, qreal docHeight) {
@@ -166,6 +175,10 @@ void TxInfoDialog::copyTxKey() {
 void TxInfoDialog::createTxProof() {
     m_txProofDialog->show();
     m_txProofDialog->getTxKey();
+}
+
+void TxInfoDialog::viewOnBlockExplorer() {
+    Utils::externalLinkWarning(this, Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), constants::networkType, m_txid));
 }
 
 TxInfoDialog::~TxInfoDialog() = default;
