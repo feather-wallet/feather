@@ -208,7 +208,7 @@
      <item>
       <widget class="QPushButton" name="btn_copyTxID">
        <property name="text">
-        <string>Copy Tx ID/hash</string>
+        <string>Copy Tx ID</string>
        </property>
       </widget>
      </item>
@@ -222,7 +222,7 @@
      <item>
       <widget class="QPushButton" name="btn_createTxProof">
        <property name="text">
-        <string>Create Transaction Proof</string>
+        <string>Create Tx Proof</string>
        </property>
       </widget>
      </item>
