@@ -31,8 +31,8 @@ SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(m_ctx.get(), &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);
     connect(m_ctx.get(), &AppContext::endTransaction, this, &SendWidget::onEndTransaction);
-    connect(m_ctx.get(), &AppContext::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
-    connect(m_ctx.get(), &AppContext::openAliasResolveError, this, &SendWidget::onOpenAliasResolveError);
+
+    connect(WalletManager::instance(), &WalletManager::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
 
     connect(ui->btnScan, &QPushButton::clicked, this, &SendWidget::scanClicked);
     connect(ui->btnSend, &QPushButton::clicked, this, &SendWidget::sendClicked);
@@ -139,8 +139,8 @@ void SendWidget::sendClicked() {
     QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
     QString description = ui->lineDescription->text();
-    if(recipient.isEmpty()) {
-        QMessageBox::warning(this, "Malformed recipient", "The recipient address was not correct");
+    if (recipient.isEmpty()) {
+        QMessageBox::warning(this, "Malformed recipient", "No destination address was entered.");
         return;
     }
 
@@ -178,7 +178,7 @@ void SendWidget::sendClicked() {
         amount = this->amount();
         bool sendAll = (ui->lineAmount->text() == "all");
         if (amount == 0 && !sendAll) {
-            QMessageBox::warning(this, "Amount error", "Invalid amount specified.");
+            QMessageBox::warning(this, "Amount error", "No amount was entered.");
             return;
         }
         m_ctx->onCreateTransaction(recipient, amount, description, sendAll);
@@ -193,8 +193,8 @@ void SendWidget::sendClicked() {
 }
 
 void SendWidget::aliasClicked() {
-    auto address = ui->lineAddress->text();
-    m_ctx->onOpenAliasResolve(address);
+    auto alias = ui->lineAddress->text();
+    WalletManager::instance()->resolveOpenAliasAsync(alias);
 }
 
 void SendWidget::clearClicked() {
@@ -254,7 +254,24 @@ double SendWidget::amountDouble() {
     return amount / constants::cdiv;
 }
 
-void SendWidget::onOpenAliasResolved(const QString &address, const QString &openAlias) {
+void SendWidget::onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid) {
+    if (address.isEmpty()) {
+        this->onOpenAliasResolveError("Could not resolve OpenAlias.");
+        return;
+    }
+
+    if (!dnssecValid) {
+        this->onOpenAliasResolveError("Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed.");
+        return;
+    }
+
+    bool valid = WalletManager::addressValid(address, constants::networkType);
+    if (!valid) {
+        this->onOpenAliasResolveError(QString("Address validation error. Perhaps it is of the wrong network type.\n\n"
+                                              "OpenAlias: %1\nAddress: %2").arg(openAlias, address));
+        return;
+    }
+
     this->fill(address, openAlias);
     ui->btn_openAlias->hide();
 }

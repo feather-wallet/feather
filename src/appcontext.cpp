@@ -210,48 +210,6 @@ void AppContext::onSetRestoreHeight(quint64 height){
     emit customRestoreHeightSet(height);
 }
 
-void AppContext::onOpenAliasResolve(const QString &openAlias) {
-    // @TODO: calling this freezes for about 1-2 seconds :/
-    const auto result = WalletManager::instance()->resolveOpenAlias(openAlias);; // TODO: async call
-    const auto spl = result.split("|");
-    auto msg = QString("");
-    if(spl.count() != 2) {
-        msg = "Internal error";
-        emit openAliasResolveError(msg);
-        return;
-    }
-
-    const auto &status = spl.at(0);
-    const auto &address = spl.at(1);
-    const auto valid = WalletManager::addressValid(address, constants::networkType);
-    if(status == "false"){
-        if(valid){
-            msg = "Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed";
-            emit openAliasResolveError(msg);
-            return;
-        } else {
-            msg = "No valid address found at this OpenAlias address, but the DNSSEC signatures could not be verified, so this may be spoofed";
-            emit openAliasResolveError(msg);
-            return;
-        }
-    } else if(status != "true") {
-        msg = "Internal error";
-        emit openAliasResolveError(msg);
-        return;
-    }
-
-    if(valid){
-        emit openAliasResolved(address, openAlias);
-        return;
-    }
-
-    msg = QString("Address validation error.");
-    if(!address.isEmpty())
-        msg += QString(" Perhaps it is of the wrong network type."
-                       "\n\nOpenAlias: %1\nAddress: %2").arg(openAlias).arg(address);
-    emit openAliasResolveError(msg);
-}
-
 void AppContext::stopTimers() {
     m_storeTimer.stop();
 }

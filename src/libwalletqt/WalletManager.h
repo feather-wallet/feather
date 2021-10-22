@@ -142,7 +142,8 @@ public:
     Q_INVOKABLE qint64 addi(qint64 x, qint64 y) const { return x + y; }
     Q_INVOKABLE qint64 subi(qint64 x, qint64 y) const { return x - y; }
 
-    Q_INVOKABLE QString resolveOpenAlias(const QString &address) const;
+    QString resolveOpenAlias(const QString &address, bool &dnssecValid) const;
+    void resolveOpenAliasAsync(const QString &address);
 
     // clear/rename wallet cache
     Q_INVOKABLE static bool clearWalletCache(const QString &fileName);
@@ -162,6 +163,7 @@ signals:
     void deviceError(const QString &message);
     void miningStatus(bool isMining) const;
     void proxyAddressChanged() const;
+    void openAliasResolved(const QString &alias, const QString &address, bool dnssecValid);
 
 public slots:
 private:

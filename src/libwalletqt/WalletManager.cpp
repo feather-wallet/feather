@@ -297,12 +297,18 @@ bool WalletManager::isDaemonLocal(const QString &daemon_address) const
     return daemon_address.isEmpty() ? false : Monero::Utils::isAddressLocal(daemon_address.toStdString());
 }
 
-QString WalletManager::resolveOpenAlias(const QString &address) const
+QString WalletManager::resolveOpenAlias(const QString &address, bool &dnssecValid) const
 {
-    bool dnssec_valid = false;
-    std::string res = m_pimpl->resolveOpenAlias(address.toStdString(), dnssec_valid);
-    res = std::string(dnssec_valid ? "true" : "false") + "|" + res;
+    std::string res = m_pimpl->resolveOpenAlias(address.toStdString(), dnssecValid);
     return QString::fromStdString(res);
+}
+
+void WalletManager::resolveOpenAliasAsync(const QString &alias) {
+    m_scheduler.run([this, alias] {
+        bool dnssecValid;
+        QString address = this->resolveOpenAlias(alias, dnssecValid);
+        emit openAliasResolved(alias, address, dnssecValid);
+    });
 }
 
 void WalletManager::setLogLevel(int logLevel)
