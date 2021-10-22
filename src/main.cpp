@@ -207,6 +207,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     qInstallMessageHandler(Utils::applicationLogHandler);
     qRegisterMetaType<QVector<QString>>();
+    qRegisterMetaType<TxProofResult>("TxProofResult");
+    qRegisterMetaType<QPair<bool, bool>>();
 
     WindowManager windowManager;
 

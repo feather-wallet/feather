@@ -61,6 +61,7 @@ class Coins;
 class CoinsModel;
 
 struct TxProofResult {
+    TxProofResult() {}
     TxProofResult(bool success, bool good, uint64_t received, bool in_pool, uint64_t confirmations)
       : success(success), good(good), received(received), in_pool(in_pool), confirmations(confirmations){}
 
@@ -406,9 +407,11 @@ public:
    // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
     //QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
     TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    void checkTxProofAsync(const QString &txid, const QString &address, const QString &message, const QString &signature);
     TxProof getSpendProof(const QString &txid, const QString &message) const;
    // void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
     QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
+    void checkSpendProofAsync(const QString &txid, const QString &message, const QString &signature);
     // Rescan spent outputs
     bool rescanSpent();
 
@@ -475,6 +478,8 @@ signals:
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
     void heightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) const;
     void deviceShowAddressShowed();
+    void transactionProofVerified(TxProofResult result);
+    void spendProofVerified(QPair<bool, bool> result);
 
     // emitted when transaction is created async
     void transactionCreated(PendingTransaction * transaction, QVector<QString> address);
