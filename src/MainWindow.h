@@ -223,7 +223,6 @@ private:
     WindowManager *m_windowManager;
     QSharedPointer<AppContext> m_ctx;
 
-    Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 

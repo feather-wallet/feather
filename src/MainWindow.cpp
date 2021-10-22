@@ -47,7 +47,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
 
-    m_windowSettings = new Settings(m_ctx, this);
     m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
 
@@ -68,19 +67,12 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 #endif
     websocketNotifier()->emitCache(); // Get cached data
 
-    // Settings
-    for (const auto &widget: m_priceTickerWidgets)
-        connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
-    connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
-    QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
-
     connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
 
     ColorScheme::updateFromWidget(this);
+    QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
 
     // Timers
     connect(&m_updateBytes, &QTimer::timeout, this, &MainWindow::updateNetStats);
@@ -833,9 +825,14 @@ void MainWindow::menuAboutClicked() {
 }
 
 void MainWindow::menuSettingsClicked() {
-    m_windowSettings->raise();
-    m_windowSettings->show();
-    m_windowSettings->activateWindow();
+    Settings settings{m_ctx, this};
+    for (const auto &widget: m_priceTickerWidgets) {
+        connect(&settings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
+    }
+    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
+    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
+    connect(&settings, &Settings::skinChanged, this, &MainWindow::skinChanged);
+    settings.exec();
 }
 
 void MainWindow::menuSignVerifyClicked() {
