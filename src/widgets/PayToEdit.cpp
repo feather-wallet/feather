@@ -170,8 +170,9 @@ void PayToEdit::parseAsMultiline(const QStringList &lines) {
     m_outputs.clear();
     m_total = 0;
 
-    int i = 0;
+    int i = -1;
     for (auto &line : lines) {
+        i++;
         PartialTxOutput output = this->parseAddressAndAmount(line);
         if (output.address.isEmpty() && output.amount == 0) {
             m_errors.append(PayToLineError(line, "Expected two comma-separated values: (address, amount)", i, true));
@@ -186,6 +187,5 @@ void PayToEdit::parseAsMultiline(const QStringList &lines) {
 
         m_outputs.append(output);
         m_total += output.amount;
-        i += 1;
     }
 }
