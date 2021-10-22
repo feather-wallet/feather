@@ -159,7 +159,8 @@ void HistoryWidget::copy(copyField field) {
             case copyField::Description:
                 return tx->description();
             case copyField::Date:
-                return tx->timestamp().toString("yyyy-MM-dd HH:mm");
+                return tx->timestamp().toString(QString("%1 %2").arg(config()->get(Config::dateFormat).toString(),
+                                                                     config()->get(Config::timeFormat).toString()));
             case copyField::Amount:
                 return WalletManager::displayAmount(tx->balanceDelta());
             default:
