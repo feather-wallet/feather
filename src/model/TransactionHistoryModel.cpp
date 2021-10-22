@@ -181,6 +181,9 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (role == Qt::UserRole) {
                 return usd_amount;
             }
+            if (usd_amount == 0.0) {
+                return QString("?");
+            }
 
             double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
             return QString("%1").arg(Utils::amountToCurrencyString(fiat_rounded, preferredFiatCurrency));
