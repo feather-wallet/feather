@@ -634,7 +634,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
             break;
         }
         case QDialog::Accepted:
-            m_ctx->commitTransaction(tx);
+            m_ctx->commitTransaction(tx, m_ctx->tmpTxDescription);
             break;
     }
 

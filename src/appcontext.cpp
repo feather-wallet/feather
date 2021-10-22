@@ -72,7 +72,8 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
 
     quint64 unlocked_balance = this->wallet->unlockedBalance();
     if (!all && amount > unlocked_balance) {
-        emit createTransactionError("Not enough money to spend");
+        emit createTransactionError(QString("Not enough money to spend.\n\n"
+                                            "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
         return;
     } else if (unlocked_balance == 0) {
         emit createTransactionError("No money to spend");
@@ -129,14 +130,14 @@ void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QStri
     this->wallet->disposeTransaction(tx);
 }
 
-void AppContext::commitTransaction(PendingTransaction *tx) {
+void AppContext::commitTransaction(PendingTransaction *tx, const QString &description) {
     // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
     // To mitigate transactions failing we just send the transaction to every node we know about over Tor
     if (config()->get(Config::multiBroadcast).toBool()) {
         this->onMultiBroadcast(tx);
     }
 
-    this->wallet->commitTransactionAsync(tx);
+    this->wallet->commitTransactionAsync(tx, description);
 }
 
 void AppContext::onMultiBroadcast(PendingTransaction *tx) {
@@ -305,13 +306,6 @@ void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 }
 
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
-    if (status) {
-        for (const auto &entry: txid) {
-            this->wallet->setUserNote(entry, this->tmpTxDescription);
-        }
-        this->tmpTxDescription = "";
-    }
-
     // Store wallet immediately so we don't risk losing tx key if wallet crashes
     this->wallet->store();
 

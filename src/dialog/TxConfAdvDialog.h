@@ -33,6 +33,7 @@ private:
     void signTransaction();
     void broadcastTransaction();
     void closeDialog();
+    void setAmounts(quint64 amount, quint64 fee);
 
     void unsignedCopy();
     void unsignedQrCode();
@@ -51,6 +52,7 @@ private:
     QMenu *m_exportUnsignedMenu;
     QMenu *m_exportSignedMenu;
     QMenu *m_exportTxKeyMenu;
+    QString m_txid;
 };
 
 #endif //FEATHER_TXCONFADVDIALOG_H

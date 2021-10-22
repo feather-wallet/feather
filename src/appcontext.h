@@ -37,7 +37,7 @@ public:
     // libwalletqt
     bool refreshed = false;
 
-    void commitTransaction(PendingTransaction *tx);
+    void commitTransaction(PendingTransaction *tx, const QString &description="");
     void syncStatusUpdated(quint64 height, quint64 target);
     void updateBalance();
     void refreshModels();

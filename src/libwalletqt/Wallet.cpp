@@ -826,11 +826,19 @@ bool Wallet::refresh(bool historyAndSubaddresses /* = true */)
     }
 }
 
-void Wallet::commitTransactionAsync(PendingTransaction *t)
+void Wallet::commitTransactionAsync(PendingTransaction *t, const QString &description)
 {
-    m_scheduler.run([this, t] {
+    m_scheduler.run([this, t, description] {
         auto txIdList = t->txid();  // retrieve before commit
-        emit transactionCommitted(t->commit(), t, txIdList);
+        bool success = t->commit();
+
+        if (success && !description.isEmpty()) {
+            for (const auto &txid : txIdList) {
+                this->setUserNote(txid, description);
+            }
+        }
+
+        emit transactionCommitted(success, t, txIdList);
     });
 }
 

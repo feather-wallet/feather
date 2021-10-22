@@ -329,7 +329,7 @@ public:
     bool submitTxFile(const QString &fileName) const;
 
     //! asynchronous transaction commit
-    void commitTransactionAsync(PendingTransaction * t);
+    void commitTransactionAsync(PendingTransaction * t, const QString &description="");
 
     //! deletes transaction and frees memory
     void disposeTransaction(PendingTransaction * t);
