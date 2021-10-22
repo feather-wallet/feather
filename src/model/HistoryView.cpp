@@ -82,11 +82,16 @@ TransactionInfo* HistoryView::currentEntry()
 }
 
 void HistoryView::setSearchMode(bool mode) {
+    if (!m_inSearchMode) {
+        m_showTxidColumn = !header()->isSectionHidden(TransactionHistoryModel::TxID);
+    }
+
     m_inSearchMode = mode;
 
     if (mode) {
         header()->showSection(TransactionHistoryModel::TxID);
-    } else {
+    }
+    else if (!m_showTxidColumn) {
         header()->hideSection(TransactionHistoryModel::TxID);
     }
 }
