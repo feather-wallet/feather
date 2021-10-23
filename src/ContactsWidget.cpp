@@ -50,7 +50,7 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     // context menu
     ui->contacts->setContextMenuPolicy(Qt::CustomContextMenu);
     m_contextMenu = new QMenu(ui->contacts);
-    m_contextMenu->addAction(icons()->icon("person.svg"), "New contact", [this]{
+    m_contextMenu->addAction("New contact", [this]{
         this->newContact();
     });
 
