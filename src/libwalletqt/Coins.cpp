@@ -96,9 +96,9 @@ QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
     return coins;
 }
 
-void Coins::setDescription(int index, quint32 accountIndex, const QString &description)
+void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const QString &description)
 {
-    m_pimpl->setDescription(index, description.toStdString());
+    m_pimpl->setDescription(publicKey.toStdString(), description.toStdString());
     this->refresh(accountIndex);
     emit descriptionChanged();
 }

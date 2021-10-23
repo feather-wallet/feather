@@ -26,8 +26,7 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->coins->header(), &QHeaderView::customContextMenuRequested, this, &CoinsWidget::showHeaderMenu);
 
     // copy menu
-    m_copyMenu->setIcon(icons()->icon("copy.png"));
-    m_copyMenu->addAction("Public key", this, [this]{copy(copyField::PubKey);});
+    m_copyMenu->addAction("Public Key", this, [this]{copy(copyField::PubKey);});
     m_copyMenu->addAction("Key Image", this, [this]{copy(copyField::KeyImage);});
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Address", this, [this]{copy(copyField::Address);});
@@ -47,7 +46,7 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_freezeAllSelectedAction = new QAction("Freeze selected", this);
     m_thawAllSelectedAction = new QAction("Thaw selected", this);
 
-    m_viewOutputAction = new QAction(icons()->icon("info2.svg"), "Details", this);
+    m_viewOutputAction = new QAction("Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
     m_sweepOutputsAction = new QAction("Sweep selected outputs", this);
 

@@ -179,9 +179,17 @@ bool CoinsModel::setData(const QModelIndex &index, const QVariant &value, int ro
     if (index.isValid() && role == Qt::EditRole) {
         const int row = index.row();
 
+        QString pubkey;
+        bool found = m_coins->coin(index.row(), [this, &pubkey](const CoinsInfo &cInfo) {
+            pubkey = cInfo.pubKey();
+        });
+        if (!found) {
+            return false;
+        }
+
         switch (index.column()) {
             case Label:
-                m_coins->setDescription(row, m_currentSubaddressAccount, value.toString());
+                m_coins->setDescription(pubkey, m_currentSubaddressAccount, value.toString());
                 emit descriptionChanged();
                 break;
             default:
