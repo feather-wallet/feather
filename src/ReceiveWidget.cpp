@@ -44,8 +44,6 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_headerMenu = new QMenu(this);
     m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ReceiveWidget::setShowFullAddresses);
     m_showFullAddressesAction->setCheckable(true);
-    m_showUsedAddressesAction = m_headerMenu->addAction("Show used addresses", this, &ReceiveWidget::setShowUsedAddresses);
-    m_showUsedAddressesAction->setCheckable(true);
     connect(ui->addresses->header(), &QHeaderView::customContextMenuRequested, this, &ReceiveWidget::showHeaderMenu);
 
     // context menu
@@ -99,9 +97,9 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 
     auto *menu = new QMenu(ui->addresses);
 
-    menu->addAction(icons()->icon("copy.png"), "Copy address", this, &ReceiveWidget::copyAddress);
-    menu->addAction(icons()->icon("copy.png"), "Copy label", this, &ReceiveWidget::copyLabel);
-    menu->addAction(icons()->icon("edit.png"), "Edit label", this, &ReceiveWidget::editLabel);
+    menu->addAction("Copy address", this, &ReceiveWidget::copyAddress);
+    menu->addAction("Copy label", this, &ReceiveWidget::copyLabel);
+    menu->addAction("Edit label", this, &ReceiveWidget::editLabel);
 
     if (isUsed) {
         menu->addAction(m_showTransactionsAction);
@@ -109,7 +107,7 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 
     QStringList hiddenAddresses = this->getHiddenAddresses();
     if (hiddenAddresses.contains(address)) {
-        menu->addAction("Show address", this, &ReceiveWidget::showAddress);
+        menu->addAction("Unhide address", this, &ReceiveWidget::showAddress);
     } else {
         menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
     }
