@@ -215,6 +215,7 @@ private:
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
     bool verifyPassword();
+    void patchStylesheetMac();
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();

@@ -95,6 +95,10 @@ void MainWindow::initStatusBar() {
     this->statusBar()->setStyleSheet("QStatusBar::item {border: None;}");
 #endif
 
+#if defined(Q_OS_MACOS)
+    this->patchStylesheetMac();
+#endif
+
     this->statusBar()->setFixedHeight(30);
 
     m_statusLabelStatus = new QLabel("Idle", this);
@@ -849,6 +853,10 @@ void MainWindow::skinChanged(const QString &skinName) {
     m_windowManager->changeSkin(skinName);
     ColorScheme::updateFromWidget(this);
     this->updateWidgetIcons();
+
+#if defined(Q_OS_MACOS)
+    this->patchStylesheetMac();
+#endif
 }
 
 void MainWindow::updateWidgetIcons() {
@@ -1584,6 +1592,14 @@ bool MainWindow::verifyPassword() {
         break;
     }
     return true;
+}
+
+void MainWindow::patchStylesheetMac() {
+    auto patch = Utils::fileOpenQRC(":assets/macStylesheet.patch");
+    auto patch_text = Utils::barrayToString(patch);
+
+    QString styleSheet = qApp->styleSheet() + patch_text;
+    qApp->setStyleSheet(styleSheet);
 }
 
 void MainWindow::toggleSearchbar(bool visible) {

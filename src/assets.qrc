@@ -3,6 +3,7 @@
     <file>assets/about.txt</file>
     <file>assets/ack.txt</file>
     <file>assets/feather.desktop</file>
+    <file>assets/macStylesheet.patch</file>
     <file>assets/nodes.json</file>
     <file>assets/gpg_keys/featherwallet.asc</file>
     <file>assets/images/appicons/32x32.png</file>
