@@ -9,7 +9,7 @@
 #include "utils/NetworkManager.h"
 
 TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::TxBroadcastDialog)
         , m_ctx(std::move(ctx))
 {

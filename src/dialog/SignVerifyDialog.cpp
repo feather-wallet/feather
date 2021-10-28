@@ -9,7 +9,7 @@
 #include "utils/Utils.h"
 
 SignVerifyDialog::SignVerifyDialog(Wallet *wallet, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::SignVerifyDialog)
         , m_wallet(wallet)
 {

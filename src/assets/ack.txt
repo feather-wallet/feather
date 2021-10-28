@@ -1,12 +1,82 @@
-The wallet UI is heavily inspired by Electrum. We would like to recognize Thomas Voegtlin for his pioneering work on Bitcoin.
+• The wallet UI is heavily inspired by Electrum. We would like to recognize Thomas Voegtlin for his pioneering work on Bitcoin.
 
-Feather uses monero-seed written by Tevador, for 14 word mnemonic seeds.
+• Feather uses the monero-seed libary written by Tevador for 14 word mnemonic seeds.
 
-Wizard banner art was adapted from a paper wallet design by the themonera (themonera.art).
+• Wizard banner art was adapted from a paper wallet design by the themonera (themonera.art).
 
-Initial CMake support for the Monero GUI was coded by TheCharlatan/xiphon.
+• Uses icons from the Icons8 icon pack (icons8.com).
 
-Huge thanks to nioc, fluffypony, wowario, thrmo for help during development.
+• Initial CMake support for the Monero GUI was coded by TheCharlatan/xiphon.
 
-Some more shoutouts for people for hosting nodes and/or having good ideas:
-dnale0r, dEBRUYNE, binaryFate, lza_menace, jwinterm, kico, wowario
+Shoutouts:
+
+Alex_LocalMonero
+anhdres
+authentic
+BigNastyHammer
+binaryFate
+bits-of-change
+blasty
+boldsuck
+boogerlad
+bruh
+btsfav
+csd
+CzarekNakamoto
+deanguss
+dEBRUYNE
+dnale0r
+fluffypony
+geonic
+GhostintheQubes
+GriftKilla
+jberman
+john_r365
+jwinterm
+kayabaNerve
+kico
+kinghat
+lozbek
+Lyza
+lza_menace
+Matt Smith
+MoneroArbo
+moneromooo
+mrdeveloper
+Nekun
+netrik182
+nikg83
+nioc
+noobmaximus
+n-peugnet
+onionltd
+Paris
+phoenix1213
+qvqc
+rating89us
+rbrunner
+rehrar
+rottenwheel
+samsunggalaxyplayer
+samwhiskey
+scoobybejesus
+selsta
+sethsimmons
+Shakybeats
+SmashTR
+SovereignStreetArt
+spoontechtips
+stickyf00t
+strace
+rottenwheel
+tevador
+thrmo
+tinkerwithtor
+Vespco
+viperperidot
+witchman05
+wowario
+xiphon
+xmrscott
+xubuntu
+yanmaani

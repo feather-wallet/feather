@@ -79,8 +79,9 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     // Preferred fiat currency combobox
     QStringList fiatCurrencies;
-    for (int index = 0; index < ui->comboBox_fiatCurrency->count(); index++)
+    for (int index = 0; index < ui->comboBox_fiatCurrency->count(); index++) {
         fiatCurrencies << ui->comboBox_fiatCurrency->itemText(index);
+    }
 
     auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
     if(!preferredFiatCurrency.isEmpty())

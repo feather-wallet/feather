@@ -8,7 +8,7 @@
 #include "utils/Utils.h"
 
 OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::OutputInfoDialog)
 {
     ui->setupUi(this);

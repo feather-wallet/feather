@@ -13,7 +13,7 @@
 #include "prices.h"
 #include "widgets/RedditPost.h"
 #include "widgets/CCSEntry.h"
-#include "txfiathistory.h"
+#include "TxFiatHistory.h"
 
 class WebsocketNotifier : public QObject {
     Q_OBJECT

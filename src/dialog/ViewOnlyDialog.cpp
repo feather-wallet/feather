@@ -9,7 +9,7 @@
 #include <QMessageBox>
 
 ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::ViewOnlyDialog)
     , m_ctx(std::move(ctx))
 {

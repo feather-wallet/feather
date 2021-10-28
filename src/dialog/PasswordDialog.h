@@ -6,11 +6,13 @@
 
 #include <QDialog>
 
+#include "components.h"
+
 namespace Ui {
     class PasswordDialog;
 }
 
-class PasswordDialog : public QDialog
+class PasswordDialog : public WindowModalDialog
 {
 Q_OBJECT
 

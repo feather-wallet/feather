@@ -18,6 +18,11 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 {
     ui->setupUi(this);
 
+    m_btn_addContact = new QPushButton(this);
+    m_btn_addContact->setIcon(icons()->icon("localMonero_register.svg"));
+    ui->searchLayout->addWidget(m_btn_addContact, 0, Qt::AlignRight);
+    connect(m_btn_addContact, &QPushButton::clicked, [this]{this->newContact();});
+
     m_model = m_ctx->wallet->addressBookModel();
     m_proxyModel = new AddressBookProxyModel;
     m_proxyModel->setSourceModel(m_model);
@@ -45,7 +50,7 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     // context menu
     ui->contacts->setContextMenuPolicy(Qt::CustomContextMenu);
     m_contextMenu = new QMenu(ui->contacts);
-    m_contextMenu->addAction(icons()->icon("person.svg"), "New contact", [this]{
+    m_contextMenu->addAction("New contact", [this]{
         this->newContact();
     });
 

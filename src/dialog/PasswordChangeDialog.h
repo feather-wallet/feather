@@ -6,13 +6,14 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class PasswordChangeDialog;
 }
 
-class PasswordChangeDialog : public QDialog
+class PasswordChangeDialog : public WindowModalDialog
 {
 Q_OBJECT
 

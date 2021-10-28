@@ -1,0 +1,31 @@
+/* From electrum/gui/qt/stylesheet_patcher.py */
+StatusBarButton {
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    margin: 0px;
+    padding: 2px;
+}
+
+StatusBarButton:checked {
+  background-color: transparent;
+  border: 1px solid #1464A0;
+}
+
+StatusBarButton:checked:disabled {
+  border: 1px solid #14506E;
+}
+
+StatusBarButton:pressed {
+  margin: 1px;
+  background-color: transparent;
+  border: 1px solid #1464A0;
+}
+
+StatusBarButton:disabled {
+  border: none;
+}
+
+StatusBarButton:hover {
+  border: 1px solid #148CD2;
+}

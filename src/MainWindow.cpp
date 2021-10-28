@@ -47,7 +47,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
 
-    m_windowSettings = new Settings(m_ctx, this);
     m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
 
@@ -68,21 +67,12 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 #endif
     websocketNotifier()->emitCache(); // Get cached data
 
-    // Settings
-    for (const auto &widget: m_priceTickerWidgets)
-        connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_ctx.get(), &AppContext::onPreferredFiatCurrencyChanged);
-    connect(m_windowSettings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
-    connect(m_windowSettings, &Settings::amountPrecisionChanged, m_ctx.get(), &AppContext::onAmountPrecisionChanged);
-    connect(m_windowSettings, &Settings::skinChanged, this, &MainWindow::skinChanged);
-    QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
-
     connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
 
     ColorScheme::updateFromWidget(this);
+    QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
 
     // Timers
     connect(&m_updateBytes, &QTimer::timeout, this, &MainWindow::updateNetStats);
@@ -103,6 +93,10 @@ void MainWindow::initStatusBar() {
 #if defined(Q_OS_WIN)
     // No seperators between statusbar widgets
     this->statusBar()->setStyleSheet("QStatusBar::item {border: None;}");
+#endif
+
+#if defined(Q_OS_MACOS)
+    this->patchStylesheetMac();
 #endif
 
     this->statusBar()->setFixedHeight(30);
@@ -327,6 +321,7 @@ void MainWindow::initMenu() {
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
+    connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentaton);
     connect(ui->actionReport_bug,        &QAction::triggered, this, &MainWindow::onReportBug);
     connect(ui->actionShow_debug_info,   &QAction::triggered, this, &MainWindow::showDebugInfo);
 
@@ -341,6 +336,7 @@ void MainWindow::initMenu() {
     ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
     ui->actionUpdate_balance->setShortcut(QKeySequence("Ctrl+U"));
     ui->actionShow_Searchbar->setShortcut(QKeySequence("Ctrl+F"));
+    ui->actionDocumentation->setShortcut(QKeySequence("F1"));
 }
 
 void MainWindow::initHome() {
@@ -626,9 +622,9 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
     m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
     // Show advanced dialog on multi-destination transactions
-    if (address.size() > 1) {
+    if (address.size() > 1 || m_ctx->wallet->viewOnly()) {
         TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
-        dialog_adv.setTransaction(tx);
+        dialog_adv.setTransaction(tx, !m_ctx->wallet->viewOnly());
         dialog_adv.exec();
         return;
     }
@@ -642,7 +638,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
             break;
         }
         case QDialog::Accepted:
-            m_ctx->commitTransaction(tx);
+            m_ctx->commitTransaction(tx, m_ctx->tmpTxDescription);
             break;
     }
 
@@ -666,9 +662,10 @@ void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, con
         if (msgBox.clickedButton() == showDetailsButton) {
             this->showHistoryTab();
             TransactionInfo *txInfo = m_ctx->wallet->history()->transaction(txid.first());
-            TxInfoDialog dialog{m_ctx, txInfo, this};
-            connect(&dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
-            dialog.exec();
+            auto *dialog = new TxInfoDialog(m_ctx, txInfo, this);
+            connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
+            dialog->show();
+            dialog->setAttribute(Qt::WA_DeleteOnClose);
         }
 
         m_sendWidget->clearFields();
@@ -832,9 +829,14 @@ void MainWindow::menuAboutClicked() {
 }
 
 void MainWindow::menuSettingsClicked() {
-    m_windowSettings->raise();
-    m_windowSettings->show();
-    m_windowSettings->activateWindow();
+    Settings settings{m_ctx, this};
+    for (const auto &widget: m_priceTickerWidgets) {
+        connect(&settings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
+    }
+    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
+    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
+    connect(&settings, &Settings::skinChanged, this, &MainWindow::skinChanged);
+    settings.exec();
 }
 
 void MainWindow::menuSignVerifyClicked() {
@@ -851,6 +853,10 @@ void MainWindow::skinChanged(const QString &skinName) {
     m_windowManager->changeSkin(skinName);
     ColorScheme::updateFromWidget(this);
     this->updateWidgetIcons();
+
+#if defined(Q_OS_MACOS)
+    this->patchStylesheetMac();
+#endif
 }
 
 void MainWindow::updateWidgetIcons() {
@@ -1042,7 +1048,7 @@ void MainWindow::showWSNodeExhaustedMessage() {
 }
 
 void MainWindow::exportKeyImages() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QDir::homePath(), "Key Images (*_keyImages)");
+    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_keyImages")) fn += "_keyImages";
     m_ctx->wallet->exportKeyImages(fn, true);
@@ -1068,7 +1074,7 @@ void MainWindow::importKeyImages() {
 }
 
 void MainWindow::exportOutputs() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QDir::homePath(), "Outputs (*_outputs)");
+    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_outputs")) fn += "_outputs";
     m_ctx->wallet->exportOutputs(fn, true);
@@ -1464,14 +1470,12 @@ void MainWindow::onCreateDesktopEntry(bool checked) {
     QMessageBox::information(this, "Desktop entry", msg);
 }
 
+void MainWindow::onShowDocumentaton() {
+    Utils::externalLinkWarning(this, "https://docs.featherwallet.org");
+}
+
 void MainWindow::onReportBug(bool checked) {
-    QMessageBox::information(this, "Reporting Bugs",
-                             "<body>Please report any bugs as issues on our git repo:<br>\n"
-                             "<a href=\"https://git.featherwallet.org/feather/feather/issues\" style=\"color: #33A4DF\">https://git.featherwallet.org/feather/feather/issues</a><br/><br/>"
-                             "\n"
-                             "Before reporting a bug, upgrade to the most recent version of Feather "
-                             "(latest release or git HEAD), and include the version number in your report. "
-                             "Try to explain not only what the bug is, but how it occurs.</body>");
+    Utils::externalLinkWarning(this, "https://docs.featherwallet.org/guides/report-an-issue");
 }
 
 QString MainWindow::getPlatformTag() {
@@ -1588,6 +1592,14 @@ bool MainWindow::verifyPassword() {
         break;
     }
     return true;
+}
+
+void MainWindow::patchStylesheetMac() {
+    auto patch = Utils::fileOpenQRC(":assets/macStylesheet.patch");
+    auto patch_text = Utils::barrayToString(patch);
+
+    QString styleSheet = qApp->styleSheet() + patch_text;
+    qApp->setStyleSheet(styleSheet);
 }
 
 void MainWindow::toggleSearchbar(bool visible) {

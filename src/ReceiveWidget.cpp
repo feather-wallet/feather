@@ -7,6 +7,7 @@
 #include <QMenu>
 #include <QMessageBox>
 
+#include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"
 #include "model/ModelUtils.h"
 #include "utils/Icons.h"
@@ -43,8 +44,6 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_headerMenu = new QMenu(this);
     m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ReceiveWidget::setShowFullAddresses);
     m_showFullAddressesAction->setCheckable(true);
-    m_showUsedAddressesAction = m_headerMenu->addAction("Show used addresses", this, &ReceiveWidget::setShowUsedAddresses);
-    m_showUsedAddressesAction->setCheckable(true);
     connect(ui->addresses->header(), &QHeaderView::customContextMenuRequested, this, &ReceiveWidget::showHeaderMenu);
 
     // context menu
@@ -60,6 +59,8 @@ ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(ui->check_showUsed, &QCheckBox::clicked, this, &ReceiveWidget::setShowUsedAddresses);
     connect(ui->check_showHidden, &QCheckBox::clicked, this, &ReceiveWidget::setShowHiddenAddresses);
+
+    connect(ui->btn_createPaymentRequest, &QPushButton::clicked, this, &ReceiveWidget::createPaymentRequest);
 }
 
 void ReceiveWidget::setSearchbarVisible(bool visible) {
@@ -96,9 +97,9 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 
     auto *menu = new QMenu(ui->addresses);
 
-    menu->addAction(icons()->icon("copy.png"), "Copy address", this, &ReceiveWidget::copyAddress);
-    menu->addAction(icons()->icon("copy.png"), "Copy label", this, &ReceiveWidget::copyLabel);
-    menu->addAction(icons()->icon("edit.png"), "Edit label", this, &ReceiveWidget::editLabel);
+    menu->addAction("Copy address", this, &ReceiveWidget::copyAddress);
+    menu->addAction("Copy label", this, &ReceiveWidget::copyLabel);
+    menu->addAction("Edit label", this, &ReceiveWidget::editLabel);
 
     if (isUsed) {
         menu->addAction(m_showTransactionsAction);
@@ -106,7 +107,7 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 
     QStringList hiddenAddresses = this->getHiddenAddresses();
     if (hiddenAddresses.contains(address)) {
-        menu->addAction("Show address", this, &ReceiveWidget::showAddress);
+        menu->addAction("Unhide address", this, &ReceiveWidget::showAddress);
     } else {
         menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
     }
@@ -116,6 +117,18 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
     }
 
     menu->popup(ui->addresses->viewport()->mapToGlobal(point));
+}
+
+void ReceiveWidget::createPaymentRequest() {
+    QModelIndex index = ui->addresses->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+
+    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+
+    PaymentRequestDialog dialog{this, m_ctx, address};
+    dialog.exec();
 }
 
 void ReceiveWidget::onShowTransactions() {
@@ -190,6 +203,7 @@ void ReceiveWidget::updateQrCode(){
     QModelIndex index = ui->addresses->currentIndex();
     if (!index.isValid()) {
         ui->qrCode->clear();
+        ui->btn_createPaymentRequest->hide();
         return;
     }
 
@@ -199,6 +213,7 @@ void ReceiveWidget::updateQrCode(){
     int width = ui->qrCode->width() - 4;
     if (qrc.isValid()) {
         ui->qrCode->setPixmap(qrc.toPixmap(1).scaled(width, width, Qt::KeepAspectRatio));
+        ui->btn_createPaymentRequest->show();
     }
 }
 

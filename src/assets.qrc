@@ -2,8 +2,8 @@
 <qresource prefix="/">
     <file>assets/about.txt</file>
     <file>assets/ack.txt</file>
-    <file>assets/contributors.txt</file>
     <file>assets/feather.desktop</file>
+    <file>assets/macStylesheet.patch</file>
     <file>assets/nodes.json</file>
     <file>assets/gpg_keys/featherwallet.asc</file>
     <file>assets/images/appicons/32x32.png</file>
@@ -35,6 +35,7 @@
     <file>assets/images/copy.png</file>
     <file>assets/images/cutexmrfox.png</file>
     <file>assets/images/edit.png</file>
+    <file>assets/images/external-link.svg</file>
     <file>assets/images/exchange.png</file>
     <file>assets/images/exchange_white.png</file>
     <file>assets/images/expired.png</file>

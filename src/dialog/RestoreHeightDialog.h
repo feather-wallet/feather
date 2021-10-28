@@ -6,9 +6,10 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "widgets/RestoreHeightWidget.h"
 
-class RestoreHeightDialog : public QDialog
+class RestoreHeightDialog : public WindowModalDialog
 {
 Q_OBJECT
 

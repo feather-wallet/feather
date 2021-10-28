@@ -102,14 +102,6 @@ void WindowManager::startupWarning() {
         this->showWarningMessageBox("Warning", worthlessWarning.arg("testnet"));
         config()->set(Config::warnOnTestnet, false);
     }
-
-    // Beta
-    if (config()->get(Config::warnOnAlpha).toBool()) {
-        QString warning = "Feather Wallet is currently in beta.\n\nPlease report any bugs "
-                          "you encounter on our Git repository, IRC or on /r/FeatherWallet.";
-        this->showWarningMessageBox("Beta warning", warning);
-        config()->set(Config::warnOnAlpha, false);
-    }
 }
 
 void WindowManager::showWarningMessageBox(const QString &title, const QString &message) {
@@ -459,8 +451,6 @@ void WindowManager::onInitialNetworkConfigured() {
 void WindowManager::initTor() {
     torManager()->init();
     torManager()->start();
-
-    connect(torManager(), &TorManager::connectionStateChanged, &websocketNotifier()->websocketClient, &WebsocketClient::onToggleConnect);
 
     this->onTorSettingsChanged();
 }

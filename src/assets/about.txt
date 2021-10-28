@@ -1,12 +1,5 @@
 Feather <feather_version> (<feather_git_head>)
 
-Website: https://featherwallet.org
-E-mail: dev@featherwallet.org
-
-Created by dsc, tobtoht, and contributors.
-
-Uses icons from the Icons8 icon pack (icons8.com).
-
 Copyright (c) 2020-<current_year>, The Monero Project
 
 All rights reserved.

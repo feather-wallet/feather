@@ -7,13 +7,14 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 #include "model/SubaddressAccountModel.h"
 
 namespace Ui {
     class AccountSwitcherDialog;
 }
 
-class AccountSwitcherDialog : public QDialog
+class AccountSwitcherDialog : public WindowModalDialog
 {
     Q_OBJECT
 

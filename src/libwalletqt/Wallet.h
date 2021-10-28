@@ -61,6 +61,7 @@ class Coins;
 class CoinsModel;
 
 struct TxProofResult {
+    TxProofResult() {}
     TxProofResult(bool success, bool good, uint64_t received, bool in_pool, uint64_t confirmations)
       : success(success), good(good), received(received), in_pool(in_pool), confirmations(confirmations){}
 
@@ -328,7 +329,7 @@ public:
     bool submitTxFile(const QString &fileName) const;
 
     //! asynchronous transaction commit
-    void commitTransactionAsync(PendingTransaction * t);
+    void commitTransactionAsync(PendingTransaction * t, const QString &description="");
 
     //! deletes transaction and frees memory
     void disposeTransaction(PendingTransaction * t);
@@ -390,6 +391,8 @@ public:
     bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
     QVariantMap parse_uri_to_object(const QString &uri) const;
 
+    QString make_uri(const QString &address, quint64 &amount, const QString &description, const QString &recipient) const;
+
     //! Namespace your cacheAttribute keys to avoid collisions
     bool setCacheAttribute(const QString &key, const QString &val);
     QString getCacheAttribute(const QString &key) const;
@@ -404,9 +407,11 @@ public:
    // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
     //QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
     TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    void checkTxProofAsync(const QString &txid, const QString &address, const QString &message, const QString &signature);
     TxProof getSpendProof(const QString &txid, const QString &message) const;
    // void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
     QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
+    void checkSpendProofAsync(const QString &txid, const QString &message, const QString &signature);
     // Rescan spent outputs
     bool rescanSpent();
 
@@ -473,6 +478,8 @@ signals:
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
     void heightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) const;
     void deviceShowAddressShowed();
+    void transactionProofVerified(TxProofResult result);
+    void spendProofVerified(QPair<bool, bool> result);
 
     // emitted when transaction is created async
     void transactionCreated(PendingTransaction * transaction, QVector<QString> address);

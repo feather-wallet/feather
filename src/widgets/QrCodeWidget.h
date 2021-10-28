@@ -18,6 +18,8 @@ public:
 
 protected:
     void paintEvent(QPaintEvent *event) override;
+    int heightForWidth(int w) const override;
+    bool hasHeightForWidth() const override;
 
 private:
     QrCode *m_qrcode = nullptr;

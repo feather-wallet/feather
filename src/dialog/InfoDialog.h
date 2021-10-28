@@ -6,11 +6,13 @@
 
 #include <QDialog>
 
+#include "components.h"
+
 namespace Ui {
     class InfoDialog;
 }
 
-class InfoDialog : public QDialog
+class InfoDialog : public WindowModalDialog
 {
     Q_OBJECT
 

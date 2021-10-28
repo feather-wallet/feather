@@ -11,7 +11,7 @@
 #include "utils/Utils.h"
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::VerifyProofDialog)
         , m_wallet(wallet)
 {
@@ -50,6 +50,9 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
         }
     });
 
+    connect(m_wallet, &Wallet::transactionProofVerified, this, &VerifyProofDialog::onTxProofVerified);
+    connect(m_wallet, &Wallet::spendProofVerified, this, &VerifyProofDialog::onSpendProofVerified);
+
     ui->input_formattedProof->setFont(ModelUtils::getMonospaceFont());
 }
 
@@ -69,31 +72,15 @@ void VerifyProofDialog::checkProof() {
 
 void VerifyProofDialog::checkTxProof(const QString &txId, const QString &address, const QString &message,
                                      const QString &signature) {
-    TxProofResult r = m_wallet->checkTxProof(txId, address, message, signature);
-
-    if (!r.success) {
-        this->proofStatus(false, m_wallet->errorString());
-        return;
-    }
-
-    if (!r.good) {
-        this->proofStatus(false, "Proof is invalid");
-        return;
-    }
-
-    this->proofStatus(true, QString("Proof is valid.\n\nThis address received %1 XMR, with %2 confirmation(s)").arg(WalletManager::displayAmount(r.received), QString::number(r.confirmations)));
+    ui->btn_verifyFormattedProof->setEnabled(false);
+    ui->btn_verify->setEnabled(false);
+    m_wallet->checkTxProofAsync(txId, address, message, signature);
 }
 
 void VerifyProofDialog::checkSpendProof(const QString &txId, const QString &message, const QString &signature) {
-    auto r = m_wallet->checkSpendProof(txId, message, signature);
-
-    if (!r.first) {
-        this->proofStatus(false, m_wallet->errorString());
-        return;
-    }
-
-    r.second ? this->proofStatus(true, "Proof is valid")
-             : this->proofStatus(false, "Proof is invalid");
+    ui->btn_verifyFormattedProof->setEnabled(false);
+    ui->btn_verify->setEnabled(false);
+    m_wallet->checkSpendProofAsync(txId, message, signature);
 }
 
 void VerifyProofDialog::checkOutProof() {
@@ -163,11 +150,37 @@ void VerifyProofDialog::proofStatus(bool success, const QString &message) {
         ui->frame_status->show();
         ui->label_icon->setPixmap(success ? m_success : m_failure);
         ui->label_status->setText(message);
+        ui->btn_verifyFormattedProof->setEnabled(true);
     }
     else {
+        ui->btn_verify->setEnabled(true);
         success ? QMessageBox::information(this, "Information", message)
                 : QMessageBox::warning(this, "Warning", message);
     }
+}
+
+void VerifyProofDialog::onTxProofVerified(TxProofResult r) {
+    if (!r.success) {
+        this->proofStatus(false, m_wallet->errorString());
+        return;
+    }
+
+    if (!r.good) {
+        this->proofStatus(false, "Proof is invalid");
+        return;
+    }
+
+    this->proofStatus(true, QString("Proof is valid.\n\nThis address received %1 XMR, with %2 confirmation(s)").arg(WalletManager::displayAmount(r.received), QString::number(r.confirmations)));
+}
+
+void VerifyProofDialog::onSpendProofVerified(QPair<bool, bool> r) {
+    if (!r.first) {
+        this->proofStatus(false, m_wallet->errorString());
+        return;
+    }
+
+    r.second ? this->proofStatus(true, "Proof is valid")
+             : this->proofStatus(false, "Proof is invalid");
 }
 
 VerifyProofDialog::~VerifyProofDialog() = default;

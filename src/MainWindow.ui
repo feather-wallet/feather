@@ -465,10 +465,12 @@
     </property>
     <addaction name="actionAbout"/>
     <addaction name="actionOfficialWebsite"/>
-    <addaction name="actionDonate_to_Feather"/>
     <addaction name="separator"/>
+    <addaction name="actionDocumentation"/>
     <addaction name="actionReport_bug"/>
     <addaction name="actionShow_debug_info"/>
+    <addaction name="separator"/>
+    <addaction name="actionDonate_to_Feather"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">
@@ -801,6 +803,11 @@
   <action name="actionAddress_checker">
    <property name="text">
     <string>Address checker</string>
+   </property>
+  </action>
+  <action name="actionDocumentation">
+   <property name="text">
+    <string>Documentation</string>
    </property>
   </action>
  </widget>

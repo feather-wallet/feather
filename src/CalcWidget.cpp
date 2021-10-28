@@ -23,13 +23,12 @@ CalcWidget::CalcWidget(QWidget *parent)
     ui->imageExchange->setFixedSize(26, 26);
 
     // validator/locale for input
-    QLocale lo(QLocale::C);
-    lo.setNumberOptions(QLocale::RejectGroupSeparator);
-    auto dv = new QDoubleValidator(0.0, 2147483647, 10, this); // [0, 32bit max], 10 decimals of precision
-    dv->setNotation(QDoubleValidator::StandardNotation);
-    dv->setLocale(lo);
-    ui->lineFrom->setValidator(dv);
-    ui->lineTo->setValidator(dv);
+    QString amount_rx = R"(^\d{0,8}[\.]\d{0,12}$)";
+    QRegExp rx;
+    rx.setPattern(amount_rx);
+    QValidator *validator = new QRegExpValidator(rx, this);
+    ui->lineFrom->setValidator(validator);
+    ui->lineTo->setValidator(validator);
 
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &CalcWidget::onPricesReceived);
     connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &CalcWidget::onPricesReceived);

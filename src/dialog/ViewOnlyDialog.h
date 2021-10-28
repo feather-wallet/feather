@@ -7,12 +7,13 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 
 namespace Ui {
     class ViewOnlyDialog;
 }
 
-class ViewOnlyDialog : public QDialog
+class ViewOnlyDialog : public WindowModalDialog
 {
 Q_OBJECT
 

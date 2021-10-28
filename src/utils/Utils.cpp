@@ -126,6 +126,16 @@ QString defaultWalletDir() {
 #endif
 }
 
+QString applicationPath() {
+    QString applicationPath = qgetenv("APPIMAGE");
+    if (!applicationPath.isEmpty()) {
+        applicationPath = QFileInfo(applicationPath).absoluteDir().path();
+    } else {
+        applicationPath = QCoreApplication::applicationDirPath();
+    }
+    return applicationPath;
+}
+
 bool validateJSON(const QByteArray &blob) {
     QJsonDocument doc = QJsonDocument::fromJson(blob);
     QString jsonString = doc.toJson(QJsonDocument::Indented);

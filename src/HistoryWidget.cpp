@@ -11,6 +11,7 @@
 #include "dialog/TxProofDialog.h"
 #include "utils/config.h"
 #include "utils/Icons.h"
+#include "WebsocketNotifier.h"
 
 HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QWidget(parent)
@@ -26,10 +27,9 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_contextMenu->addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
 
     // copy menu
-    m_copyMenu->setIcon(icons()->icon("copy.png"));
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
-    m_copyMenu->addAction("Description", this, [this]{copy(copyField::Description);});
     m_copyMenu->addAction("Date", this, [this]{copy(copyField::Date);});
+    m_copyMenu->addAction("Description", this, [this]{copy(copyField::Description);});
     m_copyMenu->addAction("Amount", this, [this]{copy(copyField::Amount);});
 
     ui->history->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -53,7 +53,10 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
     ui->history->setHistoryModel(m_model);
-    m_ctx->wallet->transactionHistoryModel()->amountPrecision = config()->get(Config::amountPrecision).toInt();
+
+    connect(websocketNotifier(), &WebsocketNotifier::FiatRatesReceived, [this]{
+        ui->history->update();
+    });
 
     // Load view state
     QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
@@ -88,9 +91,9 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     }
 
     menu.addMenu(m_copyMenu);
-    menu.addAction(icons()->icon("info2.svg"), "Show details", this, &HistoryWidget::showTxDetails);
-    menu.addAction(icons()->icon("network.png"), "View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
-    menu.addAction("Create tx proof", this, &HistoryWidget::createTxProof);
+    menu.addAction("Show details", this, &HistoryWidget::showTxDetails);
+    menu.addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
+    menu.addAction("Create Tx Proof", this, &HistoryWidget::createTxProof);
 
     menu.exec(ui->history->viewport()->mapToGlobal(point));
 }
@@ -121,6 +124,7 @@ void HistoryWidget::showTxDetails() {
        emit resendTransaction(txid);
     });
     dialog->show();
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
 }
 
 void HistoryWidget::onViewOnBlockExplorer() {
@@ -157,10 +161,13 @@ void HistoryWidget::copy(copyField field) {
         switch(field) {
             case copyField::TxID:
                 return tx->hash();
+            case copyField::Description:
+                return tx->description();
             case copyField::Date:
-                return tx->timestamp().toString("yyyy-MM-dd HH:mm");
+                return tx->timestamp().toString(QString("%1 %2").arg(config()->get(Config::dateFormat).toString(),
+                                                                     config()->get(Config::timeFormat).toString()));
             case copyField::Amount:
-                return tx->displayAmount();
+                return WalletManager::displayAmount(tx->balanceDelta());
             default:
                 return QString("");
         }

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "constants.h"
 #include "dialog/QrCodeDialog.h"
 #include "libwalletqt/Input.h"
 #include "libwalletqt/Transfer.h"
@@ -14,7 +15,7 @@
 #include "qrcode/QrCode.h"
 
 TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::TxConfAdvDialog)
     , m_ctx(std::move(ctx))
     , m_exportUnsignedMenu(new QMenu(this))
@@ -35,16 +36,15 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     m_exportTxKeyMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::txKeyCopy);
     ui->btn_exportTxKey->setMenu(m_exportTxKeyMenu);
 
-    if (m_ctx->wallet->viewOnly()) {
-        ui->btn_exportSigned->hide();
-        ui->btn_send->hide();
-    }
-
-    ui->label_description->setText(QString("Description: %1").arg(description));
+    ui->line_description->setText(description);
 
     connect(ui->btn_sign, &QPushButton::clicked, this, &TxConfAdvDialog::signTransaction);
     connect(ui->btn_send, &QPushButton::clicked, this, &TxConfAdvDialog::broadcastTransaction);
     connect(ui->btn_close, &QPushButton::clicked, this, &TxConfAdvDialog::closeDialog);
+
+    ui->amount->setFont(ModelUtils::getMonospaceFont());
+    ui->fee->setFont(ModelUtils::getMonospaceFont());
+    ui->total->setFont(ModelUtils::getMonospaceFont());
 
     ui->inputs->setFont(ModelUtils::getMonospaceFont());
     ui->outputs->setFont(ModelUtils::getMonospaceFont());
@@ -52,25 +52,35 @@ TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &
     this->adjustSize();
 }
 
-void TxConfAdvDialog::setTransaction(PendingTransaction *tx) {
+void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
     ui->btn_sign->hide();
+
+    if (!isSigned) {
+        ui->btn_exportSigned->hide();
+        ui->btn_send->hide();
+    }
 
     m_tx = tx;
     m_tx->refresh();
     PendingTransactionInfo *ptx = m_tx->transaction(0); //Todo: support split transactions
 
-    ui->txid->setText(tx->txid().first());
+    // TODO: implement hasTxKey()
+    if (!m_ctx->wallet->isHwBacked() && m_tx->transaction(0)->txKey() == "0100000000000000000000000000000000000000000000000000000000000000") {
+        ui->btn_exportTxKey->hide();
+    }
 
-    ui->amount->setText(WalletManager::displayAmount(tx->amount()));
-    ui->fee->setText(WalletManager::displayAmount(ptx->fee()));
-    ui->total->setText(WalletManager::displayAmount(tx->amount() + ptx->fee()));
+    m_txid = tx->txid().first();
+    ui->txid->setText(m_txid);
 
-    auto size_str = [this]{
-        if (m_ctx->wallet->viewOnly()) {
-            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
-        } else {
+    this->setAmounts(tx->amount(), tx->fee());
+
+    auto size_str = [this, isSigned]{
+        if (isSigned) {
             auto size = m_tx->signedTxToHex(0).size() / 2;
             return QString("Size: %1 bytes (%2 bytes unsigned)").arg(QString::number(size), QString::number(m_tx->unsignedTxToBin().size()));
+        } else {
+
+            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
         }
     }();
     ui->label_size->setText(size_str);
@@ -91,12 +101,36 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
     ui->txid->setText("n/a");
     ui->label_size->setText("Size: n/a");
 
-    ui->amount->setText(WalletManager::displayAmount(utx->amount(0)));
-    ui->fee->setText(WalletManager::displayAmount(utx->fee(0)));
-    ui->total->setText(WalletManager::displayAmount(utx->amount(0) + utx->fee(0)));
+    this->setAmounts(utx->amount(0), utx->fee(0));
 
     ConstructionInfo *ci = m_utx->constructionInfo(0);
     this->setupConstructionData(ci);
+}
+
+void TxConfAdvDialog::setAmounts(quint64 amount, quint64 fee) {
+    QString preferredCur = config()->get(Config::preferredFiatCurrency).toString();
+
+    auto convert = [preferredCur](double amount){
+        return QString::number(appData()->prices.convert("XMR", preferredCur, amount), 'f', 2);
+    };
+
+    QString amount_str = WalletManager::displayAmount(amount);
+    QString fee_str = WalletManager::displayAmount(fee);
+    QString total = WalletManager::displayAmount(amount + fee);
+    QVector<QString> amounts = {amount_str, fee_str, total};
+    int maxLength = Utils::maxLength(amounts);
+    std::for_each(amounts.begin(), amounts.end(), [maxLength](QString& amount){amount = amount.rightJustified(maxLength, ' ');});
+
+    QString amount_fiat = convert(amount / constants::cdiv);
+    QString fee_fiat = convert(fee / constants::cdiv);
+    QString total_fiat = convert((amount + fee) / constants::cdiv);
+    QVector<QString> amounts_fiat = {amount_fiat, fee_fiat, total_fiat};
+    int maxLengthFiat = Utils::maxLength(amounts_fiat);
+    std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
+
+    ui->amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
+    ui->fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
+    ui->total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 }
 
 void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
@@ -122,7 +156,6 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(outputs.size())));
 
     ui->label_ringSize->setText(QString("Ring size: %1").arg(QString::number(ci->minMixinCount() + 1)));
-    ui->label_unlockTime->setText(QString("Unlock time: %1 (height)").arg(QString::number(ci->unlockTime())));
 }
 
 void TxConfAdvDialog::signTransaction() {
@@ -180,7 +213,7 @@ void TxConfAdvDialog::signedQrCode() {
 
 void TxConfAdvDialog::broadcastTransaction() {
     if (m_tx == nullptr) return;
-    m_ctx->commitTransaction(m_tx);
+    m_ctx->commitTransaction(m_tx, ui->line_description->text());
     QDialog::accept();
 }
 

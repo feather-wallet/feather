@@ -6,11 +6,13 @@
 
 #include <QDialog>
 
+#include "components.h"
+
 namespace Ui {
     class ContactsDialog;
 }
 
-class ContactsDialog : public QDialog
+class ContactsDialog : public WindowModalDialog
 {
     Q_OBJECT
 

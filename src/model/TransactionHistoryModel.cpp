@@ -158,7 +158,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (role == Qt::UserRole) {
                 return tInfo.balanceDelta();
             }
-            QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', this->amountPrecision);
+            QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', config()->get(Config::amountPrecision).toInt());
             amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
@@ -168,23 +168,30 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
         case Column::FiatAmount:
         {
             double usd_price = appData()->txFiatHistory->get(tInfo.timestamp().toString("yyyyMMdd"));
-            if (usd_price == 0.0)
-                return QVariant("?");
+            if (usd_price == 0.0) {
+                return QString("?");
+            }
 
             double usd_amount = usd_price * (tInfo.balanceDelta() / constants::cdiv);
-            if(this->preferredFiatSymbol != "USD")
-                usd_amount = appData()->prices.convert("USD", this->preferredFiatSymbol, usd_amount);
+
+            QString preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+            if (preferredFiatCurrency != "USD") {
+                usd_amount = appData()->prices.convert("USD", preferredFiatCurrency, usd_amount);
+            }
             if (role == Qt::UserRole) {
                 return usd_amount;
             }
+            if (usd_amount == 0.0) {
+                return QString("?");
+            }
 
             double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
-            return QString("%1").arg(Utils::amountToCurrencyString(fiat_rounded, this->preferredFiatSymbol));
+            return QString("%1").arg(Utils::amountToCurrencyString(fiat_rounded, preferredFiatCurrency));
         }
         default:
         {
             qCritical() << "Unimplemented role";
-            return QVariant();
+            return {};
         }
     }
 }

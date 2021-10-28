@@ -13,7 +13,7 @@
 #include "utils/ColorScheme.h"
 
 TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::TxConfDialog)
         , m_ctx(std::move(ctx))
         , m_tx(tx)

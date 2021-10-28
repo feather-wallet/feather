@@ -28,10 +28,10 @@ public:
     Q_INVOKABLE CoinsInfo * coin(int index);
     Q_INVOKABLE void refresh(quint32 accountIndex);
     Q_INVOKABLE void refreshUnlocked();
-    Q_INVOKABLE void freeze(int index) const;
-    Q_INVOKABLE void thaw(int index) const;
+    Q_INVOKABLE void freeze(QString &publicKey) const;
+    Q_INVOKABLE void thaw(QString &publicKey) const;
     Q_INVOKABLE QVector<CoinsInfo*> coins_from_txid(const QString &txid);
-    Q_INVOKABLE void setDescription(int index, quint32 accountIndex, const QString &description);
+    Q_INVOKABLE void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
 
     quint64 count() const;
 

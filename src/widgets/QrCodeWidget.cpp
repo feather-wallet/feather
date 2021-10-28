@@ -58,3 +58,11 @@ void QrCodeWidget::paintEvent(QPaintEvent *event) {
         }
     }
 }
+
+bool QrCodeWidget::hasHeightForWidth() const {
+    return true;
+}
+
+int QrCodeWidget::heightForWidth(int w) const {
+    return w;
+}

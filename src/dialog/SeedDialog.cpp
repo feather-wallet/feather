@@ -7,7 +7,7 @@
 #include "constants.h"
 
 SeedDialog::SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::SeedDialog)
     , m_ctx(std::move(ctx))
 {

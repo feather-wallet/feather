@@ -1,16 +1,22 @@
 {
   "mainnet": {
     "tor": [
+      "sfprpc5klzs5vyitq2mrooicgk2wcs5ho2nm3niqduvzn5o6ylaslaqd.onion:18089",
+      "sfprpc2fws6ltnq4hyr7lvpul3nank5layd7q7tyc5h4gy4h77gtabad.onion:18089",
       "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
       "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
-      "rbpgdckle3h3vi4wwwrh75usqtoc5r3alohy7yyx57isynvay63nacyd.onion:18089",
       "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
       "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089",
-      "melo7jwjspngus3xhbt5kxeqc4njhokyvh55jfmehplglgmb7a6rb6yd.onion:18081"
+      "melo7jwjspngus3xhbt5kxeqc4njhokyvh55jfmehplglgmb7a6rb6yd.onion:18081",
+      "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
+      "ghziyspoobhmp5oun2xcomrmetqiwbvuaegmte3s47nnqv7hkaa64sid.onion:18089",
+      "xmrnodesarnt4w35aqmu66aart3o324yw6qbnv6pglpof6uqaydzk5id.onion:18081",
+      "usexmr2eeexmlwpuvsfe6tyjmdqliplb2b7uxju6yrrziq3n7fksnxyd.onion:18081"
     ],
     "clearnet": [
       "node.melo.tools:18081",
-      "node-1.sethsimmons.me:18089",
+      "node.sethforprivacy.com:18089",
+      "node2.sethforprivacy.com:18089",
       "selsta1.featherwallet.net:18081",
       "selsta2.featherwallet.net:18081",
       "node.monerooutreach.org:18081",

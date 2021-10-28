@@ -6,6 +6,7 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/CoinsInfo.h"
 
@@ -13,7 +14,7 @@ namespace Ui {
     class OutputInfoDialog;
 }
 
-class OutputInfoDialog : public QDialog
+class OutputInfoDialog : public WindowModalDialog
 {
 Q_OBJECT
 

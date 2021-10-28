@@ -9,7 +9,6 @@
 
 #include "utils/os/whonix.h"
 #include "utils/networking.h"
-#include "utils/wsclient.h"
 #include "utils/FeatherSeed.h"
 #include "utils/daemonrpc.h"
 #include "utils/RestoreHeightLookup.h"
@@ -38,7 +37,7 @@ public:
     // libwalletqt
     bool refreshed = false;
 
-    void commitTransaction(PendingTransaction *tx);
+    void commitTransaction(PendingTransaction *tx, const QString &description="");
     void syncStatusUpdated(quint64 height, quint64 target);
     void updateBalance();
     void refreshModels();
@@ -56,10 +55,7 @@ public slots:
     void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
     void onSweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
     void onCreateTransactionError(const QString &msg);
-    void onOpenAliasResolve(const QString &openAlias);
     void onSetRestoreHeight(quint64 height);
-    void onPreferredFiatCurrencyChanged(const QString &symbol);
-    void onAmountPrecisionChanged(int precision);
     void onMultiBroadcast(PendingTransaction *tx);
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
@@ -89,8 +85,6 @@ signals:
     void createTransactionError(QString message);
     void createTransactionCancelled(const QVector<QString> &address, quint64 amount);
     void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
-    void openAliasResolveError(const QString &msg);
-    void openAliasResolved(const QString &address, const QString &openAlias);
     void setRestoreHeightError(const QString &msg);
     void customRestoreHeightSet(int height);
     void initiateTransaction();

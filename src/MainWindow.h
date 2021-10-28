@@ -117,6 +117,7 @@ private slots:
     void onExportHistoryCSV(bool checked);
     void onExportContactsCSV(bool checked);
     void onCreateDesktopEntry(bool checked);
+    void onShowDocumentaton();
     void onReportBug(bool checked);
 
     // offline tx signing
@@ -214,6 +215,7 @@ private:
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
     bool verifyPassword();
+    void patchStylesheetMac();
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();
@@ -222,7 +224,6 @@ private:
     WindowManager *m_windowManager;
     QSharedPointer<AppContext> m_ctx;
 
-    Settings *m_windowSettings = nullptr;
     CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;
 

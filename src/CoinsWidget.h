@@ -33,9 +33,7 @@ public slots:
 private slots:
     void showHeaderMenu(const QPoint& position);
     void setShowSpent(bool show);
-    void freezeOutput();
     void freezeAllSelected();
-    void thawOutput();
     void thawAllSelected();
     void viewOutput();
     void onSweepOutputs();
@@ -43,8 +41,8 @@ private slots:
     void editLabel();
 
 private:
-    void freezeCoins(const QVector<int>& indexes);
-    void thawCoins(const QVector<int>& indexes);
+    void freezeCoins(QStringList &pubkeys);
+    void thawCoins(QStringList &pubkeys);
 
     enum copyField {
         PubKey = 0,
@@ -79,6 +77,7 @@ private:
     void copy(copyField field);
     CoinsInfo* currentEntry();
     QVector<CoinsInfo*> currentEntries();
+    QStringList selectedPubkeys();
 };
 
 

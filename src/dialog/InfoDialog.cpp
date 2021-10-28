@@ -5,7 +5,7 @@
 #include "ui_InfoDialog.h"
 
 InfoDialog::InfoDialog(QWidget *parent, const QString &title, const QString &infoData)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::InfoDialog)
 {
     ui->setupUi(this);

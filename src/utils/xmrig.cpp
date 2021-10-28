@@ -13,49 +13,58 @@
 XmRig::XmRig(const QString &configDir, QObject *parent)
     : QObject(parent)
 {
-    this->rigDir = QDir(configDir).filePath("xmrig");
-
     m_process.setProcessChannelMode(QProcess::MergedChannels);
     connect(&m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
     connect(&m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
-    connect(&m_process, &QProcess::stateChanged, this, &XmRig::stateChanged);
+    connect(&m_process, &QProcess::stateChanged, this, &XmRig::onStateChanged);
 }
 
 void XmRig::stop() {
-    if(m_process.state() == QProcess::Running) {
+    qDebug() << m_process.processId();
+    if (m_process.state() == QProcess::Running) {
 #if defined(Q_OS_WIN)
         m_process.kill(); // https://doc.qt.io/qt-5/qprocess.html#terminate
-#else
-        m_process.terminate();
+#elif defined(Q_OS_LINUX)
+        if (m_elevated) {
+            m_killProcess.start("pkexec", QStringList() << "kill" << QString::number(m_process.processId()));
+            return;
+        }
 #endif
+        m_process.terminate();
     }
 }
 
 void XmRig::start(const QString &path, int threads, const QString &address, const QString &username,
-                  const QString &password, bool tor, bool tls)
+                  const QString &password, bool tor, bool tls, bool elevated)
 {
+    m_elevated = elevated;
+
     auto state = m_process.state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
         emit error("Can't start XMRig, already running or starting");
         return;
     }
 
-    if(path.isEmpty()) {
+    if (path.isEmpty()) {
         emit error("XmRig->Start path parameter missing.");
         return;
     }
 
-    if(!Utils::fileExists(path)) {
+    if (!Utils::fileExists(path)) {
         emit error(QString("Path to XMRig binary invalid; file does not exist: %1").arg(path));
         return;
     }
 
     QStringList arguments;
+    if (m_elevated) {
+        arguments << path;
+    }
     arguments << "-o" << address;
     arguments << "-a" << "rx/0";
     arguments << "-u" << username;
-    if(!password.isEmpty())
+    if (!password.isEmpty()) {
         arguments << "-p" << password;
+    }
     arguments << "--no-color";
     arguments << "-t" << QString::number(threads);
     if (tor) {
@@ -67,20 +76,30 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
         }
         arguments << "-x" << QString("%1:%2").arg(host, port);
     }
-
-    if(tls)
+    if (tls) {
         arguments << "--tls";
+    }
     arguments << "--donate-level" << "1";
     QString cmd = QString("%1 %2").arg(path, arguments.join(" "));
     emit output(cmd.toUtf8());
-    m_process.start(path, arguments);
+
+    if (m_elevated) {
+        m_process.start("pkexec", arguments);
+    } else {
+        m_process.start(path, arguments);
+    }
 }
 
-void XmRig::stateChanged(QProcess::ProcessState state) {
-    if(state == QProcess::ProcessState::Running)
+void XmRig::onStateChanged(QProcess::ProcessState state) {
+    emit stateChanged(state);
+
+    if (state == QProcess::ProcessState::Running) {
         emit output("XMRig started");
-    else if (state == QProcess::ProcessState::NotRunning)
+    }
+
+    else if (state == QProcess::ProcessState::NotRunning) {
         emit output("XMRig stopped");
+    }
 }
 
 void XmRig::handleProcessOutput() {

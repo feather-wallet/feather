@@ -11,7 +11,7 @@
 #include "utils/WebsocketNotifier.h"
 
 DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-        : QDialog(parent)
+        : WindowModalDialog(parent)
         , ui(new Ui::DebugInfoDialog)
         , m_ctx(std::move(ctx))
 {
@@ -139,7 +139,7 @@ void DebugInfoDialog::copyToClipboad() {
     text += QString("Seed type: %1  \n").arg(ui->label_seedType->text());
     text += QString("Device type: %1  \n").arg(ui->label_deviceType->text());
     text += QString("View only: %1  \n").arg(ui->label_viewOnly->text());
-    text += QString("Primary only: %1 \n").arg(ui->label_primaryOnly->text());
+    text += QString("Primary only: %1  \n").arg(ui->label_primaryOnly->text());
 
     text += QString("Operating system: %1  \n").arg(ui->label_OS->text());
     text += QString("Timestamp: %1  \n").arg(ui->label_timestamp->text());

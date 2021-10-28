@@ -32,17 +32,22 @@ public slots:
     void onStartClicked();
     void onStopClicked();
     void onClearClicked();
+    void onUsePrimaryAddressClicked();
     void onDownloads(const QJsonObject &data);
     void linkClicked();
     void onProcessError(const QString &msg);
     void onProcessOutput(const QByteArray &msg);
     void onHashrate(const QString &hashrate);
-    void onSoloChecked(int state);
+    void onMiningModeChanged(int mode);
+    void onNetworkTLSToggled(bool checked);
+    void onNetworkTorToggled(bool checked);
+    void onXMRigStateChanged(QProcess::ProcessState state);
 
 private slots:
     void onBrowseClicked();
     void onThreadsValueChanged(int date);
     void onPoolChanged(const QString &pool);
+    void onXMRigElevationChanged(bool elevated);
 
 signals:
     void miningStarted();
@@ -51,15 +56,18 @@ signals:
 private:
     void showContextMenu(const QPoint &pos);
     void updatePools();
+    void printConsoleInfo();
+    void setMiningStopped();
+    void setMiningStarted();
+    bool checkXMRigPath();
 
     QScopedPointer<Ui::XMRigWidget> ui;
     QSharedPointer<AppContext> m_ctx;
-    XmRig * m_XMRig;
+    XmRig *m_XMRig;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;
 
     bool m_isMining = false;
-    int m_threads;
     QStringList m_urls;
     QStringList m_defaultPools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433", "pool.minexmr.com:6666", "us-west.minexmr.com:6666", "monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};
 };

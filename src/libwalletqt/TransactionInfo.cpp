@@ -28,7 +28,13 @@ bool TransactionInfo::isCoinbase() const
 
 quint64 TransactionInfo::balanceDelta() const
 {
-    return m_amount + m_fee;
+    if (m_direction == Direction_In) {
+        return m_amount;
+    }
+    else if (m_direction == Direction_Out) {
+        return m_amount + m_fee;
+    }
+    return m_amount;
 }
 
 double TransactionInfo::amount() const

@@ -20,7 +20,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::firstRun, {QS("firstRun"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
-        {Config::warnOnAlpha,{QS("warnOnAlpha"), true}},
 
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
@@ -49,8 +48,13 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // Mining
+        {Config::miningMode,{QS("miningMode"), Config::MiningMode::Pool}},
         {Config::xmrigPath,{QS("xmrigPath"), ""}},
+        {Config::xmrigElevated,{QS("xmrigElevated"), false}},
+        {Config::xmrigThreads,{QS("xmrigThreads"), 1}},
         {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+        {Config::xmrigNetworkTLS,{QS("xmrigNetworkTLS"), true}},
+        {Config::xmrigNetworkTor,{QS("xmrigNetworkTor"), false}},
         {Config::pools,{QS("pools"), {}}},
 
         // Settings

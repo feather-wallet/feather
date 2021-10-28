@@ -38,7 +38,7 @@ public slots:
     void fillAddress(const QString &address);
     void updateConversionLabel();
     void onOpenAliasResolveError(const QString &err);
-    void onOpenAliasResolved(const QString &address, const QString &openAlias);
+    void onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid);
     void onPreferredFiatCurrencyChanged();
 
     void onInitiateTransaction();

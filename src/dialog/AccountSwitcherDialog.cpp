@@ -11,7 +11,7 @@
 #include "utils/Icons.h"
 
 AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::AccountSwitcherDialog)
     , m_ctx(std::move(ctx))
     , m_model(m_ctx->wallet->subaddressAccountModel())
@@ -24,6 +24,8 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
 
     ui->label_totalBalance->setFont(ModelUtils::getMonospaceFont());
     ui->label_totalBalance->setText(WalletManager::displayAmount(m_ctx->wallet->balanceAll()));
+
+    this->setWindowModality(Qt::WindowModal);
 
     ui->accounts->setModel(m_proxyModel);
     ui->accounts->setContextMenuPolicy(Qt::CustomContextMenu);

@@ -55,9 +55,6 @@ AppContext::AppContext(Wallet *wallet)
 
     this->updateBalance();
 
-    // force trigger preferredFiat signal for history model
-    this->onPreferredFiatCurrencyChanged(config()->get(Config::preferredFiatCurrency).toString());
-
     connect(this->wallet->history(), &TransactionHistory::txNoteChanged, [this]{
         this->wallet->history()->refresh(this->wallet->currentSubaddressAccount());
     });
@@ -75,7 +72,8 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
 
     quint64 unlocked_balance = this->wallet->unlockedBalance();
     if (!all && amount > unlocked_balance) {
-        emit createTransactionError("Not enough money to spend");
+        emit createTransactionError(QString("Not enough money to spend.\n\n"
+                                            "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
         return;
     } else if (unlocked_balance == 0) {
         emit createTransactionError("No money to spend");
@@ -132,14 +130,14 @@ void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QStri
     this->wallet->disposeTransaction(tx);
 }
 
-void AppContext::commitTransaction(PendingTransaction *tx) {
+void AppContext::commitTransaction(PendingTransaction *tx, const QString &description) {
     // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
     // To mitigate transactions failing we just send the transaction to every node we know about over Tor
     if (config()->get(Config::multiBroadcast).toBool()) {
         this->onMultiBroadcast(tx);
     }
 
-    this->wallet->commitTransactionAsync(tx);
+    this->wallet->commitTransactionAsync(tx, description);
 }
 
 void AppContext::onMultiBroadcast(PendingTransaction *tx) {
@@ -165,21 +163,6 @@ void AppContext::addCacheTransaction(const QString &txid, const QString &txHex) 
 QString AppContext::getCacheTransaction(const QString &txid) const {
     QString txHex = this->wallet->getCacheAttribute(QString("tx:%1").arg(txid));
     return txHex;
-}
-
-// ################## Models ##################
-
-void AppContext::onPreferredFiatCurrencyChanged(const QString &symbol) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (model != nullptr) {
-        model->preferredFiatSymbol = symbol;
-    }
-}
-
-void AppContext::onAmountPrecisionChanged(int precision) {
-    auto *model = this->wallet->transactionHistoryModel();
-    if (!model) return;
-    model->amountPrecision = precision;
 }
 
 // ################## Device ##################
@@ -226,48 +209,6 @@ void AppContext::onSetRestoreHeight(quint64 height){
     WalletManager::clearWalletCache(fn);
 
     emit customRestoreHeightSet(height);
-}
-
-void AppContext::onOpenAliasResolve(const QString &openAlias) {
-    // @TODO: calling this freezes for about 1-2 seconds :/
-    const auto result = WalletManager::instance()->resolveOpenAlias(openAlias);; // TODO: async call
-    const auto spl = result.split("|");
-    auto msg = QString("");
-    if(spl.count() != 2) {
-        msg = "Internal error";
-        emit openAliasResolveError(msg);
-        return;
-    }
-
-    const auto &status = spl.at(0);
-    const auto &address = spl.at(1);
-    const auto valid = WalletManager::addressValid(address, constants::networkType);
-    if(status == "false"){
-        if(valid){
-            msg = "Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed";
-            emit openAliasResolveError(msg);
-            return;
-        } else {
-            msg = "No valid address found at this OpenAlias address, but the DNSSEC signatures could not be verified, so this may be spoofed";
-            emit openAliasResolveError(msg);
-            return;
-        }
-    } else if(status != "true") {
-        msg = "Internal error";
-        emit openAliasResolveError(msg);
-        return;
-    }
-
-    if(valid){
-        emit openAliasResolved(address, openAlias);
-        return;
-    }
-
-    msg = QString("Address validation error.");
-    if(!address.isEmpty())
-        msg += QString(" Perhaps it is of the wrong network type."
-                       "\n\nOpenAlias: %1\nAddress: %2").arg(openAlias).arg(address);
-    emit openAliasResolveError(msg);
 }
 
 void AppContext::stopTimers() {
@@ -365,13 +306,6 @@ void AppContext::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 }
 
 void AppContext::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid){
-    if (status) {
-        for (const auto &entry: txid) {
-            this->wallet->setUserNote(entry, this->tmpTxDescription);
-        }
-        this->tmpTxDescription = "";
-    }
-
     // Store wallet immediately so we don't risk losing tx key if wallet crashes
     this->wallet->store();
 

@@ -23,6 +23,7 @@ namespace Utils
 
     bool dirExists(const QString &path);
     QString defaultWalletDir();
+    QString applicationPath();
 
     bool validateJSON(const QByteArray &blob);
     bool readJsonFile(QIODevice &device, QSettings::SettingsMap &map);

@@ -121,4 +121,11 @@ protected:
 
 };
 
+class WindowModalDialog : public QDialog {
+    Q_OBJECT
+
+public:
+    explicit WindowModalDialog(QWidget *parent);
+};
+
 #endif //FEATHER_COMPONENTS_H

@@ -3,10 +3,10 @@ project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
-set(VERSION_MAJOR "0")
-set(VERSION_MINOR "1")
+set(VERSION_MAJOR "1")
+set(VERSION_MINOR "0")
 set(VERSION_REVISION "0")
-set(VERSION "beta-9")
+set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(STATIC "Link libraries statically, requires static Qt")
 
@@ -32,7 +32,7 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(MONERO_HEAD "d4257af2e7503fc6dc09fc704606230d353a0a02")
+set(MONERO_HEAD "bdd284b35d2e2c9c6ac733b4bc5ce8bd3b1162dd")
 set(BUILD_GUI_DEPS ON)
 option(ARCH "Target architecture" "x86-64")
 set(BUILD_64 ON)

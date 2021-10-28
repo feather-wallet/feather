@@ -7,12 +7,13 @@
 #include <QDialog>
 
 #include "appcontext.h"
+#include "components.h"
 
 namespace Ui {
     class WalletCacheDebugDialog;
 }
 
-class WalletCacheDebugDialog : public QDialog
+class WalletCacheDebugDialog : public WindowModalDialog
 {
 Q_OBJECT
 

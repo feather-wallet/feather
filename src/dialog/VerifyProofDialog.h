@@ -7,13 +7,14 @@
 #include <QDialog>
 #include <QIcon>
 
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class VerifyProofDialog;
 }
 
-class VerifyProofDialog : public QDialog
+class VerifyProofDialog : public WindowModalDialog
 {
 Q_OBJECT
 
@@ -31,6 +32,8 @@ private:
     void checkInProof();
     void checkFormattedProof();
     void proofStatus(bool success, const QString &message);
+    void onTxProofVerified(TxProofResult result);
+    void onSpendProofVerified(QPair<bool, bool> result);
 
     QScopedPointer<Ui::VerifyProofDialog> ui;
     Wallet *m_wallet;

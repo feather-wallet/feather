@@ -6,13 +6,14 @@
 
 #include <QDialog>
 
+#include "components.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class BalanceDialog;
 }
 
-class BalanceDialog : public QDialog
+class BalanceDialog : public WindowModalDialog
 {
     Q_OBJECT
 

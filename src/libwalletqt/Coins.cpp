@@ -71,15 +71,15 @@ quint64 Coins::count() const
     return m_tinfo.count();
 }
 
-void Coins::freeze(int index) const
+void Coins::freeze(QString &publicKey) const
 {
-    m_pimpl->setFrozen(index);
+    m_pimpl->setFrozen(publicKey.toStdString());
     emit coinFrozen();
 }
 
-void Coins::thaw(int index) const
+void Coins::thaw(QString &publicKey) const
 {
-    m_pimpl->thaw(index);
+    m_pimpl->thaw(publicKey.toStdString());
     emit coinThawed();
 }
 
@@ -96,9 +96,9 @@ QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
     return coins;
 }
 
-void Coins::setDescription(int index, quint32 accountIndex, const QString &description)
+void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const QString &description)
 {
-    m_pimpl->setDescription(index, description.toStdString());
+    m_pimpl->setDescription(publicKey.toStdString(), description.toStdString());
     this->refresh(accountIndex);
     emit descriptionChanged();
 }

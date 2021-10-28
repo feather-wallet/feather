@@ -11,7 +11,7 @@
 #include "utils/Utils.h"
 
 TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::TxProofDialog)
     , m_ctx(std::move(ctx))
 {
@@ -88,13 +88,13 @@ void TxProofDialog::selectOutProof() {
     m_mode = Mode::OutProof;
     this->resetFrames();
 
-    if (m_OutDestinations.empty()) {
-        this->showWarning("This transaction did not spend any outputs owned by this wallet. Creating an OutProof is not possible.");
+    if (m_txKey.isEmpty()) {
+        this->showWarning("No transaction key stored for this transaction. Creating an OutProof is not possible.");
         return;
     }
 
-    if (m_txKey.isEmpty()) {
-        this->showWarning("No transaction key stored for this transaction. Creating an OutProof is not possible.");
+    if (m_OutDestinations.empty()) {
+        this->showWarning("This transaction did not send funds to any known addresses. Creating an OutProof is not possible.");
         return;
     }
 
@@ -106,6 +106,11 @@ void TxProofDialog::selectOutProof() {
 void TxProofDialog::selectInProof() {
     m_mode = Mode::InProof;
     this->resetFrames();
+
+    if (m_direction == TransactionInfo::Direction_Out) {
+        this->showWarning("Can't create InProofs for outgoing transactions.");
+        return;
+    }
 
     if (m_InDestinations.empty()) {
         this->showWarning("Your wallet did not receive any outputs in this transaction.");

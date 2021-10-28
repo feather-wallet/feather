@@ -28,11 +28,13 @@ signals:
     void resendTranscation(const QString &txid);
 
 private:
+    void copyTxID();
     void copyTxKey();
     void createTxProof();
     void setData(TransactionInfo *tx);
     void updateData();
     void adjustHeight(QTextEdit *textEdit, qreal docHeight);
+    void viewOnBlockExplorer();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
     QSharedPointer<AppContext> m_ctx;

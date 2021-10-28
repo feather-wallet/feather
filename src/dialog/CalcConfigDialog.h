@@ -7,11 +7,13 @@
 #include <QDialog>
 #include <QListWidget>
 
+#include "components.h"
+
 namespace Ui {
     class CalcConfigDialog;
 }
 
-class CalcConfigDialog : public QDialog
+class CalcConfigDialog : public WindowModalDialog
 {
     Q_OBJECT
 

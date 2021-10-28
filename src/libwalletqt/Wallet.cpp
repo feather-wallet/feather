@@ -826,11 +826,19 @@ bool Wallet::refresh(bool historyAndSubaddresses /* = true */)
     }
 }
 
-void Wallet::commitTransactionAsync(PendingTransaction *t)
+void Wallet::commitTransactionAsync(PendingTransaction *t, const QString &description)
 {
-    m_scheduler.run([this, t] {
+    m_scheduler.run([this, t, description] {
         auto txIdList = t->txid();  // retrieve before commit
-        emit transactionCommitted(t->commit(), t, txIdList);
+        bool success = t->commit();
+
+        if (success && !description.isEmpty()) {
+            for (const auto &txid : txIdList) {
+                this->setUserNote(txid, description);
+            }
+        }
+
+        emit transactionCommitted(success, t, txIdList);
     });
 }
 
@@ -1016,6 +1024,14 @@ TxProofResult Wallet::checkTxProof(const QString &txid, const QString &address, 
     return {success, good, received, in_pool, confirmations};
 }
 
+void Wallet::checkTxProofAsync(const QString &txid, const QString &address, const QString &message,
+                               const QString &signature) {
+    m_scheduler.run([this, txid, address, message, signature] {
+        auto result = this->checkTxProof(txid, address, message, signature);
+        emit transactionProofVerified(result);
+    });
+}
+
 Q_INVOKABLE TxProof Wallet::getSpendProof(const QString &txid, const QString &message) const
 {
     std::string result = m_walletImpl->getSpendProof(txid.toStdString(), message.toStdString());
@@ -1034,6 +1050,13 @@ Q_INVOKABLE QPair<bool, bool> Wallet::checkSpendProof(const QString &txid, const
     bool good;
     bool success = m_walletImpl->checkSpendProof(txid.toStdString(), message.toStdString(), signature.toStdString(), good);
     return {success, good};
+}
+
+void Wallet::checkSpendProofAsync(const QString &txid, const QString &message, const QString &signature) {
+    m_scheduler.run([this, txid, message, signature] {
+        auto result = this->checkSpendProof(txid, message, signature);
+        emit spendProofVerified(result);
+    });
 }
 
 QString Wallet::signMessage(const QString &message, bool filename, const QString &address) const
@@ -1148,6 +1171,14 @@ QVariantMap Wallet::parse_uri_to_object(const QString &uri) const
     }
 
     return result;
+}
+
+QString Wallet::make_uri(const QString &address, quint64 &amount, const QString &description,
+                         const QString &recipient) const
+{
+    std::string error;
+    std::string uri = m_walletImpl->make_uri(address.toStdString(), "", amount, description.toStdString(), recipient.toStdString(), error);
+    return QString::fromStdString(uri);
 }
 
 bool Wallet::rescanSpent()

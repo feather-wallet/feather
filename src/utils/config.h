@@ -53,8 +53,13 @@ public:
         showSearchbar,
 
         // Mining
+        miningMode,
         xmrigPath,
+        xmrigElevated,
+        xmrigThreads,
         xmrigPool,
+        xmrigNetworkTLS,
+        xmrigNetworkTor,
         pools,
 
         // Settings
@@ -96,6 +101,11 @@ public:
         totalBalance = 0,
         spendablePlusUnconfirmed,
         spendable
+    };
+
+    enum MiningMode {
+        Pool = 0,
+        Solo
     };
 
     ~Config() override;

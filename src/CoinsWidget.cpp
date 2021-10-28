@@ -26,8 +26,7 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->coins->header(), &QHeaderView::customContextMenuRequested, this, &CoinsWidget::showHeaderMenu);
 
     // copy menu
-    m_copyMenu->setIcon(icons()->icon("copy.png"));
-    m_copyMenu->addAction("Public key", this, [this]{copy(copyField::PubKey);});
+    m_copyMenu->addAction("Public Key", this, [this]{copy(copyField::PubKey);});
     m_copyMenu->addAction("Key Image", this, [this]{copy(copyField::KeyImage);});
     m_copyMenu->addAction("Transaction ID", this, [this]{copy(copyField::TxID);});
     m_copyMenu->addAction("Address", this, [this]{copy(copyField::Address);});
@@ -47,12 +46,12 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_freezeAllSelectedAction = new QAction("Freeze selected", this);
     m_thawAllSelectedAction = new QAction("Thaw selected", this);
 
-    m_viewOutputAction = new QAction(icons()->icon("info2.svg"), "Details", this);
+    m_viewOutputAction = new QAction("Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
     m_sweepOutputsAction = new QAction("Sweep selected outputs", this);
 
-    connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeOutput);
-    connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawOutput);
+    connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeAllSelected);
+    connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
     connect(m_sweepOutputAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
     connect(m_sweepOutputsAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
@@ -155,36 +154,24 @@ void CoinsWidget::setSearchFilter(const QString &filter) {
     m_proxyModel->setSearchFilter(filter);
 }
 
-void CoinsWidget::freezeOutput() {
-    QModelIndex index = ui->coins->currentIndex();
-    QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
-    this->freezeCoins(indexes);
+QStringList CoinsWidget::selectedPubkeys() {
+    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
+
+    QStringList pubkeys;
+    for (QModelIndex index: list) {
+        pubkeys << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->pubKey();
+    }
+    return pubkeys;
 }
 
 void CoinsWidget::freezeAllSelected() {
-    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
-
-    QVector<int> indexes;
-    for (QModelIndex index: list) {
-        indexes.push_back(m_proxyModel->mapToSource(index).row()); // todo: will segfault if index get invalidated
-    }
-    this->freezeCoins(indexes);
-}
-
-void CoinsWidget::thawOutput() {
-    QModelIndex index = ui->coins->currentIndex();
-    QVector<int> indexes = {m_proxyModel->mapToSource(index).row()};
-    this->thawCoins(indexes);
+    QStringList pubkeys = this->selectedPubkeys();
+    this->freezeCoins(pubkeys);
 }
 
 void CoinsWidget::thawAllSelected() {
-    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
-
-    QVector<int> indexes;
-    for (QModelIndex index: list) {
-        indexes.push_back(m_proxyModel->mapToSource(index).row());
-    }
-    this->thawCoins(indexes);
+    QStringList pubkeys = this->selectedPubkeys();
+    this->thawCoins(pubkeys);
 }
 
 void CoinsWidget::viewOutput() {
@@ -291,17 +278,17 @@ QVector<CoinsInfo*> CoinsWidget::currentEntries() {
     return selectedCoins;
 }
 
-void CoinsWidget::freezeCoins(const QVector<int>& indexes) {
-    for (int i : indexes) {
-        m_ctx->wallet->coins()->freeze(i);
+void CoinsWidget::freezeCoins(QStringList &pubkeys) {
+    for (auto &pubkey : pubkeys) {
+        m_ctx->wallet->coins()->freeze(pubkey);
     }
     m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();
 }
 
-void CoinsWidget::thawCoins(const QVector<int> &indexes) {
-    for (int i : indexes) {
-        m_ctx->wallet->coins()->thaw(i);
+void CoinsWidget::thawCoins(QStringList &pubkeys) {
+    for (auto &pubkey : pubkeys) {
+        m_ctx->wallet->coins()->thaw(pubkey);
     }
     m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();

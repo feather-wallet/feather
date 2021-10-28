@@ -9,6 +9,7 @@
 
 #include "appcontext.h"
 #include "config.h"
+#include "constants.h"
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/TransactionHistory.h"
@@ -16,6 +17,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
 #include "Utils.h"
+#include "utils/Icons.h"
 
 TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)
@@ -26,11 +28,16 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
 {
     ui->setupUi(this);
 
+    ui->btn_viewOnBlockExplorer->setIcon(icons()->icon("external-link.svg"));
+    ui->btn_viewOnBlockExplorer->setToolTip("View on block explorer");
+    connect(ui->btn_viewOnBlockExplorer, &QPushButton::clicked, this, &TxInfoDialog::viewOnBlockExplorer);
+
     m_txid = txInfo->hash();
     ui->label_txid->setText(m_txid);
 
-    connect(ui->btn_CopyTxKey, &QPushButton::pressed, this, &TxInfoDialog::copyTxKey);
-    connect(ui->btn_createTxProof, &QPushButton::pressed, this, &TxInfoDialog::createTxProof);
+    connect(ui->btn_copyTxID, &QPushButton::clicked, this, &TxInfoDialog::copyTxID);
+    connect(ui->btn_CopyTxKey, &QPushButton::clicked, this, &TxInfoDialog::copyTxKey);
+    connect(ui->btn_createTxProof, &QPushButton::clicked, this, &TxInfoDialog::createTxProof);
 
     connect(m_ctx->wallet, &Wallet::newBlock, this, &TxInfoDialog::updateData);
 
@@ -43,6 +50,12 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     } else {
         ui->btn_rebroadcastTx->hide();
     }
+
+    if (txInfo->direction() == TransactionInfo::Direction_In) {
+        ui->btn_CopyTxKey->setDisabled(true);
+        ui->btn_CopyTxKey->setToolTip("No tx secret key available for incoming transactions.");
+    }
+
 //
 //    if (txInfo->direction() == TransactionInfo::Direction_Out) {
 //        // TODO: this will not properly represent coinjoin-like transactions.
@@ -78,6 +91,9 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     }
 
     this->adjustSize();
+
+    // Don't autofocus any of the buttons. There is probably a better way for this.
+    ui->label_txid->setFocus();
 }
 
 void TxInfoDialog::adjustHeight(QTextEdit *textEdit, qreal docHeight) {
@@ -140,6 +156,10 @@ void TxInfoDialog::updateData() {
     this->setData(tx);
 }
 
+void TxInfoDialog::copyTxID() {
+    Utils::copyToClipboard(m_txid);
+}
+
 void TxInfoDialog::copyTxKey() {
     m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
         QString txKey = map.value("tx_key").toString();
@@ -155,6 +175,10 @@ void TxInfoDialog::copyTxKey() {
 void TxInfoDialog::createTxProof() {
     m_txProofDialog->show();
     m_txProofDialog->getTxKey();
+}
+
+void TxInfoDialog::viewOnBlockExplorer() {
+    Utils::externalLinkWarning(this, Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), constants::networkType, m_txid));
 }
 
 TxInfoDialog::~TxInfoDialog() = default;

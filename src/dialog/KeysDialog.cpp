@@ -5,7 +5,7 @@
 #include "ui_KeysDialog.h"
 
 KeysDialog::KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
-    : QDialog(parent)
+    : WindowModalDialog(parent)
     , ui(new Ui::KeysDialog)
 {
     ui->setupUi(this);

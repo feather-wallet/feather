@@ -117,6 +117,11 @@ void UpdateDialog::onInstallUpdate() {
     ui->btn_installUpdate->hide();
     this->setStatus("Unzipping archive...");
 
+#ifdef Q_OS_MACOS
+    this->installUpdateMac();
+    return;
+#endif
+
     zip_error_t err;
     zip_error_init(&err);
 
@@ -172,14 +177,7 @@ void UpdateDialog::onInstallUpdate() {
     zip_fclose(zf);
     zip_close(zip_archive);
 
-    QString applicationPath = qgetenv("APPIMAGE");
-    if (!applicationPath.isEmpty()) {
-        applicationPath = QFileInfo(applicationPath).absoluteDir().path();
-    } else {
-        applicationPath = QCoreApplication::applicationDirPath();
-    }
-
-    QDir applicationDir(applicationPath);
+    QDir applicationDir(Utils::applicationPath());
     QString filePath = applicationDir.filePath(name);
     m_updatePath = filePath;
 
@@ -201,6 +199,41 @@ void UpdateDialog::onInstallUpdate() {
         this->onInstallError("Error: Unable to set executable flags");
         return;
     }
+
+    this->setStatus("Installation successful. Do you want to restart Feather now?");
+    ui->btn_restart->show();
+}
+
+void UpdateDialog::installUpdateMac() {
+    QString appPath = Utils::applicationPath();
+    QDir appDir(appPath);
+    if (appPath.endsWith("Contents/MacOS")) {
+        appDir.cd("../../..");
+    }
+    QString appName = QString("feather-%1").arg(m_version);
+    QString zipName = QString("%1.zip").arg(appName);
+    QString fPath = appDir.filePath(zipName);
+
+    QFile file(fPath);
+    qDebug() << "Writing zip file to " << fPath;
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        this->onInstallError(QString("Error: Could not write to application path: %1").arg(fPath));
+        return;
+    }
+
+    if (static_cast<size_t>(file.write(&m_updateZipArchive[0], m_updateZipArchive.size())) != m_updateZipArchive.size()) {
+        this->onInstallError("Error: Unable to write file");
+        return;
+    }
+
+    QProcess unzip;
+    unzip.start("/usr/bin/unzip", {"-n", fPath, "-d", appDir.path()});
+    unzip.waitForFinished();
+
+    m_updatePath = QString("%1.app/Contents/MacOS/feather").arg(appDir.filePath(appName));
+
+    file.remove();
 
     this->setStatus("Installation successful. Do you want to restart Feather now?");
     ui->btn_restart->show();
