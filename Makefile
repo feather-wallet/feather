@@ -11,7 +11,12 @@ CMAKEFLAGS = \
 release:
 	mkdir -p build/release && \
 	cd build/release && \
-	cmake -D CMAKE_BUILD_TYPE=Release $(CMAKEFLAGS) ../.. && \
+	cmake \
+		-DARCH=x86-64 \
+		-D BUILD_TAG="linux-x64" \
+		-D CMAKE_BUILD_TYPE=Release \
+		$(CMAKEFLAGS) \
+		../.. && \
 	$(MAKE)
 
 release-static:
