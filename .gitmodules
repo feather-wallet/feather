@@ -4,6 +4,3 @@
 [submodule "contrib/tor"]
 	path = contrib/tor
 	url = https://git.torproject.org/tor.git
-[submodule "contrib/KDMacTouchBar"]
-	path = contrib/KDMacTouchBar
-	url = https://github.com/KDAB/KDMacTouchBar.git
