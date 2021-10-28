@@ -33,6 +33,7 @@ signals:
 
 private:
     void setStatus(const QString &msg, bool success = false);
+    void installUpdateMac();
 
     QScopedPointer<Ui::UpdateDialog> ui;
 
