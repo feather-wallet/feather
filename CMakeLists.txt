@@ -32,7 +32,7 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(MONERO_HEAD "bdd284b35d2e2c9c6ac733b4bc5ce8bd3b1162dd")
+set(MONERO_HEAD "39af9bca6f5561a3e06667a868185b30353b77fb")
 set(BUILD_GUI_DEPS ON)
 option(ARCH "Target architecture" "x86-64")
 set(BUILD_64 ON)
@@ -343,9 +343,5 @@ message(STATUS "Using linker security hardening flags: ${LD_SECURITY_FLAGS}")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${C_SECURITY_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${CXX_SECURITY_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LD_SECURITY_FLAGS} ${STATIC_FLAGS}")
-
-if(APPLE)
-    add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/contrib/KDMacTouchBar")
-endif()
 
 add_subdirectory(src)
