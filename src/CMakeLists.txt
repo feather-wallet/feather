@@ -180,6 +180,10 @@ endif()
 # TODO: PLACEHOLDER
 target_compile_definitions(feather PRIVATE HAS_WEBSOCKET=1)
 
+if(PLATFORM_INSTALLER)
+    target_compile_definitions(feather PRIVATE PLATFORM_INSTALLER=1)
+endif()
+
 if(HAVE_SYS_PRCTL_H)
     target_compile_definitions(feather PRIVATE HAVE_SYS_PRCTL_H=1)
 endif()
