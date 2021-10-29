@@ -1483,6 +1483,9 @@ QString MainWindow::getPlatformTag() {
     return "mac";
 #endif
 #ifdef Q_OS_WIN
+#ifdef PLATFORM_INSTALLER
+    return "win-installer";
+#endif
     return "win";
 #endif
 #ifdef Q_OS_LINUX

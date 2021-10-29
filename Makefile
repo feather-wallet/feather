@@ -69,6 +69,20 @@ depends:
 		../../.. && \
 	$(MAKE)
 
+win-installer:
+	mkdir -p build/$(target)/release && \
+	cd build/$(target)/release && \
+	cmake \
+	    -D PLATFORM_INSTALLER=On \
+		-DARCH=x86-64 \
+		-D BUILD_TAG=$(tag) \
+		-D CMAKE_BUILD_TYPE=Release \
+		-D STATIC=ON \
+		-D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake \
+		$(CMAKEFLAGS) \
+		../../.. && \
+	$(MAKE)
+
 mac-release:
 	mkdir -p build && \
 	cd build && \
