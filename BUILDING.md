@@ -14,7 +14,7 @@ Binaries produced in this section are reproducible and their digests should matc
 
 #### 1. Clone
 
-Replace `master` with the desired version tag (e.g. `1.0.0`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `1.0.1`) to build the release binary.
 
 ```bash
 git clone https://git.featherwallet.org/feather/feather.git
@@ -61,7 +61,7 @@ Binaries produced in this section are not yet reproducible.
 
 #### 1. Clone
 
-Replace `master` with the desired version tag (e.g. `1.0.0`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `1.0.1`) to build the release binary.
 
 ```bash
 git clone https://git.featherwallet.org/feather/feather.git
@@ -123,7 +123,7 @@ git clone --branch master --recursive https://git.featherwallet.org/feather/feat
 cd feather
 ```
 
-Replace `master` with the desired version tag (e.g. `1.0.0`) to build the release binary.
+Replace `master` with the desired version tag (e.g. `1.0.1`) to build the release binary.
 
 #### 2. Base image
 
