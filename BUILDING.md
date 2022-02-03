@@ -17,7 +17,7 @@ Binaries produced in this section are reproducible and their digests should matc
 Replace `master` with the desired version tag (e.g. `1.0.1`) to build the release binary.
 
 ```bash
-git clone https://git.featherwallet.org/feather/feather.git
+git clone https://github.com/feather-wallet/feather.git
 cd feather
 git checkout master
 git submodule update --init --recursive
@@ -64,7 +64,7 @@ Binaries produced in this section are not yet reproducible.
 Replace `master` with the desired version tag (e.g. `1.0.1`) to build the release binary.
 
 ```bash
-git clone https://git.featherwallet.org/feather/feather.git
+git clone https://github.com/feather-wallet/feather.git
 cd feather
 git checkout master
 git submodule update --init --recursive
@@ -119,7 +119,7 @@ The resulting AppImage will be located in `./build`.
 #### 1. Clone
 
 ```bash
-git clone --branch master --recursive https://git.featherwallet.org/feather/feather.git
+git clone --branch master --recursive https://github.com/feather-wallet/feather.git
 cd feather
 ```
 
@@ -158,7 +158,7 @@ HOMEBREW_OPTFLAGS="-march=core2" HOMEBREW_OPTIMIZATION_LEVEL="O0" \
 Clone the repository.
 
 ```bash
-git clone --recursive https://git.featherwallet.org/feather/feather.git
+git clone --recursive https://github.com/feather-wallet/feather.git
 ``` 
 
 Get the latest LTS from here: https://www.qt.io/offline-installers and install.

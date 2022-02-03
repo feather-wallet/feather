@@ -12,7 +12,7 @@ depends=('libzip' 'boost-libs' 'libunwind' 'openssl' 'zeromq' 'hidapi' 'protobuf
     'qrencode' 'libsodium' 'expat' 'qt5-base' 'qt5-websockets' 'qt5-svg' 'tor' 'zbar')
 makedepends=('git' 'cmake' 'boost')
 
-source=("${pkgname}"::"git+https://git.featherwallet.org/feather/feather")
+source=("${pkgname}"::"git+https://github.com/feather-wallet/feather")
 
 sha256sums=('SKIP')
 

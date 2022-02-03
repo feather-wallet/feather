@@ -180,7 +180,7 @@ RUN git clone -b tor-$TOR_VERSION --depth 1 https://git.torproject.org/tor.git &
     rm -rf $(pwd) && \
     strip -s -D /usr/local/tor/bin/tor.exe
 
-RUN git clone https://git.featherwallet.org/feather/monero-seed.git && \
+RUN git clone https://github.com/feather-wallet/feather.git && \
     cd monero-seed && \
     git reset --hard 4674ef09b6faa6fe602ab5ae0b9ca8e1fd7d5e1b && \
     cmake -DCMAKE_INSTALL_PREFIX=/depends/x86_64-w64-mingw32 \
