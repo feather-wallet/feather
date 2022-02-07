@@ -106,22 +106,7 @@ message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
 message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
 
 # Tevador 14 word Monero seed
-find_package(monero-seed CONFIG)
-if(NOT monero-seed_FOUND)
-  if(FETCH_DEPS)
-    FetchContent_Declare(monero-seed
-      GIT_REPOSITORY https://github.com/feather-wallet/monero-seed.git)
-    FetchContent_GetProperties(monero-seed)
-    if(NOT monero-seed_POPULATED)
-      message(STATUS "Fetching monero-seed")
-      FetchContent_Populate(monero-seed)
-      add_subdirectory(${monero-seed_SOURCE_DIR} ${monero-seed_BINARY_DIR})
-    endif()
-    add_library(monero-seed::monero-seed ALIAS monero-seed)
-  else()
-    message(FATAL_ERROR "monero-seed was not installed and fetching deps is disabled")
-  endif()
-endif()
+add_subdirectory(contrib/monero-seed)
 
 # libzip
 find_package(zlib CONFIG)

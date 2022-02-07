@@ -223,9 +223,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
 if(UNIX AND NOT APPLE)
     # https://stackoverflow.com/questions/57766620/cmake-add-library-doesnt-initialize-static-global-variable
     # so that contrib/monero-seed/src/gf_elem.cpp properly initializes. A better solution is welcome.
-    target_link_libraries(feather -Wl,--whole-archive monero-seed::monero-seed -Wl,--no-whole-archive)
+    target_link_libraries(feather -Wl,--whole-archive monero-seed -Wl,--no-whole-archive)
 else()
-    target_link_libraries(feather monero-seed::monero-seed)
+    target_link_libraries(feather monero-seed)
 endif()
 
 target_link_libraries(feather
