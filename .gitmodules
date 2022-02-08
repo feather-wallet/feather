@@ -1,6 +1,3 @@
 [submodule "monero"]
 	path = monero
 	url = https://git.featherwallet.org/feather/monero.git
-[submodule "contrib/tor"]
-	path = contrib/tor
-	url = https://git.torproject.org/tor.git

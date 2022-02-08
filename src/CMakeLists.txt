@@ -129,7 +129,6 @@ target_include_directories(feather PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/libwalletqt
         ${CMAKE_CURRENT_SOURCE_DIR}/model
         ${CMAKE_CURRENT_SOURCE_DIR}/utils
-        ${CMAKE_CURRENT_SOURCE_DIR}/tor
         ${CMAKE_CURRENT_SOURCE_DIR}/qrcode
         ${X11_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
