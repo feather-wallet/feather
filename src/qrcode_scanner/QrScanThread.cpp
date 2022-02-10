@@ -26,7 +26,7 @@ void QrScanThread::image_callback(zbar::Image &image)
 void QrScanThread::processZImage(zbar::Image &image)
 {
     m_scanner.recycle_image(image);
-    zbar::Image tmp = image.convert(*(long*)"Y800");
+    zbar::Image tmp = image.convert(zbar_fourcc('Y', '8', '0', '0'));
     m_scanner.scan(tmp);
     image.set_symbols(tmp.get_symbols());
 }

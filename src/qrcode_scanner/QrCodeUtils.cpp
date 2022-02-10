@@ -40,7 +40,7 @@ QString QrCodeUtils::scanImage(const QImage &img) {
         return "";
     }
 
-    zbar::Image scanImg = zImg.convert(*(long*)"Y800");
+    zbar::Image scanImg = zImg.convert(zbar_fourcc('Y', '8', '0', '0'));
     scanner.scan(scanImg);
 
     QString result;
