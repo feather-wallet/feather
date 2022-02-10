@@ -131,8 +131,8 @@ RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
     rm -rf $(pwd)
 
 # OpenSSL -> Tor
-RUN wget https://www.openssl.org/source/openssl-1.1.1l.tar.gz && \
-    echo "0b7a3e5e59c34827fe0c3a74b7ec8baef302b98fa80088d7f9153aa16fa76bd1 openssl-1.1.1l.tar.gz" | sha256sum -c && \
+RUN wget https://www.openssl.org/source/openssl-1.1.1m.tar.gz && \
+    echo "f89199be8b23ca45fc7cb9f1d8d3ee67312318286ad030f5316aca6462db6c96 openssl-1.1.1m.tar.gz" | sha256sum -c && \
     tar -xzf openssl-1.1.1l.tar.gz && \
     rm openssl-1.1.1l.tar.gz && \
     cd openssl-1.1.1l && \
