@@ -11,7 +11,6 @@ ENV WITH_SCANNER=ON
 
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
 ENV TOR_BIN=/usr/local/tor/bin/tor.exe
-ENV TOR_VERSION=0.4.6.6
 
 RUN apt update && \
     apt install -y \
@@ -155,9 +154,9 @@ RUN wget https://github.com/libevent/libevent/releases/download/release-2.1.11-s
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b tor-$TOR_VERSION --depth 1 https://git.torproject.org/tor.git && \
+RUN git clone -b tor-0.4.6.9 --depth 1 https://git.torproject.org/tor.git && \
     cd tor  && \
-    git reset --hard 60d1fb3d37274e29e9e88620d77e1636ef922561 && \
+    git reset --hard ea2ada6d1459f829446b6b1e66c557d1b084e78b && \
     ./autogen.sh && \
     ./configure --host=x86_64-w64-mingw32 \
     --disable-asciidoc \
