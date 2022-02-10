@@ -116,7 +116,6 @@
   </layout>
   <zorder>label_9</zorder>
   <zorder>label</zorder>
-  <zorder>verticalSpacer</zorder>
   <zorder>line_walletName</zorder>
   <zorder>frame</zorder>
  </widget>
