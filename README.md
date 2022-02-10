@@ -2,7 +2,7 @@
 
 Feather is a free, open-source Monero wallet for Linux, Tails, macOS and Windows. It is written in C++ with the Qt framework.
 
-Copyright (c) 2020-2021, The Monero Project.
+Copyright (c) 2020-2022, The Monero Project.
 
 ## Resources
 

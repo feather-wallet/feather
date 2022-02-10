@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (C) 2020 KeePassXC Team <team@keepassxc.org>
-// Copyright (C) 2011 Felix Geyer <debfx@fobos.de>
-// Copyright (c) 2020-2021, The Monero Project.
+// SPDX-FileCopyrightText: 2011 Felix Geyer <debfx@fobos.de>
+// SPDX-FileCopyrightText: 2020 KeePassXC Team <team@keepassxc.org>
+// SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
 #ifndef FEATHER_CONFIG_H
 #define FEATHER_CONFIG_H

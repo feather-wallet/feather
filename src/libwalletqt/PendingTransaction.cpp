@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2014-2021, The Monero Project.
+// SPDX-FileCopyrightText: 2014-2022 The Monero Project
 
 #include "PendingTransaction.h"
 

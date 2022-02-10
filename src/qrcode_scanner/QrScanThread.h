@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2020, The Monero Project.
+// SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
 #ifndef _QRSCANTHREAD_H_
 #define _QRSCANTHREAD_H_

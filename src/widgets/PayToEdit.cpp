@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// Copyright (c) 2020-2021, The Monero Project.
-// Copyright (c) 2012 thomasv@gitorious
+// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2012 thomasv@gitorious
 
 #include "PayToEdit.h"
 

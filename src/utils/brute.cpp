@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+
 #include "brute.h"
 
 brute::brute(const std::string &chars) {

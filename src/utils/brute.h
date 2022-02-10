@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+
 #ifndef FEATHER_BRUTE_H
 #define FEATHER_BRUTE_H
 
