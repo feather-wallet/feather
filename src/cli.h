@@ -13,6 +13,7 @@ class CLI : public QObject
 
 public:
     enum Mode {
+        Invalid,
         ExportContacts,
         ExportTxHistory,
         BruteforcePassword

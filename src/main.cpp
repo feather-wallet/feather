@@ -176,6 +176,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
                 return CLI::Mode::ExportTxHistory;
             if (bruteforcePassword)
                 return CLI::Mode::BruteforcePassword;
+            return CLI::Mode::Invalid;
         }();
 
         CLI cli{mode, &parser, &app};
