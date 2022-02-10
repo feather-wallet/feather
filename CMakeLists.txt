@@ -73,7 +73,6 @@ get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
 
 include(CMakePackageConfigHelpers)
-include(VersionMonero)
 include(VersionFeather)
 
 include_directories(${EASYLOGGING_INCLUDE})

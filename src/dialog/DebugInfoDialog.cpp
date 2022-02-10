@@ -46,7 +46,6 @@ void DebugInfoDialog::updateInfo() {
         torStatus = "Unknown";
 
     ui->label_featherVersion->setText(QString("%1-%2").arg(FEATHER_VERSION, FEATHER_BRANCH));
-    ui->label_moneroVersion->setText(QString("%1-%2").arg(MONERO_VERSION, MONERO_BRANCH));
 
     ui->label_walletHeight->setText(QString::number(m_ctx->wallet->blockChainHeight()));
     ui->label_daemonHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainHeight()));
@@ -122,7 +121,6 @@ void DebugInfoDialog::copyToClipboad() {
     // Two spaces at the end of each line are for newlines in Markdown
     QString text = "";
     text += QString("Feather version: %1  \n").arg(ui->label_featherVersion->text());
-    text += QString("Monero version: %1  \n").arg(ui->label_moneroVersion->text());
 
     text += QString("Wallet height: %1  \n").arg(ui->label_walletHeight->text());
     text += QString("Daemon height: %1  \n").arg(ui->label_daemonHeight->text());
