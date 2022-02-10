@@ -1,5 +1,2 @@
 *
-!contrib/Qt5.15_LinuxPatch.json
-!utils/pubkeys/*
 !contrib/build-deps/verify-packages.sh
-!contrib/monero-seed.patch
