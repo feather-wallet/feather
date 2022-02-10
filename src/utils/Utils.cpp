@@ -401,12 +401,10 @@ void externalLinkWarning(QWidget *parent, const QString &url){
         return;
     }
 
-    QString body = "You are about to open the following link:\n\n";
-    body += QString("%1").arg(url);
+    QString body = QString("You are about to open the following link:\n\n%1").arg(url);
 
     if (!(TailsOS::detect() || WhonixOS::detect()))
         body += "\n\nYou will NOT be using Tor.";
-
 
     QMessageBox linkWarning(parent);
     linkWarning.setWindowTitle("External link warning");
