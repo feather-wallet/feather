@@ -1,39 +1,27 @@
 # SPDX-License-Identifier: BSD-3-Clause
-# Copyright (c) 2020, The Monero Project.
+# SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
 find_package(Git QUIET)
 
-# Check what commit we're on
-execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short=9 HEAD RESULT_VARIABLE RET OUTPUT_VARIABLE COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE)
+# Sets FEATHER_COMMIT to the first 9 chars of the current commit hash.
 
-if(RET)
-    # Something went wrong, set the version tag to -unknown
-
-    message(WARNING "Cannot determine current commit. Make sure that you are building either from a Git working tree or from a source archive.")
-    set(FEATHER_BRANCH "unknown")
-    configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
-else()
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/githash.txt")
+    # This file added in source archives where the .git folder has been removed to optimize for space.
+    file(READ "githash.txt" COMMIT)
     string(SUBSTRING ${COMMIT} 0 9 COMMIT)
     message(STATUS "You are currently on commit ${COMMIT}")
+    set(FEATHER_COMMIT "${COMMIT}")
+else()
+    execute_process(COMMAND "${GIT_EXECUTABLE}" rev-parse --short=9 HEAD RESULT_VARIABLE RET OUTPUT_VARIABLE COMMIT OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    # Get all the tags
-    execute_process(COMMAND "${GIT}" rev-list --tags --max-count=1 --abbrev-commit RESULT_VARIABLE RET OUTPUT_VARIABLE TAGGEDCOMMIT OUTPUT_STRIP_TRAILING_WHITESPACE)
-
-    if(NOT TAGGEDCOMMIT)
-        message(STATUS "Cannot determine most recent tag. Make sure that you are building either from a Git working tree or from a source archive.")
-        set(FEATHER_BRANCH "${COMMIT}")
+    if(RET)
+        message(WARNING "Cannot determine current commit. Make sure that you are building either from a Git working tree or from a source archive.")
+        set(FEATHER_COMMIT "unknown")
     else()
-        message(STATUS "The most recent tag was at ${TAGGEDCOMMIT}")
-
-        # Check if we're building that tagged commit or a different one
-        if(COMMIT STREQUAL TAGGEDCOMMIT)
-            message(STATUS "You are building a tagged release")
-            set(FEATHER_BRANCH "release")
-        else()
-            message(STATUS "You are ahead of or behind a tagged release")
-            set(FEATHER_BRANCH "${COMMIT}")
-        endif()
+        string(SUBSTRING ${COMMIT} 0 9 COMMIT)
+        message(STATUS "You are currently on commit ${COMMIT}")
+        set(FEATHER_COMMIT "${COMMIT}")
     endif()
-
-    configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 endif()
+
+configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
