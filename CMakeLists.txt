@@ -10,8 +10,6 @@ set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
 
 option(STATIC "Link libraries statically, requires static Qt")
 
-option(FETCH_DEPS "Download dependencies if they are not found" ON)
-
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
