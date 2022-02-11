@@ -594,9 +594,9 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         qCritical() << tx_err;
 
         if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
-            err = QString("%1 Wrong node version: %2").arg(err).arg(tx_err);
+            err = QString("%1 Wrong node version: %2").arg(err, tx_err);
         else
-            err = QString("%1 %2").arg(err).arg(tx_err);
+            err = QString("%1 %2").arg(err, tx_err);
 
         if (tx_err.contains("Node response did not include the requested real output")) {
             QString currentNode = m_ctx->nodes->connection().toAddress();
@@ -612,7 +612,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         return;
     }
     else if (tx->txCount() == 0) {
-        err = QString("%1 %2").arg(err).arg("No unmixable outputs to sweep.");
+        err = QString("%1 %2").arg(err, "No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
         m_ctx->wallet->disposeTransaction(tx);
@@ -1489,7 +1489,7 @@ QString MainWindow::getPlatformTag() {
     return "win";
 #endif
 #ifdef Q_OS_LINUX
-    if (!qgetenv("APPIMAGE").isEmpty()) {
+    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
         return "linux-appimage";
     }
     return "linux";

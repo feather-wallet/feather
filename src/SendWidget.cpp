@@ -146,7 +146,7 @@ void SendWidget::sendClicked() {
 
     QVector<PartialTxOutput> outputs = ui->lineAddress->getOutputs();
     QVector<PayToLineError> errors = ui->lineAddress->getErrors();
-    if (errors.size() > 0 && ui->lineAddress->isMultiline()) {
+    if (!errors.empty() && ui->lineAddress->isMultiline()) {
         QString errorText;
         for (auto &error: errors) {
             errorText += QString("Line #%1:\n%2\n").arg(QString::number(error.idx + 1), error.error);
@@ -156,7 +156,7 @@ void SendWidget::sendClicked() {
         return;
     }
 
-    if (outputs.size() > 0) { // multi destination transaction
+    if (!outputs.empty()) { // multi destination transaction
         if (outputs.size() > 16) {
             QMessageBox::warning(this, "Warning", "Maximum number of outputs (16) exceeded.");
             return;

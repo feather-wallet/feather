@@ -126,8 +126,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     // Setup config directories
     QString configDir = Config::defaultConfigDir().path();
-    QString config_dir_tor = QString("%1/%2").arg(configDir).arg("tor");
-    QString config_dir_tordata = QString("%1/%2").arg(configDir).arg("tor/data");
+    QString config_dir_tor = QString("%1/%2").arg(configDir, "tor");
+    QString config_dir_tordata = QString("%1/%2").arg(configDir, "tor/data");
     QStringList createDirs({configDir, config_dir_tor, config_dir_tordata});
     for (const auto &d: createDirs) {
         if (!Utils::dirExists(d)) {
@@ -194,8 +194,9 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         else info["Mode"] = "Mainnet";
         info["SSL"] = QSslSocket::sslLibraryVersionString();
         info["SSL build"] = QSslSocket::sslLibraryBuildVersionString();
-        for (const auto &k: info.keys())
-            qWarning().nospace().noquote() << QString("%1: %2").arg(k).arg(info[k]);
+        for (const QString &k: info.keys()) {
+            qWarning().nospace().noquote() << QString("%1: %2").arg(k, info[k]);
+        }
     }
 
 #if defined(Q_OS_MAC)
