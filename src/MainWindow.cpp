@@ -1395,15 +1395,6 @@ void MainWindow::onSignedHashesReceived(QNetworkReply *reply, const QString &pla
     this->onCheckUpdatesComplete(version, binaryFilename, hash, signer);
 }
 
-void MainWindow::onShowDonationNag() {
-    auto msg = "Feather is a 100% community-sponsored endeavor. Please consider supporting "
-               "the project financially. Get rid of this message by donating any amount.";
-    int ret = QMessageBox::information(this, "Donate to Feather", msg, QMessageBox::Yes, QMessageBox::No);
-    if (ret == QMessageBox::Yes) {
-        this->donateButtonClicked();
-    }
-}
-
 void MainWindow::onInitiateTransaction() {
     m_statusDots = 0;
     m_constructingTransaction = true;

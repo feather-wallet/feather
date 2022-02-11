@@ -134,7 +134,6 @@ private slots:
     void onCheckUpdatesComplete(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
     void onShowUpdateCheck(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
     void onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version);
-    void onShowDonationNag();
     void onInitiateTransaction();
     void onEndTransaction();
     void onCustomRestoreHeightSet(int height);
