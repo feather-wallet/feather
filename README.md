@@ -12,7 +12,7 @@ Copyright (c) 2020-2022, The Monero Project.
 * Reddit: [/r/FeatherWallet](https://old.reddit.com/r/FeatherWallet)
 * Mail: dev@featherwallet.org
 * IRC: `#feather` on OFTC
-* Matrix: `#_oftc_#feather:matrix.org`
+* Matrix: `#feather:monero.social`
 
 Download the latest release [here](https://featherwallet.org/download).
 
