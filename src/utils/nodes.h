@@ -117,6 +117,7 @@ public:
     NodeSource source();
     FeatherNode connection();
 
+    QList<FeatherNode> nodes();
     QList<FeatherNode> customNodes();
     QList<FeatherNode> websocketNodes();
 

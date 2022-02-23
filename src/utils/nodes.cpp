@@ -472,6 +472,11 @@ void Nodes::WSNodeExhaustedWarning() {
     m_wsExhaustedWarningEmitted = true;
 }
 
+QList<FeatherNode> Nodes::nodes() {
+    // Return current node list
+    return (this->source() == NodeSource::websocket) ? websocketNodes() : m_customNodes;
+}
+
 QList<FeatherNode> Nodes::customNodes() {
     return m_customNodes;
 }

@@ -145,9 +145,7 @@ void AppContext::onMultiBroadcast(PendingTransaction *tx) {
     for (quint64 i = 0; i < count; i++) {
         QString txData = tx->signedTxToHex(i);
 
-        for (const auto& node: this->nodes->websocketNodes()) {
-            if (!node.online) continue;
-
+        for (const auto& node: this->nodes->nodes()) {
             QString address = node.toURL();
             qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
             m_rpc->setDaemonAddress(address);
