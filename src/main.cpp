@@ -25,9 +25,7 @@ int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(assets);
 
-#if defined(Q_OS_MAC) && defined(HAS_TOR_BIN)
-    Q_INIT_RESOURCE(assets_tor_macos);
-#elif defined(HAS_TOR_BIN)
+#if defined(HAS_TOR_BIN)
     Q_INIT_RESOURCE(assets_tor);
 #endif
 
@@ -194,6 +192,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         else info["Mode"] = "Mainnet";
         info["SSL"] = QSslSocket::sslLibraryVersionString();
         info["SSL build"] = QSslSocket::sslLibraryBuildVersionString();
+#if defined(TOR_VERSION)
+        info["Tor version"] = TOR_VERSION;
+#else
+        info["Tor version"] = "Not bundled";
+#endif
         for (const QString &k: info.keys()) {
             qWarning().nospace().noquote() << QString("%1: %2").arg(k, info[k]);
         }

@@ -157,34 +157,12 @@ void TorManager::handleProcessError(QProcess::ProcessError error) {
 }
 
 bool TorManager::unpackBins() {
-    QString torFile;
-
-    // On MacOS write libevent to disk
-#if defined(Q_OS_MAC)
-    QString libEvent = ":/assets/exec/libevent-2.1.7.dylib";
-    if (Utils::fileExists(libEvent)) {
-        QFile e(libEvent);
-        QFileInfo eventInfo(e);
-        auto libEventPath = QDir(this->torDir).filePath(eventInfo.fileName());
-        qDebug() << libEventPath;
-        e.copy(libEventPath);
-        e.close();
-    }
-#endif
-
-    torFile = ":/assets/exec/tor";
-    if (!Utils::fileExists(torFile))
-        return false;
-
-    // write to disk
-    QFile f(torFile);
-    QFileInfo fileInfo(f);
-    this->torPath = QDir(this->torDir).filePath(fileInfo.fileName());
-
+    QString torBin = "tor";
 #if defined(Q_OS_WIN)
-    if(!this->torPath.endsWith(".exe"))
-        this->torPath += ".exe";
+   torBin += ".exe";
 #endif
+
+    this->torPath = QDir(this->torDir).filePath(torBin);
 
     SemanticVersion embeddedVersion = SemanticVersion::fromString(QString(TOR_VERSION));
     SemanticVersion filesystemVersion = this->getVersion(torPath);
@@ -194,18 +172,29 @@ bool TorManager::unpackBins() {
         QFile::setPermissions(torPath, QFile::ReadOther | QFile::WriteOther);
         if (!QFile::remove(torPath)) {
             qWarning() << "Unable to remove old Tor binary";
-        };
+            return false;
+        }
     }
 
-    qDebug() << "Writing Tor executable to " << this->torPath;
-    f.copy(torPath);
-    f.close();
+    if (embeddedVersion > filesystemVersion) {
+        QDirIterator it(":/assets/tor", QDirIterator::Subdirectories);
+        while (it.hasNext()) {
+            QString assetFile = it.next();
+            QFileInfo assetFileInfo = QFileInfo(assetFile);
+            QFile f(assetFile);
+            QString filePath = QDir(this->torDir).filePath(assetFileInfo.fileName());
+            f.copy(filePath);
+            f.close();
+        }
+        qInfo() << "Wrote Tor binaries to: " << this->torDir;
+    }
 
 #if defined(Q_OS_UNIX)
-    QFile torBin(this->torPath);
-    torBin.setPermissions(QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther
-                          | QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther);
+    QFile tor(this->torPath);
+    tor.setPermissions(QFile::ExeUser | QFile::ExeGroup | QFile::ExeOther
+    | QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther);
 #endif
+
     return true;
 }
 

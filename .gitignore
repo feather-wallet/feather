@@ -5,13 +5,14 @@ cmake-build-debug/*
 *.user
 *.stash
 build/*
+build*/
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
 feather_autogen/
 feather.cbp
-src/tor/*
-!src/tor/.gitkeep
 src/config-feather.h
-src/assets/exec/*
+src/assets_tor.qrc
 feather.AppDir/*
+src/assets/tor/*
+!src/assets/tor/.gitkeep

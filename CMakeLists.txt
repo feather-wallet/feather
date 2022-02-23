@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.20)
 project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
@@ -31,7 +31,7 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(MONERO_HEAD "6a2b96394d3c81a4ccf9be0daea02afe5f6f3683")
+set(MONERO_HEAD "4c2fa8df7f82ab00ec5d58329f4b8314ae1038d3")
 set(BUILD_GUI_DEPS ON)
 option(ARCH "Target architecture" "x86-64")
 set(BUILD_64 ON)
@@ -153,31 +153,30 @@ if("$ENV{DRONE}" STREQUAL "true")
     message(STATUS "We are inside a static compile with Drone CI")
 endif()
 
-# To build Feather with embedded (and static) Tor, pass CMake -DTOR_BIN=/path/to/tor
-if(TOR_BIN)
-    if(APPLE)
-        execute_process(COMMAND bash -c "touch ${CMAKE_CURRENT_SOURCE_DIR}/src/tor/libevent-2.1.7.dylib")
+include(TorQrcGenerator)
+
+# To build Feather with embedded (and static) Tor, pass CMake -DTOR_DIR=/path/to/tor/
+if(TOR_DIR)
+    if (NOT TOR_VERSION)
+        message(FATAL_ERROR "TOR_DIR is specified but TOR_VERSION is not set")
     endif()
 
     message(STATUS "Embedded Tor version: ${TOR_VERSION}")
     configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
-    # on the buildbot Tor is baked into the image
-    # - linux: See `Dockerfile`
-    # - windows: See `Dockerfile.windows`
-    # - macos: taken from Tor Browser official release
-    if(REPRODUCIBLE) # Always copy Tor when doing a reproducible build to prevent old versions from getting included
-        set(TOR_COPY_CMD "cp ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+    # Always copy Tor when doing a reproducible build to prevent old versions from getting included
+    if (REPRODUCIBLE)
+        set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
     else()
-        set(TOR_COPY_CMD "cp -u ${TOR_BIN} ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/exec/tor")
+        set(TOR_COPY_CMD "cp -au ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
     endif()
-    message(STATUS "${TOR_COPY_CMD}")
+
     execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
     if(ret EQUAL "1")
         message(FATAL_ERROR "Tor copy failure: ${TOR_COPY_CMD}")
     endif()
 
-    message(STATUS "Embedding Tor binary at ${TOR_BIN}")
+    message(STATUS "Embedding Tor binaries at ${TOR_DIR}")
 else()
     message(STATUS "Skipping Tor inclusion because -DTOR_BIN=Off")
 endif()

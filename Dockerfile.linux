@@ -36,9 +36,9 @@ RUN git clone -b OpenSSL_1_1_1m --depth 1 https://github.com/openssl/openssl.git
     rm -rf $(pwd)
 
 # CMake: Required to build libqrencode, monero-seed, libzip
-RUN git clone -b v3.18.4 --depth 1 https://github.com/Kitware/CMake && \
+RUN git clone -b v3.22.2 --depth 1 https://github.com/Kitware/CMake && \
     cd CMake && \
-    git reset --hard 3cc3d42aba879fff5e85b363ae8f21386a3f9f9b && \
+    git reset --hard 8428e39ed9cddb3b7f1a6f7a58cb8617503183d2 && \
     ./bootstrap && \
     make -j$THREADS && \
     make -j$THREADS install && \
@@ -227,9 +227,11 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-# Tor: Optional for Feather (-DTOR_BIN)
+# Tor: Optional for Feather (-DTOR_DIR)
 # Binary can be embedded in Feather
-ENV TOR_BIN=/usr/local/tor/bin/tor
+# TOR_VERSION is used by CMAKE to determine embedded version
+ENV TOR_VERSION=0.4.6.9
+ENV TOR_DIR=/usr/local/tor/bin/tor
 RUN git clone -b tor-0.4.6.9 --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
     git reset --hard ea2ada6d1459f829446b6b1e66c557d1b084e78b && \

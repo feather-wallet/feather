@@ -137,7 +137,7 @@ Building the base image takes a while. You only need to build the base image onc
 #### 3. Build
 
 ```bash
-docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make depends root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
+docker run --rm -it -v $PWD:/feather -w /feather feather:win sh -c 'make release-static-windows root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j4'
 ```
 
 If you're re-running a build make sure to `rm -rf build/` first.

@@ -25,7 +25,7 @@ find_package(Qt5 REQUIRED COMPONENTS ${QT5_COMPONENTS})
 
 add_subdirectory(openpgp)
 
-qt5_add_resources(RESOURCES assets.qrc)
+qt5_add_resources(RESOURCES assets.qrc assets_tor.qrc)
 
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
@@ -68,14 +68,6 @@ if (WITH_SCANNER)
 
     list(APPEND SOURCE_FILES
             ${SCANNER_FILES})
-endif()
-
-if(TOR_BIN)
-    if(APPLE)
-        set(ASSETS_TOR "assets_tor_macos.qrc")
-    else()
-        set(ASSETS_TOR "assets_tor.qrc")
-    endif()
 endif()
 
 set(EXECUTABLE_FLAG)
@@ -164,7 +156,7 @@ if(LOCALMONERO)
     target_compile_definitions(feather PRIVATE HAS_LOCALMONERO=1)
 endif()
 
-if(TOR_BIN)
+if(TOR_DIR)
     target_compile_definitions(feather PRIVATE HAS_TOR_BIN=1)
 endif()
 

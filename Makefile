@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
 CMAKEFLAGS = \
-	-DTOR_BIN=$(or ${TOR_BIN}, Off) \
+	-DTOR_DIR=$(or ${TOR_DIR}, Off) \
 	-DTOR_VERSION=$(or ${TOR_VERSION}, Off) \
 	-DCHECK_UPDATES=$(or ${CHECK_UPDATES}, Off) \
 	-DWITH_SCANNER=$(or ${WITH_SCANNER}, Off) \
@@ -56,7 +56,7 @@ release-static-linux-arm64-rpi:
 		../.. && \
 	$(MAKE)
 
-depends:
+release-static-windows:
 	mkdir -p build/$(target)/release && \
 	cd build/$(target)/release && \
 	cmake \
