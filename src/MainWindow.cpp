@@ -910,11 +910,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::donateButtonClicked() {
-    double donation = appData()->prices.convert("EUR", "XMR", constants::donationAmount);
-    if (donation <= 0)
-        donation = 0.1337;
-
-    m_sendWidget->fill(constants::donationAddress, "Donation to the Feather development team", donation);
+    m_sendWidget->fill(constants::donationAddress, "Donation to the Feather development team");
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
