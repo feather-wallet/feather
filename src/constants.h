@@ -27,7 +27,10 @@ namespace constants
     const int donationBoundary = 25;
 
     // websocket constants
-    const QUrl websocketUrl = QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws"));
+    const QVector<QUrl> websocketUrls = {
+        QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws")),
+        QUrl(QStringLiteral("ws://an5ecwgzyujqe7jverkp42d22zhvjes2mrhvol6tpqcgfkzwseqrafqd.onion/ws"))
+    };
 
     // website constants
     const QString websiteUrl = "https://featherwallet.org";

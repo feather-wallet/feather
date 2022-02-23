@@ -9,6 +9,7 @@
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)
 {
+    connect(&webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
     connect(&webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
     connect(&webSocket, &QWebSocket::disconnected, this, &WebsocketClient::onDisconnected);
     connect(&webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WebsocketClient::onError);
@@ -23,6 +24,11 @@ WebsocketClient::WebsocketClient(QObject *parent)
     });
     m_pingTimer.setInterval(30 * 1000);
     m_pingTimer.start();
+
+    connect(&m_connectionTimeout, &QTimer::timeout, this, &WebsocketClient::onConnectionTimeout);
+
+    m_websocketUrlIndex = QRandomGenerator::global()->bounded(constants::websocketUrls.length());
+    this->nextWebsocketUrl();
 }
 
 void WebsocketClient::sendMsg(const QByteArray &data) {
@@ -48,7 +54,17 @@ void WebsocketClient::onConnected() {
 
 void WebsocketClient::onDisconnected() {
     qDebug() << "WebSocket disconnected";
+    this->nextWebsocketUrl();
     QTimer::singleShot(1000, [this]{this->start();});
+}
+
+void WebsocketClient::onStateChanged(QAbstractSocket::SocketState state) {
+    if (state == QAbstractSocket::ConnectingState) {
+        m_connectionTimeout.start(m_timeout*1000);
+    }
+    else if (state == QAbstractSocket::ConnectedState) {
+        m_connectionTimeout.stop();
+    }
 }
 
 void WebsocketClient::onError(QAbstractSocket::SocketError error) {
@@ -59,8 +75,19 @@ void WebsocketClient::onError(QAbstractSocket::SocketError error) {
     }
 }
 
+void WebsocketClient::nextWebsocketUrl() {
+    m_url = constants::websocketUrls[m_websocketUrlIndex];
+    m_websocketUrlIndex = (m_websocketUrlIndex+1)%constants::websocketUrls.length();
+}
+
+void WebsocketClient::onConnectionTimeout() {
+    qWarning() << "Websocket connection timeout";
+    m_timeout = std::min(m_timeout + 5, 60);
+    this->onDisconnected();
+}
+
 void WebsocketClient::onbinaryMessageReceived(const QByteArray &message) {
-    qDebug() << "WebSocket received:" << message;
+//    qDebug() << "WebSocket received:" << message;
 
     if (!Utils::validateJSON(message)) {
         qCritical() << "Could not interpret WebSocket message as JSON";

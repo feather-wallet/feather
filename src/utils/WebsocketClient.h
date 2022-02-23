@@ -27,12 +27,18 @@ signals:
 private slots:
     void onConnected();
     void onDisconnected();
+    void onStateChanged(QAbstractSocket::SocketState state);
     void onbinaryMessageReceived(const QByteArray &message);
     void onError(QAbstractSocket::SocketError error);
+    void nextWebsocketUrl();
+    void onConnectionTimeout();
 
 private:
-    QUrl m_url = constants::websocketUrl;
+    QUrl m_url;
     QTimer m_pingTimer;
+    QTimer m_connectionTimeout;
+    int m_timeout = 10;
+    int m_websocketUrlIndex = 0;
 };
 
 #endif //FEATHER_WEBSOCKETCLIENT_H
