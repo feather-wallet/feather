@@ -27,6 +27,8 @@ public:
     static WebsocketNotifier* instance();
     void emitCache();
 
+    bool stale(int minutes);
+
 signals:
     void BlockHeightsReceived(int mainnet, int stagenet);
     void NodesReceived(QList<FeatherNode> &L);
@@ -54,6 +56,7 @@ private:
     static QPointer<WebsocketNotifier> m_instance;
 
     QHash<QString, QJsonObject> m_cache;
+    QDateTime m_lastMessageReceived;
 };
 
 inline WebsocketNotifier* websocketNotifier()

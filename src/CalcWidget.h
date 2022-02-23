@@ -6,6 +6,7 @@
 
 #include <QWidget>
 #include <QComboBox>
+#include <QTimer>
 
 namespace Ui {
     class CalcWidget;
@@ -30,9 +31,11 @@ private slots:
 private:
     void convert(bool reverse);
     void setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat);
+    void updateStatus();
 
     QScopedPointer<Ui::CalcWidget> ui;
     bool m_comboBoxInit = false;
+    QTimer m_statusTimer;
 };
 
 #endif // FEATHER_CALCWIDGET_H

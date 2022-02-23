@@ -20,6 +20,7 @@ QPointer<WebsocketNotifier> WebsocketNotifier::m_instance(nullptr);
 void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
     QString cmd = msg.value("cmd").toString();
 
+    m_lastMessageReceived = QDateTime::currentDateTimeUtc();
     m_cache[cmd] = msg;
 
     if (cmd == "blockheights") {
@@ -90,6 +91,10 @@ void WebsocketNotifier::emitCache() {
     for (const auto &msg : m_cache) {
         this->onWSMessage(msg);
     }
+}
+
+bool WebsocketNotifier::stale(int minutes) {
+    return m_lastMessageReceived < QDateTime::currentDateTimeUtc().addSecs(-(minutes*60));
 }
 
 void WebsocketNotifier::onWSNodes(const QJsonArray &nodes) {
