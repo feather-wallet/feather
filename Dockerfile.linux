@@ -146,22 +146,12 @@ RUN git clone -b hidapi-0.10.1 --depth 1 https://github.com/libusb/hidapi && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-# libsodium: Required for libzmq
+# libsodium: Required for libwallet
 RUN git clone -b 1.0.18-RELEASE --depth 1 https://github.com/jedisct1/libsodium.git && \
     cd libsodium && \
     git reset --hard 940ef42797baa0278df6b7fd9e67c7590f87744b && \
     ./autogen.sh && \
     ./configure --disable-shared --enable-static && \
-    make -j$THREADS && \
-    make -j$THREADS install && \
-    rm -rf $(pwd)
-
-# libzmq: Required for libwallet
-RUN git clone -b v4.3.2 --depth 1 https://github.com/zeromq/libzmq && \
-    cd libzmq && \
-    git reset --hard a84ffa12b2eb3569ced199660bac5ad128bff1f0 && \
-    ./autogen.sh && \
-    ./configure --disable-shared --enable-static --disable-libunwind --with-libsodium && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd)
@@ -231,7 +221,7 @@ RUN git clone -b v1.2.11 --depth 1 https://github.com/madler/zlib && \
 # Binary can be embedded in Feather
 # TOR_VERSION is used by CMAKE to determine embedded version
 ENV TOR_VERSION=0.4.6.9
-ENV TOR_DIR=/usr/local/tor/bin/tor
+ENV TOR_DIR=/usr/local/tor/bin/
 RUN git clone -b tor-0.4.6.9 --depth 1 https://git.torproject.org/tor.git && \
     cd tor && \
     git reset --hard ea2ada6d1459f829446b6b1e66c557d1b084e78b && \
@@ -254,7 +244,8 @@ RUN git clone -b tor-0.4.6.9 --depth 1 https://git.torproject.org/tor.git && \
     make -j$THREADS && \
     make -j$THREADS install && \
     rm -rf $(pwd) && \
-    strip -s -D /usr/local/tor/bin/tor
+    strip -s -D /usr/local/tor/bin/tor && \
+    rm /usr/local/tor/bin/tor?*
 
 # libqrencode: Required for Feather
 # Used to display QR Codes
