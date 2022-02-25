@@ -317,6 +317,10 @@ void MainWindow::initMenu() {
     ui->actionCreateDesktopEntry->setDisabled(true);
 #endif
 
+#ifndef SELF_CONTAINED
+    ui->actionCreateDesktopEntry->setVisible(false);
+#endif
+
     // [Help]
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
