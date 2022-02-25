@@ -48,6 +48,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "bin\{#AppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "tor\*"; DestDir: "{app}\tor"; Flags: ignoreversion
 
 ;Source: "C:\Users\dev\Desktop\feather setup\finishbanner.bmp"; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
