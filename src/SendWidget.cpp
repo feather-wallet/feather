@@ -136,6 +136,12 @@ void SendWidget::sendClicked() {
         return;
     }
 
+    if (!m_ctx->wallet->isSynchronized()) {
+        QMessageBox::warning(this, "Error", "Wallet is not synchronized, unable to create transaction.\n\n"
+                                            "Wait for synchronization to complete.");
+        return;
+    }
+
     QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
     QString description = ui->lineDescription->text();
