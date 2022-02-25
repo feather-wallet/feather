@@ -101,6 +101,7 @@ void Seed::setRestoreHeight(int height) {
 void Seed::setRestoreHeight() {
     // Ignore the embedded restore date, new wallets should sync from the current block height.
     this->restoreHeight = appData()->restoreHeights[networkType]->dateToHeight(this->time);
+    int a = 0;
 }
 
 Seed::Seed() = default;

@@ -31,7 +31,7 @@ enum DeviceType {
 struct WizardFields {
     QString walletName;
     QString walletDir;
-    QString seed;
+    Seed seed;
     QString seedOffsetPassphrase;
     QString seedLanguage = constants::seedLanguage;
     QString password;

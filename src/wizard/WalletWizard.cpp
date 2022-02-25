@@ -117,17 +117,15 @@ void WalletWizard::onCreateWallet() {
         return;
     }
 
-    auto seed = Seed(m_wizardFields.seedType, m_wizardFields.seed.split(" "), constants::networkType);
-
     // If we're connected to the websocket, use the reported height for new wallets to skip initial synchronization.
     if (m_wizardFields.mode == WizardMode::CreateWallet && currentBlockHeight > 0) {
         qInfo() << "New wallet, setting restore height to latest blockheight: " << currentBlockHeight;
-        seed.restoreHeight = currentBlockHeight;
+        m_wizardFields.seed.restoreHeight = currentBlockHeight;
     }
 
     if (m_wizardFields.mode == WizardMode::RestoreFromSeed && m_wizardFields.seedType == Seed::Type::MONERO) {
-        seed.setRestoreHeight(m_wizardFields.restoreHeight);
+        m_wizardFields.seed.setRestoreHeight(m_wizardFields.restoreHeight);
     }
 
-    emit createWallet(seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase);
+    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase);
 }

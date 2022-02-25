@@ -139,7 +139,7 @@ bool PageWalletRestoreSeed::validatePage() {
         QMessageBox::information(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
     }
 
-    m_fields->seed = seedSplit.join(" ");
+    m_fields->seed = _seed;
     m_fields->seedOffsetPassphrase = ui->line_seedOffset->text();
 
     return true;

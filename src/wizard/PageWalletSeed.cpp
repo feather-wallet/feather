@@ -31,7 +31,7 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
         this->seedRoulette(0);
     });
     connect(ui->btnCopy, &QPushButton::clicked, [this]{
-        Utils::copyToClipboard(m_mnemonic);
+        Utils::copyToClipboard(m_seed.mnemonic.join(" "));
     });
 }
 
@@ -53,17 +53,17 @@ void PageWalletSeed::seedRoulette(int count) {
 }
 
 void PageWalletSeed::generateSeed() {
-    Seed seed;
+    QString mnemonic;
 
     do {
-        seed = Seed(Seed::Type::TEVADOR);
-        m_mnemonic = seed.mnemonic.join(" ");
-        m_restoreHeight = seed.restoreHeight;
-    } while (m_mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2
+        m_seed = Seed(Seed::Type::TEVADOR);
+        mnemonic = m_seed.mnemonic.join(" ");
+        m_restoreHeight = m_seed.restoreHeight;
+    } while (mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2
 
-    this->displaySeed(m_mnemonic);
+    this->displaySeed(mnemonic);
 
-    if (!seed.errorString.isEmpty()) {
+    if (!m_seed.errorString.isEmpty()) {
         ui->frame_invalidSeed->show();
         ui->frame_seedDisplay->hide();
         m_seedError = true;
@@ -94,7 +94,7 @@ int PageWalletSeed::nextId() const {
 }
 
 bool PageWalletSeed::validatePage() {
-    if (m_mnemonic.isEmpty()) return false;
+    if (m_seed.mnemonic.isEmpty()) return false;
     if (!m_restoreHeight) return false;
 
     QMessageBox seedWarning(this);
@@ -111,7 +111,7 @@ bool PageWalletSeed::validatePage() {
         return false;
     }
 
-    m_fields->seed = m_mnemonic;
+    m_fields->seed = m_seed;
 
     return true;
 }

@@ -40,12 +40,12 @@ private:
 
     WizardFields *m_fields;
 
-    QString m_mnemonic;
     int m_restoreHeight;
 
     bool m_seedError = false;
     bool m_roulette = false;
     int m_rouletteSpin = 15;
+    Seed m_seed;
 };
 
 #endif //FEATHER_CREATEWALLETSEED_H
