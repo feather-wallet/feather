@@ -204,7 +204,7 @@ bool WindowManager::autoOpenWallet() {
 
 // ######################## WALLET CREATION ########################
 
-void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedLanguage,
+void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage,
                                     const QString &seedOffset) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
@@ -218,12 +218,12 @@ void WindowManager::tryCreateWallet(FeatherSeed seed, const QString &path, const
     }
 
     Wallet *wallet = nullptr;
-    if (seed.seedType == SeedType::TEVADOR) {
+    if (seed.type == Seed::Type::TEVADOR) {
         wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, constants::networkType, seed.spendKey, seed.restoreHeight, constants::kdfRounds, seedOffset);
         wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
         wallet->setCacheAttribute("feather.seedoffset", seedOffset);
     }
-    if (seed.seedType == SeedType::MONERO) {
+    if (seed.type == Seed::Type::MONERO) {
         wallet = m_walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, constants::networkType, seed.restoreHeight, constants::kdfRounds);
     }
 

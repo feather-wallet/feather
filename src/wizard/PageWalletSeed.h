@@ -22,6 +22,7 @@ public:
     explicit PageWalletSeed(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
+    bool isComplete() const override;
     int nextId() const override;
 
 public slots:
@@ -42,6 +43,7 @@ private:
     QString m_mnemonic;
     int m_restoreHeight;
 
+    bool m_seedError = false;
     bool m_roulette = false;
     int m_rouletteSpin = 15;
 };

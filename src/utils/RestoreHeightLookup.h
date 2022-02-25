@@ -14,10 +14,10 @@
 
 struct RestoreHeightLookup {
     NetworkType::Type type;
-    QMap<int, int> data;
+    QMap<time_t, int> data;
     explicit RestoreHeightLookup(NetworkType::Type type) : type(type) {}
 
-    int dateToHeight(int date) {
+    int dateToHeight(time_t date) {
         // restore height based on a given timestamp using a lookup
         // table. If it cannot find the date in the lookup table, it
         // will calculate the blockheight based off the last known
@@ -28,34 +28,43 @@ struct RestoreHeightLookup {
         }
 
         int blockTime = 120;
-        int blocksPerDay = 86400 / blockTime;
+        int blocksPerDay = 720;
         int blockCalcClearance = blocksPerDay * 5;
-        QList<int> values = this->data.keys();
-        if (date <= values.at(0))
-            return this->data[values.at(0)];
+
+        QList<time_t> values = this->data.keys();
+
+        // If timestamp is before epoch, return genesis height.
+        if (date <= values.at(0)) {
+            return 1;
+        }
+
         for (int i = 0; i != values.count(); i++) {
-            if(values[i] > date) {
-                return i - 1 < 0 ? this->data[values[i]] : this->data[values[i-1]] - blockCalcClearance;
+            if (values[i] > date) {
+                if (i == 0) {
+                    return 1;
+                }
+                return this->data[values[i-1]] - blockCalcClearance;
             }
         }
 
         // lookup failed, calculate blockheight from last known checkpoint
-        int lastBlockHeightTime = values.at(values.count() - 1);
+        time_t lastBlockHeightTime = values.last();
         int lastBlockHeight = this->data[lastBlockHeightTime];
-        int deltaTime = date - lastBlockHeightTime;
+
+        time_t deltaTime = date - lastBlockHeightTime;
         int deltaBlocks = deltaTime / blockTime;
+
         int blockHeight = (lastBlockHeight + deltaBlocks) - blockCalcClearance;
-        qDebug() << "Calculated blockheight: " << blockHeight << " from epoch " << date;
         return blockHeight;
     }
 
-    int heightToTimestamp(int height) {
+    time_t heightToTimestamp(int height) {
         // @TODO: most likely inefficient, refactor
-        QMap<int, int>::iterator i;
-        int timestamp = 0;
+        QMap<time_t, int>::iterator i;
+        time_t timestamp = 0;
         int heightData = 1;
         for (i = this->data.begin(); i != this->data.end(); ++i) {
-            int ts = i.key();
+            time_t ts = i.key();
             if (i.value() > height)
                 return timestamp;
             timestamp = ts;
@@ -77,12 +86,14 @@ struct RestoreHeightLookup {
     static RestoreHeightLookup *fromFile(const QString &fn, NetworkType::Type type) {
         // initialize this class using a lookup table, e.g `:/assets/restore_heights_monero_mainnet.txt`/
         auto rtn = new RestoreHeightLookup(type);
-        auto data = Utils::barrayToString(Utils::fileOpen(fn));
-        QMap<int, int> _data;
-        for(const auto &line: data.split('\n')) {
-            if(line.trimmed().isEmpty()) continue;
+        auto data= Utils::barrayToString(Utils::fileOpen(fn));
+
+        for (const auto &line: data.split('\n')) {
+            if (line.trimmed().isEmpty()) {
+                continue;
+            }
             auto spl = line.trimmed().split(':');
-            rtn->data[spl.at(0).toInt()] = spl.at(1).toInt();
+            rtn->data[(time_t)spl.at(0).toInt()] = spl.at(1).toInt();
         }
         return rtn;
     }

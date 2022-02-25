@@ -9,7 +9,7 @@
 
 #include "utils/os/whonix.h"
 #include "utils/networking.h"
-#include "utils/FeatherSeed.h"
+#include "utils/Seed.h"
 #include "utils/daemonrpc.h"
 #include "utils/RestoreHeightLookup.h"
 #include "utils/nodes.h"

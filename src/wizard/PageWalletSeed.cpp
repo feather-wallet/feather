@@ -5,6 +5,7 @@
 #include "PageWalletSeed.h"
 #include "ui_PageWalletSeed.h"
 #include "constants.h"
+#include "Seed.h"
 
 #include <QMessageBox>
 
@@ -14,6 +15,10 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     , m_fields(fields)
 {
     ui->setupUi(this);
+
+    ui->frame_invalidSeed->hide();
+    QPixmap warningIcon = QPixmap(":/assets/images/warning.png");
+    ui->warningIcon->setPixmap(warningIcon.scaledToWidth(32, Qt::SmoothTransformation));
 
     QPixmap pixmap = QPixmap(":/assets/images/seed.png");
     ui->seedIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
@@ -48,13 +53,21 @@ void PageWalletSeed::seedRoulette(int count) {
 }
 
 void PageWalletSeed::generateSeed() {
+    Seed seed;
+
     do {
-        FeatherSeed seed = FeatherSeed(constants::networkType, QString::fromStdString(constants::coinName), constants::seedLanguage);
+        seed = Seed(Seed::Type::TEVADOR);
         m_mnemonic = seed.mnemonic.join(" ");
         m_restoreHeight = seed.restoreHeight;
     } while (m_mnemonic.split(" ").length() != 14); // https://github.com/tevador/monero-seed/issues/2
 
     this->displaySeed(m_mnemonic);
+
+    if (!seed.errorString.isEmpty()) {
+        ui->frame_invalidSeed->show();
+        ui->frame_seedDisplay->hide();
+        m_seedError = true;
+    }
 }
 
 void PageWalletSeed::displaySeed(const QString &seed){
@@ -101,4 +114,8 @@ bool PageWalletSeed::validatePage() {
     m_fields->seed = m_mnemonic;
 
     return true;
+}
+
+bool PageWalletSeed::isComplete() const {
+    return !m_seedError;
 }

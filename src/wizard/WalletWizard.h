@@ -41,7 +41,7 @@ struct WizardFields {
     QString secretSpendKey;
     WizardMode mode;
     int restoreHeight = 0;
-    SeedType seedType;
+    Seed::Type seedType;
     DeviceType deviceType;
 };
 
@@ -74,7 +74,7 @@ signals:
 
     void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
-    void createWallet(FeatherSeed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset = "");
+    void createWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset = "");
 
 private slots:
     void onCreateWallet();

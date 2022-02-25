@@ -9,7 +9,7 @@
 #include <QMessageBox>
 
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
-#include "utils/FeatherSeed.h"
+#include "utils/Seed.h"
 #include "constants.h"
 
 #include <mnemonics/electrum-words.h>
@@ -60,13 +60,13 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
 void PageWalletRestoreSeed::onSeedTypeToggled() {
     if (ui->radio14->isChecked()) {
         m_mode = &m_tevador;
-        m_fields->seedType = SeedType::TEVADOR;
+        m_fields->seedType = Seed::Type::TEVADOR;
         ui->seedEdit->setPlaceholderText("Enter 14 word seed..");
         ui->group_seedLanguage->hide();
     }
     else if (ui->radio25->isChecked()) {
         m_mode = &m_legacy;
-        m_fields->seedType = SeedType::MONERO;
+        m_fields->seedType = Seed::Type::MONERO;
         ui->seedEdit->setPlaceholderText("Enter 25 word seed..");
         ui->group_seedLanguage->show();
     }
@@ -128,7 +128,8 @@ bool PageWalletRestoreSeed::validatePage() {
         }
     }
 
-    auto _seed = FeatherSeed(constants::networkType, QString::fromStdString(constants::coinName), constants::seedLanguage, seedSplit);
+    Seed _seed = Seed(m_mode->length == 14 ? Seed::Type::TEVADOR : Seed::Type::MONERO, seedSplit, constants::networkType);
+
     if (!_seed.errorString.isEmpty()) {
         QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));
         ui->seedEdit->setStyleSheet(errStyle);
