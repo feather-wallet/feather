@@ -1,5 +1,5 @@
 ; Feather Wallet Installer for Windows
-; Copyright (c) 2021-2021, The Monero Project
+; Copyright (c) 2021-2022, The Monero Project
 
 #define AppName "Feather Wallet"
 #define AppVersion "1.0.2"
@@ -17,7 +17,7 @@ AppPublisherURL={#AppURL}
 AppSupportURL={#AppURL}
 AppUpdatesURL={#AppURL}
 DefaultDirName={autopf}\{#AppName}
-DisableDirPage=yes
+DisableDirPage=no
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 ;PrivilegesRequired=lowest
