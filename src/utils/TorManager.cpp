@@ -20,7 +20,12 @@ TorManager::TorManager(QObject *parent)
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
     this->torDir = Config::defaultConfigDir().filePath("tor");
-    this->torDataPath = QDir(this->torDir).filePath("data");
+#if defined(PLATFORM_INSTALLER)
+    // When installed, use directory relative to application path.
+    this->torDir = QDir(Utils::applicationPath()).filePath("tor");
+#endif
+
+    this->torDataPath = Config::defaultConfigDir().filePath("tor/data");
 
     m_process.setProcessChannelMode(QProcess::MergedChannels);
 
@@ -163,6 +168,11 @@ bool TorManager::unpackBins() {
 #endif
 
     this->torPath = QDir(this->torDir).filePath(torBin);
+
+#if defined(PLATFORM_INSTALLER)
+    // We don't need to unpack if Tor was installed using the installer
+    return true;
+#endif
 
     SemanticVersion embeddedVersion = SemanticVersion::fromString(QString(TOR_VERSION));
     SemanticVersion filesystemVersion = this->getVersion(torPath);
