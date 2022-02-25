@@ -162,7 +162,9 @@ void Nodes::loadConfig() {
         if (nodes_obj.contains(netKey)) {
             QJsonArray nodes_list;
             nodes_list = nodes_json[netKey].toObject()["tor"].toArray();
-            nodes_list.append(nodes_json[netKey].toObject()["clearnet"].toArray());
+            for (const auto &node : nodes_json[netKey].toObject()["clearnet"].toArray()) {
+                nodes_list.append(node);
+            }
 
             for (auto node: nodes_list) {
                 FeatherNode wsNode(node.toString());
