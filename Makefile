@@ -69,11 +69,12 @@ release-static-windows:
 		../../.. && \
 	$(MAKE)
 
-win-installer:
+release-static-windows-installer:
 	mkdir -p build/$(target)/release && \
 	cd build/$(target)/release && \
 	cmake \
 	    -D PLATFORM_INSTALLER=On \
+	    -D TOR_DIR=Off \
 		-DARCH=x86-64 \
 		-D BUILD_TAG=$(tag) \
 		-D CMAKE_BUILD_TYPE=Release \
