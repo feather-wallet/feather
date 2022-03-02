@@ -102,14 +102,13 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     });
 
     // Links tab
+    this->setupLocalMoneroFrontendCombobox();
     connect(ui->combo_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_blockExplorerChanged);
     connect(ui->combo_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_redditFrontendChanged);
     connect(ui->combo_localMoneroFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_localMoneroFrontendChanged);
 
     ui->combo_blockExplorer->setCurrentIndex(ui->combo_blockExplorer->findText(config()->get(Config::blockExplorer).toString()));
     ui->combo_redditFrontend->setCurrentIndex(ui->combo_redditFrontend->findText(config()->get(Config::redditFrontend).toString()));
-
-    this->setupLocalMoneroFrontendCombobox();
 
     this->adjustSize();
 }
