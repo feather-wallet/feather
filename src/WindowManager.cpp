@@ -115,6 +115,21 @@ void WindowManager::showWarningMessageBox(const QString &title, const QString &m
     msgBox.exec();
 }
 
+void WindowManager::raise() {
+    if (!m_windows.isEmpty()) {
+        m_windows.first()->bringToFront();
+    }
+    else if (m_wizard) {
+        m_wizard->show();
+        m_wizard->raise();
+        m_wizard->activateWindow();
+    }
+    else {
+        // This shouldn't happen
+        this->close();
+    }
+}
+
 // ######################## WALLET OPEN ########################
 
 void WindowManager::tryOpenWallet(const QString &path, const QString &password) {

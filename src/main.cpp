@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QtCore>
 #include <QtGui>
+#include <singleapplication.h>
 
 #include "cli.h"
 #include "config-feather.h"
@@ -117,7 +118,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QApplication::setDesktopSettingsAware(true); // use system font
     QApplication::setApplicationVersion(FEATHER_VERSION);
 
-    QApplication app(argc, argv);
+    SingleApplication app(argc, argv);
 
     QApplication::setQuitOnLastWindowClosed(false);
     QApplication::setApplicationName("FeatherWallet");
@@ -223,6 +224,10 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     qRegisterMetaType<QPair<bool, bool>>();
 
     WindowManager windowManager;
+
+    QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
+        windowManager.raise();
+    });
 
     return QApplication::exec();
 }

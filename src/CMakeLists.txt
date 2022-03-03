@@ -23,6 +23,9 @@ endif()
 
 find_package(Qt5 REQUIRED COMPONENTS ${QT5_COMPONENTS})
 
+set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
+add_subdirectory(third-party/singleapplication)
+
 add_subdirectory(openpgp)
 
 qt5_add_resources(RESOURCES assets.qrc assets_tor.qrc)
@@ -250,6 +253,7 @@ target_link_libraries(feather
         ${ZLIB_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZBAR_LIBRARIES}
+        SingleApplication::SingleApplication
         )
 
 if(DEVICE_TREZOR_READY)

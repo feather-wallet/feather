@@ -26,6 +26,7 @@ public:
     void showWizard(WalletWizard::Page startPage);
     void changeSkin(const QString &skinName);
     void restartApplication(const QString &binaryFilename);
+    void raise();
 
 signals:
     void torSettingsChanged();
