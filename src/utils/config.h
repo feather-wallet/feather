@@ -24,7 +24,6 @@ public:
         firstRun,
         warnOnStagenet,
         warnOnTestnet,
-        warnOnAlpha,
 
         homeWidget,
         donateBeg,
