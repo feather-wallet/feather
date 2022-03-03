@@ -20,6 +20,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::firstRun, {QS("firstRun"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
+        {Config::logLevel,{QS("logLevel"), 0}},
 
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
@@ -68,6 +69,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
+        {Config::disableLogging, {QS("disableLogging"), false}},
 
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},

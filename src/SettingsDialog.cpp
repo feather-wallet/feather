@@ -27,6 +27,10 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
         config()->set(Config::hideBalance, toggled);
         m_ctx->updateBalance();
     });
+    connect(ui->checkBox_disableLogging, &QCheckBox::toggled, [this](bool toggled){
+       config()->set(Config::disableLogging, toggled);
+       WalletManager::instance()->setLogLevel(toggled ? -1 : config()->get(Config::logLevel).toInt());
+    });
 
     connect(ui->closeButton, &QDialogButtonBox::accepted, this, &Settings::close);
 
@@ -39,6 +43,7 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->checkBox_multiBroadcast->setChecked(config()->get(Config::multiBroadcast).toBool());
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
+    ui->checkBox_disableLogging->setChecked(config()->get(Config::disableLogging).toBool());
 
     // setup comboboxes
     this->setupSkinCombobox();

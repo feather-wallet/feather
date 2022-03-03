@@ -143,11 +143,18 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     bool logLevelFromEnv;
     int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
+    if (!logLevelFromEnv) {
+        logLevel = 0;
+    }
+    config()->set(Config::logLevel, logLevel);
 
-    if (parser.isSet("quiet"))
+    if (parser.isSet("quiet") || config()->get(Config::disableLogging).toBool()) {
+        qWarning() << "Logging is disabled";
         WalletManager::instance()->setLogLevel(-1);
-    else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max)
+    }
+    else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max) {
         Monero::WalletManagerFactory::setLogLevel(logLevel);
+    }
 
     // Setup wallet directory
     QString walletDir = config()->get(Config::walletDirectory).toString();

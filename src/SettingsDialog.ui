@@ -211,6 +211,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QCheckBox" name="checkBox_disableLogging">
+         <property name="text">
+          <string>Do not write log files to disk</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_node">

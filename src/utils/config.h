@@ -24,6 +24,7 @@ public:
         firstRun,
         warnOnStagenet,
         warnOnTestnet,
+        logLevel,
 
         homeWidget,
         donateBeg,
@@ -72,6 +73,7 @@ public:
         multiBroadcast,
         warnOnExternalLink,
         hideBalance,
+        disableLogging,
 
         blockExplorer,
         redditFrontend,
