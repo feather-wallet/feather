@@ -57,8 +57,9 @@ void DebugInfoDialog::updateInfo() {
     auto node = m_ctx->nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_ctx->wallet->connectionStatus()));
-    ui->label_torStatus->setText(torStatus);
     ui->label_websocketStatus->setText(Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State"));
+    ui->label_torStatus->setText(torStatus);
+    ui->label_torLevel->setText(config()->get(Config::torPrivacyLevel).toString());
 
     QString seedType = [this](){
         if (m_ctx->wallet->isHwBacked())
@@ -130,8 +131,9 @@ void DebugInfoDialog::copyToClipboad() {
 
     text += QString("Remote node: %1  \n").arg(ui->label_remoteNode->text());
     text += QString("Wallet status: %1  \n").arg(ui->label_walletStatus->text());
-    text += QString("Tor status: %1  \n").arg(ui->label_torStatus->text());
     text += QString("Websocket status: %1  \n").arg(ui->label_websocketStatus->text());
+    text += QString("Tor status: %1  \n").arg(ui->label_torStatus->text());
+    text += QString("Tor level: %1  \n").arg(ui->label_torLevel->text());
 
     text += QString("Network type: %1  \n").arg(ui->label_netType->text());
     text += QString("Seed type: %1  \n").arg(ui->label_seedType->text());

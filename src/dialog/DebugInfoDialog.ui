@@ -167,30 +167,13 @@
       </widget>
      </item>
      <item row="10" column="0">
-      <widget class="QLabel" name="label_18">
-       <property name="text">
-        <string>Tor status:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QLabel" name="label_torStatus">
-       <property name="text">
-        <string>TextLabel</string>
-       </property>
-       <property name="textInteractionFlags">
-        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="0">
       <widget class="QLabel" name="label_19">
        <property name="text">
         <string>Websocket status:</string>
        </property>
       </widget>
      </item>
-     <item row="11" column="1">
+     <item row="10" column="1">
       <widget class="QLabel" name="label_websocketStatus">
        <property name="text">
         <string>TextLabel</string>
@@ -200,21 +183,52 @@
        </property>
       </widget>
      </item>
+     <item row="11" column="0">
+      <widget class="QLabel" name="label_18">
+       <property name="text">
+        <string>Tor status:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="1">
+      <widget class="QLabel" name="label_torStatus">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+       <property name="textInteractionFlags">
+        <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLabel" name="label_4">
+       <property name="text">
+        <string>Tor level:</string>
+       </property>
+      </widget>
+     </item>
      <item row="12" column="1">
+      <widget class="QLabel" name="label_torLevel">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="13" column="1">
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="13" column="0">
+     <item row="14" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Network type:</string>
        </property>
       </widget>
      </item>
-     <item row="13" column="1">
+     <item row="14" column="1">
       <widget class="QLabel" name="label_netType">
        <property name="text">
         <string>TextLabel</string>
@@ -224,14 +238,14 @@
        </property>
       </widget>
      </item>
-     <item row="14" column="0">
+     <item row="15" column="0">
       <widget class="QLabel" name="label_23">
        <property name="text">
         <string>Seed type:</string>
        </property>
       </widget>
      </item>
-     <item row="14" column="1">
+     <item row="15" column="1">
       <widget class="QLabel" name="label_seedType">
        <property name="text">
         <string>TextLabel</string>
@@ -241,14 +255,14 @@
        </property>
       </widget>
      </item>
-     <item row="15" column="0">
+     <item row="16" column="0">
       <widget class="QLabel" name="label_8">
        <property name="text">
         <string>Device type:</string>
        </property>
       </widget>
      </item>
-     <item row="15" column="1">
+     <item row="16" column="1">
       <widget class="QLabel" name="label_deviceType">
        <property name="text">
         <string>TextLabel</string>
@@ -258,14 +272,14 @@
        </property>
       </widget>
      </item>
-     <item row="16" column="0">
+     <item row="17" column="0">
       <widget class="QLabel" name="label_7">
        <property name="text">
         <string>View only:</string>
        </property>
       </widget>
      </item>
-     <item row="16" column="1">
+     <item row="17" column="1">
       <widget class="QLabel" name="label_viewOnly">
        <property name="text">
         <string>TextLabel</string>
@@ -275,14 +289,14 @@
        </property>
       </widget>
      </item>
-     <item row="17" column="0">
+     <item row="18" column="0">
       <widget class="QLabel" name="label_11">
        <property name="text">
         <string>Primary only:</string>
        </property>
       </widget>
      </item>
-     <item row="17" column="1">
+     <item row="18" column="1">
       <widget class="QLabel" name="label_primaryOnly">
        <property name="text">
         <string>TextLabel</string>
@@ -292,21 +306,21 @@
        </property>
       </widget>
      </item>
-     <item row="18" column="1">
+     <item row="19" column="1">
       <widget class="Line" name="line_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="19" column="0">
+     <item row="20" column="0">
       <widget class="QLabel" name="label_3">
        <property name="text">
         <string>Operating system:</string>
        </property>
       </widget>
      </item>
-     <item row="19" column="1">
+     <item row="20" column="1">
       <widget class="QLabel" name="label_OS">
        <property name="text">
         <string>TextLabel</string>
@@ -316,14 +330,14 @@
        </property>
       </widget>
      </item>
-     <item row="20" column="0">
+     <item row="21" column="0">
       <widget class="QLabel" name="label_24">
        <property name="text">
         <string>Timestamp:</string>
        </property>
       </widget>
      </item>
-     <item row="20" column="1">
+     <item row="21" column="1">
       <widget class="QLabel" name="label_timestamp">
        <property name="text">
         <string>TextLabel</string>
