@@ -22,7 +22,7 @@ WalletKeysFile::WalletKeysFile(const QFileInfo &info, int networkType, QString a
 qint64 WalletKeysFile::getModified(const QFileInfo &info) {
     qint64 m = info.lastModified().toSecsSinceEpoch();
 
-    QFileInfo cacheFile = QFileInfo(info.absoluteFilePath().replace(QRegExp(".keys$"), ""));
+    QFileInfo cacheFile = QFileInfo(info.absoluteFilePath().replace(QRegularExpression(".keys$"), ""));
     qint64 cacheLastModified = cacheFile.lastModified().toSecsSinceEpoch();
     if (cacheFile.exists() && cacheLastModified > m) {
         m = cacheLastModified;
@@ -73,8 +73,7 @@ void WalletKeysFilesModel::findWallets() {
     qDebug() << "wallet .keys search initiated";
     auto now = high_resolution_clock::now();
 
-    QRegExp rx("*.keys");
-    rx.setPatternSyntax(QRegExp::Wildcard);
+    QRegularExpression rx(QRegularExpression::wildcardToRegularExpression("*.keys"));
     QStringList walletPaths;
 
     for(auto i = 0; i != m_walletDirectories.length(); i++) {

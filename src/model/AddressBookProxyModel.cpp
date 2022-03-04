@@ -8,8 +8,7 @@ AddressBookProxyModel::AddressBookProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent),
     m_searchRegExp("")
 {
-    m_searchRegExp.setCaseSensitivity(Qt::CaseInsensitive);
-    m_searchRegExp.setPatternSyntax(QRegExp::RegExp);
+    m_searchRegExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 }
 
 bool AddressBookProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const

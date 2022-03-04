@@ -4,7 +4,6 @@
 #include "utils/TorManager.h"
 
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QDesktopServices>
 #include <QRegularExpression>
 

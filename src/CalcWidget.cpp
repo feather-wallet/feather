@@ -26,9 +26,9 @@ CalcWidget::CalcWidget(QWidget *parent)
 
     // validator/locale for input
     QString amount_rx = R"(^\d{0,8}[\.]\d{0,12}$)";
-    QRegExp rx;
+    QRegularExpression rx;
     rx.setPattern(amount_rx);
-    QValidator *validator = new QRegExpValidator(rx, this);
+    QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->lineFrom->setValidator(validator);
     ui->lineTo->setValidator(validator);
 

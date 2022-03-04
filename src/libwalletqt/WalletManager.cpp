@@ -218,8 +218,8 @@ QString WalletManager::displayAmount(quint64 amount, bool trailing_zeroes, int d
     }
 
     if (!trailing_zeroes) {
-        amountStr.remove(QRegExp("0+$"));
-        amountStr.remove(QRegExp("\\.$"));
+        amountStr.remove(QRegularExpression("0+$"));
+        amountStr.remove(QRegularExpression("\\.$"));
     }
 
     return amountStr;

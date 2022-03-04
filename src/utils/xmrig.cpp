@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
 #include <QScreen>
-#include <QDesktopWidget>
 #include <QDesktopServices>
 
 #include "utils/Utils.h"

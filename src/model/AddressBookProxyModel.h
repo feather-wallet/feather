@@ -22,7 +22,7 @@ public slots:
     }
 
 private:
-    QRegExp m_searchRegExp;
+    QRegularExpression m_searchRegExp;
 };
 
 #endif //FEATHER_ADDRESSBOOKPROXYMODEL_H

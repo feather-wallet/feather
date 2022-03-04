@@ -10,9 +10,7 @@ SubaddressProxyModel::SubaddressProxyModel(QObject *parent, Subaddress *subaddre
     , m_searchCaseSensitiveRegExp("")
     , m_hidePrimary(hidePrimary)
 {
-    m_searchRegExp.setCaseSensitivity(Qt::CaseInsensitive);
-    m_searchRegExp.setPatternSyntax(QRegExp::FixedString);
-    m_searchCaseSensitiveRegExp.setPatternSyntax(QRegExp::FixedString);
+    m_searchRegExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 }
 
 bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
@@ -33,7 +31,7 @@ bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &so
         return false;
     }
 
-    if (!m_searchRegExp.isEmpty()) {
+    if (!m_searchRegExp.pattern().isEmpty()) {
         return address.contains(m_searchCaseSensitiveRegExp) || label.contains(m_searchRegExp);
     }
     return (m_showUsed || !isUsed);

@@ -15,12 +15,12 @@ RestoreHeightWidget::RestoreHeightWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    QRegExp yearRe(R"(\d{2,4}-\d{1,2}-\d{1,2})");
-    QValidator *yearValidator = new QRegExpValidator(yearRe, this);
+    QRegularExpression yearRe(R"(\d{2,4}-\d{1,2}-\d{1,2})");
+    QValidator *yearValidator = new QRegularExpressionValidator(yearRe, this);
     ui->line_creationDate->setValidator(yearValidator);
 
-    QRegExp heightRe(R"(\d{7})");
-    QValidator *heightValidator = new QRegExpValidator(heightRe, this);
+    QRegularExpression heightRe(R"(\d{7})");
+    QValidator *heightValidator = new QRegularExpressionValidator(heightRe, this);
     ui->line_restoreHeight->setValidator(heightValidator);
 
     connect(ui->line_creationDate, &QLineEdit::textEdited, this, &RestoreHeightWidget::onCreationDateChanged);

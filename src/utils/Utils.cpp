@@ -67,7 +67,7 @@ bool pixmapWrite(const QString &path, const QPixmap &pixmap) {
     return false;
 }
 
-QStringList fileFind(const QRegExp &pattern, const QString &baseDir, int level, int depth, const int maxPerDir) {
+QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, const int maxPerDir) {
     // like `find /foo -name -maxdepth 2 "*.jpg"`
     QStringList rtn;
     QDir dir(baseDir);
@@ -83,12 +83,16 @@ QStringList fileFind(const QRegExp &pattern, const QString &baseDir, int level, 
         const auto fn = fileInfo.fileName();
         const auto path = fileInfo.filePath();
 
+        QRegularExpression re(QRegularExpression::anchoredPattern(pattern.pattern()));
+        QRegularExpressionMatch match = re.match(fn);
+
         if (fileInfo.isDir()) {
             if (level + 1 <= depth)
                 rtn << fileFind(pattern, path, level + 1, depth, maxPerDir);
         }
-        else if (pattern.exactMatch(fn))
+        else if (match.hasMatch()) {
             rtn << path;
+        }
     }
     return rtn;
 }

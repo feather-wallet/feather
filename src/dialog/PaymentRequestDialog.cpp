@@ -7,7 +7,7 @@
 #include <QClipboard>
 #include <QFileDialog>
 #include <QMessageBox>
-#include <QRegExpValidator>
+#include <QRegularExpressionValidator>
 
 #include "WalletManager.h"
 
@@ -20,9 +20,9 @@ PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, QSharedPointer<AppCo
     ui->setupUi(this);
 
     QString amount_rx = R"(^\d{0,8}[\.]\d{0,12}|(all)$)";
-    QRegExp rx;
+    QRegularExpression rx;
     rx.setPattern(amount_rx);
-    QValidator *validator = new QRegExpValidator(rx, this);
+    QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->line_amountXMR->setValidator(validator);
 
     connect(ui->line_amountXMR, &QLineEdit::textChanged, this, &PaymentRequestDialog::updatePaymentRequest);

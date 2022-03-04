@@ -4,7 +4,7 @@
 #ifndef FEATHER_NETWORKING_H
 #define FEATHER_NETWORKING_H
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QtNetwork>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>

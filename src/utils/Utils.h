@@ -4,7 +4,7 @@
 #ifndef FEATHER_UTILS_H
 #define FEATHER_UTILS_H
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStandardItemModel>
 #include <QApplication>
 #include <QTextCharFormat>
@@ -19,7 +19,7 @@ namespace Utils
     QByteArray fileOpenQRC(const QString &path);
     bool fileWrite(const QString &path, const QString &data);
     bool pixmapWrite(const QString &path, const QPixmap &pixmap);
-    QStringList fileFind(const QRegExp &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
+    QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
 
     bool dirExists(const QString &path);
     QString defaultWalletDir();

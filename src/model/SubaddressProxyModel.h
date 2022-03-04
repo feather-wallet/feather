@@ -42,8 +42,8 @@ private:
     Subaddress *m_subaddress;
 
     QStringList m_hiddenAddresses;
-    QRegExp m_searchRegExp;
-    QRegExp m_searchCaseSensitiveRegExp;
+    QRegularExpression m_searchRegExp;
+    QRegularExpression m_searchCaseSensitiveRegExp;
     bool m_showUsed = false;
     bool m_showHidden = false;
     bool m_hidePrimary;

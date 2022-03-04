@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QMessageBox>
 
 #include "tails.h"
@@ -50,10 +50,10 @@ QString TailsOS::version()
         return "";
 
     QByteArray data = Utils::fileOpen("/etc/os-release");
-    QRegExp re(R"(TAILS_VERSION_ID="(\d+.\d+))");
-    int pos = re.indexIn(data);
-    if (pos >= 0) {
-        return re.cap(1);
+    QRegularExpression re(R"(TAILS_VERSION_ID="(\d+.\d+))");
+    QRegularExpressionMatch match = re.match(data);
+    if (match.hasMatch()) {
+        return match.captured(1);
     }
     return "";
 }

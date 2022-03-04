@@ -5,7 +5,7 @@
 #define FEATHER_NODES_H
 
 #include <QTimer>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QApplication>
 #include <QtNetwork>
 #include <QNetworkAccessManager>

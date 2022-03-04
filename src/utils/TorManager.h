@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QtNetwork>
 #include "utils/childproc.h"
 #include "utils/SemanticVersion.h"
