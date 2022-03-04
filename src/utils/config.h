@@ -71,6 +71,7 @@ public:
         balanceDisplay,
         inactivityLockEnabled,
         inactivityLockTimeout,
+        disableWebsocket,
 
         multiBroadcast,
         warnOnExternalLink,

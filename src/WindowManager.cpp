@@ -522,6 +522,10 @@ void WindowManager::onTorSettingsChanged() {
 }
 
 void WindowManager::initWS() {
+    if (config()->get(Config::disableWebsocket).toBool()) {
+        return;
+    }
+
     websocketNotifier()->websocketClient.start();
 }
 

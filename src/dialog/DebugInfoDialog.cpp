@@ -57,7 +57,11 @@ void DebugInfoDialog::updateInfo() {
     auto node = m_ctx->nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_ctx->wallet->connectionStatus()));
-    ui->label_websocketStatus->setText(Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State"));
+    QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State");
+    if (config()->get(Config::disableWebsocket).toBool()) {
+        websocketStatus = "Disabled";
+    }
+    ui->label_websocketStatus->setText(websocketStatus);
     ui->label_torStatus->setText(torStatus);
     ui->label_torLevel->setText(config()->get(Config::torPrivacyLevel).toString());
 

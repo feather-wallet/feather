@@ -38,13 +38,27 @@ void WebsocketClient::sendMsg(const QByteArray &data) {
 }
 
 void WebsocketClient::start() {
+    if (m_stopped) {
+        return;
+    }
+
     // connect & reconnect on errors/close
     qDebug() << "WebSocket connect:" << m_url.url();
-
     auto state = webSocket.state();
     if (state != QAbstractSocket::ConnectedState && state != QAbstractSocket::ConnectingState) {
         webSocket.open(m_url);
     }
+}
+
+void WebsocketClient::restart() {
+    m_stopped = false;
+    this->start();
+}
+
+void WebsocketClient::stop() {
+    m_stopped = true;
+    webSocket.close();
+    m_connectionTimeout.stop();
 }
 
 void WebsocketClient::onConnected() {

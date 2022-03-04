@@ -16,6 +16,8 @@ class WebsocketClient : public QObject {
 public:
     explicit WebsocketClient(QObject *parent = nullptr);
     void start();
+    void restart();
+    void stop();
     void sendMsg(const QByteArray &data);
 
     QWebSocket webSocket;
@@ -39,6 +41,7 @@ private:
     QTimer m_connectionTimeout;
     int m_timeout = 10;
     int m_websocketUrlIndex = 0;
+    bool m_stopped = false;
 };
 
 #endif //FEATHER_WEBSOCKETCLIENT_H
