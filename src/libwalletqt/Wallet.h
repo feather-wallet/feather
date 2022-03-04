@@ -394,6 +394,7 @@ public:
     QString make_uri(const QString &address, quint64 &amount, const QString &description, const QString &recipient) const;
 
     //! Namespace your cacheAttribute keys to avoid collisions
+    bool cacheAttributeExists(const QString &key);
     bool setCacheAttribute(const QString &key, const QString &val);
     QString getCacheAttribute(const QString &key) const;
 

@@ -958,6 +958,10 @@ QString Wallet::integratedAddress(const QString &paymentId) const
     return QString::fromStdString(m_walletImpl->integratedAddress(paymentId.toStdString()));
 }
 
+bool Wallet::cacheAttributeExists(const QString &key) {
+    return m_walletImpl->cacheAttributeExists(key.toStdString());
+}
+
 QString Wallet::getCacheAttribute(const QString &key) const {
     return QString::fromStdString(m_walletImpl->getCacheAttribute(key.toStdString()));
 }

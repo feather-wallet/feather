@@ -290,7 +290,7 @@ bool WalletManager::clearWalletCache(const QString &wallet_path)
 
     // create unique file name
     for (int i = 1; QFile::exists(newFileName); i++) {
-       newFileName = QString("%1%2.%3").arg(fileName).arg(suffix).arg(i);
+       newFileName = QString("%1%2.%3").arg(fileName, suffix, QString::number(i));
     }
 
     return walletCache.rename(newFileName);

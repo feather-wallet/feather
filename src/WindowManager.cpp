@@ -158,17 +158,21 @@ void WindowManager::tryOpenWallet(const QString &path, const QString &password) 
 }
 
 void WindowManager::onWalletOpened(Wallet *wallet) {
-    if (wallet->status() != Wallet::Status_Ok) {
+    auto status = wallet->status();
+    if (status != Wallet::Status_Ok) {
         QString errMsg = wallet->errorString();
-        if (wallet->status() == Wallet::Status_BadPassword) {
+        QString keysPath = wallet->keysPath();
+        QString cachePath = wallet->cachePath();
+        wallet->deleteLater();
+        if (status == Wallet::Status_BadPassword) {
             // Don't show incorrect password when we try with empty password for the first time
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
-            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
+            this->onWalletOpenPasswordRequired(showIncorrectPassword, keysPath);
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
             qCritical() << errMsg;
-            WalletManager::clearWalletCache(wallet->cachePath()); // TODO: check this
+            WalletManager::clearWalletCache(cachePath);
             errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
             this->handleWalletError(errMsg);
         } else {
@@ -178,6 +182,16 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
     }
 
     this->onInitialNetworkConfigured();
+
+    if (!wallet->cacheAttributeExists("feather.xmrig_password") && !wallet->cacheAttributeExists("feather.created")) {
+        auto result = QMessageBox::question(nullptr, "Foreign wallet",
+                                            "This wallet file was not created with Feather. This may cause unexpected behavior. Please restore your wallet from seed.\n\nOpen this wallet anyway?");
+        if (result == QMessageBox::No) {
+            wallet->deleteLater();
+            this->initWizard();
+            return;
+        }
+    }
 
     // Create new mainwindow with wallet
 
