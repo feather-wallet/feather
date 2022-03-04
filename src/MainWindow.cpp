@@ -1001,6 +1001,10 @@ void MainWindow::showDebugInfo() {
 }
 
 void MainWindow::showWalletCacheDebugDialog() {
+    if (!this->verifyPassword()) {
+        return;
+    }
+
     WalletCacheDebugDialog dialog{m_ctx, this};
     dialog.exec();
 }
