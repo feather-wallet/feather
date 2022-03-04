@@ -109,7 +109,6 @@ set_target_properties(feather PROPERTIES
 
 set_property(TARGET feather PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-#target_include_directories(feather PUBLIC ${OPENGL_INCLUDE_DIR})
 target_include_directories(feather PUBLIC ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
 
 target_include_directories(feather PUBLIC
