@@ -30,6 +30,7 @@
 #include "model/CoinsProxyModel.h"
 #include "utils/networking.h"
 #include "utils/config.h"
+#include "utils/EventFilter.h"
 #include "widgets/CCSWidget.h"
 #include "widgets/RedditWidget.h"
 #include "widgets/TickerWidget.h"
@@ -215,6 +216,8 @@ private:
     void updateWidgetIcons();
     bool verifyPassword();
     void patchStylesheetMac();
+    void userActivity();
+    void checkUserActivity();
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();
@@ -260,6 +263,7 @@ private:
     QMap<QString, ToggleTab*> m_tabShowHideMapper;
 
     QTimer m_updateBytes;
+    QTimer m_checkUserActivity;
 
     QString m_statusText;
     int m_statusDots;
@@ -269,6 +273,9 @@ private:
     QTimer m_txTimer;
 
     bool cleanedUp = false;
+
+    EventFilter *m_eventFilter = nullptr;
+    qint64 m_userLastActive = QDateTime::currentSecsSinceEpoch();
 };
 
 #endif // FEATHER_MAINWINDOW_H

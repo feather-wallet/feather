@@ -31,6 +31,12 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
        config()->set(Config::disableLogging, toggled);
        WalletManager::instance()->setLogLevel(toggled ? -1 : config()->get(Config::logLevel).toInt());
     });
+    connect(ui->checkBox_inactivityLockTimeout, &QCheckBox::toggled, [](bool toggled){
+        config()->set(Config::inactivityLockEnabled, toggled);
+    });
+    connect(ui->spinBox_inactivityLockTimeout, QOverload<int>::of(&QSpinBox::valueChanged), [](int value){
+        config()->set(Config::inactivityLockTimeout, value);
+    });
 
     connect(ui->closeButton, &QDialogButtonBox::accepted, this, &Settings::close);
 
@@ -44,6 +50,8 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->checkBox_externalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
     ui->checkBox_disableLogging->setChecked(config()->get(Config::disableLogging).toBool());
+    ui->checkBox_inactivityLockTimeout->setChecked(config()->get(Config::inactivityLockEnabled).toBool());
+    ui->spinBox_inactivityLockTimeout->setValue(config()->get(Config::inactivityLockTimeout).toInt());
 
     // setup comboboxes
     this->setupSkinCombobox();

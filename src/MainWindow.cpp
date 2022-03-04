@@ -87,6 +87,11 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 #ifdef DONATE_BEG
     this->donationNag();
 #endif
+
+    connect(m_windowManager->eventFilter, &EventFilter::userActivity, this, &MainWindow::userActivity);
+    connect(&m_checkUserActivity, &QTimer::timeout, this, &MainWindow::checkUserActivity);
+    m_checkUserActivity.setInterval(5000);
+    m_checkUserActivity.start();
 }
 
 void MainWindow::initStatusBar() {
@@ -1579,11 +1584,12 @@ void MainWindow::updateRecentlyOpenedMenu() {
 bool MainWindow::verifyPassword() {
     bool ok;
     while (true) {
-        QString password = QInputDialog::getText(this, "Enter password", "Please enter your password:", QLineEdit::EchoMode::Password, "", &ok);
-        if (!ok) { // Dialog cancelled
+        PasswordDialog passwordDialog{this->walletName(), false, this};
+        int ret = passwordDialog.exec();
+        if (ret == QDialog::Rejected) {
             return false;
         }
-        if (password != m_ctx->wallet->getPassword()) {
+        if (passwordDialog.password != m_ctx->wallet->getPassword()) {
             QMessageBox::warning(this, "Error", "Incorrect password");
             continue;
         }
@@ -1598,6 +1604,37 @@ void MainWindow::patchStylesheetMac() {
 
     QString styleSheet = qApp->styleSheet() + patch_text;
     qApp->setStyleSheet(styleSheet);
+}
+
+void MainWindow::userActivity() {
+    m_userLastActive = QDateTime::currentSecsSinceEpoch();
+}
+
+void MainWindow::checkUserActivity() {
+    if (!config()->get(Config::inactivityLockEnabled).toBool()) {
+        return;
+    }
+
+    if (m_constructingTransaction) {
+        return;
+    }
+
+    if ((m_userLastActive + (config()->get(Config::inactivityLockTimeout).toInt()*60)) < QDateTime::currentSecsSinceEpoch()) {
+        m_checkUserActivity.stop();
+        qInfo() << "Locking wallet for inactivity";
+        if (!this->verifyPassword()) {
+            this->setEnabled(false);
+            this->close();
+            // This doesn't close the wallet immediately.
+            do {
+                QApplication::processEvents();
+                // Because running it a single time is apparently not enough.
+                // TODO: Qt bug? Need proper fix for this.
+            } while (QApplication::hasPendingEvents());
+        } else {
+            m_checkUserActivity.start();
+        }
+    }
 }
 
 void MainWindow::toggleSearchbar(bool visible) {

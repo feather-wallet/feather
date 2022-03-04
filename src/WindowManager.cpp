@@ -15,7 +15,9 @@
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
-WindowManager::WindowManager() {
+WindowManager::WindowManager(EventFilter *eventFilter)
+    : eventFilter(eventFilter)
+{
     m_walletManager = WalletManager::instance();
     m_splashDialog = new SplashDialog;
     m_cleanupThread = new QThread();

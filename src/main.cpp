@@ -11,6 +11,7 @@
 #include "config-feather.h"
 #include "constants.h"
 #include "MainWindow.h"
+#include "utils/EventFilter.h"
 #include "WindowManager.h"
 
 #if defined(Q_OS_WIN)
@@ -223,11 +224,16 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     qRegisterMetaType<TxProofResult>("TxProofResult");
     qRegisterMetaType<QPair<bool, bool>>();
 
-    WindowManager windowManager;
+    EventFilter filter;
+    app.installEventFilter(&filter);
+
+    WindowManager windowManager(&filter);
 
     QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
         windowManager.raise();
     });
+
+
 
     return QApplication::exec();
 }

@@ -17,7 +17,7 @@ class WindowManager : public QObject {
 Q_OBJECT
 
 public:
-    explicit WindowManager();
+    explicit WindowManager(EventFilter *eventFilter);
     ~WindowManager() override;
 
     void wizardOpenWallet();
@@ -27,6 +27,8 @@ public:
     void changeSkin(const QString &skinName);
     void restartApplication(const QString &binaryFilename);
     void raise();
+
+    EventFilter *eventFilter;
 
 signals:
     void torSettingsChanged();
