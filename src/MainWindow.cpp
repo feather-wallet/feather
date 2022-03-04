@@ -487,8 +487,6 @@ void MainWindow::onWalletOpened() {
 }
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
-    qDebug() << Q_FUNC_INFO;
-
     bool hide = config()->get(Config::hideBalance).toBool();
     int displaySetting = config()->get(Config::balanceDisplay).toInt();
     int decimals = config()->get(Config::amountPrecision).toInt();

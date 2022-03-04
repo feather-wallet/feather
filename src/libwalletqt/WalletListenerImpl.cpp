@@ -44,7 +44,6 @@ void WalletListenerImpl::updated()
 // called when wallet refreshed by background thread or explicitly
 void WalletListenerImpl::refreshed(bool success)
 {
-    qDebug() << __FUNCTION__;
     QString message = m_wallet->errorString();
     m_wallet->onRefreshed(success);
     emit m_wallet->refreshed(success, message);

@@ -258,8 +258,6 @@ void AppContext::onWalletRefreshed(bool success, const QString &message) {
         // store wallet immediately upon finishing synchronization
         this->wallet->store();
     }
-
-    qDebug() << "Wallet refresh status: " << success;
 }
 
 void AppContext::onWalletNewBlock(quint64 blockheight, quint64 targetHeight) {
@@ -274,8 +272,6 @@ void AppContext::onWalletNewBlock(quint64 blockheight, quint64 targetHeight) {
 }
 
 void AppContext::onHeightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) {
-    qDebug() << Q_FUNC_INFO << walletHeight << daemonHeight << targetHeight;
-
     if (this->wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected)
         return;
 
