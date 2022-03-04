@@ -193,19 +193,9 @@ QStringList WalletManager::findWallets(const QString &path)
     return result;
 }
 
-QString WalletManager::errorString() const
-{
-    return tr("Unknown error");
-}
-
 quint64 WalletManager::maximumAllowedAmount() const
 {
     return Monero::Wallet::maximumAllowedAmount();
-}
-
-QString WalletManager::maximumAllowedAmountAsString() const
-{
-    return WalletManager::displayAmount(WalletManager::maximumAllowedAmount());
 }
 
 QString WalletManager::displayAmount(quint64 amount, bool trailing_zeroes, int decimals)
@@ -260,38 +250,6 @@ QString WalletManager::paymentIdFromAddress(const QString &address, NetworkType:
     return QString::fromStdString(Monero::Wallet::paymentIdFromAddress(address.toStdString(), static_cast<Monero::NetworkType>(nettype)));
 }
 
-void WalletManager::setDaemonAddressAsync(const QString &address)
-{
-    m_scheduler.run([this, address] {
-        m_pimpl->setDaemonAddress(address.toStdString());
-    });
-}
-
-bool WalletManager::connected() const
-{
-    return m_pimpl->connected();
-}
-
-quint64 WalletManager::networkDifficulty() const
-{
-    return m_pimpl->networkDifficulty();
-}
-
-quint64 WalletManager::blockchainHeight() const
-{
-    return m_pimpl->blockchainHeight();
-}
-
-quint64 WalletManager::blockchainTargetHeight() const
-{
-    return m_pimpl->blockchainTargetHeight();
-}
-
-bool WalletManager::localDaemonSynced() const
-{
-    return blockchainHeight() > 1 && blockchainHeight() >= blockchainTargetHeight();
-}
-
 bool WalletManager::isDaemonLocal(const QString &daemon_address) const
 {
     return daemon_address.isEmpty() ? false : Monero::Utils::isAddressLocal(daemon_address.toStdString());
@@ -319,16 +277,6 @@ void WalletManager::setLogLevel(int logLevel)
 void WalletManager::setLogCategories(const QString &categories)
 {
     Monero::WalletManagerFactory::setLogCategories(categories.toStdString());
-}
-
-QString WalletManager::urlToLocalPath(const QUrl &url) const
-{
-    return QDir::toNativeSeparators(url.toLocalFile());
-}
-
-QUrl WalletManager::localPathToUrl(const QString &path) const
-{
-    return QUrl::fromLocalFile(path);
 }
 
 bool WalletManager::clearWalletCache(const QString &wallet_path)
@@ -373,27 +321,4 @@ void WalletManager::onPassphraseEntered(const QString &passphrase, bool enter_on
     {
         m_passphraseReceiver->onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
-}
-
-QString WalletManager::proxyAddress() const
-{
-    QMutexLocker locker(&m_proxyMutex);
-    return m_proxyAddress;
-}
-
-void WalletManager::setProxyAddress(QString address)
-{
-    m_scheduler.run([this, address] {
-        {
-            QMutexLocker locker(&m_proxyMutex);
-
-            if (!m_pimpl->setProxy(address.toStdString()))
-            {
-                qCritical() << "Failed to set proxy address" << address;
-            }
-
-            m_proxyAddress = std::move(address);
-        }
-        emit proxyAddressChanged();
-    });
 }
