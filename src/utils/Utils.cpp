@@ -123,11 +123,7 @@ QString defaultWalletDir() {
         return path;
     }
 
-#if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
-    return QString("%1/Monero/wallets").arg(QDir::homePath());
-#elif defined(Q_OS_WIN)
-    return QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation) + "/Monero/wallets";
-#endif
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/wallets";
 }
 
 QString applicationPath() {
