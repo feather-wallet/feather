@@ -5,6 +5,9 @@
 #include "ui_SettingsDialog.h"
 
 #include <QFileDialog>
+#include <QMessageBox>
+
+#include "Icons.h"
 
 Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
@@ -15,12 +18,15 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     this->setWindowIcon(QIcon("://assets/images/appicons/64x64.png"));
 
-    ui->tabWidget->setTabVisible(2, false);
-    ui->tabWidget->setTabVisible(5, false);
+    ui->tabWidget->setTabVisible(3, false);
+    ui->tabWidget->setTabVisible(6, false);
 
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
     connect(ui->checkBox_multiBroadcast, &QCheckBox::toggled, [](bool toggled){
         config()->set(Config::multiBroadcast, toggled);
+    });
+    connect(ui->btn_multiBroadcast, &QPushButton::clicked, [this]{
+       QMessageBox::information(this, "Multibroadcasting", "Multibroadcasting relays outgoing transactions to all nodes in your selected node list. This may improve transaction relay speed and reduces the chance of your transaction failing.");
     });
     connect(ui->checkBox_externalLink, &QCheckBox::clicked, this, &Settings::checkboxExternalLinkWarn);
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
