@@ -195,6 +195,21 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
         }
     }
 
+    if (!wallet->viewOnly() && !wallet->isHwBacked()) {
+        if (!wallet->isDeterministic()) {
+            auto result = QMessageBox::question(nullptr, "Non-deterministic wallet",
+                                                "This wallet is not deterministic. This may be caused by a corrupt keys file. "
+                                                "If you are unsure what this means, RESTORE YOUR WALLET FROM SEED.\n\n"
+                                                "USING THIS WALLET FILE MAY RESULT IN A LOSS OF FUNDS.\n\n"
+                                                "Open this wallet anyway?");
+            if (result == QMessageBox::No) {
+                wallet->deleteLater();
+                this->initWizard();
+                return;
+            }
+        }
+    }
+
     // Create new mainwindow with wallet
 
     m_splashDialog->hide();
