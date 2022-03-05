@@ -176,11 +176,18 @@ QDir Config::defaultConfigDir() {
             QString appImagePath = qgetenv("APPIMAGE");
             if (appImagePath.isEmpty()) {
                 qDebug() << "Not an appimage, using currentPath()";
-                return QDir::currentPath() + "/.feather/.config/feather";
+                if (QDir(QDir::currentPath() + "/.feather").exists()) {
+                    return QDir::currentPath() + "/.feather/.config/feather";
+                }
+                return QDir::currentPath() + "/feather_data";
             }
 
             QFileInfo appImageDir(appImagePath);
-            return appImageDir.absoluteDir().path() + "/.feather/.config/feather";
+            QString absolutePath = appImageDir.absoluteDir().path();
+            if (QDir(absolutePath + "/.feather").exists()) {
+                return absolutePath + "/.feather/.config/feather";
+            }
+            return absolutePath + "/feather_data";
         }();
 
         return QDir(path);

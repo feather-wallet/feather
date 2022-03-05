@@ -110,14 +110,25 @@ QString defaultWalletDir() {
 
     if (TailsOS::detect()) {
         QString path = []{
+            // Starting in 1.1.0 the wallet and config directory were moved from ./.feather to ./feather_data
+            // A user might accidentally delete the folder containing the file hidden folder after moving the AppImage
+            // We return the old path if it still exists
+
             QString appImagePath = qgetenv("APPIMAGE");
             if (appImagePath.isEmpty()) {
                 qDebug() << "Not an appimage, using currentPath()";
-                return QDir::currentPath() + "/.feather/Monero/wallets";
+                if (QDir(QDir::currentPath() + "/.feather").exists()) {
+                    return QDir::currentPath() + "/.feather/Monero/wallets";
+                }
+                return QDir::currentPath() + "/feather_data/wallets";
             }
 
             QFileInfo appImageDir(appImagePath);
-            return appImageDir.absoluteDir().path() + "/.feather/Monero/wallets";
+            QString absolutePath = appImageDir.absoluteDir().path();
+            if (QDir(absolutePath + "/.feather").exists()) {
+                return absolutePath + "/.feather/Monero/wallets";
+            }
+            return absolutePath + "/feather_data/wallets";
         }();
 
         return path;
