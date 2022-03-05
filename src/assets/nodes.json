@@ -7,7 +7,7 @@
       "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
       "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
       "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089",
-      "melo7jwjspngus3xhbt5kxeqc4njhokyvh55jfmehplglgmb7a6rb6yd.onion:18081",
+      "rino4muoj3zk223twblr53hwt4ukqemjqw4fbiwdcrqqevcrclpuzyyd.onion:18081",
       "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
       "ghziyspoobhmp5oun2xcomrmetqiwbvuaegmte3s47nnqv7hkaa64sid.onion:18089",
       "xmrnodesarnt4w35aqmu66aart3o324yw6qbnv6pglpof6uqaydzk5id.onion:18081",
@@ -15,7 +15,7 @@
       "mhfsxznn5pi4xuxohj5k7unqp73sa6d44mbeewbpxnm25z3wzfogcfyd.onion:18081"
     ],
     "clearnet": [
-      "node.melo.tools:18081",
+      "node.community.rino.io:18081",
       "node.sethforprivacy.com:18089",
       "node2.sethforprivacy.com:18089",
       "selsta1.featherwallet.net:18081",
@@ -32,20 +32,20 @@
   },
   "testnet": {
     "tor": [
-      "melot6vncfusj5gfi73gaosea2mc572n3n7f7gof75zkwg6oibkhk3id.onion:28081"
+      "rino4tpcrisugb2pt7bhs7cwkrkoigf366aetuzyqkqcakaad7vijiid.onion:28081"
     ],
     "clearnet": [
-      "testnet.melo.tools:28081"
+      "testnet.community.rino.io:28081"
     ]
   },
   "stagenet": {
     "tor": [
       "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081",
-      "melos2hbwolcavwbgytdwbmcx7t3uh2eu36p3vnbttibosnpzmtp6hqd.onion:38081"
+      "rino4sek7bzoqgkgsn5qxlsic3gk2mj23t3shcaj5axfyipjnyoql4ad.onion:38081"
     ],
     "clearnet": [
       "super.fast.node.xmr.pm:38089",
-      "stagenet.melo.tools:38081"
+      "stagenet.community.rino.io:38081"
     ]
   }
 }
