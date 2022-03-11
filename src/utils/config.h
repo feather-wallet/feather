@@ -63,6 +63,7 @@ public:
         pools,
 
         // Settings
+        lastSettingsPage,
         preferredFiatCurrency,
         skin,
         amountPrecision,

@@ -59,6 +59,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::pools,{QS("pools"), {}}},
 
         // Settings
+        {Config::lastSettingsPage, {QS("lastSettingsPage"), 0}},
         {Config::preferredFiatCurrency,{QS("preferredFiatCurrency"), "USD"}},
         {Config::skin,{QS("skin"), "light"}},
         {Config::amountPrecision, {QS("amountPrecision"), 12}},

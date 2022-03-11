@@ -856,6 +856,11 @@ void MainWindow::menuVerifyTxProof() {
     dialog.exec();
 }
 
+void MainWindow::onShowSettingsPage(int page) {
+    config()->set(Config::lastSettingsPage, page);
+    this->menuSettingsClicked();
+}
+
 void MainWindow::skinChanged(const QString &skinName) {
     m_windowManager->changeSkin(skinName);
     ColorScheme::updateFromWidget(this);

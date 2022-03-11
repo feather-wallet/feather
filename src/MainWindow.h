@@ -120,6 +120,7 @@ private slots:
     void onCreateDesktopEntry(bool checked);
     void onShowDocumentaton();
     void onReportBug(bool checked);
+    void onShowSettingsPage(int page);
 
     // offline tx signing
     void exportKeyImages();

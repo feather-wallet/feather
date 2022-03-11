@@ -21,6 +21,10 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     ui->tabWidget->setTabVisible(3, false);
     ui->tabWidget->setTabVisible(6, false);
+    ui->tabWidget->setCurrentIndex(config()->get(Config::lastSettingsPage).toInt());
+    connect(ui->tabWidget, &QTabWidget::currentChanged, [this](int index){
+            config()->set(Config::lastSettingsPage, index);
+    });
 
     connect(ui->btnCopyToClipboard, &QPushButton::clicked, this, &Settings::copyToClipboard);
     connect(ui->checkBox_multiBroadcast, &QCheckBox::toggled, [](bool toggled){
