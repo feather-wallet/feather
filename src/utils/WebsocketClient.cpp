@@ -117,3 +117,9 @@ void WebsocketClient::onbinaryMessageReceived(const QByteArray &message) {
 
     emit WSMessage(object);
 }
+
+WebsocketClient::~WebsocketClient() {
+    // webSocket may fire QWebSocket::disconnected after WebsocketClient is destroyed
+    // explicitly disconnect to prevent crash
+    webSocket.disconnect();
+}

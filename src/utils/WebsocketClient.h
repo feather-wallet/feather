@@ -15,6 +15,7 @@ class WebsocketClient : public QObject {
 
 public:
     explicit WebsocketClient(QObject *parent = nullptr);
+    ~WebsocketClient() override;
     void start();
     void restart();
     void stop();
