@@ -187,21 +187,6 @@ QString Wallet::keysPath() const
     return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->keysFilename()));;
 }
 
-//void Wallet::storeAsync(const QJSValue &callback, const QString &path /* = "" */)
-//{
-//    const auto future = m_scheduler.run(
-//            [this, path] {
-//                QMutexLocker locker(&m_asyncMutex);
-//
-//                return QJSValueList({m_walletImpl->store(path.toStdString())});
-//            },
-//            callback);
-//    if (!future.first)
-//    {
-//        QJSValue(callback).call(QJSValueList({false}));
-//    }
-//}
-
 void Wallet::store(const QString &path)
 {
     m_walletImpl->store(path.toStdString());
