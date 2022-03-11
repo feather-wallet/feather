@@ -6,7 +6,7 @@
 
 #include "utils/ScopeGuard.h"
 
-class WalletPassphraseListenerImpl : public  Monero::WalletListener, public PassphraseReceiver
+class WalletPassphraseListenerImpl : public Monero::WalletListener, public PassphraseReceiver
 {
 public:
     explicit WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
