@@ -635,7 +635,25 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         return;
     }
 
-
+    // This is a weak check to see if we send to all specified destination addresses
+    // This is here to catch rare memory corruption errors during transaction construction
+    // TODO: also check that amounts match
+    tx->refresh();
+    QSet<QString> outputAddresses;
+    for (const auto &output : tx->transaction(0)->outputs()) {
+        outputAddresses.insert(output->address());
+    }
+    QSet<QString> destAddresses;
+    for (const auto &addr : address) {
+        destAddresses.insert(addr);
+    }
+    if (!outputAddresses.contains(destAddresses)) {
+        err = QString("%1 %2").arg(err, "Constructed transaction doesn't appear to send to (all) specified destination address(es). Try creating the transaction again.");
+        qDebug() << Q_FUNC_INFO << err;
+        this->displayWalletErrorMsg(err);
+        m_ctx->wallet->disposeTransaction(tx);
+        return;
+    }
 
     m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
