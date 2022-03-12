@@ -25,6 +25,7 @@
 #include "dialog/WalletCacheDebugDialog.h"
 #include "dialog/UpdateDialog.h"
 #include "libwalletqt/AddressBook.h"
+#include "libwalletqt/Transfer.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
@@ -626,6 +627,15 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         m_ctx->wallet->disposeTransaction(tx);
         return;
     }
+    else if (tx->txCount() > 1) {
+        err = QString("%1 %2").arg(err, "Split transactions are not supported. Try sending a smaller amount.");
+        qDebug() << Q_FUNC_INFO << err;
+        this->displayWalletErrorMsg(err);
+        m_ctx->wallet->disposeTransaction(tx);
+        return;
+    }
+
+
 
     m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
