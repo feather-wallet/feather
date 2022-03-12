@@ -139,6 +139,7 @@ private slots:
     void onInitiateTransaction();
     void onEndTransaction();
     void onCustomRestoreHeightSet(int height);
+    void onKeysCorrupted();
 
     // libwalletqt
     void onBalanceUpdated(quint64 balance, quint64 spendable);
@@ -274,6 +275,7 @@ private:
     QTimer m_txTimer;
 
     bool cleanedUp = false;
+    bool m_criticalWarningShown = false;
 
     EventFilter *m_eventFilter = nullptr;
     qint64 m_userLastActive = QDateTime::currentSecsSinceEpoch();

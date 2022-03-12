@@ -20,7 +20,7 @@ public:
     bool getRow(int index, std::function<void (Monero::SubaddressRow &row)> callback) const;
     bool addRow(quint32 accountIndex, const QString &label) const;
     bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const;
-    void refresh(quint32 accountIndex) const;
+    bool refresh(quint32 accountIndex) const;
     quint64 unusedLookahead() const;
     quint64 count() const;
     QString errorString() const;

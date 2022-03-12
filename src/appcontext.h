@@ -92,6 +92,7 @@ signals:
     void deviceButtonRequest(quint64 code);
     void deviceButtonPressed();
     void deviceError(const QString &message);
+    void keysCorrupted();
 
 private:
     DaemonRpc *m_rpc;

@@ -73,10 +73,11 @@ bool Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QStr
     return r;
 }
 
-void Subaddress::refresh(quint32 accountIndex) const
+bool Subaddress::refresh(quint32 accountIndex) const
 {
-    m_subaddressImpl->refresh(accountIndex);
+    bool r = m_subaddressImpl->refresh(accountIndex);
     getAll();
+    return r;
 }
 
 quint64 Subaddress::unusedLookahead() const

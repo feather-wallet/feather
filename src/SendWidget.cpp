@@ -305,7 +305,14 @@ void SendWidget::onInitiateTransaction() {
 }
 
 void SendWidget::onEndTransaction() {
-    ui->btnSend->setEnabled(true);
+    if (!m_sendDisabled) {
+        ui->btnSend->setEnabled(true);
+    }
+}
+
+void SendWidget::disableSendButton() {
+    m_sendDisabled = true;
+    ui->btnSend->setEnabled(false);
 }
 
 void SendWidget::onDataPasted(const QString &data) {

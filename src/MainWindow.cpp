@@ -377,6 +377,7 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
     connect(m_ctx.get(), &AppContext::endTransaction,           this, &MainWindow::onEndTransaction);
     connect(m_ctx.get(), &AppContext::customRestoreHeightSet,   this, &MainWindow::onCustomRestoreHeightSet);
+    connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
 
     // Nodes
     connect(m_ctx->nodes, &Nodes::updateStatus,    this, &MainWindow::onSetStatusText);
@@ -1437,6 +1438,14 @@ void MainWindow::onCustomRestoreHeightSet(int height) {
                        "Please re-open the wallet. Feather will now quit.").arg(height);
     QMessageBox::information(this, "Cannot set custom restore height", msg);
     this->menuQuitClicked();
+}
+
+void MainWindow::onKeysCorrupted() {
+    if (!m_criticalWarningShown) {
+        m_criticalWarningShown = true;
+        QMessageBox::warning(this, "Critical error", "WARNING!\n\nThe wallet keys are corrupted.\n\nTo prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\nRestore your wallet from seed.\n\nPlease report this incident to the Feather developers.\n\nWARNING!");
+        m_sendWidget->disableSendButton();
+    }
 }
 
 void MainWindow::onExportHistoryCSV(bool checked) {

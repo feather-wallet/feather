@@ -345,7 +345,13 @@ void AppContext::syncStatusUpdated(quint64 height, quint64 target) {
 
 void AppContext::refreshModels() {
     this->wallet->history()->refresh(this->wallet->currentSubaddressAccount());
-    this->wallet->subaddress()->refresh(this->wallet->currentSubaddressAccount());
     this->wallet->coins()->refresh(this->wallet->currentSubaddressAccount());
-    // Todo: set timer for refreshes
+    bool r = this->wallet->subaddress()->refresh(this->wallet->currentSubaddressAccount());
+
+    if (!r) {
+        // This should only happen if wallet keys got corrupted or were tampered with
+        // The list of subaddresses is wiped to prevent loss of funds
+        // Notify MainWindow to display an error message
+        emit keysCorrupted();
+    }
 }

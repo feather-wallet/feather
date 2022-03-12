@@ -40,6 +40,7 @@ public slots:
     void onOpenAliasResolveError(const QString &err);
     void onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid);
     void onPreferredFiatCurrencyChanged();
+    void disableSendButton();
 
     void onInitiateTransaction();
     void onEndTransaction();
@@ -51,10 +52,12 @@ private:
     void setupComboBox();
     double amountDouble();
 
-    QScopedPointer<Ui::SendWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
     quint64 amount();
     double conversionAmount();
+
+    QScopedPointer<Ui::SendWidget> ui;
+    QSharedPointer<AppContext> m_ctx;
+    bool m_sendDisabled = false;
 };
 
 #endif // FEATHER_SENDWIDGET_H
