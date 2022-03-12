@@ -1529,7 +1529,11 @@ QString MainWindow::getPlatformTag() {
     return "win";
 #endif
 #ifdef Q_OS_LINUX
-    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
+    bool isAppImage = !qEnvironmentVariableIsEmpty("APPIMAGE");
+    if (TailsOS::detect() && isAppImage) {
+        return "tails-appimage";
+    }
+    if (isAppImage) {
         return "linux-appimage";
     }
     return "linux";
