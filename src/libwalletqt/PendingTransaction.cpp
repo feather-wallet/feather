@@ -3,6 +3,7 @@
 
 #include "PendingTransaction.h"
 
+#include <QVariant>
 
 PendingTransaction::Status PendingTransaction::status() const
 {

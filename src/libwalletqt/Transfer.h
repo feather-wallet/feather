@@ -11,8 +11,7 @@
 class Transfer : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(quint64 amount READ amount)
-    Q_PROPERTY(QString address READ address)
+
 private:
     explicit Transfer(uint64_t _amount, QString _address,  QObject *parent = 0)
             : QObject(parent), m_amount(_amount), m_address(std::move(_address)) {};

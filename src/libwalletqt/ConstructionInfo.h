@@ -14,12 +14,6 @@ class Transfer;
 class ConstructionInfo : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(quint64 unlockTime READ unlockTime)
-    Q_PROPERTY(QSet<quint32> subaddressIndices READ subaddressIndices)
-    Q_PROPERTY(QVector<QString> subaddresses READ subaddresses)
-    Q_PROPERTY(quint64 minMixinCount READ minMixinCount)
-    Q_PROPERTY(QList<Input*> inputs READ inputs)
-    Q_PROPERTY(QList<Transfer*> outputs READ outputs)
 
 public:
     quint64 unlockTime() const;
@@ -41,6 +35,5 @@ private:
     mutable QList<Input*> m_inputs;
     mutable QList<Transfer*> m_outputs;
 };
-
 
 #endif //FEATHER_CONSTRUCTIONINFO_H

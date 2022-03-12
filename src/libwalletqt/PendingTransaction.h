@@ -6,7 +6,6 @@
 
 #include <QObject>
 #include <QList>
-#include <QVariant>
 
 #include <wallet/api/wallet2_api.h>
 #include "PendingTransactionInfo.h"
@@ -14,14 +13,6 @@
 class PendingTransaction : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Status status READ status)
-    Q_PROPERTY(QString errorString READ errorString)
-    Q_PROPERTY(quint64 amount READ amount)
-    Q_PROPERTY(quint64 dust READ dust)
-    Q_PROPERTY(quint64 fee READ fee)
-    Q_PROPERTY(QStringList txid READ txid)
-    Q_PROPERTY(quint64 txCount READ txCount)
-    Q_PROPERTY(QList<QVariant> subaddrIndices READ subaddrIndices)
 
 public:
     enum Status {
@@ -41,7 +32,7 @@ public:
 
     Status status() const;
     QString errorString() const;
-    Q_INVOKABLE bool commit();
+    bool commit();
     bool saveToFile(const QString &fileName);
     quint64 amount() const;
     quint64 dust() const;
