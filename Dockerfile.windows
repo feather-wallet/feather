@@ -31,9 +31,9 @@ RUN git clone -b v3.22.2 --depth 1 https://github.com/Kitware/CMake && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b v0.17.2.0 --depth 1 https://github.com/monero-project/monero && \
+RUN git clone -b v0.17.3.0 --depth 1 https://github.com/monero-project/monero && \
     cd monero && \
-    git reset --hard f6e63ef260e795aacd408c28008398785b84103a && \
+    git reset --hard ab18fea3500841fc312630d49ed6840b3aedb34d && \
     cp -a contrib/depends / && \
     cd .. && \
     rm -rf monero
