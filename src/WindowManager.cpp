@@ -489,6 +489,7 @@ void WindowManager::onInitialNetworkConfigured() {
     if (!m_initialNetworkConfigured) {
         m_initialNetworkConfigured = true;
         appData();
+
         this->initTor();
         this->initWS();
     }
@@ -522,6 +523,10 @@ void WindowManager::onTorSettingsChanged() {
 }
 
 void WindowManager::initWS() {
+    if (config()->get(Config::offlineMode).toBool()) {
+        return;
+    }
+
     if (config()->get(Config::disableWebsocket).toBool()) {
         return;
     }

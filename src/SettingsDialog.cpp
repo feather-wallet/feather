@@ -9,6 +9,7 @@
 
 #include "Icons.h"
 #include "utils/WebsocketNotifier.h"
+#include "utils/NetworkManager.h"
 
 Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
@@ -48,13 +49,14 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     connect(ui->spinBox_inactivityLockTimeout, QOverload<int>::of(&QSpinBox::valueChanged), [](int value){
         config()->set(Config::inactivityLockTimeout, value);
     });
-    connect(ui->checkBox_disableWebsocket, &QCheckBox::toggled, [this](bool toggled){
-        config()->set(Config::disableWebsocket, toggled);
-        if (toggled) {
-            websocketNotifier()->websocketClient.stop();
-        } else {
-            websocketNotifier()->websocketClient.restart();
-        }
+    connect(ui->checkBox_disableWebsocket, &QCheckBox::toggled, [this](bool checked){
+        config()->set(Config::disableWebsocket, checked);
+        this->enableWebsocket(checked);
+    });
+    connect(ui->checkBox_offlineMode, &QCheckBox::toggled, [this](bool checked){
+        config()->set(Config::offlineMode, checked);
+        m_ctx->wallet->setOffline(checked);
+        this->enableWebsocket(checked);
     });
 
     connect(ui->closeButton, &QDialogButtonBox::accepted, this, &Settings::close);
@@ -72,6 +74,7 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->checkBox_inactivityLockTimeout->setChecked(config()->get(Config::inactivityLockEnabled).toBool());
     ui->spinBox_inactivityLockTimeout->setValue(config()->get(Config::inactivityLockTimeout).toInt());
     ui->checkBox_disableWebsocket->setChecked(config()->get(Config::disableWebsocket).toBool());
+    ui->checkBox_offlineMode->setChecked(config()->get(Config::offlineMode).toBool());
 
     // setup comboboxes
     this->setupSkinCombobox();
@@ -224,6 +227,14 @@ void Settings::setupLocalMoneroFrontendCombobox() {
                                            "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion");
 
     ui->combo_localMoneroFrontend->setCurrentIndex(ui->combo_localMoneroFrontend->findData(config()->get(Config::localMoneroFrontend).toString()));
+}
+
+void Settings::enableWebsocket(bool enabled) {
+    if (enabled && !config()->get(Config::offlineMode).toBool() && !config()->get(Config::disableWebsocket).toBool()) {
+        websocketNotifier()->websocketClient.restart();
+    } else {
+        websocketNotifier()->websocketClient.stop();
+    }
 }
 
 Settings::~Settings() = default;

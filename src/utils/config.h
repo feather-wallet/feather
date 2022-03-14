@@ -73,6 +73,7 @@ public:
         inactivityLockEnabled,
         inactivityLockTimeout,
         disableWebsocket,
+        offlineMode,
 
         multiBroadcast,
         warnOnExternalLink,

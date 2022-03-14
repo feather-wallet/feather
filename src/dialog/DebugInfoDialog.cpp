@@ -88,7 +88,11 @@ void DebugInfoDialog::updateInfo() {
         }
     }();
 
-    ui->label_netType->setText(Utils::QtEnumToString(m_ctx->wallet->nettype()));
+    QString networkType = Utils::QtEnumToString(m_ctx->wallet->nettype());
+    if (config()->get(Config::offlineMode).toBool()) {
+        networkType += " (offline)";
+    }
+    ui->label_netType->setText(networkType);
     ui->label_seedType->setText(seedType);
     ui->label_deviceType->setText(deviceType);
     ui->label_viewOnly->setText(m_ctx->wallet->viewOnly() ? "True" : "False");

@@ -127,6 +127,8 @@ public:
     //! return true if wallet is connected to a node
     bool isConnected() const;
 
+    void setOffline(bool offline) const;
+
     //! returns last operation's error message
     QString errorString() const;
 

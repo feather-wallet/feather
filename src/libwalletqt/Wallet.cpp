@@ -148,6 +148,11 @@ bool Wallet::isConnected() const
     return status == ConnectionStatus_Synchronizing || status == ConnectionStatus_Synchronized;
 }
 
+void Wallet::setOffline(bool offline) const
+{
+    return m_walletImpl->setOffline(offline);
+}
+
 QString Wallet::errorString() const
 {
     return QString::fromStdString(m_walletImpl->errorString());

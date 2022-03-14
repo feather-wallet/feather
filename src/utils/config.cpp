@@ -69,6 +69,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::inactivityLockEnabled, {QS("inactivityLockEnabled"), false}},
         {Config::inactivityLockTimeout, {QS("inactivityLockTimeout"), 10}},
         {Config::disableWebsocket, {QS("disableWebsocket"), false}},
+        {Config::offlineMode, {QS("offlineMode"), false}},
 
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},

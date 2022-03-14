@@ -192,6 +192,10 @@ void Nodes::connectToNode(const FeatherNode &node) {
     if (!node.isValid())
         return;
 
+    if (config()->get(Config::offlineMode).toBool()) {
+        return;
+    }
+
     emit updateStatus(QString("Connecting to %1").arg(node.toAddress()));
     qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress()).arg(node.custom ? "custom" : "ws");
 

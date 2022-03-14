@@ -49,6 +49,7 @@ public slots:
 private:
     void setupSkinCombobox();
     void setupLocalMoneroFrontendCombobox();
+    void enableWebsocket(bool enabled);
 
     QScopedPointer<Ui::Settings> ui;
     QSharedPointer<AppContext> m_ctx;

@@ -238,7 +238,11 @@ bool xdgDesktopEntryRegister() {
     return true;
 }
 
-bool portOpen(const QString &hostname, quint16 port){
+bool portOpen(const QString &hostname, quint16 port) { // TODO: this call should be async
+    if (config()->get(Config::offlineMode).toBool()) {
+        return false;
+    }
+
     QTcpSocket socket;
     socket.connectToHost(hostname, port);
     return socket.waitForConnected(600);

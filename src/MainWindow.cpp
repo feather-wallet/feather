@@ -451,8 +451,6 @@ void MainWindow::onWalletOpened() {
 
     this->bringToFront();
     this->setEnabled(true);
-    if (!torManager()->torConnected)
-        this->setStatusText("Starting Tor (may take a while)");
 
     // receive page
     m_ctx->wallet->subaddress()->refresh(m_ctx->wallet->currentSubaddressAccount());
