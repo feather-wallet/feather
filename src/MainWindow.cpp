@@ -1092,10 +1092,9 @@ void MainWindow::exportKeyImages() {
     QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_keyImages")) fn += "_keyImages";
-    m_ctx->wallet->exportKeyImages(fn, true);
-    auto err = m_ctx->wallet->errorString();
-    if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(err));
+    bool r = m_ctx->wallet->exportKeyImages(fn, true);
+    if (!r) {
+        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(m_ctx->wallet->errorString()));
     } else {
         QMessageBox::information(this, "Key image export", "Successfully exported key images.");
     }
@@ -1104,10 +1103,9 @@ void MainWindow::exportKeyImages() {
 void MainWindow::importKeyImages() {
     QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
-    m_ctx->wallet->importKeyImages(fn);
-    auto err = m_ctx->wallet->errorString();
-    if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(err));
+    bool r = m_ctx->wallet->importKeyImages(fn);
+    if (!r) {
+        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(m_ctx->wallet->errorString()));
     } else {
         QMessageBox::information(this, "Key image import", "Successfully imported key images");
         m_ctx->refreshModels();
@@ -1118,10 +1116,9 @@ void MainWindow::exportOutputs() {
     QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_outputs")) fn += "_outputs";
-    m_ctx->wallet->exportOutputs(fn, true);
-    auto err = m_ctx->wallet->errorString();
-    if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(err));
+    bool r = m_ctx->wallet->exportOutputs(fn, true);
+    if (!r) {
+        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(m_ctx->wallet->errorString()));
     } else {
         QMessageBox::information(this, "Outputs export", "Successfully exported outputs.");
     }
@@ -1130,10 +1127,9 @@ void MainWindow::exportOutputs() {
 void MainWindow::importOutputs() {
     QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
-    m_ctx->wallet->importOutputs(fn);
-    auto err = m_ctx->wallet->errorString();
-    if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(err));
+    bool r = m_ctx->wallet->importOutputs(fn);
+    if (!r) {
+        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(m_ctx->wallet->errorString()));
     } else {
         QMessageBox::information(this, "Outputs import", "Successfully imported outputs");
         m_ctx->refreshModels();
