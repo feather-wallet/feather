@@ -47,6 +47,8 @@ NodeWidget::NodeWidget(QWidget *parent)
 
     connect(ui->customView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
     connect(ui->wsView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
+
+    this->onWebsocketStatusChanged();
 }
 
 void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
@@ -63,6 +65,13 @@ void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
     if (node.toAddress().isEmpty()) return;
 
     this->showContextMenu(pos, node);
+}
+
+void NodeWidget::onWebsocketStatusChanged() {
+    bool disabled = config()->get(Config::disableWebsocket).toBool() || config()->get(Config::offlineMode).toBool();
+    QString labelText = disabled ? "From cached list" : "From websocket (recommended)";
+    ui->radioButton_websocket->setText(labelText);
+    ui->wsView->setColumnHidden(1, disabled);
 }
 
 void NodeWidget::showContextMenu(const QPoint &pos, const FeatherNode &node) {

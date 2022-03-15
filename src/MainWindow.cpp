@@ -68,6 +68,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 #endif
     websocketNotifier()->emitCache(); // Get cached data
 
+    connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
+    this->onWebsocketStatusChanged(!config()->get(Config::disableWebsocket).toBool());
+
     connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
@@ -540,6 +543,20 @@ void MainWindow::tryStoreWallet() {
     m_ctx->wallet->store();
 }
 
+void MainWindow::onWebsocketStatusChanged(bool enabled) {
+    ui->actionShow_Home->setVisible(enabled);
+    ui->actionShow_calc->setVisible(enabled);
+    ui->actionShow_Exchange->setVisible(enabled);
+
+    ui->tabWidget->setTabVisible(Tabs::HOME, enabled && config()->get(Config::showTabHome).toBool());
+    ui->tabWidget->setTabVisible(Tabs::CALC, enabled && config()->get(Config::showTabCalc).toBool());
+    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && config()->get(Config::showTabExchange).toBool());
+
+#ifdef HAS_XMRIG
+    m_xmrig->setDownloadsTabEnabled(enabled);
+#endif
+}
+
 void MainWindow::onSynchronized() {
     this->updateNetStats();
     this->setStatusText("Synchronized");
@@ -828,6 +845,7 @@ void MainWindow::menuSettingsClicked() {
     connect(&settings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
     connect(&settings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
     connect(&settings, &Settings::skinChanged, this, &MainWindow::skinChanged);
+    connect(&settings, &Settings::websocketStatusChanged, m_windowManager, &WindowManager::onWebsocketStatusChanged);
     settings.exec();
 }
 

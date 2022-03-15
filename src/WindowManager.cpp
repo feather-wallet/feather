@@ -522,6 +522,10 @@ void WindowManager::onTorSettingsChanged() {
     emit torSettingsChanged();
 }
 
+void WindowManager::onWebsocketStatusChanged(bool enabled) {
+    emit websocketStatusChanged(enabled);
+}
+
 void WindowManager::initWS() {
     if (config()->get(Config::offlineMode).toBool()) {
         return;

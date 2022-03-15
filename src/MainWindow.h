@@ -182,6 +182,7 @@ private slots:
     void onUpdatesAvailable(const QJsonObject &updates);
     void toggleSearchbar(bool enabled);
     void tryStoreWallet();
+    void onWebsocketStatusChanged(bool enabled);
 
 private:
     friend WindowManager;

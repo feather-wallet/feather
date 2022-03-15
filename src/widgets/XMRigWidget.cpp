@@ -134,6 +134,10 @@ bool XMRigWidget::isMining() {
     return m_isMining;
 }
 
+void XMRigWidget::setDownloadsTabEnabled(bool enabled) {
+    ui->tabWidget->setTabVisible(2, enabled);
+}
+
 void XMRigWidget::onWalletClosed() {
     this->onStopClicked();
 }

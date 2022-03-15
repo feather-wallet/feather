@@ -33,6 +33,7 @@ public slots:
     void onCustomAddClicked();
     void onShowWSContextMenu(const QPoint &pos);
     void onShowCustomContextMenu(const QPoint &pos);
+    void onWebsocketStatusChanged();
 
 private slots:
     void onContextConnect();

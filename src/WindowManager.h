@@ -32,9 +32,11 @@ public:
 
 signals:
     void torSettingsChanged();
+    void websocketStatusChanged(bool enabled);
 
 public slots:
     void onTorSettingsChanged();
+    void onWebsocketStatusChanged(bool enabled);
     void tryOpenWallet(const QString &path, const QString &password);
 
 private slots:

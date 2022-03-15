@@ -26,6 +26,7 @@ public:
     QStandardItemModel *model();
 
     bool isMining();
+    void setDownloadsTabEnabled(bool enabled);
 
 public slots:
     void onWalletClosed();

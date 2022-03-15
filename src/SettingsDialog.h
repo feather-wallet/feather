@@ -28,6 +28,7 @@ signals:
     void skinChanged(QString skinName);
     void blockExplorerChanged(QString blockExplorer);
     void amountPrecisionChanged(int precision);
+    void websocketStatusChanged(bool enabled);
 
 public slots:
     void checkboxExternalLinkWarn();

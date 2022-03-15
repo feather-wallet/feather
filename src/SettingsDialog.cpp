@@ -94,14 +94,6 @@ void Settings::setupGeneralTab() {
     // [Balance display]
     ui->comboBox_balanceDisplay->setCurrentIndex(config()->get(Config::balanceDisplay).toInt());
     connect(ui->comboBox_balanceDisplay, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &Settings::comboBox_balanceDisplayChanged);
-
-    // [Offline mode]
-    ui->checkBox_offlineMode->setChecked(config()->get(Config::offlineMode).toBool());
-    connect(ui->checkBox_offlineMode, &QCheckBox::toggled, [this](bool checked){
-        config()->set(Config::offlineMode, checked);
-        m_ctx->wallet->setOffline(checked);
-        this->enableWebsocket(checked);
-    });
 }
 
 void Settings::setupPrivacyTab() {
@@ -129,7 +121,7 @@ void Settings::setupPrivacyTab() {
     ui->checkBox_disableWebsocket->setChecked(config()->get(Config::disableWebsocket).toBool());
     connect(ui->checkBox_disableWebsocket, &QCheckBox::toggled, [this](bool checked){
         config()->set(Config::disableWebsocket, checked);
-        this->enableWebsocket(checked);
+        this->enableWebsocket(!checked);
     });
 
     // [Do not write log files to disk]
@@ -147,6 +139,14 @@ void Settings::setupPrivacyTab() {
     });
     connect(ui->spinBox_inactivityLockTimeout, QOverload<int>::of(&QSpinBox::valueChanged), [](int value){
         config()->set(Config::inactivityLockTimeout, value);
+    });
+
+    // [Offline mode]
+    ui->checkBox_offlineMode->setChecked(config()->get(Config::offlineMode).toBool());
+    connect(ui->checkBox_offlineMode, &QCheckBox::toggled, [this](bool checked){
+        config()->set(Config::offlineMode, checked);
+        m_ctx->wallet->setOffline(checked);
+        this->enableWebsocket(!checked);
     });
 }
 
@@ -261,6 +261,8 @@ void Settings::enableWebsocket(bool enabled) {
     } else {
         websocketNotifier()->websocketClient.stop();
     }
+    ui->nodeWidget->onWebsocketStatusChanged();
+    emit websocketStatusChanged(enabled);
 }
 
 Settings::~Settings() = default;
