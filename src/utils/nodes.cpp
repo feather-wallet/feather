@@ -196,7 +196,6 @@ void Nodes::connectToNode(const FeatherNode &node) {
         return;
     }
 
-    emit updateStatus(QString("Connecting to %1").arg(node.toAddress()));
     qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress()).arg(node.custom ? "custom" : "ws");
 
     if (!node.url.userName().isEmpty() && !node.url.password().isEmpty())

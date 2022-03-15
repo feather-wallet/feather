@@ -181,7 +181,6 @@ private slots:
     void menuHwDeviceClicked();
     void onUpdatesAvailable(const QJsonObject &updates);
     void toggleSearchbar(bool enabled);
-    void onSetStatusText(const QString &text);
     void tryStoreWallet();
 
 private:

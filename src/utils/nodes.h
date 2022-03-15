@@ -137,7 +137,6 @@ public slots:
 signals:
     void WSNodeExhausted();
     void nodeExhausted();
-    void updateStatus(const QString &msg);
 
 private slots:
     void onWalletRefreshed();

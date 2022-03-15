@@ -383,7 +383,6 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
 
     // Nodes
-    connect(m_ctx->nodes, &Nodes::updateStatus,    this, &MainWindow::onSetStatusText);
     connect(m_ctx->nodes, &Nodes::nodeExhausted,   this, &MainWindow::showNodeExhaustedMessage);
     connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
 
@@ -511,10 +510,6 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     m_statusLabelBalance->setToolTip("Click for details");
     m_statusLabelBalance->setText(balance_str);
     m_balanceTickerWidget->setHidden(hide);
-}
-
-void MainWindow::onSetStatusText(const QString &text) {
-    this->setStatusText(text);
 }
 
 void MainWindow::setStatusText(const QString &text, bool override, int timeout) {
