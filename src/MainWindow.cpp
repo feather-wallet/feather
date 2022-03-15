@@ -130,7 +130,9 @@ void MainWindow::initStatusBar() {
     connect(m_statusLabelBalance, &ClickableLabel::clicked, this, &MainWindow::showBalanceDialog);
 
     m_statusBtnConnectionStatusIndicator = new StatusBarButton(icons()->icon("status_disconnected.svg"), "Connection status", this);
-    connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, this, &MainWindow::showConnectionStatusDialog);
+    connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, [this](){
+        this->onShowSettingsPage(2);
+    });
     this->statusBar()->addPermanentWidget(m_statusBtnConnectionStatusIndicator);
 
     m_statusAccountSwitcher = new StatusBarButton(icons()->icon("change_account.png"), "Account switcher", this);
@@ -747,45 +749,6 @@ void MainWindow::showSeedDialog() {
 
     SeedDialog dialog{m_ctx, this};
     dialog.exec();
-}
-
-void MainWindow::showConnectionStatusDialog() {
-    auto status = m_ctx->wallet->connectionStatus();
-    bool synchronized = m_ctx->wallet->isSynchronized();
-
-    QString statusMsg;
-    switch(status){
-        case Wallet::ConnectionStatus_Disconnected:
-            statusMsg = "Wallet is disconnected from node.";
-            break;
-        case Wallet::ConnectionStatus_Connecting: {
-            auto node = m_ctx->nodes->connection();
-            statusMsg = QString("Wallet is connecting to %1").arg(node.toAddress());
-            break;
-        }
-        case Wallet::ConnectionStatus_WrongVersion:
-            statusMsg = "Wallet is connected to incompatible node.";
-            break;
-        case Wallet::ConnectionStatus_Synchronizing:
-        case Wallet::ConnectionStatus_Synchronized: {
-            auto node = m_ctx->nodes->connection();
-            statusMsg = QString("Wallet is connected to %1 ").arg(node.toAddress());
-
-            if (synchronized) {
-                statusMsg += "and synchronized";
-            } else {
-                statusMsg += "and synchronizing";
-            }
-            break;
-        }
-        default:
-            statusMsg = "Unknown connection status (this should never happen).";
-    }
-
-    statusMsg += QString("\n\nTx: %1, Rx: %2").arg(Utils::formatBytes(m_ctx->wallet->getBytesSent()),
-                                                   Utils::formatBytes(m_ctx->wallet->getBytesReceived()));
-
-    QMessageBox::information(this, "Connection Status", statusMsg);
 }
 
 void MainWindow::showPasswordDialog() {

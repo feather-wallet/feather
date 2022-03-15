@@ -153,7 +153,6 @@ private slots:
     // Dialogs
     void showWalletInfoDialog();
     void showSeedDialog();
-    void showConnectionStatusDialog();
     void showPasswordDialog();
     void showKeysDialog();
     void showViewOnlyDialog();
