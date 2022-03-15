@@ -24,16 +24,12 @@ public:
     ~Settings() override;
 
 signals:
-    void closed();
     void preferredFiatCurrencyChanged(QString currency);
     void skinChanged(QString skinName);
-    void showHomeCCS(bool);
     void blockExplorerChanged(QString blockExplorer);
     void amountPrecisionChanged(int precision);
 
 public slots:
-    void updatePaths();
-    void copyToClipboard();
     void checkboxExternalLinkWarn();
     void fiatCurrencySelected(int index);
     void comboBox_skinChanged(int pos);
@@ -41,12 +37,17 @@ public slots:
     void comboBox_dateFormatChanged(int pos);
     void comboBox_timeFormatChanged(int pos);
     void comboBox_balanceDisplayChanged(int pos);
-
     void comboBox_blockExplorerChanged(int pos);
     void comboBox_redditFrontendChanged(int pos);
     void comboBox_localMoneroFrontendChanged(int pos);
 
 private:
+    void setupGeneralTab();
+    void setupPrivacyTab();
+    void setupNodeTab();
+    void setupPathsTab();
+    void setupLinksTab();
+
     void setupSkinCombobox();
     void setupLocalMoneroFrontendCombobox();
     void enableWebsocket(bool enabled);
