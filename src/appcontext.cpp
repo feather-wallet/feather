@@ -82,9 +82,9 @@ void AppContext::onCreateTransaction(const QString &address, quint64 amount, con
 
     qInfo() << "Creating transaction";
     if (all)
-        this->wallet->createTransactionAllAsync(address, "", constants::mixin, this->tx_priority);
+        this->wallet->createTransactionAllAsync(address, "", constants::mixin, this->tx_priority, m_selectedInputs);
     else
-        this->wallet->createTransactionAsync(address, "", amount, constants::mixin, this->tx_priority);
+        this->wallet->createTransactionAsync(address, "", amount, constants::mixin, this->tx_priority, m_selectedInputs);
 
     emit initiateTransaction();
 }
@@ -103,7 +103,7 @@ void AppContext::onCreateTransactionMultiDest(const QVector<QString> &addresses,
     }
 
     qInfo() << "Creating transaction";
-    this->wallet->createTransactionMultiDestAsync(addresses, amounts, this->tx_priority);
+    this->wallet->createTransactionMultiDestAsync(addresses, amounts, this->tx_priority, m_selectedInputs);
 
     emit initiateTransaction();
 }
@@ -131,6 +131,9 @@ void AppContext::onCancelTransaction(PendingTransaction *tx, const QVector<QStri
 }
 
 void AppContext::commitTransaction(PendingTransaction *tx, const QString &description) {
+    // Clear list of selected transfers
+    this->setSelectedInputs({});
+
     // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
     // To mitigate transactions failing we just send the transaction to every node we know about over Tor
     if (config()->get(Config::multiBroadcast).toBool()) {
@@ -179,6 +182,11 @@ void AppContext::onDeviceError(const QString &message) {
 }
 
 // ################## Misc ##################
+
+void AppContext::setSelectedInputs(const QStringList &selectedInputs) {
+    m_selectedInputs = selectedInputs;
+    emit selectedInputsChanged(selectedInputs);
+}
 
 void AppContext::onTorSettingsChanged() {
     if (Utils::isTorsocks()) {

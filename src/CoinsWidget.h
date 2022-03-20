@@ -26,6 +26,11 @@ public:
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
 
+    void setSpendSelected(const QStringList &pubkeys);
+
+signals:
+    void spendSelectedChanged(const QStringList &pubkeys);
+
 public slots:
     void setSearchbarVisible(bool visible);
     void focusSearchbar();
@@ -35,6 +40,7 @@ private slots:
     void setShowSpent(bool show);
     void freezeAllSelected();
     void thawAllSelected();
+    void spendSelected();
     void viewOutput();
     void onSweepOutputs();
     void setSearchFilter(const QString &filter);
@@ -43,6 +49,7 @@ private slots:
 private:
     void freezeCoins(QStringList &pubkeys);
     void thawCoins(QStringList &pubkeys);
+    void selectCoins(const QStringList &pubkeys);
 
     enum copyField {
         PubKey = 0,
@@ -60,6 +67,7 @@ private:
     QMenu *m_contextMenu;
     QMenu *m_headerMenu;
     QMenu *m_copyMenu;
+    QAction *m_spendAction;
     QAction *m_showSpentAction;
     QAction *m_freezeOutputAction;
     QAction *m_freezeAllSelectedAction;

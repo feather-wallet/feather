@@ -61,6 +61,8 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
     QVariant result;
 
     bool found = m_coins->coin(index.row(), [this, &index, &result, &role](const CoinsInfo &cInfo) {
+        bool selected = cInfo.keyImageKnown() && m_selected.contains(cInfo.keyImage());
+
         if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseTransactionInfo(cInfo, index.column(), role);
         }
@@ -73,6 +75,9 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             }
             else if (!cInfo.unlocked()) {
                 result = QBrush(ColorScheme::YELLOW.asColor(true));
+            }
+            else if (selected) {
+                result = QBrush(ColorScheme::GREEN.asColor(true));
             }
         }
         else if (role == Qt::TextAlignmentRole) {
@@ -121,6 +126,9 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             }
             else if (cInfo.spent()) {
                 result = "Output is spent";
+            }
+            else if (selected) {
+                result = "Coin selected to be spent";
             }
         }
     });
@@ -245,6 +253,14 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
 
 void CoinsModel::setCurrentSubaddressAccount(quint32 accountIndex) {
     m_currentSubaddressAccount = accountIndex;
+}
+
+void CoinsModel::setSelected(const QStringList &keyimages) {
+    m_selected.clear();
+    for (const auto &ki : keyimages) {
+        m_selected.insert(ki);
+    }
+    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
 CoinsInfo* CoinsModel::entryFromIndex(const QModelIndex &index) const {

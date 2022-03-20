@@ -140,6 +140,7 @@ private slots:
     void onEndTransaction();
     void onCustomRestoreHeightSet(int height);
     void onKeysCorrupted();
+    void onSelectedInputsChanged(const QStringList &selectedInputs);
 
     // libwalletqt
     void onBalanceUpdated(quint64 balance, quint64 spendable);

@@ -25,6 +25,7 @@
 #include "dialog/WalletCacheDebugDialog.h"
 #include "dialog/UpdateDialog.h"
 #include "libwalletqt/AddressBook.h"
+#include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/Transfer.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
@@ -217,6 +218,11 @@ void MainWindow::initWidgets() {
 #if defined(Q_OS_MACOS)
     ui->line->hide();
 #endif
+
+    ui->frame_coinControl->setVisible(false);
+    connect(ui->btn_resetCoinControl, &QPushButton::clicked, [this]{
+       m_ctx->setSelectedInputs({});
+    });
 }
 
 void MainWindow::initMenu() {
@@ -384,6 +390,7 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::endTransaction,           this, &MainWindow::onEndTransaction);
     connect(m_ctx.get(), &AppContext::customRestoreHeightSet,   this, &MainWindow::onCustomRestoreHeightSet);
     connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
+    connect(m_ctx.get(), &AppContext::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
 
     // Nodes
     connect(m_ctx->nodes, &Nodes::nodeExhausted,   this, &MainWindow::showNodeExhaustedMessage);
@@ -1443,6 +1450,24 @@ void MainWindow::onKeysCorrupted() {
         m_criticalWarningShown = true;
         QMessageBox::warning(this, "Critical error", "WARNING!\n\nThe wallet keys are corrupted.\n\nTo prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\nRestore your wallet from seed.\n\nPlease report this incident to the Feather developers.\n\nWARNING!");
         m_sendWidget->disableSendButton();
+    }
+}
+
+void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
+    int numInputs = selectedInputs.size();
+
+    ui->frame_coinControl->setStyleSheet(ColorScheme::GREEN.asStylesheet(true));
+    ui->frame_coinControl->setVisible(numInputs > 0);
+
+    if (numInputs > 0) {
+        quint64 totalAmount = 0;
+        auto coins = m_ctx->wallet->coins()->coinsFromKeyImage(selectedInputs);
+        for (const auto coin : coins) {
+            totalAmount += coin->amount();
+        }
+
+        QString text = QString("Coin control active: %1 selected outputs, %2 XMR").arg(QString::number(numInputs), WalletManager::displayAmount(totalAmount));
+        ui->label_coinControl->setText(text);
     }
 }
 

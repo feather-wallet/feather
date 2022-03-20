@@ -48,6 +48,7 @@ public:
     CoinsInfo* entryFromIndex(const QModelIndex &index) const;
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
+    void setSelected(const QStringList &selected);
 
 signals:
     void descriptionChanged();
@@ -61,6 +62,7 @@ private:
 
     Coins *m_coins;
     quint32 m_currentSubaddressAccount;
+    QSet<QString> m_selected;
 };
 
 #endif //FEATHER_COINSMODEL_H

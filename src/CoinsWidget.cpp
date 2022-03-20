@@ -46,12 +46,14 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     m_freezeAllSelectedAction = new QAction("Freeze selected", this);
     m_thawAllSelectedAction = new QAction("Thaw selected", this);
 
+    m_spendAction = new QAction("Spend", this);
     m_viewOutputAction = new QAction("Details", this);
     m_sweepOutputAction = new QAction("Sweep output", this);
     m_sweepOutputsAction = new QAction("Sweep selected outputs", this);
 
     connect(m_freezeOutputAction, &QAction::triggered, this, &CoinsWidget::freezeAllSelected);
     connect(m_thawOutputAction, &QAction::triggered, this, &CoinsWidget::thawAllSelected);
+    connect(m_spendAction, &QAction::triggered, this, &CoinsWidget::spendSelected);
     connect(m_viewOutputAction, &QAction::triggered, this, &CoinsWidget::viewOutput);
     connect(m_sweepOutputAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
     connect(m_sweepOutputsAction, &QAction::triggered, this, &CoinsWidget::onSweepOutputs);
@@ -68,6 +70,8 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     });
 
     connect(ui->search, &QLineEdit::textChanged, this, &CoinsWidget::setSearchFilter);
+
+    connect(m_ctx.get(), &AppContext::selectedInputsChanged, this, &CoinsWidget::selectCoins);
 }
 
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
@@ -106,6 +110,7 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
 
     auto *menu = new QMenu(ui->coins);
     if (list.size() > 1) {
+        menu->addAction(m_spendAction);
         menu->addAction(m_freezeAllSelectedAction);
         menu->addAction(m_thawAllSelectedAction);
         menu->addAction(m_sweepOutputsAction);
@@ -118,6 +123,7 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
         bool isFrozen = c->frozen();
         bool isUnlocked = c->unlocked();
 
+        menu->addAction(m_spendAction);
         menu->addMenu(m_copyMenu);
         menu->addAction(m_editLabelAction);
 
@@ -172,6 +178,18 @@ void CoinsWidget::freezeAllSelected() {
 void CoinsWidget::thawAllSelected() {
     QStringList pubkeys = this->selectedPubkeys();
     this->thawCoins(pubkeys);
+}
+
+void CoinsWidget::spendSelected() {
+    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
+
+    QStringList keyimages;
+    for (QModelIndex index: list) {
+        keyimages << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
+    }
+
+    m_ctx->setSelectedInputs(keyimages);
+    this->selectCoins(keyimages);
 }
 
 void CoinsWidget::viewOutput() {
@@ -292,6 +310,11 @@ void CoinsWidget::thawCoins(QStringList &pubkeys) {
     }
     m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
     m_ctx->updateBalance();
+}
+
+void CoinsWidget::selectCoins(const QStringList &keyimages) {
+    m_model->setSelected(keyimages);
+    ui->coins->clearSelection();
 }
 
 void CoinsWidget::editLabel() {

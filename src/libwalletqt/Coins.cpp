@@ -96,6 +96,19 @@ QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
     return coins;
 }
 
+QVector<CoinsInfo*> Coins::coinsFromKeyImage(const QStringList &keyimages) {
+    QVector<CoinsInfo*> coins;
+
+    for (int i = 0; i < this->count(); i++) {
+        CoinsInfo* coin = this->coin(i);
+        if (coin->keyImageKnown() && keyimages.contains(coin->keyImage())) {
+            coins.append(coin);
+        }
+    }
+
+    return coins;
+}
+
 void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const QString &description)
 {
     m_pimpl->setDescription(publicKey.toStdString(), description.toStdString());

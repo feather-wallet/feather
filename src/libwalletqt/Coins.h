@@ -21,17 +21,17 @@ class CoinsInfo;
 class Coins : public QObject
 {
 Q_OBJECT
-    Q_PROPERTY(int count READ count)
 
 public:
-    Q_INVOKABLE bool coin(int index, std::function<void (CoinsInfo &)> callback);
-    Q_INVOKABLE CoinsInfo * coin(int index);
-    Q_INVOKABLE void refresh(quint32 accountIndex);
-    Q_INVOKABLE void refreshUnlocked();
-    Q_INVOKABLE void freeze(QString &publicKey) const;
-    Q_INVOKABLE void thaw(QString &publicKey) const;
-    Q_INVOKABLE QVector<CoinsInfo*> coins_from_txid(const QString &txid);
-    Q_INVOKABLE void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
+    bool coin(int index, std::function<void (CoinsInfo &)> callback);
+    CoinsInfo * coin(int index);
+    void refresh(quint32 accountIndex);
+    void refreshUnlocked();
+    void freeze(QString &publicKey) const;
+    void thaw(QString &publicKey) const;
+    QVector<CoinsInfo*> coins_from_txid(const QString &txid);
+    QVector<CoinsInfo*> coinsFromKeyImage(const QStringList &keyimages);
+    void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
 
     quint64 count() const;
 

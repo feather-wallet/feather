@@ -271,30 +271,33 @@ public:
 
     //! creates transaction
     PendingTransaction * createTransaction(const QString &dst_addr, const QString &payment_id,
-                                                       quint64 amount, quint32 mixin_count,
-                                                       PendingTransaction::Priority priority);
+                                           quint64 amount, quint32 mixin_count,
+                                           PendingTransaction::Priority priority,
+                                           const QStringList &preferredInputs);
 
     //! creates async transaction
     void createTransactionAsync(const QString &dst_addr, const QString &payment_id,
-                                            quint64 amount, quint32 mixin_count,
-                                            PendingTransaction::Priority priority);
+                                quint64 amount, quint32 mixin_count,
+                                PendingTransaction::Priority priority, const QStringList &preferredInputs);
 
     //! creates multi-destination transaction
     PendingTransaction * createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
-                                                                PendingTransaction::Priority priority);
+                                                    PendingTransaction::Priority priority, const QStringList &preferredInputs);
 
     //! creates async multi-destination transaction
     void createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
-                                                     PendingTransaction::Priority priority);
+                                         PendingTransaction::Priority priority, const QStringList &preferredInputs);
 
 
     //! creates transaction with all outputs
     PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
-                                                          quint32 mixin_count, PendingTransaction::Priority priority);
+                                              quint32 mixin_count, PendingTransaction::Priority priority,
+                                              const QStringList &preferredInputs);
 
     //! creates async transaction with all outputs
     void createTransactionAllAsync(const QString &dst_addr, const QString &payment_id,
-                                               quint32 mixin_count, PendingTransaction::Priority priority);
+                                   quint32 mixin_count, PendingTransaction::Priority priority,
+                                   const QStringList &preferredInputs);
 
     //! creates transaction with single input
     PendingTransaction * createTransactionSingle(const QString &key_image, const QString &dst_addr,

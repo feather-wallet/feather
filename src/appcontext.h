@@ -49,6 +49,8 @@ public:
     void addCacheTransaction(const QString &txid, const QString &txHex) const;
     QString getCacheTransaction(const QString &txid) const;
 
+    void setSelectedInputs(const QStringList &selectedInputs);
+
 public slots:
     void onCreateTransaction(const QString &address, quint64 amount, const QString &description, bool all);
     void onCreateTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
@@ -93,10 +95,12 @@ signals:
     void deviceButtonPressed();
     void deviceError(const QString &message);
     void keysCorrupted();
+    void selectedInputsChanged(const QStringList &selectedInputs);
 
 private:
     DaemonRpc *m_rpc;
     QTimer m_storeTimer;
+    QStringList m_selectedInputs;
 };
 
 #endif //FEATHER_APPCONTEXT_H
