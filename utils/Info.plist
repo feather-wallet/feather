@@ -19,12 +19,15 @@
 
   <key>CFBundleExecutable</key>
   <string>feather</string>
-  
+
   <key>CFBundleName</key>
   <string>Feather</string>
 
   <key>NSHumanReadableCopyright</key>
   <string>Copyright © 2014-2021 The Monero Project</string>
+
+  <key>NSCameraUsageDescription</key>
+  <string>Camera is used to scan QR codes on demand.</string>
 
   <key>CFBundleIdentifier</key>
   <string>org.monero-project.feather</string>
