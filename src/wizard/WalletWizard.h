@@ -25,7 +25,8 @@ enum WizardMode {
 enum DeviceType {
     LEDGER_NANO_S = 0,
     LEDGER_NANO_X,
-    TREZOR_MODEL_T
+    TREZOR_MODEL_T,
+    LEDGER_NANO_S_PLUS
 };
 
 struct WizardFields {

@@ -96,6 +96,7 @@ void WalletWizard::onCreateWallet() {
         QString deviceName;
         switch (m_wizardFields.deviceType) {
             case DeviceType::LEDGER_NANO_S:
+            case DeviceType::LEDGER_NANO_S_PLUS:
             case DeviceType::LEDGER_NANO_X:
                 deviceName = "Ledger";
                 break;
