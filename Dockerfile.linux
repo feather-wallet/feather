@@ -73,7 +73,7 @@ RUN git clone -b 2.13.92 --depth 1 https://gitlab.freedesktop.org/fontconfig/fon
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-ENV QT_VERSION=v5.15.3-lts-lgpl
+ENV QT_VERSION=v5.15.4-lts-lgpl
 RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
     cd qt5 && \
     git clone git://code.qt.io/qt/qtbase.git -b ${QT_VERSION} --depth 1 && \
