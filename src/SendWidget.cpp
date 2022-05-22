@@ -142,11 +142,9 @@ void SendWidget::sendClicked() {
         return;
     }
 
-    QString currency = ui->comboCurrencySelection->currentText();
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
-    QString description = ui->lineDescription->text();
     if (recipient.isEmpty()) {
-        QMessageBox::warning(this, "Malformed recipient", "No destination address was entered.");
+        QMessageBox::warning(this, "Error", "No destination address was entered.");
         return;
     }
 
@@ -158,13 +156,15 @@ void SendWidget::sendClicked() {
             errorText += QString("Line #%1:\n%2\n").arg(QString::number(error.idx + 1), error.error);
         }
 
-        QMessageBox::warning(this, "Warning", QString("Invalid lines found:\n\n%1").arg(errorText));
+        QMessageBox::warning(this, "Error", QString("Invalid lines found:\n\n%1").arg(errorText));
         return;
     }
 
+    QString description = ui->lineDescription->text();
+
     if (!outputs.empty()) { // multi destination transaction
         if (outputs.size() > 16) {
-            QMessageBox::warning(this, "Warning", "Maximum number of outputs (16) exceeded.");
+            QMessageBox::warning(this, "Error", "Maximum number of outputs (16) exceeded.");
             return;
         }
 
@@ -179,23 +179,21 @@ void SendWidget::sendClicked() {
         return;
     }
 
-    quint64 amount;
-    if (currency == "XMR") {
-        amount = this->amount();
-        bool sendAll = (ui->lineAmount->text() == "all");
-        if (amount == 0 && !sendAll) {
-            QMessageBox::warning(this, "Amount error", "No amount was entered.");
-            return;
-        }
-        m_ctx->onCreateTransaction(recipient, amount, description, sendAll);
-    } else {
-        amount = WalletManager::amountFromDouble(this->conversionAmount());
-        if (amount == 0) {
-            QMessageBox::warning(this, "Fiat conversion error", "Could not create transaction.");
-            return;
-        }
-        m_ctx->onCreateTransaction(recipient, amount, description, false);
+    bool sendAll = (ui->lineAmount->text() == "all");
+    QString currency = ui->comboCurrencySelection->currentText();
+    quint64 amount = this->amount();
+
+    if (amount == 0 && !sendAll) {
+        QMessageBox::warning(this, "Error", "No amount was entered.");
+        return;
     }
+
+    if (currency != "XMR" && !sendAll) {
+        // Convert fiat amount to XMR, but only if we're not sending the entire balance
+        amount = WalletManager::amountFromDouble(this->conversionAmount());
+    }
+
+    m_ctx->onCreateTransaction(recipient, amount, description, sendAll);
 }
 
 void SendWidget::aliasClicked() {
@@ -248,10 +246,14 @@ double SendWidget::conversionAmount() {
 quint64 SendWidget::amount() {
     // grab amount from "amount" text box
     QString amount = ui->lineAmount->text();
-    if (amount == "all") return 0;
+    if (amount == "all") {
+        return 0;
+    }
 
     amount.replace(',', '.');
-    if (amount.isEmpty()) return 0;
+    if (amount.isEmpty()) {
+        return 0;
+    }
 
     return WalletManager::amountFromString(amount);
 }
