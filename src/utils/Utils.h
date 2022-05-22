@@ -22,6 +22,7 @@ namespace Utils
     QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
 
     bool dirExists(const QString &path);
+    bool portableFileExists(const QString &dir);
     QString defaultWalletDir();
     QString applicationPath();
 

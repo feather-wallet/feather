@@ -168,9 +168,9 @@ Config::Config(QObject* parent)
 }
 
 QDir Config::defaultConfigDir() {
-    QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
-    if (QFile::exists(portablePath.arg(".portable")) || QFile::exists(portablePath.arg(".portable.txt"))) {
-        return portablePath.arg("feather_data");
+    QString portablePath = QCoreApplication::applicationDirPath();
+    if (Utils::portableFileExists(portablePath)) {
+        return portablePath + "/feather_data";
     }
 
     if (TailsOS::detect()) {

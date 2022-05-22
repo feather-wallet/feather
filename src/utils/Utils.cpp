@@ -102,10 +102,18 @@ bool dirExists(const QString &path) {
     return pathDir.exists();
 }
 
+bool portableFileExists(const QString &dir) {
+    QStringList portableFiles = {".portable", ".portable.txt", "portable.txt"};
+
+    return std::find_if(portableFiles.begin(), portableFiles.end(), [dir](const QString &portableFile){
+        return QFile::exists(dir + "/" + portableFile);
+    }) != portableFiles.end();
+}
+
 QString defaultWalletDir() {
-    QString portablePath = QCoreApplication::applicationDirPath().append("/%1");
-    if (QFile::exists(portablePath.arg(".portable")) || QFile::exists(portablePath.arg(".portable.txt"))) {
-        return portablePath.arg("feather_data/wallets");
+    QString portablePath = QCoreApplication::applicationDirPath();
+    if (Utils::portableFileExists(portablePath)) {
+        return portablePath + "/feather_data/wallets";
     }
 
     if (TailsOS::detect()) {
