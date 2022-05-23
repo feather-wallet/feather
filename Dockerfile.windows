@@ -31,9 +31,9 @@ RUN git clone -b v3.22.2 --depth 1 https://github.com/Kitware/CMake && \
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-RUN git clone -b v0.17.3.0 --depth 1 https://github.com/monero-project/monero && \
+RUN git clone -b master https://github.com/monero-project/monero && \
     cd monero && \
-    git reset --hard ab18fea3500841fc312630d49ed6840b3aedb34d && \
+    git reset --hard 9aab19f349433687c7aaf2c1cbc5751e5912c0aa && \
     cp -a contrib/depends / && \
     cd .. && \
     rm -rf monero
@@ -164,3 +164,5 @@ RUN git clone -b 0.23.92 --depth 1 --recursive https://github.com/mchehab/zbar.g
     make -j$THREADS && \
     make install && \
     rm -rf $(pwd)
+
+RUN git config --global --add safe.directory /feather/monero
