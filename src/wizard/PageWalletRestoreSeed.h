@@ -54,6 +54,7 @@ private:
     Ui::PageWalletRestoreSeed *ui;
     WizardFields *m_fields;
 
+    seedType m_polyseed;
     seedType m_tevador;
     seedType m_legacy;
 

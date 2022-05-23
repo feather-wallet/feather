@@ -264,12 +264,12 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     }
 
     Wallet *wallet = nullptr;
-    if (seed.type == Seed::Type::TEVADOR) {
+    if (seed.type == Seed::Type::POLYSEED || seed.type == Seed::Type::TEVADOR) {
         wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, constants::networkType, seed.spendKey, seed.restoreHeight, constants::kdfRounds, seedOffset);
         wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
         wallet->setCacheAttribute("feather.seedoffset", seedOffset);
     }
-    if (seed.type == Seed::Type::MONERO) {
+    else if (seed.type == Seed::Type::MONERO) {
         wallet = m_walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, constants::networkType, seed.restoreHeight, constants::kdfRounds);
     }
 

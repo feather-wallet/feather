@@ -307,3 +307,15 @@ RUN git clone -b stable-0.21 --recursive https://github.com/mchehab/zbar.git && 
     make -j$THREADS && \
     make install && \
     rm -rf $(pwd)
+
+# polyseed: Required for Feather
+RUN git clone https://github.com/tevador/polyseed.git && \
+    cd polyseed && \
+    git reset --hard 4945d8239d6b26dc12723ca2aaa9f8110ceff5af && \
+    mkdir build && \
+    cd build && \
+    cmake .. && \
+    make && \
+    make install && \
+    rm /usr/local/lib/libpolyseed.so* && \
+    rm -rf $(pwd)

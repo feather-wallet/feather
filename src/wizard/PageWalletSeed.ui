@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>877</width>
-    <height>625</height>
+    <width>654</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -57,7 +57,7 @@
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Store your 14-word wallet seed in a safe location.</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Store your &lt;span style=&quot; font-weight:600;&quot;&gt;16-word&lt;/span&gt; seed in a safe location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -71,6 +71,84 @@
           </property>
           <property name="wordWrap">
            <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QFrame" name="frame_18">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_20">
+      <item>
+       <widget class="QLabel" name="newSeedWarningIcon">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>icon</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Fixed</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>5</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <layout class="QVBoxLayout" name="verticalLayout_9">
+        <item>
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather recently switched to a new seed scheme called &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>Please take note that mnemonic seeds now consist of 16 words instead of 14.</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_12">
+          <property name="text">
+           <string>For more information visit: docs.featherwallet.org/guides/seed-scheme</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+          <property name="textInteractionFlags">
+           <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
           </property>
          </widget>
         </item>
@@ -225,14 +303,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_13">
+           <widget class="QFrame" name="frame_3">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_11">
+            <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -240,7 +318,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_27">
+              <widget class="QLabel" name="label_7">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -248,12 +326,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>4.</string>
+                <string>5.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord4">
+              <widget class="QLabel" name="seedWord5">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -263,14 +341,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_11">
+           <widget class="QFrame" name="frame_5">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
+            <layout class="QHBoxLayout" name="horizontalLayout_15">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -278,7 +356,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_19">
+              <widget class="QLabel" name="label_29">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -286,50 +364,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>7.</string>
+                <string>9.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord7">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_8">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <property name="topMargin">
-              <number>7</number>
-             </property>
-             <property name="bottomMargin">
-              <number>7</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_13">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>10.</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="seedWord10">
+              <widget class="QLabel" name="seedWord9">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -409,7 +449,7 @@
               </widget>
              </item>
              <item>
-              <widget class="HelpLabel" name="seedWord2">
+              <widget class="QLabel" name="seedWord2">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -419,14 +459,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_3">
+           <widget class="QFrame" name="frame_7">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <layout class="QHBoxLayout" name="horizontalLayout_5">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -434,7 +474,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_7">
+              <widget class="QLabel" name="label_11">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -442,12 +482,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>5.</string>
+                <string>6.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord5">
+              <widget class="QLabel" name="seedWord6">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -457,14 +497,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_14">
+           <widget class="QFrame" name="frame_8">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_13">
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -472,7 +512,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_25">
+              <widget class="QLabel" name="label_13">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -480,50 +520,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>8.</string>
+                <string>10.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord8">
-               <property name="text">
-                <string>TextLabel</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </widget>
-          </item>
-          <item>
-           <widget class="QFrame" name="frame_12">
-            <property name="frameShape">
-             <enum>QFrame::StyledPanel</enum>
-            </property>
-            <property name="frameShadow">
-             <enum>QFrame::Raised</enum>
-            </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
-             <property name="topMargin">
-              <number>7</number>
-             </property>
-             <property name="bottomMargin">
-              <number>7</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_21">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>11.</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="seedWord11">
+              <widget class="QLabel" name="seedWord10">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -613,14 +615,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_7">
+           <widget class="QFrame" name="frame_11">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -628,7 +630,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_11">
+              <widget class="QLabel" name="label_19">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -636,12 +638,12 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>6.</string>
+                <string>7.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord6">
+              <widget class="QLabel" name="seedWord7">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -651,14 +653,14 @@
            </widget>
           </item>
           <item>
-           <widget class="QFrame" name="frame_5">
+           <widget class="QFrame" name="frame_12">
             <property name="frameShape">
              <enum>QFrame::StyledPanel</enum>
             </property>
             <property name="frameShadow">
              <enum>QFrame::Raised</enum>
             </property>
-            <layout class="QHBoxLayout" name="horizontalLayout_15">
+            <layout class="QHBoxLayout" name="horizontalLayout_10">
              <property name="topMargin">
               <number>7</number>
              </property>
@@ -666,7 +668,7 @@
               <number>7</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_29">
+              <widget class="QLabel" name="label_21">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                  <horstretch>0</horstretch>
@@ -674,12 +676,130 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>9.</string>
+                <string>11.</string>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="seedWord9">
+              <widget class="QLabel" name="seedWord11">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_16">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_18">
+             <property name="topMargin">
+              <number>7</number>
+             </property>
+             <property name="bottomMargin">
+              <number>7</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_2">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>15.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="seedWord15">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout" name="verticalLayout_8">
+          <item>
+           <widget class="QFrame" name="frame_13">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_11">
+             <property name="topMargin">
+              <number>7</number>
+             </property>
+             <property name="bottomMargin">
+              <number>7</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_27">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>4.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="seedWord4">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QFrame" name="frame_14">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_13">
+             <property name="topMargin">
+              <number>7</number>
+             </property>
+             <property name="bottomMargin">
+              <number>7</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_25">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>8.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="seedWord8">
                <property name="text">
                 <string>TextLabel</string>
                </property>
@@ -727,10 +847,41 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string/>
+           <widget class="QFrame" name="frame_17">
+            <property name="frameShape">
+             <enum>QFrame::StyledPanel</enum>
             </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QHBoxLayout" name="horizontalLayout_19">
+             <property name="topMargin">
+              <number>7</number>
+             </property>
+             <property name="bottomMargin">
+              <number>7</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_3">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>16.</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="seedWord16">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </widget>
           </item>
          </layout>
@@ -792,13 +943,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>HelpLabel</class>
-   <extends>QLabel</extends>
-   <header>components.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
