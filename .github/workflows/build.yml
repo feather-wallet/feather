@@ -92,8 +92,8 @@ jobs:
         run: CMAKE_PREFIX_PATH=/usr/local/opt/qt@5/ make mac-release -j3
       - name: create .tar
         run: tar -cf feather.tar feather.app
-        working-directory: build/release/bin
+        working-directory: build/bin
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.job }}
-          path: build/release/bin/feather.tar
+          path: build/bin/feather.tar
