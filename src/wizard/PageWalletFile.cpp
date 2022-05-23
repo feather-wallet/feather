@@ -99,11 +99,10 @@ QString PageWalletFile::defaultWalletName() {
         QString walletStr = QString("wallet_%1");
         if (m_fields->mode == WizardMode::CreateWalletFromDevice) {
             switch (m_fields->deviceType) {
-                case DeviceType::LEDGER_NANO_S:
-                case DeviceType::LEDGER_NANO_X:
+                case DeviceType::LEDGER:
                     walletStr = QString("ledger_%1");
                     break;
-                case DeviceType::TREZOR_MODEL_T:
+                case DeviceType::TREZOR:
                     walletStr = QString("trezor_%1");
             }
         }
