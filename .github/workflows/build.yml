@@ -87,6 +87,6 @@ jobs:
         with:
           submodules: recursive
       - name: install dependencies
-        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt@5 libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkg-config
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt@5 libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
       - name: build
         run: CMAKE_PREFIX_PATH=/opt/homebrew/opt/qt@5/ make mac-release -j3
