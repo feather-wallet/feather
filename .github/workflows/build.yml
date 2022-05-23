@@ -73,12 +73,12 @@ jobs:
       - name: build
         run: docker run --rm -v $PWD:/feather -w /feather feather:win sh -c 'make release-static-windows root=/depends target=x86_64-w64-mingw32 tag=win-x64 -j3'
       - name: sha256sum
-        run: shasum -a256 /home/runner/work/feather/feather/build/release/bin/feather.exe
+        run: shasum -a256 /home/runner/work/feather/feather/build/x86_64-w64-mingw32/release/bin/feather.exe
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ github.job }}
           path: |
-            /home/runner/work/feather/feather/build/release/bin/feather.exe
+            /home/runner/work/feather/feather/build/x86_64-w64-mingw32/release/bin/feather.exe
 
   macos:
     runs-on: macOS-latest
@@ -90,3 +90,10 @@ jobs:
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt@5 libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
       - name: build
         run: CMAKE_PREFIX_PATH=/usr/local/opt/qt@5/ make mac-release -j3
+      - name: create .tar
+        run: tar -cf feather.tar feather.app
+        working-directory: build/release/bin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.job }}
+          path: build/release/bin/feather.tar
