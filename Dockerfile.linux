@@ -166,6 +166,15 @@ RUN git clone -b v3.10.0 --depth 1 https://github.com/protocolbuffers/protobuf &
     make -j$THREADS install && \
     rm -rf $(pwd)
 
+# unbound: Required for libwallet
+RUN git clone -b release-1.13.2 --depth 1 https://github.com/NLnetLabs/unbound.git && \
+    cd unbound && \
+    git reset --hard 8e538dcaa8df2d0fab8ff3dcf94ac1f972450b66 && \
+    ./configure --disable-shared --enable-static --without-pyunbound --with-libexpat=/usr/local/ --with-ssl=/usr/local/openssl --with-libevent=no --without-pythonmodule --disable-flto --with-pthreads --with-libunbound-only --with-pic && \
+    make -j$THREADS && \
+    make -j$THREADS install && \
+    rm -rf $(pwd)
+
 # squashfs-tools: Used to create Feather AppImage
 RUN git clone https://github.com/plougher/squashfs-tools.git && \
     cd squashfs-tools/squashfs-tools && \
