@@ -21,7 +21,7 @@ jobs:
       - name: prepare build environment
         run: docker build -t feather:linux -f Dockerfile.linux --build-arg THREADS=3 .
       - name: build
-        run: docker run --rm -it -v /home/runner/work/feather/feather:/feather -w /feather feather:linux sh -c 'WITH_SCANNER=Off make release-static -j3'
+        run: docker run --rm -v /home/runner/work/feather/feather:/feather -w /feather feather:linux sh -c 'WITH_SCANNER=Off make release-static -j3'
       - name: sha256sum
         run: shasum -a256 /home/runner/work/feather/feather/build/release/bin/feather
       - uses: actions/upload-artifact@v2
