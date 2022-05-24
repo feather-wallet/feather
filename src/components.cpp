@@ -89,7 +89,11 @@ void HelpLabel::mouseReleaseEvent(QMouseEvent *event)
     QMessageBox::information(this, "Help", this->help_text);
 }
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 void HelpLabel::enterEvent(QEvent *event)
+#else
+void HelpLabel::enterEvent(QEnterEvent *event)
+#endif
 {
    font.setUnderline(true);
    setFont(font);
