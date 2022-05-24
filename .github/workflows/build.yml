@@ -89,7 +89,7 @@ jobs:
       - name: install dependencies
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt@5 libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
       - name: install polyseed
-        run: git clone https://github.com/tevador/polyseed.git && cd polyseed && git reset --hard 4945d8239d6b26dc12723ca2aaa9f8110ceff5af && iconv -f iso-8859-1 -t utf-8 -o src/lang_pt.c src/lang_pt.c && cmake . && make && make install
+        run: git clone -b apple_pt https://github.com/tobtoht/polyseed.git && cd polyseed && git reset --hard f8eea85b94a9f33f1aeaaabd67fc30be0c2b1c8f && cmake . && make && make install
       - name: build
         run: CMAKE_PREFIX_PATH=/usr/local/opt/qt@5/ make mac-release -j3
       - name: create .tar
