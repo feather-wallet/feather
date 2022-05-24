@@ -252,7 +252,6 @@ target_link_libraries(feather
         Qt::Gui
         Qt::Network
         Qt::Svg
-        Qt::SvgWidgets
         Qt::Xml
         Qt::WebSockets
         ${ICU_LIBRARIES}
@@ -265,6 +264,10 @@ target_link_libraries(feather
         ${POLYSEED_LIBRARY}
         SingleApplication::SingleApplication
         )
+
+if(Qt6_FOUND)
+    target_link_libraries(feather Qt::SvgWidgets)
+endif()
 
 if(DEVICE_TREZOR_READY)
     target_link_libraries(feather ${TREZOR_DEP_LIBS})
@@ -279,20 +282,20 @@ endif()
 
 if(NOT APPLE AND NOT Qt6_FOUND)
     target_link_libraries(feather
-            Qt::QSvgIconPlugin
-            Qt::QSvgPlugin
+            Qt5::QSvgIconPlugin
+            Qt5::QSvgPlugin
     )
 endif()
 
-if(STATIC)
+if(STATIC AND NOT Qt6_FOUND)
     if(NOT Qt6_FOUND)
     target_link_libraries(feather
-            Qt::QSvgIconPlugin
-            Qt::QSvgPlugin)
+            Qt5::QSvgIconPlugin
+            Qt5::QSvgPlugin)
     endif()
     if(UNIX AND NOT APPLE)
         target_link_libraries(feather
-            Qt::QXcbIntegrationPlugin)
+            Qt5::QXcbIntegrationPlugin)
     endif()
 endif()
 
