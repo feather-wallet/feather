@@ -107,11 +107,7 @@ message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
 add_subdirectory(contrib/monero-seed)
 
 # Polyseed 16 word mnemonic seeds
-find_path(POLYSEED_INCLUDE_DIR polyseed.h)
-message(STATUS "POLYSEED PATH ${POLYSEED_INCLUDE_DIR}")
-
-find_library(POLYSEED_LIBRARY polyseed)
-message(STATUS "POLYSEED LIBARY ${POLYSEED_LIBRARY}")
+find_package(Polyseed REQUIRED)
 
 # libzip
 find_package(zlib CONFIG)
