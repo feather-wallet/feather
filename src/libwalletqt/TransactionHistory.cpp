@@ -202,7 +202,7 @@ bool TransactionHistory::writeCSV(const QString &path) {
 
         // format and write
         QString line = QString("\n%1,%2,\"%3\",%4,\"%5\",%6,%7,%8,\"%9\",\"%10\",\"%11\",%12,\"%13\"")
-                .arg(QString::number(info.blockHeight()), QString::number(timeStamp.toTime_t()), date,
+                .arg(QString::number(info.blockHeight()), QString::number(timeStamp.toSecsSinceEpoch()), date,
                      QString::number(info.subaddrAccount()), direction, balanceDelta, info.displayAmount(),
                      info.fee(), info.hash(), info.description(), paymentId, fiatAmount, preferredFiatSymbol);
         data += line;
