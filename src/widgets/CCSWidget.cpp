@@ -17,11 +17,7 @@ CCSWidget::CCSWidget(QWidget *parent)
         , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
-    auto progressDelegate = new CCSProgressDelegate(m_model, this);
     ui->tableView->setModel(m_model);
-#ifndef Q_OS_MACOS
-    ui->tableView->setItemDelegateForColumn(2, progressDelegate);
-#endif
     this->setupTable();
 
     m_contextMenu->addAction("View proposal", this, &CCSWidget::linkClicked);
