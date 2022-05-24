@@ -156,8 +156,8 @@ void LocalMoneroModel::setPaymentMethods(const QJsonObject &data) {
     m_paymentMethods = data;
     m_paymentMethodNames.clear();
     for (const auto &payment_method : data) {
-        auto code = payment_method["code"].toString();
-        auto name = payment_method["name"].toString();
+        auto code = payment_method.toObject()["code"].toString();
+        auto name = payment_method.toObject()["name"].toString();
 
         if (!code.isEmpty() && !name.isEmpty()) {
             m_paymentMethodNames[code] = name;
