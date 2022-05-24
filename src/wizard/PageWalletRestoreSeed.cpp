@@ -37,12 +37,13 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     QStringList bip39English;
     for (int i = 0; i != 2048; i++)
         bip39English << QString::fromStdString(wordlist::english.get_word(i));
-    // Restore has limited error correction capability, namely it can correct a single erasure
-    // (illegible word with a known location). This can be tested by replacing a word with xxxx
-    bip39English << "xxxx";
 
     m_polyseed.length = 16;
     m_polyseed.setWords(bip39English);
+
+    // Restore has limited error correction capability, namely it can correct a single erasure
+    // (illegible word with a known location). This can be tested by replacing a word with xxxx
+    bip39English << "xxxx";
 
     m_tevador.length = 14;
     m_tevador.setWords(bip39English);
