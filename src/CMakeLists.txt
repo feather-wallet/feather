@@ -21,7 +21,7 @@ if (WITH_SCANNER)
             MultimediaWidgets)
 endif()
 
-find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS} SvgWidgets)
+find_package(Qt6 COMPONENTS ${QT_COMPONENTS} SvgWidgets)
 if (NOT Qt6_FOUND)
     find_package(Qt5 5.15 REQUIRED COMPONENTS ${QT_COMPONENTS})
 endif()
