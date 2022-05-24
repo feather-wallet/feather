@@ -1665,11 +1665,12 @@ void MainWindow::checkUserActivity() {
             this->setEnabled(false);
             this->close();
             // This doesn't close the wallet immediately.
-            do {
+            // FIXME
+//            do {
                 QApplication::processEvents();
                 // Because running it a single time is apparently not enough.
                 // TODO: Qt bug? Need proper fix for this.
-            } while (QApplication::hasPendingEvents());
+//            } while (QApplication::hasPendingEvents());
         } else {
             m_checkUserActivity.start();
         }
