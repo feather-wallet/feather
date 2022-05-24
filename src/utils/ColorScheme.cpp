@@ -15,7 +15,7 @@ ColorSchemeItem ColorScheme::GRAY    = ColorSchemeItem("gray", "gray");
 
 bool ColorScheme::hasDarkBackground(QWidget *widget) {
     int r, g, b;
-    widget->palette().color(QPalette::Background).getRgb(&r, &g, &b);
+    widget->palette().color(QPalette::Window).getRgb(&r, &g, &b);
     auto brightness = r + g + b;
     return brightness < (255*3/2);
 }
