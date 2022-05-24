@@ -3,6 +3,9 @@ project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 set(VERSION_MAJOR "1")
 set(VERSION_MINOR "0")
 set(VERSION_REVISION "1")

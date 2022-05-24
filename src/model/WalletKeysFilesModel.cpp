@@ -98,7 +98,7 @@ void WalletKeysFilesModel::findWallets() {
         if (Utils::fileExists(basePath + ".address.txt")) {
             QFile file(basePath + ".address.txt");
             file.open(QFile::ReadOnly | QFile::Text);
-            const QString _address = QTextCodec::codecForMib(106)->toUnicode(file.readAll());
+            const QString _address = QString::fromUtf8(file.readAll());
 
             if (!_address.isEmpty()) {
                 addr = _address;

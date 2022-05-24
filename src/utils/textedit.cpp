@@ -55,6 +55,7 @@
 #include <QtDebug>
 #include <QApplication>
 #include <QScrollBar>
+#include <QFile>
 
 
 TextEdit::TextEdit(QWidget *parent) : QTextEdit(parent) { }

@@ -14,7 +14,7 @@ TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirecto
 
 double TxFiatHistory::get(int timestamp) {
     QDateTime ts;
-    ts.setTime_t(timestamp);
+    ts.setSecsSinceEpoch(timestamp);
     auto key = ts.toString("yyyyMMdd");
     return this->get(key);  // USD
 }

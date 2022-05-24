@@ -5,7 +5,7 @@ set(CMAKE_AUTOUIC ON)
 # pthread
 find_package(Threads REQUIRED)
 
-set(QT5_COMPONENTS
+set(QT_COMPONENTS
         Core
         Widgets
         Gui
@@ -16,19 +16,22 @@ set(QT5_COMPONENTS
 )
 
 if (WITH_SCANNER)
-    list(APPEND QT5_COMPONENTS
+    list(APPEND QT_COMPONENTS
             Multimedia
             MultimediaWidgets)
 endif()
 
-find_package(Qt5 REQUIRED COMPONENTS ${QT5_COMPONENTS})
+find_package(Qt6 COMPONENTS ${QT_COMPONENTS} SvgWidgets)
+if (NOT Qt6_FOUND)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS ${QT_COMPONENTS})
+endif()
 
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(third-party/singleapplication)
 
 add_subdirectory(openpgp)
 
-qt5_add_resources(RESOURCES assets.qrc assets_tor.qrc)
+qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
 
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
@@ -67,7 +70,7 @@ file(GLOB SOURCE_FILES
         "qrcode_scanner/QrCodeUtils.h"
         )
 
-if (WITH_SCANNER)
+if (WITH_SCANNER AND NOT Qt6_FOUND)
     file(GLOB SCANNER_FILES
             "qrcode_scanner/*.h"
             "qrcode_scanner/*.cpp")
@@ -84,8 +87,8 @@ if(MINGW)
     set(ICON_RC ${CMAKE_CURRENT_BINARY_DIR}/icon.rc)
     set(ICON_RES ${CMAKE_CURRENT_BINARY_DIR}/icon.o)
     file(WRITE ${ICON_RC} "IDI_ICON1 ICON DISCARDABLE \"${ICON}\"")
-    find_program(Qt5_WINDRES_EXECUTABLE NAMES windres x86_64-w64-mingw32-windres REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
-    add_custom_command(OUTPUT ${ICON_RES} COMMAND ${Qt5_WINDRES_EXECUTABLE} ${ICON_RC} ${ICON_RES} MAIN_DEPENDENCY ${ICON_RC})
+    find_program(Qt_WINDRES_EXECUTABLE NAMES windres x86_64-w64-mingw32-windres REQUIRED CMAKE_FIND_ROOT_PATH_BOTH)
+    add_custom_command(OUTPUT ${ICON_RES} COMMAND ${Qt_WINDRES_EXECUTABLE} ${ICON_RC} ${ICON_RES} MAIN_DEPENDENCY ${ICON_RC})
     list(APPEND RESOURCES ${ICON_RES})
 endif()
 
@@ -112,7 +115,7 @@ set_target_properties(feather PROPERTIES
 
 set_property(TARGET feather PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-target_include_directories(feather PUBLIC ${Qt5Gui_PRIVATE_INCLUDE_DIRS})
+target_include_directories(feather PUBLIC ${QtGui_PRIVATE_INCLUDE_DIRS})
 
 target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
@@ -130,13 +133,14 @@ target_include_directories(feather PUBLIC
         ${X11_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${OPENSSL_INCLUDE_DIR}
-        ${Qt5Core_INCLUDE_DIRS}
-        ${Qt5Widgets_INCLUDE_DIRS}
-        ${Qt5Gui_INCLUDE_DIRS}
-        ${Qt5Network_INCLUDE_DIRS}
-        ${Qt5Svg_INCLUDE_DIRS}
-        ${Qt5Xml_INCLUDE_DIRS}
-        ${Qt5WebSockets_INCLUDE_DIRS}
+        ${QtCore_INCLUDE_DIRS}
+        ${QtWidgets_INCLUDE_DIRS}
+        ${QtGui_INCLUDE_DIRS}
+        ${QtNetwork_INCLUDE_DIRS}
+        ${QtSvg_INCLUDE_DIRS}
+        ${QtSvgWidgets_INCLUDE_DIRS}
+        ${QtXml_INCLUDE_DIRS}
+        ${QtWebSockets_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
         ${ZBAR_INCLUDE_DIR}
@@ -145,8 +149,8 @@ target_include_directories(feather PUBLIC
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
-            ${Qt5Multimedia_INCLUDE_DIRS}
-            ${Qt5MultimediaWidgets_INCLUDE_DIRS}
+            ${QtMultimedia_INCLUDE_DIRS}
+            ${QtMultimediaWidgets_INCLUDE_DIRS}
     )
 endif()
 
@@ -174,7 +178,7 @@ if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
-if(WITH_SCANNER)
+if(WITH_SCANNER AND NOT Qt6_FOUND)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
@@ -203,23 +207,24 @@ endif()
 
 target_compile_definitions(feather
         PUBLIC
-        ${Qt5Core_DEFINITIONS}
-        ${Qt5Widgets_DEFINITIONS}
-        ${Qt5Gui_DEFINITIONS}
-        ${Qt5Network_DEFINITIONS}
-        ${Qt5Svg_DEFINITIONS}
-        ${Qt5Xml_DEFINITIONS}
-        ${Qt5WebSockets_DEFINITIONS}
+        ${QtCore_DEFINITIONS}
+        ${QtWidgets_DEFINITIONS}
+        ${QtGui_DEFINITIONS}
+        ${QtNetwork_DEFINITIONS}
+        ${QtSvg_DEFINITIONS}
+        ${QtSvgWidgets_DEFINITIONS}
+        ${QtXml_DEFINITIONS}
+        ${QtWebSockets_DEFINITIONS}
 )
 
 if (WITH_SCANNER)
     target_compile_definitions(feather PUBLIC
-            ${Qt5Multimedia_DEFINITIONS}
-            ${Qt5MultimediaWidgets_DEFINITIONS}
+            ${QtMultimedia_DEFINITIONS}
+            ${QtMultimediaWidgets_DEFINITIONS}
     )
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${Qt5Widgets_EXECUTABLE_COMPILE_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QtWidgets_EXECUTABLE_COMPILE_FLAGS}")
 
 if(UNIX AND NOT APPLE)
     # https://stackoverflow.com/questions/57766620/cmake-add-library-doesnt-initialize-static-global-variable
@@ -242,13 +247,13 @@ target_link_libraries(feather
         ${OPENSSL_LIBRARIES}
         ${CMAKE_DL_LIBS}
         ${EXTRA_LIBRARIES}
-        Qt5::Core
-        Qt5::Widgets
-        Qt5::Gui
-        Qt5::Network
-        Qt5::Svg
-        Qt5::Xml
-        Qt5::WebSockets
+        Qt::Core
+        Qt::Widgets
+        Qt::Gui
+        Qt::Network
+        Qt::Svg
+        Qt::Xml
+        Qt::WebSockets
         ${ICU_LIBRARIES}
         openpgp
         Threads::Threads
@@ -260,28 +265,34 @@ target_link_libraries(feather
         SingleApplication::SingleApplication
         )
 
+if(Qt6_FOUND)
+    target_link_libraries(feather Qt::SvgWidgets)
+endif()
+
 if(DEVICE_TREZOR_READY)
     target_link_libraries(feather ${TREZOR_DEP_LIBS})
 endif()
 
 if (WITH_SCANNER)
     target_link_libraries(feather
-            Qt5::Multimedia
-            Qt5::MultimediaWidgets
+            Qt::Multimedia
+            Qt::MultimediaWidgets
     )
 endif()
 
-if(NOT APPLE)
+if(NOT APPLE AND NOT Qt6_FOUND)
     target_link_libraries(feather
             Qt5::QSvgIconPlugin
             Qt5::QSvgPlugin
     )
 endif()
 
-if(STATIC)
+if(STATIC AND NOT Qt6_FOUND)
+    if(NOT Qt6_FOUND)
     target_link_libraries(feather
             Qt5::QSvgIconPlugin
             Qt5::QSvgPlugin)
+    endif()
     if(UNIX AND NOT APPLE)
         target_link_libraries(feather
             Qt5::QXcbIntegrationPlugin)

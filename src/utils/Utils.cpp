@@ -516,7 +516,7 @@ void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, co
 }
 
 QString barrayToString(const QByteArray &data) {
-    return QString(QTextCodec::codecForMib(106)->toUnicode(data));
+    return QString::fromUtf8(data);
 }
 
 QString getAccountName() {
