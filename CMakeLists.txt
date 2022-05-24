@@ -229,16 +229,11 @@ endif()
 list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if(APPLE)
-    include_directories(SYSTEM /usr/include/malloc)
-    if(POLICY CMP0042)
-        cmake_policy(SET CMP0042 NEW)
-    endif()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default -std=c++11")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -DGTEST_HAS_TR1_TUPLE=0")
+    cmake_policy(SET CMP0042 NEW)
 endif()
 
 if (APPLE AND NOT IOS)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=x86-64 -fvisibility=default -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -std=c++11")
 endif()
 
 if(APPLE)
