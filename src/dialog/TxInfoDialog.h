@@ -7,7 +7,7 @@
 #include <QDialog>
 #include <QTextCharFormat>
 #include <QTextEdit>
-#include <QtSvg/QSvgWidget>
+#include <QSvgWidget>
 
 #include "appcontext.h"
 #include "dialog/TxProofDialog.h"

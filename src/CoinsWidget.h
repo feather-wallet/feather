@@ -6,7 +6,7 @@
 
 #include <QMenu>
 #include <QWidget>
-#include <QtSvg/QSvgWidget>
+#include <QSvgWidget>
 
 #include "appcontext.h"
 #include "model/CoinsModel.h"
