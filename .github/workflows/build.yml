@@ -88,6 +88,8 @@ jobs:
           submodules: recursive
       - name: install dependencies
         run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt@5 libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
+      - name: install polyseed
+        run: git clone -b apple_pt https://github.com/tobtoht/polyseed.git && cd polyseed && git reset --hard f8eea85b94a9f33f1aeaaabd67fc30be0c2b1c8f && cmake . && make && make install
       - name: build
         run: CMAKE_PREFIX_PATH=/usr/local/opt/qt@5/ make mac-release -j3
       - name: create .tar

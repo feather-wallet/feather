@@ -165,4 +165,18 @@ RUN git clone -b 0.23.92 --depth 1 --recursive https://github.com/mchehab/zbar.g
     make install && \
     rm -rf $(pwd)
 
+# polyseed: Required for Feather
+RUN git clone https://github.com/tevador/polyseed.git && \
+    cd polyseed && \
+    git reset --hard 4945d8239d6b26dc12723ca2aaa9f8110ceff5af && \
+    mkdir build && \
+    cd build && \
+    cmake -DCMAKE_INSTALL_PREFIX=/depends/x86_64-w64-mingw32 \
+          -DCMAKE_TOOLCHAIN_FILE=/depends/x86_64-w64-mingw32/share/toolchain.cmake \
+          -DBUILD_SHARED_LIBS=OFF \
+          -DCMAKE_PREFIX_PATH=/usr/x86_64-w64-mingw32 .. && \
+    make && \
+    make install && \
+    rm -rf $(pwd)
+
 RUN git config --global --add safe.directory /feather/monero

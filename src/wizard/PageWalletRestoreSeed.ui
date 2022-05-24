@@ -26,6 +26,19 @@
          <string>14 word mnemonic seed</string>
         </property>
         <property name="checked">
+         <bool>false</bool>
+        </property>
+        <attribute name="buttonGroup">
+         <string notr="true">seedBtnGroup</string>
+        </attribute>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="radio16">
+        <property name="text">
+         <string>16 word mnemonic seed (Polyseed)</string>
+        </property>
+        <property name="checked">
          <bool>true</bool>
         </property>
         <attribute name="buttonGroup">

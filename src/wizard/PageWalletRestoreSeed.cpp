@@ -37,6 +37,10 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     QStringList bip39English;
     for (int i = 0; i != 2048; i++)
         bip39English << QString::fromStdString(wordlist::english.get_word(i));
+
+    m_polyseed.length = 16;
+    m_polyseed.setWords(bip39English);
+
     // Restore has limited error correction capability, namely it can correct a single erasure
     // (illegible word with a known location). This can be tested by replacing a word with xxxx
     bip39English << "xxxx";
@@ -58,6 +62,12 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
 }
 
 void PageWalletRestoreSeed::onSeedTypeToggled() {
+    if (ui->radio16->isChecked()) {
+        m_mode = &m_polyseed;
+        m_fields->seedType = Seed::Type::POLYSEED;
+        ui->seedEdit->setPlaceholderText("Enter 16 word seed..");
+        ui->group_seedLanguage->hide();
+    }
     if (ui->radio14->isChecked()) {
         m_mode = &m_tevador;
         m_fields->seedType = Seed::Type::TEVADOR;
@@ -128,7 +138,7 @@ bool PageWalletRestoreSeed::validatePage() {
         }
     }
 
-    Seed _seed = Seed(m_mode->length == 14 ? Seed::Type::TEVADOR : Seed::Type::MONERO, seedSplit, constants::networkType);
+    Seed _seed = Seed(m_fields->seedType, seedSplit, constants::networkType);
 
     if (!_seed.errorString.isEmpty()) {
         QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));

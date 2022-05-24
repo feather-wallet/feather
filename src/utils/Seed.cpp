@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2022 The Monero Project
 
+#include <iomanip>
 #include "Seed.h"
 
 Seed::Seed(Type type, NetworkType::Type networkType, QString language)
     : type(type), networkType(networkType), language(std::move(language))
 {
-    // We only support the creation of Tevador-style seeds for now.
-    if (this->type != Type::TEVADOR) {
+    // We only support the creation of Polyseeds
+    if (this->type != Type::POLYSEED) {
         this->errorString = "Unsupported seed type";
         return;
     }
@@ -21,15 +22,22 @@ Seed::Seed(Type type, NetworkType::Type networkType, QString language)
     this->time = std::time(nullptr);
 
     try {
-        monero_seed seed(this->time, constants::coinName);
+        polyseed::data seed(POLYSEED_MONERO);
+        seed.create(0);
 
-        std::stringstream buffer;
-        buffer << seed;
-        this->mnemonic = QString::fromStdString(buffer.str()).split(" ");
+        uint8_t key[32];
+        seed.keygen(&key, sizeof(key));
 
-        buffer.str(std::string());
-        buffer << seed.key();
-        this->spendKey = QString::fromStdString(buffer.str());
+        std::stringstream keyStream;
+        for (unsigned char i : key) {
+            keyStream << std::hex << std::setfill('0') << std::setw(2) << (int)i;
+        }
+
+        std::string phrase;
+        seed.encode(polyseed::get_lang_by_name("English"), phrase);
+
+        this->mnemonic = QString::fromStdString(phrase).split(" ");
+        this->spendKey = QString::fromStdString(keyStream.str());
     }
     catch (const std::exception &e) {
         this->errorString = QString::fromStdString(e.what());
@@ -54,8 +62,26 @@ Seed::Seed(Type type, QStringList mnemonic, NetworkType::Type networkType)
     }
 
     if (this->type == Type::POLYSEED) {
-        this->errorString = "Unsupported seed type";
-        return;
+        try {
+            polyseed::data seed(POLYSEED_MONERO);
+            auto lang = seed.decode(this->mnemonic.join(" ").toStdString().c_str());
+
+            uint8_t key[32];
+            seed.keygen(&key, sizeof(key));
+
+            std::stringstream keyStream;
+            for (unsigned char i : key) {
+                keyStream << std::hex << std::setfill('0') << std::setw(2) << (int)i;
+            }
+            this->spendKey = QString::fromStdString(keyStream.str());
+
+            this->time = seed.birthday();
+            this->setRestoreHeight();
+        }
+        catch (const std::exception &e) {
+            this->errorString = e.what();
+            return;
+        }
     }
 
     if (this->type == Type::TEVADOR) {

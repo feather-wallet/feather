@@ -7,6 +7,7 @@
 #include "constants.h"
 #include "libwalletqt/Wallet.h"
 #include "monero_seed/monero_seed.hpp"
+#include "polyseed/polyseed.h"
 #include "utils/AppData.h"
 
 #include <QString>

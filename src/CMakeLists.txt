@@ -60,6 +60,9 @@ file(GLOB SOURCE_FILES
         "qrcode/*.cpp"
         "dialog/*.h"
         "dialog/*.cpp"
+        "polyseed/*.h"
+        "polyseed/*.cpp"
+        "polyseed/*.c"
         "qrcode_scanner/QrCodeUtils.cpp"
         "qrcode_scanner/QrCodeUtils.h"
         )
@@ -137,6 +140,7 @@ target_include_directories(feather PUBLIC
         ${ZLIB_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
         ${ZBAR_INCLUDE_DIR}
+        ${POLYSEED_INCLUDE_DIR}
         )
 
 if(WITH_SCANNER)
@@ -252,6 +256,7 @@ target_link_libraries(feather
         ${ZLIB_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZBAR_LIBRARIES}
+        ${POLYSEED_LIBRARY}
         SingleApplication::SingleApplication
         )
 
