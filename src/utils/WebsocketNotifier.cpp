@@ -60,6 +60,11 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
         emit TxFiatHistoryReceived(txFiatHistory_data);
     }
 
+    else if(cmd == "revuo") {
+        auto revuo_data = msg.value("data").toArray();
+        this->onWSRevuo(revuo_data);
+    }
+
 #if defined(CHECK_UPDATES)
     else if (cmd == "updates") {
         this->onWSUpdates(msg.value("data").toObject());
@@ -174,6 +179,29 @@ void WebsocketNotifier::onWSCCS(const QJsonArray &ccs_data) {
     }
 
     emit CCSReceived(l);
+}
+
+void WebsocketNotifier::onWSRevuo(const QJsonArray &revuo_data) {
+    QList<QSharedPointer<RevuoItem>> l;
+
+    for (auto &&entry: revuo_data) {
+        auto obj = entry.toObject();
+
+        QStringList newsbytes;
+        for (const auto &n : obj.value("newsbytes").toArray()) {
+            newsbytes.append(n.toString());
+        }
+
+        auto revuoItem = new RevuoItem(
+                obj.value("title").toString(),
+                obj.value("url").toString(),
+                newsbytes);
+
+        QSharedPointer<RevuoItem> r = QSharedPointer<RevuoItem>(revuoItem);
+        l.append(r);
+    }
+
+    emit RevuoReceived(l);
 }
 
 void WebsocketNotifier::onWSUpdates(const QJsonObject &updates) {

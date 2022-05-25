@@ -63,6 +63,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     // Websocket notifier
     connect(websocketNotifier(), &WebsocketNotifier::CCSReceived, ui->ccsWidget->model(), &CCSModel::updateEntries);
     connect(websocketNotifier(), &WebsocketNotifier::RedditReceived, ui->redditWidget->model(), &RedditModel::updatePosts);
+    connect(websocketNotifier(), &WebsocketNotifier::RevuoReceived, ui->revuoWidget, &RevuoWidget::updateItems);
     connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, this, &MainWindow::onUpdatesAvailable);
 #ifdef HAS_XMRIG
     connect(websocketNotifier(), &WebsocketNotifier::XMRigDownloadsReceived, m_xmrig, &XMRigWidget::onDownloads);
@@ -373,6 +374,10 @@ void MainWindow::initHome() {
 
     connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
     connect(ui->redditWidget, &RedditWidget::setStatusText, this, &MainWindow::setStatusText);
+    connect(ui->revuoWidget, &RevuoWidget::donate, [this](const QString &address, const QString &description){
+        m_sendWidget->fill(address, description);
+        ui->tabWidget->setCurrentIndex(Tabs::SEND);
+    });
 }
 
 void MainWindow::initWalletContext() {
@@ -887,6 +892,7 @@ void MainWindow::updateWidgetIcons() {
     m_localMoneroWidget->skinChanged();
 #endif
     ui->conversionWidget->skinChanged();
+    ui->revuoWidget->skinChanged();
 
     m_statusBtnHwDevice->setIcon(this->hardwareDevicePairedIcon());
 }
