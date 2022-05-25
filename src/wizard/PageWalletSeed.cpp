@@ -8,6 +8,9 @@
 #include "Seed.h"
 
 #include <QMessageBox>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QDialogButtonBox>
 
 PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -32,6 +35,7 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     connect(ui->btnCopy, &QPushButton::clicked, [this]{
         Utils::copyToClipboard(m_seed.mnemonic.join(" "));
     });
+    connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletSeed::onOptionsClicked);
 }
 
 void PageWalletSeed::initializePage() {
@@ -89,7 +93,26 @@ void PageWalletSeed::displaySeed(const QString &seed){
     ui->seedWord16->setText(seedSplit[15]);
 }
 
+void PageWalletSeed::onOptionsClicked() {
+    QDialog dialog(this);
+    QVBoxLayout layout;
+    QCheckBox checkbox("Extend this seed with a passphrase");
+    checkbox.setChecked(m_fields->seedOffsetPassphraseEnabled);
+    layout.addWidget(&checkbox);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok);
+    layout.addWidget(&buttons);
+    dialog.setLayout(&layout);
+    connect(&buttons, &QDialogButtonBox::accepted, [&dialog]{
+        dialog.close();
+    });
+    dialog.exec();
+    m_fields->seedOffsetPassphraseEnabled = checkbox.isChecked();
+}
+
 int PageWalletSeed::nextId() const {
+    if (m_fields->seedOffsetPassphraseEnabled) {
+        return WalletWizard::Page_SetSeedPassphrase;
+    }
     return WalletWizard::Page_WalletFile;
 }
 

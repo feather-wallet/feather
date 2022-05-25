@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>654</width>
-    <height>594</height>
+    <width>777</width>
+    <height>658</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -123,16 +123,6 @@
          <widget class="QLabel" name="label_14">
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather recently switched to a new seed scheme called &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>Please take note that mnemonic seeds now consist of 16 words instead of 14.</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -892,6 +882,9 @@
     </widget>
    </item>
    <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_21"/>
+   </item>
+   <item>
     <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -906,6 +899,13 @@
    </item>
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnOptions">
+       <property name="text">
+        <string>Options</string>
+       </property>
+      </widget>
+     </item>
      <item>
       <spacer name="horizontalSpacer">
        <property name="orientation">

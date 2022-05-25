@@ -77,6 +77,8 @@ Seed::Seed(Type type, QStringList mnemonic, NetworkType::Type networkType)
 
             this->time = seed.birthday();
             this->setRestoreHeight();
+
+            this->encrypted = seed.encrypted();
         }
         catch (const std::exception &e) {
             this->errorString = e.what();

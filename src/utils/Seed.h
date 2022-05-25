@@ -38,6 +38,8 @@ struct Seed {
 
     QString errorString;
 
+    bool encrypted = false;
+
     explicit Seed();
     explicit Seed(Type type, NetworkType::Type networkType = NetworkType::MAINNET, QString language = "English");
     explicit Seed(Type type, QStringList mnemonic, NetworkType::Type networkType = NetworkType::MAINNET);

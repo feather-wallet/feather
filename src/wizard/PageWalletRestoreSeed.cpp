@@ -61,6 +61,7 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     this->onSeedTypeToggled();
 }
 
+
 void PageWalletRestoreSeed::onSeedTypeToggled() {
     if (ui->radio16->isChecked()) {
         m_mode = &m_polyseed;
@@ -139,6 +140,11 @@ bool PageWalletRestoreSeed::validatePage() {
     }
 
     Seed _seed = Seed(m_fields->seedType, seedSplit, constants::networkType);
+
+    if (_seed.encrypted) {
+        QMessageBox::warning(this, "Encrypted seed", QString("This seed is encrypted. Encrypted seeds are not supported"));
+        return false;
+    }
 
     if (!_seed.errorString.isEmpty()) {
         QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));

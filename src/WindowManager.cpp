@@ -565,6 +565,7 @@ void WindowManager::showWizard(WalletWizard::Page startPage) {
         m_wizard = this->createWizard(startPage);
     }
 
+    m_wizard->resetFields();
     m_wizard->setStartId(startPage);
     m_wizard->restart();
     m_wizard->setEnabled(true);

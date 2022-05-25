@@ -13,6 +13,7 @@
 #include "PageWalletRestoreKeys.h"
 #include "PageSetPassword.h"
 #include "PageSetRestoreHeight.h"
+#include "PageSetSeedPassphrase.h"
 #include "PageHardwareDevice.h"
 #include "PageNetworkTor.h"
 #include "constants.h"
@@ -37,6 +38,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     auto createWallet = new PageWalletFile(&m_wizardFields , this);
     auto createWalletSeed = new PageWalletSeed(&m_wizardFields, this);
     auto walletSetPasswordPage = new PageSetPassword(&m_wizardFields, this);
+    auto walletSetSeedPassphrasePage = new PageSetSeedPassphrase(&m_wizardFields, this);
     setPage(Page_Menu, menuPage);
     setPage(Page_WalletFile, createWallet);
     setPage(Page_OpenWallet, openWalletPage);
@@ -48,6 +50,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_WalletRestoreKeys, new PageWalletRestoreKeys(&m_wizardFields, this));
     setPage(Page_SetRestoreHeight, new PageSetRestoreHeight(&m_wizardFields, this));
     setPage(Page_HardwareDevice, new PageHardwareDevice(&m_wizardFields, this));
+    setPage(Page_SetSeedPassphrase, walletSetSeedPassphrasePage);
 
     setStartId(Page_Menu);
 
@@ -77,6 +80,10 @@ WalletWizard::WalletWizard(QWidget *parent)
     connect(openWalletPage, &PageOpenWallet::openWallet, [=](const QString &path){
         emit openWallet(path, "");
     });
+}
+
+void WalletWizard::resetFields() {
+    m_wizardFields = {};
 }
 
 void WalletWizard::onCreateWallet() {

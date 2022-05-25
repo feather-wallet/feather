@@ -31,6 +31,7 @@ public slots:
 private:
     void seedRoulette(int count);
     void generateSeed();
+    void onOptionsClicked();
 
 signals:
     void createWallet();

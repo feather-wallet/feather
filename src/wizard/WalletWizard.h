@@ -31,6 +31,7 @@ struct WizardFields {
     QString walletName;
     QString walletDir;
     Seed seed;
+    bool seedOffsetPassphraseEnabled = false;
     QString seedOffsetPassphrase;
     QString seedLanguage = constants::seedLanguage;
     QString password;
@@ -42,6 +43,9 @@ struct WizardFields {
     int restoreHeight = 0;
     Seed::Type seedType;
     DeviceType deviceType;
+
+    WizardFields(): deviceType(DeviceType::LEDGER), mode(WizardMode::CreateWallet),
+    seedType(Seed::POLYSEED), seedOffsetPassphraseEnabled(false), restoreHeight(0) {}
 };
 
 class WalletWizard : public QWizard
@@ -53,6 +57,7 @@ public:
         Page_Menu,
         Page_WalletFile,
         Page_CreateWalletSeed,
+        Page_SetSeedPassphrase,
         Page_SetPasswordPage,
         Page_OpenWallet,
         Page_Network,
@@ -64,6 +69,7 @@ public:
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);
+    void resetFields();
 
 signals:
     void initialNetworkConfigured();
