@@ -37,7 +37,7 @@ endif()
 
 set(MONERO_HEAD "2ab81abe7bea16f0f6da55da3b212f9ffbca8dcd")
 set(BUILD_GUI_DEPS ON)
-option(ARCH "Target architecture" "x86-64")
+option(ARCH "Target architecture" "native")
 set(BUILD_64 ON)
 set(USE_SINGLE_BUILDDIR ON)
 

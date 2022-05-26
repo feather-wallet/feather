@@ -88,7 +88,7 @@ mac-release:
 	mkdir -p build && \
 	cd build && \
 	cmake \
-	    -DARCH=x86-64 \
+	    -DARCH=native \
         -D BUILD_TAG="mac-x64" \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=Off \
