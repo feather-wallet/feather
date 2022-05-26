@@ -1,106 +1,117 @@
 # Documentation for developers
 
-Feather is developed primarily on Linux. It uses Qt 5.15.* and chances are that your 
-distro's package manager has a lower version. It is therefore recommended that you install 
-Qt manually using the online installer, which can be found here: https://www.qt.io/download 
-(under open-source).
+Feather is developed primarily on Linux, but can also be built and debugged on macOS. Development on Windows is not 
+currently supported. 
 
-## Jetbrains Clion
+If you are just looking to build Feather from source, we recommend following the instructions in BUILDING.md instead.
 
-Feather was developed using JetBrains Clion since it integrates nicely 
-with CMake and comes with a built-in debugger. To pass CMake flags to CLion, 
-go to `File->Settings->Build->CMake`, set Build Type to `Debug` and set your 
-preferred CMake options/definitions.
+## Setting up a development environment
 
-## Requirements
+### Dependencies
 
-### Ubuntu/Debian
+Note: Feather uses Qt 5.15.* or Qt 6.2+. Make sure your distro's package manager provides these versions. 
+If not, it is recommended that you install Qt manually using the online installer, which can be found here:
+https://www.qt.io/download (under open-source).
 
-```bash
-apt install -y git cmake libqrencode-dev build-essential cmake libboost-all-dev \
-miniupnpc libunbound-dev graphviz doxygen libunwind8-dev pkg-config libssl-dev \
-libzmq3-dev libsodium-dev libhidapi-dev libnorm-dev libusb-1.0-0-dev libpgm-dev \
-libprotobuf-dev protobuf-compiler libgcrypt20-dev libzip-dev
-```
-
-## Mac OS
+#### Arch Linux
 
 ```bash
-brew install boost zmq openssl libpgm miniupnpc libsodium expat libunwind-headers \
-protobuf libgcrypt qrencode ccache cmake pkgconfig git
+pacman -S git cmake base-devel ccache unbound boost qrencode zbar qt6-base qt6-svg qt6-websockets libzip hidapi protobuf
 ```
 
-## CMake
-
-After installing Qt you might have a folder called `/home/$user/Qt/`. You need to pass this to CMake 
-via the `CMAKE_PREFIX_PATH` definition. For me this is:
-
-```
--DCMAKE_PREFIX_PATH=/home/dsc/QtNew/5.15.0/gcc_64
-```
-
-There are some Monero/Feather related options/definitions that you may pass:
-
-- `-DLOCALMONERO=OFF` - disable LocalMonero feature
-- `-DXMRIG=OFF` - disable XMRig feature
-- `-DTOR_BIN=/path/to/tor` - Embed a Tor executable inside Feather
-- `-DDONATE_BEG=OFF` - disable the dreaded donate requests
-- `-DCHECK_UPDATES=ON` - enable checking for updates, only for standalone binaries
-
-And:
-
-```
--DMANUAL_SUBMODULES=1  
--DUSE_DEVICE_TREZOR=OFF 
--DUSE_SINGLE_BUILDDIR=ON 
--DDEV_MODE=ON 
-```
-
-If you have OpenSSL installed in a custom location, try:
-
-```
--DOPENSSL_INCLUDE_DIR=/usr/local/lib/openssl-1.1.1g/include 
--DOPENSSL_SSL_LIBRARY=/usr/local/lib/openssl-1.1.1g/libssl.so.1.1 
--DOPENSSL_CRYPTO_LIBRARY=/usr/local/lib/openssl-1.1.1g/libcrypto.so.1.1
-```
-
-I prefer also enabling verbose makefiles, which may be useful in some situations.
-
-```
--DCMAKE_VERBOSE_MAKEFILE=ON
-```
-
-Enable debugging symbols:
+#### Ubuntu 22.04
 
 ```bash
--DCMAKE_BUILD_TYPE=Debug
+apt update
+apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev libqrencode-dev libzbar-dev \
+    qt6-base-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev libzip-dev libsodium-dev libgcrypt-dev \
+    libx11-xcb-dev libprotobuf-dev libhidapi-dev
 ```
 
-## Feather
-
-It's best to install Tor locally as a service and start Feather with `--use-local-tor`, this 
-prevents the child process from starting up and saves time.
-
-#### Ubuntu/Debian
+#### macOS
 
 ```bash
-apt install -y tor
-sudo service tor start
+brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
 ```
 
-#### Mac OS
+### Polyseed
+
+Feather uses Polyseed to create 16-word mnemonic seeds. It is not currently packaged anywhere, so you must build it 
+from source manually.
+
+```bash
+git clone https://github.com/tevador/polyseed.git
+cd polyseed
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
+
+### Tor daemon
+
+A Tor daemon is required to connect to .onion nodes and the websocket server. Development builds do not include 
+the Tor binary by default, this can be enabled with `-DTOR_DIR=/path/to/tor`. We recommend running a local Tor daemon 
+as this prevents Feather from spawning a child process and saves time.
+
+#### Arch Linux
+
+```bash
+pacman -S tor
+systemctl enable --now tor
+```
+
+#### Ubuntu Debian
+
+```bash
+apt update && apt install tor
+systemctl enable --now tor
+```
+
+#### macOS
 
 ```bash
 brew install tor
-brew services start tor
+brew services restart tor
 ```
 
-To skip the wizards and open a wallet directly use `--wallet-file`: 
+### Clone Feather
 
 ```bash
-./feather --use-local-tor --wallet-file /home/user/Monero/wallets/bla.keys
+git clone http://github.com/feather-wallet/feather.git
+cd feather
+git submodule update --init --recursive
 ```
 
-It is recommended that you use `--stagenet` for development. Testnet is also possible, 
-but you'll have to provide Feather a testnet node of your own.
- 
+### Jetbrains Clion
+
+We recommend using Jetbrains Clion for Feather development. It integrates nicely with CMake and comes with a built-in
+debugger. 
+
+To pass CMake flags to CLion, go to `File->Settings->Build->CMake`, set Build Type to `Debug` and set your
+preferred CMake options/definitions. Add `-DARCH=x86-64` to the CMake options. If you installed Qt using the online 
+installer you may have to add `-DCMAKE_PREFIX_PATH=/path/to/qt/installation` in the CMake options. More CMake options
+are documented below.
+
+Run CMake (`View -> Tool Windows -> CMake`). Click on the 🔃 (`Reload CMake Project`) button.
+
+Go to `Run -> Edit configurations` and make sure the `feather` target is selected. 
+You can add any environment variables and program arguments here:
+
+- For more verbose logging add `MONERO_LOG_LEVEL=1` to environment variables.
+- To start Feather in stagenet mode, add `--stagenet` to program arguments. 
+
+After the target is configured, `Run -> Run 'feather'` or press Shift + F10 to build Feather.
+
+### CMake
+
+There are some CMake options that you may pass to control how Feather is built:
+
+- `-DLOCALMONERO=OFF` - disable LocalMonero feature
+- `-DXMRIG=OFF` - disable XMRig feature
+- `-DCHECK_UPDATES=ON` - enable checking for updates, only for standalone binaries
+- `-DDONATE_BEG=OFF` - disable the dreaded donate requests
+- `-DUSE_DEVICE_TREZOR=OFF` - disable Trezor hardware wallet support
+- `-DWITH_SCANNER=ON` - enable the webcam QR code scanner
+- `-DTOR_DIR=/path/to/tor/` - embed a Tor binary in Feather, argument should be a directory containing the binary
