@@ -151,22 +151,39 @@ The resulting binary can be found in `./build/x86_64-w64-mingw32/release/bin/`.
 For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies. 
 
 ```bash
-HOMEBREW_OPTFLAGS="-march=core2" HOMEBREW_OPTIMIZATION_LEVEL="O0" \
-    brew install boost zmq openssl libpgm miniupnpc libsodium expat libunwind-headers protobuf libgcrypt qrencode ccache cmake pkgconfig git
+brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
 ```
 
-Clone the repository.
+Build and install Polyseed:
+
+```bash
+git clone https://github.com/tevador/polyseed.git
+cd polyseed
+mkdir build
+cd build
+cmake ..
+make
+sudo make install
+```
+
+Clone the Feather repository.
 
 ```bash
 git clone --recursive https://github.com/feather-wallet/feather.git
+cd feather
 ``` 
-
-Get the latest LTS from here: https://www.qt.io/offline-installers and install.
 
 Build Feather.
 
 ```bash
-CMAKE_PREFIX_PATH=~/Qt5.15.1/5.15.1/clang_64 make mac-release
+make mac-release
 ```
 
 The resulting macOS application can be found `build/bin/feather.app` and will **not** have Tor embedded.
+
+To run a Tor daemon on macOS:
+
+```bash
+brew install tor
+brew services restart tor
+```
