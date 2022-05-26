@@ -30,6 +30,8 @@ apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-
 
 #### macOS
 
+For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies.
+
 ```bash
 brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
 ```
@@ -84,7 +86,7 @@ cd feather
 git submodule update --init --recursive
 ```
 
-### Jetbrains Clion
+### Jetbrains Clion (IDE)
 
 We recommend using Jetbrains Clion for Feather development. It integrates nicely with CMake and comes with a built-in
 debugger. 
@@ -103,6 +105,13 @@ You can add any environment variables and program arguments here:
 - To start Feather in stagenet mode, add `--stagenet` to program arguments. 
 
 After the target is configured, `Run -> Run 'feather'` or press Shift + F10 to build Feather.
+
+### Building without IDE
+
+To build Feather without an IDE:
+
+- Linux: `make release`
+- macOS: `make mac-release`
 
 ### CMake
 

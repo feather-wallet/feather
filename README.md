@@ -14,20 +14,24 @@ Copyright (c) 2020-2022, The Monero Project.
 * IRC: `#feather` on OFTC
 * Matrix: `#feather:monero.social`
 
-Download the latest release [here](https://featherwallet.org/download).
-
-## Compiling Feather from source
-
-See [BUILDING.md](https://github.com/feather-wallet/feather/blob/master/BUILDING.md) for information on how to build from source.
+**Download** the latest release [here](https://featherwallet.org/download).
 
 ## Supporting the project
 
 Feather is a 100% community-sponsored project. If you want to join our efforts, the easiest thing you can do is support the project financially.
 
+Donations help pay for hosting, build servers, domain names, e-mail and other recurring costs. Any amount helps.
+
 `47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f`
+
+## Building from source
+
+See [BUILDING.md](https://github.com/feather-wallet/feather/blob/master/BUILDING.md) for information on how to build from source.
 
 ## Developers
 
-See [HACKING.md](https://github.com/feather-wallet/feather/blob/master/HACKING.md) for useful development resources.
+If you are looking to set up a development environment for Feather, see [HACKING.md](https://github.com/feather-wallet/feather/blob/master/HACKING.md).
 
-It is HIGHLY recommended that you join the `#feather` IRC channel on OFTC if you are hacking on Feather. Due to the nature of this open source software project, joining this channel and idling is the best way to stay updated on best practices and new developments.
+It is highly recommended that you join the `#feather` IRC channel on OFTC or `#feather:monero.social` on Matrix if you 
+are hacking on Feather. Due to the nature of this open source software project, idling in this channel is the best 
+way to stay updated on best practices and new developments.

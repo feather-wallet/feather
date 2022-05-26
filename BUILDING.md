@@ -1,4 +1,9 @@
-## Building with Docker
+# Building Feather
+
+Release binaries (except macOS) are built using Docker. If you are looking to build Feather without Docker, 
+see [HACKING.MD](https://github.com/feather-wallet/feather/blob/master/HACKING.md).
+
+## Docker
 
 Builds with Docker are done in 3 steps:
 
@@ -144,46 +149,6 @@ If you're re-running a build make sure to `rm -rf build/` first.
 
 The resulting binary can be found in `./build/x86_64-w64-mingw32/release/bin/`.
 
----
+### macOS
 
-## Building on macOS
-
-For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies. 
-
-```bash
-brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
-```
-
-Build and install Polyseed:
-
-```bash
-git clone https://github.com/tevador/polyseed.git
-cd polyseed
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
-```
-
-Clone the Feather repository.
-
-```bash
-git clone --recursive https://github.com/feather-wallet/feather.git
-cd feather
-``` 
-
-Build Feather.
-
-```bash
-make mac-release
-```
-
-The resulting macOS application can be found `build/bin/feather.app` and will **not** have Tor embedded.
-
-To run a Tor daemon on macOS:
-
-```bash
-brew install tor
-brew services restart tor
-```
+Docker builds for macOS are not currently supported. To build Feather on macOS follow the steps in [HACKING.md](HACKING.md).
