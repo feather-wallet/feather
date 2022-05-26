@@ -788,9 +788,9 @@ void MainWindow::updatePasswordIcon() {
 
 void MainWindow::showRestoreHeightDialog() {
     // settings custom restore height is only available for 25 word seeds
-    auto seed = m_ctx->wallet->getCacheAttribute("feather.seed");
-    if(!seed.isEmpty()) { // TODO: update this warning (import tx, delete cache, restore from seed)
-        const auto msg = "This wallet has a 14 word mnemonic seed which has the restore height embedded.";
+    auto seedLength = m_ctx->wallet->seedLength();
+    if (seedLength == 14 || seedLength == 16) { // TODO: update this warning (import tx, delete cache, restore from seed)
+        const auto msg = "This wallet has a mnemonic seed with an embedded restore height.";
         QMessageBox::warning(this, "Cannot set custom restore height", msg);
         return;
     }

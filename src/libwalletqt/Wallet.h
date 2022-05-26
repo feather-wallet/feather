@@ -106,6 +106,8 @@ public:
     //! returns mnemonic seed
     QString getSeed(const QString &seedOffset) const;
 
+    qsizetype seedLength() const;
+
     //! returns seed language
     QString getSeedLanguage() const;
 

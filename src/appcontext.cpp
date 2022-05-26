@@ -200,9 +200,9 @@ void AppContext::onTorSettingsChanged() {
 }
 
 void AppContext::onSetRestoreHeight(quint64 height){
-    auto seed = this->wallet->getCacheAttribute("feather.seed");
-    if(!seed.isEmpty()) {
-        const auto msg = "This wallet has a 14 word mnemonic seed which has the restore height embedded.";
+    auto seedLength = this->wallet->seedLength();
+    if (seedLength == 14 || seedLength == 16) {
+        const auto msg = "This wallet has a mnemonic seed with an embedded restore height.";
         emit setRestoreHeightError(msg);
         return;
     }

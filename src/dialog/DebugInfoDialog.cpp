@@ -67,11 +67,8 @@ void DebugInfoDialog::updateInfo() {
 
     QString seedType = [this](){
         if (m_ctx->wallet->isHwBacked())
-            return "Hardware";
-        if (m_ctx->wallet->getCacheAttribute("feather.seed").isEmpty())
-            return "25 word";
-        else
-            return "14 word";
+            return QString("Hardware");
+        return QString("%1 word").arg(m_ctx->wallet->seedLength());
     }();
 
     QString deviceType = [this](){
