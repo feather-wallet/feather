@@ -99,3 +99,23 @@ jobs:
         with:
           name: ${{ github.job }}
           path: build/bin/feather.tar
+
+  macos-qt6:
+    runs-on: macOS-latest
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: recursive
+      - name: install dependencies
+        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
+      - name: install polyseed
+        run: git clone https://github.com/tevador/polyseed.git && cd polyseed && git reset --hard e38516561c647522e2e2608f13eabdeab61d9a5d && cmake . && make && make install
+      - name: build
+        run: make mac-release -j3
+      - name: create .tar
+        run: tar -cf feather.tar feather.app
+        working-directory: build/bin
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ github.job }}
+          path: build/bin/feather.tar
