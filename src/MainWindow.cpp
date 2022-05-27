@@ -1627,15 +1627,15 @@ void MainWindow::updateRecentlyOpenedMenu() {
 }
 
 bool MainWindow::verifyPassword() {
-    bool ok;
+    bool incorrectPassword = false;
     while (true) {
-        PasswordDialog passwordDialog{this->walletName(), false, this};
+        PasswordDialog passwordDialog{this->walletName(), incorrectPassword, true, this};
         int ret = passwordDialog.exec();
         if (ret == QDialog::Rejected) {
             return false;
         }
         if (passwordDialog.password != m_ctx->wallet->getPassword()) {
-            QMessageBox::warning(this, "Error", "Incorrect password");
+            incorrectPassword = true;
             continue;
         }
         break;
