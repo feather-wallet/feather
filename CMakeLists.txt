@@ -219,9 +219,6 @@ if(APPLE)
 endif()
 
 # warnings
-# @TODO: enable these 2 for migration to Qt 6
-#add_c_flag_if_supported(-Werror C_SECURITY_FLAGS)
-#add_cxx_flag_if_supported(-Werror CXX_SECURITY_FLAGS)
 add_c_flag_if_supported(-Wformat C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-Wformat CXX_SECURITY_FLAGS)
 add_c_flag_if_supported(-Wformat-security C_SECURITY_FLAGS)
