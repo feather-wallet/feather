@@ -47,13 +47,6 @@ if(STATIC)
     message(STATUS "Initiating static build, turning on manual submodules")
     set(MANUAL_SUBMODULES 1)
 
-    # monero-project/unbound:monero has a fix for static builds, however, it's not merged in Monero yet, because
-    # it breaks their buildbot, since that still uses openssl 1.1.0 and we use openssl 1.1.1g. We need to
-    # manually set the unbound submodule the right commit that has the fix.
-    # This only works with -DMANUAL_SUBMODULES=1
-    message(STATUS "applying unbound static build fix contrib/unbound_static.patch")
-    execute_process(COMMAND bash -c "git -C ${CMAKE_SOURCE_DIR}/monero/external/unbound apply ${CMAKE_SOURCE_DIR}/contrib/unbound_static.patch")
-
     set(Boost_USE_STATIC_LIBS ON)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
