@@ -3,7 +3,6 @@
 HASH="$1"
 echo "[+] hash: $HASH"
 
-export DRONE=true
 echo "[+] Building"
 
 rm ~/feather.zip 2>&1 >/dev/null

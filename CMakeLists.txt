@@ -156,10 +156,6 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-if("$ENV{DRONE}" STREQUAL "true")
-    message(STATUS "We are inside a static compile with Drone CI")
-endif()
-
 include(TorQrcGenerator)
 
 # To build Feather with embedded (and static) Tor, pass CMake -DTOR_DIR=/path/to/tor/
