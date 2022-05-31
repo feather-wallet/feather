@@ -77,9 +77,6 @@ link_directories(${EASYLOGGING_LIBRARY_DIRS})
 find_library(SODIUM_LIBRARY sodium)
 message(STATUS "libsodium: libraries at ${SODIUM_LIBRARY}")
 
-# HIDApi
-set(HIDAPI_FOUND OFF)
-
 # QrEncode
 find_package(QREncode REQUIRED)
 
