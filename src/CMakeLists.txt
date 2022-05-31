@@ -132,7 +132,6 @@ target_include_directories(feather PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/qrcode
         ${X11_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
-        ${OPENSSL_INCLUDE_DIR}
         ${QtCore_INCLUDE_DIRS}
         ${QtWidgets_INCLUDE_DIRS}
         ${QtGui_INCLUDE_DIRS}
