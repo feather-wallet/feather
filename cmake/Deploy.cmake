@@ -5,6 +5,7 @@ if(APPLE OR (WIN32 AND NOT STATIC))
 
     if(APPLE AND NOT IOS)
         find_program(MACDEPLOYQT_EXECUTABLE macdeployqt HINTS "${_qt_bin_dir}")
+        MESSAGE(INFO "MACDEPLOY ${MACDEPLOYQT_EXECUTABLE}")
         add_custom_command(TARGET deploy
                 POST_BUILD
                 COMMAND "${MACDEPLOYQT_EXECUTABLE}" "$<TARGET_FILE_DIR:feather>/../.." -always-overwrite

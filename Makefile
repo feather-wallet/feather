@@ -8,6 +8,17 @@ CMAKEFLAGS = \
 	-DWITH_SCANNER=$(or ${WITH_SCANNER}, Off) \
 	-DREPRODUCIBLE=$(or ${SOURCE_DATE_EPOCH}, Off)
 
+guix:
+	mkdir -p build/$(target)/release && \
+	cd build/$(target)/release && \
+	cmake -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+		-DCMAKE_PREFIX_PATH=/gnu/store \
+		-DCMAKE_PREFIX_PATH=$(CURDIR)/contrib/depends/$(target) \
+		-DCMAKE_PREFIX_PATH=$(CURDIR)/contrib/depends/$(target)/native/bin \
+		-DCMAKE_TOOLCHAIN_FILE=/feather/contrib/depends/$(target)/share/toolchain.cmake ../../.. \
+		$(CMAKEFLAGS) && \
+	$(MAKE)
+
 release:
 	mkdir -p build/release && \
 	cd build/release && \

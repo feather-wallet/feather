@@ -1,6 +1,21 @@
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+if(NOT DEPENDS)
+    set(CMAKE_AUTORCC ON)
+else()
+    add_executable(Qt5::moc IMPORTED)
+    set_target_properties(Qt5::moc PROPERTIES
+            IMPORTED_LOCATION "${NATIVE_BIN_PATH}/moc")
+
+    add_executable(Qt5::rcc IMPORTED)
+    set_target_properties(Qt5::rcc PROPERTIES
+            IMPORTED_LOCATION "${NATIVE_BIN_PATH}/rcc")
+
+    add_executable(Qt5::uic IMPORTED)
+    set_target_properties(Qt5::uic PROPERTIES
+            IMPORTED_LOCATION "${NATIVE_BIN_PATH}/uic")
+endif()
 
 # pthread
 find_package(Threads REQUIRED)
@@ -11,7 +26,6 @@ set(QT_COMPONENTS
         Gui
         Network
         Svg
-        Xml
         WebSockets
 )
 
@@ -31,7 +45,17 @@ add_subdirectory(third-party/singleapplication)
 
 add_subdirectory(openpgp)
 
-qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
+IF(DEPENDS)
+    # AutoRCC is broken in depends builds.
+    # RCC path in Options is an apparent Qt bug. It appears to ignore IMPORTED_LOCATION set earlier.
+    qt_add_resources(RESOURCES
+        assets.qrc assets_tor.qrc ui/qdarkstyle/style.qrc ui/BreezeStyleSheets/breeze.qrc
+        OPTIONS "${NATIVE_BIN_PATH}/rcc")
+else()
+    qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
+endif()
+
+find_library(ICONV_LIBRARIES iconv)
 
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
@@ -119,6 +143,7 @@ target_include_directories(feather PUBLIC ${QtGui_PRIVATE_INCLUDE_DIRS})
 
 target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
+        ${ZLIB_INCLUDE_DIR}
         ${CMAKE_SOURCE_DIR}/monero/include
         ${CMAKE_SOURCE_DIR}/monero/src
         ${CMAKE_SOURCE_DIR}/monero/external/easylogging++
@@ -130,7 +155,7 @@ target_include_directories(feather PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/model
         ${CMAKE_CURRENT_SOURCE_DIR}/utils
         ${CMAKE_CURRENT_SOURCE_DIR}/qrcode
-        ${X11_INCLUDE_DIR}
+#        ${X11_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${QtCore_INCLUDE_DIRS}
         ${QtWidgets_INCLUDE_DIRS}
@@ -140,10 +165,11 @@ target_include_directories(feather PUBLIC
         ${QtSvgWidgets_INCLUDE_DIRS}
         ${QtXml_INCLUDE_DIRS}
         ${QtWebSockets_INCLUDE_DIRS}
-        ${ZLIB_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
+        ${ZLIB_INCLUDE_DIRS}
         ${ZBAR_INCLUDE_DIR}
         ${POLYSEED_INCLUDE_DIR}
+        ${ZLIB_INCLUDE_DIR}
         )
 
 if(WITH_SCANNER)
@@ -229,6 +255,8 @@ else()
     target_link_libraries(feather monero-seed)
 endif()
 
+MESSAGE(INFO "ZLIBBB ${ZLIB_LIBRARIES}")
+
 target_link_libraries(feather
         wallet_merged
         ${LMDB_LIBRARY}
@@ -246,18 +274,24 @@ target_link_libraries(feather
         Qt::Gui
         Qt::Network
         Qt::Svg
-        Qt::Xml
         Qt::WebSockets
-        ${ICU_LIBRARIES}
         openpgp
         Threads::Threads
         ${QRENCODE_LIBRARY}
         ${ZLIB_LIBRARIES}
-        ${LIBZIP_LIBRARIES}
         ${ZBAR_LIBRARIES}
         ${POLYSEED_LIBRARY}
         SingleApplication::SingleApplication
+        ${ICU_LIBRARIES}
+        ${ICONV_LIBRARIES}
+        ${ZLIB_LIBRARIES}
         )
+
+if(APPLE)
+    target_link_libraries(feather ${ICONV_LIBRARIES})
+endif()
+
+target_link_libraries(feather ${LIBZIP_LIBRARIES} ${ZLIB_LIBRARIES})
 
 if(Qt6_FOUND)
     target_link_libraries(feather Qt::SvgWidgets)
@@ -293,13 +327,15 @@ if(STATIC AND NOT Qt6_FOUND)
     endif()
 endif()
 
-if(X11_FOUND)
-    target_link_libraries(feather ${X11_LIBRARIES})
-endif()
+#if(X11_FOUND)
+#    target_link_libraries(feather ${X11_LIBRARIES})
+#endif()
 
-if(APPLE)
-    include(Deploy)
-endif()
+#if(APPLE)
+#    include(Deploy)
+#endif()
+
+target_link_libraries(feather ${ZLIB_LIBRARIES})
 
 install(TARGETS feather
         DESTINATION ${CMAKE_INSTALL_PREFIX}

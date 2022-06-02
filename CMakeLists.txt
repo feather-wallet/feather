@@ -3,13 +3,16 @@ project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(VERSION_MAJOR "2")
 set(VERSION_MINOR "1")
 set(VERSION_REVISION "2")
 set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
+
+set ( CMAKE_CXX_FLAGS "-no-pie" )
+#target_compile_options(feather PRIVATE -no-pie)
 
 option(STATIC "Link libraries statically, requires static Qt")
 
@@ -28,6 +31,7 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(CheckIncludeFile)
 include(CheckSymbolExists)
+include(SelectLibraryConfigurations)
 
 if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -84,7 +88,8 @@ if(Polyseed_SUBMODULE)
 endif()
 
 # libzip
-find_package(zlib CONFIG)
+set(ZLIB_USE_STATIC_LIBS "ON")
+find_package(ZLIB REQUIRED)
 find_path(LIBZIP_INCLUDE_DIRS zip.h)
 find_library(LIBZIP_LIBRARIES zip)
 
@@ -98,6 +103,8 @@ endif()
 if(MINGW)
     set(Boost_THREADAPI win32)
 endif()
+
+set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.58 REQUIRED COMPONENTS
         system
         filesystem
@@ -107,7 +114,8 @@ find_package(Boost 1.58 REQUIRED COMPONENTS
         regex
         serialization
         program_options
-        locale)
+        locale
+        )
 
 if(UNIX AND NOT APPLE)
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -115,12 +123,12 @@ if(UNIX AND NOT APPLE)
         set(CMAKE_SKIP_RPATH ON)
     endif()
 
-    find_package(X11 REQUIRED)
-    message(STATUS "X11_FOUND = ${X11_FOUND}")
-    message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
-    message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
-    include_directories(${X11_INCLUDE_DIR})
-    link_directories(${X11_LIBRARIES})
+#    find_package(X11 REQUIRED)
+#    message(STATUS "X11_FOUND = ${X11_FOUND}")
+#    message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
+#    message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
+#    include_directories(${X11_INCLUDE_DIR})
+#    link_directories(${X11_LIBRARIES})
     if(STATIC)
         find_library(XCB_LIBRARY xcb)
         message(STATUS "Found xcb library: ${XCB_LIBRARY}")
@@ -175,11 +183,11 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
     set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
-    if(DEPENDS)
-        set(ICU_LIBRARIES iconv)
-    else()
-        set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
-    endif()
+#    if(DEPENDS)
+#        set(ICU_LIBRARIES iconv)
+#    else()
+#        set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
+#    endif()
 elseif(APPLE)
     set(EXTRA_LIBRARIES "-framework AppKit")
 elseif(OPENBSD)
@@ -217,7 +225,7 @@ add_c_flag_if_supported(-Wformat-security C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-Wformat-security CXX_SECURITY_FLAGS)
 
 # -fstack-protector
-if (NOT OPENBSD AND NOT (WIN32 AND (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_LESS 9.1)))
+if (NOT OPENBSD)
     add_c_flag_if_supported(-fstack-protector C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fstack-protector CXX_SECURITY_FLAGS)
     add_c_flag_if_supported(-fstack-protector-strong C_SECURITY_FLAGS)
@@ -246,10 +254,10 @@ if (APPLE)
     add_linker_flag_if_supported(-Wl,-dead_strip LD_SECURITY_FLAGS)
     add_linker_flag_if_supported(-Wl,-dead_strip_dylibs LD_SECURITY_FLAGS)
 endif()
-if (NOT APPLE AND NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "GNU"))
-    # Windows binaries die on startup with PIE when compiled with GCC
-    add_linker_flag_if_supported(-pie LD_SECURITY_FLAGS)
-endif()
+#if (NOT APPLE AND NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "GNU"))
+#    # Windows binaries die on startup with PIE when compiled with GCC
+#    add_linker_flag_if_supported(-pie LD_SECURITY_FLAGS)
+#endif()
 add_linker_flag_if_supported(-Wl,-z,relro LD_SECURITY_FLAGS)
 add_linker_flag_if_supported(-Wl,-z,now LD_SECURITY_FLAGS)
 add_linker_flag_if_supported(-Wl,-z,noexecstack noexecstack_SUPPORTED)
@@ -267,19 +275,6 @@ if (WIN32)
     add_linker_flag_if_supported(-Wl,--nxcompat LD_SECURITY_FLAGS)
     add_linker_flag_if_supported(-Wl,--high-entropy-va LD_SECURITY_FLAGS)
 endif()
-
-if(STATIC)
-    add_linker_flag_if_supported(-static-libgcc STATIC_FLAGS)
-    add_linker_flag_if_supported(-static-libstdc++ STATIC_FLAGS)
-    if(MINGW)
-        add_linker_flag_if_supported(-static STATIC_FLAGS)
-    endif()
-endif()
-
-# With GCC 6.1.1 the compiled binary malfunctions due to aliasing. Until that
-# is fixed in the code (Issue #847), force compiler to be conservative.
-add_c_flag_if_supported(-fno-strict-aliasing C_SECURITY_FLAGS)
-add_cxx_flag_if_supported(-fno-strict-aliasing CXX_SECURITY_FLAGS)
 
 add_c_flag_if_supported(-fPIC C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-fPIC CXX_SECURITY_FLAGS)

@@ -1,0 +1,23 @@
+--- a/include/polyseed.h
++++ b/include/polyseed.h
+@@ -93,13 +93,13 @@ Shared/static library definitions
+     - define POLYSEED_STATIC when linking to the static library
+ */
+ #if defined(_WIN32) || defined(__CYGWIN__)
+-    #ifdef POLYSEED_SHARED
+-        #define POLYSEED_API __declspec(dllexport)
+-    #elif !defined(POLYSEED_STATIC)
+-        #define POLYSEED_API __declspec(dllimport)
+-    #else
+-        #define POLYSEED_API
+-    #endif
++//    #ifdef POLYSEED_SHARED
++//        #define POLYSEED_API __declspec(dllexport)
++//    #elif !defined(POLYSEED_STATIC)
++//        #define POLYSEED_API __declspec(dllimport)
++//    #else
++          #define POLYSEED_API
++//    #endif
+     #define POLYSEED_PRIVATE
+ #else
+     #ifdef POLYSEED_SHARED

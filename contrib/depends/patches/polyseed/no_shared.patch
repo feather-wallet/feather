@@ -1,0 +1,42 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,19 +28,20 @@ if(NOT CMAKE_BUILD_TYPE)
+   message(STATUS "Setting default build type: ${CMAKE_BUILD_TYPE}")
+ endif()
+
+-add_library(polyseed SHARED ${polyseed_sources})
+-set_property(TARGET polyseed PROPERTY POSITION_INDEPENDENT_CODE ON)
+-set_property(TARGET polyseed PROPERTY PUBLIC_HEADER include/polyseed.h)
+-include_directories(polyseed
+-  include/)
+-target_compile_definitions(polyseed PRIVATE POLYSEED_SHARED)
+-set_target_properties(polyseed PROPERTIES VERSION 1.0.0
+-                                          SOVERSION 1
+-                                          C_STANDARD 11
+-                                          C_STANDARD_REQUIRED ON)
++#add_library(polyseed SHARED ${polyseed_sources})
++#set_property(TARGET polyseed PROPERTY POSITION_INDEPENDENT_CODE ON)
++#set_property(TARGET polyseed PROPERTY PUBLIC_HEADER include/polyseed.h)
++#include_directories(polyseed
++#  include/)
++#target_compile_definitions(polyseed PRIVATE POLYSEED_SHARED)
++#set_target_properties(polyseed PROPERTIES VERSION 1.0.0
++#                                          SOVERSION 1
++#                                          C_STANDARD 11
++#                                          C_STANDARD_REQUIRED ON)
+
+ add_library(polyseed_static STATIC ${polyseed_sources})
+ set_property(TARGET polyseed_static PROPERTY POSITION_INDEPENDENT_CODE ON)
++set_property(TARGET polyseed_static PROPERTY PUBLIC_HEADER include/polyseed.h)
+ include_directories(polyseed_static
+   include/)
+ target_compile_definitions(polyseed_static PRIVATE POLYSEED_STATIC)
+@@ -57,7 +58,7 @@ target_link_libraries(polyseed-tests
+   PRIVATE polyseed_static)
+
+ include(GNUInstallDirs)
+-install(TARGETS polyseed polyseed_static
++install(TARGETS polyseed_static
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
