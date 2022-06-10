@@ -243,7 +243,7 @@ private:
     LocalMoneroWidget *m_localMoneroWidget = nullptr;
 #endif
 
-    QList<PriceTickerWidget*> m_priceTickerWidgets;
+    QList<TickerWidgetBase*> m_tickerWidgets;
     BalanceTickerWidget *m_balanceTickerWidget;
 
     QPointer<QAction> m_clearRecentlyOpenAction;

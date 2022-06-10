@@ -25,6 +25,7 @@ public:
 
     void setPercentageText(const QString &text, bool positive);
     void setFiatText(double amount, const QString &fiatCurrency);
+    void setDisplayText(const QString &text);
 
 public slots:
     virtual void updateDisplay() = 0;
@@ -62,6 +63,21 @@ public slots:
 
 private:
     QString m_symbol;
+};
+
+class RatioTickerWidget : public TickerWidgetBase
+{
+    Q_OBJECT
+
+public:
+    explicit RatioTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol1, QString symbol2);
+
+public slots:
+    void updateDisplay() override;
+
+private:
+    QString m_symbol1;
+    QString m_symbol2;
 };
 
 #endif // FEATHER_TICKERWIDGET_H

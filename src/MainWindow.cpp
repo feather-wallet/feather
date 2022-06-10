@@ -363,9 +363,10 @@ void MainWindow::initMenu() {
 
 void MainWindow::initHome() {
     // Ticker widgets
-    m_priceTickerWidgets.append(new PriceTickerWidget(this, m_ctx, "XMR"));
-    m_priceTickerWidgets.append(new PriceTickerWidget(this, m_ctx, "BTC"));
-    for (const auto &widget : m_priceTickerWidgets) {
+    m_tickerWidgets.append(new PriceTickerWidget(this, m_ctx, "XMR"));
+    m_tickerWidgets.append(new PriceTickerWidget(this, m_ctx, "BTC"));
+    m_tickerWidgets.append(new RatioTickerWidget(this, m_ctx, "XMR", "BTC"));
+    for (const auto &widget : m_tickerWidgets) {
         ui->tickerLayout->addWidget(widget);
     }
 
@@ -851,8 +852,8 @@ void MainWindow::menuAboutClicked() {
 
 void MainWindow::menuSettingsClicked() {
     Settings settings{m_ctx, this};
-    for (const auto &widget: m_priceTickerWidgets) {
-        connect(&settings, &Settings::preferredFiatCurrencyChanged, widget, &PriceTickerWidget::updateDisplay);
+    for (const auto &widget: m_tickerWidgets) {
+        connect(&settings, &Settings::preferredFiatCurrencyChanged, widget, &TickerWidgetBase::updateDisplay);
     }
     connect(&settings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
     connect(&settings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
