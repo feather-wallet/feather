@@ -9,6 +9,7 @@
 #include "model/AddressBookModel.h"
 #include "model/TransactionHistoryModel.h"
 #include "utils/brute.h"
+#include "utils/Utils.h"
 #include "constants.h"
 
 CLI::CLI(Mode mode, QCommandLineParser *cmdargs, QObject *parent)
@@ -34,7 +35,7 @@ CLI::CLI(Mode mode, QCommandLineParser *cmdargs, QObject *parent)
         QString password = cmdargs->value("password");
 
 
-        m_walletManager->openWalletAsync(walletFile, password, constants::networkType);
+        m_walletManager->openWalletAsync(walletFile, password, constants::networkType, constants::kdfRounds, Utils::ringDatabasePath());
     }
     else if (mode == Mode::BruteforcePassword)
     {

@@ -74,7 +74,7 @@ Wallet *WalletManager::createWallet(const QString &path, const QString &password
     return new Wallet(w);
 }
 
-Wallet *WalletManager::openWallet(const QString &path, const QString &password, NetworkType::Type nettype, quint64 kdfRounds)
+Wallet *WalletManager::openWallet(const QString &path, const QString &password, NetworkType::Type nettype, quint64 kdfRounds, const QString &ringDatabasePath)
 {
     QMutexLocker locker(&m_mutex);
     WalletPassphraseListenerImpl tmpListener(this);
@@ -88,7 +88,7 @@ Wallet *WalletManager::openWallet(const QString &path, const QString &password, 
 
     qDebug() << QString("%1: opening wallet at %2, nettype = %3 ").arg(__PRETTY_FUNCTION__).arg(qPrintable(path)).arg(nettype);
 
-    Monero::Wallet * w =  m_pimpl->openWallet(path.toStdString(), password.toStdString(), static_cast<Monero::NetworkType>(nettype), kdfRounds, &tmpListener);
+    Monero::Wallet * w = m_pimpl->openWallet(path.toStdString(), password.toStdString(), static_cast<Monero::NetworkType>(nettype), kdfRounds, ringDatabasePath.toStdString(), &tmpListener);
     w->setListener(nullptr);
 
     qDebug() << QString("%1: opened wallet: %2, status: %3").arg(__PRETTY_FUNCTION__).arg(w->address(0, 0).c_str()).arg(w->status());
@@ -102,10 +102,10 @@ Wallet *WalletManager::openWallet(const QString &path, const QString &password, 
     return wallet;
 }
 
-void WalletManager::openWalletAsync(const QString &path, const QString &password, NetworkType::Type nettype, quint64 kdfRounds)
+void WalletManager::openWalletAsync(const QString &path, const QString &password, NetworkType::Type nettype, quint64 kdfRounds, const QString &ringDatabasePath)
 {
-    m_scheduler.run([this, path, password, nettype, kdfRounds] {
-        emit walletOpened(openWallet(path, password, nettype, kdfRounds));
+    m_scheduler.run([this, path, password, nettype, kdfRounds, ringDatabasePath] {
+        emit walletOpened(openWallet(path, password, nettype, kdfRounds, ringDatabasePath));
     });
 }
 

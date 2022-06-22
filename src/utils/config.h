@@ -123,7 +123,6 @@ public:
     void resetToDefaults();
 
     static QDir defaultConfigDir();
-    static QDir defaultPortableConfigDir();
 
     static Config* instance();
 

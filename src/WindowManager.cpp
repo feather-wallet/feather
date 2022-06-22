@@ -156,7 +156,7 @@ void WindowManager::tryOpenWallet(const QString &path, const QString &password) 
     }
 
     m_openingWallet = true;
-    m_walletManager->openWalletAsync(path, password, constants::networkType, 1);
+    m_walletManager->openWalletAsync(path, password, constants::networkType, constants::kdfRounds, Utils::ringDatabasePath());
 }
 
 void WindowManager::onWalletOpened(Wallet *wallet) {
