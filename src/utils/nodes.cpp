@@ -383,18 +383,11 @@ void Nodes::onWalletRefreshed() {
         if (m_connection.isOnion())
             return;
 
-        // Don't reconnect on Tails or Whonix (all traffic is already routed through Tor)
-        if (TailsOS::detect() || WhonixOS::detect())
-            return;
-
         this->autoConnect(true);
     }
 }
 
 bool Nodes::useOnionNodes() {
-    if (TailsOS::detect() || WhonixOS::detect()) {
-        return true;
-    }
     auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
     if (privacyLevel == Config::allTor) {
         return true;
@@ -424,6 +417,10 @@ bool Nodes::useTorProxy(const FeatherNode &node) {
 
     if (Utils::isTorsocks()) {
         return false;
+    }
+
+    if (TailsOS::detect() || WhonixOS::detect()) {
+        return true;
     }
 
     return this->useOnionNodes();

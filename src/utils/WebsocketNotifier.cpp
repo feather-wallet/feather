@@ -121,9 +121,6 @@ void WebsocketNotifier::onWSNodes(const QJsonArray &nodes) {
         if(nettype == "testnet" && networkType != NetworkType::TESTNET)
             continue;
 
-        if(type == "clearnet" && (TailsOS::detect() || WhonixOS::detect() || Utils::isTorsocks()))
-            continue;
-
         FeatherNode node{obj.value("address").toString(),
                          obj.value("height").toInt(),
                          obj.value("target_height").toInt(),
