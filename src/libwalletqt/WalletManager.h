@@ -35,13 +35,13 @@ public:
      * \param nettype    - type of network the wallet is running on
      * \return wallet object pointer
      */
-    Wallet * openWallet(const QString &path, const QString &password, NetworkType::Type nettype = NetworkType::MAINNET, quint64 kdfRounds = 1);
+    Wallet * openWallet(const QString &path, const QString &password, NetworkType::Type nettype = NetworkType::MAINNET, quint64 kdfRounds = 1, const QString &ringDatabasePath = "");
 
     /*!
      * \brief openWalletAsync - asynchronous version of "openWallet". Returns immediately. "walletOpened" signal
      *                          emitted when wallet opened;
      */
-    void openWalletAsync(const QString &path, const QString &password, NetworkType::Type nettype = NetworkType::MAINNET, quint64 kdfRounds = 1);
+    void openWalletAsync(const QString &path, const QString &password, NetworkType::Type nettype = NetworkType::MAINNET, quint64 kdfRounds = 1, const QString &ringDatabasePath = "");
 
     Wallet * recoveryWallet(const QString &path, const QString &password, const QString &seed, const QString &seed_offset,
                             NetworkType::Type nettype = NetworkType::MAINNET, quint64 restoreHeight = 0, quint64 kdfRounds = 1);

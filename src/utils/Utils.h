@@ -21,8 +21,12 @@ namespace Utils
     bool pixmapWrite(const QString &path, const QPixmap &pixmap);
     QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
 
-    bool dirExists(const QString &path);
+    QString portablePath();
+    bool isPortableMode();
     bool portableFileExists(const QString &dir);
+    QString ringDatabasePath();
+
+    bool dirExists(const QString &path);
     QString defaultWalletDir();
     QString applicationPath();
 

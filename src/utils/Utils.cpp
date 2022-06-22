@@ -102,6 +102,14 @@ bool dirExists(const QString &path) {
     return pathDir.exists();
 }
 
+QString portablePath() {
+    return Utils::applicationPath() + "/feather_data";
+}
+
+bool isPortableMode() {
+    return Utils::portableFileExists(Utils::applicationPath());
+}
+
 bool portableFileExists(const QString &dir) {
     QStringList portableFiles = {".portable", ".portable.txt", "portable.txt"};
 
@@ -111,9 +119,8 @@ bool portableFileExists(const QString &dir) {
 }
 
 QString defaultWalletDir() {
-    QString portablePath = QCoreApplication::applicationDirPath();
-    if (Utils::portableFileExists(portablePath)) {
-        return portablePath + "/feather_data/wallets";
+    if (Utils::isPortableMode()) {
+        return Utils::portablePath() + "/wallets";
     }
 
     if (TailsOS::detect()) {
@@ -145,13 +152,35 @@ QString defaultWalletDir() {
     return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/wallets";
 }
 
-QString applicationPath() {
-    QString applicationPath = qgetenv("APPIMAGE");
-    if (!applicationPath.isEmpty()) {
-        applicationPath = QFileInfo(applicationPath).absoluteDir().path();
-    } else {
-        applicationPath = QCoreApplication::applicationDirPath();
+QString ringDatabasePath() {
+    if (Utils::isPortableMode()) {
+        QString suffix = "";
+        if (constants::networkType != NetworkType::Type::MAINNET) {
+            suffix = "-" + Utils::QtEnumToString(constants::networkType);
+        }
+        return Utils::portablePath() + "/ringdb" + suffix;
     }
+    return ""; // Use libwallet default
+}
+
+QString applicationPath() {
+    QString applicationPath = QCoreApplication::applicationDirPath();
+    QDir appDir(applicationPath);
+
+#ifdef Q_OS_MACOS
+    // applicationDirPath will be inside the app bundle
+
+    if (applicationPath.endsWith("Contents/MacOS")) {
+        appDir.cd("../../..");
+    }
+    return appDir.absolutePath();
+#endif
+
+    QString appimagePath = qgetenv("APPIMAGE");
+    if (!appimagePath.isEmpty()) {
+        return QFileInfo(appimagePath).absoluteDir().path();
+    }
+
     return applicationPath;
 }
 

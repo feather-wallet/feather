@@ -159,7 +159,7 @@ void Settings::setupNodeTab() {
 void Settings::setupPathsTab() {
     ui->lineEdit_defaultWalletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
-    ui->lineEdit_applicationDir->setText(QCoreApplication::applicationDirPath());
+    ui->lineEdit_applicationDir->setText(Utils::applicationPath());
 
     connect(ui->btn_browseDefaultWalletDir, &QPushButton::clicked, [this]{
         QString walletDirOld = config()->get(Config::walletDirectory).toString();
