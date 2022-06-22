@@ -118,10 +118,15 @@ void Settings::setupPrivacyTab() {
     });
 
     // [Disable websocket]
-    ui->checkBox_disableWebsocket->setChecked(config()->get(Config::disableWebsocket).toBool());
-    connect(ui->checkBox_disableWebsocket, &QCheckBox::toggled, [this](bool checked){
-        config()->set(Config::disableWebsocket, checked);
-        this->enableWebsocket(!checked);
+    ui->checkBox_enableWebsocket->setChecked(!config()->get(Config::disableWebsocket).toBool());
+    connect(ui->checkBox_enableWebsocket, &QCheckBox::toggled, [this](bool checked){
+        config()->set(Config::disableWebsocket, !checked);
+        this->enableWebsocket(checked);
+    });
+    connect(ui->btn_enableWebsocket, &QPushButton::clicked, [this]{
+        QMessageBox::information(this, "Obtain third-party information", "Feather can connect to an onion service hosted by the Feather developers to obtain pricing information, a curated list of remote nodes, Home feeds, the latest version of Feather Wallet and more.\n\n"
+                                                                         "This service is only used to fetch information and can only be reached over Tor. The wallet does not send information about its state or your transactions to the server. It is not used for any telemetry or crash reports.\n\n"
+                                                                         "If you opt to disable this connection some wallet functionality will be disabled. You can re-enable it at any time.");
     });
 
     // [Do not write log files to disk]

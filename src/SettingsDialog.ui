@@ -264,14 +264,14 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_10">
          <item>
-          <widget class="QCheckBox" name="checkBox_disableWebsocket">
+          <widget class="QCheckBox" name="checkBox_enableWebsocket">
            <property name="text">
-            <string>Disable websocket</string>
+            <string>Obtain third-party data</string>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="btn_disableWebsocket">
+          <widget class="QPushButton" name="btn_enableWebsocket">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
              <horstretch>0</horstretch>

@@ -16,6 +16,7 @@
 #include "PageSetSeedPassphrase.h"
 #include "PageHardwareDevice.h"
 #include "PageNetworkTor.h"
+#include "PageNetworkWebsocket.h"
 #include "constants.h"
 
 #include <QLineEdit>
@@ -33,6 +34,7 @@ WalletWizard::WalletWizard(QWidget *parent)
 
     auto networkPage = new PageNetwork(this);
     auto networkTorPage = new PageNetworkTor(this);
+    auto networkWebsocketPage = new PageNetworkWebsocket(this);
     auto menuPage = new PageMenu(&m_wizardFields, m_walletKeysFilesModel, this);
     auto openWalletPage = new PageOpenWallet(m_walletKeysFilesModel, this);
     auto createWallet = new PageWalletFile(&m_wizardFields , this);
@@ -46,6 +48,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_SetPasswordPage, walletSetPasswordPage);
     setPage(Page_Network, networkPage);
     setPage(Page_NetworkTor, networkTorPage);
+    setPage(Page_NetworkWebsocket, networkWebsocketPage);
     setPage(Page_WalletRestoreSeed, new PageWalletRestoreSeed(&m_wizardFields, this));
     setPage(Page_WalletRestoreKeys, new PageWalletRestoreKeys(&m_wizardFields, this));
     setPage(Page_SetRestoreHeight, new PageSetRestoreHeight(&m_wizardFields, this));
@@ -59,7 +62,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     setWizardStyle(WizardStyle::ModernStyle);
     setOption(QWizard::NoBackButtonOnStartPage);
 
-    connect(networkTorPage, &PageNetworkTor::initialNetworkConfigured, [this](){
+    connect(networkWebsocketPage, &PageNetworkWebsocket::initialNetworkConfigured, [this](){
         emit initialNetworkConfigured();
     });
 

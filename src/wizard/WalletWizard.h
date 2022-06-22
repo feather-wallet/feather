@@ -65,7 +65,8 @@ public:
         Page_WalletRestoreKeys,
         Page_SetRestoreHeight,
         Page_HardwareDevice,
-        Page_NetworkTor
+        Page_NetworkTor,
+        Page_NetworkWebsocket
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);

@@ -11,9 +11,6 @@ PageNetworkTor::PageNetworkTor(QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->setCommitPage(true);
-    this->setButtonText(QWizard::CommitButton, "Next");
-
     QPixmap iconAllTorExceptNode(":/assets/images/securityLevelStandard.png");
     QPixmap iconAllTorExceptInitSync(":/assets/images/securityLevelSafer.png");
     QPixmap iconAllTor(":/assets/images/securityLevelSafest.png");
@@ -46,7 +43,7 @@ void PageNetworkTor::initializePage() {
 }
 
 int PageNetworkTor::nextId() const {
-    return WalletWizard::Page_Menu;
+    return WalletWizard::Page_NetworkWebsocket;
 }
 
 bool PageNetworkTor::validatePage() {
