@@ -25,7 +25,7 @@ RUN bash verify-packages.sh && \
     dpkg -i --force-depends *.deb && \
     rm -rf /deps /archives
 
-# OpenSSL: Required for CMake, Qt 5.15.2, libwallet, Tor
+# OpenSSL: Required for CMake, Qt 5.15, libwallet, Tor
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
 RUN git clone -b OpenSSL_1_1_1m --depth 1 https://github.com/openssl/openssl.git && \
     cd openssl && \
@@ -73,7 +73,7 @@ RUN git clone -b 2.13.92 --depth 1 https://gitlab.freedesktop.org/fontconfig/fon
     make -j$THREADS install && \
     rm -rf $(pwd)
 
-ENV QT_VERSION=v5.15.4-lts-lgpl
+ENV QT_VERSION=v5.15.5-lts-lgpl
 RUN git clone git://code.qt.io/qt/qt5.git -b ${QT_VERSION} --depth 1 && \
     cd qt5 && \
     git clone git://code.qt.io/qt/qtbase.git -b ${QT_VERSION} --depth 1 && \
