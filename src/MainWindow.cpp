@@ -253,7 +253,6 @@ void MainWindow::initMenu() {
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_ctx->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
-    connect(ui->actionChange_restore_height, &QAction::triggered, this, &MainWindow::showRestoreHeightDialog);
 
     // [Wallet] -> [Advanced] -> [Export]
     connect(ui->actionExportOutputs,   &QAction::triggered, this, &MainWindow::exportOutputs);
@@ -394,7 +393,6 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::deviceButtonPressed,      this, &MainWindow::onDeviceButtonPressed);
     connect(m_ctx.get(), &AppContext::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
     connect(m_ctx.get(), &AppContext::endTransaction,           this, &MainWindow::onEndTransaction);
-    connect(m_ctx.get(), &AppContext::customRestoreHeightSet,   this, &MainWindow::onCustomRestoreHeightSet);
     connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
     connect(m_ctx.get(), &AppContext::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
 
@@ -785,22 +783,6 @@ void MainWindow::showPasswordDialog() {
 void MainWindow::updatePasswordIcon() {
     QIcon icon = m_ctx->wallet->getPassword().isEmpty() ? icons()->icon("unlock.svg") : icons()->icon("lock.svg");
     m_statusBtnPassword->setIcon(icon);
-}
-
-void MainWindow::showRestoreHeightDialog() {
-    // settings custom restore height is only available for 25 word seeds
-    auto seedLength = m_ctx->wallet->seedLength();
-    if (seedLength == 14 || seedLength == 16) { // TODO: update this warning (import tx, delete cache, restore from seed)
-        const auto msg = "This wallet has a mnemonic seed with an embedded restore height.";
-        QMessageBox::warning(this, "Cannot set custom restore height", msg);
-        return;
-    }
-
-    RestoreHeightDialog dialog{this, m_ctx->wallet->getWalletCreationHeight()};
-    if (dialog.exec() == QDialog::Accepted) {
-        int restoreHeight = dialog.getHeight();
-        m_ctx->onSetRestoreHeight(restoreHeight);
-    }
 }
 
 void MainWindow::showKeysDialog() {
@@ -1443,13 +1425,6 @@ void MainWindow::onEndTransaction() {
     if (m_ctx->wallet->isHwBacked()) {
         m_splashDialog->hide();
     }
-}
-
-void MainWindow::onCustomRestoreHeightSet(int height) {
-    auto msg = QString("The restore height for this wallet has been set to %1. "
-                       "Please re-open the wallet. Feather will now quit.").arg(height);
-    QMessageBox::information(this, "Cannot set custom restore height", msg);
-    this->menuQuitClicked();
 }
 
 void MainWindow::onKeysCorrupted() {

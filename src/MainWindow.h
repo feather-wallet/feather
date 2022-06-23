@@ -20,7 +20,6 @@
 #include "dialog/PasswordChangeDialog.h"
 #include "dialog/KeysDialog.h"
 #include "dialog/AboutDialog.h"
-#include "dialog/RestoreHeightDialog.h"
 #include "dialog/SplashDialog.h"
 #include "libwalletqt/Wallet.h"
 #include "model/SubaddressModel.h"
@@ -138,7 +137,6 @@ private slots:
     void onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version);
     void onInitiateTransaction();
     void onEndTransaction();
-    void onCustomRestoreHeightSet(int height);
     void onKeysCorrupted();
     void onSelectedInputsChanged(const QStringList &selectedInputs);
 
@@ -173,7 +171,6 @@ private slots:
     void onViewOnBlockExplorer(const QString &txid);
     void onResendTransaction(const QString &txid);
     void importContacts();
-    void showRestoreHeightDialog();
     void importTransaction();
     void onDeviceError(const QString &error);
     void onDeviceButtonRequest(quint64 code);

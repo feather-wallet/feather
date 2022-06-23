@@ -57,7 +57,6 @@ public slots:
     void onCancelTransaction(PendingTransaction *tx, const QVector<QString> &address);
     void onSweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
     void onCreateTransactionError(const QString &msg);
-    void onSetRestoreHeight(quint64 height);
     void onMultiBroadcast(PendingTransaction *tx);
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
@@ -87,8 +86,6 @@ signals:
     void createTransactionError(QString message);
     void createTransactionCancelled(const QVector<QString> &address, quint64 amount);
     void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
-    void setRestoreHeightError(const QString &msg);
-    void customRestoreHeightSet(int height);
     void initiateTransaction();
     void endTransaction();
     void deviceButtonRequest(quint64 code);

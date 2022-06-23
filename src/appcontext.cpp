@@ -199,24 +199,6 @@ void AppContext::onTorSettingsChanged() {
     qDebug() << "Changed privacyLevel to " << privacyLevel;
 }
 
-void AppContext::onSetRestoreHeight(quint64 height){
-    auto seedLength = this->wallet->seedLength();
-    if (seedLength == 14 || seedLength == 16) {
-        const auto msg = "This wallet has a mnemonic seed with an embedded restore height.";
-        emit setRestoreHeightError(msg);
-        return;
-    }
-
-    this->wallet->setWalletCreationHeight(height);
-    this->wallet->setPassword(this->wallet->getPassword());  // trigger .keys write
-
-    // nuke wallet cache
-    const auto fn = this->wallet->cachePath();
-    WalletManager::clearWalletCache(fn);
-
-    emit customRestoreHeightSet(height);
-}
-
 void AppContext::stopTimers() {
     m_storeTimer.stop();
 }

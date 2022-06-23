@@ -476,7 +476,6 @@
      <addaction name="actionRescan_spent"/>
      <addaction name="actionWallet_cache_debug"/>
      <addaction name="separator"/>
-     <addaction name="actionChange_restore_height"/>
      <addaction name="menuExport"/>
      <addaction name="menuImport"/>
     </widget>
