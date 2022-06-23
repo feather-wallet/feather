@@ -279,7 +279,8 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
     wallet->setCacheAttribute("feather.seedoffset", seedOffset);
 
-    this->onWalletOpened(wallet);
+    wallet->deleteLater();
+    this->tryOpenWallet(path, password);
 }
 
 void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight)
