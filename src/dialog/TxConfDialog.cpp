@@ -72,6 +72,11 @@ TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *t
         ui->label_address->setToolTip("Wallet change/primary address");
     }
 
+    if (tx->fee() > WalletManager::amountFromDouble(0.01)) {
+        ui->label_fee->setStyleSheet(ColorScheme::RED.asStylesheet(true));
+        ui->label_fee->setToolTip("Unrealistic fee. You may be connected to a malicious node.");
+    }
+
     ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
