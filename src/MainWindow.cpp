@@ -1575,6 +1575,9 @@ void MainWindow::donationNag() {
     if (m_ctx->wallet->viewOnly())
         return;
 
+    if (m_ctx->wallet->balanceAll() == 0)
+        return;
+
     auto donationCounter = config()->get(Config::donateBeg).toInt();
     if (donationCounter == -1)
         return;
