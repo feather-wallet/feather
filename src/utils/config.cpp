@@ -79,6 +79,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}},
+        {Config::bountiesFrontend, {QS("bountiesFrontend"), "https://bounties.monero.social"}},
 
         {Config::fiatSymbols, {QS("fiatSymbols"), QStringList{"USD", "EUR", "GBP", "CAD", "AUD", "RUB"}}},
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},

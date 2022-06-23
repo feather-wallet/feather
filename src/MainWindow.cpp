@@ -62,6 +62,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     // Websocket notifier
     connect(websocketNotifier(), &WebsocketNotifier::CCSReceived, ui->ccsWidget->model(), &CCSModel::updateEntries);
+    connect(websocketNotifier(), &WebsocketNotifier::BountyReceived, ui->bountiesWidget->model(), &BountiesModel::updateBounties);
     connect(websocketNotifier(), &WebsocketNotifier::RedditReceived, ui->redditWidget->model(), &RedditModel::updatePosts);
     connect(websocketNotifier(), &WebsocketNotifier::RevuoReceived, ui->revuoWidget, &RevuoWidget::updateItems);
     connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, this, &MainWindow::onUpdatesAvailable);
@@ -373,6 +374,7 @@ void MainWindow::initHome() {
     ui->fiatTickerLayout->addWidget(m_balanceTickerWidget);
 
     connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
+    connect(ui->bountiesWidget, &BountiesWidget::donate, this, &MainWindow::fillSendTab);
     connect(ui->redditWidget, &RedditWidget::setStatusText, this, &MainWindow::setStatusText);
     connect(ui->revuoWidget, &RevuoWidget::donate, [this](const QString &address, const QString &description){
         m_sendWidget->fill(address, description);
@@ -932,6 +934,11 @@ void MainWindow::showHistoryTab() {
 
 void MainWindow::showSendTab() {
     this->raise();
+    ui->tabWidget->setCurrentIndex(Tabs::SEND);
+}
+
+void MainWindow::fillSendTab(const QString &address, const QString &description) {
+    m_sendWidget->fill(address, description);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 

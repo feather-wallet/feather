@@ -83,6 +83,7 @@ public:
         blockExplorer,
         redditFrontend,
         localMoneroFrontend,
+        bountiesFrontend,
 
         fiatSymbols,
         cryptoSymbols,

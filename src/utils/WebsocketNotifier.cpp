@@ -55,6 +55,11 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
         this->onWSCCS(ccs_data);
     }
 
+    else if(cmd == "bounties") {
+        auto data = msg.value("data").toArray();
+        this->onWSBounties(data);
+    }
+
     else if(cmd == "txFiatHistory") {
         auto txFiatHistory_data = msg.value("data").toObject();
         emit TxFiatHistoryReceived(txFiatHistory_data);
@@ -151,10 +156,6 @@ void WebsocketNotifier::onWSReddit(const QJsonArray& reddit_data) {
 void WebsocketNotifier::onWSCCS(const QJsonArray &ccs_data) {
     QList<QSharedPointer<CCSEntry>> l;
 
-    QStringList fonts = {"state", "address", "author", "date",
-                         "title", "target_amount", "raised_amount",
-                         "percentage_funded", "contributions"};
-
     for (auto &&entry: ccs_data) {
         auto obj = entry.toObject();
         auto c = QSharedPointer<CCSEntry>(new CCSEntry());
@@ -199,6 +200,24 @@ void WebsocketNotifier::onWSRevuo(const QJsonArray &revuo_data) {
     }
 
     emit RevuoReceived(l);
+}
+
+void WebsocketNotifier::onWSBounties(const QJsonArray &bounties_data) {
+    QList<QSharedPointer<BountyEntry>> l;
+
+    for (const auto& entry : bounties_data) {
+        QJsonObject obj = entry.toObject();
+        auto bounty = new BountyEntry(obj.value("votes").toInt(),
+                                      obj.value("title").toString(),
+                                      obj.value("amount").toDouble(),
+                                      obj.value("link").toString(),
+                                      obj.value("address").toString(),
+                                      obj.value("status").toString());
+        QSharedPointer<BountyEntry> b = QSharedPointer<BountyEntry>(bounty);
+        l.append(b);
+    }
+
+    emit BountyReceived(l);
 }
 
 void WebsocketNotifier::onWSUpdates(const QJsonObject &updates) {

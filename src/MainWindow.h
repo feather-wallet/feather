@@ -215,6 +215,7 @@ private:
     void updateWidgetIcons();
     bool verifyPassword();
     void patchStylesheetMac();
+    void fillSendTab(const QString &address, const QString &description);
     void userActivity();
     void checkUserActivity();
 

@@ -11,6 +11,7 @@
 #include "networktype.h"
 #include "nodes.h"
 #include "prices.h"
+#include "widgets/Bounty.h"
 #include "widgets/RedditPost.h"
 #include "widgets/CCSEntry.h"
 #include "widgets/RevuoItem.h"
@@ -37,6 +38,7 @@ signals:
     void FiatRatesReceived(const QJsonObject &fiat_rates);
     void RedditReceived(QList<QSharedPointer<RedditPost>> L);
     void CCSReceived(QList<QSharedPointer<CCSEntry>> L);
+    void BountyReceived(QList<QSharedPointer<BountyEntry>> L);
     void RevuoReceived(QList<QSharedPointer<RevuoItem>> L);
     void TxFiatHistoryReceived(const QJsonObject &data);
     void UpdatesReceived(const QJsonObject &updates);
@@ -51,6 +53,7 @@ private slots:
     void onWSNodes(const QJsonArray &nodes);
     void onWSReddit(const QJsonArray &reddit_data);
     void onWSCCS(const QJsonArray &ccs_data);
+    void onWSBounties(const QJsonArray &bounties_data);
     void onWSRevuo(const QJsonArray &revuo_data);
     void onWSUpdates(const QJsonObject &updates);
     void onWSXMRigDownloads(const QJsonObject &downloads);
