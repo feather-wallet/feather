@@ -1654,11 +1654,15 @@ void MainWindow::checkUserActivity() {
             this->close();
             // This doesn't close the wallet immediately.
             // FIXME
-//            do {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            do {
+#endif
                 QApplication::processEvents();
-                // Because running it a single time is apparently not enough.
-                // TODO: Qt bug? Need proper fix for this.
-//            } while (QApplication::hasPendingEvents());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            // Because running it a single time is apparently not enough.
+            // TODO: Qt bug? Need proper fix for this.
+            } while (QApplication::hasPendingEvents());
+#endif
         } else {
             m_checkUserActivity.start();
         }
