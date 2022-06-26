@@ -1413,18 +1413,18 @@ Wallet::~Wallet()
 
     m_scheduler.shutdownWaitForFinished();
 
-    if (status() == Status_Critical || status() == Status_BadPassword)
+    //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
+    if(status() == Status_Critical || status() == Status_BadPassword)
         qDebug("Not storing wallet cache");
-    else if (m_walletImpl->store(""))
+    else if( m_walletImpl->store(""))
         qDebug("Wallet cache stored successfully");
     else
         qDebug("Error storing wallet cache");
-
     delete m_walletImpl;
     m_walletImpl = nullptr;
     delete m_walletListener;
-    m_walletListener = nullptr;
-    qDebug("~Wallet: Closed");
+    m_walletListener = NULL;
+    qDebug("m_walletImpl deleted");
 }
 
 void Wallet::startRefreshThread()
