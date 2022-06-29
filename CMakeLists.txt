@@ -3,7 +3,7 @@ project(feather)
 
 message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 set(VERSION_MAJOR "1")
@@ -16,7 +16,7 @@ option(STATIC "Link libraries statically, requires static Qt")
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
-option(TOR_BIN "Path to Tor binary to embed inside Feather" OFF)
+option(TOR_DIR "Path to Tor binary to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
@@ -28,6 +28,7 @@ include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)
 include(CheckIncludeFile)
 include(CheckSymbolExists)
+include(SelectLibraryConfigurations)
 
 if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -92,7 +93,8 @@ add_subdirectory(contrib/monero-seed)
 find_package(Polyseed REQUIRED)
 
 # libzip
-find_package(zlib CONFIG)
+set(ZLIB_USE_STATIC_LIBS "ON")
+find_package(ZLIB REQUIRED)
 find_path(LIBZIP_INCLUDE_DIRS zip.h)
 find_library(LIBZIP_LIBRARIES zip)
 
@@ -106,6 +108,8 @@ endif()
 if(MINGW)
     set(Boost_THREADAPI win32)
 endif()
+
+set(Boost_USE_MULTITHREADED ON)
 find_package(Boost 1.58 REQUIRED COMPONENTS
         system
         filesystem
@@ -115,7 +119,8 @@ find_package(Boost 1.58 REQUIRED COMPONENTS
         regex
         serialization
         program_options
-        locale)
+        locale
+        )
 
 if(UNIX AND NOT APPLE)
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -160,7 +165,7 @@ if(TOR_DIR)
 
     message(STATUS "Embedding Tor binaries at ${TOR_DIR}")
 else()
-    message(STATUS "Skipping Tor inclusion because -DTOR_BIN=Off")
+    message(STATUS "Skipping Tor inclusion because -DTOR_DIR=Off")
 endif()
 
 if(MINGW)
