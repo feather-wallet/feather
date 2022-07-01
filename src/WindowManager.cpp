@@ -185,15 +185,15 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
 
     this->onInitialNetworkConfigured();
 
-    if (!wallet->cacheAttributeExists("feather.xmrig_password") && !wallet->cacheAttributeExists("feather.created")) {
-        auto result = QMessageBox::question(nullptr, "Foreign wallet",
-                                            "This wallet file was not created with Feather. This may cause unexpected behavior. Please restore your wallet from seed.\n\nOpen this wallet anyway?");
-        if (result == QMessageBox::No) {
-            wallet->deleteLater();
-            this->initWizard();
-            return;
-        }
-    }
+//    if (!wallet->cacheAttributeExists("feather.xmrig_password") && !wallet->cacheAttributeExists("feather.created")) {
+//        auto result = QMessageBox::question(nullptr, "Foreign wallet",
+//                                            "This wallet file was not created with Feather. This may cause unexpected behavior. Please restore your wallet from seed.\n\nOpen this wallet anyway?");
+//        if (result == QMessageBox::No) {
+//            wallet->deleteLater();
+//            this->initWizard();
+//            return;
+//        }
+//    }
 
     if (!wallet->viewOnly() && !wallet->isHwBacked()) {
         if (!wallet->isDeterministic()) {
