@@ -462,6 +462,8 @@ public:
 
     bool isDeviceConnected() const;
 
+    bool setRingDatabase(const QString &path);
+
     // TODO: setListenter() when it implemented in API
 signals:
     // emitted on every event happened with wallet

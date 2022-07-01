@@ -1359,6 +1359,10 @@ bool Wallet::isDeviceConnected() const {
     return m_walletImpl->isDeviceConnected();
 }
 
+bool Wallet::setRingDatabase(const QString &path) {
+    return m_walletImpl->setRingDatabase(path.toStdString());
+}
+
 void Wallet::onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort)
 {
     if (m_walletListener != nullptr)
