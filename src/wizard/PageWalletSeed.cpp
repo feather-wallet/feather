@@ -58,8 +58,7 @@ void PageWalletSeed::seedRoulette(int count) {
 void PageWalletSeed::generateSeed() {
     QString mnemonic;
 
-
-    m_seed = Seed(Seed::Type::POLYSEED);
+    m_seed = Seed(Seed::Type::POLYSEED, constants::networkType);
     mnemonic = m_seed.mnemonic.join(" ");
     m_restoreHeight = m_seed.restoreHeight;
 
