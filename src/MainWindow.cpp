@@ -170,9 +170,6 @@ void MainWindow::initStatusBar() {
 void MainWindow::initWidgets() {
     int homeWidget = config()->get(Config::homeWidget).toInt();
     ui->tabHomeWidget->setCurrentIndex(TabsHome(homeWidget));
-    connect(ui->tabHomeWidget, &QTabWidget::currentChanged, [](int index){
-        config()->set(Config::homeWidget, TabsHome(index));
-    });
 
     // [History]
     m_historyWidget = new HistoryWidget(m_ctx, this);
@@ -907,6 +904,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
     if (!this->cleanedUp) {
         this->cleanedUp = true;
+
+        config()->set(Config::homeWidget, ui->tabHomeWidget->currentIndex());
 
         m_historyWidget->resetModel();
 

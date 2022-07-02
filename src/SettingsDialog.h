@@ -53,6 +53,8 @@ private:
     void setupLocalMoneroFrontendCombobox();
     void enableWebsocket(bool enabled);
 
+    void closeEvent(QCloseEvent *event) override;
+
     QScopedPointer<Ui::Settings> ui;
     QSharedPointer<AppContext> m_ctx;
 

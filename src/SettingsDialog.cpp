@@ -6,6 +6,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QCloseEvent>
 
 #include "Icons.h"
 #include "utils/WebsocketNotifier.h"
@@ -22,9 +23,6 @@ Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     ui->tabWidget->setTabVisible(5, false);
     ui->tabWidget->setCurrentIndex(config()->get(Config::lastSettingsPage).toInt());
-    connect(ui->tabWidget, &QTabWidget::currentChanged, [](int index){
-            config()->set(Config::lastSettingsPage, index);
-    });
 
     this->setupGeneralTab();
     this->setupPrivacyTab();
@@ -268,6 +266,11 @@ void Settings::enableWebsocket(bool enabled) {
     }
     ui->nodeWidget->onWebsocketStatusChanged();
     emit websocketStatusChanged(enabled);
+}
+
+void Settings::closeEvent(QCloseEvent *event) {
+  config()->set(Config::lastSettingsPage, ui->tabWidget->currentIndex());
+  event->accept();
 }
 
 Settings::~Settings() = default;

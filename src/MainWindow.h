@@ -90,8 +90,10 @@ public:
     };
 
     enum TabsHome {
-        CCS,
-        REDDIT
+        CCS = 0,
+        BOUNTIES,
+        REDDIT,
+        REVUO
     };
 
     void showOrHide();
