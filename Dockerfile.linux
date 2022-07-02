@@ -27,9 +27,9 @@ RUN bash verify-packages.sh && \
 
 # OpenSSL: Required for CMake, Qt 5.15, libwallet, Tor
 ENV OPENSSL_ROOT_DIR=/usr/local/openssl/
-RUN git clone -b OpenSSL_1_1_1m --depth 1 https://github.com/openssl/openssl.git && \
+RUN git clone -b OpenSSL_1_1_1p --depth 1 https://github.com/openssl/openssl.git && \
     cd openssl && \
-    git reset --hard ac3cef223a4c61d6bee34527b6d4c8c6432494a7 && \
+    git reset --hard 8aaca20cf9996257d1ce2e6f4d3059b3698dde3d && \
     ./config no-shared no-dso --prefix=/usr/local/openssl && \
     make -j$THREADS && \
     make -j$THREADS install_sw && \
