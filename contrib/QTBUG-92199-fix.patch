@@ -1,0 +1,46 @@
+diff --git a/src/widgets/styles/qstylesheetstyle.cpp b/src/widgets/styles/qstylesheetstyle.cpp
+index 2ab9756f8d..a9d6ecd51a 100644
+--- a/src/widgets/styles/qstylesheetstyle.cpp
++++ b/src/widgets/styles/qstylesheetstyle.cpp
+@@ -1465,7 +1465,6 @@ void QRenderRule::configurePalette(QPalette *p, QPalette::ColorGroup cg, const Q
+         p->setBrush(cg, w->foregroundRole(), pal->foreground);
+         p->setBrush(cg, QPalette::WindowText, pal->foreground);
+         p->setBrush(cg, QPalette::Text, pal->foreground);
+-        p->setBrush(cg, QPalette::PlaceholderText, pal->foreground);
+     }
+     if (pal->selectionBackground.style() != Qt::NoBrush)
+         p->setBrush(cg, QPalette::Highlight, pal->selectionBackground);
+diff --git a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+index 26868a763c..82527849b0 100644
+--- a/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
++++ b/tests/auto/widgets/styles/qstylesheetstyle/tst_qstylesheetstyle.cpp
+@@ -126,7 +126,6 @@ private slots:
+     void QTBUG15910_crashNullWidget();
+     void QTBUG36933_brokenPseudoClassLookup();
+     void styleSheetChangeBeforePolish();
+-    void placeholderColor();
+     //at the end because it mess with the style.
+     void widgetStyle();
+     void appStyle();
+@@ -2230,21 +2229,6 @@ void tst_QStyleSheetStyle::highdpiImages()
+     QHighDpiScaling::updateHighDpiScaling(); // reset to normal
+ }
+ 
+-void tst_QStyleSheetStyle::placeholderColor()
+-{
+-    const QColor red(Qt::red);
+-    qApp->setStyleSheet("* { color: red; }");
+-    QLineEdit le1;
+-    QLineEdit le2;
+-    le2.setEnabled(false);
+-    le1.ensurePolished();
+-    QCOMPARE(le1.palette().placeholderText(), red);
+-    le2.ensurePolished();
+-    QCOMPARE(le2.palette().placeholderText(), red);
+-    le2.setEnabled(true);
+-    QCOMPARE(le2.palette().placeholderText(), red);
+-}
+-
+ QTEST_MAIN(tst_QStyleSheetStyle)
+ #include "tst_qstylesheetstyle.moc"
+ 
