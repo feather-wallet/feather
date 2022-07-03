@@ -215,7 +215,7 @@ private:
     void addToRecentlyOpened(const QString &filename);
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
-    bool verifyPassword();
+    bool verifyPassword(bool senstive = true);
     void patchStylesheetMac();
     void fillSendTab(const QString &address, const QString &description);
     void userActivity();

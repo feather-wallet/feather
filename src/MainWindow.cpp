@@ -1611,10 +1611,10 @@ void MainWindow::updateRecentlyOpenedMenu() {
     ui->menuRecently_open->addAction(m_clearRecentlyOpenAction);
 }
 
-bool MainWindow::verifyPassword() {
+bool MainWindow::verifyPassword(bool sensitive) {
     bool incorrectPassword = false;
     while (true) {
-        PasswordDialog passwordDialog{this->walletName(), incorrectPassword, true, this};
+        PasswordDialog passwordDialog{this->walletName(), incorrectPassword, sensitive, this};
         int ret = passwordDialog.exec();
         if (ret == QDialog::Rejected) {
             return false;
@@ -1652,7 +1652,10 @@ void MainWindow::checkUserActivity() {
     if ((m_userLastActive + (config()->get(Config::inactivityLockTimeout).toInt()*60)) < QDateTime::currentSecsSinceEpoch()) {
         m_checkUserActivity.stop();
         qInfo() << "Locking wallet for inactivity";
-        if (!this->verifyPassword()) {
+        ui->tabWidget->hide();
+        this->statusBar()->hide();
+        this->menuBar()->hide();
+        if (!this->verifyPassword(false)) {
             this->setEnabled(false);
             this->close();
             // This doesn't close the wallet immediately.
@@ -1667,6 +1670,9 @@ void MainWindow::checkUserActivity() {
             } while (QApplication::hasPendingEvents());
 #endif
         } else {
+            ui->tabWidget->show();
+            this->statusBar()->show();
+            this->menuBar()->show();
             m_checkUserActivity.start();
         }
     }
