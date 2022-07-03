@@ -70,6 +70,10 @@ void HistoryWidget::focusSearchbar() {
     ui->search->setFocus();
 }
 
+void HistoryWidget::setWebsocketEnabled(bool enabled) {
+    ui->history->setColumnHidden(TransactionHistoryModel::FiatAmount, !enabled);
+}
+
 void HistoryWidget::showContextMenu(const QPoint &point) {
     QModelIndex index = ui->history->indexAt(point);
     if (!index.isValid()) {

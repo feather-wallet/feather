@@ -27,6 +27,7 @@ public:
 
     void setSearchbarVisible(bool visible);
     void focusSearchbar();
+    void setWebsocketEnabled(bool enabled);
 
 public slots:
     void setSearchText(const QString &text);

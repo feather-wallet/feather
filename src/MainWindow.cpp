@@ -564,6 +564,8 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     ui->tabWidget->setTabVisible(Tabs::CALC, enabled && config()->get(Config::showTabCalc).toBool());
     ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && config()->get(Config::showTabExchange).toBool());
 
+    m_historyWidget->setWebsocketEnabled(enabled);
+
 #ifdef HAS_XMRIG
     m_xmrig->setDownloadsTabEnabled(enabled);
 #endif
