@@ -41,7 +41,7 @@ QString Wallet::getSeed(const QString &seedOffset) const
 
 qsizetype Wallet::seedLength() const
 {
-    auto seedLength = this->getCacheAttribute("feather.seed").split(" ").length();
+    auto seedLength = this->getCacheAttribute("feather.seed").split(" ", Qt::SkipEmptyParts).length();
     return seedLength ? seedLength : 25;
 }
 
