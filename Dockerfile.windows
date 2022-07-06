@@ -165,10 +165,15 @@ RUN git clone -b 0.23.92 --depth 1 --recursive https://github.com/mchehab/zbar.g
     make install && \
     rm -rf $(pwd)
 
+COPY contrib/patches/polyseed/force-static-mingw.patch .
+COPY contrib/patches/polyseed/no_shared.patch .
+
 # polyseed: Required for Feather
 RUN git clone https://github.com/tevador/polyseed.git && \
     cd polyseed && \
     git reset --hard 4945d8239d6b26dc12723ca2aaa9f8110ceff5af && \
+    git apply ../force-static-mingw.patch && \
+    git apply ../no_shared.patch && \
     mkdir build && \
     cd build && \
     cmake -DCMAKE_INSTALL_PREFIX=/depends/x86_64-w64-mingw32 \
