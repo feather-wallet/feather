@@ -231,7 +231,7 @@ public:
     bool importOutputs(const QString& path);
 
     //! import a transaction
-    bool importTransaction(const QString& txid, const QVector<quint64>& output_indeces, quint64 height, quint64 timestamp, bool miner_tx, bool pool, bool double_spend_seen);
+    bool importTransaction(const QString& txid);
 
     QString printBlockchain();
     QString printTransfers();

@@ -23,18 +23,11 @@ public:
     ~TxImportDialog() override;
 
 private slots:
-    void loadTx();
     void onImport();
-    void onApiResponse(const DaemonRpc::DaemonResponse &resp);
 
 private:
     QScopedPointer<Ui::TxImportDialog> ui;
     QSharedPointer<AppContext> m_ctx;
-
-    DaemonRpc *m_rpc;
-    QTimer *m_loadTimer;
-
-    QJsonObject m_transaction;
 };
 
 

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>700</width>
-    <height>442</height>
+    <height>88</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -28,38 +28,11 @@
     </widget>
    </item>
    <item>
-    <widget class="QPlainTextEdit" name="resp">
-     <property name="readOnly">
-      <bool>true</bool>
-     </property>
-     <property name="placeholderText">
-      <string>Debug info..</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <layout class="QHBoxLayout" name="horizontalLayout_2">
      <item>
-      <widget class="QPushButton" name="btn_load">
-       <property name="text">
-        <string>Load</string>
-       </property>
-      </widget>
-     </item>
-     <item>
       <widget class="QPushButton" name="btn_import">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
        <property name="text">
         <string>Import</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="label_loading">
-       <property name="text">
-        <string>Loading transaction</string>
        </property>
       </widget>
      </item>
