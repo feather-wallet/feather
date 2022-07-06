@@ -2,7 +2,7 @@
 ; Copyright (c) 2021-2022, The Monero Project
 
 #define AppName "Feather Wallet"
-#define AppVersion "1.0.2"
+#define AppVersion "2.0.0"
 #define AppPublisher "Feather Wallet"
 #define AppURL "https://featherwallet.org"
 #define AppExeName "feather.exe"
