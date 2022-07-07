@@ -1,5 +1,10 @@
 find_path(POLYSEED_INCLUDE_DIR polyseed.h)
-message(STATUS "POLYSEED PATH ${POLYSEED_INCLUDE_DIR}")
-
 find_library(POLYSEED_LIBRARY polyseed)
+if (NOT POLYSEED_INCLUDE_DIR OR NOT POLYSEED_LIBRARY)
+    MESSAGE(STATUS "Could not find installed Polyseed, using submodule instead")
+    set(Polyseed_SUBMODULE "ON")
+    set(POLYSEED_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/src/third-party/polyseed/include)
+    set(POLYSEED_LIBRARY polyseed)
+endif()
+message(STATUS "POLYSEED PATH ${POLYSEED_INCLUDE_DIR}")
 message(STATUS "POLYSEED LIBARY ${POLYSEED_LIBRARY}")

@@ -4,3 +4,6 @@
 [submodule "src/third-party/singleapplication"]
 	path = src/third-party/singleapplication
 	url = https://github.com/itay-grudev/SingleApplication.git
+[submodule "src/third-party/polyseed"]
+	path = src/third-party/polyseed
+	url = https://github.com/tevador/polyseed.git

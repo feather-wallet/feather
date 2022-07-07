@@ -79,6 +79,9 @@ add_subdirectory(contrib/monero-seed)
 
 # Polyseed 16 word mnemonic seeds
 find_package(Polyseed REQUIRED)
+if(Polyseed_SUBMODULE)
+    add_subdirectory(src/third-party/polyseed)
+endif()
 
 # libzip
 find_package(zlib CONFIG)
