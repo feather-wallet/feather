@@ -236,7 +236,7 @@ target_link_libraries(feather
         ${UNBOUND_LIBRARY}
         ${SODIUM_LIBRARY}
         easylogging
-        blockchain_db
+        ringct
         ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}
         ${CMAKE_DL_LIBS}
