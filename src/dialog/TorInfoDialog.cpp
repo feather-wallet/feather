@@ -56,7 +56,7 @@ TorInfoDialog::TorInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->btn_configureInitSync->setIcon(icons()->icon("preferences.svg"));
     connect(ui->btn_configureInitSync, &QPushButton::clicked, this, &TorInfoDialog::onShowInitSyncConfigDialog);
 
-#ifndef HAS_TOR_BIN
+#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
     ui->check_useLocalTor->setChecked(true);
     ui->check_useLocalTor->setEnabled(false);
     ui->check_useLocalTor->setToolTip("Feather was bundled without Tor");
