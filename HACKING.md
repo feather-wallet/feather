@@ -36,21 +36,6 @@ For macOS it's easiest to leverage [brew](https://brew.sh) to install the requir
 brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
 ```
 
-### Polyseed
-
-Feather uses Polyseed to create 16-word mnemonic seeds. It is not currently packaged anywhere, so you must build it 
-from source manually.
-
-```bash
-git clone https://github.com/tevador/polyseed.git
-cd polyseed
-mkdir build
-cd build
-cmake ..
-make
-sudo make install
-```
-
 ### Tor daemon
 
 A Tor daemon is required to connect to .onion nodes and the websocket server. Development builds do not include 
