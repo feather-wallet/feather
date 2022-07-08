@@ -74,13 +74,14 @@ release-static-windows-installer:
 	cd build/$(target)/release && \
 	cmake \
 	    -D PLATFORM_INSTALLER=On \
-	    -D TOR_DIR=Off \
 		-DARCH=x86-64 \
 		-D BUILD_TAG=$(tag) \
 		-D CMAKE_BUILD_TYPE=Release \
 		-D STATIC=ON \
 		-D CMAKE_TOOLCHAIN_FILE=$(root)/$(target)/share/toolchain.cmake \
 		$(CMAKEFLAGS) \
+		-D TOR_DIR=Off \
+		-D TOR_VERSION=Off \
 		../../.. && \
 	$(MAKE)
 
