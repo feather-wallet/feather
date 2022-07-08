@@ -140,12 +140,12 @@ RUN wget https://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.16.tar.gz && \
     rm -rf $(pwd)
 
 # TOR_VERSION is used by CMAKE to determine embedded version
-ENV TOR_VERSION=0.4.7.7
+ENV TOR_VERSION=0.4.7.8
 ENV TOR_DIR=/tor/Tor/
-RUN wget https://dist.torproject.org/torbrowser/11.0.14/tor-win64-0.4.7.7.zip && \
-    echo "ba2a8610e13656262bc4b0da33e814f0eff3a32d4e255d4a65a77cd78ed2b3e5 tor-win64-0.4.7.7.zip" | sha256sum -c && \
-    unzip tor-win64-0.4.7.7.zip -d tor && \
-    rm tor-win64-0.4.7.7.zip
+RUN wget https://dist.torproject.org/torbrowser/11.0.15/tor-win64-0.4.7.8.zip && \
+    echo "14115567eb9674c79481509ac97d4a7b76c80a36966dd9864989a96670440757 tor-win64-0.4.7.8.zip" | sha256sum -c && \
+    unzip tor-win64-0.4.7.8.zip -d tor && \
+    rm tor-win64-0.4.7.8.zip
 
 RUN git clone https://github.com/nih-at/libzip.git && \
     cd libzip && \
