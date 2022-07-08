@@ -231,7 +231,7 @@ bool TorManager::shouldStartTorDaemon() {
     }
 
     // Don't start a Tor daemon if we don't have one
-#ifndef HAS_TOR_BIN
+#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
     qWarning() << "Feather built without embedded Tor. Assuming --use-local-tor";
     return false;
 #endif
