@@ -45,11 +45,15 @@
   "stagenet": {
     "tor": [
       "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081",
-      "rino4sek7bzoqgkgsn5qxlsic3gk2mj23t3shcaj5axfyipjnyoql4ad.onion:38081"
+      "rino4sek7bzoqgkgsn5qxlsic3gk2mj23t3shcaj5axfyipjnyoql4ad.onion:38081",
+      "plowsof7q4sexshcqfhoe2ksjalzsaxfblew26zleaq4ty647ly6qyid.onion:38089"
     ],
     "clearnet": [
-      "super.fast.node.xmr.pm:38089",
-      "stagenet.community.rino.io:38081"
+      "stagenet.community.rino.io:38081",
+      "node.sethforprivacy.com:38089",
+      "node2.sethforprivacy.com:38089",
+      "xmr-lux.boldsuck.org:38081",
+      "stagenet.xmr-tw.org:38081"
     ]
   }
 }
