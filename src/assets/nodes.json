@@ -36,10 +36,14 @@
   },
   "testnet": {
     "tor": [
-      "rino4tpcrisugb2pt7bhs7cwkrkoigf366aetuzyqkqcakaad7vijiid.onion:28081"
+      "rino4tpcrisugb2pt7bhs7cwkrkoigf366aetuzyqkqcakaad7vijiid.onion:28081",
+      "plowsof7q4sexshcqfhoe2ksjalzsaxfblew26zleaq4ty647ly6qyid.onion:28089"
     ],
     "clearnet": [
-      "testnet.community.rino.io:28081"
+      "testnet.community.rino.io:28081",
+      "node2.sethforprivacy.com:28089",
+      "node.sethforprivacy.com:28089",
+      "testnet.xmr-tw.org:28081"
     ]
   },
   "stagenet": {
