@@ -250,6 +250,11 @@ QString WalletManager::paymentIdFromAddress(const QString &address, NetworkType:
     return QString::fromStdString(Monero::Wallet::paymentIdFromAddress(address.toStdString(), static_cast<Monero::NetworkType>(nettype)));
 }
 
+QString WalletManager::baseAddressFromIntegratedAddress(const QString &address, NetworkType::Type nettype)
+{
+    return QString::fromStdString(Monero::Wallet::baseAddressFromIntegratedAddress(address.toStdString(), static_cast<Monero::NetworkType>(nettype)))   ;
+}
+
 bool WalletManager::isDaemonLocal(const QString &daemon_address) const
 {
     return daemon_address.isEmpty() ? false : Monero::Utils::isAddressLocal(daemon_address.toStdString());

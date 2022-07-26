@@ -667,11 +667,12 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
     tx->refresh();
     QSet<QString> outputAddresses;
     for (const auto &output : tx->transaction(0)->outputs()) {
-        outputAddresses.insert(output->address());
+        outputAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(output->address(), constants::networkType));
     }
     QSet<QString> destAddresses;
     for (const auto &addr : address) {
-        destAddresses.insert(addr);
+        // TODO: Monero core bug, integrated address is not added to dests for transactions spending ALL
+        destAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(addr, constants::networkType));
     }
     if (!outputAddresses.contains(destAddresses)) {
         err = QString("%1 %2").arg(err, "Constructed transaction doesn't appear to send to (all) specified destination address(es). Try creating the transaction again.");

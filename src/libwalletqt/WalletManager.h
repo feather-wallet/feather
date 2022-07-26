@@ -98,6 +98,7 @@ public:
     static bool keyValid(const QString &key, const QString &address, bool isViewKey, NetworkType::Type nettype);
 
     QString paymentIdFromAddress(const QString &address, NetworkType::Type nettype) const;
+    static QString baseAddressFromIntegratedAddress(const QString &address, NetworkType::Type nettype);
 
     bool isDaemonLocal(const QString &daemon_address) const;
 
