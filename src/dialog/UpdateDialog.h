@@ -16,7 +16,7 @@ class UpdateDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer);
+    explicit UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer, QString platformTag);
     ~UpdateDialog() override;
 
 private slots:
@@ -41,6 +41,7 @@ private:
     QString m_downloadUrl;
     QString m_hash;
     QString m_signer;
+    QString m_platformTag;
 
     QString m_updatePath;
 

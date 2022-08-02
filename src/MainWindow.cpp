@@ -1345,9 +1345,10 @@ void MainWindow::onCheckUpdatesComplete(const QString &version, const QString &b
 
 void MainWindow::onShowUpdateCheck(const QString &version, const QString &binaryFilename,
                                    const QString &hash, const QString &signer) {
-    QString downloadUrl = QString("https://featherwallet.org/files/releases/%1/%2").arg(this->getPlatformTag(), binaryFilename);
+    QString platformTag = this->getPlatformTag();
+    QString downloadUrl = QString("https://featherwallet.org/files/releases/%1/%2").arg(platformTag, binaryFilename);
 
-    UpdateDialog updateDialog{this, version, downloadUrl, hash, signer};
+    UpdateDialog updateDialog{this, version, downloadUrl, hash, signer, platformTag};
     connect(&updateDialog, &UpdateDialog::restartWallet, m_windowManager, &WindowManager::restartApplication);
     updateDialog.exec();
 }

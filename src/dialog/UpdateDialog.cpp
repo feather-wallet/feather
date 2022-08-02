@@ -14,13 +14,14 @@
 
 #include "zip.h"
 
-UpdateDialog::UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer)
+UpdateDialog::UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer, QString platformTag)
         : QDialog(parent)
         , ui(new Ui::UpdateDialog)
         , m_version(std::move(version))
         , m_downloadUrl(std::move(downloadUrl))
         , m_hash(std::move(hash))
         , m_signer(std::move(signer))
+        , m_platformTag(std::move(platformTag))
 {
     ui->setupUi(this);
 
@@ -179,6 +180,10 @@ void UpdateDialog::onInstallUpdate() {
 
     QDir applicationDir(Utils::applicationPath());
     QString filePath = applicationDir.filePath(name);
+    if (m_platformTag == "win-installer") {
+        filePath = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), name);
+    }
+
     m_updatePath = filePath;
 
     QFile file(filePath);
@@ -200,7 +205,11 @@ void UpdateDialog::onInstallUpdate() {
         return;
     }
 
-    this->setStatus("Installation successful. Do you want to restart Feather now?");
+    if (m_platformTag == "win-installer") {
+        this->setStatus("Installer written. Click 'restart' to close Feather and start the installer.");
+    } else {
+        this->setStatus("Installation successful. Do you want to restart Feather now?");
+    }
     ui->btn_restart->show();
 }
 
