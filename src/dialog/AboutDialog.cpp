@@ -19,6 +19,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto about = Utils::fileOpenQRC(":assets/about.txt");
     auto about_text = Utils::barrayToString(about);
     about_text = about_text.replace("<feather_version>", FEATHER_VERSION);
+    about_text = about_text.replace("<feather_git_head>", FEATHER_COMMIT);
     about_text = about_text.replace("<current_year>", QString::number(QDate::currentDate().year()));
     ui->copyrightText->setPlainText(about_text);
 

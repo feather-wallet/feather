@@ -45,7 +45,7 @@ void DebugInfoDialog::updateInfo() {
     else
         torStatus = "Unknown";
 
-    ui->label_featherVersion->setText(QString("%1").arg(FEATHER_VERSION));
+    ui->label_featherVersion->setText(QString("%1-%2").arg(FEATHER_VERSION, FEATHER_COMMIT));
 
     ui->label_walletHeight->setText(QString::number(m_ctx->wallet->blockChainHeight()));
     ui->label_daemonHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainHeight()));

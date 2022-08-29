@@ -1,4 +1,4 @@
-Feather <feather_version>
+Feather <feather_version> (<feather_git_head>)
 
 Copyright (c) 2020-<current_year>, The Monero Project
 
