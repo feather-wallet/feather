@@ -509,6 +509,12 @@
            <string>blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>127.0.0.1:31312</string>
+          </property>
+         </item>
+
         </widget>
        </item>
        <item row="1" column="0">
