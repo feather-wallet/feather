@@ -14,7 +14,8 @@
       "xmrnodesarnt4w35aqmu66aart3o324yw6qbnv6pglpof6uqaydzk5id.onion:18081",
       "usexmr2eeexmlwpuvsfe6tyjmdqliplb2b7uxju6yrrziq3n7fksnxyd.onion:18081",
       "mhfsxznn5pi4xuxohj5k7unqp73sa6d44mbeewbpxnm25z3wzfogcfyd.onion:18081",
-      "7inib34hqn2ocmlaaxjshdavbdn5w5rfdff735lbz33765j2pz3tn4ad.onion:18081"
+      "7inib34hqn2ocmlaaxjshdavbdn5w5rfdff735lbz33765j2pz3tn4ad.onion:18081",
+      "qz43zul2x56jexzoqgkx2trzwcfnr6l3hbtfcfx54g4r3eahy3bssjyd.onion:18083"
     ],
     "clearnet": [
       "node.community.rino.io:18081",
@@ -43,7 +44,8 @@
       "testnet.community.rino.io:28081",
       "node2.sethforprivacy.com:28089",
       "node.sethforprivacy.com:28089",
-      "testnet.xmr-tw.org:28081"
+      "testnet.xmr-tw.org:28081",
+      "singapore.node.xmr.pm:28081"
     ]
   },
   "stagenet": {
@@ -57,7 +59,8 @@
       "node.sethforprivacy.com:38089",
       "node2.sethforprivacy.com:38089",
       "xmr-lux.boldsuck.org:38081",
-      "stagenet.xmr-tw.org:38081"
+      "stagenet.xmr-tw.org:38081",
+      "singapore.node.xmr.pm:38081"
     ]
   }
 }
