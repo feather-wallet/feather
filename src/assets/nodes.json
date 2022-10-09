@@ -36,8 +36,7 @@
   },
   "testnet": {
     "tor": [
-      "rino4tpcrisugb2pt7bhs7cwkrkoigf366aetuzyqkqcakaad7vijiid.onion:28081",
-      "plowsof7q4sexshcqfhoe2ksjalzsaxfblew26zleaq4ty647ly6qyid.onion:28089"
+      "rino4tpcrisugb2pt7bhs7cwkrkoigf366aetuzyqkqcakaad7vijiid.onion:28081"
     ],
     "clearnet": [
       "testnet.community.rino.io:28081",
@@ -49,8 +48,7 @@
   "stagenet": {
     "tor": [
       "ct36dsbe3oubpbebpxmiqz4uqk6zb6nhmkhoekileo4fts23rvuse2qd.onion:38081",
-      "rino4sek7bzoqgkgsn5qxlsic3gk2mj23t3shcaj5axfyipjnyoql4ad.onion:38081",
-      "plowsof7q4sexshcqfhoe2ksjalzsaxfblew26zleaq4ty647ly6qyid.onion:38089"
+      "rino4sek7bzoqgkgsn5qxlsic3gk2mj23t3shcaj5axfyipjnyoql4ad.onion:38081"
     ],
     "clearnet": [
       "stagenet.community.rino.io:38081",
