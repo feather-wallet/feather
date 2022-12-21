@@ -41,5 +41,5 @@ define $(package)_stage_cmds
   cp .libs/libfuseprivate.a $($(package)_staging_prefix_dir)/lib/ && \
   cp .libs/libsquashfuse.a $($(package)_staging_prefix_dir)/lib/ && \
   cp .libs/libsquashfuse_ll.a $($(package)_staging_prefix_dir)/lib/ && \
-  find . -name "*.h" -exec cp "{}" $($(package)_staging_prefix_dir)/include/  \;
+  find . -name "*.h" -exec cp --parents '{}' $($(package)_staging_prefix_dir)/include/  \;
 endef
