@@ -7,7 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-#include <monero_seed/monero_seed.hpp>
+#include "monero_seed/monero_seed.hpp"
 
 #include "networktype.h"
 #include "utils/Utils.h"

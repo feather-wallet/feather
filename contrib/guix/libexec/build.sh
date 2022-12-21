@@ -35,6 +35,7 @@ Required environment variables as seen inside the container:
     JOBS: ${JOBS:?not set}
     DISTSRC: ${DISTSRC:?not set}
     OUTDIR: ${OUTDIR:?not set}
+    OPTIONS: ${OPTIONS}
 EOF
 
 ACTUAL_OUTDIR="${OUTDIR}"
@@ -185,6 +186,19 @@ esac
 # Depends Building #
 ####################
 
+# LDFLAGS
+case "$HOST" in
+    *linux*)  HOST_LDFLAGS="-Wl,--as-needed -Wl,--dynamic-linker=$glibc_dynamic_linker -static-libstdc++ -Wl,-O2" ;;
+    *mingw*)  HOST_LDFLAGS="-Wl,--no-insert-timestamp" ;;
+esac
+
+# Using --no-tls-get-addr-optimize retains compatibility with glibc 2.18, by
+# avoiding a PowerPC64 optimisation available in glibc 2.22 and later.
+# https://sourceware.org/binutils/docs-2.35/ld/PowerPC64-ELF64.html
+case "$HOST" in
+    *powerpc64*) HOST_LDFLAGS="${HOST_LDFLAGS} -Wl,--no-tls-get-addr-optimize" ;;
+esac
+
 # Build the depends tree, overriding variables that assume multilib gcc
 make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    ${V:+V=1} \
@@ -197,8 +211,9 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    x86_64_linux_RANLIB=x86_64-linux-gnu-ranlib \
                                    x86_64_linux_NM=x86_64-linux-gnu-nm \
                                    x86_64_linux_STRIP=x86_64-linux-gnu-strip \
+                                   FORCE_USE_SYSTEM_CLANG=1 \
                                    qt_config_opts_x86_64_linux='-platform linux-g++ -xplatform bitcoin-linux-g++' \
-                                   FORCE_USE_SYSTEM_CLANG=1
+                                   guix_ldflags="$HOST_LDFLAGS"
 
 
 ###########################
@@ -219,11 +234,9 @@ mkdir -p "$OUTDIR"
 # Binary Tarball Building #
 ###########################
 
-# CONFIGFLAGS
-CONFIGFLAGS="--enable-reduce-exports --disable-bench --disable-gui-tests --disable-fuzz-binary"
-
 # CFLAGS
 HOST_CFLAGS="-O2 -g"
+HOST_CFLAGS+=$(find /gnu/store -maxdepth 1 -mindepth 1 -type d -exec echo -n " -ffile-prefix-map={}=/usr" \;)
 case "$HOST" in
     *linux*)  HOST_CFLAGS+=" -ffile-prefix-map=${PWD}=." ;;
     *mingw*)  HOST_CFLAGS+=" -fno-ident" ;;
@@ -237,25 +250,8 @@ case "$HOST" in
     arm-linux-gnueabihf) HOST_CXXFLAGS="${HOST_CXXFLAGS} -Wno-psabi" ;;
 esac
 
-# LDFLAGS
-case "$HOST" in
-    *linux*)  HOST_LDFLAGS="-Wl,--as-needed -Wl,--dynamic-linker=$glibc_dynamic_linker -static-libstdc++ -Wl,-O2" ;;
-    *mingw*)  HOST_LDFLAGS="-Wl,--no-insert-timestamp" ;;
-esac
-
-# Using --no-tls-get-addr-optimize retains compatibility with glibc 2.18, by
-# avoiding a PowerPC64 optimisation available in glibc 2.22 and later.
-# https://sourceware.org/binutils/docs-2.35/ld/PowerPC64-ELF64.html
-case "$HOST" in
-    *powerpc64*) HOST_LDFLAGS="${HOST_LDFLAGS} -Wl,--no-tls-get-addr-optimize" ;;
-esac
-
-case "$HOST" in
-    powerpc64-linux-*|riscv64-linux-*) HOST_LDFLAGS="${HOST_LDFLAGS} -Wl,-z,noexecstack" ;;
-esac
-
 # Make $HOST-specific native binaries from depends available in $PATH
-export PATH="${BASEPREFIX}/${HOST}/native/bin:/gnu/store:${PATH}"
+export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
 mkdir -p "$DISTSRC"
 (
     cd "$DISTSRC"
@@ -263,33 +259,144 @@ mkdir -p "$DISTSRC"
     # Extract the source tarball
     tar --strip-components=1 -xf "${GIT_ARCHIVE}"
 
-    # Build Feather Wallet
-    make --jobs="$JOBS" guix target=$HOST
+    # Setup the directory where our Bitcoin Core build for HOST will be
+    # installed. This directory will also later serve as the input for our
+    # binary tarballs.
+    INSTALLPATH="${DISTSRC}/installed"
+    mkdir -p "${INSTALLPATH}"
+
+
+    # Set appropriate CMake options for build type
+    CMAKEVARS="-DWITH_SCANNER=On"
+    case "$HOST" in
+        *mingw32)
+            case "$OPTIONS" in
+                installer)
+                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    ;;
+            esac
+            ;;
+        *linux*)
+            case "$OPTIONS" in
+                tails)
+                    CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    ;;
+            esac
+            ;;
+    esac
+
+    # Configure this DISTSRC for $HOST
+    # shellcheck disable=SC2086
+    env CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}" \
+    cmake --toolchain "${BASEPREFIX}/${HOST}/share/toolchain.cmake" -S . -B build \
+      -DCMAKE_INSTALL_PREFIX="${INSTALLPATH}" \
+      -DCCACHE=OFF \
+      ${CONFIGFLAGS} \
+      -DCMAKE_EXE_LINKER_FLAGS="${HOST_LDFLAGS}" \
+      -DCMAKE_SHARED_LINKER_FLAGS="${HOST_LDFLAGS}" \
+      ${CMAKEVARS}
+
+    make -C build --jobs="$JOBS"
+
+    case "$HOST" in
+        *linux*)
+            bash contrib/AppImage/build-appimage.sh
+            mv feather.AppImage ${DISTNAME}.AppImage
+            cp ${DISTNAME}.AppImage "${INSTALLPATH}/"
+            cp ${DISTNAME}.AppImage "${OUTDIR}/"
+            ;;
+    esac
 
     mkdir -p "$OUTDIR"
 
-    # Setup the directory where our Feather Wallet build for HOST will be
-    # installed. This directory will also later serve as the input for our
-    # binary tarballs.
-    INSTALLPATH="${PWD}/installed/${DISTNAME}"
-    mkdir -p "${INSTALLPATH}"
-    # Install built Feather Wallet to $INSTALLPATH
+    # Make the os-specific installers
+    case "$HOST" in
+        *mingw*)
+            case "$OPTIONS" in
+                installer)
+                    makensis -DCUR_PATH=$PWD -V2 contrib/installers/windows/setup.nsi
+                    cp contrib/installers/windows/FeatherWalletSetup-*.exe "${INSTALLPATH}/"
+                    mv contrib/installers/windows/FeatherWalletSetup-*.exe "${OUTDIR}/"
+                    ;;
+            esac
+            ;;
+    esac
 
+    # Install built Feather to $INSTALLPATH
+    case "$HOST" in
+        *darwin*)
+            make -C build install/strip ${V:+V=1}
+            ;;
+        *)
+            make -C build install ${V:+V=1}
+            ;;
+    esac
 
-    cp -a build/ "$ACTUAL_OUTDIR"
+    # Make macOS DMG
+    case "$HOST" in
+        *darwin*)
+            make -C build deploy ${V:+V=1}
+            mv build/feather.dmg "${OUTDIR}/${DISTNAME}.dmg"
+            ;;
+    esac
+
+    (
+        cd installed
+
+        # Finally, deterministically produce {non-,}debug binary tarballs ready
+        # for release
+        case "$HOST" in
+            *mingw*)
+                case "$OPTIONS" in
+                    installer)
+                        find . -print0 \
+                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                        find . \
+                            | sort \
+                            | zip -X@ "${OUTDIR}/${DISTNAME}-win-installer.zip" \
+                            || ( rm -f "${OUTDIR}/${DISTNAME}-win-installer.zip" && exit 1 )
+                        ;;
+                    "")
+                        mv feather.exe ${DISTNAME}.exe && \
+                        find . -print0 \
+                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                        find . \
+                            | sort \
+                            | zip -X@ "${OUTDIR}/${DISTNAME}-win.zip" \
+                            || ( rm -f "${OUTDIR}/${DISTNAME}-win.zip" && exit 1 )
+                        ;;
+                esac
+                ;;
+            *linux*)
+                find . -not -name "*.AppImage" -print0 \
+                    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                find . -not -name "*.AppImage" \
+                    | sort \
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux.zip" && exit 1 )
+                find . -name "*.AppImage" -print0 \
+                    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                find . -name "*.AppImage" \
+                    | sort \
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux-appimage.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux-appimage.zip" && exit 1 )
+                ;;
+        esac
+
+    )
 )  # $DISTSRC
 
-#rm -rf "$ACTUAL_OUTDIR"
-#mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
-#    || ( rm -rf "$ACTUAL_OUTDIR" && exit 1 )
-#
-#(
-#    cd /outdir-base
-#    {
-#        echo "$GIT_ARCHIVE"
-#        find "$ACTUAL_OUTDIR" -type f
-#    } | xargs realpath --relative-base="$PWD" \
-#      | xargs sha256sum \
-#      | sort -k2 \
-#      | sponge "$ACTUAL_OUTDIR"/SHA256SUMS.part
-#)
+rm -rf "$ACTUAL_OUTDIR"
+mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
+    || ( rm -rf "$ACTUAL_OUTDIR" && exit 1 )
+
+(
+    cd /outdir-base
+    {
+        echo "$GIT_ARCHIVE"
+        find "$ACTUAL_OUTDIR" -type f
+    } | xargs realpath --relative-base="$PWD" \
+      | xargs sha256sum \
+      | sort -k2 \
+      | sponge "$ACTUAL_OUTDIR"/SHA256SUMS.part
+)

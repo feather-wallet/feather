@@ -1,8 +1,8 @@
 package=boost
-$(package)_version=1_64_0
-$(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/1.64.0/
+$(package)_version=1_68_0
+$(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/1.68.0/
 $(package)_file_name=$(package)_$($(package)_version).tar.bz2
-$(package)_sha256_hash=7bcc5caace97baa948931d712ea5f37038dbb1c5d89b43ad4def4ed7cb683332
+$(package)_sha256_hash=7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7
 $(package)_dependencies=libiconv
 $(package)_patches=fix_aroptions.patch fix_arm_arch.patch fix_coalesce.patch
 
@@ -23,7 +23,7 @@ $(package)_archiver_$(host_os)=$($(package)_ar)
 $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
 $(package)_config_libraries=chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,locale
-$(package)_cxxflags=-std=c++11
+$(package)_cxxflags=-std=c++17
 $(package)_cxxflags_linux=-fPIC
 $(package)_cxxflags_freebsd=-fPIC
 endef

@@ -10,8 +10,7 @@ $(package)_sha256_hash=f79b8f904b749e3e0d20afeadecf8249c55b2e32d4ebb089ae378df47
 define $(package)_set_vars
   $(package)_config_opts=--disable-shared --without-docbook --without-tests --without-examples
   $(package)_config_opts += --disable-dependency-tracking --enable-option-checking
-  $(package)_config_opts += --without-xmlwf
-  $(package)_config_opts_linux=--with-pic
+  $(package)_config_opts += --without-xmlwf --with-pic
   $(package)_cppflags += -D_DEFAULT_SOURCE
 endef
 

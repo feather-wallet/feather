@@ -7,18 +7,19 @@ $(package)_dependencies=libgpg-error
 $(package)_patches=gost-sb.h no_gen_gost-sb.patch
 
 define $(package)_set_vars
-  $(package)_build_opts=CFLAGS="-fPIE"
+   $(package)_build_opts=CFLAGS="-fPIE"
 endef
 
+# TODO: do a native compile first to eliminate the need for this patch
 define $(package)_preprocess_cmds
     mv $($(package)_patch_dir)/gost-sb.h cipher/gost-sb.h && \
     patch -p1 < $($(package)_patch_dir)/no_gen_gost-sb.patch
 endef
 
-# building on linux with $($(package)_autoconf) fails for mysterious reasons
+# TODO: building on linux with $($(package)_autoconf) fails for mysterious reasons (related to --host)
 ifeq ($(host_os),linux)
 define $(package)_config_cmds
-    CLAGS='-fPIE' CXXFLAGS='-fPIE' ./configure --disable-shared --enable-static --disable-doc --with-libgpg-error-prefix=$(host_prefix) --prefix=$(host_prefix)
+    CFLAGS='-fPIE' CXXFLAGS='-fPIE' ./configure --enable-digests="sha256 blake2" --enable-ciphers=aes --disable-amd64-as-feature-detection --disable-asm --disable-avx-support --disable-avx2-support --disable-sse41-support --disable-shared --enable-static --disable-doc --with-libgpg-error-prefix=$(host_prefix) --prefix=$(host_prefix)
 endef
 else
 define $(package)_config_cmds

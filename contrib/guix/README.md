@@ -1,8 +1,5 @@
 # Bootstrappable Feather Wallet Builds
 
-Significant portions of the code in this folder were copied from 
-[Bitcoin Core](https://github.com/bitcoin/bitcoin/tree/master/contrib/guix).
-
 This directory contains the files necessary to perform bootstrappable Feather Wallet 
 builds.
 
@@ -313,12 +310,6 @@ Where `<PREFIX>` is likely:
 - `/usr/local` if you installed Guix from source and didn't supply any
   prefix-modifying flags to Guix's `./configure`
 
-For dongcarl's substitute server at https://guix.carldong.io, run as root:
-
-```sh
-wget -qO- 'https://guix.carldong.io/signing-key.pub' | guix archive --authorize
-```
-
 #### Removing authorized keys
 
 To remove previously authorized keys, simply edit `/etc/guix/acl` and remove the
@@ -329,30 +320,7 @@ To remove previously authorized keys, simply edit `/etc/guix/acl` and remove the
 Once its key is authorized, the official Guix build farm at
 https://ci.guix.gnu.org is automatically used unless the `--no-substitutes` flag
 is supplied. This default list of substitute servers is overridable both on a
-`guix-daemon` level and when you invoke `guix` commands. See examples below for
-the various ways of adding dongcarl's substitute server after having [authorized
-his signing key](#authorize-the-signing-keys).
-
-Change the **default list** of substitute servers by starting `guix-daemon` with
-the `--substitute-urls` option (you will likely need to edit your init script):
-
-```sh
-guix-daemon <cmd> --substitute-urls='https://guix.carldong.io https://ci.guix.gnu.org'
-```
-
-Override the default list of substitute servers by passing the
-`--substitute-urls` option for invocations of `guix` commands:
-
-```sh
-guix <cmd> --substitute-urls='https://guix.carldong.io https://ci.guix.gnu.org'
-```
-
-For scripts under `./contrib/guix`, set the `SUBSTITUTE_URLS` environment
-variable:
-
-```sh
-export SUBSTITUTE_URLS='https://guix.carldong.io https://ci.guix.gnu.org'
-```
+`guix-daemon` level and when you invoke `guix` commands. 
 
 ## Option 2: Disabling substitutes on an ad-hoc basis
 

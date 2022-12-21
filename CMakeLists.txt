@@ -1,29 +1,32 @@
-cmake_minimum_required(VERSION 3.20)
-project(feather)
+cmake_minimum_required(VERSION 3.18)
 
-message(STATUS "Initiating compile using CMake ${CMAKE_VERSION}")
+project(feather
+  VERSION "2.1.2"
+  DESCRIPTION "A free Monero desktop wallet"
+  LANGUAGES CXX C ASM
+)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(VERSION_MAJOR "2")
-set(VERSION_MINOR "1")
-set(VERSION_REVISION "2")
-set(VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}")
+set(PACKAGE_NAME ${PROJECT_NAME})
+set(PACKAGE_BUGREPORT "https://github.com/feather-wallet/feather/issues")
+set(PACKAGE_URL "https://featherwallet.org/")
+set(COPYRIGHT_YEAR "2022")
+set(COPYRIGHT_HOLDERS "The Monero Project")
 
-set ( CMAKE_CXX_FLAGS "-no-pie" )
-#target_compile_options(feather PRIVATE -no-pie)
-
-option(STATIC "Link libraries statically, requires static Qt")
-
+# Configurable options
+option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
-option(TOR_DIR "Path to Tor binary to embed inside Feather" OFF)
+option(TOR_DIR "Directory containing Tor binaries to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
+
+
 option(WITH_SCANNER "Enable webcam QR scanner" OFF)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
@@ -37,13 +40,13 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-set(BUILD_GUI_DEPS ON)
-option(ARCH "Target architecture" "native")
-set(BUILD_64 ON)
-set(USE_SINGLE_BUILDDIR ON)
-
 check_include_file(sys/prctl.h HAVE_SYS_PRCTL_H)
 check_symbol_exists(prctl "sys/prctl.h" HAVE_PRCTL)
+
+# Monero configuration
+set(BUILD_GUI_DEPS ON)
+set(BUILD_64 ON)
+set(USE_SINGLE_BUILDDIR ON)
 
 if(STATIC)
     message(STATUS "Initiating static build, turning on manual submodules")
@@ -53,16 +56,19 @@ if(STATIC)
     set(Boost_USE_STATIC_RUNTIME ON)
 endif()
 
-add_subdirectory(monero)
+include(CMakePackageConfigHelpers)
+include(VersionFeather)
+
+#### Dependencies
+# Monero
+add_subdirectory(monero EXCLUDE_FROM_ALL)
 set_property(TARGET wallet_merged PROPERTY FOLDER "monero")
 get_directory_property(ARCH_WIDTH DIRECTORY "monero" DEFINITION ARCH_WIDTH)
 get_directory_property(UNBOUND_LIBRARY DIRECTORY "monero" DEFINITION UNBOUND_LIBRARY)
 get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_TREZOR_READY)
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
 
-include(CMakePackageConfigHelpers)
-include(VersionFeather)
-
+# Easylogging
 include_directories(${EASYLOGGING_INCLUDE})
 link_directories(${EASYLOGGING_LIBRARY_DIRS})
 
@@ -73,18 +79,15 @@ message(STATUS "libsodium: libraries at ${SODIUM_LIBRARY}")
 # QrEncode
 find_package(QREncode REQUIRED)
 
-# Qr scanner
+# ZBAR
 find_package(ZBAR REQUIRED)
 message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
 message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
 
-# Tevador 14 word Monero seed
-add_subdirectory(contrib/monero-seed)
-
-# Polyseed 16 word mnemonic seeds
+# Polyseed
 find_package(Polyseed REQUIRED)
 if(Polyseed_SUBMODULE)
-    add_subdirectory(src/third-party/polyseed)
+    add_subdirectory(src/third-party/polyseed EXCLUDE_FROM_ALL)
 endif()
 
 # libzip
@@ -122,17 +125,6 @@ if(UNIX AND NOT APPLE)
         # https://github.com/monero-project/monero-gui/issues/3142#issuecomment-705940446
         set(CMAKE_SKIP_RPATH ON)
     endif()
-
-#    find_package(X11 REQUIRED)
-#    message(STATUS "X11_FOUND = ${X11_FOUND}")
-#    message(STATUS "X11_INCLUDE_DIR = ${X11_INCLUDE_DIR}")
-#    message(STATUS "X11_LIBRARIES = ${X11_LIBRARIES}")
-#    include_directories(${X11_INCLUDE_DIR})
-#    link_directories(${X11_LIBRARIES})
-    if(STATIC)
-        find_library(XCB_LIBRARY xcb)
-        message(STATUS "Found xcb library: ${XCB_LIBRARY}")
-    endif()
 endif()
 
 include(TorQrcGenerator)
@@ -163,19 +155,6 @@ else()
     message(STATUS "Skipping Tor inclusion because -DTOR_DIR=Off")
 endif()
 
-if(MINGW)
-    string(REGEX MATCH "^[^/]:/[^/]*" msys2_install_path "${CMAKE_C_COMPILER}")
-    message(STATUS "MSYS location: ${msys2_install_path}")
-    set(CMAKE_INCLUDE_PATH "${msys2_install_path}/mingw${ARCH_WIDTH}/include")
-    # This is necessary because otherwise CMake will make Boost libraries -lfoo
-    # rather than a full path. Unfortunately, this makes the shared libraries get
-    # linked due to a bug in CMake which misses putting -static flags around the
-    # -lfoo arguments.
-    set(DEFLIB ${msys2_install_path}/mingw${ARCH_WIDTH}/lib)
-    list(REMOVE_ITEM CMAKE_C_IMPLICIT_LINK_DIRECTORIES ${DEFLIB})
-    list(REMOVE_ITEM CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES ${DEFLIB})
-endif()
-
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIRS}")
 message(STATUS "Using Boost libraries at ${Boost_LIBRARIES}")
 
@@ -183,11 +162,6 @@ include_directories(SYSTEM ${Boost_INCLUDE_DIRS})
 if(MINGW)
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -Wa,-mbig-obj")
     set(EXTRA_LIBRARIES mswsock;ws2_32;iphlpapi;crypt32;bcrypt)
-#    if(DEPENDS)
-#        set(ICU_LIBRARIES iconv)
-#    else()
-#        set(ICU_LIBRARIES icuio icuin icuuc icudt icutu iconv)
-#    endif()
 elseif(APPLE)
     set(EXTRA_LIBRARIES "-framework AppKit")
 elseif(OPENBSD)
@@ -208,13 +182,7 @@ list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if(APPLE)
     cmake_policy(SET CMP0042 NEW)
-endif()
-
-if (APPLE AND NOT IOS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -std=c++11")
-endif()
-
-if(APPLE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -DGTEST_HAS_TR1_TUPLE=0")
 endif()
 
@@ -237,7 +205,7 @@ if (NOT OPENBSD AND NOT (WIN32 AND (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE
     add_c_flag_if_supported(-fcf-protection=full C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fcf-protection=full CXX_SECURITY_FLAGS)
 endif()
-if (NOT WIN32 AND NOT OPENBSD)
+if (NOT WIN32 AND NOT OPENBSD AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_c_flag_if_supported(-fstack-clash-protection C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fstack-clash-protection CXX_SECURITY_FLAGS)
 endif()
@@ -254,10 +222,10 @@ if (APPLE)
     add_linker_flag_if_supported(-Wl,-dead_strip LD_SECURITY_FLAGS)
     add_linker_flag_if_supported(-Wl,-dead_strip_dylibs LD_SECURITY_FLAGS)
 endif()
-#if (NOT APPLE AND NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "GNU"))
-#    # Windows binaries die on startup with PIE when compiled with GCC
-#    add_linker_flag_if_supported(-pie LD_SECURITY_FLAGS)
-#endif()
+if (NOT APPLE AND NOT (WIN32 AND CMAKE_C_COMPILER_ID STREQUAL "GNU"))
+    # Windows binaries die on startup with PIE when compiled with GCC
+    add_linker_flag_if_supported(-pie LD_SECURITY_FLAGS)
+endif()
 add_linker_flag_if_supported(-Wl,-z,relro LD_SECURITY_FLAGS)
 add_linker_flag_if_supported(-Wl,-z,now LD_SECURITY_FLAGS)
 add_linker_flag_if_supported(-Wl,-z,noexecstack noexecstack_SUPPORTED)
@@ -276,6 +244,14 @@ if (WIN32)
     add_linker_flag_if_supported(-Wl,--high-entropy-va LD_SECURITY_FLAGS)
 endif()
 
+if(STATIC)
+#    add_linker_flag_if_supported(-static-libgcc STATIC_FLAGS)
+#    add_linker_flag_if_supported(-static-libstdc++ STATIC_FLAGS)
+    if(MINGW)
+        add_linker_flag_if_supported(-static STATIC_FLAGS)
+    endif()
+endif()
+
 add_c_flag_if_supported(-fPIC C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-fPIC CXX_SECURITY_FLAGS)
 
@@ -288,3 +264,48 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${CXX_SECURITY_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LD_SECURITY_FLAGS} ${STATIC_FLAGS}")
 
 add_subdirectory(src)
+
+configure_file("${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi.in" "${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi" @ONLY)
+
+if(APPLE AND CMAKE_CROSSCOMPILING)
+    set(macos_app "feather.app")
+    configure_file(contrib/macdeploy/background.tiff contrib/macdeploy/background.tiff COPYONLY)
+    configure_file(contrib/macdeploy/Info.plist.in ${macos_app}/Contents/Info.plist @ONLY)
+    configure_file(src/assets/images/appicons/appicon.icns ${macos_app}/Contents/Resources/appicon.icns COPYONLY)
+
+    set(xorrisofs_options)
+    if(DEFINED ENV{SOURCE_DATE_EPOCH})
+        set(xorrisofs_options -volume_date all_file_dates =$ENV{SOURCE_DATE_EPOCH})
+    endif()
+    add_custom_target(deploy
+            COMMAND "${CMAKE_COMMAND}" --install "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --prefix "${CMAKE_BINARY_DIR}/release" --strip
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS"
+            COMMAND "${CMAKE_COMMAND}" -E rename "${CMAKE_BINARY_DIR}/bin/$<TARGET_FILE_NAME:feather>" "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS/feather"
+            COMMAND PYTHONPATH=${PYTHONPATH} INSTALL_NAME_TOOL=${CMAKE_INSTALL_NAME_TOOL} OTOOL=${OTOOL} STRIP=${CMAKE_STRIP} ${CMAKE_SOURCE_DIR}/contrib/macdeploy/macdeployqtplus ${macos_app} ${PACKAGE_NAME}
+            COMMAND xorrisofs -D -l -V "${PACKAGE_NAME}" -no-pad -r -dir-mode 0755 -o ${PACKAGE_NAME}.dmg ${CMAKE_BINARY_DIR}/dist -- ${xorrisofs_options}
+            VERBATIM
+            )
+endif()
+
+SET(CPACK_GENERATOR "DEB")
+SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "tobtoht") #required
+INCLUDE(CPack)
+
+message("\n")
+message("Configure summary")
+message("=================")
+
+if(CMAKE_CROSSCOMPILING)
+    set(cross_status "TRUE, for ${CMAKE_SYSTEM_NAME}, ${CMAKE_SYSTEM_PROCESSOR}")
+else()
+    set(cross_status "FALSE")
+endif()
+message("Cross compiling ....................... ${cross_status}")
+get_directory_property(definitions COMPILE_DEFINITIONS)
+message("Preprocessor defined macros ........... ${definitions}")
+message("C compiler ............................ ${CMAKE_C_COMPILER}")
+message("CFLAGS ................................ ${CMAKE_C_FLAGS}")
+message("C++ compiler .......................... ${CMAKE_CXX_COMPILER}")
+message("CXXFLAGS .............................. ${CMAKE_CXX_FLAGS}")
+message("LDFLAGS for executables ............... ${CMAKE_EXE_LINKER_FLAGS}")
+message("\n")

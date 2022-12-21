@@ -1,9 +1,8 @@
 package=libiconv
-$(package)_version=1.15
+$(package)_version=1.17
 $(package)_download_path=https://ftp.gnu.org/gnu/libiconv
 $(package)_file_name=libiconv-$($(package)_version).tar.gz
-$(package)_sha256_hash=ccf536620a45458d26ba83887a983b96827001e92a13847b45e4925cc8913178
-$(package)_patches=fix-whitespace.patch
+$(package)_sha256_hash=8f74213b56238c85a50a5329f77e06198771e70dd9a739779f4c02f65d971313
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-nls
@@ -13,13 +12,8 @@ define $(package)_set_vars
   $(package)_config_opts_freebsd=--with-pic
 endef
 
-define $(package)_preprocess_cmds
-  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux/ &&\
-  patch -p1 < $($(package)_patch_dir)/fix-whitespace.patch
-endef
-
 define $(package)_config_cmds
-  $($(package)_autoconf)
+  $($(package)_autoconf) AR_FLAGS=$($(package)_arflags)
 endef
 
 define $(package)_build_cmds

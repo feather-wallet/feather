@@ -17,3 +17,4 @@ feather.AppDir/*
 src/assets/tor/*
 !src/assets/tor/.gitkeep
 guix-build-*
+contrib/installers/windows/setup.nsi

@@ -35,5 +35,6 @@ define $(package)_stage_cmds
   $(MAKE) DESTDIR=$($(package)_staging_dir) install
 endef
 
-define $(package)_postprocess_cmds  cp -f lib/libusb-1.0.a lib/libusb.a
+define $(package)_postprocess_cmds
+  cp -f lib/libusb-1.0.a lib/libusb.a
 endef

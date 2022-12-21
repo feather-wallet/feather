@@ -6,8 +6,8 @@ $(package)_sha256_hash=6f504490b342a4f8a4c4a02fc9b866cbef8622d5df4e5452b46be121e
 $(package)_patches=disable-glibc-getrandom-getentropy.patch fix-whitespace.patch
 
 define $(package)_set_vars
-$(package)_config_opts=--enable-static --disable-shared
-$(package)_config_opts+=--prefix=$(host_prefix)
+  $(package)_config_opts=--enable-static --disable-shared
+  $(package)_config_opts+=--prefix=$(host_prefix)
 endef
 
 define $(package)_preprocess_cmds
@@ -17,7 +17,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-  $($(package)_autoconf)
+  $($(package)_autoconf) AR_FLAGS=$($(package)_arflags)
 endef
 
 define $(package)_build_cmds
@@ -31,4 +31,3 @@ endef
 define $(package)_postprocess_cmds
   rm lib/*.la
 endef
-

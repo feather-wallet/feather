@@ -1,6 +1,7 @@
 (use-modules (gnu)
              (gnu packages)
              (gnu packages autotools)
+             (gnu packages assembly)
              (gnu packages base)
              (gnu packages bash)
              (gnu packages bison)
@@ -12,6 +13,7 @@
              (gnu packages compression)
              (gnu packages cross-base)
              (gnu packages curl)
+             (gnu packages elf)
              (gnu packages file)
              (gnu packages gawk)
              (gnu packages gcc)
@@ -31,6 +33,7 @@
              (gnu packages shells)
              (gnu packages tls)
              (gnu packages version-control)
+             (gnu packages qt)
              (guix build-system gnu)
              (guix build-system python)
              (guix build-system trivial)
@@ -62,6 +65,26 @@ FILE-NAME found in ./patches relative to the current file."
 ;     (substitute-keyword-arguments (package-arguments xgcc)
 ;       ((#:make-flags flags)
 ;        `(cons "gcc_cv_libc_provides_ssp=yes" ,flags))))))
+
+(define-public mingw-w64-x86_64-winpthreads-10.0.0
+  (package (inherit mingw-w64-x86_64-winpthreads)
+    (name "mingw-w64-x86_64-winpthreads-10.0.0")
+    (version "10.0.0")
+    (source
+      (origin
+        (method url-fetch)
+        (uri (string-append
+              "mirror://sourceforge/mingw-w64/mingw-w64/"
+              "mingw-w64-release/mingw-w64-v" version ".tar.bz2"))
+        (sha256
+        (base32 "15089y4rlj6g1m2m3cm3awndw3rbzhznl7skd0vkmikjxl546sxs"))
+        (patches
+          (search-patches "mingw-w64-6.0.0-gcc.patch"
+                          "mingw-w64-dlltool-temp-prefix.patch"
+                          "mingw-w64-reproducible-gendef.patch"))))
+    (arguments
+      (substitute-keyword-arguments (package-arguments mingw-w64-x86_64-winpthreads)
+               ((#:parallel-build? _ #f) #f)))))
 
 (define (make-gcc-rpath-link xgcc)
   "Given a XGCC package, return a modified package that replace each instance of
@@ -156,7 +179,10 @@ desirable for building Feather Wallet release binaries."
                         base-gcc))
 
 (define (make-gcc-with-pthreads gcc)
-  (package-with-extra-configure-variable gcc "--enable-threads" "posix"))
+  (package-with-extra-configure-variable
+    (package-with-extra-patches gcc
+      (search-our-patches "gcc-10-remap-guix-store.patch"))
+    "--enable-threads" "posix"))
 
 (define (make-mingw-w64-cross-gcc cross-gcc)
   (package-with-extra-patches cross-gcc
@@ -166,7 +192,7 @@ desirable for building Feather Wallet release binaries."
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
   (let* ((xbinutils (cross-binutils target))
-         (pthreads-xlibc mingw-w64-x86_64-winpthreads)
+         (pthreads-xlibc mingw-w64-x86_64-winpthreads-10.0.0)
          (pthreads-xgcc (make-gcc-with-pthreads
                          (cross-gcc target
                                     #:xgcc (make-mingw-w64-cross-gcc base-gcc)
@@ -193,12 +219,17 @@ chain for " target " development."))
 
 (define (make-nsis-for-gcc-10 base-nsis)
   (package-with-extra-patches base-nsis
-    (search-our-patches "nsis-gcc-10-memmove.patch")))
+    (search-our-patches "nsis-gcc-10-memmove.patch"
+                        "nsis-disable-installer-reloc.patch")))
+
+(define (fix-ppc64-nx-default lief)
+  (package-with-extra-patches lief
+    (search-our-patches "lief-fix-ppc64-nx-default.patch")))
 
 (define-public lief
   (package
    (name "python-lief")
-   (version "0.12.0")
+   (version "0.12.1")
    (source
     (origin
      (method git-fetch)
@@ -208,8 +239,15 @@ chain for " target " development."))
      (file-name (git-file-name name version))
      (sha256
       (base32
-       "026jchj56q25v6gc0754dj9cj5hz5zaza8ij93y5ga94w20kzm9q"))))
+       "1xzbh3bxy4rw1yamnx68da1v5s56ay4g081cyamv67256g0qy2i1"))))
    (build-system python-build-system)
+   (arguments
+    `(#:phases
+      (modify-phases %standard-phases
+        (add-after 'unpack 'parallel-jobs
+          ;; build with multiple cores
+          (lambda _
+            (substitute* "setup.py" (("self.parallel if self.parallel else 1") (number->string (parallel-job-count)))))))))
    (native-inputs
     `(("cmake" ,cmake)))
    (home-page "https://github.com/lief-project/LIEF")
@@ -251,7 +289,7 @@ thus should be able to compile on most platforms where these exist.")
     (license license:gpl3+))) ; license is with openssl exception
 
 (define-public python-elfesteem
-  (let ((commit "87bbd79ab7e361004c98cc8601d4e5f029fd8bd5"))
+  (let ((commit "2eb1e5384ff7a220fd1afacd4a0170acff54fe56"))
     (package
       (name "python-elfesteem")
       (version (git-version "0.1" "1" commit))
@@ -264,8 +302,7 @@ thus should be able to compile on most platforms where these exist.")
          (file-name (git-file-name name commit))
          (sha256
           (base32
-           "1nyvjisvyxyxnd0023xjf5846xd03lwawp5pfzr8vrky7wwm5maz"))
-      (patches (search-our-patches "elfsteem-value-error-python-39.patch"))))
+           "07x6p8clh11z8s1n2kdxrqwqm2almgc5qpkcr9ckb6y5ivjdr5r6"))))
       (build-system python-build-system)
       ;; There are no tests, but attempting to run python setup.py test leads to
       ;; PYTHONPATH problems, just disable the test
@@ -400,9 +437,9 @@ thus should be able to compile on most platforms where these exist.")
                                  line)))
                (substitute* "tests/test_validate.py"
                  (("^(.*)def test_revocation_mode_soft" line indent)
-                   (string-append indent
-                     "@unittest.skip(\"Disabled by Guix\")\n"
-                     line)))
+                  (string-append indent
+                                 "@unittest.skip(\"Disabled by Guix\")\n"
+                                 line)))
                #t))
            (replace 'check
              (lambda _
@@ -564,7 +601,8 @@ inspecting signatures in Mach-O binaries.")
                                            "glibc-versioned-locpath.patch"
                                            "glibc-2.24-elfm-loadaddr-dynamic-rewrite.patch"
                                            "glibc-2.24-no-build-time-cxx-header-run.patch"
-                                           "glibc-2.24-fcommon.patch"))))))
+                                           "glibc-2.24-fcommon.patch"
+                                           "glibc-2.24-guix-prefix.patch"))))))
 
 (define-public glibc-2.27/bitcoin-patched
   (package
@@ -581,7 +619,47 @@ inspecting signatures in Mach-O binaries.")
                 "1b2n1gxv9f4fd5yy68qjbnarhf8mf4vmlxk10i3328c1w5pmp0ca"))
               (patches (search-our-patches "glibc-ldd-x86_64.patch"
                                            "glibc-2.27-riscv64-Use-__has_include-to-include-asm-syscalls.h.patch"
-                                           "glibc-2.27-dont-redefine-nss-database.patch"))))))
+                                           "glibc-2.27-dont-redefine-nss-database.patch"
+                                           "glibc-2.27-guix-prefix.patch"))))))
+
+(define-public linuxdeployqt
+  (package
+    (name "linuxdeployqt")
+    (version "b4697483c98120007019c3456914cfd1dba58384")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/probonopd/linuxdeployqt")
+               (commit version)))
+        (file-name (git-file-name name version))
+        (sha256
+          (base32
+            "0zp1c5pya39g5nwkly1ix58svj08lfsfmv530jyf2ya7m4vvkhfs"))))
+    (build-system gnu-build-system)
+    (arguments
+        `(#:phases
+           (modify-phases %standard-phases
+             (replace 'configure
+               (lambda* (#:key outputs #:allow-other-keys)
+                 (let ((out (assoc-ref outputs "out")))
+                   (invoke "qmake"
+                     (string-append "PREFIX=" out)
+                     "linuxdeployqt.pro"))))
+             (replace 'install
+               ;; Messes up for some reason.
+               (lambda* (#:key outputs #:allow-other-keys)
+                 (let* ((out (assoc-ref outputs "out"))
+                        (bin (string-append out "/bin")))
+                   (install-file "bin/linuxdeployqt" bin)
+                   #t))))))
+    (native-inputs (list qtbase-5))
+    (home-page "https://github.com/probonopd/linuxdeployqt")
+    (synopsis "Linux deploy tool")
+    (description "Makes Linux applications self-contained by copying in the libraries
+    and plugins that the application uses, and optionally generates an AppImage.
+    Can be used for Qt and other applications ")
+    (license license:gpl3+)))
 
 (packages->manifest
  (append
@@ -600,12 +678,15 @@ inspecting signatures in Mach-O binaries.")
         gawk
         sed
         moreutils
+        patchelf
         ;; Compression and archiving
         tar
         bzip2
         gzip
         xz
         p7zip
+        zip
+        unzip
         ;; Build tools
         gnu-make
         libtool
@@ -615,6 +696,8 @@ inspecting signatures in Mach-O binaries.")
         bison
         gperf
         gettext-minimal
+        squashfs-tools
+        linuxdeployqt
         ;; Native GCC 10 toolchain
         gcc-toolchain-10
         (list gcc-toolchain-10 "static")
@@ -625,13 +708,12 @@ inspecting signatures in Mach-O binaries.")
         git
         python-git-archive-all
         ;; Tests
-        lief)
+        lief
+    )
   (let ((target (getenv "HOST")))
     (cond ((string-suffix? "-mingw32" target)
            ;; Windows
-           (list zip
-                 unzip
-                 (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
+           (list (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
                  (make-nsis-for-gcc-10 nsis-x86_64)
                  osslsigncode))
           ((string-contains target "-linux-")

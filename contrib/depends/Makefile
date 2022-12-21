@@ -32,7 +32,7 @@ SOURCES_PATH ?= $(BASEDIR)/sources
 WORK_PATH = $(BASEDIR)/work
 BASE_CACHE ?= $(BASEDIR)/built
 SDK_PATH ?= $(BASEDIR)/SDKs
-FALLBACK_DOWNLOAD_PATH ?= https://downloads.getmonero.org/depends-sources
+FALLBACK_DOWNLOAD_PATH ?=
 
 BUILD = $(shell ./config.guess)
 HOST ?= $(BUILD)
@@ -178,7 +178,6 @@ build-only-$(1)_$(3): CMAKE_SHARED_BOOL = $(if $(findstring shared,$(3)),ON,OFF)
 
 
 toolchain_path=$($($(host_arch)_$(host_os)_native_toolchain)_prefixbin)
-final_build_id_long+=$(shell $(build_SHA256SUM) config.site.in)
 final_build_id_long+=$(shell $(build_SHA256SUM) toolchain.cmake.in)
 final_build_id+=$(shell echo -n "$(final_build_id_long)" | $(build_SHA256SUM) | cut -c-$(HASH_LENGTH))
 $(host_prefix)/.stamp_$(final_build_id): $(native_packages) $(packages)
@@ -213,26 +212,6 @@ $(host_prefix)/.stamp_$(final_build_id): $(native_packages) $(packages)
 # Minor note: it is also okay to refer to tools by their absolute path even if
 # we expect them to be available in $PATH at all times, more specificity does
 # not hurt.
-$(host_prefix)/share/config.site : config.site.in $(host_prefix)/.stamp_$(final_build_id)
-	@mkdir -p $(@D)
-	sed -e 's|@HOST@|$(host)|' \
-            -e 's|@CC@|$(toolchain_path)$(host_CC)|' \
-            -e 's|@CXX@|$(toolchain_path)$(host_CXX)|' \
-            -e 's|@AR@|$(toolchain_path)$(host_AR)|' \
-            -e 's|@RANLIB@|$(toolchain_path)$(host_RANLIB)|' \
-            -e 's|@NM@|$(toolchain_path)$(host_NM)|' \
-            -e 's|@STRIP@|$(toolchain_path)$(host_STRIP)|' \
-            -e 's|@build_os@|$(build_os)|' \
-            -e 's|@host_os@|$(host_os)|' \
-            -e 's|@CFLAGS@|$(strip $(host_CFLAGS) $(host_$(release_type)_CFLAGS))|' \
-            -e 's|@CXXFLAGS@|$(strip $(host_CXXFLAGS) $(host_$(release_type)_CXXFLAGS))|' \
-            -e 's|@CPPFLAGS@|$(strip $(host_CPPFLAGS) $(host_$(release_type)_CPPFLAGS))|' \
-            -e 's|@LDFLAGS@|$(strip $(host_LDFLAGS) $(host_$(release_type)_LDFLAGS))|' \
-            -e 's|@allow_host_packages@|$(ALLOW_HOST_PACKAGES)|' \
-            -e 's|@debug@|$(DEBUG)|' \
-            $< > $@
-	touch $@
-
 $(host_prefix)/share/toolchain.cmake : toolchain.cmake.in $(host_prefix)/.stamp_$(final_build_id)
 	@mkdir -p $(@D)
 	sed -e 's|@HOST@|$(host)|' \
@@ -242,6 +221,8 @@ $(host_prefix)/share/toolchain.cmake : toolchain.cmake.in $(host_prefix)/.stamp_
             -e 's|@RANLIB@|$(toolchain_path)$(host_RANLIB)|' \
             -e 's|@NM@|$(toolchain_path)$(host_NM)|' \
             -e 's|@STRIP@|$(toolchain_path)$(host_STRIP)|' \
+            -e 's|@CMAKE_INSTALL_NAME_TOOL@|$(host_INSTALL_NAME_TOOL)|' \
+            -e 's|@OTOOL@|$(host_OTOOL)|' \
             -e 's|@build_os@|$(build_os)|' \
             -e 's|@host_os@|$(host_os)|' \
             -e 's|@CFLAGS@|$(strip $(host_CFLAGS) $(host_$(release_type)_CFLAGS))|' \
@@ -255,6 +236,8 @@ $(host_prefix)/share/toolchain.cmake : toolchain.cmake.in $(host_prefix)/.stamp_
             -e 's|@depends@|$(host_cmake)|' \
             -e 's|@prefix@|$($(host_arch)_$(host_os)_prefix)|'\
             -e 's|@arch@|$(host_arch)|'\
+            -e 's|@guix_ldflags@|$(guix_ldflags)|'\
+            -e 's|@tor_version@|$(tor_$(host_os)_version)|'\
             $< > $@
 	touch $@
 

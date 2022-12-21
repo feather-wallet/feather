@@ -19,9 +19,9 @@ SET(CMAKE_FIND_ROOT_PATH @prefix@ /usr /gnu/store /feather/contrib/depends/SDKs/
 
 SET(ENV{PKG_CONFIG_PATH} @prefix@/lib/pkgconfig)
 
-# TODO: This is hacky, find a way to obtain to obtain the version from the depends package
-SET(TOR_DIR @prefix@/Tor)
-SET(TOR_VERSION 0.4.7.7)
+# use CACHE here because we need to be able to override these later
+SET(TOR_DIR @prefix@/Tor CACHE STRING "Tor dir")
+SET(TOR_VERSION @tor_version@ CACHE STRING "Tor version")
 
 SET(Readline_ROOT_DIR @prefix@)
 SET(Readline_INCLUDE_DIR @prefix@/include)
@@ -94,8 +94,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   SET(CMAKE_CXX_COMPILER @CXX@ -stdlib=libc++ )
   SET(CMAKE_CXX_COMPILER_TARGET ${CLANG_TARGET})
   SET(CMAKE_CXX_FLAGS_INIT -B${_CMAKE_TOOLCHAIN_PREFIX})
-  SET(CMAKE_ASM_COMPILER /home/user/.guix-profile/bin/clang)
-  SET(CMAKE_ASM-ATT_COMPILER /home/user/.guix-profile/bin/as)
+  SET(CMAKE_ASM_COMPILER clang)
+  SET(CMAKE_ASM-ATT_COMPILER as)
   SET(CMAKE_ASM_COMPILER_TARGET ${CLANG_TARGET})
   SET(CMAKE_ASM-ATT_COMPILER_TARGET ${CLANG_TARGET})
   SET(APPLE True)
@@ -180,3 +180,16 @@ endif()
 
 #Create a new global cmake flag that indicates building with depends
 set (DEPENDS true)
+
+set(CMAKE_EXE_LINKER_FLAGS_INIT "@guix_ldflags@")
+
+if(DEFINED ENV{PYTHONPATH})
+  set(PYTHONPATH "@prefix@/native/lib/python3/dist-packages:$ENV{PYTHONPATH}")
+else()
+  set(PYTHONPATH "@prefix@/native/lib/python3/dist-packages")
+endif()
+
+set(CMAKE_INSTALL_NAME_TOOL "@CMAKE_INSTALL_NAME_TOOL@" CACHE FILEPATH "")
+set(CMAKE_INSTALL_NAME_TOOL "@CMAKE_INSTALL_NAME_TOOL@")
+
+set(OTOOL "@OTOOL@")
