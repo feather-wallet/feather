@@ -19,6 +19,7 @@ $(package)_patches += no-statx.patch
 $(package)_patches += no-renameat2.patch
 $(package)_patches += no_pthread_cond_clockwait.patch
 $(package)_patches += QTBUG-92199-fix.patch
+$(package)_patches += remove-shaders.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=7ab93a930b693eeb53ab97b038b4e6e057d06374e6f49a3814d99145a276925f
@@ -184,6 +185,9 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no-renameat2.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_pthread_cond_clockwait.patch && \
   patch -p1 -i $($(package)_patch_dir)/QTBUG-92199-fix.patch && \
+  cd qtmultimedia && \
+  patch -p1 -i $($(package)_patch_dir)/remove-shaders.patch && \
+  cd .. && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\
   cp -f $($(package)_patch_dir)/mac-qmake.conf qtbase/mkspecs/macx-clang-linux/qmake.conf && \

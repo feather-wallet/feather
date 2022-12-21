@@ -1,0 +1,105 @@
+From 779b0701b82280a319a4b11d04742fbd1a245848 Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Wed, 21 Dec 2022 21:59:31 +0100
+Subject: [PATCH] Remove shaders
+
+---
+ src/multimedia/CMakeLists.txt              | 59 ----------------------
+ src/multimedia/video/qvideoframeformat.cpp |  5 --
+ 2 files changed, 64 deletions(-)
+
+diff --git a/src/multimedia/CMakeLists.txt b/src/multimedia/CMakeLists.txt
+index 651c7ee76..b386e1501 100644
+--- a/src/multimedia/CMakeLists.txt
++++ b/src/multimedia/CMakeLists.txt
+@@ -250,64 +250,5 @@ set(VIDEO_SHADERS
+     "shaders/nv12_bt2020_hlg.frag"
+ )
+ 
+-qt_internal_add_shaders(Multimedia "shaders"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    FILES
+-        ${VIDEO_VERTEX_SHADERS}
+-        ${VIDEO_SHADERS}
+-)
+-
+ string(REPLACE ".frag" "_linear.frag.qsb" LINEAR_VIDEO_SHADERS "${VIDEO_SHADERS}")
+ 
+-qt_internal_add_shaders(Multimedia "shaders_linear"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    FILES
+-        ${VIDEO_SHADERS}
+-    OUTPUTS
+-        ${LINEAR_VIDEO_SHADERS}
+-    DEFINES
+-        QMM_OUTPUTSURFACE_LINEAR
+-)
+-
+-qt_internal_add_shaders(Multimedia "shaders_gl_macos"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    GLSL
+-        "120,150"
+-    NOHLSL
+-    NOMSL
+-    FILES
+-        "shaders/rectsampler.vert"
+-        "shaders/rectsampler_bgra.frag"
+-)
+-
+-qt_internal_add_shaders(Multimedia "shaders_gl_macos_linear"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    GLSL
+-        "120,150"
+-    NOHLSL
+-    NOMSL
+-    FILES
+-        "shaders/rectsampler_bgra.frag"
+-    OUTPUTS
+-        "shaders/rectsampler_bgra_linear.frag.qsb"
+-)
+diff --git a/src/multimedia/video/qvideoframeformat.cpp b/src/multimedia/video/qvideoframeformat.cpp
+index bc8fbe2e1..25bfdd5ff 100644
+--- a/src/multimedia/video/qvideoframeformat.cpp
++++ b/src/multimedia/video/qvideoframeformat.cpp
+@@ -11,10 +11,6 @@
+ #include <qvariant.h>
+ #include <qmatrix4x4.h>
+ 
+-static void initResource() {
+-    Q_INIT_RESOURCE(shaders);
+-}
+-
+ QT_BEGIN_NAMESPACE
+ 
+ class QVideoFrameFormatPrivate : public QSharedData
+@@ -348,7 +344,6 @@ QT_DEFINE_QESDP_SPECIALIZATION_DTOR(QVideoFrameFormatPrivate);
+ QVideoFrameFormat::QVideoFrameFormat()
+     : d(new QVideoFrameFormatPrivate)
+ {
+-    initResource();
+ }
+ 
+ /*!
+-- 
+2.38.1
+
