@@ -26,6 +26,8 @@
              (gnu packages mingw)
              (gnu packages moreutils)
              (gnu packages perl)
+             (gnu packages perl-compression)
+             (gnu packages perl-check)
              (gnu packages pkg-config)
              (gnu packages python)
              (gnu packages python-crypto)
@@ -35,6 +37,7 @@
              (gnu packages version-control)
              (gnu packages qt)
              (guix build-system gnu)
+             (guix build-system perl)
              (guix build-system python)
              (guix build-system trivial)
              (guix download)
@@ -622,6 +625,74 @@ inspecting signatures in Mach-O binaries.")
                                            "glibc-2.27-dont-redefine-nss-database.patch"
                                            "glibc-2.27-guix-prefix.patch"))))))
 
+(define-public perl-sub-override
+  (package
+    (name "perl-sub-override")
+    (version "0.09")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://cpan.metacpan.org/authors/id/O/OV/OVID/"
+                     "Sub-Override-" version ".tar.gz"))
+              (sha256
+                (base32
+                  "1d955qn44brkcfif3gi0q2vvvqahny6rax0vr068x5i9yz0ng6lk"))))
+    (build-system perl-build-system)
+    (inputs
+      (list perl-test-fatal))
+    (license license:perl-license)
+    (synopsis "Perl extension for easily overriding subroutines")
+    (description
+      "Perl extension for easily overriding subroutines")
+    (home-page "https://metacpan.org/pod/Sub::Override")))
+
+(define-public perl-archive-cpio
+  (package
+    (name "perl-archive-cpio")
+    (version "0.10")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://cpan.metacpan.org/authors/id/P/PI/PIXEL/"
+                     "Archive-Cpio-" version ".tar.gz"))
+              (sha256
+                (base32
+                  "1lxyd238zciaamyz7i1dv3r48z70490i7491dcrphkknd4bb6vr4"))))
+    (build-system perl-build-system)
+    (synopsis "module for manipulations of cpio archives ")
+    (license #f)
+    (description
+      "module for manipulations of cpio archives")
+    (home-page "https://metacpan.org/dist/Archive-Cpio")))
+
+(define-public perl-strip-nondeterminism
+  (package
+    (name "perl-strip-nondeterminism")
+    (version "1.13.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://salsa.debian.org/reproducible-builds/reproducible-lfs/-/raw/master/releases/strip-nondeterminism/"
+                     "strip-nondeterminism_" version ".tar.bz2"))
+              (sha256
+                (base32
+                  "1z5lf2y2myqcn54h2q8bkpl8gn67a55hr209bnvpisi8szaxl357"))))
+    (build-system perl-build-system)
+    (inputs
+      (list perl-archive-cpio
+            perl-getopt-long
+            perl-archive-zip
+            perl-sub-override))
+    (arguments
+      `(#:tests? #f))
+    (synopsis "Strip nondeterministic information from archive files")
+    (description
+      "File::StripNondeterminism is a Perl module for stripping bits of
+nondeterministic information, such as timestamps and file system
+order, from files such as gzipped files, ZIP archives, and Jar files.
+It can be used as a post-processing step to make a build reproducible,
+when the build process itself cannot be made deterministic.  It is used
+as part of the Reproducible Builds project.")
+    (license license:gpl3+)
+    (home-page "https://github.com/esoule/strip-nondeterminism")))
+
 (define-public linuxdeployqt
   (package
     (name "linuxdeployqt")
@@ -679,6 +750,7 @@ inspecting signatures in Mach-O binaries.")
         sed
         moreutils
         patchelf
+        perl-strip-nondeterminism
         ;; Compression and archiving
         tar
         bzip2
