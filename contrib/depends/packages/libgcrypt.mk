@@ -16,10 +16,10 @@ define $(package)_preprocess_cmds
     patch -p1 < $($(package)_patch_dir)/no_gen_gost-sb.patch
 endef
 
-# TODO: building on linux with $($(package)_autoconf) fails for mysterious reasons (related to --host)
+# TODO: building on linux with $($(package)_autoconf) fails for mysterious reasons
 ifeq ($(host_os),linux)
 define $(package)_config_cmds
-    CFLAGS='-fPIE' CXXFLAGS='-fPIE' ./configure --enable-digests="sha256 blake2" --enable-ciphers=aes --disable-amd64-as-feature-detection --disable-asm --disable-avx-support --disable-avx2-support --disable-sse41-support --disable-shared --enable-static --disable-doc --with-libgpg-error-prefix=$(host_prefix) --prefix=$(host_prefix)
+    CFLAGS='-fPIE' CXXFLAGS='-fPIE' ./configure --host=$(host) --enable-digests="sha256 blake2" --enable-ciphers=aes --disable-amd64-as-feature-detection --disable-asm --disable-avx-support --disable-avx2-support --disable-sse41-support --disable-shared --enable-static --disable-doc --with-libgpg-error-prefix=$(host_prefix) --prefix=$(host_prefix)
 endef
 else
 define $(package)_config_cmds

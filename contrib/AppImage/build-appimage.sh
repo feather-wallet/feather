@@ -18,13 +18,18 @@ chmod +x "$APPDIR/usr/bin/feather"
 
 export LD_LIBRARY_PATH=/feather/contrib/depends/x86_64-linux-gnu/lib/:/gnu/store:/gnu/store/yk91cxchassi5ykxsyd4vci32vncgjkf-gcc-cross-x86_64-linux-gnu-10.3.0-lib/x86_64-linux-gnu/lib
 
-# fuck you linuxdeployqt
+# linuxdeployqt glibc moaning bypass
 mkdir -p "$APPDIR/usr/share/doc/libc6"
 touch "$APPDIR/usr/share/doc/libc6/copyright"
 
-linuxdeployqt feather.AppDir/usr/share/applications/feather.desktop -verbose=2 -bundle-non-qt-libs -unsupported-allow-new-glibc
+# TODO: linuxdeployqt can't build ARM appimages on x86_64, skip this step for ARM builds
+case "$HOST" in
+    x86_64*)
+        linuxdeployqt feather.AppDir/usr/share/applications/feather.desktop -verbose=2 -bundle-non-qt-libs -unsupported-allow-new-glibc
+        rm "$APPDIR/AppRun"
+        ;;
+esac
 
-rm "$APPDIR/AppRun"
 cp "contrib/AppImage/AppRun" "$APPDIR/"
 chmod +x "$APPDIR/AppRun"
 
@@ -37,7 +42,7 @@ mksquashfs feather.AppDir feather.squashfs -info -root-owned -no-xattrs -noappen
 printf '\x00\x00\x00\x00' | dd conv=notrunc of=feather.squashfs bs=1 seek=$((0x8))
 
 rm -f feather.AppImage
-## Don't hardcode this
-cat /feather/contrib/depends/x86_64-linux-gnu/runtime-x86_64 >> feather.AppImage
+
+cat /feather/contrib/depends/${HOST}/runtime >> feather.AppImage
 cat feather.squashfs >> feather.AppImage
 chmod a+x feather.AppImage

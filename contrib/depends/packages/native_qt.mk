@@ -114,7 +114,6 @@ $(package)_config_opts += -no-feature-undoview
 $(package)_config_opts += -no-feature-vnc
 #$(package)_config_opts += -no-feature-wizard # Needed
 $(package)_config_opts += -no-feature-fontconfig
-$(package)_config_opts += -no-feature-dbus
 
 $(package)_config_opts += -xcb
 $(package)_config_opts += -no-xcb-xlib

@@ -12,7 +12,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
-    $($(package)_cmake) -DCMAKE_INSTALL_PREFIX=$(host_prefix) .
+    $($(package)_cmake) -DCMAKE_INSTALL_PREFIX=$(host_prefix) -DHOST=$(host) -DGLIBC_DYNAMIC_LINKER=$(GLIBC_DYNAMIC_LINKER) .
 endef
 
 define $(package)_build_cmds
@@ -20,5 +20,5 @@ define $(package)_build_cmds
 endef
 
 define $(package)_stage_cmds
-    cp -a runtime $($(package)_staging_prefix_dir)/runtime-x86_64
+    cp -a runtime $($(package)_staging_prefix_dir)/runtime
 endef

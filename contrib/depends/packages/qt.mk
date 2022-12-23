@@ -6,7 +6,7 @@ $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=cb6475a0bd8567c49f7ffbb072a05516ee6671171bed55db75b22b94ead9b37d
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_cmake native_qt native_freetype native_fontconfig native_libxkbcommon
-$(package)_linux_dependencies=openssl native_cmake native_freetype native_fontconfig native_libxcb native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm
+$(package)_linux_dependencies=openssl native_qt native_cmake native_freetype native_fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches = root_CMakeLists.txt
@@ -32,6 +32,8 @@ $(package)_patches += missing-include.patch
 $(package)_patches += no-__builtin_available.patch
 $(package)_patches += no-ffmpeg.patch
 $(package)_patches += remove-shaders.patch
+$(package)_patches += aarch64Toolchain.cmake
+$(package)_patches += gnueabihfToolchain.cmake
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=7ab93a930b693eeb53ab97b038b4e6e057d06374e6f49a3814d99145a276925f
@@ -177,6 +179,12 @@ ifneq (,$(findstring -stdlib=libc++,$($(1)_cxx)))
 $(package)_config_opts_x86_64_linux = -xplatform linux-clang-libc++
 endif
 
+$(package)_config_opts_arm_linux += -qt-host-path $(build_prefix)/qt-host
+$(package)_config_opts_arm_linux += -- -DCMAKE_TOOLCHAIN_FILE=gnueabihfToolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
+
+$(package)_config_opts_aarch64_linux += -qt-host-path $(build_prefix)/qt-host
+$(package)_config_opts_aarch64_linux += -- -DCMAKE_TOOLCHAIN_FILE=aarch64Toolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
+
 $(package)_config_opts_mingw32 = -no-opengl
 $(package)_config_opts_mingw32 += -no-dbus
 $(package)_config_opts_mingw32 += -no-freetype
@@ -267,6 +275,8 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no-__builtin_available.patch && \
   mv $($(package)_patch_dir)/WindowsToolchain.cmake . && \
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
+  mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
+  mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/no-ffmpeg.patch && \
   patch -p1 -i $($(package)_patch_dir)/remove-shaders.patch && \

@@ -8,6 +8,8 @@ project(appimage_runtime)
 # The runtime produced here is not guaranteed to run on all officially supported platforms.
 # You have been warned.
 
+# TODO: Switch to https://github.com/AppImageCrafters/appimage-runtime
+
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # C and C++ versions
@@ -33,8 +35,8 @@ endif()
 # must not include -flto in the following flags, otherwise the data sections will be stripped out
 set(runtime_cflags
         -std=c99 -ffunction-sections -fdata-sections
-        -I/feather/contrib/depends/x86_64-linux-gnu/include
-        -I/feather/contrib/depends/x86_64-linux-gnu/include/appimage
+        -I/feather/contrib/depends/${HOST}/include
+        -I/feather/contrib/depends/${HOST}/include/appimage
         )
 # must not include -Wl,--gc-sections in the following flags, otherwise the data sections will be stripped out
 set(runtime_ldflags -s -ffunction-sections -fdata-sections -flto)
@@ -80,28 +82,28 @@ add_custom_command(
 # TODO: find out whether all the sections can be embedded in a single objcopy call
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/runtime.1.o
-        COMMAND objcopy --add-section .digest_md5=16_blank_bytes --set-section-flags .digest_md5=noload,readonly runtime.0.o runtime.1.o
+        COMMAND ${HOST}-objcopy --add-section .digest_md5=16_blank_bytes --set-section-flags .digest_md5=noload,readonly runtime.0.o runtime.1.o
         MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/runtime.0.o
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/16_blank_bytes
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/runtime.2.o
-        COMMAND objcopy --add-section .upd_info=1024_blank_bytes --set-section-flags .upd_info=noload,readonly runtime.1.o runtime.2.o
+        COMMAND ${HOST}-objcopy --add-section .upd_info=1024_blank_bytes --set-section-flags .upd_info=noload,readonly runtime.1.o runtime.2.o
         MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/runtime.1.o
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/1024_blank_bytes
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/runtime.3.o
-        COMMAND objcopy --add-section .sha256_sig=1024_blank_bytes --set-section-flags .sha256_sig=noload,readonly runtime.2.o runtime.3.o
+        COMMAND ${HOST}-objcopy --add-section .sha256_sig=1024_blank_bytes --set-section-flags .sha256_sig=noload,readonly runtime.2.o runtime.3.o
         MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/runtime.2.o
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/1024_blank_bytes
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/runtime.4.o
-        COMMAND objcopy --add-section .sig_key=8192_blank_bytes --set-section-flags .sig_key=noload,readonly runtime.3.o runtime.4.o
+        COMMAND ${HOST}-objcopy --add-section .sig_key=8192_blank_bytes --set-section-flags .sig_key=noload,readonly runtime.3.o runtime.4.o
         MAIN_DEPENDENCY ${CMAKE_CURRENT_BINARY_DIR}/runtime.3.o
         DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/8192_blank_bytes
         WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
@@ -118,14 +120,14 @@ else()
 endif()
 # CMake gets confused by the .o object, therefore we need to tell it that it shall link everything using the C compiler
 set_property(TARGET runtime PROPERTY LINKER_LANGUAGE C)
-target_link_libraries(runtime PRIVATE -Wl,--as-needed -Wl,--dynamic-linker=/lib64/ld-linux-x86-64.so.2 -static-libstdc++ -Wl,-O2 -zmuldefs -L/feather/contrib/depends/x86_64-linux-gnu/lib squashfuse squashfuse_ll fuseprivate lzma z dl  pthread appimage_shared appimage_hashlib )
+target_link_libraries(runtime PRIVATE -Wl,--as-needed -Wl,--dynamic-linker=${GLIBC_DYNAMIC_LINKER} -static-libstdc++ -Wl,-no-pie -Wl,-O2 -zmuldefs -L/feather/contrib/depends/${HOST}/lib squashfuse squashfuse_ll fuseprivate lzma z dl  pthread appimage_shared appimage_hashlib )
 
 target_include_directories(runtime PRIVATE ${PROJECT_SOURCE_DIR}/include)
 
 add_custom_command(
         TARGET runtime
         POST_BUILD
-        COMMAND strip ${CMAKE_CURRENT_BINARY_DIR}/runtime
+        COMMAND ${HOST}-strip ${CMAKE_CURRENT_BINARY_DIR}/runtime
 )
 
 add_custom_command(

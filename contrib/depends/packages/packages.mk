@@ -4,10 +4,12 @@ packages := boost openssl libiconv ldns unbound qrencode zbar sodium polyseed hi
 hardware_packages := hidapi protobuf libusb
 hardware_native_packages := native_protobuf
 
-linux_packages := eudev libzip liblzma libarchive libfuse libsquashfuse libappimage
+linux_packages := eudev libzip liblzma libarchive libfuse libsquashfuse libappimage appimage_runtime
 linux_native_packages = $(hardware_native_packages) native_patchelf
 
-qt_linux_packages:=qt native_expat native_libxcb native_xcb_proto native_libXau native_xproto native_freetype native_fontconfig native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm appimage_runtime
+linux_native_packages += native_qt native_expat native_libxcb native_xcb_proto native_libXau native_xproto native_freetype native_fontconfig native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm
+
+qt_linux_packages:=native_expat libxcb xcb_proto libXau xproto native_freetype native_fontconfig libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm qt
 qt_darwin_packages=native_qt qt
 qt_mingw32_packages=native_qt
 

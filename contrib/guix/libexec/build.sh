@@ -168,6 +168,8 @@ case "$HOST" in
         ;;
 esac
 
+export GLIBC_DYNAMIC_LINKER=${glibc_dynamic_linker}
+
 # Environment variables for determinism
 export TAR_OPTIONS="--owner=0 --group=0 --numeric-owner --mtime='@${SOURCE_DATE_EPOCH}' --sort=name"
 export TZ="UTC"
@@ -285,6 +287,9 @@ mkdir -p "$DISTSRC"
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ;;
             esac
+            ;;
+        *gnueabihf)
+            CMAKEVARS+=" -DNO_AES=On" # Raspberry Pi
             ;;
     esac
 

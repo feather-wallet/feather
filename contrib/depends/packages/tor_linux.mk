@@ -11,10 +11,12 @@ define $(package)_set_vars
     $(package)_config_opts+=--with-libevent-dir=$(host_prefix) --with-openssl-dir=$(host_prefix)
     $(package)_config_opts+=--with-zlib-dir=$(host_prefix) --disable-tool-name-check --enable-fatal-warnings
     $(package)_config_opts+=--prefix=$(host_prefix)
+    $(package)_cflags+=-O2
+    $(package)_cxxflags+=-O2
 endef
 
 define $(package)_config_cmds
-    ./configure $($(package)_config_opts)
+    $($(package)_autoconf) $($(package)_config_opts)
 endef
 
 define $(package)_build_cmds
@@ -26,7 +28,7 @@ define $(package)_stage_cmds
 endef
 
 define $(package)_postprocess_cmds
-    strip -s -D bin/tor && \
+    $(host_toolchain)strip -s -D bin/tor && \
     mkdir $($(package)_staging_prefix_dir)/Tor/ && \
     cp bin/tor $($(package)_staging_prefix_dir)/Tor
 endef
