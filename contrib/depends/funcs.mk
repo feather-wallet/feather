@@ -184,32 +184,6 @@ ifneq ($($(1)_ldflags),)
 $(1)_autoconf += LDFLAGS="$$($(1)_ldflags)"
 endif
 
-$(1)_autoconff=./configure --prefix=$($($(1)_type)_prefix) $$($(1)_config_opts) CC="$$($(1)_cc)" CXX="$$($(1)_cxx)"
-ifneq ($($(1)_nm),)
-$(1)_autoconff += NM="$$($(1)_nm)"
-endif
-ifneq ($($(1)_ranlib),)
-$(1)_autoconff += RANLIB="$$($(1)_ranlib)"
-endif
-ifneq ($($(1)_ar),)
-$(1)_autoconff += AR="$$($(1)_ar)"
-endif
-ifneq ($($(1)_arflags),)
-$(1)_autoconff += ARFLAGS="$$($(1)_arflags)"
-endif
-ifneq ($($(1)_cflags),)
-$(1)_autoconff += CFLAGS="$$($(1)_cflags)"
-endif
-ifneq ($($(1)_cxxflags),)
-$(1)_autoconff += CXXFLAGS="$$($(1)_cxxflags)"
-endif
-ifneq ($($(1)_cppflags),)
-$(1)_autoconff += CPPFLAGS="$$($(1)_cppflags)"
-endif
-ifneq ($($(1)_ldflags),)
-$(1)_autoconff += LDFLAGS="$$($(1)_ldflags)"
-endif
-
 $(1)_cmake=env CC="$$($(1)_cc)" \
                CFLAGS="$$($(1)_cppflags) $$($(1)_cflags)" \
                CXX="$$($(1)_cxx)" \
