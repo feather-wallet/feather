@@ -46,6 +46,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 {
     ui->setupUi(this);
 
+    qDebug() << "Platform tag: " << this->getPlatformTag();
+
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
 
@@ -1518,10 +1520,22 @@ QString MainWindow::getPlatformTag() {
     return "win";
 #endif
 #ifdef Q_OS_LINUX
-    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
-        return "linux-appimage";
+    QString tag = "";
+
+    QString arch = QSysInfo::buildCpuArchitecture();
+    if (arch == "arm64") {
+        tag += "linux-arm64";
+    } else if (arch == "arm") {
+        tag += "linux-arm";
+    } else {
+        tag += "linux";
     }
-    return "linux";
+
+    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
+        tag += "-appimage";
+    }
+
+    return tag;
 #endif
     return "";
 }
