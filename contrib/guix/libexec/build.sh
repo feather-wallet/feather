@@ -227,9 +227,7 @@ GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 # Create the source tarball if not already there
 if [ ! -e "$GIT_ARCHIVE" ]; then
     mkdir -p "$(dirname "$GIT_ARCHIVE")"
-    # python gzip does not produce reproducible output
-    git-archive-all --include=monero/src/device_trezor/trezor/messages --prefix="${DISTNAME}/" "$GIT_ARCHIVE"
-    strip-nondeterminism "$GIT_ARCHIVE"
+    git ls-files --recurse-submodules | tar --transform 's,^,$DISTNAME/,' -caf ${GIT_ARCHIVE} -T-
     sha256sum "$GIT_ARCHIVE"
 fi
 

@@ -26,8 +26,6 @@
              (gnu packages mingw)
              (gnu packages moreutils)
              (gnu packages perl)
-             (gnu packages perl-compression)
-             (gnu packages perl-check)
              (gnu packages pkg-config)
              (gnu packages python)
              (gnu packages python-crypto)
@@ -477,27 +475,6 @@ constructing graphs, BFS and DFS traversals, topological sort, shortest paths,
 etc. with graphviz output.")
     (license license:expat)))
 
-(define-public python-git-archive-all
-  (package
-    (name "python-git-archive-all")
-    (version "1.23.0")
-    (source
-      (origin
-        (method git-fetch)
-        (uri (git-reference
-               (url "https://github.com/Kentzo/git-archive-all")
-               (commit version)))
-        (file-name (git-file-name name version))
-        (sha256
-          (base32
-            "1rj9v28gvcqzpbcnb0c9rbjaf7n0r26495dpjzkn58pmzrkmlp0v"))))
-    (build-system python-build-system)
-    (arguments `(#:tests? #f))
-    (home-page "https://github.com/Kentzo/git-archive-all")
-    (synopsis "Archive a repository with all its submodules.")
-    (description "git archive does not include submodules.")
-    (license license:expat)))
-
 (define-public python-macholib
   (package
     (name "python-macholib")
@@ -625,74 +602,6 @@ inspecting signatures in Mach-O binaries.")
                                            "glibc-2.27-dont-redefine-nss-database.patch"
                                            "glibc-2.27-guix-prefix.patch"))))))
 
-(define-public perl-sub-override
-  (package
-    (name "perl-sub-override")
-    (version "0.09")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://cpan.metacpan.org/authors/id/O/OV/OVID/"
-                     "Sub-Override-" version ".tar.gz"))
-              (sha256
-                (base32
-                  "1d955qn44brkcfif3gi0q2vvvqahny6rax0vr068x5i9yz0ng6lk"))))
-    (build-system perl-build-system)
-    (inputs
-      (list perl-test-fatal))
-    (license license:perl-license)
-    (synopsis "Perl extension for easily overriding subroutines")
-    (description
-      "Perl extension for easily overriding subroutines")
-    (home-page "https://metacpan.org/pod/Sub::Override")))
-
-(define-public perl-archive-cpio
-  (package
-    (name "perl-archive-cpio")
-    (version "0.10")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://cpan.metacpan.org/authors/id/P/PI/PIXEL/"
-                     "Archive-Cpio-" version ".tar.gz"))
-              (sha256
-                (base32
-                  "1lxyd238zciaamyz7i1dv3r48z70490i7491dcrphkknd4bb6vr4"))))
-    (build-system perl-build-system)
-    (synopsis "module for manipulations of cpio archives ")
-    (license #f)
-    (description
-      "module for manipulations of cpio archives")
-    (home-page "https://metacpan.org/dist/Archive-Cpio")))
-
-(define-public perl-strip-nondeterminism
-  (package
-    (name "perl-strip-nondeterminism")
-    (version "1.13.0")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://salsa.debian.org/reproducible-builds/reproducible-lfs/-/raw/master/releases/strip-nondeterminism/"
-                     "strip-nondeterminism_" version ".tar.bz2"))
-              (sha256
-                (base32
-                  "1z5lf2y2myqcn54h2q8bkpl8gn67a55hr209bnvpisi8szaxl357"))))
-    (build-system perl-build-system)
-    (inputs
-      (list perl-archive-cpio
-            perl-getopt-long
-            perl-archive-zip
-            perl-sub-override))
-    (arguments
-      `(#:tests? #f))
-    (synopsis "Strip nondeterministic information from archive files")
-    (description
-      "File::StripNondeterminism is a Perl module for stripping bits of
-nondeterministic information, such as timestamps and file system
-order, from files such as gzipped files, ZIP archives, and Jar files.
-It can be used as a post-processing step to make a build reproducible,
-when the build process itself cannot be made deterministic.  It is used
-as part of the Reproducible Builds project.")
-    (license license:gpl3+)
-    (home-page "https://github.com/esoule/strip-nondeterminism")))
-
 (define-public linuxdeployqt
   (package
     (name "linuxdeployqt")
@@ -750,7 +659,6 @@ as part of the Reproducible Builds project.")
         sed
         moreutils
         patchelf
-        perl-strip-nondeterminism
         ;; Compression and archiving
         tar
         bzip2
@@ -778,7 +686,6 @@ as part of the Reproducible Builds project.")
         python-3
         ;; Git
         git
-        python-git-archive-all
         ;; Tests
         lief
     )
