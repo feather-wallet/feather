@@ -1,60 +1,75 @@
-From c39453a479896aab03aa9251bfd330709d702aeb Mon Sep 17 00:00:00 2001
+From a4ef234505904045f5c19cd1bee67be28a775c83 Mon Sep 17 00:00:00 2001
 From: tobtoht <tob@featherwallet.org>
-Date: Sat, 26 Nov 2022 12:27:16 +0100
-Subject: [PATCH] No FFmpeg
+Date: Tue, 27 Dec 2022 12:00:44 +0100
+Subject: [PATCH] qtmultimedia fixes
 
 ---
+ cmake/FindWMF.cmake                           |   10 +-
+ src/multimedia/CMakeLists.txt                 |   59 -
  src/multimedia/configure.cmake                |    3 +-
+ src/multimedia/video/qvideoframeformat.cpp    |    5 -
+ .../windows/qwindowsmediadevices.cpp          |    2 +-
+ src/multimedia/windows/qwindowsresampler.cpp  |    2 +-
+ .../darwin/camera/qavfcamerabase.mm           |    1 +
+ .../multimedia/darwin/qdarwinintegration.mm   |    3 +-
  src/plugins/multimedia/ffmpeg/CMakeLists.txt  |   87 +-
- src/plugins/multimedia/ffmpeg/qavfcamera.mm   |  413 -----
+ src/plugins/multimedia/ffmpeg/qavfcamera.mm   |  422 ------
  src/plugins/multimedia/ffmpeg/qavfcamera_p.h  |   87 --
- src/plugins/multimedia/ffmpeg/qffmpeg_p.h     |   47 -
- .../multimedia/ffmpeg/qffmpegaudiodecoder.cpp |  241 ---
- .../multimedia/ffmpeg/qffmpegaudiodecoder_p.h |   68 -
+ src/plugins/multimedia/ffmpeg/qffmpeg_p.h     |   60 -
+ .../multimedia/ffmpeg/qffmpegaudiodecoder.cpp |  265 ----
+ .../multimedia/ffmpeg/qffmpegaudiodecoder_p.h |   69 -
  .../multimedia/ffmpeg/qffmpegaudioinput.cpp   |  189 ---
  .../multimedia/ffmpeg/qffmpegaudioinput_p.h   |   54 -
- .../multimedia/ffmpeg/qffmpegclock.cpp        |  209 ---
- .../multimedia/ffmpeg/qffmpegclock_p.h        |  120 --
- .../multimedia/ffmpeg/qffmpegdecoder.cpp      | 1368 -----------------
- .../multimedia/ffmpeg/qffmpegdecoder_p.h      |  513 -------
- .../multimedia/ffmpeg/qffmpegencoder.cpp      |  553 -------
+ .../multimedia/ffmpeg/qffmpegclock.cpp        |  193 ---
+ .../multimedia/ffmpeg/qffmpegclock_p.h        |  113 --
+ .../multimedia/ffmpeg/qffmpegdecoder.cpp      | 1272 -----------------
+ .../multimedia/ffmpeg/qffmpegdecoder_p.h      |  501 -------
+ .../multimedia/ffmpeg/qffmpegencoder.cpp      |  557 --------
  .../multimedia/ffmpeg/qffmpegencoder_p.h      |  197 ---
  .../ffmpeg/qffmpegencoderoptions.cpp          |  272 ----
  .../ffmpeg/qffmpegencoderoptions_p.h          |   32 -
- .../multimedia/ffmpeg/qffmpeghwaccel.cpp      |  399 -----
- .../ffmpeg/qffmpeghwaccel_d3d11.cpp           |  178 ---
+ .../multimedia/ffmpeg/qffmpeghwaccel.cpp      |  372 -----
+ .../ffmpeg/qffmpeghwaccel_d3d11.cpp           |  158 --
  .../ffmpeg/qffmpeghwaccel_d3d11_p.h           |   43 -
  .../ffmpeg/qffmpeghwaccel_mediacodec.cpp      |   70 -
  .../ffmpeg/qffmpeghwaccel_mediacodec_p.h      |   35 -
- .../multimedia/ffmpeg/qffmpeghwaccel_p.h      |  125 --
+ .../multimedia/ffmpeg/qffmpeghwaccel_p.h      |  121 --
  .../ffmpeg/qffmpeghwaccel_vaapi.cpp           |  346 -----
  .../ffmpeg/qffmpeghwaccel_vaapi_p.h           |   48 -
- .../ffmpeg/qffmpeghwaccel_videotoolbox.mm     |  280 ----
- .../ffmpeg/qffmpeghwaccel_videotoolbox_p.h    |   59 -
+ .../ffmpeg/qffmpeghwaccel_videotoolbox.mm     |  281 ----
+ .../ffmpeg/qffmpeghwaccel_videotoolbox_p.h    |   63 -
  .../ffmpeg/qffmpegmediacapturesession.cpp     |   15 +-
  .../ffmpeg/qffmpegmediacapturesession_p.h     |    1 -
  .../ffmpeg/qffmpegmediaformatinfo.cpp         |  474 ------
  .../ffmpeg/qffmpegmediaformatinfo_p.h         |   18 -
  .../ffmpeg/qffmpegmediaintegration.cpp        |   31 -
- .../ffmpeg/qffmpegmediaintegration_p.h        |    6 -
+ .../ffmpeg/qffmpegmediaintegration_p.h        |    8 -
  .../ffmpeg/qffmpegmediametadata.cpp           |  105 --
  .../ffmpeg/qffmpegmediametadata_p.h           |    5 -
- .../multimedia/ffmpeg/qffmpegmediaplayer.cpp  |  206 ---
- .../multimedia/ffmpeg/qffmpegmediaplayer_p.h  |   89 --
+ .../multimedia/ffmpeg/qffmpegmediaplayer.cpp  |  236 ---
+ .../multimedia/ffmpeg/qffmpegmediaplayer_p.h  |   98 --
  .../ffmpeg/qffmpegmediarecorder.cpp           |  157 --
  .../ffmpeg/qffmpegmediarecorder_p.h           |   68 -
  .../multimedia/ffmpeg/qffmpegresampler.cpp    |   95 --
  .../multimedia/ffmpeg/qffmpegresampler_p.h    |   46 -
  .../multimedia/ffmpeg/qffmpegthread.cpp       |   57 -
  .../multimedia/ffmpeg/qffmpegthread_p.h       |   68 -
- .../multimedia/ffmpeg/qffmpegvideobuffer.cpp  |  357 -----
- .../multimedia/ffmpeg/qffmpegvideobuffer_p.h  |   73 -
- .../ffmpeg/qffmpegvideoframeencoder.cpp       |  370 -----
+ .../multimedia/ffmpeg/qffmpegvideobuffer.cpp  |  356 -----
+ .../multimedia/ffmpeg/qffmpegvideobuffer_p.h  |   72 -
+ .../ffmpeg/qffmpegvideoframeencoder.cpp       |  374 -----
  .../ffmpeg/qffmpegvideoframeencoder_p.h       |   76 -
  .../multimedia/ffmpeg/qffmpegvideosink.cpp    |   14 -
  .../multimedia/ffmpeg/qffmpegvideosink_p.h    |   10 +-
  .../multimedia/ffmpeg/qwindowscamera.cpp      |    4 +-
- 50 files changed, 12 insertions(+), 8369 deletions(-)
+ .../multimedia/windows/common/mfmetadata_p.h  |    2 +-
+ .../windows/decoder/mfaudiodecodercontrol.cpp |    2 +-
+ .../qwindowsmediadevicereader_p.h             |    4 +-
+ .../mediacapture/qwindowsmediaencoder.cpp     |    2 +-
+ .../windows/player/mfplayercontrol_p.h        |    2 +-
+ .../windows/player/mfplayersession.cpp        |    2 +-
+ .../multimedia/windows/player/mftvideo.cpp    |    2 +-
+ .../windows/qwindowsvideodevices.cpp          |    4 +-
+ 65 files changed, 31 insertions(+), 8369 deletions(-)
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera.mm
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera_p.h
  delete mode 100644 src/plugins/multimedia/ffmpeg/qffmpeg_p.h
@@ -93,6 +108,96 @@ Subject: [PATCH] No FFmpeg
  delete mode 100644 src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder.cpp
  delete mode 100644 src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder_p.h
 
+diff --git a/cmake/FindWMF.cmake b/cmake/FindWMF.cmake
+index 7c6923c1e..b69274be5 100644
+--- a/cmake/FindWMF.cmake
++++ b/cmake/FindWMF.cmake
+@@ -22,11 +22,11 @@ find_library(WMF_UUID_LIBRARY uuid HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+ find_library(WMF_MSDMO_LIBRARY msdmo HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+ find_library(WMF_OLE32_LIBRARY ole32 HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+ find_library(WMF_OLEAUT32_LIBRARY oleaut32 HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+-find_library(WMF_MF_LIBRARY Mf HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+-find_library(WMF_MFUUID_LIBRARY Mfuuid HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+-find_library(WMF_MFPLAT_LIBRARY Mfplat HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+-find_library(WMF_MFCORE_LIBRARY Mfcore HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+-find_library(WMF_PROPSYS_LIBRARY Propsys HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
++find_library(WMF_MF_LIBRARY mf HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
++find_library(WMF_MFUUID_LIBRARY mfuuid HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
++find_library(WMF_MFPLAT_LIBRARY mfplat HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
++find_library(WMF_MFCORE_LIBRARY mfcore HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
++find_library(WMF_PROPSYS_LIBRARY propsys HINTS ${CMAKE_C_IMPLICIT_LINK_DIRECTORIES})
+ 
+ 
+ set(WMF_LIBRARIES ${WMF_STRMIIDS_LIBRARY} ${WMF_AMSTRMID_LIBRARY} ${WMF_DMOGUIDS_LIBRARY} ${WMF_UUID_LIBRARY}
+diff --git a/src/multimedia/CMakeLists.txt b/src/multimedia/CMakeLists.txt
+index cc0a86958..440449918 100644
+--- a/src/multimedia/CMakeLists.txt
++++ b/src/multimedia/CMakeLists.txt
+@@ -248,64 +248,5 @@ set(VIDEO_SHADERS
+     "shaders/nv12_bt2020_hlg.frag"
+ )
+ 
+-qt_internal_add_shaders(Multimedia "shaders"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    FILES
+-        ${VIDEO_VERTEX_SHADERS}
+-        ${VIDEO_SHADERS}
+-)
+-
+ string(REPLACE ".frag" "_linear.frag.qsb" LINEAR_VIDEO_SHADERS "${VIDEO_SHADERS}")
+ 
+-qt_internal_add_shaders(Multimedia "shaders_linear"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    FILES
+-        ${VIDEO_SHADERS}
+-    OUTPUTS
+-        ${LINEAR_VIDEO_SHADERS}
+-    DEFINES
+-        QMM_OUTPUTSURFACE_LINEAR
+-)
+-
+-qt_internal_add_shaders(Multimedia "shaders_gl_macos"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    GLSL
+-        "120,150"
+-    NOHLSL
+-    NOMSL
+-    FILES
+-        "shaders/rectsampler.vert"
+-        "shaders/rectsampler_bgra.frag"
+-)
+-
+-qt_internal_add_shaders(Multimedia "shaders_gl_macos_linear"
+-    SILENT
+-    BATCHABLE
+-    PRECOMPILE
+-    OPTIMIZED
+-    PREFIX
+-        "/qt-project.org/multimedia"
+-    GLSL
+-        "120,150"
+-    NOHLSL
+-    NOMSL
+-    FILES
+-        "shaders/rectsampler_bgra.frag"
+-    OUTPUTS
+-        "shaders/rectsampler_bgra_linear.frag.qsb"
+-)
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
 index efcadfc5c..29b056003 100644
 --- a/src/multimedia/configure.cmake
@@ -114,6 +219,81 @@ index efcadfc5c..29b056003 100644
  )
  qt_feature("alsa" PUBLIC PRIVATE
      LABEL "ALSA (experimental)"
+diff --git a/src/multimedia/video/qvideoframeformat.cpp b/src/multimedia/video/qvideoframeformat.cpp
+index 22ccc1ac5..9c90fa8b8 100644
+--- a/src/multimedia/video/qvideoframeformat.cpp
++++ b/src/multimedia/video/qvideoframeformat.cpp
+@@ -11,10 +11,6 @@
+ #include <qvariant.h>
+ #include <qmatrix4x4.h>
+ 
+-static void initResource() {
+-    Q_INIT_RESOURCE(shaders);
+-}
+-
+ QT_BEGIN_NAMESPACE
+ 
+ class QVideoFrameFormatPrivate : public QSharedData
+@@ -348,7 +344,6 @@ QT_DEFINE_QESDP_SPECIALIZATION_DTOR(QVideoFrameFormatPrivate);
+ QVideoFrameFormat::QVideoFrameFormat()
+     : d(new QVideoFrameFormatPrivate)
+ {
+-    initResource();
+ }
+ 
+ /*!
+diff --git a/src/multimedia/windows/qwindowsmediadevices.cpp b/src/multimedia/windows/qwindowsmediadevices.cpp
+index c91597102..8c2df5816 100644
+--- a/src/multimedia/windows/qwindowsmediadevices.cpp
++++ b/src/multimedia/windows/qwindowsmediadevices.cpp
+@@ -13,7 +13,7 @@
+ #include <mmddk.h>
+ #include <mfobjects.h>
+ #include <mfidl.h>
+-#include <Mferror.h>
++#include <mferror.h>
+ #include <mmdeviceapi.h>
+ #include <qwindowsmfdefs_p.h>
+ 
+diff --git a/src/multimedia/windows/qwindowsresampler.cpp b/src/multimedia/windows/qwindowsresampler.cpp
+index 9e76c9159..f78628c91 100644
+--- a/src/multimedia/windows/qwindowsresampler.cpp
++++ b/src/multimedia/windows/qwindowsresampler.cpp
+@@ -7,7 +7,7 @@
+ #include <qloggingcategory.h>
+ #include <QUuid>
+ 
+-#include <Wmcodecdsp.h>
++#include <wmcodecdsp.h>
+ #include <mftransform.h>
+ #include <mferror.h>
+ 
+diff --git a/src/plugins/multimedia/darwin/camera/qavfcamerabase.mm b/src/plugins/multimedia/darwin/camera/qavfcamerabase.mm
+index a11290a8d..b40c1133e 100644
+--- a/src/plugins/multimedia/darwin/camera/qavfcamerabase.mm
++++ b/src/plugins/multimedia/darwin/camera/qavfcamerabase.mm
+@@ -7,6 +7,7 @@
+ #include <private/qcameradevice_p.h>
+ #include "qavfhelpers_p.h"
+ #include <private/qplatformmediaintegration_p.h>
++#include <QtCore/qset.h>
+ 
+ QT_USE_NAMESPACE
+ 
+diff --git a/src/plugins/multimedia/darwin/qdarwinintegration.mm b/src/plugins/multimedia/darwin/qdarwinintegration.mm
+index 5e26fe5c4..3e82655b0 100644
+--- a/src/plugins/multimedia/darwin/qdarwinintegration.mm
++++ b/src/plugins/multimedia/darwin/qdarwinintegration.mm
+@@ -39,8 +39,7 @@ public:
+ QDarwinIntegration::QDarwinIntegration()
+ {
+ #if defined(Q_OS_MACOS) && QT_MACOS_PLATFORM_SDK_EQUAL_OR_ABOVE(__MAC_11_0)
+-    if (__builtin_available(macOS 11.0, *))
+-        VTRegisterSupplementalVideoDecoderIfAvailable(kCMVideoCodecType_VP9);
++    VTRegisterSupplementalVideoDecoderIfAvailable(kCMVideoCodecType_VP9);
+ #endif
+     m_videoDevices = new QAVFVideoDevices(this);
+ }
 diff --git a/src/plugins/multimedia/ffmpeg/CMakeLists.txt b/src/plugins/multimedia/ffmpeg/CMakeLists.txt
 index 5d6c0a8c3..6c83b9cb2 100644
 --- a/src/plugins/multimedia/ffmpeg/CMakeLists.txt
@@ -235,10 +415,10 @@ index 5d6c0a8c3..6c83b9cb2 100644
 \ No newline at end of file
 diff --git a/src/plugins/multimedia/ffmpeg/qavfcamera.mm b/src/plugins/multimedia/ffmpeg/qavfcamera.mm
 deleted file mode 100644
-index fbe29296e..000000000
+index 37dd4b262..000000000
 --- a/src/plugins/multimedia/ffmpeg/qavfcamera.mm
 +++ /dev/null
-@@ -1,413 +0,0 @@
+@@ -1,422 +0,0 @@
 -// Copyright (C) 2022 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#include <qavfcamera_p.h>
@@ -301,7 +481,7 @@ index fbe29296e..000000000
 -         didOutputSampleBuffer:(CMSampleBufferRef)sampleBuffer
 -         fromConnection:(AVCaptureConnection *)connection;
 -
--- (void) setHWAccel:(QFFmpeg::HWAccel *)accel;
+-- (void) setHWAccel:(std::unique_ptr<QFFmpeg::HWAccel> &&)accel;
 -
 -@end
 -
@@ -310,7 +490,7 @@ index fbe29296e..000000000
 -@private
 -    QAVFCamera *m_camera;
 -    AVBufferRef *hwFramesContext;
--    QFFmpeg::HWAccel m_accel;
+-    std::unique_ptr<QFFmpeg::HWAccel> m_accel;
 -    qint64 startTime;
 -    qint64 baseTime;
 -}
@@ -348,7 +528,10 @@ index fbe29296e..000000000
 -        return;
 -    }
 -
--    AVFrame *avFrame = allocHWFrame(m_accel.hwFramesContextAsBuffer(), imageBuffer);
+-    if (!m_accel)
+-        return;
+-
+-    AVFrame *avFrame = allocHWFrame(m_accel->hwFramesContextAsBuffer(), imageBuffer);
 -    if (!avFrame)
 -        return;
 -
@@ -382,9 +565,9 @@ index fbe29296e..000000000
 -    m_camera->syncHandleFrame(frame);
 -}
 -
--- (void) setHWAccel:(QFFmpeg::HWAccel *)accel
+-- (void) setHWAccel:(std::unique_ptr<QFFmpeg::HWAccel> &&)accel
 -{
--    m_accel = *accel;
+-    m_accel = std::move(accel);
 -}
 -
 -@end
@@ -608,9 +791,15 @@ index fbe29296e..000000000
 -        avPixelFormat = setPixelFormat(m_cameraFormat.pixelFormat());
 -    }
 -
--    hwAccel = QFFmpeg::HWAccel(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
--    hwAccel.createFramesContext(av_map_videotoolbox_format_to_pixfmt(avPixelFormat), m_cameraFormat.resolution());
--    [m_sampleBufferDelegate setHWAccel:&hwAccel];
+-    auto hwAccel = QFFmpeg::HWAccel::create(AV_HWDEVICE_TYPE_VIDEOTOOLBOX);
+-    if (hwAccel) {
+-        hwAccel->createFramesContext(av_map_videotoolbox_format_to_pixfmt(avPixelFormat),
+-                                     m_cameraFormat.resolution());
+-        hwPixelFormat = hwAccel->hwFormat();
+-    } else {
+-        hwPixelFormat = AV_PIX_FMT_NONE;
+-    }
+-    [m_sampleBufferDelegate setHWAccel:std::move(hwAccel)];
 -}
 -
 -uint QAVFCamera::setPixelFormat(const QVideoFrameFormat::PixelFormat pixelFormat)
@@ -654,7 +843,7 @@ index fbe29296e..000000000
 -#include "moc_qavfcamera_p.cpp"
 diff --git a/src/plugins/multimedia/ffmpeg/qavfcamera_p.h b/src/plugins/multimedia/ffmpeg/qavfcamera_p.h
 deleted file mode 100644
-index 281ebf672..000000000
+index 40a53dc7c..000000000
 --- a/src/plugins/multimedia/ffmpeg/qavfcamera_p.h
 +++ /dev/null
 @@ -1,87 +0,0 @@
@@ -718,7 +907,7 @@ index 281ebf672..000000000
 -
 -    void deviceOrientationChanged(int angle = -1);
 -
--    const void *ffmpegHWAccel() const override { return &hwAccel; }
+-    std::optional<int> ffmpegHWPixelFormat() const override { return hwPixelFormat; }
 -
 -private:
 -    void requestCameraPermissionIfNeeded();
@@ -737,7 +926,7 @@ index 281ebf672..000000000
 -    QAVFSampleBufferDelegate *m_sampleBufferDelegate = nullptr;
 -    dispatch_queue_t m_delegateQueue;
 -    QVideoOutputOrientationHandler m_orientationHandler;
--    QFFmpeg::HWAccel hwAccel;
+-    AVPixelFormat hwPixelFormat = AV_PIX_FMT_NONE;
 -};
 -
 -QT_END_NAMESPACE
@@ -747,10 +936,10 @@ index 281ebf672..000000000
 -
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeg_p.h b/src/plugins/multimedia/ffmpeg/qffmpeg_p.h
 deleted file mode 100644
-index 3f06f5f56..000000000
+index 6a1d6ab38..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeg_p.h
 +++ /dev/null
-@@ -1,47 +0,0 @@
+@@ -1,60 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#ifndef QFFMPEG_P_H
@@ -774,17 +963,30 @@ index 3f06f5f56..000000000
 -namespace QFFmpeg
 -{
 -
--inline qint64 timeStamp(qint64 ts, AVRational base)
+-inline std::optional<qint64> mul(qint64 a, AVRational b)
 -{
--    return (1000*ts*base.num + 500)/base.den;
+-    return b.den != 0 ? (a * b.num + b.den / 2) / b.den : std::optional<qint64>{};
 -}
 -
--inline qint64 timeStampUs(qint64 ts, AVRational base)
+-inline std::optional<qreal> mul(qreal a, AVRational b)
 -{
--    return (1000000*ts*base.num + 500000)/base.den;
+-    return b.den != 0 ? a * qreal(b.num) / qreal(b.den) : std::optional<qreal>{};
 -}
 -
--inline float toFloat(AVRational r) { return float(r.num)/float(r.den); }
+-inline std::optional<qint64> timeStampMs(qint64 ts, AVRational base)
+-{
+-    return mul(1'000 * ts, base);
+-}
+-
+-inline std::optional<qint64> timeStampUs(qint64 ts, AVRational base)
+-{
+-    return mul(1'000'000 * ts, base);
+-}
+-
+-inline std::optional<float> toFloat(AVRational r)
+-{
+-    return r.den != 0 ? float(r.num) / float(r.den) : std::optional<float>{};
+-}
 -
 -inline QString err2str(int errnum)
 -{
@@ -800,10 +1002,10 @@ index 3f06f5f56..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder.cpp b/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder.cpp
 deleted file mode 100644
-index 28e9044ed..000000000
+index 4dff93d12..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder.cpp
 +++ /dev/null
-@@ -1,241 +0,0 @@
+@@ -1,265 +0,0 @@
 -// Copyright (C) 2020 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -//#define DEBUG_DECODER
@@ -844,8 +1046,7 @@ index 28e9044ed..000000000
 -{
 -    Q_OBJECT
 -public:
--    explicit AudioDecoder(QFFmpegAudioDecoder *audioDecoder)
--        : Decoder(audioDecoder)
+-    explicit AudioDecoder(QFFmpegAudioDecoder *audioDecoder) : Decoder(), audioDecoder(audioDecoder)
 -    {}
 -
 -    void setup(const QAudioFormat &format)
@@ -855,7 +1056,7 @@ index 28e9044ed..000000000
 -        m_format = format;
 -        audioRenderer = new SteppingAudioRenderer(this, format);
 -        audioRenderer->start();
--        auto *stream = demuxer->addStream(m_currentAVStreamIndex[QPlatformMediaPlayer::AudioStream]);
+-        auto *stream = demuxer->addStream(avStreamIndex(QPlatformMediaPlayer::AudioStream));
 -        audioRenderer->setStream(stream);
 -    }
 -
@@ -869,6 +1070,7 @@ index 28e9044ed..000000000
 -    void isAtEnd();
 -
 -private:
+-    QFFmpegAudioDecoder *audioDecoder = nullptr;
 -    QAudioFormat m_format;
 -};
 -
@@ -981,6 +1183,8 @@ index 28e9044ed..000000000
 -    if (error() != QAudioDecoder::NoError)
 -        goto error;
 -
+-    connect(decoder, &QFFmpeg::Decoder::errorOccured, this, &QFFmpegAudioDecoder::errorSignal);
+-    durationChanged(duration());
 -    setIsDecoding(true);
 -    return;
 -
@@ -1042,15 +1246,37 @@ index 28e9044ed..000000000
 -    finished();
 -}
 -
+-void QFFmpegAudioDecoder::errorSignal(int err, const QString &errorString)
+-{
+-    // unfortunately the error enums for QAudioDecoder and QMediaPlayer aren't identical.
+-    // Map them.
+-    switch (QMediaPlayer::Error(err)) {
+-    case QMediaPlayer::NoError:
+-        error(QAudioDecoder::NoError, errorString);
+-        break;
+-    case QMediaPlayer::ResourceError:
+-        error(QAudioDecoder::ResourceError, errorString);
+-        break;
+-    case QMediaPlayer::FormatError:
+-        error(QAudioDecoder::FormatError, errorString);
+-        break;
+-    case QMediaPlayer::NetworkError:
+-        // fall through, Network error doesn't exist in QAudioDecoder
+-    case QMediaPlayer::AccessDeniedError:
+-        error(QAudioDecoder::AccessDeniedError, errorString);
+-        break;
+-    }
+-}
+-
 -QT_END_NAMESPACE
 -
 -#include "qffmpegaudiodecoder.moc"
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder_p.h b/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder_p.h
 deleted file mode 100644
-index 252784984..000000000
+index 0196f88a7..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegaudiodecoder_p.h
 +++ /dev/null
-@@ -1,68 +0,0 @@
+@@ -1,69 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -1106,6 +1332,7 @@ index 252784984..000000000
 -public Q_SLOTS:
 -    void newAudioBuffer(const QAudioBuffer &b);
 -    void done();
+-    void errorSignal(int err, const QString &errorString);
 -
 -private:
 -    QUrl m_url;
@@ -1376,10 +1603,10 @@ index f81549748..000000000
 -#endif // QPLATFORMAUDIOINPUT_H
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegclock.cpp b/src/plugins/multimedia/ffmpeg/qffmpegclock.cpp
 deleted file mode 100644
-index c080c55df..000000000
+index a3ca04d93..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegclock.cpp
 +++ /dev/null
-@@ -1,209 +0,0 @@
+@@ -1,193 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#include <qffmpegclock_p.h>
@@ -1475,14 +1702,6 @@ index c080c55df..000000000
 -    m_baseTime = time;
 -    m_elapsedTimer.restart();
 -
--    // Avoid posting too many updates to the notifyObject, or we can overload
--    // the event queue with too many notifications
--    if (qAbs(time - m_lastMasterTime) < 5000)
--        return time;
--    m_lastMasterTime = time;
--//        qCDebug(qLcClock) << "ClockController::timeUpdated(master)" << time << "skew" << skew();
--    if (notifyObject)
--        notify.invoke(notifyObject, Qt::QueuedConnection, Q_ARG(qint64, time));
 -    return time;
 -}
 -
@@ -1580,21 +1799,13 @@ index c080c55df..000000000
 -        p->setPaused(paused);
 -}
 -
--void QFFmpeg::ClockController::setNotify(QObject *object, QMetaMethod method)
--{
--    QMutexLocker l(&m_mutex);
--
--    notifyObject = object;
--    notify = method;
--}
--
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegclock_p.h b/src/plugins/multimedia/ffmpeg/qffmpegclock_p.h
 deleted file mode 100644
-index b09f7bd6d..000000000
+index f8cc0bdf3..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegclock_p.h
 +++ /dev/null
-@@ -1,120 +0,0 @@
+@@ -1,113 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#ifndef QFFMPEGCLOCK_P_H
@@ -1665,9 +1876,6 @@ index b09f7bd6d..000000000
 -    float m_playbackRate = 1.;
 -    bool m_isPaused = true;
 -
--    qint64 m_lastMasterTime = 0;
--    QObject *notifyObject = nullptr;
--    QMetaMethod notify;
 -    qint64 currentTimeNoLock() const;
 -
 -    friend class Clock;
@@ -1677,8 +1885,6 @@ index b09f7bd6d..000000000
 -    bool isMaster(const Clock *clock) const;
 -
 -public:
--    // max 5 msecs tolerance for the clock
--    enum { NotificationTolerance = 5000 };
 -    ClockController() = default;
 -    ~ClockController();
 -
@@ -1690,8 +1896,6 @@ index b09f7bd6d..000000000
 -    void setPlaybackRate(float s);
 -    float playbackRate() const { return m_playbackRate; }
 -    void setPaused(bool paused);
--
--    void setNotify(QObject *object, QMetaMethod method);
 -};
 -
 -inline float Clock::playbackRate() const
@@ -1717,10 +1921,10 @@ index b09f7bd6d..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegdecoder.cpp b/src/plugins/multimedia/ffmpeg/qffmpegdecoder.cpp
 deleted file mode 100644
-index f37a10174..000000000
+index 89a95f5a3..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegdecoder.cpp
 +++ /dev/null
-@@ -1,1368 +0,0 @@
+@@ -1,1272 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -1756,55 +1960,49 @@ index f37a10174..000000000
 -Q_LOGGING_CATEGORY(qLcVideoRenderer, "qt.multimedia.ffmpeg.videoRenderer")
 -Q_LOGGING_CATEGORY(qLcAudioRenderer, "qt.multimedia.ffmpeg.audioRenderer")
 -
--Codec::Data::Data(AVCodecContext *context, AVStream *stream, const HWAccel &hwAccel)
--    : context(context)
+-Codec::Data::Data(UniqueAVCodecContext &&context, AVStream *stream, std::unique_ptr<QFFmpeg::HWAccel> &&hwAccel)
+-    : context(std::move(context))
 -    , stream(stream)
--    , hwAccel(hwAccel)
+-    , hwAccel(std::move(hwAccel))
 -{
 -}
 -
 -Codec::Data::~Data()
 -{
--    if (!context)
--        return;
--    avcodec_close(context);
--    avcodec_free_context(&context);
+-    avcodec_close(context.get());
 -}
 -
--Codec::Codec(AVFormatContext *format, int streamIndex)
+-QMaybe<Codec> Codec::create(AVStream *stream)
 -{
--    qCDebug(qLcDecoder) << "Codec::Codec" << streamIndex;
--    Q_ASSERT(streamIndex >= 0 && streamIndex < (int)format->nb_streams);
+-    if (!stream)
+-        return { "Invalid stream" };
 -
--    AVStream *stream = format->streams[streamIndex];
 -    const AVCodec *decoder =
 -            QFFmpeg::HWAccel::hardwareDecoderForCodecId(stream->codecpar->codec_id);
+-    if (!decoder)
+-        return { "Failed to find a valid FFmpeg decoder" };
 -
--    if (!decoder) {
--        qCDebug(qLcDecoder) << "Failed to find a valid FFmpeg decoder";
--        return;
+-    //avcodec_free_context
+-    UniqueAVCodecContext context(avcodec_alloc_context3(decoder));
+-    if (!context)
+-        return { "Failed to allocate a FFmpeg codec context" };
+-
+-    if (context->codec_type != AVMEDIA_TYPE_AUDIO &&
+-        context->codec_type != AVMEDIA_TYPE_VIDEO &&
+-        context->codec_type != AVMEDIA_TYPE_SUBTITLE) {
+-        return { "Unknown codec type" };
 -    }
 -
--    QFFmpeg::HWAccel hwAccel;
+-    int ret = avcodec_parameters_to_context(context.get(), stream->codecpar);
+-    if (ret < 0)
+-        return { "Failed to set FFmpeg codec parameters" };
+-
+-    std::unique_ptr<QFFmpeg::HWAccel> hwAccel;
 -    if (decoder->type == AVMEDIA_TYPE_VIDEO) {
--        hwAccel = QFFmpeg::HWAccel(decoder);
+-        hwAccel = QFFmpeg::HWAccel::create(decoder);
+-        if (hwAccel)
+-            context->hw_device_ctx = av_buffer_ref(hwAccel->hwDeviceContextAsBuffer());
 -    }
--
--    auto *context = avcodec_alloc_context3(decoder);
--    if (!context) {
--        qCDebug(qLcDecoder) << "Failed to allocate a FFmpeg codec context";
--        return;
--    }
--
--    int ret = avcodec_parameters_to_context(context, stream->codecpar);
--    if (ret < 0) {
--        qCDebug(qLcDecoder) << "Failed to set FFmpeg codec parameters";
--        return;
--    }
--
--    auto *buf = hwAccel.hwDeviceContextAsBuffer();
--    if (buf)
--        context->hw_device_ctx = av_buffer_ref(buf);
 -    // ### This still gives errors about wrong HW formats (as we accept all of them)
 -    // But it would be good to get so we can filter out pixel format we don't support natively
 -    context->get_format = QFFmpeg::getFormat;
@@ -1813,14 +2011,11 @@ index f37a10174..000000000
 -    AVDictionary *opts = nullptr;
 -    av_dict_set(&opts, "refcounted_frames", "1", 0);
 -    av_dict_set(&opts, "threads", "auto", 0);
--    ret = avcodec_open2(context, decoder, &opts);
--    if (ret < 0) {
--        qCDebug(qLcDecoder) << "Failed to open FFmpeg codec context.";
--        avcodec_free_context(&context);
--        return;
--    }
+-    ret = avcodec_open2(context.get(), decoder, &opts);
+-    if (ret < 0)
+-        return "Failed to open FFmpeg codec context " + err2str(ret);
 -
--    d = new Data(context, stream, hwAccel);
+-    return Codec(new Data(std::move(context), stream, std::move(hwAccel)));
 -}
 -
 -
@@ -1839,7 +2034,7 @@ index f37a10174..000000000
 -{
 -    if (context) {
 -        if (context->pb) {
--            av_free(context->pb);
+-            avio_context_free(&context->pb);
 -            context->pb = nullptr;
 -        }
 -        avformat_free_context(context);
@@ -1848,19 +2043,20 @@ index f37a10174..000000000
 -
 -StreamDecoder *Demuxer::addStream(int streamIndex)
 -{
--    if (streamIndex < 0)
+-    if (streamIndex < 0 || streamIndex >= (int)context->nb_streams)
 -        return nullptr;
+-
+-    AVStream *avStream = context->streams[streamIndex];
+-    if (!avStream)
+-        return nullptr;
+-
 -    QMutexLocker locker(&mutex);
--    Codec codec(context, streamIndex);
--    if (!codec.isValid()) {
--        decoder->error(QMediaPlayer::FormatError, "Invalid media file");
+-    auto maybeCodec = Codec::create(avStream);
+-    if (!maybeCodec) {
+-        decoder->errorOccured(QMediaPlayer::FormatError, "Cannot open codec; " + maybeCodec.error());
 -        return nullptr;
 -    }
--
--    Q_ASSERT(codec.context()->codec_type == AVMEDIA_TYPE_AUDIO ||
--             codec.context()->codec_type == AVMEDIA_TYPE_VIDEO ||
--             codec.context()->codec_type == AVMEDIA_TYPE_SUBTITLE);
--    auto *stream = new StreamDecoder(this, codec);
+-    auto *stream = new StreamDecoder(this, maybeCodec.value());
 -    Q_ASSERT(!streamDecoders.at(streamIndex));
 -    streamDecoders[streamIndex] = stream;
 -    stream->start();
@@ -1984,7 +2180,9 @@ index f37a10174..000000000
 -
 -    if (last_pts < 0 && packet->pts != AV_NOPTS_VALUE) {
 -        auto *stream = context->streams[packet->stream_index];
--        last_pts = timeStamp(packet->pts, stream->time_base);
+-        auto pts = timeStampMs(packet->pts, stream->time_base);
+-        if (pts)
+-            last_pts = *pts;
 -    }
 -
 -    auto *streamDecoder = streamDecoders.at(packet->stream_index);
@@ -2001,10 +2199,6 @@ index f37a10174..000000000
 -    , demuxer(demuxer)
 -    , codec(codec)
 -{
--    Q_ASSERT(codec.context()->codec_type == AVMEDIA_TYPE_AUDIO ||
--             codec.context()->codec_type == AVMEDIA_TYPE_VIDEO ||
--             codec.context()->codec_type == AVMEDIA_TYPE_SUBTITLE);
--
 -    QString objectName;
 -    switch (codec.context()->codec_type) {
 -    case AVMEDIA_TYPE_AUDIO:
@@ -2177,9 +2371,7 @@ index f37a10174..000000000
 -        timeOut = -1;
 -        return;
 -    } else if (res != AVERROR(EAGAIN)) {
--        char buf[512];
--        av_make_error_string(buf, 512, res);
--        qWarning() << "error in decoder" << res << buf;
+-        qWarning() << "error in decoder" << res << err2str(res);
 -        av_frame_free(&frame);
 -        return;
 -    } else {
@@ -2221,9 +2413,9 @@ index f37a10174..000000000
 -            start = codec.toUs(packet.avPacket()->pts);
 -            end = start + codec.toUs(packet.avPacket()->duration);
 -        } else {
--            qint64 pts = timeStampUs(subtitle.pts, AVRational{1, AV_TIME_BASE});
--            start = pts + qint64(subtitle.start_display_time)*1000;
--            end = pts + qint64(subtitle.end_display_time)*1000;
+-            auto pts = timeStampUs(subtitle.pts, AVRational{1, AV_TIME_BASE});
+-            start = *pts + qint64(subtitle.start_display_time)*1000;
+-            end = *pts + qint64(subtitle.end_display_time)*1000;
 -        }
 -        //        qCDebug(qLcDecoder) << "    got subtitle (" << start << "--" << end << "):";
 -        QString text;
@@ -2398,14 +2590,14 @@ index f37a10174..000000000
 -//        qDebug() << "RHI:" << accel.isNull() << accel.rhi() << sink->rhi();
 -
 -        // in practice this only happens with mediacodec
--        if (!frame.codec()->hwAccel().isNull() && !frame.avFrame()->hw_frames_ctx) {
--            HWAccel hwaccel = frame.codec()->hwAccel();
+-        if (frame.codec()->hwAccel() && !frame.avFrame()->hw_frames_ctx) {
+-            HWAccel *hwaccel = frame.codec()->hwAccel();
 -            AVFrame *avframe = frame.avFrame();
--            if (!hwaccel.hwFramesContext())
--                hwaccel.createFramesContext(AVPixelFormat(avframe->format),
+-            if (!hwaccel->hwFramesContext())
+-                hwaccel->createFramesContext(AVPixelFormat(avframe->format),
 -                                            { avframe->width, avframe->height });
 -
--            avframe->hw_frames_ctx = av_buffer_ref(hwaccel.hwFramesContextAsBuffer());
+-            avframe->hw_frames_ctx = av_buffer_ref(hwaccel->hwFramesContextAsBuffer());
 -        }
 -
 -        QFFmpegVideoBuffer *buffer = new QFFmpegVideoBuffer(frame.takeAVFrame());
@@ -2595,7 +2787,6 @@ index f37a10174..000000000
 -            return;
 -        }
 -        eos.storeRelease(false);
--
 -        if (!audioSink)
 -            updateOutput(frame.codec());
 -
@@ -2651,7 +2842,6 @@ index f37a10174..000000000
 -void AudioRenderer::setSoundVolume(float volume)
 -{
 -    QMutexLocker locker(&mutex);
--
 -    if (audioSink)
 -        audioSink->setVolume(volume);
 -}
@@ -2701,16 +2891,91 @@ index f37a10174..000000000
 -    return offset;
 -}
 -
+-static void insertVideoData(QMediaMetaData &metaData, AVStream *stream)
+-{
+-    Q_ASSERT(stream);
+-    auto *codecPar = stream->codecpar;
+-    metaData.insert(QMediaMetaData::VideoBitRate, (int)codecPar->bit_rate);
+-    metaData.insert(QMediaMetaData::VideoCodec, QVariant::fromValue(QFFmpegMediaFormatInfo::videoCodecForAVCodecId(codecPar->codec_id)));
+-    metaData.insert(QMediaMetaData::Resolution, QSize(codecPar->width, codecPar->height));
+-    auto fr = toFloat(stream->avg_frame_rate);
+-    if (fr)
+-        metaData.insert(QMediaMetaData::VideoFrameRate, *fr);
+-};
+-
+-static void insertAudioData(QMediaMetaData &metaData, AVStream *stream)
+-{
+-    Q_ASSERT(stream);
+-    auto *codecPar = stream->codecpar;
+-    metaData.insert(QMediaMetaData::AudioBitRate, (int)codecPar->bit_rate);
+-    metaData.insert(QMediaMetaData::AudioCodec,
+-                    QVariant::fromValue(QFFmpegMediaFormatInfo::audioCodecForAVCodecId(codecPar->codec_id)));
+-};
+-
+-static int getDefaultStreamIndex(QList<Decoder::StreamInfo> &streams)
+-{
+-    if (streams.empty())
+-        return -1;
+-    for (qsizetype i = 0; i < streams.size(); i++)
+-        if (streams[i].isDefault)
+-            return i;
+-    return 0;
+-}
+-
+-static void readStreams(const AVFormatContext *context,
+-                        QList<Decoder::StreamInfo> (&map)[QPlatformMediaPlayer::NTrackTypes], qint64 &maxDuration)
+-{
+-    maxDuration = 0;
+-
+-    for (unsigned int i = 0; i < context->nb_streams; ++i) {
+-        auto *stream = context->streams[i];
+-        if (!stream)
+-            continue;
+-
+-        auto *codecPar = stream->codecpar;
+-        if (!codecPar)
+-            continue;
+-
+-        QMediaMetaData metaData = QFFmpegMetaData::fromAVMetaData(stream->metadata);
+-        bool isDefault = stream->disposition & AV_DISPOSITION_DEFAULT;
+-        QPlatformMediaPlayer::TrackType type = QPlatformMediaPlayer::VideoStream;
+-
+-        switch (codecPar->codec_type) {
+-        case AVMEDIA_TYPE_UNKNOWN:
+-        case AVMEDIA_TYPE_DATA:          ///< Opaque data information usually continuous
+-        case AVMEDIA_TYPE_ATTACHMENT:    ///< Opaque data information usually sparse
+-        case AVMEDIA_TYPE_NB:
+-            continue;
+-        case AVMEDIA_TYPE_VIDEO:
+-            type = QPlatformMediaPlayer::VideoStream;
+-            insertVideoData(metaData, stream);
+-            break;
+-        case AVMEDIA_TYPE_AUDIO:
+-            type = QPlatformMediaPlayer::AudioStream;
+-            insertAudioData(metaData, stream);
+-            break;
+-        case AVMEDIA_TYPE_SUBTITLE:
+-            type = QPlatformMediaPlayer::SubtitleStream;
+-            break;
+-        }
+-
+-        map[type].append({ (int)i, isDefault, metaData });
+-        auto maybeDuration = mul(1'000'000ll * stream->duration, stream->time_base);
+-        if (maybeDuration)
+-            maxDuration = qMax(maxDuration, *maybeDuration);
+-    }
+-}
+-
 -void Decoder::setMedia(const QUrl &media, QIODevice *stream)
 -{
 -    QByteArray url = media.toEncoded(QUrl::PreferLocalFile);
 -
 -    AVFormatContext *context = nullptr;
--
 -    if (stream) {
 -        if (!stream->isOpen()) {
 -            if (!stream->open(QIODevice::ReadOnly)) {
--                emitError(QMediaPlayer::ResourceError, QLatin1String("Could not open source device."));
+-                emit errorOccured(QMediaPlayer::ResourceError,
+-                                  QLatin1String("Could not open source device."));
 -                return;
 -            }
 -        }
@@ -2730,13 +2995,15 @@ index f37a10174..000000000
 -        else if (ret == AVERROR(EINVAL))
 -            code = QMediaPlayer::FormatError;
 -
--        emitError(code, QMediaPlayer::tr("Could not open file"));
+-        emit errorOccured(code, QMediaPlayer::tr("Could not open file"));
 -        return;
 -    }
 -
 -    ret = avformat_find_stream_info(context, nullptr);
 -    if (ret < 0) {
--        emitError(QMediaPlayer::FormatError, QMediaPlayer::tr("Could not find stream information for media file"));
+-        emit errorOccured(QMediaPlayer::FormatError,
+-                          QMediaPlayer::tr("Could not find stream information for media file"));
+-        avformat_free_context(context);
 -        return;
 -    }
 -
@@ -2744,119 +3011,26 @@ index f37a10174..000000000
 -    av_dump_format(context, 0, url.constData(), 0);
 -#endif
 -
+-    readStreams(context, m_streamMap, m_duration);
+-
+-    m_requestedStreams[QPlatformMediaPlayer::VideoStream] = getDefaultStreamIndex(m_streamMap[QPlatformMediaPlayer::VideoStream]);
+-    m_requestedStreams[QPlatformMediaPlayer::AudioStream] = getDefaultStreamIndex(m_streamMap[QPlatformMediaPlayer::AudioStream]);
+-    m_requestedStreams[QPlatformMediaPlayer::SubtitleStream] = -1;
+-
 -    m_metaData = QFFmpegMetaData::fromAVMetaData(context->metadata);
 -    m_metaData.insert(QMediaMetaData::FileFormat,
 -                      QVariant::fromValue(QFFmpegMediaFormatInfo::fileFormatForAVInputFormat(context->iformat)));
 -
--    checkStreams(context);
+-    if (m_requestedStreams[QPlatformMediaPlayer::VideoStream] >= 0)
+-        insertVideoData(m_metaData, context->streams[avStreamIndex(QPlatformMediaPlayer::VideoStream)]);
+-
+-    if (m_requestedStreams[QPlatformMediaPlayer::AudioStream] >= 0)
+-        insertAudioData(m_metaData, context->streams[avStreamIndex(QPlatformMediaPlayer::AudioStream)]);
 -
 -    m_isSeekable = !(context->ctx_flags & AVFMTCTX_UNSEEKABLE);
 -
 -    demuxer = new Demuxer(this, context);
 -    demuxer->start();
--
--    qCDebug(qLcDecoder) << ">>>>>> index:" << metaObject()->indexOfSlot("updateCurrentTime(qint64)");
--    clockController.setNotify(this, metaObject()->method(metaObject()->indexOfSlot("updateCurrentTime(qint64)")));
--}
--
--static void insertVideoData(QMediaMetaData &metaData, AVStream *stream)
--{
--    Q_ASSERT(stream);
--    auto *codecPar = stream->codecpar;
--    metaData.insert(QMediaMetaData::VideoBitRate, (int)codecPar->bit_rate);
--    metaData.insert(QMediaMetaData::VideoCodec, QVariant::fromValue(QFFmpegMediaFormatInfo::videoCodecForAVCodecId(codecPar->codec_id)));
--    metaData.insert(QMediaMetaData::Resolution, QSize(codecPar->width, codecPar->height));
--    metaData.insert(QMediaMetaData::VideoFrameRate,
--                    qreal(stream->avg_frame_rate.num)/qreal(stream->avg_frame_rate.den));
--};
--
--static void insertAudioData(QMediaMetaData &metaData, AVStream *stream)
--{
--    Q_ASSERT(stream);
--    auto *codecPar = stream->codecpar;
--    metaData.insert(QMediaMetaData::AudioBitRate, (int)codecPar->bit_rate);
--    metaData.insert(QMediaMetaData::AudioCodec,
--                    QVariant::fromValue(QFFmpegMediaFormatInfo::audioCodecForAVCodecId(codecPar->codec_id)));
--};
--
--void Decoder::checkStreams(AVFormatContext *context)
--{
--    qint64 duration = 0;
--    AVStream *firstAudioStream = nullptr;
--    AVStream *defaultAudioStream = nullptr;
--    AVStream *firstVideoStream = nullptr;
--    AVStream *defaultVideoStream = nullptr;
--
--    for (unsigned int i = 0; i < context->nb_streams; ++i) {
--        auto *stream = context->streams[i];
--
--        QMediaMetaData metaData = QFFmpegMetaData::fromAVMetaData(stream->metadata);
--        QPlatformMediaPlayer::TrackType type = QPlatformMediaPlayer::VideoStream;
--        auto *codecPar = stream->codecpar;
--
--        bool isDefault = stream->disposition & AV_DISPOSITION_DEFAULT;
--        switch (codecPar->codec_type) {
--        case AVMEDIA_TYPE_UNKNOWN:
--        case AVMEDIA_TYPE_DATA:          ///< Opaque data information usually continuous
--        case AVMEDIA_TYPE_ATTACHMENT:    ///< Opaque data information usually sparse
--        case AVMEDIA_TYPE_NB:
--            continue;
--        case AVMEDIA_TYPE_VIDEO:
--            type = QPlatformMediaPlayer::VideoStream;
--            insertVideoData(metaData, stream);
--            if (!firstVideoStream)
--                firstVideoStream = stream;
--            if (isDefault && !defaultVideoStream)
--                defaultVideoStream = stream;
--            break;
--        case AVMEDIA_TYPE_AUDIO:
--            type = QPlatformMediaPlayer::AudioStream;
--            insertAudioData(metaData, stream);
--            if (!firstAudioStream)
--                firstAudioStream = stream;
--            if (isDefault && !defaultAudioStream)
--                defaultAudioStream = stream;
--            break;
--        case AVMEDIA_TYPE_SUBTITLE:
--            type = QPlatformMediaPlayer::SubtitleStream;
--            break;
--        }
--        if (isDefault && m_requestedStreams[type] < 0)
--            m_requestedStreams[type] = m_streamMap[type].size();
--
--        m_streamMap[type].append({ (int)i, isDefault, metaData });
--        duration = qMax(duration, 1000000*stream->duration*stream->time_base.num/stream->time_base.den);
--    }
--
--    if (m_requestedStreams[QPlatformMediaPlayer::VideoStream] < 0 && m_streamMap[QPlatformMediaPlayer::VideoStream].size()) {
--        m_requestedStreams[QPlatformMediaPlayer::VideoStream] = 0;
--        defaultVideoStream = firstVideoStream;
--    }
--    if (m_requestedStreams[QPlatformMediaPlayer::AudioStream] < 0 && m_streamMap[QPlatformMediaPlayer::AudioStream].size()) {
--        m_requestedStreams[QPlatformMediaPlayer::AudioStream] = 0;
--        defaultAudioStream = firstAudioStream;
--    }
--    if (defaultVideoStream) {
--        insertVideoData(m_metaData, defaultVideoStream);
--        m_currentAVStreamIndex[QPlatformMediaPlayer::VideoStream] = defaultVideoStream->index;
--    }
--    if (defaultAudioStream) {
--        insertAudioData(m_metaData, defaultAudioStream);
--        m_currentAVStreamIndex[QPlatformMediaPlayer::AudioStream] = defaultAudioStream->index;
--    }
--    m_requestedStreams[QPlatformMediaPlayer::SubtitleStream] = -1;
--    m_currentAVStreamIndex[QPlatformMediaPlayer::SubtitleStream] = -1;
--
--    if (player)
--        player->tracksChanged();
--
--    if (m_duration != duration) {
--        m_duration = duration;
--        if (player)
--            player->durationChanged(duration/1000);
--        else if (audioDecoder)
--            audioDecoder->durationChanged(duration/1000);
--    }
 -}
 -
 -int Decoder::activeTrack(QPlatformMediaPlayer::TrackType type)
@@ -2871,41 +3045,7 @@ index f37a10174..000000000
 -    if (m_requestedStreams[type] == streamNumber)
 -        return;
 -    m_requestedStreams[type] = streamNumber;
--    int avStreamIndex = m_streamMap[type].value(streamNumber).avStreamIndex;
--    changeAVTrack(type, avStreamIndex);
--}
--
--void Decoder::error(int errorCode, const QString &errorString)
--{
--    QMetaObject::invokeMethod(this, "emitError", Q_ARG(int, errorCode), Q_ARG(QString, errorString));
--}
--
--void Decoder::emitError(int error, const QString &errorString)
--{
--    if (player)
--        player->error(error, errorString);
--    else if (audioDecoder) {
--        // unfortunately the error enums for QAudioDecoder and QMediaPlayer aren't identical.
--        // Map them.
--        switch (QMediaPlayer::Error(error)) {
--        case QMediaPlayer::NoError:
--            error = QAudioDecoder::NoError;
--            break;
--        case QMediaPlayer::ResourceError:
--            error = QAudioDecoder::ResourceError;
--            break;
--        case QMediaPlayer::FormatError:
--            error = QAudioDecoder::FormatError;
--            break;
--        case QMediaPlayer::NetworkError:
--            // fall through, Network error doesn't exist in QAudioDecoder
--        case QMediaPlayer::AccessDeniedError:
--            error = QAudioDecoder::AccessDeniedError;
--            break;
--        }
--
--        audioDecoder->error(error, errorString);
--    }
+-    changeAVTrack(type);
 -}
 -
 -void Decoder::setState(QMediaPlayer::PlaybackState state)
@@ -2922,7 +3062,6 @@ index f37a10174..000000000
 -        seek(0);
 -        if (videoSink)
 -            videoSink->setVideoFrame({});
--        updateCurrentTime(0);
 -        qCDebug(qLcDecoder) << "Decoder::stop: done";
 -        break;
 -    case QMediaPlayer::PausedState:
@@ -2964,18 +3103,18 @@ index f37a10174..000000000
 -    if (sink == videoSink)
 -        return;
 -    videoSink = sink;
--    if (!videoSink || m_currentAVStreamIndex[QPlatformMediaPlayer::VideoStream] < 0) {
+-    if (!videoSink || m_requestedStreams[QPlatformMediaPlayer::VideoStream] < 0) {
 -        if (videoRenderer) {
 -            videoRenderer->kill();
 -            videoRenderer = nullptr;
 -        }
 -    } else if (!videoRenderer) {
 -        videoRenderer = new VideoRenderer(this, sink);
--        connect(audioRenderer, &Renderer::atEnd, this, &Decoder::streamAtEnd);
+-        connect(videoRenderer, &Renderer::atEnd, this, &Decoder::streamAtEnd);
 -        videoRenderer->start();
--        StreamDecoder *stream = demuxer->addStream(m_currentAVStreamIndex[QPlatformMediaPlayer::VideoStream]);
+-        StreamDecoder *stream = demuxer->addStream(avStreamIndex(QPlatformMediaPlayer::VideoStream));
 -        videoRenderer->setStream(stream);
--        stream = demuxer->addStream(m_currentAVStreamIndex[QPlatformMediaPlayer::SubtitleStream]);
+-        stream = demuxer->addStream(avStreamIndex(QPlatformMediaPlayer::SubtitleStream));
 -        videoRenderer->setSubtitleStream(stream);
 -    }
 -}
@@ -2987,7 +3126,7 @@ index f37a10174..000000000
 -
 -    qCDebug(qLcDecoder) << "setAudioSink" << audioOutput;
 -    audioOutput = output;
--    if (!output || m_currentAVStreamIndex[QPlatformMediaPlayer::AudioStream] < 0) {
+-    if (!output || m_requestedStreams[QPlatformMediaPlayer::AudioStream] < 0) {
 -        if (audioRenderer) {
 -            audioRenderer->kill();
 -            audioRenderer = nullptr;
@@ -2996,22 +3135,19 @@ index f37a10174..000000000
 -        audioRenderer = new AudioRenderer(this, output->q);
 -        connect(audioRenderer, &Renderer::atEnd, this, &Decoder::streamAtEnd);
 -        audioRenderer->start();
--        auto *stream = demuxer->addStream(m_currentAVStreamIndex[QPlatformMediaPlayer::AudioStream]);
+-        auto *stream = demuxer->addStream(avStreamIndex(QPlatformMediaPlayer::AudioStream));
 -        audioRenderer->setStream(stream);
 -    }
 -}
 -
--void Decoder::changeAVTrack(QPlatformMediaPlayer::TrackType type, int streamIndex)
+-void Decoder::changeAVTrack(QPlatformMediaPlayer::TrackType type)
 -{
--    int oldIndex = m_currentAVStreamIndex[type];
--    qCDebug(qLcDecoder) << ">>>>> change track" << type << "from" << oldIndex << "to" << streamIndex << clockController.currentTime();
--    m_currentAVStreamIndex[type] = streamIndex;
 -    if (!demuxer)
 -        return;
 -    qCDebug(qLcDecoder) << "    applying to renderer.";
 -    if (m_state == QMediaPlayer::PlayingState)
 -        setPaused(true);
--    auto *streamDecoder = demuxer->addStream(streamIndex);
+-    auto *streamDecoder = demuxer->addStream(avStreamIndex(type));
 -    switch (type) {
 -    case QPlatformMediaPlayer::AudioStream:
 -        audioRenderer->setStream(streamDecoder);
@@ -3032,21 +3168,6 @@ index f37a10174..000000000
 -        triggerStep();
 -}
 -
--QPlatformMediaPlayer::TrackType trackType(AVMediaType mediaType)
--{
--    switch (mediaType) {
--    case AVMEDIA_TYPE_VIDEO:
--        return QPlatformMediaPlayer::VideoStream;
--    case AVMEDIA_TYPE_AUDIO:
--        return QPlatformMediaPlayer::AudioStream;
--    case AVMEDIA_TYPE_SUBTITLE:
--        return QPlatformMediaPlayer::SubtitleStream;
--    default:
--        break;
--    }
--    return QPlatformMediaPlayer::NTrackTypes;
--}
--
 -void Decoder::seek(qint64 pos)
 -{
 -    if (!demuxer)
@@ -3054,8 +3175,6 @@ index f37a10174..000000000
 -    pos = qBound(0, pos, m_duration);
 -    demuxer->seek(pos);
 -    clockController.syncTo(pos);
--    if (player)
--        player->positionChanged(pos/1000);
 -    demuxer->wake();
 -    if (m_state == QMediaPlayer::PausedState)
 -        triggerStep();
@@ -3066,12 +3185,6 @@ index f37a10174..000000000
 -    clockController.setPlaybackRate(rate);
 -}
 -
--void Decoder::updateCurrentTime(qint64 time)
--{
--    if (player)
--        player->positionChanged(time/1000);
--}
--
 -void Decoder::streamAtEnd()
 -{
 -    if (audioRenderer && !audioRenderer->isAtEnd())
@@ -3079,22 +3192,17 @@ index f37a10174..000000000
 -    if (videoRenderer && !videoRenderer->isAtEnd())
 -        return;
 -    pause();
--    // take a local copy, as the signals below could lead to this object being deleted
--    auto *p = player;
--    if (p) {
--        p->positionChanged(m_duration/1000);
--        p->stateChanged(QMediaPlayer::StoppedState);
--        p->mediaStatusChanged(QMediaPlayer::EndOfMedia);
--    }
+-
+-    emit endOfStream();
 -}
 -
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegdecoder_p.h b/src/plugins/multimedia/ffmpeg/qffmpegdecoder_p.h
 deleted file mode 100644
-index 01763911d..000000000
+index 2ee61a68e..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegdecoder_p.h
 +++ /dev/null
-@@ -1,513 +0,0 @@
+@@ -1,501 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#ifndef QFFMPEGDECODER_P_H
@@ -3119,6 +3227,7 @@ index 01763911d..000000000
 -#include "qaudiobuffer.h"
 -#include "qffmpegresampler_p.h"
 -
+-#include <private/qmultimediautils_p.h>
 -#include <qshareddata.h>
 -#include <qtimer.h>
 -#include <qqueue.h>
@@ -3164,28 +3273,28 @@ index 01763911d..000000000
 -
 -struct Codec
 -{
+-    struct AVCodecFreeContext { void operator()(AVCodecContext *ctx) { avcodec_free_context(&ctx); } };
+-    using UniqueAVCodecContext = std::unique_ptr<AVCodecContext, AVCodecFreeContext>;
 -    struct Data {
--        Data(AVCodecContext *context, AVStream *stream, const QFFmpeg::HWAccel &hwAccel);
+-        Data(UniqueAVCodecContext &&context, AVStream *stream, std::unique_ptr<QFFmpeg::HWAccel> &&hwAccel);
 -        ~Data();
 -        QAtomicInt ref;
--        AVCodecContext *context = nullptr;
+-        UniqueAVCodecContext context;
 -        AVStream *stream = nullptr;
--        QFFmpeg::HWAccel hwAccel;
--        int streamIndex = -1;
+-        std::unique_ptr<QFFmpeg::HWAccel> hwAccel;
 -    };
 -
--    Codec() = default;
--    Codec(AVFormatContext *format, int streamIndex);
--    bool isValid() const { return !!d; }
+-    static QMaybe<Codec> create(AVStream *);
 -
--    AVCodecContext *context() const { return d->context; }
+-    AVCodecContext *context() const { return d->context.get(); }
 -    AVStream *stream() const { return d->stream; }
 -    uint streamIndex() const { return d->stream->index; }
--    HWAccel hwAccel() const { return d->hwAccel; }
--    qint64 toMs(qint64 ts) const { return timeStamp(ts, d->stream->time_base); }
--    qint64 toUs(qint64 ts) const { return timeStampUs(ts, d->stream->time_base); }
+-    HWAccel *hwAccel() const { return d->hwAccel.get(); }
+-    qint64 toMs(qint64 ts) const { return timeStampMs(ts, d->stream->time_base).value_or(0); }
+-    qint64 toUs(qint64 ts) const { return timeStampUs(ts, d->stream->time_base).value_or(0); }
 -
 -private:
+-    Codec(Data *data) : d(data) {}
 -    QExplicitlySharedDataPointer<Data> d;
 -};
 -
@@ -3206,7 +3315,7 @@ index 01763911d..000000000
 -                av_frame_free(&frame);
 -        }
 -        QAtomicInt ref;
--        Codec codec;
+-        std::optional<Codec> codec;
 -        AVFrame *frame = nullptr;
 -        QString text;
 -        qint64 pts = -1;
@@ -3227,7 +3336,7 @@ index 01763911d..000000000
 -        d->frame = nullptr;
 -        return f;
 -    }
--    const Codec *codec() const { return &d->codec; }
+-    const Codec *codec() const { return d->codec ? &d->codec.value() : nullptr; }
 -    qint64 pts() const { return d->pts; }
 -    qint64 duration() const { return d->duration; }
 -    qint64 end() const { return d->pts + d->duration; }
@@ -3247,14 +3356,6 @@ index 01763911d..000000000
 -    Q_OBJECT
 -public:
 -    Decoder();
--    Decoder(QFFmpegMediaPlayer *player)
--        : player(player)
--    {
--    }
--    Decoder(QFFmpegAudioDecoder *decoder)
--        : audioDecoder(decoder)
--    {
--    }
 -    ~Decoder();
 -
 -    void setMedia(const QUrl &media, QIODevice *stream);
@@ -3276,12 +3377,10 @@ index 01763911d..000000000
 -    void setVideoSink(QVideoSink *sink);
 -    void setAudioSink(QPlatformAudioOutput *output);
 -
--    void changeAVTrack(QPlatformMediaPlayer::TrackType type, int index);
+-    void changeAVTrack(QPlatformMediaPlayer::TrackType type);
 -
 -    void seek(qint64 pos);
 -    void setPlaybackRate(float rate);
--
--    void checkStreams(AVFormatContext *context);
 -
 -    int activeTrack(QPlatformMediaPlayer::TrackType type);
 -    void setActiveTrack(QPlatformMediaPlayer::TrackType type, int streamNumber);
@@ -3291,15 +3390,20 @@ index 01763911d..000000000
 -        return m_isSeekable;
 -    }
 -
--    // threadsafe
--    void error(int errorCode, const QString &errorString);
+-signals:
+-    void endOfStream();
+-    void errorOccured(int error, const QString &errorString);
+-    void positionChanged(qint64 time);
 -
--public Q_SLOTS:
--    void emitError(int error, const QString &errorString);
--    void updateCurrentTime(qint64 time);
+-public slots:
 -    void streamAtEnd();
 -
 -public:
+-    struct StreamInfo {
+-        int avStreamIndex = -1;
+-        bool isDefault = false;
+-        QMediaMetaData metaData;
+-    };
 -
 -    // Accessed from multiple threads, but API is threadsafe
 -    ClockController clockController;
@@ -3310,33 +3414,25 @@ index 01763911d..000000000
 -protected:
 -    friend QFFmpegMediaPlayer;
 -
--    QFFmpegMediaPlayer *player = nullptr;
--    QFFmpegAudioDecoder *audioDecoder = nullptr;
--
 -    QMediaPlayer::PlaybackState m_state = QMediaPlayer::StoppedState;
 -    bool m_isSeekable = false;
 -
 -    Demuxer *demuxer = nullptr;
--    int m_currentAVStreamIndex[QPlatformMediaPlayer::NTrackTypes] = { -1, -1, -1 };
--
 -    QVideoSink *videoSink = nullptr;
 -    Renderer *videoRenderer = nullptr;
--
 -    QPlatformAudioOutput *audioOutput = nullptr;
 -    Renderer *audioRenderer = nullptr;
 -
--    bool playing = false;
--
--    struct StreamInfo {
--        int avStreamIndex = -1;
--        bool isDefault = false;
--        QMediaMetaData metaData;
--    };
--
 -    QList<StreamInfo> m_streamMap[QPlatformMediaPlayer::NTrackTypes];
--    int m_requestedStreams[3] = { -1, -1, -1 };
+-    int m_requestedStreams[QPlatformMediaPlayer::NTrackTypes] = { -1, -1, -1 };
 -    qint64 m_duration = 0;
 -    QMediaMetaData m_metaData;
+-
+-    int avStreamIndex(QPlatformMediaPlayer::TrackType type)
+-    {
+-        int i = m_requestedStreams[type];
+-        return i < 0 || i >= m_streamMap[type].size() ? -1 : m_streamMap[type][i].avStreamIndex;
+-    }
 -};
 -
 -class Demuxer : public Thread
@@ -3610,10 +3706,10 @@ index 01763911d..000000000
 -
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegencoder.cpp b/src/plugins/multimedia/ffmpeg/qffmpegencoder.cpp
 deleted file mode 100644
-index 186e254fd..000000000
+index 86e33c83c..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegencoder.cpp
 +++ /dev/null
-@@ -1,553 +0,0 @@
+@@ -1,557 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#include "qffmpegencoder_p.h"
@@ -4019,10 +4115,14 @@ index 186e254fd..000000000
 -    qCDebug(qLcFFmpegEncoder) << "VideoEncoder" << settings.videoCodec();
 -
 -    auto format = m_camera->cameraFormat();
--    auto *hwAccel = static_cast<const QFFmpeg::HWAccel *>(camera->ffmpegHWAccel());
+-    std::optional<AVPixelFormat> hwFormat = camera->ffmpegHWPixelFormat()
+-            ? AVPixelFormat(*camera->ffmpegHWPixelFormat())
+-            : std::optional<AVPixelFormat>{};
+-
 -    AVPixelFormat swFormat = QFFmpegVideoBuffer::toAVPixelFormat(format.pixelFormat());
--    AVPixelFormat pixelFormat = hwAccel ? hwAccel->hwFormat() : swFormat;
+-    AVPixelFormat pixelFormat = hwFormat ? *hwFormat : swFormat;
 -    frameEncoder = new VideoFrameEncoder(settings, format.resolution(), format.maxFrameRate(), pixelFormat, swFormat);
+-
 -    frameEncoder->initWithFormatContext(encoder->formatContext);
 -}
 -
@@ -4688,10 +4788,10 @@ index 005ad7652..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel.cpp b/src/plugins/multimedia/ffmpeg/qffmpeghwaccel.cpp
 deleted file mode 100644
-index c2bc4f6e1..000000000
+index e5d90239b..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel.cpp
 +++ /dev/null
-@@ -1,399 +0,0 @@
+@@ -1,372 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -4720,11 +4820,7 @@ index c2bc4f6e1..000000000
 -
 -namespace QFFmpeg {
 -
--// HW context initialization
--
--// preferred order of HW accelerators to use
 -static const AVHWDeviceType preferredHardwareAccelerators[] = {
--// Linux/Unix
 -#if defined(Q_OS_LINUX)
 -    AV_HWDEVICE_TYPE_VAAPI,
 -//    AV_HWDEVICE_TYPE_DRM,
@@ -4735,7 +4831,6 @@ index c2bc4f6e1..000000000
 -#elif defined (Q_OS_ANDROID)
 -    AV_HWDEVICE_TYPE_MEDIACODEC,
 -#endif
--    AV_HWDEVICE_TYPE_NONE
 -};
 -
 -static AVBufferRef *loadHWContext(const AVHWDeviceType type)
@@ -4757,20 +4852,18 @@ index c2bc4f6e1..000000000
 -
 -    // First try our preferred accelerators. Those are the ones where we can
 -    // set up a zero copy pipeline
--    auto *preferred = preferredHardwareAccelerators;
--    while (*preferred != AV_HWDEVICE_TYPE_NONE) {
+-    for (auto type : preferredHardwareAccelerators) {
 -        for (int i = 0;; ++i) {
 -            const AVCodecHWConfig *config = avcodec_get_hw_config(codec, i);
 -            if (!config)
 -                break;
--            if (config->device_type == *preferred) {
+-            if (config->device_type == type) {
 -                auto *hwContext = loadHWContext(config->device_type);
 -                if (hwContext)
 -                    return hwContext;
 -                break;
 -            }
 -        }
--        ++preferred;
 -    }
 -
 -    // Ok, let's see if we can get any HW acceleration at all. It'll still involve one buffer copy,
@@ -4833,38 +4926,30 @@ index c2bc4f6e1..000000000
 -    delete backend;
 -}
 -
--
--
--HWAccel::Data::~Data()
+-HWAccel::~HWAccel()
 -{
--    if (hwDeviceContext)
--        av_buffer_unref(&hwDeviceContext);
--    if (hwFramesContext)
--        av_buffer_unref(&hwFramesContext);
+-    if (m_hwDeviceContext)
+-        av_buffer_unref(&m_hwDeviceContext);
+-    if (m_hwFramesContext)
+-        av_buffer_unref(&m_hwFramesContext);
 -}
 -
--
--HWAccel::HWAccel(const AVCodec *codec)
+-std::unique_ptr<HWAccel> HWAccel::create(const AVCodec *codec)
 -{
--    if (codec->type != AVMEDIA_TYPE_VIDEO)
--        return;
--    auto *ctx = hardwareContextForCodec(codec);
--    if (!ctx)
--        return;
--    d = new Data;
--    d->hwDeviceContext = ctx;
+-    if (codec->type == AVMEDIA_TYPE_VIDEO) {
+-        if (auto *ctx = hardwareContextForCodec(codec))
+-            return std::unique_ptr<HWAccel>(new HWAccel(ctx));
+-    }
+-    return {};
 -}
 -
--HWAccel::HWAccel(AVHWDeviceType deviceType)
+-std::unique_ptr<HWAccel> HWAccel::create(AVHWDeviceType deviceType)
 -{
--    auto *ctx = loadHWContext(deviceType);
--    if (!ctx)
--        return;
--    d = new Data;
--    d->hwDeviceContext = ctx;
+-    if (auto *ctx = loadHWContext(deviceType))
+-        return std::unique_ptr<HWAccel>(new HWAccel(ctx));
+-    else
+-        return {};
 -}
--
--HWAccel::~HWAccel() = default;
 -
 -AVPixelFormat HWAccel::format(AVFrame *frame)
 -{
@@ -4876,16 +4961,15 @@ index c2bc4f6e1..000000000
 -    return AVPixelFormat(hwFramesContext->sw_format);
 -}
 -
--const AVHWDeviceType *HWAccel::preferredDeviceTypes()
+-std::pair<const AVHWDeviceType*, qsizetype> HWAccel::preferredDeviceTypes()
 -{
--    return preferredHardwareAccelerators;
+-    return { preferredHardwareAccelerators,
+-             sizeof(preferredHardwareAccelerators) / sizeof(AVHWDeviceType) };
 -}
 -
 -AVHWDeviceContext *HWAccel::hwDeviceContext() const
 -{
--    if (!d || !d->hwDeviceContext)
--        return nullptr;
--    return (AVHWDeviceContext *)d->hwDeviceContext->data;
+-    return m_hwDeviceContext ? (AVHWDeviceContext *)m_hwDeviceContext->data : nullptr;
 -}
 -
 -AVPixelFormat HWAccel::hwFormat() const
@@ -4991,37 +5075,33 @@ index c2bc4f6e1..000000000
 -    return c;
 -}
 -
--HWAccel HWAccel::findHardwareAccelForCodecID(AVCodecID id)
+-std::unique_ptr<HWAccel> HWAccel::findHardwareAccelForCodecID(AVCodecID id)
 -{
--    auto *accels = preferredHardwareAccelerators;
--    while (*accels != AV_HWDEVICE_TYPE_NONE) {
--        auto accel = HWAccel(*accels);
--        if (accel.hardwareEncoderForCodecId(id) != nullptr)
+-    for (auto type : preferredHardwareAccelerators) {
+-        auto accel = HWAccel::create(type);
+-        if (accel && accel->hardwareEncoderForCodecId(id))
 -            return accel;
--        ++accels;
 -    }
 -    return {};
 -}
 -
 -AVHWDeviceType HWAccel::deviceType() const
 -{
--    if (!d || !d->hwDeviceContext)
--        return AV_HWDEVICE_TYPE_NONE;
--    return hwDeviceContext()->type;
+-    return m_hwDeviceContext ? hwDeviceContext()->type : AV_HWDEVICE_TYPE_NONE;
 -}
 -
 -void HWAccel::createFramesContext(AVPixelFormat swFormat, const QSize &size)
 -{
--    if (!d || !d->hwDeviceContext)
+-    if (m_hwDeviceContext)
 -        return;
--    d->hwFramesContext = av_hwframe_ctx_alloc(d->hwDeviceContext);
--    auto *c = (AVHWFramesContext *)d->hwFramesContext->data;
+-    m_hwFramesContext = av_hwframe_ctx_alloc(m_hwDeviceContext);
+-    auto *c = (AVHWFramesContext *)m_hwFramesContext->data;
 -    c->format = hwFormat();
 -    c->sw_format = swFormat;
 -    c->width = size.width();
 -    c->height = size.height();
 -    qDebug() << "init frames context";
--    int err = av_hwframe_ctx_init(d->hwFramesContext);
+-    int err = av_hwframe_ctx_init(m_hwFramesContext);
 -    if (err < 0)
 -        qWarning() << "failed to init HW frame context" << err << err2str(err);
 -    else
@@ -5030,9 +5110,7 @@ index c2bc4f6e1..000000000
 -
 -AVHWFramesContext *HWAccel::hwFramesContext() const
 -{
--    if (!d || !d->hwFramesContext)
--        return nullptr;
--    return (AVHWFramesContext *)d->hwFramesContext->data;
+-    return m_hwFramesContext ? (AVHWFramesContext *)m_hwFramesContext->data : nullptr;
 -}
 -
 -
@@ -5083,20 +5161,15 @@ index c2bc4f6e1..000000000
 -    d->format = fmt;
 -}
 -
--std::unique_ptr<QRhiTexture> TextureSet::texture(int /*plane*/)
--{
--    return {};
--}
--
 -} // namespace QFFmpeg
 -
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_d3d11.cpp b/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_d3d11.cpp
 deleted file mode 100644
-index ff06fee54..000000000
+index f0a6c7b91..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_d3d11.cpp
 +++ /dev/null
-@@ -1,178 +0,0 @@
+@@ -1,158 +0,0 @@
 -// Copyright (C) 2022 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -5126,36 +5199,16 @@ index ff06fee54..000000000
 -class D3D11TextureSet : public TextureSet
 -{
 -public:
--    D3D11TextureSet(QRhi *rhi, QVideoFrameFormat::PixelFormat format, QWindowsIUPointer<ID3D11Texture2D> &&tex)
--        : m_rhi(rhi)
--        , m_format(format)
--        , m_tex(tex)
+-    D3D11TextureSet(QWindowsIUPointer<ID3D11Texture2D> &&tex)
+-        : m_tex(tex)
 -    {}
 -
--    std::unique_ptr<QRhiTexture> texture(int plane) override {
--        auto desc = QVideoTextureHelper::textureDescription(m_format);
--        if (!m_tex || !m_rhi || !desc || plane >= desc->nplanes)
--            return {};
--
--        D3D11_TEXTURE2D_DESC d3d11desc = {};
--        m_tex->GetDesc(&d3d11desc);
--
--        QSize planeSize(desc->widthForPlane(int(d3d11desc.Width), plane),
--                        desc->heightForPlane(int(d3d11desc.Height), plane));
--
--        std::unique_ptr<QRhiTexture> tex(m_rhi->newTextureArray(desc->textureFormat[plane],
--                                                                int(d3d11desc.ArraySize),
--                                                                planeSize, 1, {}));
--        if (tex) {
--            if (!tex->createFrom({quint64(m_tex.get()), 0}))
--                tex.reset();
--        }
--        return tex;
+-    qint64 textureHandle(int plane) override
+-    {
+-        return qint64(m_tex.get());
 -    }
 -
 -private:
--    QRhi *m_rhi = nullptr;
--    QVideoFrameFormat::PixelFormat m_format;
 -    QWindowsIUPointer<ID3D11Texture2D> m_tex;
 -};
 -
@@ -5242,7 +5295,7 @@ index ff06fee54..000000000
 -            auto tex = copyTextureFromArray(dev, sharedTex.get(), index);
 -            if (tex) {
 -                QVideoFrameFormat::PixelFormat format = QFFmpegVideoBuffer::toQtPixelFormat(AVPixelFormat(fCtx->sw_format));
--                return new D3D11TextureSet(rhi, format, std::move(tex));
+-                return new D3D11TextureSet(std::move(tex));
 -            }
 -        }
 -    }
@@ -5443,10 +5496,10 @@ index 95982ba4d..000000000
 -#endif // QFFMPEGHWACCEL_MEDIACODEC_P_H
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_p.h b/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_p.h
 deleted file mode 100644
-index 1170e9fb4..000000000
+index 81bb163bb..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_p.h
 +++ /dev/null
-@@ -1,125 +0,0 @@
+@@ -1,121 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#ifndef QFFMPEGHWACCEL_P_H
@@ -5465,6 +5518,7 @@ index 1170e9fb4..000000000
 -
 -#include "qffmpeg_p.h"
 -#include "qvideoframeformat.h"
+-#include <private/qabstractvideobuffer_p.h>
 -#include <qshareddata.h>
 -#include <memory>
 -
@@ -5486,7 +5540,6 @@ index 1170e9fb4..000000000
 -    // ### Should add QVideoFrameFormat::PixelFormat here
 -    virtual ~TextureSet() {}
 -    virtual qint64 textureHandle(int /*plane*/) { return 0; }
--    virtual std::unique_ptr<QRhiTexture> texture(int plane);
 -};
 -
 -class TextureConverterBackend
@@ -5531,40 +5584,36 @@ index 1170e9fb4..000000000
 -
 -class HWAccel
 -{
--    struct Data {
--        ~Data();
--        QAtomicInt ref = 0;
--        AVBufferRef *hwDeviceContext = nullptr;
--        AVBufferRef *hwFramesContext = nullptr;
--    };
+-    AVBufferRef *m_hwDeviceContext = nullptr;
+-    AVBufferRef *m_hwFramesContext = nullptr;
 -
 -public:
--    HWAccel() = default;
--    explicit HWAccel(AVHWDeviceType deviceType);
--    explicit HWAccel(const AVCodec *codec);
 -    ~HWAccel();
 -
--    bool isNull() const { return !d || !d->hwDeviceContext; }
+-    static std::unique_ptr<HWAccel> create(const AVCodec *decoder);
+-    static std::unique_ptr<HWAccel> create(AVHWDeviceType deviceType);
+-    static std::unique_ptr<HWAccel> findHardwareAccelForCodecID(AVCodecID id);
+-
+-    static const AVCodec *hardwareDecoderForCodecId(AVCodecID id);
+-    const AVCodec *hardwareEncoderForCodecId(AVCodecID id) const;
 -
 -    AVHWDeviceType deviceType() const;
 -
--    AVBufferRef *hwDeviceContextAsBuffer() const { return d ? d->hwDeviceContext : nullptr; }
+-    AVBufferRef *hwDeviceContextAsBuffer() const { return m_hwDeviceContext; }
 -    AVHWDeviceContext *hwDeviceContext() const;
 -    AVPixelFormat hwFormat() const;
 -
--    const AVCodec *hardwareEncoderForCodecId(AVCodecID id) const;
--    static HWAccel findHardwareAccelForCodecID(AVCodecID id);
--
--    static const AVCodec *hardwareDecoderForCodecId(AVCodecID id);
--
 -    void createFramesContext(AVPixelFormat swFormat, const QSize &size);
--    AVBufferRef *hwFramesContextAsBuffer() const { return d ? d->hwFramesContext : nullptr; }
+-    AVBufferRef *hwFramesContextAsBuffer() const { return m_hwFramesContext; }
 -    AVHWFramesContext *hwFramesContext() const;
 -
 -    static AVPixelFormat format(AVFrame *frame);
--    static const AVHWDeviceType *preferredDeviceTypes();
+-    static std::pair<const AVHWDeviceType*, qsizetype> preferredDeviceTypes();
+-
 -private:
--    QExplicitlySharedDataPointer<Data> d;
+-    HWAccel(AVBufferRef *hwDeviceContext, AVBufferRef *hwFrameContext = nullptr)
+-        : m_hwDeviceContext(hwDeviceContext), m_hwFramesContext(hwFrameContext)
+-    {}
 -};
 -
 -}
@@ -5980,10 +6029,10 @@ index 03084cc72..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox.mm b/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox.mm
 deleted file mode 100644
-index 7078c8f23..000000000
+index db64f2003..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox.mm
 +++ /dev/null
-@@ -1,280 +0,0 @@
+@@ -1,281 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -6005,8 +6054,9 @@ index 7078c8f23..000000000
 -#include <CoreVideo/CVMetalTextureCache.h>
 -
 -#include <qopenglcontext.h>
--
+-#ifdef Q_OS_MACOS
 -#import <AppKit/AppKit.h>
+-#endif
 -#import <Metal/Metal.h>
 -
 -QT_BEGIN_NAMESPACE
@@ -6266,10 +6316,10 @@ index 7078c8f23..000000000
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox_p.h b/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox_p.h
 deleted file mode 100644
-index f618d5dd9..000000000
+index 44fa32dd2..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpeghwaccel_videotoolbox_p.h
 +++ /dev/null
-@@ -1,59 +0,0 @@
+@@ -1,63 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -#ifndef QFFMPEGHWACCEL_VIDEOTOOLBOX_P_H
@@ -6295,7 +6345,11 @@ index f618d5dd9..000000000
 -#include <CoreVideo/CVImageBuffer.h>
 -
 -#include <CoreVideo/CVMetalTexture.h>
+-#if defined(Q_OS_MACOS)
 -#include <CoreVideo/CVOpenGLTextureCache.h>
+-#elif defined(Q_OS_IOS)
+-#include <CoreVideo/CVOpenGLESTextureCache.h>
+-#endif
 -
 -QT_BEGIN_NAMESPACE
 -
@@ -6913,7 +6967,7 @@ index 52fcf6f72..e34005bbf 100644
  
  QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration.cpp b/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration.cpp
-index b51a9996f..3aee26f6d 100644
+index e55444cc2..c07c0ebc7 100644
 --- a/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration.cpp
 +++ b/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration.cpp
 @@ -5,13 +5,9 @@
@@ -6948,41 +7002,41 @@ index b51a9996f..3aee26f6d 100644
      return m_formatsInfo;
  }
  
--QPlatformAudioDecoder *QFFmpegMediaIntegration::createAudioDecoder(QAudioDecoder *decoder)
+-QMaybe<QPlatformAudioDecoder *> QFFmpegMediaIntegration::createAudioDecoder(QAudioDecoder *decoder)
 -{
 -    return new QFFmpegAudioDecoder(decoder);
 -}
 -
- QPlatformMediaCaptureSession *QFFmpegMediaIntegration::createCaptureSession()
+ QMaybe<QPlatformMediaCaptureSession *> QFFmpegMediaIntegration::createCaptureSession()
  {
      return new QFFmpegMediaCaptureSession();
  }
  
--QPlatformMediaPlayer *QFFmpegMediaIntegration::createPlayer(QMediaPlayer *player)
+-QMaybe<QPlatformMediaPlayer *> QFFmpegMediaIntegration::createPlayer(QMediaPlayer *player)
 -{
 -    return new QFFmpegMediaPlayer(player);
 -}
 -
- QPlatformCamera *QFFmpegMediaIntegration::createCamera(QCamera *camera)
+ QMaybe<QPlatformCamera *> QFFmpegMediaIntegration::createCamera(QCamera *camera)
  {
  #ifdef Q_OS_DARWIN
-@@ -115,11 +94,6 @@ QPlatformCamera *QFFmpegMediaIntegration::createCamera(QCamera *camera)
+@@ -115,11 +94,6 @@ QMaybe<QPlatformCamera *> QFFmpegMediaIntegration::createCamera(QCamera *camera)
  #endif
  }
  
--QPlatformMediaRecorder *QFFmpegMediaIntegration::createRecorder(QMediaRecorder *recorder)
+-QMaybe<QPlatformMediaRecorder *> QFFmpegMediaIntegration::createRecorder(QMediaRecorder *recorder)
 -{
 -    return new QFFmpegMediaRecorder(recorder);
 -}
 -
- QPlatformImageCapture *QFFmpegMediaIntegration::createImageCapture(QImageCapture *imageCapture)
+ QMaybe<QPlatformImageCapture *> QFFmpegMediaIntegration::createImageCapture(QImageCapture *imageCapture)
  {
      return new QFFmpegImageCapture(imageCapture);
-@@ -130,11 +104,6 @@ QPlatformVideoSink *QFFmpegMediaIntegration::createVideoSink(QVideoSink *sink)
+@@ -130,11 +104,6 @@ QMaybe<QPlatformVideoSink *> QFFmpegMediaIntegration::createVideoSink(QVideoSink
      return new QFFmpegVideoSink(sink);
  }
  
--QPlatformAudioInput *QFFmpegMediaIntegration::createAudioInput(QAudioInput *input)
+-QMaybe<QPlatformAudioInput *> QFFmpegMediaIntegration::createAudioInput(QAudioInput *input)
 -{
 -    return new QFFmpegAudioInput(input);
 -}
@@ -6991,23 +7045,24 @@ index b51a9996f..3aee26f6d 100644
  Q_DECL_EXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void * /*reserved*/)
  {
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration_p.h b/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration_p.h
-index 08ca227a2..682f9a14e 100644
+index 35c062f16..8b44da741 100644
 --- a/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration_p.h
 +++ b/src/plugins/multimedia/ffmpeg/qffmpegmediaintegration_p.h
-@@ -30,18 +30,12 @@ public:
+@@ -30,19 +30,11 @@ public:
      static QFFmpegMediaIntegration *instance() { return static_cast<QFFmpegMediaIntegration *>(QPlatformMediaIntegration::instance()); }
      QPlatformMediaFormatInfo *formatInfo() override;
  
--    QPlatformAudioDecoder *createAudioDecoder(QAudioDecoder *decoder) override;
-     QPlatformMediaCaptureSession *createCaptureSession() override;
--    QPlatformMediaPlayer *createPlayer(QMediaPlayer *player) override;
-     QPlatformCamera *createCamera(QCamera *) override;
--    QPlatformMediaRecorder *createRecorder(QMediaRecorder *) override;
-     QPlatformImageCapture *createImageCapture(QImageCapture *) override;
+-
+-    QMaybe<QPlatformAudioDecoder *> createAudioDecoder(QAudioDecoder *decoder) override;
+     QMaybe<QPlatformMediaCaptureSession *> createCaptureSession() override;
+-    QMaybe<QPlatformMediaPlayer *> createPlayer(QMediaPlayer *player) override;
+     QMaybe<QPlatformCamera *> createCamera(QCamera *) override;
+-    QMaybe<QPlatformMediaRecorder *> createRecorder(QMediaRecorder *) override;
+     QMaybe<QPlatformImageCapture *> createImageCapture(QImageCapture *) override;
+-
+     QMaybe<QPlatformVideoSink *> createVideoSink(QVideoSink *sink) override;
  
-     QPlatformVideoSink *createVideoSink(QVideoSink *sink) override;
- 
--    QPlatformAudioInput *createAudioInput(QAudioInput *input) override;
+-    QMaybe<QPlatformAudioInput *> createAudioInput(QAudioInput *input) override;
 -//    QPlatformAudioOutput *createAudioOutput(QAudioOutput *) override;
 -
      QFFmpegMediaFormatInfo *m_formatsInfo = nullptr;
@@ -7157,10 +7212,10 @@ index 201287495..95b069b64 100644
  QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer.cpp b/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer.cpp
 deleted file mode 100644
-index 1d5f5e11d..000000000
+index 5e6062f42..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer.cpp
 +++ /dev/null
-@@ -1,206 +0,0 @@
+@@ -1,236 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -7193,6 +7248,9 @@ index 1d5f5e11d..000000000
 -QFFmpegMediaPlayer::QFFmpegMediaPlayer(QMediaPlayer *player)
 -    : QPlatformMediaPlayer(player)
 -{
+-    positionUpdateTimer.setInterval(100);
+-    positionUpdateTimer.setTimerType(Qt::PreciseTimer);
+-    connect(&positionUpdateTimer, &QTimer::timeout, this, &QFFmpegMediaPlayer::updatePosition);
 -}
 -
 -QFFmpegMediaPlayer::~QFFmpegMediaPlayer()
@@ -7207,10 +7265,24 @@ index 1d5f5e11d..000000000
 -
 -void QFFmpegMediaPlayer::setPosition(qint64 position)
 -{
--    if (decoder)
--        decoder->seek(position*1000);
+-    if (decoder) {
+-        decoder->seek(position * 1000);
+-        updatePosition();
+-    }
 -    if (state() == QMediaPlayer::StoppedState)
 -        mediaStatusChanged(QMediaPlayer::LoadedMedia);
+-}
+-
+-void QFFmpegMediaPlayer::updatePosition()
+-{
+-    positionChanged(decoder ? decoder->clockController.currentTime() / 1000 : 0);
+-}
+-
+-void QFFmpegMediaPlayer::endOfStream()
+-{
+-    positionChanged(duration());
+-    stateChanged(QMediaPlayer::StoppedState);
+-    mediaStatusChanged(QMediaPlayer::EndOfMedia);
 -}
 -
 -float QFFmpegMediaPlayer::bufferProgress() const
@@ -7267,16 +7339,21 @@ index 1d5f5e11d..000000000
 -    }
 -
 -    mediaStatusChanged(QMediaPlayer::LoadingMedia);
--    decoder = new Decoder(this);
+-    decoder = new Decoder;
+-    connect(decoder, &Decoder::endOfStream, this, &QFFmpegMediaPlayer::endOfStream);
+-    connect(decoder, &Decoder::errorOccured, this, &QFFmpegMediaPlayer::error);
 -    decoder->setMedia(media, stream);
 -    decoder->setAudioSink(m_audioOutput);
 -    decoder->setVideoSink(m_videoSink);
 -
+-    durationChanged(duration());
+-    tracksChanged();
 -    metaDataChanged();
 -    seekableChanged(decoder->isSeekable());
 -
 -    audioAvailableChanged(!decoder->m_streamMap[QPlatformMediaPlayer::AudioStream].isEmpty());
 -    videoAvailableChanged(!decoder->m_streamMap[QPlatformMediaPlayer::VideoStream].isEmpty());
+-
 -
 -    QMetaObject::invokeMethod(this, "delayedLoadedStatus", Qt::QueuedConnection);
 -}
@@ -7286,9 +7363,12 @@ index 1d5f5e11d..000000000
 -    if (!decoder)
 -        return;
 -
--    if (mediaStatus() == QMediaPlayer::EndOfMedia && state() == QMediaPlayer::StoppedState)
+-    if (mediaStatus() == QMediaPlayer::EndOfMedia && state() == QMediaPlayer::StoppedState) {
 -        decoder->seek(0);
+-        positionChanged(0);
+-    }
 -    decoder->play();
+-    positionUpdateTimer.start();
 -    stateChanged(QMediaPlayer::PlayingState);
 -    mediaStatusChanged(QMediaPlayer::BufferedMedia);
 -}
@@ -7297,9 +7377,12 @@ index 1d5f5e11d..000000000
 -{
 -    if (!decoder)
 -        return;
--    if (mediaStatus() == QMediaPlayer::EndOfMedia && state() == QMediaPlayer::StoppedState)
+-    if (mediaStatus() == QMediaPlayer::EndOfMedia && state() == QMediaPlayer::StoppedState) {
 -        decoder->seek(0);
+-        positionChanged(0);
+-    }
 -    decoder->pause();
+-    positionUpdateTimer.stop();
 -    stateChanged(QMediaPlayer::PausedState);
 -    mediaStatusChanged(QMediaPlayer::BufferedMedia);
 -}
@@ -7309,6 +7392,8 @@ index 1d5f5e11d..000000000
 -    if (!decoder)
 -        return;
 -    decoder->stop();
+-    positionUpdateTimer.stop();
+-    positionChanged(0);
 -    stateChanged(QMediaPlayer::StoppedState);
 -    mediaStatusChanged(QMediaPlayer::LoadedMedia);
 -}
@@ -7369,10 +7454,10 @@ index 1d5f5e11d..000000000
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer_p.h b/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer_p.h
 deleted file mode 100644
-index 6c7aff74c..000000000
+index 8e2753c82..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegmediaplayer_p.h
 +++ /dev/null
-@@ -1,89 +0,0 @@
+@@ -1,98 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -7392,6 +7477,7 @@ index 6c7aff74c..000000000
 -
 -#include <private/qplatformmediaplayer_p.h>
 -#include <qmediametadata.h>
+-#include <qtimer.h>
 -#include "qffmpeg_p.h"
 -
 -QT_BEGIN_NAMESPACE
@@ -7443,12 +7529,20 @@ index 6c7aff74c..000000000
 -
 -    Q_INVOKABLE void delayedLoadedStatus() { mediaStatusChanged(QMediaPlayer::LoadedMedia); }
 -
+-private slots:
+-    void updatePosition();
+-    void endOfStream();
+-    void error(int error, const QString &errorString)
+-    {
+-        QPlatformMediaPlayer::error(error, errorString);
+-    }
+-
 -private:
 -    friend class QFFmpeg::Decoder;
 -
--    QFFmpeg::Decoder *decoder = nullptr;
--    void checkStreams();
+-    QTimer positionUpdateTimer;
 -
+-    QFFmpeg::Decoder *decoder = nullptr;
 -    QPlatformAudioOutput *m_audioOutput = nullptr;
 -    QVideoSink *m_videoSink = nullptr;
 -
@@ -7991,10 +8085,10 @@ index e5c87e237..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer.cpp b/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer.cpp
 deleted file mode 100644
-index 1b718e43a..000000000
+index b17c04938..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer.cpp
 +++ /dev/null
-@@ -1,357 +0,0 @@
+@@ -1,356 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -8147,7 +8241,9 @@ index 1b718e43a..000000000
 -        // TODO: Longer term we might want to also support HDR10+ dynamic metadata
 -        if (sd->type == AV_FRAME_DATA_MASTERING_DISPLAY_METADATA) {
 -            auto *data = reinterpret_cast<AVMasteringDisplayMetadata *>(sd->data);
--            maxNits = float(data->max_luminance.num)/float(data->max_luminance.den)*10000.;
+-            auto maybeLum = QFFmpeg::mul(10'000., data->max_luminance);
+-            if (maybeLum)
+-                maxNits = float(maybeLum.value());
 -        }
 -    }
 -    return maxNits;
@@ -8192,24 +8288,21 @@ index 1b718e43a..000000000
 -    // nothing to do here for SW buffers
 -}
 -
--void QFFmpegVideoBuffer::mapTextures()
+-std::unique_ptr<QVideoFrameTextures> QFFmpegVideoBuffer::mapTextures(QRhi *)
 -{
--    if (textures || !hwFrame)
--        return;
--//    qDebug() << ">>>>> mapTextures";
+-    if (textures)
+-        return {};
+-    if (!hwFrame)
+-        return {};
 -    textures = textureConverter.getTextures(hwFrame);
 -    if (!textures)
 -        qWarning() << "    failed to get textures for frame" << textureConverter.isNull();
+-    return {};
 -}
 -
 -quint64 QFFmpegVideoBuffer::textureHandle(int plane) const
 -{
 -    return textures ? textures->textureHandle(plane) : 0;
--}
--
--std::unique_ptr<QRhiTexture> QFFmpegVideoBuffer::texture(int plane) const
--{
--    return textures ? textures->texture(plane) : std::unique_ptr<QRhiTexture>();
 -}
 -
 -QVideoFrameFormat::PixelFormat QFFmpegVideoBuffer::pixelFormat() const
@@ -8354,10 +8447,10 @@ index 1b718e43a..000000000
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer_p.h b/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer_p.h
 deleted file mode 100644
-index 0f82942c1..000000000
+index a981ec245..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegvideobuffer_p.h
 +++ /dev/null
-@@ -1,73 +0,0 @@
+@@ -1,72 +0,0 @@
 -// Copyright (C) 2021 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -8396,9 +8489,8 @@ index 0f82942c1..000000000
 -    MapData map(QVideoFrame::MapMode mode) override;
 -    void unmap() override;
 -
--    virtual void mapTextures() override;
+-    virtual std::unique_ptr<QVideoFrameTextures> mapTextures(QRhi *) override;
 -    virtual quint64 textureHandle(int plane) const override;
--    std::unique_ptr<QRhiTexture> texture(int plane) const override;
 -
 -    QVideoFrameFormat::PixelFormat pixelFormat() const;
 -    QSize size() const;
@@ -8433,10 +8525,10 @@ index 0f82942c1..000000000
 -#endif
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder.cpp b/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder.cpp
 deleted file mode 100644
-index 374152bfa..000000000
+index 6cb34f56c..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder.cpp
 +++ /dev/null
-@@ -1,370 +0,0 @@
+@@ -1,374 +0,0 @@
 -// Copyright (C) 2022 The Qt Company Ltd.
 -// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 -
@@ -8485,13 +8577,14 @@ index 374152bfa..000000000
 -    auto codecID = QFFmpegMediaFormatInfo::codecIdForVideoCodec(qVideoCodec);
 -
 -#ifndef QT_DISABLE_HW_ENCODING
--    const auto *accels = HWAccel::preferredDeviceTypes();
--    while (*accels != AV_HWDEVICE_TYPE_NONE) {
--        auto accel = HWAccel(*accels);
--        ++accels;
+-    auto [preferredTypes, size] = HWAccel::preferredDeviceTypes();
+-    for (qsizetype i = 0; i < size; i++) {
+-        auto accel = HWAccel::create(preferredTypes[i]);
+-        if (!accel)
+-            continue;
 -
 -        auto matchesSizeConstraints = [&]() -> bool {
--            auto *constraints = av_hwdevice_get_hwframe_constraints(accel.hwDeviceContextAsBuffer(), nullptr);
+-            auto *constraints = av_hwdevice_get_hwframe_constraints(accel->hwDeviceContextAsBuffer(), nullptr);
 -            if (!constraints)
 -                return true;
 -                // Check size constraints
@@ -8504,15 +8597,15 @@ index 374152bfa..000000000
 -        if (!matchesSizeConstraints())
 -            continue;
 -
--        d->codec = accel.hardwareEncoderForCodecId(codecID);
+-        d->codec = accel->hardwareEncoderForCodecId(codecID);
 -        if (!d->codec)
 -            continue;
--        d->accel = accel;
+-        d->accel = std::move(accel);
 -        break;
 -    }
 -#endif
 -
--    if (d->accel.isNull()) {
+-    if (!d->accel) {
 -        d->codec = avcodec_find_encoder(codecID);
 -        if (!d->codec) {
 -            qWarning() << "Could not find encoder for codecId" << codecID;
@@ -8561,7 +8654,7 @@ index 374152bfa..000000000
 -    }
 -
 -    if (d->targetFormatIsHWFormat) {
--        Q_ASSERT(!d->accel.isNull());
+-        Q_ASSERT(d->accel);
 -        // if source and target formats don't agree, but the target is a HW format, we need to upload
 -        if (d->sourceFormat != d->targetFormat || needToScale) {
 -            d->uploadToHW = true;
@@ -8574,7 +8667,7 @@ index 374152bfa..000000000
 -
 -            d->targetSWFormat = AV_PIX_FMT_NONE;
 -
--            auto *constraints = av_hwdevice_get_hwframe_constraints(d->accel.hwDeviceContextAsBuffer(), nullptr);
+-            auto *constraints = av_hwdevice_get_hwframe_constraints(d->accel->hwDeviceContextAsBuffer(), nullptr);
 -            auto *f = constraints->valid_sw_formats;
 -            int score = INT_MIN;
 -            while (*f != AV_PIX_FMT_NONE) {
@@ -8622,7 +8715,7 @@ index 374152bfa..000000000
 -
 -            av_hwframe_constraints_free(&constraints);
 -            // need to create a frames context to convert the input data
--            d->accel.createFramesContext(d->targetSWFormat, sourceSize);
+-            d->accel->createFramesContext(d->targetSWFormat, sourceSize);
 -        }
 -    } else {
 -        d->targetSWFormat = d->targetFormat;
@@ -8664,22 +8757,22 @@ index 374152bfa..000000000
 -    float delta = 1e10;
 -    if (d->codec->supported_framerates) {
 -        // codec only supports fixed frame rates
--        auto *f = d->codec->supported_framerates;
--        auto *best = f;
+-        auto *best = d->codec->supported_framerates;
 -        qCDebug(qLcVideoFrameEncoder) << "Finding fixed rate:";
--        while (f->num != 0) {
--            float rate = float(f->num)/float(f->den);
--            float d = qAbs(rate - requestedRate);
+-        for (auto *f = d->codec->supported_framerates; f->num != 0; f++) {
+-            auto maybeRate = toFloat(*f);
+-            if (!maybeRate)
+-                continue;
+-            float d = qAbs(*maybeRate - requestedRate);
 -            qCDebug(qLcVideoFrameEncoder) << "    " << f->num << f->den << d;
 -            if (d < delta) {
 -                best = f;
 -                delta = d;
 -            }
--            ++f;
 -        }
 -        qCDebug(qLcVideoFrameEncoder) << "Fixed frame rate required. Requested:" << requestedRate << "Using:" << best->num << "/" << best->den;
--        d->stream->time_base = { best->den, best->num };
--        requestedRate = float(best->num)/float(best->den);
+-        d->stream->time_base = *best;
+-        requestedRate = toFloat(*best).value_or(0.f);
 -    }
 -
 -    Q_ASSERT(d->codec);
@@ -8695,12 +8788,14 @@ index 374152bfa..000000000
 -    qCDebug(qLcVideoFrameEncoder) << "requesting time base" << d->codecContext->time_base.num << d->codecContext->time_base.den;
 -    auto [num, den] = qRealToFraction(requestedRate);
 -    d->codecContext->framerate = { num, den };
--    auto deviceContext = d->accel.hwDeviceContextAsBuffer();
--    if (deviceContext)
--        d->codecContext->hw_device_ctx = av_buffer_ref(deviceContext);
--    auto framesContext = d->accel.hwFramesContextAsBuffer();
--    if (framesContext)
--        d->codecContext->hw_frames_ctx = av_buffer_ref(framesContext);
+-    if (d->accel) {
+-        auto deviceContext = d->accel->hwDeviceContextAsBuffer();
+-        if (deviceContext)
+-            d->codecContext->hw_device_ctx = av_buffer_ref(deviceContext);
+-        auto framesContext = d->accel->hwFramesContextAsBuffer();
+-        if (framesContext)
+-            d->codecContext->hw_frames_ctx = av_buffer_ref(framesContext);
+-    }
 -}
 -
 -bool VideoFrameEncoder::open()
@@ -8721,8 +8816,8 @@ index 374152bfa..000000000
 -qint64 VideoFrameEncoder::getPts(qint64 us)
 -{
 -    Q_ASSERT(d);
--    qint64 div = 1000000*d->stream->time_base.num;
--    return (us*d->stream->time_base.den + (div>>1))/div;
+-    qint64 div = 1'000'000 * d->stream->time_base.num;
+-    return div != 0 ? (us * d->stream->time_base.den + div / 2) / div : 0;
 -}
 -
 -int VideoFrameEncoder::sendFrame(AVFrame *frame)
@@ -8755,7 +8850,7 @@ index 374152bfa..000000000
 -    }
 -
 -    if (d->uploadToHW) {
--        auto *hwFramesContext = d->accel.hwFramesContextAsBuffer();
+-        auto *hwFramesContext = d->accel->hwFramesContextAsBuffer();
 -        Q_ASSERT(hwFramesContext);
 -        auto *f = av_frame_alloc();
 -        if (!f)
@@ -8799,7 +8894,8 @@ index 374152bfa..000000000
 -            qCDebug(qLcVideoFrameEncoder) << "Error receiving packet" << ret << err2str(ret);
 -        return nullptr;
 -    }
--    qCDebug(qLcVideoFrameEncoder) << "got a packet" << packet->pts << timeStamp(packet->pts, d->stream->time_base);
+-    auto ts = timeStampMs(packet->pts, d->stream->time_base);
+-    qCDebug(qLcVideoFrameEncoder) << "got a packet" << packet->pts << (ts ? *ts : 0);
 -    packet->stream_index = d->stream->id;
 -    return packet;
 -}
@@ -8809,7 +8905,7 @@ index 374152bfa..000000000
 -QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder_p.h b/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder_p.h
 deleted file mode 100644
-index 4dd9f05d7..000000000
+index f71460799..000000000
 --- a/src/plugins/multimedia/ffmpeg/qffmpegvideoframeencoder_p.h
 +++ /dev/null
 @@ -1,76 +0,0 @@
@@ -8848,7 +8944,7 @@ index 4dd9f05d7..000000000
 -        float frameRate = 0.;
 -        QSize sourceSize;
 -
--        HWAccel accel;
+-        std::unique_ptr<HWAccel> accel;
 -        const AVCodec *codec = nullptr;
 -        AVStream *stream = nullptr;
 -        AVCodecContext *codecContext = nullptr;
@@ -8954,10 +9050,10 @@ index dbd9ac7f2..cbaa810d7 100644
  
  QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp b/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp
-index a169e0873..de94e82b4 100644
+index 790c49858..4a4e7a921 100644
 --- a/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp
 +++ b/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp
-@@ -10,8 +10,8 @@
+@@ -11,8 +11,8 @@
  
  #include <mfapi.h>
  #include <mfidl.h>
@@ -8968,6 +9064,117 @@ index a169e0873..de94e82b4 100644
  
  #include <system_error>
  
+diff --git a/src/plugins/multimedia/windows/common/mfmetadata_p.h b/src/plugins/multimedia/windows/common/mfmetadata_p.h
+index 81a03b126..9ff196240 100644
+--- a/src/plugins/multimedia/windows/common/mfmetadata_p.h
++++ b/src/plugins/multimedia/windows/common/mfmetadata_p.h
+@@ -16,7 +16,7 @@
+ //
+ 
+ #include <qmediametadata.h>
+-#include "Mfidl.h"
++#include "mfidl.h"
+ 
+ QT_USE_NAMESPACE
+ 
+diff --git a/src/plugins/multimedia/windows/decoder/mfaudiodecodercontrol.cpp b/src/plugins/multimedia/windows/decoder/mfaudiodecodercontrol.cpp
+index 45bc70d65..0e27a2779 100644
+--- a/src/plugins/multimedia/windows/decoder/mfaudiodecodercontrol.cpp
++++ b/src/plugins/multimedia/windows/decoder/mfaudiodecodercontrol.cpp
+@@ -4,7 +4,7 @@
+ #include <system_error>
+ #include <mferror.h>
+ #include <qglobal.h>
+-#include "Wmcodecdsp.h"
++#include "wmcodecdsp.h"
+ #include "mfaudiodecodercontrol_p.h"
+ #include <private/qwindowsaudioutils_p.h>
+ 
+diff --git a/src/plugins/multimedia/windows/mediacapture/qwindowsmediadevicereader_p.h b/src/plugins/multimedia/windows/mediacapture/qwindowsmediadevicereader_p.h
+index 0205eafe2..4699a463a 100644
+--- a/src/plugins/multimedia/windows/mediacapture/qwindowsmediadevicereader_p.h
++++ b/src/plugins/multimedia/windows/mediacapture/qwindowsmediadevicereader_p.h
+@@ -17,8 +17,8 @@
+ 
+ #include <mfapi.h>
+ #include <mfidl.h>
+-#include <Mferror.h>
+-#include <Mfreadwrite.h>
++#include <mferror.h>
++#include <mfreadwrite.h>
+ 
+ #include <QtCore/qobject.h>
+ #include <QtCore/qmutex.h>
+diff --git a/src/plugins/multimedia/windows/mediacapture/qwindowsmediaencoder.cpp b/src/plugins/multimedia/windows/mediacapture/qwindowsmediaencoder.cpp
+index d5eb07980..dc87afc4b 100644
+--- a/src/plugins/multimedia/windows/mediacapture/qwindowsmediaencoder.cpp
++++ b/src/plugins/multimedia/windows/mediacapture/qwindowsmediaencoder.cpp
+@@ -8,7 +8,7 @@
+ #include "mfmetadata_p.h"
+ #include <QtCore/QUrl>
+ #include <QtCore/QMimeType>
+-#include <Mferror.h>
++#include <mferror.h>
+ #include <shobjidl.h>
+ #include <private/qmediastoragelocation_p.h>
+ #include <private/qmediarecorder_p.h>
+diff --git a/src/plugins/multimedia/windows/player/mfplayercontrol_p.h b/src/plugins/multimedia/windows/player/mfplayercontrol_p.h
+index ac60e8c29..78ff71439 100644
+--- a/src/plugins/multimedia/windows/player/mfplayercontrol_p.h
++++ b/src/plugins/multimedia/windows/player/mfplayercontrol_p.h
+@@ -15,7 +15,7 @@
+ // We mean it.
+ //
+ 
+-#include "QUrl.h"
++#include "qurl.h"
+ #include "private/qplatformmediaplayer_p.h"
+ 
+ #include <QtCore/qcoreevent.h>
+diff --git a/src/plugins/multimedia/windows/player/mfplayersession.cpp b/src/plugins/multimedia/windows/player/mfplayersession.cpp
+index 58efaa87e..5d3372152 100644
+--- a/src/plugins/multimedia/windows/player/mfplayersession.cpp
++++ b/src/plugins/multimedia/windows/player/mfplayersession.cpp
+@@ -32,7 +32,7 @@
+ 
+ #include <mmdeviceapi.h>
+ #include <propvarutil.h>
+-#include <Functiondiscoverykeys_devpkey.h>
++#include <functiondiscoverykeys_devpkey.h>
+ 
+ //#define DEBUG_MEDIAFOUNDATION
+ 
+diff --git a/src/plugins/multimedia/windows/player/mftvideo.cpp b/src/plugins/multimedia/windows/player/mftvideo.cpp
+index 601c51e42..06a8769a7 100644
+--- a/src/plugins/multimedia/windows/player/mftvideo.cpp
++++ b/src/plugins/multimedia/windows/player/mftvideo.cpp
+@@ -7,7 +7,7 @@
+ #include <mferror.h>
+ #include <strmif.h>
+ #include <uuids.h>
+-#include <InitGuid.h>
++#include <initguid.h>
+ #include <d3d9.h>
+ #include <qdebug.h>
+ 
+diff --git a/src/plugins/multimedia/windows/qwindowsvideodevices.cpp b/src/plugins/multimedia/windows/qwindowsvideodevices.cpp
+index 878c4730b..41ccb4733 100644
+--- a/src/plugins/multimedia/windows/qwindowsvideodevices.cpp
++++ b/src/plugins/multimedia/windows/qwindowsvideodevices.cpp
+@@ -8,11 +8,11 @@
+ #include <private/qwindowsmultimediautils_p.h>
+ #include <private/qwindowsiupointer_p.h>
+ 
+-#include <Dbt.h>
++#include <dbt.h>
+ 
+ #include <mfapi.h>
+ #include <mfreadwrite.h>
+-#include <Mferror.h>
++#include <mferror.h>
+ 
+ QT_BEGIN_NAMESPACE
+ 
 -- 
-2.38.1
+2.39.0
 

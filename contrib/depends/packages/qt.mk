@@ -1,57 +1,52 @@
 package=qt
-$(package)_version=6.4.0
+$(package)_version=6.4.1
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.4/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=cb6475a0bd8567c49f7ffbb072a05516ee6671171bed55db75b22b94ead9b37d
+$(package)_sha256_hash=532ad71cc0f9c8f7cb92766c47bc3d23263c60876becd9053802f9727af24fae
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_cmake native_qt native_freetype native_fontconfig native_libxkbcommon
 $(package)_linux_dependencies=openssl native_qt native_cmake native_freetype native_fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
-$(package)_patches = root_CMakeLists.txt
-$(package)_patches += mac-qmake.conf
-$(package)_patches += no-xlib.patch
+$(package)_patches  = aarch64Toolchain.cmake
 $(package)_patches += dont_hardcode_pwd.patch
-$(package)_patches += qtbase-moc-ignore-gcc-macro.patch
-$(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
-$(package)_patches += guix_cross_lib_path.patch
-$(package)_patches += no-statx.patch
-$(package)_patches += no-renameat2.patch
-$(package)_patches += no_pthread_cond_clockwait.patch
-$(package)_patches += QTBUG-92199-fix.patch
-$(package)_patches += WindowsToolchain.cmake
-$(package)_patches += windows_func_fix.patch
-$(package)_patches += fix_include_capitalization.patch
-$(package)_patches += dont_capitalize_wmf_libs.patch
-$(package)_patches += MacToolchain.cmake
-$(package)_patches += no_wraprt_on_apple.patch
-$(package)_patches += ___isOSVersionAtLeast_hack.patch
-$(package)_patches += missing-include.patch
-$(package)_patches += no-__builtin_available.patch
-$(package)_patches += no-ffmpeg.patch
-$(package)_patches += remove-shaders.patch
-$(package)_patches += aarch64Toolchain.cmake
 $(package)_patches += gnueabihfToolchain.cmake
+$(package)_patches += guix_cross_lib_path.patch
+$(package)_patches += ___isOSVersionAtLeast_hack.patch
+$(package)_patches += mac-qmake.conf
+$(package)_patches += MacToolchain.cmake
+$(package)_patches += no_pthread_cond_clockwait.patch
+$(package)_patches += no-renameat2.patch
+$(package)_patches += no-statx.patch
+$(package)_patches += no_wraprt_on_apple.patch
+$(package)_patches += no-xlib.patch
+$(package)_patches += qtbase-moc-ignore-gcc-macro.patch
+$(package)_patches += qtmultimedia-fixes.patch
+$(package)_patches += rcc_hardcode_timestamp.patch
+$(package)_patches += remove-shaders.patch
+$(package)_patches += root_CMakeLists.txt
+$(package)_patches += windows_func_fix.patch
+$(package)_patches += WindowsToolchain.cmake
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
-$(package)_qttranslations_sha256_hash=7ab93a930b693eeb53ab97b038b4e6e057d06374e6f49a3814d99145a276925f
+$(package)_qttranslations_sha256_hash=44dbc6f1d256d2048c96fa665c240e0075c2e67188c93986a39ede3556a16a12
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=97f3d5f88c458be7a8f7b7b08efc06c4ebad39ca51669476b18bf9e4c11afba2
+$(package)_qttools_sha256_hash=9e20562c6b04c21fbdb4ed89e59226169ffeaafaab8f45f7d81ea49b0e4b0933
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=03fdae9437d074dcfa387dc1f2c6e7e14fea0f989bf7e1aa265fd35ffc2c5b25
+$(package)_qtsvg_sha256_hash=5e5345c5941567db883f9daf8ab25108c6f3a527453b1a13c62290849bce9ce5
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=ff3c6629cd6537266123c441709acdd67f231ff2a07216fc848448255bec9bca
+$(package)_qtwebsockets_sha256_hash=537789ea56403ea8a15e115d7f503c3ead630192e97ec99464810fcdb5d67a24
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=e82e8e847cae2a951a11db05b6d10a22b21e3a1d72e06a7781cce4bd197e796f
+$(package)_qtmultimedia_sha256_hash=c086d43a026e6090971fd7a697ef8370c5c455115240609cd08d5e2f840dbaaf
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=dbd6a5f00e8178cd2fea7e84c4eef3818de5287d34e20a68383929c754ae3b90
+$(package)_qtshadertools_sha256_hash=6bc1748326088c87f562fa3a68140e33fde162fd1333fbfecb775aeb66114504
 
 $(package)_extra_sources  = $($(package)_qttranslations_file_name)
 $(package)_extra_sources += $($(package)_qttools_file_name)
@@ -265,21 +260,15 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no-statx.patch && \
   patch -p1 -i $($(package)_patch_dir)/no-renameat2.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_pthread_cond_clockwait.patch && \
-  patch -p1 -i $($(package)_patch_dir)/QTBUG-92199-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/windows_func_fix.patch && \
-  patch -p1 -i $($(package)_patch_dir)/fix_include_capitalization.patch && \
-  patch -p1 -i $($(package)_patch_dir)/dont_capitalize_wmf_libs.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_wraprt_on_apple.patch && \
   patch -p1 -i $($(package)_patch_dir)/___isOSVersionAtLeast_hack.patch && \
-  patch -p1 -i $($(package)_patch_dir)/missing-include.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-__builtin_available.patch && \
   mv $($(package)_patch_dir)/WindowsToolchain.cmake . && \
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
   cd qtmultimedia && \
-  patch -p1 -i $($(package)_patch_dir)/no-ffmpeg.patch && \
-  patch -p1 -i $($(package)_patch_dir)/remove-shaders.patch && \
+  patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   cd .. && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\
