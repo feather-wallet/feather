@@ -25,9 +25,7 @@ option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
 option(DONATE_BEG "Prompt donation window every once in a while" ON)
-
-
-option(WITH_SCANNER "Enable webcam QR scanner" OFF)
+option(WITH_SCANNER "Enable webcam QR scanner" ON)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)

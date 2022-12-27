@@ -12,7 +12,7 @@
 
 #include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
-#include "qrcode_scanner/QrCodeUtils.h"
+#include "qrcode_utils/QrCodeUtils.h"
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
 {

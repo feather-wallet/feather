@@ -69,8 +69,8 @@ file(GLOB SOURCE_FILES
         "polyseed/*.h"
         "polyseed/*.cpp"
         "polyseed/*.c"
-        "qrcode_scanner/QrCodeUtils.cpp"
-        "qrcode_scanner/QrCodeUtils.h"
+        "qrcode_utils/QrCodeUtils.cpp"
+        "qrcode_utils/QrCodeUtils.h"
         "monero_seed/argon2/blake2/*.c"
         "monero_seed/argon2/*.c"
         "monero_seed/*.cpp"
@@ -175,7 +175,7 @@ if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
-if(WITH_SCANNER AND NOT Qt6_FOUND)
+if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
