@@ -1,4 +1,4 @@
-From a4ef234505904045f5c19cd1bee67be28a775c83 Mon Sep 17 00:00:00 2001
+From f88adf2a411e79c8f1fe73806cbf591a12f055c0 Mon Sep 17 00:00:00 2001
 From: tobtoht <tob@featherwallet.org>
 Date: Tue, 27 Dec 2022 12:00:44 +0100
 Subject: [PATCH] qtmultimedia fixes
@@ -60,6 +60,7 @@ Subject: [PATCH] qtmultimedia fixes
  .../ffmpeg/qffmpegvideoframeencoder_p.h       |   76 -
  .../multimedia/ffmpeg/qffmpegvideosink.cpp    |   14 -
  .../multimedia/ffmpeg/qffmpegvideosink_p.h    |   10 +-
+ src/plugins/multimedia/ffmpeg/qv4l2camera.cpp |    4 +-
  .../multimedia/ffmpeg/qwindowscamera.cpp      |    4 +-
  .../multimedia/windows/common/mfmetadata_p.h  |    2 +-
  .../windows/decoder/mfaudiodecodercontrol.cpp |    2 +-
@@ -69,7 +70,7 @@ Subject: [PATCH] qtmultimedia fixes
  .../windows/player/mfplayersession.cpp        |    2 +-
  .../multimedia/windows/player/mftvideo.cpp    |    2 +-
  .../windows/qwindowsvideodevices.cpp          |    4 +-
- 65 files changed, 31 insertions(+), 8369 deletions(-)
+ 66 files changed, 33 insertions(+), 8371 deletions(-)
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera.mm
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera_p.h
  delete mode 100644 src/plugins/multimedia/ffmpeg/qffmpeg_p.h
@@ -9049,6 +9050,28 @@ index dbd9ac7f2..cbaa810d7 100644
  };
  
  QT_END_NAMESPACE
+diff --git a/src/plugins/multimedia/ffmpeg/qv4l2camera.cpp b/src/plugins/multimedia/ffmpeg/qv4l2camera.cpp
+index 4189bdedf..c61c452f3 100644
+--- a/src/plugins/multimedia/ffmpeg/qv4l2camera.cpp
++++ b/src/plugins/multimedia/ffmpeg/qv4l2camera.cpp
+@@ -147,7 +147,7 @@ void QV4L2CameraDevices::doCheckCameras()
+ 
+             while (!ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frameSize)) {
+                 if (frameSize.type != V4L2_FRMSIZE_TYPE_DISCRETE)
+-                    continue;
++                    break;
+ 
+                 QSize resolution(frameSize.discrete.width, frameSize.discrete.height);
+                 float min = 1e10;
+@@ -160,7 +160,7 @@ void QV4L2CameraDevices::doCheckCameras()
+ 
+                 while (!ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frameInterval)) {
+                     if (frameInterval.type != V4L2_FRMIVAL_TYPE_DISCRETE)
+-                        continue;
++                        break;
+                     ++frameInterval.index;
+                     float rate = float(frameInterval.discrete.denominator)/float(frameInterval.discrete.numerator);
+                     if (rate > max)
 diff --git a/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp b/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp
 index 790c49858..4a4e7a921 100644
 --- a/src/plugins/multimedia/ffmpeg/qwindowscamera.cpp
