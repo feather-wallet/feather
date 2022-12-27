@@ -37,6 +37,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
+// Disable High DPI scaling on Linux for now
+#if defined(Q_OS_LINUX)
+    qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
+#endif
+
     QStringList argv_;
     for(int i = 0; i != argc; i++){
         argv_ << QString::fromStdString(argv[i]);
