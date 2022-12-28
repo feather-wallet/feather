@@ -115,6 +115,12 @@ void Settings::setupPrivacyTab() {
         m_ctx->updateBalance();
     });
 
+        // [Hide notifications]
+    ui->checkBox_hideNotifications->setChecked(config()->get(Config::hideNotifications).toBool());
+    connect(ui->checkBox_hideNotifications, &QCheckBox::toggled, [this](bool toggled){
+        config()->set(Config::hideNotifications, toggled);
+    });
+
     // [Disable websocket]
     ui->checkBox_enableWebsocket->setChecked(!config()->get(Config::disableWebsocket).toBool());
     connect(ui->checkBox_enableWebsocket, &QCheckBox::toggled, [this](bool checked){

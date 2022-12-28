@@ -74,6 +74,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
+         {Config::hideNotifications, {QS("hideNotifications"), false}},
         {Config::disableLogging, {QS("disableLogging"), false}},
 
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
