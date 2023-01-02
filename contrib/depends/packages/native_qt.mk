@@ -19,6 +19,8 @@ $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += remove-shaders.patch
 $(package)_patches += root_CMakeLists.txt
+$(package)_patches += Use-consistent-ordering-in-QShader.patch
+$(package)_patches += QShader_map.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=44dbc6f1d256d2048c96fa665c240e0075c2e67188c93986a39ede3556a16a12
@@ -182,6 +184,10 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no-statx.patch && \
   patch -p1 -i $($(package)_patch_dir)/no-renameat2.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_pthread_cond_clockwait.patch && \
+  cd qtbase && \
+  patch -p1 -i $($(package)_patch_dir)/Use-consistent-ordering-in-QShader.patch && \
+  patch -p1 -i $($(package)_patch_dir)/QShader_map.patch && \
+  cd .. && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/remove-shaders.patch && \
   cd .. && \
