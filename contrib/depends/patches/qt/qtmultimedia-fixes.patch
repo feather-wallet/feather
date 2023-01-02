@@ -1,13 +1,11 @@
-From f88adf2a411e79c8f1fe73806cbf591a12f055c0 Mon Sep 17 00:00:00 2001
+From 070ac586846f4ae2bbe88946afcc0f5ef109c4a5 Mon Sep 17 00:00:00 2001
 From: tobtoht <tob@featherwallet.org>
-Date: Tue, 27 Dec 2022 12:00:44 +0100
+Date: Mon, 2 Jan 2023 20:03:18 +0100
 Subject: [PATCH] qtmultimedia fixes
 
 ---
  cmake/FindWMF.cmake                           |   10 +-
- src/multimedia/CMakeLists.txt                 |   59 -
  src/multimedia/configure.cmake                |    3 +-
- src/multimedia/video/qvideoframeformat.cpp    |    5 -
  .../windows/qwindowsmediadevices.cpp          |    2 +-
  src/multimedia/windows/qwindowsresampler.cpp  |    2 +-
  .../darwin/camera/qavfcamerabase.mm           |    1 +
@@ -70,7 +68,7 @@ Subject: [PATCH] qtmultimedia fixes
  .../windows/player/mfplayersession.cpp        |    2 +-
  .../multimedia/windows/player/mftvideo.cpp    |    2 +-
  .../windows/qwindowsvideodevices.cpp          |    4 +-
- 66 files changed, 33 insertions(+), 8371 deletions(-)
+ 64 files changed, 33 insertions(+), 8307 deletions(-)
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera.mm
  delete mode 100644 src/plugins/multimedia/ffmpeg/qavfcamera_p.h
  delete mode 100644 src/plugins/multimedia/ffmpeg/qffmpeg_p.h
@@ -130,75 +128,6 @@ index 7c6923c1e..b69274be5 100644
  
  
  set(WMF_LIBRARIES ${WMF_STRMIIDS_LIBRARY} ${WMF_AMSTRMID_LIBRARY} ${WMF_DMOGUIDS_LIBRARY} ${WMF_UUID_LIBRARY}
-diff --git a/src/multimedia/CMakeLists.txt b/src/multimedia/CMakeLists.txt
-index cc0a86958..440449918 100644
---- a/src/multimedia/CMakeLists.txt
-+++ b/src/multimedia/CMakeLists.txt
-@@ -248,64 +248,5 @@ set(VIDEO_SHADERS
-     "shaders/nv12_bt2020_hlg.frag"
- )
- 
--qt_internal_add_shaders(Multimedia "shaders"
--    SILENT
--    BATCHABLE
--    PRECOMPILE
--    OPTIMIZED
--    PREFIX
--        "/qt-project.org/multimedia"
--    FILES
--        ${VIDEO_VERTEX_SHADERS}
--        ${VIDEO_SHADERS}
--)
--
- string(REPLACE ".frag" "_linear.frag.qsb" LINEAR_VIDEO_SHADERS "${VIDEO_SHADERS}")
- 
--qt_internal_add_shaders(Multimedia "shaders_linear"
--    SILENT
--    BATCHABLE
--    PRECOMPILE
--    OPTIMIZED
--    PREFIX
--        "/qt-project.org/multimedia"
--    FILES
--        ${VIDEO_SHADERS}
--    OUTPUTS
--        ${LINEAR_VIDEO_SHADERS}
--    DEFINES
--        QMM_OUTPUTSURFACE_LINEAR
--)
--
--qt_internal_add_shaders(Multimedia "shaders_gl_macos"
--    SILENT
--    BATCHABLE
--    PRECOMPILE
--    OPTIMIZED
--    PREFIX
--        "/qt-project.org/multimedia"
--    GLSL
--        "120,150"
--    NOHLSL
--    NOMSL
--    FILES
--        "shaders/rectsampler.vert"
--        "shaders/rectsampler_bgra.frag"
--)
--
--qt_internal_add_shaders(Multimedia "shaders_gl_macos_linear"
--    SILENT
--    BATCHABLE
--    PRECOMPILE
--    OPTIMIZED
--    PREFIX
--        "/qt-project.org/multimedia"
--    GLSL
--        "120,150"
--    NOHLSL
--    NOMSL
--    FILES
--        "shaders/rectsampler_bgra.frag"
--    OUTPUTS
--        "shaders/rectsampler_bgra_linear.frag.qsb"
--)
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
 index efcadfc5c..29b056003 100644
 --- a/src/multimedia/configure.cmake
@@ -220,29 +149,6 @@ index efcadfc5c..29b056003 100644
  )
  qt_feature("alsa" PUBLIC PRIVATE
      LABEL "ALSA (experimental)"
-diff --git a/src/multimedia/video/qvideoframeformat.cpp b/src/multimedia/video/qvideoframeformat.cpp
-index 22ccc1ac5..9c90fa8b8 100644
---- a/src/multimedia/video/qvideoframeformat.cpp
-+++ b/src/multimedia/video/qvideoframeformat.cpp
-@@ -11,10 +11,6 @@
- #include <qvariant.h>
- #include <qmatrix4x4.h>
- 
--static void initResource() {
--    Q_INIT_RESOURCE(shaders);
--}
--
- QT_BEGIN_NAMESPACE
- 
- class QVideoFrameFormatPrivate : public QSharedData
-@@ -348,7 +344,6 @@ QT_DEFINE_QESDP_SPECIALIZATION_DTOR(QVideoFrameFormatPrivate);
- QVideoFrameFormat::QVideoFrameFormat()
-     : d(new QVideoFrameFormatPrivate)
- {
--    initResource();
- }
- 
- /*!
 diff --git a/src/multimedia/windows/qwindowsmediadevices.cpp b/src/multimedia/windows/qwindowsmediadevices.cpp
 index c91597102..8c2df5816 100644
 --- a/src/multimedia/windows/qwindowsmediadevices.cpp
