@@ -1,12 +1,12 @@
 package=qt
-$(package)_version=6.4.1
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.4/$($(package)_version)/submodules
+$(package)_version=6.5.0-beta1
+$(package)_download_path=https://download.qt.io/development_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=532ad71cc0f9c8f7cb92766c47bc3d23263c60876becd9053802f9727af24fae
+$(package)_sha256_hash=8357aa58c86ade1eeda535177b5e40578662a1a3f75571bfb799e1eae356b2ce
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_cmake native_qt native_libxkbcommon
-$(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm
+$(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = aarch64Toolchain.cmake
@@ -20,33 +20,31 @@ $(package)_patches += no_pthread_cond_clockwait.patch
 $(package)_patches += no-renameat2.patch
 $(package)_patches += no-statx.patch
 $(package)_patches += no_wraprt_on_apple.patch
-$(package)_patches += no-xlib.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += qtmultimedia-fixes.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
+$(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
-$(package)_patches += Use-consistent-ordering-in-QShader.patch
-$(package)_patches += QShader_map.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
-$(package)_qttranslations_sha256_hash=44dbc6f1d256d2048c96fa665c240e0075c2e67188c93986a39ede3556a16a12
+$(package)_qttranslations_sha256_hash=b2a9f1225d613d5958f0993e28cbdc75c115a430df2054a544cdd2bb87656982
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=9e20562c6b04c21fbdb4ed89e59226169ffeaafaab8f45f7d81ea49b0e4b0933
+$(package)_qttools_sha256_hash=ee62073cf9e0866e15c4d4f643bca094329c57a534ad3f4b1789803be45ab1af
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=5e5345c5941567db883f9daf8ab25108c6f3a527453b1a13c62290849bce9ce5
+$(package)_qtsvg_sha256_hash=20e96ef340491c49b4150e7153a37263dac064b9655f7944088f6d1cbfbfd446
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=537789ea56403ea8a15e115d7f503c3ead630192e97ec99464810fcdb5d67a24
+$(package)_qtwebsockets_sha256_hash=26f207d5532fb06316fe1193f99e5a02d2a95f52986a40101effea516f2fa889
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=c086d43a026e6090971fd7a697ef8370c5c455115240609cd08d5e2f840dbaaf
+$(package)_qtmultimedia_sha256_hash=3cd15bee887d49593db1f3a075c7b4b5854c1816d665862d9b31b966eabee32e
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=6bc1748326088c87f562fa3a68140e33fde162fd1333fbfecb775aeb66114504
+$(package)_qtshadertools_sha256_hash=58e37ea1fabcf383768c7fa93cb74d981ea95915a2802283deea8d82134668f8
 
 $(package)_extra_sources  = $($(package)_qttranslations_file_name)
 $(package)_extra_sources += $($(package)_qttools_file_name)
@@ -252,7 +250,6 @@ endef
 define $(package)_preprocess_cmds
   cp $($(package)_patch_dir)/root_CMakeLists.txt CMakeLists.txt && \
   patch -p1 -i $($(package)_patch_dir)/dont_hardcode_pwd.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-xlib.patch && \
   patch -p1 -i $($(package)_patch_dir)/qtbase-moc-ignore-gcc-macro.patch && \
   patch -p1 -i $($(package)_patch_dir)/rcc_hardcode_timestamp.patch && \
   patch -p1 -i $($(package)_patch_dir)/fast_fixed_dtoa_no_optimize.patch && \
@@ -266,12 +263,9 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
-  cd qtbase && \
-  patch -p1 -i $($(package)_patch_dir)/Use-consistent-ordering-in-QShader.patch && \
-  patch -p1 -i $($(package)_patch_dir)/QShader_map.patch && \
-  cd .. && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
+  patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
   cd .. && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\
@@ -344,6 +338,11 @@ endef
 else ifeq ($(host_os),mingw32)
 define $(package)_build_cmds
   export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
+  $(MAKE)
+endef
+else ifneq (,$(findstring x86_64,$(HOST)))
+define $(package)_build_cmds
+  cmake --build . --target syncqt_build && \
   $(MAKE)
 endef
 else
