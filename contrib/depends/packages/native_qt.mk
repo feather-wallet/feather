@@ -17,7 +17,6 @@ $(package)_patches += no-statx.patch
 $(package)_patches += no-xlib.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
-$(package)_patches += remove-shaders.patch
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += Use-consistent-ordering-in-QShader.patch
 $(package)_patches += QShader_map.patch
@@ -187,9 +186,6 @@ define $(package)_preprocess_cmds
   cd qtbase && \
   patch -p1 -i $($(package)_patch_dir)/Use-consistent-ordering-in-QShader.patch && \
   patch -p1 -i $($(package)_patch_dir)/QShader_map.patch && \
-  cd .. && \
-  cd qtmultimedia && \
-  patch -p1 -i $($(package)_patch_dir)/remove-shaders.patch && \
   cd .. && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\

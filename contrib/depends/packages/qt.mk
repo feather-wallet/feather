@@ -25,10 +25,11 @@ $(package)_patches += no-xlib.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += qtmultimedia-fixes.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
-$(package)_patches += remove-shaders.patch
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
+$(package)_patches += Use-consistent-ordering-in-QShader.patch
+$(package)_patches += QShader_map.patch
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
 $(package)_qttranslations_sha256_hash=44dbc6f1d256d2048c96fa665c240e0075c2e67188c93986a39ede3556a16a12
@@ -267,6 +268,10 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
+  cd qtbase && \
+  patch -p1 -i $($(package)_patch_dir)/Use-consistent-ordering-in-QShader.patch && \
+  patch -p1 -i $($(package)_patch_dir)/QShader_map.patch && \
+  cd .. && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   cd .. && \
