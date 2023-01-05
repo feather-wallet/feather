@@ -61,7 +61,7 @@ Section -Main SEC0000
     File "${CUR_PATH}\build\bin\feather.exe"
     File /oname=LICENSE.txt "${CUR_PATH}\LICENSE"
     SetOutPath $INSTDIR\tor
-    File /r "${CUR_PATH}\src\assets\tor\*.*"
+    File /r \feather\contrib\depends\x86_64-w64-mingw32\Tor\*.*
     SetOutPath $INSTDIR
 SectionEnd
 
