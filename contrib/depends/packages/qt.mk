@@ -345,6 +345,7 @@ define $(package)_build_cmds
 endef
 else
 define $(package)_build_cmds
+  export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
   $(MAKE)
 endef
 endif
