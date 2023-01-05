@@ -7,6 +7,9 @@ export LC_ALL=C
 set -e -o pipefail
 export TZ=UTC
 
+# shellcheck source=contrib/shell/git-utils.bash
+source contrib/shell/git-utils.bash
+
 # Although Guix _does_ set umask when building its own packages (in our case,
 # this is all packages in manifest.scm), it does not set it for `guix
 # environment`. It does make sense for at least `guix environment --container`
@@ -227,7 +230,8 @@ GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 # Create the source tarball if not already there
 if [ ! -e "$GIT_ARCHIVE" ]; then
     mkdir -p "$(dirname "$GIT_ARCHIVE")"
-    git ls-files --recurse-submodules | tar --transform 's,^,$DISTNAME/,' -caf ${GIT_ARCHIVE} -T-
+    echo "$(git_head_version)" > githash.txt
+    ( git ls-files --recurse-submodules ; echo "githash.txt" ) | cat | tar --transform 's,^,$DISTNAME/,' -caf ${GIT_ARCHIVE} -T-
     sha256sum "$GIT_ARCHIVE"
 fi
 
