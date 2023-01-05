@@ -45,12 +45,12 @@ XPStyle on
 BrandingText " "
 ShowInstDetails show
 VIProductVersion @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@.0
-VIAddVersionKey ProductName "$(^Name)"
+VIAddVersionKey ProductName "Feather Wallet"
 VIAddVersionKey ProductVersion "@PROJECT_VERSION@"
 VIAddVersionKey CompanyName "Feather Wallet"
 VIAddVersionKey CompanyWebsite "https://featherwallet.org"
 VIAddVersionKey FileVersion "@PROJECT_VERSION@"
-VIAddVersionKey FileDescription "Installer for $(^Name)"
+VIAddVersionKey FileDescription "Installer for Feather Wallet"
 VIAddVersionKey LegalCopyright "Copyright (C) 2020-@COPYRIGHT_YEAR@ @COPYRIGHT_HOLDERS@"
 ShowUninstDetails show
 
