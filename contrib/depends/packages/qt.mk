@@ -181,7 +181,7 @@ $(package)_config_opts_arm_linux += -- -DCMAKE_TOOLCHAIN_FILE=gnueabihfToolchain
 $(package)_config_opts_aarch64_linux += -qt-host-path $(build_prefix)/qt-host
 $(package)_config_opts_aarch64_linux += -- -DCMAKE_TOOLCHAIN_FILE=aarch64Toolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
 
-$(package)_config_opts_mingw32 = -no-opengl
+$(package)_config_opts_mingw32 += -no-opengl
 $(package)_config_opts_mingw32 += -no-dbus
 $(package)_config_opts_mingw32 += -no-freetype
 $(package)_config_opts_mingw32 += -xplatform win32-g++
