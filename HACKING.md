@@ -3,8 +3,6 @@
 Feather is developed primarily on Linux, but can also be built and debugged on macOS. Development on Windows is not 
 currently supported. 
 
-If you are just looking to build Feather from source, we recommend following the instructions in BUILDING.md instead.
-
 ## Setting up a development environment
 
 ### Dependencies
