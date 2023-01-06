@@ -1,0 +1,68 @@
+From 0171c86423f6c5aa8becf1259d42a3e67b8da59c Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Sun, 30 Oct 2022 17:43:43 +0100
+Subject: [PATCH] no xlib
+
+---
+ src/plugins/platforms/xcb/qxcbcursor.cpp | 8 ++++++++
+ 1 file changed, 8 insertions(+)
+
+diff --git a/qtbase/src/plugins/platforms/xcb/qxcbcursor.cpp b/qtbase/src/plugins/platforms/xcb/qxcbcursor.cpp
+index 2cc39f1e85..90efc1f1fb 100644
+--- a/qtbase/src/plugins/platforms/xcb/qxcbcursor.cpp
++++ b/qtbase/src/plugins/platforms/xcb/qxcbcursor.cpp
+@@ -13,7 +13,9 @@
+ #include <QtGui/QWindow>
+ #include <QtGui/QBitmap>
+ #include <QtGui/private/qguiapplication_p.h>
++#if QT_CONFIG(xcb_xlib) && QT_CONFIG(library)
+ #include <X11/cursorfont.h>
++#endif
+ #include <xcb/xfixes.h>
+ #include <xcb/xcb_image.h>
+ 
+@@ -357,6 +359,7 @@ void QXcbCursor::changeCursor(QCursor *cursor, QWindow *window)
+     xcb_flush(xcb_connection());
+ }
+ 
++#if QT_CONFIG(xcb_xlib) && QT_CONFIG(library)
+ static int cursorIdForShape(int cshape)
+ {
+     int cursorId = 0;
+@@ -410,6 +413,7 @@ static int cursorIdForShape(int cshape)
+     }
+     return cursorId;
+ }
++#endif
+ 
+ xcb_cursor_t QXcbCursor::createNonStandardCursor(int cshape)
+ {
+@@ -524,7 +528,9 @@ static xcb_cursor_t loadCursor(void *dpy, int cshape)
+ xcb_cursor_t QXcbCursor::createFontCursor(int cshape)
+ {
+     xcb_connection_t *conn = xcb_connection();
++#if QT_CONFIG(xcb_xlib) && QT_CONFIG(library)
+     int cursorId = cursorIdForShape(cshape);
++#endif
+     xcb_cursor_t cursor = XCB_NONE;
+ 
+ #if QT_CONFIG(xcb_xlib) && QT_CONFIG(library)
+@@ -556,6 +562,7 @@ xcb_cursor_t QXcbCursor::createFontCursor(int cshape)
+     // Non-standard X11 cursors are created from bitmaps
+     cursor = createNonStandardCursor(cshape);
+ 
++#if QT_CONFIG(xcb_xlib) && QT_CONFIG(library)
+     // Create a glyph cursor if everything else failed
+     if (!cursor && cursorId) {
+         cursor = xcb_generate_id(conn);
+@@ -563,6 +570,7 @@ xcb_cursor_t QXcbCursor::createFontCursor(int cshape)
+                                 cursorId, cursorId + 1,
+                                 0xFFFF, 0xFFFF, 0xFFFF, 0, 0, 0);
+     }
++#endif
+ 
+     if (cursor && cshape >= 0 && cshape < Qt::LastCursor && connection()->hasXFixes()) {
+         const char *name = cursorNames[cshape].front();
+-- 
+2.38.1
+

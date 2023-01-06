@@ -1,0 +1,13 @@
+--- a/cipher/Makefile.in
++++ b/cipher/Makefile.in
+@@ -1228,9 +1228,7 @@ uninstall-am:
+ .PRECIOUS: Makefile
+
+
+-gost28147.lo: gost-sb.h
+-gost-sb.h: gost-s-box
+-	./gost-s-box $@
++gost28147.lo:
+
+ gost-s-box: gost-s-box.c
+ 	$(CC_FOR_BUILD) -o $@ $(srcdir)/gost-s-box.c

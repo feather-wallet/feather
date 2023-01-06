@@ -1,0 +1,121 @@
+Name "Feather Wallet"
+
+OutFile "${CUR_PATH}\contrib\installers\windows\FeatherWalletSetup-@PROJECT_VERSION@.exe"
+RequestExecutionLevel highest
+SetCompressor /SOLID lzma
+SetDateSave off
+Unicode true
+
+# Uncomment these lines when investigating reproducibility errors
+#SetCompress off
+#SetDatablockOptimize off
+
+# MUI Symbol Definitions
+!define MUI_ICON "${CUR_PATH}\contrib\installers\windows\appicon.ico"
+!define MUI_FINISHPAGE_NOAUTOCLOSE
+!define MUI_STARTMENUPAGE_DEFAULTFOLDER "$(^Name)"
+!define MUI_FINISHPAGE_RUN "$WINDIR\explorer.exe"
+!define MUI_FINISHPAGE_RUN_PARAMETERS $INSTDIR\feather.exe
+!define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
+!define MUI_UNFINISHPAGE_NOAUTOCLOSE
+
+# Included files
+!include Sections.nsh
+!include MUI2.nsh
+!include x64.nsh
+
+# Variables
+Var StartMenuGroup
+
+# Installer pages
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_STARTMENU Application $StartMenuGroup
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+
+# Installer languages
+!insertmacro MUI_LANGUAGE English
+
+# Installer attributes
+InstallDir "$PROGRAMFILES64\Feather Wallet"
+CRCCheck force
+XPStyle on
+BrandingText " "
+ShowInstDetails show
+VIProductVersion @PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@.@PROJECT_VERSION_PATCH@.0
+VIAddVersionKey ProductName "Feather Wallet"
+VIAddVersionKey ProductVersion "@PROJECT_VERSION@"
+VIAddVersionKey CompanyName "Feather Wallet"
+VIAddVersionKey CompanyWebsite "https://featherwallet.org"
+VIAddVersionKey FileVersion "@PROJECT_VERSION@"
+VIAddVersionKey FileDescription "Installer for Feather Wallet"
+VIAddVersionKey LegalCopyright "Copyright (C) 2020-@COPYRIGHT_YEAR@ @COPYRIGHT_HOLDERS@"
+ShowUninstDetails show
+
+# Installer sections
+Section -Main SEC0000
+    SetOutPath $INSTDIR
+    SetOverwrite on
+    File "${CUR_PATH}\build\bin\feather.exe"
+    File /oname=LICENSE.txt "${CUR_PATH}\LICENSE"
+    SetOutPath $INSTDIR\tor
+    File /r \feather\contrib\depends\x86_64-w64-mingw32\Tor\*.*
+    SetOutPath $INSTDIR
+SectionEnd
+
+Section -post SEC0001
+    SetOutPath $INSTDIR
+    Delete /REBOOTOK "$INSTDIR\unins000.exe"
+    Delete /REBOOTOK "$INSTDIR\unins000.dat"
+    WriteUninstaller "$INSTDIR\uninstall.exe"
+    SetShellVarContext all
+    Delete /REBOOTOK "$SMPROGRAMS\Feather Wallet.lnk"
+    SetShellVarContext current
+    !insertmacro MUI_STARTMENU_WRITE_BEGIN Application
+    CreateDirectory $SMPROGRAMS\$StartMenuGroup
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk" $INSTDIR\feather.exe
+    CreateShortcut "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk" $INSTDIR\uninstall.exe
+    CreateShortcut "$Desktop\$(^Name).lnk" "$InstDir\feather.exe"
+    !insertmacro MUI_STARTMENU_WRITE_END
+SectionEnd
+
+# Uninstaller sections
+Section /o -un.Main UNSEC0000
+    Delete /REBOOTOK $INSTDIR\feather.exe
+    Delete /REBOOTOK $INSTDIR\LICENSE.txt
+    RMDir /r /REBOOTOK $INSTDIR\tor
+SectionEnd
+
+Section -un.post UNSEC0001
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\Uninstall $(^Name).lnk"
+    Delete /REBOOTOK "$SMPROGRAMS\$StartMenuGroup\$(^Name).lnk"
+    Delete /REBOOTOK "$Desktop\$(^Name).lnk"
+    Delete /REBOOTOK $INSTDIR\uninstall.exe
+    RmDir /REBOOTOK $SMPROGRAMS\$StartMenuGroup
+    RmDir /REBOOTOK $INSTDIR
+    Push $R0
+    StrCpy $R0 $StartMenuGroup 1
+    StrCmp $R0 ">" no_smgroup
+no_smgroup:
+    Pop $R0
+SectionEnd
+
+# Installer functions
+Function .onInit
+    InitPluginsDir
+    ${If} ${RunningX64}
+      ; disable registry redirection (enable access to 64-bit portion of registry)
+      SetRegView 64
+    ${Else}
+      MessageBox MB_OK|MB_ICONSTOP "Cannot install 64-bit version on a 32-bit system."
+      Abort
+    ${EndIf}
+FunctionEnd
+
+# Uninstaller functions
+Function un.onInit
+    !insertmacro MUI_STARTMENU_GETFOLDER Application $StartMenuGroup
+    !insertmacro SelectSection ${UNSEC0000}
+FunctionEnd

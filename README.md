@@ -2,7 +2,7 @@
 
 Feather is a free, open-source Monero wallet for Linux, Tails, macOS and Windows. It is written in C++ with the Qt framework.
 
-Copyright (c) 2020-2022, The Monero Project.
+Copyright (c) 2020-2023, The Monero Project.
 
 ## Resources
 
@@ -24,11 +24,11 @@ Donations help pay for hosting, build servers, domain names, e-mail and other re
 
 `47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f`
 
-## Building from source
+## Deterministic builds
 
-See [BUILDING.md](https://github.com/feather-wallet/feather/blob/master/BUILDING.md) for information on how to build from source.
+See [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md) for more information.
 
-## Developers
+## Development
 
 If you are looking to set up a development environment for Feather, see [HACKING.md](https://github.com/feather-wallet/feather/blob/master/HACKING.md).
 

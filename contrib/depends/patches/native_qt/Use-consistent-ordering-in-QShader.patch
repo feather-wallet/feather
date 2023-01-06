@@ -1,0 +1,145 @@
+From 9dced35b41882c42f4239a6380bd86dfda4cd7f5 Mon Sep 17 00:00:00 2001
+From: Laszlo Agocs <laszlo.agocs@qt.io>
+Date: Fri, 10 Jun 2022 12:09:11 +0200
+Subject: [PATCH] Use consistent ordering in QShader
+
+Fixes: QTBUG-101923
+Change-Id: I62df3eba773350e47ed650acb00bc42b3ce6a899
+Reviewed-by: Qt CI Bot <qt_ci_bot@qt-project.org>
+Reviewed-by: Andy Nichols <andy.nichols@qt.io>
+---
+ src/gui/rhi/qshader.cpp                    | 38 ++++++++++++++++++++++
+ src/gui/rhi/qshader_p.h                    |  2 ++
+ src/gui/rhi/qshader_p_p.h                  |  9 ++---
+ tests/auto/gui/rhi/qshader/tst_qshader.cpp | 11 +++++++
+ 4 files changed, 56 insertions(+), 4 deletions(-)
+
+diff --git a/src/gui/rhi/qshader.cpp b/src/gui/rhi/qshader.cpp
+index 1992708ba4..cd4a9f3854 100644
+--- a/src/gui/rhi/qshader.cpp
++++ b/src/gui/rhi/qshader.cpp
+@@ -563,6 +563,22 @@ size_t qHash(const QShaderVersion &s, size_t seed) noexcept
+ }
+ #endif
+ 
++/*!
++    Establishes a sorting order between the two QShaderVersion \a lhs and \a rhs.
++
++    \relates QShaderVersion
++ */
++bool operator<(const QShaderVersion &lhs, const QShaderVersion &rhs) noexcept
++{
++    if (lhs.version() < rhs.version())
++        return true;
++
++    if (lhs.version() == rhs.version())
++        return int(lhs.flags()) < int(rhs.flags());
++
++    return false;
++}
++
+ /*!
+     \internal
+     \fn bool operator!=(const QShaderVersion &lhs, const QShaderVersion &rhs)
+@@ -584,6 +600,28 @@ bool operator==(const QShaderKey &lhs, const QShaderKey &rhs) noexcept
+             && lhs.sourceVariant() == rhs.sourceVariant();
+ }
+ 
++/*!
++    Establishes a sorting order between the two keys \a lhs and \a rhs.
++
++    \relates QShaderKey
++ */
++bool operator<(const QShaderKey &lhs, const QShaderKey &rhs) noexcept
++{
++    if (int(lhs.source()) < int(rhs.source()))
++        return true;
++
++    if (int(lhs.source()) == int(rhs.source())) {
++        if (lhs.sourceVersion() < rhs.sourceVersion())
++            return true;
++        if (lhs.sourceVersion() == rhs.sourceVersion()) {
++            if (int(lhs.sourceVariant()) < int(rhs.sourceVariant()))
++                return true;
++        }
++    }
++
++    return false;
++}
++
+ /*!
+     \internal
+     \fn bool operator!=(const QShaderKey &lhs, const QShaderKey &rhs)
+diff --git a/src/gui/rhi/qshader_p.h b/src/gui/rhi/qshader_p.h
+index 690a7f44cd..c6ef338bfa 100644
+--- a/src/gui/rhi/qshader_p.h
++++ b/src/gui/rhi/qshader_p.h
+@@ -187,7 +187,9 @@ inline bool operator!=(const QShader &lhs, const QShader &rhs) noexcept
+ }
+ 
+ Q_GUI_EXPORT bool operator==(const QShaderVersion &lhs, const QShaderVersion &rhs) noexcept;
++Q_GUI_EXPORT bool operator<(const QShaderVersion &lhs, const QShaderVersion &rhs) noexcept;
+ Q_GUI_EXPORT bool operator==(const QShaderKey &lhs, const QShaderKey &rhs) noexcept;
++Q_GUI_EXPORT bool operator<(const QShaderKey &lhs, const QShaderKey &rhs) noexcept;
+ Q_GUI_EXPORT bool operator==(const QShaderCode &lhs, const QShaderCode &rhs) noexcept;
+ 
+ inline bool operator!=(const QShaderVersion &lhs, const QShaderVersion &rhs) noexcept
+diff --git a/src/gui/rhi/qshader_p_p.h b/src/gui/rhi/qshader_p_p.h
+index c87f882bc5..e9d1e31aaf 100644
+--- a/src/gui/rhi/qshader_p_p.h
++++ b/src/gui/rhi/qshader_p_p.h
+@@ -17,7 +17,7 @@
+ 
+ #include "qshader_p.h"
+ #include <QtCore/QAtomicInt>
+-#include <QtCore/QHash>
++#include <QtCore/QMap>
+ #include <QtCore/QDebug>
+ 
+ QT_BEGIN_NAMESPACE
+@@ -54,9 +54,10 @@ struct Q_GUI_EXPORT QShaderPrivate
+     int qsbVersion = QSB_VERSION;
+     QShader::Stage stage = QShader::VertexStage;
+     QShaderDescription desc;
+-    QHash<QShaderKey, QShaderCode> shaders;
+-    QHash<QShaderKey, QShader::NativeResourceBindingMap> bindings;
+-    QHash<QShaderKey, QShader::SeparateToCombinedImageSamplerMappingList> combinedImageMap;
++    // QMap not QHash because we need to be able to iterate based on sorted keys
++    QMap<QShaderKey, QShaderCode> shaders;
++    QMap<QShaderKey, QShader::NativeResourceBindingMap> bindings;
++    QMap<QShaderKey, QShader::SeparateToCombinedImageSamplerMappingList> combinedImageMap;
+ };
+ 
+ QT_END_NAMESPACE
+diff --git a/tests/auto/gui/rhi/qshader/tst_qshader.cpp b/tests/auto/gui/rhi/qshader/tst_qshader.cpp
+index cd883b34d9..40aa9d9a87 100644
+--- a/tests/auto/gui/rhi/qshader/tst_qshader.cpp
++++ b/tests/auto/gui/rhi/qshader/tst_qshader.cpp
+@@ -18,6 +18,7 @@ private slots:
+     void genVariants();
+     void shaderDescImplicitSharing();
+     void bakedShaderImplicitSharing();
++    void sortedKeys();
+     void mslResourceMapping();
+     void serializeShaderDesc();
+     void comparison();
+@@ -238,6 +239,16 @@ void tst_QShader::bakedShaderImplicitSharing()
+     }
+ }
+ 
++void tst_QShader::sortedKeys()
++{
++    QShader s = getShader(QLatin1String(":/data/texture_all_v4.frag.qsb"));
++    QVERIFY(s.isValid());
++    QList<QShaderKey> availableShaders = s.availableShaders();
++    QCOMPARE(availableShaders.count(), 7);
++    std::sort(availableShaders.begin(), availableShaders.end());
++    QCOMPARE(availableShaders, s.availableShaders());
++}
++
+ void tst_QShader::mslResourceMapping()
+ {
+     QShader s = getShader(QLatin1String(":/data/texture_all_v4.frag.qsb"));
+-- 
+2.39.0
+

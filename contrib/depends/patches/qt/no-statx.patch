@@ -1,0 +1,56 @@
+From ceb48fa2f01b9c421d880f6220778d830e5c5f7b Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Sun, 30 Oct 2022 16:52:17 +0100
+Subject: [PATCH] Never use statx
+
+---
+ src/corelib/configure.cmake               | 1 -
+ src/corelib/global/qconfig-bootstrapped.h | 6 +-----
+ src/corelib/io/qfilesystemengine_unix.cpp | 2 +-
+ 3 files changed, 2 insertions(+), 7 deletions(-)
+
+diff --git a/qtbase/src/corelib/configure.cmake b/qtbase/src/corelib/configure.cmake
+index 4ab122afd0..7b89fa3dd7 100644
+--- a/qtbase/src/corelib/configure.cmake
++++ b/qtbase/src/corelib/configure.cmake
+@@ -428,7 +428,6 @@ qt_config_compile_test(statx
+     CODE
+ "#define _ATFILE_SOURCE 1
+ #include <sys/types.h>
+-#include <sys/stat.h>
+ #include <unistd.h>
+ #include <fcntl.h>
+ 
+diff --git a/qtbase/src/corelib/global/qconfig-bootstrapped.h b/qtbase/src/corelib/global/qconfig-bootstrapped.h
+index 42d38d0d04..25b551210c 100644
+--- a/qtbase/src/corelib/global/qconfig-bootstrapped.h
++++ b/qtbase/src/corelib/global/qconfig-bootstrapped.h
+@@ -119,11 +119,7 @@
+ #define QT_FEATURE_shortcut -1
+ #define QT_FEATURE_signaling_nan -1
+ #define QT_FEATURE_slog2 -1
+-#ifdef __GLIBC_PREREQ
+-# define QT_FEATURE_statx (__GLIBC_PREREQ(2, 28) ? 1 : -1)
+-#else
+-# define QT_FEATURE_statx -1
+-#endif
++#define QT_FEATURE_statx -1
+ #define QT_FEATURE_syslog -1
+ #define QT_NO_SYSTEMLOCALE
+ #define QT_FEATURE_systemsemaphore -1
+diff --git a/qtbase/src/corelib/io/qfilesystemengine_unix.cpp b/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
+index 5ba9309426..c968d1c61f 100644
+--- a/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
++++ b/qtbase/src/corelib/io/qfilesystemengine_unix.cpp
+@@ -99,7 +99,7 @@ extern "C" NSString *NSTemporaryDirectory();
+ #endif
+ #endif
+ 
+-#if defined(Q_OS_ANDROID)
++#if defined(Q_OS_LINUX)
+ // statx() is disabled on Android because quite a few systems
+ // come with sandboxes that kill applications that make system calls outside a
+ // whitelist and several Android vendors can't be bothered to update the list.
+-- 
+2.38.1
+

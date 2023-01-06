@@ -1,6 +1,6 @@
 set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTORCC ON)
 
 # pthread
 find_package(Threads REQUIRED)
@@ -11,7 +11,6 @@ set(QT_COMPONENTS
         Gui
         Network
         Svg
-        Xml
         WebSockets
 )
 
@@ -32,6 +31,10 @@ add_subdirectory(third-party/singleapplication)
 add_subdirectory(openpgp)
 
 qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
+
+if (DEPENDS)
+    find_library(ICONV_LIBRARIES iconv)
+endif()
 
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
@@ -66,18 +69,29 @@ file(GLOB SOURCE_FILES
         "polyseed/*.h"
         "polyseed/*.cpp"
         "polyseed/*.c"
-        "qrcode_scanner/QrCodeUtils.cpp"
-        "qrcode_scanner/QrCodeUtils.h"
+        "qrcode_utils/QrCodeUtils.cpp"
+        "qrcode_utils/QrCodeUtils.h"
+        "monero_seed/argon2/blake2/*.c"
+        "monero_seed/argon2/*.c"
+        "monero_seed/*.cpp"
+        "monero_seed/*.c"
+        "monero_seed/*.hpp"
         )
 
 if (WITH_SCANNER AND NOT Qt6_FOUND)
     file(GLOB SCANNER_FILES
             "qrcode_scanner/*.h"
             "qrcode_scanner/*.cpp")
-
-    list(APPEND SOURCE_FILES
-            ${SCANNER_FILES})
 endif()
+
+if (WITH_SCANNER AND Qt6_FOUND)
+    file(GLOB SCANNER_FILES
+            "qrcode_scanner_qt6/*.h"
+            "qrcode_scanner_qt6/*.cpp")
+endif()
+
+list(APPEND SOURCE_FILES
+        ${SCANNER_FILES})
 
 set(EXECUTABLE_FLAG)
 if(MINGW)
@@ -92,30 +106,16 @@ if(MINGW)
     list(APPEND RESOURCES ${ICON_RES})
 endif()
 
-# mac os bundle
-if(APPLE)
-    set(ICON ${PROJECT_SOURCE_DIR}/src/assets/images/appicons/appicon.icns)
-    set_source_files_properties(${ICON} PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
-    list(APPEND RESOURCES ${ICON})
-endif()
-
 add_executable(feather ${EXECUTABLE_FLAG} main.cpp
         ${SOURCE_FILES}
         ${RESOURCES}
         ${ASSETS_TOR}
 )
 
-# mac os bundle
 set_target_properties(feather PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-        MACOSX_BUNDLE TRUE
-        MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/utils/Info.plist"
         LINK_FLAGS_RELEASE -s
 )
-
-set_property(TARGET feather PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-
-target_include_directories(feather PUBLIC ${QtGui_PRIVATE_INCLUDE_DIRS})
 
 target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
@@ -125,12 +125,10 @@ target_include_directories(feather PUBLIC
         ${CMAKE_SOURCE_DIR}/monero/contrib/epee/include
         ${CMAKE_SOURCE_DIR}/src
         ${CMAKE_CURRENT_SOURCE_DIR}
-        ${CMAKE_CURRENT_SOURCE_DIR}/daemon
         ${CMAKE_CURRENT_SOURCE_DIR}/libwalletqt
         ${CMAKE_CURRENT_SOURCE_DIR}/model
         ${CMAKE_CURRENT_SOURCE_DIR}/utils
         ${CMAKE_CURRENT_SOURCE_DIR}/qrcode
-        ${X11_INCLUDE_DIR}
         ${Boost_INCLUDE_DIRS}
         ${QtCore_INCLUDE_DIRS}
         ${QtWidgets_INCLUDE_DIRS}
@@ -140,11 +138,11 @@ target_include_directories(feather PUBLIC
         ${QtSvgWidgets_INCLUDE_DIRS}
         ${QtXml_INCLUDE_DIRS}
         ${QtWebSockets_INCLUDE_DIRS}
-        ${ZLIB_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
+        ${ZLIB_INCLUDE_DIRS}
         ${ZBAR_INCLUDE_DIR}
         ${POLYSEED_INCLUDE_DIR}
-        )
+)
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
@@ -177,7 +175,7 @@ if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
-if(WITH_SCANNER AND NOT Qt6_FOUND)
+if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
@@ -219,16 +217,6 @@ if (WITH_SCANNER)
     )
 endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${QtWidgets_EXECUTABLE_COMPILE_FLAGS}")
-
-if(UNIX AND NOT APPLE)
-    # https://stackoverflow.com/questions/57766620/cmake-add-library-doesnt-initialize-static-global-variable
-    # so that contrib/monero-seed/src/gf_elem.cpp properly initializes. A better solution is welcome.
-    target_link_libraries(feather -Wl,--whole-archive monero-seed -Wl,--no-whole-archive)
-else()
-    target_link_libraries(feather monero-seed)
-endif()
-
 target_link_libraries(feather
         wallet_merged
         ${LMDB_LIBRARY}
@@ -246,18 +234,21 @@ target_link_libraries(feather
         Qt::Gui
         Qt::Network
         Qt::Svg
-        Qt::Xml
         Qt::WebSockets
-        ${ICU_LIBRARIES}
         openpgp
         Threads::Threads
         ${QRENCODE_LIBRARY}
-        ${ZLIB_LIBRARIES}
-        ${LIBZIP_LIBRARIES}
         ${ZBAR_LIBRARIES}
         ${POLYSEED_LIBRARY}
         SingleApplication::SingleApplication
-        )
+        ${ICU_LIBRARIES}
+        ${LIBZIP_LIBRARIES}
+        ${ZLIB_LIBRARIES}
+)
+
+if(DEPENDS)
+    target_link_libraries(feather ${ICONV_LIBRARIES})
+endif()
 
 if(Qt6_FOUND)
     target_link_libraries(feather Qt::SvgWidgets)
@@ -291,14 +282,6 @@ if(STATIC AND NOT Qt6_FOUND)
         target_link_libraries(feather
             Qt5::QXcbIntegrationPlugin)
     endif()
-endif()
-
-if(X11_FOUND)
-    target_link_libraries(feather ${X11_LIBRARIES})
-endif()
-
-if(APPLE)
-    include(Deploy)
 endif()
 
 install(TARGETS feather
