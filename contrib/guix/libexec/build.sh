@@ -230,7 +230,7 @@ GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 # Create the source tarball if not already there
 if [ ! -e "$GIT_ARCHIVE" ]; then
     mkdir -p "$(dirname "$GIT_ARCHIVE")"
-    echo "$(git_head_version)" > githash.txt
+    git rev-parse --short=12 HEAD > githash.txt
     ( git ls-files --recurse-submodules ; echo "githash.txt" ) | cat | tar --transform 's,^,$DISTNAME/,' -caf ${GIT_ARCHIVE} -T-
     sha256sum "$GIT_ARCHIVE"
 fi
