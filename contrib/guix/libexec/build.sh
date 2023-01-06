@@ -308,12 +308,22 @@ mkdir -p "$DISTSRC"
 
     make -C build --jobs="$JOBS"
 
+    LINUX_ARCH=""
+    case "$HOST" in
+        aarch64-linux*)
+            LINUX_ARCH="-arm64"
+            ;;
+        arm-linux*)
+            LINUX_ARCH="-arm"
+            ;;
+    esac
+
     case "$HOST" in
         *linux*)
             bash contrib/AppImage/build-appimage.sh
-            mv feather.AppImage ${DISTNAME}.AppImage
-            cp ${DISTNAME}.AppImage "${INSTALLPATH}/"
-            cp ${DISTNAME}.AppImage "${OUTDIR}/"
+            mv feather.AppImage ${DISTNAME}${LINUX_ARCH}.AppImage
+            cp ${DISTNAME}${LINUX_ARCH}.AppImage "${INSTALLPATH}/"
+            cp ${DISTNAME}${LINUX_ARCH}.AppImage "${OUTDIR}/"
             ;;
     esac
 
@@ -382,14 +392,14 @@ mkdir -p "$DISTSRC"
                     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                 find . -not -name "*.AppImage" \
                     | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux.zip" && exit 1 )
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" && exit 1 )
                 find . -name "*.AppImage" -print0 \
                     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                 find . -name "*.AppImage" \
                     | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux-appimage.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux-appimage.zip" && exit 1 )
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" && exit 1 )
                 ;;
         esac
 
