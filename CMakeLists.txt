@@ -285,10 +285,6 @@ if(APPLE AND CMAKE_CROSSCOMPILING)
             )
 endif()
 
-SET(CPACK_GENERATOR "DEB")
-SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "tobtoht") #required
-INCLUDE(CPack)
-
 message("\n")
 message("Configure summary")
 message("=================")
