@@ -347,6 +347,13 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_hideNotifications">
+         <property name="text">
+          <string>Hide notifications</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox_offlineMode">
          <property name="text">
           <string>Offline mode</string>

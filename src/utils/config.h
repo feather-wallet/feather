@@ -79,6 +79,7 @@ public:
         warnOnExternalLink,
         hideBalance,
         disableLogging,
+        hideNotifications,
 
         blockExplorer,
         redditFrontend,
