@@ -301,7 +301,7 @@ define $(package)_config_cmds
   export PKG_CONFIG_LIBDIR=$(host_prefix)/lib/pkgconfig && \
   export QT_MAC_SDK_NO_VERSION_CHECK=1 && \
   cd qtbase && \
-  env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH ./configure -top-level $($(package)_config_opts) --debug-find-pkg=Threads -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+  env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH ./configure -top-level $($(package)_config_opts) -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endef
 else ifeq ($(host_os),mingw32)
 define $(package)_config_cmds

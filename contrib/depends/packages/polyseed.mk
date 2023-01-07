@@ -3,7 +3,8 @@ $(package)_version=1.0.0
 $(package)_download_path=https://github.com/tevador/polyseed/archive/refs/tags/
 $(package)_file_name=v$($(package)_version).tar.gz
 $(package)_sha256_hash=45f1e6c08575286581079e6e26d341a3a33abe1f1ee2d026bd098cf632ea2349
-$(package)_dependencies=native_cmake
+$(package)_linux_dependencies=native_cmake
+$(package)_mingw32_dependencies=native_cmake
 $(package)_patches=no_shared.patch force-static-mingw.patch 32-bit.patch
 
 define $(package)_preprocess_cmds
