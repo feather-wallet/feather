@@ -87,7 +87,7 @@ if(NOT ZLIB_LIBRARY)
         find_library(ZLIB_LIBRARY_DEBUG NAMES ${ZLIB_NAMES_DEBUG} NAMES_PER_DIR ${${search}} PATH_SUFFIXES lib)
     endforeach()
 
-    include(${CMAKE_CURRENT_LIST_DIR}/SelectLibraryConfigurations.cmake)
+    include(SelectLibraryConfigurations)
     select_library_configurations(ZLIB)
 endif()
 
@@ -116,7 +116,7 @@ if(ZLIB_INCLUDE_DIR AND EXISTS "${ZLIB_INCLUDE_DIR}/zlib.h")
     set(ZLIB_PATCH_VERSION "${ZLIB_VERSION_PATCH}")
 endif()
 
-include(${CMAKE_CURRENT_LIST_DIR}/FindPackageHandleStandardArgs.cmake)
+include(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(ZLIB REQUIRED_VARS ZLIB_LIBRARY ZLIB_INCLUDE_DIR
         VERSION_VAR ZLIB_VERSION_STRING)
 
@@ -151,4 +151,6 @@ if(ZLIB_FOUND)
                     IMPORTED_LOCATION "${ZLIB_LIBRARY}")
         endif()
     endif()
+
+    message(STATUS "Found zlib libraries ${ZLIB_LIBRARIES}")
 endif()

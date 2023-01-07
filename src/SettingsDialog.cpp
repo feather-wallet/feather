@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "SettingsDialog.h"
 #include "ui_SettingsDialog.h"
@@ -113,6 +113,12 @@ void Settings::setupPrivacyTab() {
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
         config()->set(Config::hideBalance, toggled);
         m_ctx->updateBalance();
+    });
+
+        // [Hide notifications]
+    ui->checkBox_hideNotifications->setChecked(config()->get(Config::hideNotifications).toBool());
+    connect(ui->checkBox_hideNotifications, &QCheckBox::toggled, [this](bool toggled){
+        config()->set(Config::hideNotifications, toggled);
     });
 
     // [Disable websocket]

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include <QMessageBox>
 #include <QtNetwork>
@@ -480,26 +480,29 @@ void externalLinkWarning(QWidget *parent, const QString &url){
 }
 
 void desktopNotify(const QString &title, const QString &message, int duration) {
-    QStringList notify_send = QStringList() << title << message << "-t" << QString::number(duration);
-    QStringList kdialog = QStringList() << title << message;
-    QStringList macos = QStringList() << "-e" << QString(R"(display notification "%1" with title "%2")").arg(message).arg(title);
-#if defined(Q_OS_LINUX)
-    QProcess process;
-    if (fileExists("/usr/bin/kdialog"))
-        process.start("/usr/bin/kdialog", kdialog);
-    else if (fileExists("/usr/bin/notify-send"))
-        process.start("/usr/bin/notify-send", notify_send);
-    process.waitForFinished(-1);
-    QString stdout = process.readAllStandardOutput();
-    QString stderr = process.readAllStandardError();
-#elif defined(Q_OS_MACOS)
-    QProcess process;
-    // @TODO: need to escape special chars with "\"
-    process.start("osascript", macos);
-    process.waitForFinished(-1);
-    QString stdout = process.readAllStandardOutput();
-    QString stderr = process.readAllStandardError();
-#endif
+    if (!Config::hideNotifications)
+    {
+        QStringList notify_send = QStringList() << title << message << "-t" << QString::number(duration);
+        QStringList kdialog = QStringList() << title << message;
+        QStringList macos = QStringList() << "-e" << QString(R"(display notification "%1" with title "%2")").arg(message).arg(title);
+    #if defined(Q_OS_LINUX)
+        QProcess process;
+        if (fileExists("/usr/bin/kdialog"))
+            process.start("/usr/bin/kdialog", kdialog);
+        else if (fileExists("/usr/bin/notify-send"))
+            process.start("/usr/bin/notify-send", notify_send);
+        process.waitForFinished(-1);
+        QString stdout = process.readAllStandardOutput();
+        QString stderr = process.readAllStandardError();
+    #elif defined(Q_OS_MACOS)
+        QProcess process;
+        // @TODO: need to escape special chars with "\"
+        process.start("osascript", macos);
+        process.waitForFinished(-1);
+        QString stdout = process.readAllStandardOutput();
+        QString stderr = process.readAllStandardError();
+    #endif
+    }
 }
 
 QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount) {

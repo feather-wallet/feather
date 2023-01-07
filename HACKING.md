@@ -3,8 +3,6 @@
 Feather is developed primarily on Linux, but can also be built and debugged on macOS. Development on Windows is not 
 currently supported. 
 
-If you are just looking to build Feather from source, we recommend following the instructions in BUILDING.md instead.
-
 ## Setting up a development environment
 
 ### Dependencies
@@ -16,7 +14,7 @@ https://www.qt.io/download (under open-source).
 #### Arch Linux
 
 ```bash
-pacman -S git cmake base-devel ccache unbound boost qrencode zbar qt6-base qt6-svg qt6-websockets libzip hidapi protobuf
+pacman -S git cmake base-devel ccache unbound boost qrencode zbar qt6-base qt6-svg qt6-websockets qt6-multimedia libzip hidapi protobuf
 ```
 
 #### Ubuntu 22.04
@@ -77,9 +75,8 @@ We recommend using Jetbrains Clion for Feather development. It integrates nicely
 debugger. 
 
 To pass CMake flags to CLion, go to `File->Settings->Build->CMake`, set Build Type to `Debug` and set your
-preferred CMake options/definitions. Add `-DARCH=x86-64` to the CMake options. If you installed Qt using the online 
-installer you may have to add `-DCMAKE_PREFIX_PATH=/path/to/qt/installation` in the CMake options. More CMake options
-are documented below.
+preferred CMake options. If you installed Qt using the online installer you may have to add 
+`-DCMAKE_PREFIX_PATH=/path/to/qt/installation` in the CMake options. More CMake options are documented below.
 
 Run CMake (`View -> Tool Windows -> CMake`). Click on the 🔃 (`Reload CMake Project`) button.
 
@@ -95,8 +92,12 @@ After the target is configured, `Run -> Run 'feather'` or press Shift + F10 to b
 
 To build Feather without an IDE:
 
-- Linux: `make release`
-- macOS: `make mac-release`
+```bash
+mkdir build && \
+cd build && \
+cmake .. && \
+cmake --build . -j $(nproc)
+```
 
 ### CMake
 

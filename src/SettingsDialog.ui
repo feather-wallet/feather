@@ -347,6 +347,13 @@
         </layout>
        </item>
        <item>
+        <widget class="QCheckBox" name="checkBox_hideNotifications">
+         <property name="text">
+          <string>Hide notifications</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QCheckBox" name="checkBox_offlineMode">
          <property name="text">
           <string>Offline mode</string>
@@ -533,6 +540,11 @@
          <item>
           <property name="text">
            <string>teddit.net</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>reddittorjg6rue252oqsxryoxengawnmo46qy4kyii5wtqnwfj4ooad.onion</string>
           </property>
          </item>
         </widget>

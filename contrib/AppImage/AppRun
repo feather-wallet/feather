@@ -3,7 +3,6 @@
 HERE="$(dirname "$(readlink -f "${0}")")"
 echo $HERE
 
-export GST_PLUGIN_SCANNER=$(readlink -f $(dirname "$0")/usr/lib/gst-plugin-scanner)
-export GST_PLUGIN_SYSTEM_PATH=$(readlink -f $(dirname "$0")/usr/lib)
-
+# Tails 5.8 sets QT_QPA_PLATFORM to wayland which breaks our app
+export QT_QPA_PLATFORM=xcb
 ${APPDIR}/usr/bin/feather $*

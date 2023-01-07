@@ -1,0 +1,25 @@
+From 8c51b00cb98381a791ef3dcda39f76bebaf9d68f Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Fri, 23 Dec 2022 13:51:36 +0100
+Subject: [PATCH] allow compiling on 32-bit machines
+
+---
+ src/birthday.h | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/src/birthday.h b/src/birthday.h
+index 822883a..5af79aa 100644
+--- a/src/birthday.h
++++ b/src/birthday.h
+@@ -7,8 +7,6 @@
+ #include <time.h>
+ #include <assert.h>
+ 
+-static_assert(sizeof(time_t) == 8, "time_t must be a 64-bit type.");
+-
+ #define EPOCH ((uint64_t)1635768000)  /* 1st November 2021 12:00 UTC */
+ #define TIME_STEP ((uint64_t)2629746) /* 30.436875 days = 1/12 of the Gregorian year */
+ 
+-- 
+2.39.0
+

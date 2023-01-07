@@ -10,6 +10,6 @@ The following keys may be used to communicate sensitive information to developer
 
 | Name | Fingerprint |
 |------|-------------|
-| tobtoht | C5AB E5C0 E50F A2B3 F14A B92D 1CAD D27F 41F4 5C3C |
+| tobtoht | E87B D921 CDD8 85C9 D78A 38C5 E45B 10DD 027D 2472 |
 
 Public keys can be found in `utils/pubkeys`.

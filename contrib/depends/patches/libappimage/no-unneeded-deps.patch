@@ -1,0 +1,163 @@
+From b7875398d91821a49b7b0233950a3e687257c790 Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Mon, 7 Nov 2022 11:30:46 +0100
+Subject: [PATCH] no unneeded deps
+
+---
+ cmake/dependencies.cmake          | 78 +++++++++++++++----------------
+ cmake/imported_dependencies.cmake | 10 ++--
+ cmake/tools.cmake                 |  3 --
+ src/CMakeLists.txt                | 12 ++---
+ 4 files changed, 50 insertions(+), 53 deletions(-)
+
+diff --git a/cmake/dependencies.cmake b/cmake/dependencies.cmake
+index 7c65e85..5bf5e51 100644
+--- a/cmake/dependencies.cmake
++++ b/cmake/dependencies.cmake
+@@ -55,45 +55,45 @@ endif()
+ # for distro packaging, it can be linked to an existing package just fine
+ set(USE_SYSTEM_SQUASHFUSE OFF CACHE BOOL "Use system libsquashfuse instead of building our own")
+
+-if(NOT USE_SYSTEM_SQUASHFUSE)
+-    message(STATUS "Downloading and building squashfuse")
+-
+-    # TODO: implement out-of-source builds for squashfuse, as for the other dependencies
+-    configure_file(
+-        ${CMAKE_CURRENT_SOURCE_DIR}/src/patches/patch-squashfuse.sh.in
+-        ${CMAKE_CURRENT_BINARY_DIR}/patch-squashfuse.sh
+-        @ONLY
+-    )
+-
+-    ExternalProject_Add(squashfuse-EXTERNAL
+-        GIT_REPOSITORY https://github.com/vasi/squashfuse/
+-        GIT_TAG 1f98030
+-        UPDATE_COMMAND ""  # make sure CMake won't try to fetch updates unnecessarily and hence rebuild the dependency every time
+-        PATCH_COMMAND bash -xe ${CMAKE_CURRENT_BINARY_DIR}/patch-squashfuse.sh
+-        CONFIGURE_COMMAND ${LIBTOOLIZE} --force
+-                  # for some reason, a first run may fail, but it seems just running it a second time fixes the issues
+-                  COMMAND env PKG_CONFIG_PATH=${xz_LIBRARY_DIRS}/pkgconfig ./autogen.sh || true
+-                  COMMAND env PKG_CONFIG_PATH=${xz_LIBRARY_DIRS}/pkgconfig ./autogen.sh
+-                  COMMAND ${SED} -i "/PKG_CHECK_MODULES.*/,/,:./d" configure  # https://github.com/vasi/squashfuse/issues/12
+-                  COMMAND ${SED} -i "s/typedef off_t sqfs_off_t/typedef int64_t sqfs_off_t/g" common.h  # off_t's size might differ, see https://stackoverflow.com/a/9073762
+-                  COMMAND CC=${CC} CXX=${CXX} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} <SOURCE_DIR>/configure --disable-demo --disable-high-level --without-lzo --without-lz4 --prefix=<INSTALL_DIR> --libdir=<INSTALL_DIR>/lib --with-xz=${xz_PREFIX} ${EXTRA_CONFIGURE_FLAGS}
+-                  COMMAND ${SED} -i "s|XZ_LIBS = -llzma |XZ_LIBS = -Bstatic ${xz_LIBRARIES}/|g" Makefile
+-        BUILD_COMMAND ${MAKE}
+-        BUILD_IN_SOURCE ON
+-        INSTALL_COMMAND ${MAKE} install
+-    )
+-
+-    import_external_project(
+-        TARGET_NAME libsquashfuse
+-        EXT_PROJECT_NAME squashfuse-EXTERNAL
+-        LIBRARIES "<SOURCE_DIR>/.libs/libsquashfuse.a;<SOURCE_DIR>/.libs/libsquashfuse_ll.a;<SOURCE_DIR>/.libs/libfuseprivate.a"
+-        INCLUDE_DIRS "<SOURCE_DIR>"
+-    )
+-else()
+-    message(STATUS "Using system squashfuse")
+-
+-    import_pkgconfig_target(TARGET_NAME libsquashfuse PKGCONFIG_TARGET squashfuse)
+-endif()
++#if(NOT USE_SYSTEM_SQUASHFUSE)
++#    message(STATUS "Downloading and building squashfuse")
++#
++#    # TODO: implement out-of-source builds for squashfuse, as for the other dependencies
++#    configure_file(
++#        ${CMAKE_CURRENT_SOURCE_DIR}/src/patches/patch-squashfuse.sh.in
++#        ${CMAKE_CURRENT_BINARY_DIR}/patch-squashfuse.sh
++#        @ONLY
++#    )
++#
++#    ExternalProject_Add(squashfuse-EXTERNAL
++#        GIT_REPOSITORY https://github.com/vasi/squashfuse/
++#        GIT_TAG 1f98030
++#        UPDATE_COMMAND ""  # make sure CMake won't try to fetch updates unnecessarily and hence rebuild the dependency every time
++#        PATCH_COMMAND bash -xe ${CMAKE_CURRENT_BINARY_DIR}/patch-squashfuse.sh
++#        CONFIGURE_COMMAND ${LIBTOOLIZE} --force
++#                  # for some reason, a first run may fail, but it seems just running it a second time fixes the issues
++#                  COMMAND env PKG_CONFIG_PATH=${xz_LIBRARY_DIRS}/pkgconfig ./autogen.sh || true
++#                  COMMAND env PKG_CONFIG_PATH=${xz_LIBRARY_DIRS}/pkgconfig ./autogen.sh
++#                  COMMAND ${SED} -i "/PKG_CHECK_MODULES.*/,/,:./d" configure  # https://github.com/vasi/squashfuse/issues/12
++#                  COMMAND ${SED} -i "s/typedef off_t sqfs_off_t/typedef int64_t sqfs_off_t/g" common.h  # off_t's size might differ, see https://stackoverflow.com/a/9073762
++#                  COMMAND CC=${CC} CXX=${CXX} CFLAGS=${CFLAGS} LDFLAGS=${LDFLAGS} <SOURCE_DIR>/configure --disable-demo --disable-high-level --without-lzo --without-lz4 --prefix=<INSTALL_DIR> --libdir=<INSTALL_DIR>/lib --with-xz=${xz_PREFIX} ${EXTRA_CONFIGURE_FLAGS}
++#                  COMMAND ${SED} -i "s|XZ_LIBS = -llzma |XZ_LIBS = -Bstatic ${xz_LIBRARIES}/|g" Makefile
++#        BUILD_COMMAND ${MAKE}
++#        BUILD_IN_SOURCE ON
++#        INSTALL_COMMAND ${MAKE} install
++#    )
++#
++#    import_external_project(
++#        TARGET_NAME libsquashfuse
++#        EXT_PROJECT_NAME squashfuse-EXTERNAL
++#        LIBRARIES "<SOURCE_DIR>/.libs/libsquashfuse.a;<SOURCE_DIR>/.libs/libsquashfuse_ll.a;<SOURCE_DIR>/.libs/libfuseprivate.a"
++#        INCLUDE_DIRS "<SOURCE_DIR>"
++#    )
++#else()
++#    message(STATUS "Using system squashfuse")
++#
++#    import_pkgconfig_target(TARGET_NAME libsquashfuse PKGCONFIG_TARGET squashfuse)
++#endif()
+
+
+ set(USE_SYSTEM_LIBARCHIVE OFF CACHE BOOL "Use system libarchive instead of building our own")
+diff --git a/cmake/imported_dependencies.cmake b/cmake/imported_dependencies.cmake
+index 56d7fc0..2a709c9 100644
+--- a/cmake/imported_dependencies.cmake
++++ b/cmake/imported_dependencies.cmake
+@@ -3,8 +3,8 @@ include(${CMAKE_CURRENT_LIST_DIR}/scripts.cmake)
+ # the names of the targets need to differ from the library filenames
+ # this is especially an issue with libcairo, where the library is called libcairo
+ # therefore, all libs imported this way have been prefixed with lib
+-import_pkgconfig_target(TARGET_NAME libglib PKGCONFIG_TARGET glib-2.0>=2.40)
+-import_pkgconfig_target(TARGET_NAME libgobject PKGCONFIG_TARGET gobject-2.0>=2.40)
+-import_pkgconfig_target(TARGET_NAME libgio PKGCONFIG_TARGET gio-2.0>=2.40)
+-import_pkgconfig_target(TARGET_NAME libzlib PKGCONFIG_TARGET zlib)
+-import_pkgconfig_target(TARGET_NAME libcairo PKGCONFIG_TARGET cairo)
++#import_pkgconfig_target(TARGET_NAME libglib PKGCONFIG_TARGET glib-2.0>=2.40)
++#import_pkgconfig_target(TARGET_NAME libgobject PKGCONFIG_TARGET gobject-2.0>=2.40)
++#import_pkgconfig_target(TARGET_NAME libgio PKGCONFIG_TARGET gio-2.0>=2.40)
++#import_pkgconfig_target(TARGET_NAME libzlib PKGCONFIG_TARGET zlib)
++#import_pkgconfig_target(TARGET_NAME libcairo PKGCONFIG_TARGET cairo)
+diff --git a/cmake/tools.cmake b/cmake/tools.cmake
+index d0941bb..c93b6b3 100644
+--- a/cmake/tools.cmake
++++ b/cmake/tools.cmake
+@@ -50,9 +50,6 @@ check_program(NAME autoreconf)
+ check_program(NAME libtoolize)
+ check_program(NAME patch)
+ check_program(NAME sed)
+-check_program(NAME wget)
+-check_program(NAME xxd)
+-check_program(NAME desktop-file-validate)
+ check_program(NAME objcopy FORCE_PREFIX)
+ check_program(NAME objdump FORCE_PREFIX)
+ check_program(NAME readelf FORCE_PREFIX)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 664bf2a..081523b 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -3,16 +3,16 @@ cmake_minimum_required(VERSION 3.6)
+
+ find_package(PkgConfig)
+
+-pkg_check_modules(glib glib-2.0>=2.40 IMPORTED_TARGET)
+-pkg_check_modules(gobject gobject-2.0>=2.40 IMPORTED_TARGET)
+-pkg_check_modules(gio gio-2.0>=2.40 IMPORTED_TARGET)
+-pkg_check_modules(zlib zlib IMPORTED_TARGET)
+-pkg_check_modules(cairo cairo IMPORTED_TARGET)
++#pkg_check_modules(glib glib-2.0>=2.40 IMPORTED_TARGET)
++#pkg_check_modules(gobject gobject-2.0>=2.40 IMPORTED_TARGET)
++#pkg_check_modules(gio gio-2.0>=2.40 IMPORTED_TARGET)
++#pkg_check_modules(zlib zlib IMPORTED_TARGET)
++#pkg_check_modules(cairo cairo IMPORTED_TARGET)
+
+ add_subdirectory(xdg-basedir)
+ add_subdirectory(libappimage_hashlib)
+ add_subdirectory(libappimage_shared)
+-add_subdirectory(libappimage)
++#add_subdirectory(libappimage)
+
+ # Export the package for use from the build-tree
+ # (this registers the build-tree with a global CMake-registry)
+-- 
+2.38.1
+
