@@ -21,6 +21,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND ARCHITECTURE STREQUAL "x86_64")
   SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /home/user/.guix-profile/)
 endif()
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  # MWF libs
+  SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /gnu/store/3hw9n6yl57lgv01ffi15nk3cj2rjk1km-mingw-w64-x86_64-winpthreads-10.0.0-10.0.0)
+endif()
+
 SET(ENV{PKG_CONFIG_PATH} @prefix@/lib/pkgconfig)
 
 # use CACHE here because we need to be able to override these later

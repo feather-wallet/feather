@@ -1,5 +1,5 @@
 packages := boost openssl libiconv ldns unbound qrencode zbar sodium polyseed hidapi protobuf libusb zlib libgpg-error libgcrypt expat libzip
-native_packages := native_expat native_libxcb native_xcb_proto native_libXau native_xproto native_freetype native_fontconfig native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm native_qt native_protobuf
+native_packages := native_libxcb native_xcb_proto native_libXau native_xproto native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm native_qt native_protobuf
 
 linux_packages := eudev liblzma libarchive libfuse libsquashfuse libappimage appimage_runtime
 linux_native_packages = native_patchelf

@@ -1,4 +1,4 @@
-package=native_freetype
+package=freetype
 $(package)_version=2.11.0
 $(package)_download_path=https://download.savannah.gnu.org/releases/freetype
 $(package)_file_name=freetype-$($(package)_version).tar.xz
