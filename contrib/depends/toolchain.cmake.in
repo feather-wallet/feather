@@ -15,7 +15,11 @@ SET(BUILD_TESTS @build_tests@)
 SET(TREZOR_DEBUG @build_tests@)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH @prefix@ /usr /gnu/store /feather/contrib/depends/SDKs/)
+SET(CMAKE_FIND_ROOT_PATH @prefix@ /feather/contrib/depends/SDKs/ /home/user/.guix-profile/@HOST@)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND ARCHITECTURE STREQUAL "x86_64")
+  SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /home/user/.guix-profile/)
+endif()
 
 SET(ENV{PKG_CONFIG_PATH} @prefix@/lib/pkgconfig)
 

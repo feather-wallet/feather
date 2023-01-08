@@ -5,7 +5,6 @@ $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=532ad71cc0f9c8f7cb92766c47bc3d23263c60876becd9053802f9727af24fae
 $(package)_dependencies=native_libxcb native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm
-$(package)_linux_dependencies=native_cmake
 $(package)_mingw32_dependencies=native_cmake
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert

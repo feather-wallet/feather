@@ -3,7 +3,7 @@ $(package)_version=v0.1.x-legacy
 $(package)_download_path=https://github.com/AppImageCommunity/libappimage/archive/refs/heads/
 $(package)_file_name=$($(package)_version).tar.gz
 $(package)_sha256_hash=fef3962bfb75f986f24c530a6230e95b8c79e46da3dd581543f1b615d45e7389
-$(package)_dependencies=native_cmake liblzma libfuse libarchive
+$(package)_dependencies=liblzma libfuse libarchive
 $(package)_patches=no-unneeded-deps.patch
 
 define $(package)_preprocess_cmds
