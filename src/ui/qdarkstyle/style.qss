@@ -15,7 +15,7 @@ And each widget is separated with a header like this:
     QWidgetName ------
 
 This makes more easy to find and change some css field. The basic
-configuration is described bellow.
+configuration is described below.
 
     BACKGROUND -----------
 
@@ -1400,7 +1400,7 @@ QLineEdit:selected {
   color: #32414B;
 }
 
-/* QTabWiget --------------------------------------------------------------
+/* QTabWidget --------------------------------------------------------------
 
 https://doc.qt.io/qt-5/stylesheet-examples.html#customizing-qtabwidget-and-qtabbar
 
@@ -1676,7 +1676,7 @@ QTabBar QToolButton::right-arrow:disabled {
   image: url(":/qss_icons/rc/arrow_right_disabled.png");
 }
 
-/* QDockWiget -------------------------------------------------------------
+/* QDockWidget -------------------------------------------------------------
 
 --------------------------------------------------------------------------- */
 QDockWidget {

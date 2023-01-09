@@ -19,7 +19,7 @@ ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->label_primaryAddress->setText(m_ctx->wallet->address(0, 0));
     ui->label_secretViewKey->setText(m_ctx->wallet->getSecretViewKey());
 
-    connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboad);
+    connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboard);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
 
     if (m_ctx->wallet->viewOnly()) {
@@ -50,7 +50,7 @@ void ViewOnlyDialog::onWriteViewOnlyWallet(){
     QMessageBox::information(this, "Information", "View-only wallet successfully written to disk.");
 }
 
-void ViewOnlyDialog::copyToClipboad() {
+void ViewOnlyDialog::copyToClipboard() {
     QString text = "";
     text += QString("Address: %1\n").arg(ui->label_primaryAddress->text());
     text += QString("Secret view key: %1\n").arg(ui->label_secretViewKey->text());

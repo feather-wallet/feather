@@ -119,7 +119,7 @@ private slots:
     void onExportHistoryCSV(bool checked);
     void onExportContactsCSV(bool checked);
     void onCreateDesktopEntry(bool checked);
-    void onShowDocumentaton();
+    void onShowDocumentation();
     void onReportBug(bool checked);
     void onShowSettingsPage(int page);
 
@@ -215,7 +215,7 @@ private:
     void addToRecentlyOpened(const QString &filename);
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
-    bool verifyPassword(bool senstive = true);
+    bool verifyPassword(bool sensitive = true);
     void patchStylesheetMac();
     void fillSendTab(const QString &address, const QString &description);
     void userActivity();

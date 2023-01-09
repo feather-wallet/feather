@@ -221,7 +221,7 @@ void TxProofDialog::getSignature() {
     }
 
     Utils::copyToClipboard(proof.proof);
-    QMessageBox::information(this, "Get proof singature", "Proof signature copied to clipboard");
+    QMessageBox::information(this, "Get proof signature", "Proof signature copied to clipboard");
 }
 
 TxProof TxProofDialog::getProof() {

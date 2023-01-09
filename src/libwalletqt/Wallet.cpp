@@ -372,7 +372,7 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex)
         m_subaddress->refresh(m_currentSubaddressAccount);
         m_history->refresh(m_currentSubaddressAccount);
         m_coins->refresh(m_currentSubaddressAccount);
-        this->subaddressModel()->setCurrentSubaddressAcount(m_currentSubaddressAccount);
+        this->subaddressModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->coinsModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         emit currentSubaddressAccountChanged();
     }

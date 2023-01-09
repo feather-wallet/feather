@@ -24,7 +24,7 @@ public:
 
 private:
     QString statusToString(Wallet::ConnectionStatus status);
-    void copyToClipboad();
+    void copyToClipboard();
     void updateInfo();
 
     QScopedPointer<Ui::DebugInfoDialog> ui;

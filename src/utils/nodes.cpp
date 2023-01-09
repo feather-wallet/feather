@@ -146,7 +146,7 @@ void Nodes::loadConfig() {
         qDebug() << QString("Loaded %1 custom nodes from config").arg(m_customNodes.count());
     }
 
-    // No nodes cached, fallback to hardcorded list
+    // No nodes cached, fallback to hardcoded list
     if (m_websocketNodes.count() == 0) {
         QByteArray file = Utils::fileOpenQRC(":/assets/nodes.json");
         QJsonDocument nodes_json = QJsonDocument::fromJson(file);

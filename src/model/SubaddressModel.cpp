@@ -143,7 +143,7 @@ bool SubaddressModel::setData(const QModelIndex &index, const QVariant &value, i
 
         switch (index.column()) {
             case Label:
-                m_subaddress->setLabel(m_currentSubaddressAcount, row, value.toString());
+                m_subaddress->setLabel(m_currentSubaddressAccount, row, value.toString());
                 break;
             default:
                 return false;
@@ -180,8 +180,8 @@ int SubaddressModel::unusedLookahead() const {
     return m_subaddress->unusedLookahead();
 }
 
-void SubaddressModel::setCurrentSubaddressAcount(quint32 accountIndex) {
-    m_currentSubaddressAcount = accountIndex;
+void SubaddressModel::setCurrentSubaddressAccount(quint32 accountIndex) {
+    m_currentSubaddressAccount = accountIndex;
 }
 
 Monero::SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {

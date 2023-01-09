@@ -1,7 +1,7 @@
 ## Note to package maintainers:
 
 This library was vendored because it is **deprecated** and **unmaintained**, it is kept for legacy reasons only.
-Feather is the only project that will ever use this code, thus it is considered part of Feather source. 
+Feather is the only project that will ever use this code, thus it is considered part of Feather source.
 Do NOT unvendor this code.
 
 ---
@@ -25,7 +25,7 @@ The mnemonic phrase contains 154 bits of data, which are used as follows:
 ### Wordlist
 
 The mnemonic phrase uses the BIP-39 wordlist, which has 2048 words, allowing 11 bits to be stored in each word. It has some additional useful properties,
-for example each word can be uniquly identified by its first 4 characters. The wordlist is available for 9 languages (this repository only uses the English list).
+for example each word can be uniquely identified by its first 4 characters. The wordlist is available for 9 languages (this repository only uses the English list).
 
 ### Reserved bits
 
