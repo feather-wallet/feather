@@ -438,7 +438,12 @@ QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettyp
             return QString("http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%1").arg(txid);
         }
     }
-
+    else if (blockExplorer == "127.0.0.1:31312") {
+        if (nettype == NetworkType::MAINNET) {
+            return QString("http://127.0.0.1:31312/tx?id=%1").arg(txid);
+        }
+    }
+    
     switch (nettype) {
         case NetworkType::MAINNET:
             return QString("https://xmrchain.net/tx/%1").arg(txid);
