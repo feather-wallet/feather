@@ -17,7 +17,7 @@ DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->btn_Copy, &QPushButton::clicked, this, &DebugInfoDialog::copyToClipboad);
+    connect(ui->btn_Copy, &QPushButton::clicked, this, &DebugInfoDialog::copyToClipboard);
 
     m_updateTimer.start(5000);
     connect(&m_updateTimer, &QTimer::timeout, this, &DebugInfoDialog::updateInfo);

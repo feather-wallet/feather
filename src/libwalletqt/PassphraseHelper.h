@@ -15,7 +15,7 @@
  * Implements component responsible for showing entry prompt to the user,
  * typically Wallet / Wallet manager.
  */
-class PassprasePrompter {
+class PassphrasePrompter {
 public:
     virtual void onWalletPassphraseNeeded(bool onDevice) = 0;
 };
