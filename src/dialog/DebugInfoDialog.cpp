@@ -123,7 +123,7 @@ QString DebugInfoDialog::statusToString(Wallet::ConnectionStatus status) {
     }
 }
 
-void DebugInfoDialog::copyToClipboad() {
+void DebugInfoDialog::copyToClipboard() {
     // Two spaces at the end of each line are for newlines in Markdown
     QString text = "";
     text += QString("Feather version: %1  \n").arg(ui->label_featherVersion->text());

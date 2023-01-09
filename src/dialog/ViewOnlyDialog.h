@@ -25,7 +25,7 @@ private slots:
     void onWriteViewOnlyWallet();
 
 private:
-    void copyToClipboad();
+    void copyToClipboard();
 
     QScopedPointer<Ui::ViewOnlyDialog> ui;
     QSharedPointer<AppContext> m_ctx;

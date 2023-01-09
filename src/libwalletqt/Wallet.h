@@ -72,7 +72,7 @@ struct TxProofResult {
     uint64_t confirmations;
 };
 
-class Wallet : public QObject, public PassprasePrompter
+class Wallet : public QObject, public PassphrasePrompter
 {
 Q_OBJECT
 
@@ -361,19 +361,19 @@ public:
     //! returns Address book
     AddressBook *addressBook() const;
 
-    //! returns adress book model
+    //! returns address book model
     AddressBookModel *addressBookModel() const;
 
     //! returns subaddress
     Subaddress *subaddress();
 
-    //! returns subadress model
+    //! returns subaddress model
     SubaddressModel *subaddressModel();
 
     //! returns subaddress account
     SubaddressAccount *subaddressAccount() const;
 
-    //! returns subadress account model
+    //! returns subaddress account model
     SubaddressAccountModel *subaddressAccountModel() const;
 
     //! returns coins
@@ -437,7 +437,7 @@ public:
 
     QString getDaemonLogPath() const;
 
-    // Blackalled outputs
+    // Blackballed outputs
     bool blackballOutput(const QString &amount, const QString &offset);
     bool blackballOutputs(const QList<QString> &outputs, bool add);
     bool blackballOutputs(const QString &filename, bool add);
@@ -464,7 +464,7 @@ public:
 
     bool setRingDatabase(const QString &path);
 
-    // TODO: setListenter() when it implemented in API
+    // TODO: setListener() when it implemented in API
 signals:
     // emitted on every event happened with wallet
     // (money sent/received, new block)

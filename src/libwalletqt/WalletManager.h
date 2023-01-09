@@ -19,7 +19,7 @@ namespace Monero {
     struct WalletManager;
 }
 
-class WalletManager : public QObject, public PassprasePrompter
+class WalletManager : public QObject, public PassphrasePrompter
 {
     Q_OBJECT
 
