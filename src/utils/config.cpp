@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2011 Felix Geyer <debfx@fobos.de>
 // SPDX-FileCopyrightText: 2020 KeePassXC Team <team@keepassxc.org>
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "config.h"
 #include "utils/Utils.h"
@@ -74,6 +74,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
+         {Config::hideNotifications, {QS("hideNotifications"), false}},
         {Config::disableLogging, {QS("disableLogging"), false}},
 
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},

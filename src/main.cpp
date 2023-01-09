@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include <QResource>
 #include <QApplication>
@@ -7,7 +7,6 @@
 #include <QtGui>
 #include <singleapplication.h>
 
-#include "cli.h"
 #include "config-feather.h"
 #include "constants.h"
 #include "MainWindow.h"
@@ -38,6 +37,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
+// Disable High DPI scaling on Linux for now
+#if defined(Q_OS_LINUX)
+    qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
+#endif
+
     QStringList argv_;
     for(int i = 0; i != argc; i++){
         argv_ << QString::fromStdString(argv[i]);
@@ -66,44 +70,15 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QCommandLineOption testnetOption(QStringList() << "testnet", "Testnet is for development purposes only.");
     parser.addOption(testnetOption);
 
-    QCommandLineOption walletPathOption(QStringList() << "wallet-file", "Path to wallet keys file.", "file");
-    parser.addOption(walletPathOption);
-
-    QCommandLineOption walletPasswordOption(QStringList() << "password", "Wallet password (escape/quote as needed)", "password");
-    parser.addOption(walletPasswordOption);
-
-    QCommandLineOption daemonAddressOption(QStringList() << "daemon-address", "Daemon address (IPv4:port)", "daemonAddress");
-    parser.addOption(daemonAddressOption);
-
-    QCommandLineOption exportContactsOption(QStringList() << "export-contacts", "Output wallet contacts as CSV to specified path.", "file");
-    parser.addOption(exportContactsOption);
-
-    QCommandLineOption exportTxHistoryOption(QStringList() << "export-txhistory", "Output wallet transaction history as CSV to specified path.", "file");
-    parser.addOption(exportTxHistoryOption);
-
-    QCommandLineOption bruteforcePasswordOption(QStringList() << "bruteforce-password", "Bruteforce wallet password", "file");
-    parser.addOption(bruteforcePasswordOption);
-
-    QCommandLineOption bruteforceCharsOption(QStringList() << "bruteforce-chars", "Chars used to bruteforce password", "string");
-    parser.addOption(bruteforceCharsOption);
-
-    QCommandLineOption bruteforceDictionairy(QStringList() << "bruteforce-dict", "Bruteforce dictionairy", "file");
-    parser.addOption(bruteforceDictionairy);
-
     bool parsed = parser.parse(argv_);
     if (!parsed) {
         qCritical() << parser.errorText();
         exit(1);
     }
 
-    const QStringList args = parser.positionalArguments();
     bool stagenet = parser.isSet(stagenetOption);
     bool testnet = parser.isSet(testnetOption);
     bool quiet = parser.isSet(quietModeOption);
-    bool exportContacts = parser.isSet(exportContactsOption);
-    bool exportTxHistory = parser.isSet(exportTxHistoryOption);
-    bool bruteforcePassword = parser.isSet(bruteforcePasswordOption);
-    bool cliMode = exportContacts || exportTxHistory || bruteforcePassword;
 
     // Setup networkType
     if (stagenet)
@@ -177,21 +152,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     if (parser.isSet("use-local-tor"))
         config()->set(Config::useLocalTor, true);
 
-    if (cliMode) {
-        CLI::Mode mode = [&]{
-            if (exportContacts)
-                return CLI::Mode::ExportContacts;
-            if (exportTxHistory)
-                return CLI::Mode::ExportTxHistory;
-            if (bruteforcePassword)
-                return CLI::Mode::BruteforcePassword;
-            return CLI::Mode::Invalid;
-        }();
-
-        CLI cli{mode, &parser, &app};
-        return QCoreApplication::exec();
-    }
-
     parser.process(app); // Parse again for --help and --version
 
     if (!quiet) {
@@ -234,8 +194,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
         windowManager.raise();
     });
-
-
 
     return QApplication::exec();
 }

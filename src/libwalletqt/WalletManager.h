@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2014-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #ifndef WALLETMANAGER_H
 #define WALLETMANAGER_H
@@ -19,7 +19,7 @@ namespace Monero {
     struct WalletManager;
 }
 
-class WalletManager : public QObject, public PassprasePrompter
+class WalletManager : public QObject, public PassphrasePrompter
 {
     Q_OBJECT
 

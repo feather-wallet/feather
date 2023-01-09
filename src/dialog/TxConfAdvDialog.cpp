@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "TxConfAdvDialog.h"
 #include "ui_TxConfAdvDialog.h"
@@ -164,7 +164,7 @@ void TxConfAdvDialog::signTransaction() {
     if(fn.isEmpty()) return;
 
     m_utx->sign(fn) ? QMessageBox::information(this, "Sign transaction", "Transaction saved successfully")
-                    : QMessageBox::warning(this, "Sign transaction", "Failes to save transaction to file.");
+                    : QMessageBox::warning(this, "Sign transaction", "Failed to save transaction to file.");
 }
 
 void TxConfAdvDialog::unsignedSaveFile() {

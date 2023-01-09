@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "DebugInfoDialog.h"
 #include "ui_DebugInfoDialog.h"
@@ -17,7 +17,7 @@ DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent
 {
     ui->setupUi(this);
 
-    connect(ui->btn_Copy, &QPushButton::clicked, this, &DebugInfoDialog::copyToClipboad);
+    connect(ui->btn_Copy, &QPushButton::clicked, this, &DebugInfoDialog::copyToClipboard);
 
     m_updateTimer.start(5000);
     connect(&m_updateTimer, &QTimer::timeout, this, &DebugInfoDialog::updateInfo);
@@ -123,7 +123,7 @@ QString DebugInfoDialog::statusToString(Wallet::ConnectionStatus status) {
     }
 }
 
-void DebugInfoDialog::copyToClipboad() {
+void DebugInfoDialog::copyToClipboard() {
     // Two spaces at the end of each line are for newlines in Markdown
     QString text = "";
     text += QString("Feather version: %1  \n").arg(ui->label_featherVersion->text());

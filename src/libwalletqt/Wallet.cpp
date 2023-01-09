@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2014-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "Wallet.h"
 
@@ -372,7 +372,7 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex)
         m_subaddress->refresh(m_currentSubaddressAccount);
         m_history->refresh(m_currentSubaddressAccount);
         m_coins->refresh(m_currentSubaddressAccount);
-        this->subaddressModel()->setCurrentSubaddressAcount(m_currentSubaddressAccount);
+        this->subaddressModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->coinsModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         emit currentSubaddressAccountChanged();
     }

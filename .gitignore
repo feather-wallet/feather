@@ -5,7 +5,7 @@ cmake-build-debug/*
 *.user
 *.stash
 build/*
-build*/
+guix-*
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
@@ -17,3 +17,5 @@ feather.AppDir/*
 src/assets/tor/*
 !src/assets/tor/.gitkeep
 guix-build-*
+contrib/installers/windows/setup.nsi
+githash.txt

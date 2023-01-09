@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "SendWidget.h"
 #include "ui_SendWidget.h"
@@ -11,9 +11,12 @@
 #include "utils/AppData.h"
 #include "Icons.h"
 
-#ifdef WITH_SCANNER
+#if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include "qrcode_scanner/QrCodeScanDialog.h"
 #include <QtMultimedia/QCameraInfo>
+#elif defined(WITH_SCANNER)
+#include "qrcode_scanner_qt6/QrCodeScanDialog.h"
+#include <QMediaDevices>
 #endif
 
 SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
@@ -112,7 +115,7 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::scanClicked() {
-#ifdef WITH_SCANNER
+#if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     auto cameras = QCameraInfo::availableCameras();
     if (cameras.count() < 1) {
         QMessageBox::warning(this, "QR code scanner", "No available cameras found.");
@@ -120,6 +123,17 @@ void SendWidget::scanClicked() {
     }
 
     auto *dialog = new QrCodeScanDialog(this);
+    dialog->exec();
+    ui->lineAddress->setText(dialog->decodedString);
+    dialog->deleteLater();
+#elif defined(WITH_SCANNER)
+    auto cameras = QMediaDevices::videoInputs();
+    if (cameras.empty()) {
+        QMessageBox::warning(this, "QR code scanner", "No available cameras found.");
+        return;
+    }
+
+    auto dialog = new QrCodeScanDialog(this);
     dialog->exec();
     ui->lineAddress->setText(dialog->decodedString);
     dialog->deleteLater();

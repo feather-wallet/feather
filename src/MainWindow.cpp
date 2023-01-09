@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "MainWindow.h"
 #include "ui_MainWindow.h"
@@ -45,6 +45,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     , m_ctx(new AppContext(wallet))
 {
     ui->setupUi(this);
+
+    qDebug() << "Platform tag: " << this->getPlatformTag();
 
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
@@ -103,7 +105,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
 void MainWindow::initStatusBar() {
 #if defined(Q_OS_WIN)
-    // No seperators between statusbar widgets
+    // No separators between statusbar widgets
     this->statusBar()->setStyleSheet("QStatusBar::item {border: None;}");
 #endif
 
@@ -340,7 +342,7 @@ void MainWindow::initMenu() {
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
-    connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentaton);
+    connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentation);
     connect(ui->actionReport_bug,        &QAction::triggered, this, &MainWindow::onReportBug);
     connect(ui->actionShow_debug_info,   &QAction::triggered, this, &MainWindow::showDebugInfo);
 
@@ -475,7 +477,7 @@ void MainWindow::onWalletOpened() {
             m_ctx->wallet->subaddress()->addRow(m_ctx->wallet->currentSubaddressAccount(), "");
         }
     }
-    m_ctx->wallet->subaddressModel()->setCurrentSubaddressAcount(m_ctx->wallet->currentSubaddressAccount());
+    m_ctx->wallet->subaddressModel()->setCurrentSubaddressAccount(m_ctx->wallet->currentSubaddressAccount());
 
     // history page
     m_ctx->wallet->history()->refresh(m_ctx->wallet->currentSubaddressAccount());
@@ -1499,7 +1501,7 @@ void MainWindow::onCreateDesktopEntry(bool checked) {
     QMessageBox::information(this, "Desktop entry", msg);
 }
 
-void MainWindow::onShowDocumentaton() {
+void MainWindow::onShowDocumentation() {
     Utils::externalLinkWarning(this, "https://docs.featherwallet.org");
 }
 
@@ -1518,10 +1520,22 @@ QString MainWindow::getPlatformTag() {
     return "win";
 #endif
 #ifdef Q_OS_LINUX
-    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
-        return "linux-appimage";
+    QString tag = "";
+
+    QString arch = QSysInfo::buildCpuArchitecture();
+    if (arch == "arm64") {
+        tag += "linux-arm64";
+    } else if (arch == "arm") {
+        tag += "linux-arm";
+    } else {
+        tag += "linux";
     }
-    return "linux";
+
+    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
+        tag += "-appimage";
+    }
+
+    return tag;
 #endif
     return "";
 }

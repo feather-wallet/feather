@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "TxProofDialog.h"
 #include "ui_TxProofDialog.h"
@@ -221,7 +221,7 @@ void TxProofDialog::getSignature() {
     }
 
     Utils::copyToClipboard(proof.proof);
-    QMessageBox::information(this, "Get proof singature", "Proof signature copied to clipboard");
+    QMessageBox::information(this, "Get proof signature", "Proof signature copied to clipboard");
 }
 
 TxProof TxProofDialog::getProof() {

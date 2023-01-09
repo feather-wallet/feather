@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2014-2022 The Monero Project
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #ifndef SUBADDRESSMODEL_H
 #define SUBADDRESSMODEL_H
@@ -40,7 +40,7 @@ public:
 
     Monero::SubaddressRow* entryFromIndex(const QModelIndex &index) const;
 
-    void setCurrentSubaddressAcount(quint32 accountIndex);
+    void setCurrentSubaddressAccount(quint32 accountIndex);
     int unusedLookahead() const;
 
 public slots:
@@ -52,7 +52,7 @@ private:
     QVariant parseSubaddressRow(const Monero::SubaddressRow &subaddress, const QModelIndex &index, int role) const;
 
     bool m_showFullAddresses;
-    quint32 m_currentSubaddressAcount;
+    quint32 m_currentSubaddressAccount;
 };
 
 #endif // SUBADDRESSMODEL_H

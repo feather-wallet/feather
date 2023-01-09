@@ -1,0 +1,10 @@
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -99,7 +99,6 @@ check_function_exists(_strtoi64 HAVE__STRTOI64)
+ check_function_exists(_strtoui64 HAVE__STRTOUI64)
+ check_function_exists(_unlink HAVE__UNLINK)
+ check_function_exists(arc4random HAVE_ARC4RANDOM)
+-check_function_exists(clonefile HAVE_CLONEFILE)
+ check_function_exists(explicit_bzero HAVE_EXPLICIT_BZERO)
+ check_function_exists(explicit_memset HAVE_EXPLICIT_MEMSET)
+ check_function_exists(fchmod HAVE_FCHMOD)

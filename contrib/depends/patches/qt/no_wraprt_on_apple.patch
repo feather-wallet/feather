@@ -1,0 +1,27 @@
+From da01a1fcdfffeef62024546abf03a28fc1673c9e Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Sat, 26 Nov 2022 14:07:42 +0100
+Subject: [PATCH] No WrapRT on APPLE
+
+---
+ src/corelib/CMakeLists.txt                            | 2 +-
+ src/corelib/meta_types/qt6core_release_metatypes.json | 0
+ 2 files changed, 1 insertion(+), 1 deletion(-)
+ create mode 100644 src/corelib/meta_types/qt6core_release_metatypes.json
+
+diff --git a/qtbase/src/corelib/CMakeLists.txt b/qtbase/src/corelib/CMakeLists.txt
+index c683bb46dd..c018b81cf2 100644
+--- a/qtbase/src/corelib/CMakeLists.txt
++++ b/qtbase/src/corelib/CMakeLists.txt
+@@ -1071,7 +1071,7 @@ qt_internal_extend_target(Core CONDITION QT_FEATURE_glib AND UNIX
+         GLIB2::GLIB2
+ )
+ 
+-qt_internal_extend_target(Core CONDITION QT_FEATURE_clock_gettime AND UNIX
++qt_internal_extend_target(Core CONDITION QT_FEATURE_clock_gettime AND UNIX AND NOT APPLE
+     LIBRARIES
+         WrapRt::WrapRt
+ )
+-- 
+2.38.1
+
