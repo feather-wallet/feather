@@ -60,6 +60,8 @@ def run():
         sdk_build_id = pl['ProductBuildVersion']
     print("Found MacOSX SDK (version: {sdk_version}, build id: {sdk_build_id})".format(sdk_version=sdk_version, sdk_build_id=sdk_build_id))
 
+    clang_rt = xcode_app.joinpath("Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/lib/darwin")
+
     out_name = "Xcode-{xcode_version}-{xcode_build_id}-extracted-SDK-with-libcxx-headers".format(xcode_version=xcode_version, xcode_build_id=xcode_build_id)
 
     xcode_libcxx_dir = xcode_app.joinpath("Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
@@ -109,6 +111,8 @@ def run():
                 tarfp_add_with_base_change(tarfp, sdk_dir, out_name)
                 print("Adding libc++ headers...")
                 tarfp_add_with_base_change(tarfp, xcode_libcxx_dir, "{}/usr/include/c++/v1".format(out_name))
+                print("Adding clang_rt libraries")
+                tarfp_add_with_base_change(tarfp, clang_rt, "{}/lib/darwin".format(out_name))
     print("Done! Find the resulting gzipped tarball at:")
     print(out_sdktgz_path.resolve())
 

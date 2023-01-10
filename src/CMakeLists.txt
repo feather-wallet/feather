@@ -284,6 +284,12 @@ if(STATIC AND NOT Qt6_FOUND)
     endif()
 endif()
 
+if(DEPENDS AND APPLE)
+    # TODO: Needed for ___isOSVersionAtLeast
+    target_link_libraries(feather
+            ${CMAKE_OSX_SYSROOT}/lib/darwin/libclang_rt.osx.a)
+endif()
+
 install(TARGETS feather
         DESTINATION ${CMAKE_INSTALL_PREFIX}
 )

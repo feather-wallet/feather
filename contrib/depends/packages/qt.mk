@@ -263,7 +263,6 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no_pthread_cond_clockwait.patch && \
   patch -p1 -i $($(package)_patch_dir)/windows_func_fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_wraprt_on_apple.patch && \
-  patch -p1 -i $($(package)_patch_dir)/___isOSVersionAtLeast_hack.patch && \
   mv $($(package)_patch_dir)/WindowsToolchain.cmake . && \
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
