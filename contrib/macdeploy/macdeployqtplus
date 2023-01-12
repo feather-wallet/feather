@@ -425,7 +425,7 @@ if os.path.exists(appname + ".temp.dmg"):
 
 # ------------------------------------------------
 
-target = os.path.join("dist", "feather.app")
+target = os.path.join("dist", "Feather.app")
 
 print("+ Copying source bundle +")
 if verbose:
@@ -533,7 +533,7 @@ ds['.']['icvp'] = icvp
 ds['.']['vSrn'] = ('long', 1)
 
 ds['Applications']['Iloc'] = (370, 156)
-ds['feather.app']['Iloc'] = (128, 156)
+ds['Feather.app']['Iloc'] = (128, 156)
 
 ds.flush()
 ds.close()

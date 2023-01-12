@@ -266,7 +266,7 @@ add_subdirectory(src)
 configure_file("${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi.in" "${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi" @ONLY)
 
 if(APPLE AND CMAKE_CROSSCOMPILING)
-    set(macos_app "feather.app")
+    set(macos_app "Feather.app")
     configure_file(contrib/macdeploy/background.tiff contrib/macdeploy/background.tiff COPYONLY)
     configure_file(contrib/macdeploy/Info.plist.in ${macos_app}/Contents/Info.plist @ONLY)
     configure_file(src/assets/images/appicons/appicon.icns ${macos_app}/Contents/Resources/appicon.icns COPYONLY)
