@@ -14,7 +14,6 @@ $(package)_patches += dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += gnueabihfToolchain.cmake
 $(package)_patches += guix_cross_lib_path.patch
-$(package)_patches += ___isOSVersionAtLeast_hack.patch
 $(package)_patches += mac-qmake.conf
 $(package)_patches += MacToolchain.cmake
 $(package)_patches += no_pthread_cond_clockwait.patch
