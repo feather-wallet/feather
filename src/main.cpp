@@ -37,11 +37,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
-// Disable High DPI scaling on Linux for now
-#if defined(Q_OS_LINUX)
-    qputenv("QT_ENABLE_HIGHDPI_SCALING", "0");
-#endif
-
     QStringList argv_;
     for(int i = 0; i != argc; i++){
         argv_ << QString::fromStdString(argv[i]);
@@ -96,10 +91,16 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QApplication::setDesktopSettingsAware(true); // use system font
     QApplication::setApplicationVersion(FEATHER_VERSION);
 
+#if defined(Q_OS_LINUX)
+    // PassThrough results in muddy text
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+#endif
+
     SingleApplication app(argc, argv);
 
     QApplication::setQuitOnLastWindowClosed(false);
     QApplication::setApplicationName("FeatherWallet");
+
 
     // Setup config directories
     QString configDir = Config::defaultConfigDir().path();
