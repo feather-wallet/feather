@@ -132,7 +132,7 @@ void WalletWizard::onCreateWallet() {
         m_wizardFields.seed.restoreHeight = currentBlockHeight;
     }
 
-    if (m_wizardFields.mode == WizardMode::RestoreFromSeed && m_wizardFields.seedType == Seed::Type::MONERO) {
+    if (m_wizardFields.mode == WizardMode::RestoreFromSeed && (m_wizardFields.seedType == Seed::Type::MONERO || m_wizardFields.seedCreationDateOverridden)) {
         m_wizardFields.seed.setRestoreHeight(m_wizardFields.restoreHeight);
     }
 

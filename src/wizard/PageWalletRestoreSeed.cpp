@@ -57,8 +57,6 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
 
     connect(ui->seedBtnGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &PageWalletRestoreSeed::onSeedTypeToggled);
     connect(ui->combo_seedLanguage, &QComboBox::currentTextChanged, this, &PageWalletRestoreSeed::onSeedLanguageChanged);
-
-    this->onSeedTypeToggled();
 }
 
 
@@ -68,18 +66,21 @@ void PageWalletRestoreSeed::onSeedTypeToggled() {
         m_fields->seedType = Seed::Type::POLYSEED;
         ui->seedEdit->setPlaceholderText("Enter 16 word seed..");
         ui->group_seedLanguage->hide();
+        ui->check_overrideCreationDate->setVisible(true);
     }
     if (ui->radio14->isChecked()) {
         m_mode = &m_tevador;
         m_fields->seedType = Seed::Type::TEVADOR;
         ui->seedEdit->setPlaceholderText("Enter 14 word seed..");
         ui->group_seedLanguage->hide();
+        ui->check_overrideCreationDate->setVisible(true);
     }
     else if (ui->radio25->isChecked()) {
         m_mode = &m_legacy;
         m_fields->seedType = Seed::Type::MONERO;
         ui->seedEdit->setPlaceholderText("Enter 25 word seed..");
         ui->group_seedLanguage->show();
+        ui->check_overrideCreationDate->setVisible(false);
     }
 
     ui->label_errorString->hide();
@@ -94,7 +95,7 @@ void PageWalletRestoreSeed::onSeedLanguageChanged(const QString &language) {
 }
 
 int PageWalletRestoreSeed::nextId() const {
-    if (m_mode == &m_legacy) {
+    if (m_mode == &m_legacy || ui->check_overrideCreationDate->isChecked()) {
         return WalletWizard::Page_SetRestoreHeight;
     }
 
@@ -107,6 +108,10 @@ void PageWalletRestoreSeed::initializePage() {
     ui->seedEdit->setStyleSheet("");
     ui->label_errorString->hide();
     ui->line_seedOffset->setText("");
+    ui->check_overrideCreationDate->setVisible(false);
+    ui->check_overrideCreationDate->setChecked(false);
+    ui->radio16->isChecked();
+    this->onSeedTypeToggled();
 }
 
 bool PageWalletRestoreSeed::validatePage() {
@@ -157,6 +162,7 @@ bool PageWalletRestoreSeed::validatePage() {
 
     m_fields->seed = _seed;
     m_fields->seedOffsetPassphrase = ui->line_seedOffset->text();
+    m_fields->seedCreationDateOverridden = ui->check_overrideCreationDate->isChecked();
 
     return true;
 }

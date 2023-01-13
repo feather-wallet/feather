@@ -45,6 +45,12 @@ void PageSetRestoreHeight::initializePage() {
     ui->line_restoreHeight->setText("");
     ui->frame_scanWarning->hide();
     ui->frame_walletAgeWarning->hide();
+
+    if (m_fields->seedCreationDateOverridden) {
+        auto creationDate = QDateTime::fromSecsSinceEpoch(m_fields->seed.time);
+        ui->line_creationDate->setText(creationDate.toString("yyyy-MM-dd"));
+        this->onCreationDateEdited();
+    }
 }
 
 void PageSetRestoreHeight::onCreationDateEdited() {

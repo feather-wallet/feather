@@ -32,6 +32,7 @@ struct WizardFields {
     QString walletDir;
     Seed seed;
     bool seedOffsetPassphraseEnabled = false;
+    bool seedCreationDateOverridden = false;
     QString seedOffsetPassphrase;
     QString seedLanguage = constants::seedLanguage;
     QString password;

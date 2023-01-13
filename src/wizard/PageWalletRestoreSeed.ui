@@ -112,6 +112,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="check_overrideCreationDate">
+     <property name="text">
+      <string>Override embedded wallet creation date</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="label_errorString">
      <property name="text">
       <string>errorString</string>
