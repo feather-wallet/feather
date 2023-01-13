@@ -4,6 +4,8 @@
 #include "AboutDialog.h"
 #include "ui_AboutDialog.h"
 
+#include <QMessageBox>
+
 #include "config-feather.h"
 #include "utils/Utils.h"
 
@@ -26,6 +28,10 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");
     auto ack_text = Utils::barrayToString(ack);
     ui->ackText->setText(ack_text);
+
+    connect(ui->aboutImage, &ClickableLabel::clicked, [this](){
+        QMessageBox::information(this, "...", "Foxes don't have feathers.");
+    });
 
     this->adjustSize();
 }
