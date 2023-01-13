@@ -1,29 +1,23 @@
 {
   "mainnet": {
     "tor": [
-      "sfprpc5klzs5vyitq2mrooicgk2wcs5ho2nm3niqduvzn5o6ylaslaqd.onion:18089",
       "sfprpc2fws6ltnq4hyr7lvpul3nank5layd7q7tyc5h4gy4h77gtabad.onion:18089",
-      "majesticrepik35vnngouksfl7jiwf6sj7s2doj3bvdffq27tgqoeayd.onion:18089",
-      "mxcd4577fldb3ppzy7obmmhnu3tf57gbcbd4qhwr2kxyjj2qi3dnbfqd.onion:18081",
       "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
       "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
       "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089",
-      "rino4muoj3zk223twblr53hwt4ukqemjqw4fbiwdcrqqevcrclpuzyyd.onion:18081",
       "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
-      "ghziyspoobhmp5oun2xcomrmetqiwbvuaegmte3s47nnqv7hkaa64sid.onion:18089",
-      "xmrnodesarnt4w35aqmu66aart3o324yw6qbnv6pglpof6uqaydzk5id.onion:18081",
-      "usexmr2eeexmlwpuvsfe6tyjmdqliplb2b7uxju6yrrziq3n7fksnxyd.onion:18081",
       "mhfsxznn5pi4xuxohj5k7unqp73sa6d44mbeewbpxnm25z3wzfogcfyd.onion:18081",
       "7inib34hqn2ocmlaaxjshdavbdn5w5rfdff735lbz33765j2pz3tn4ad.onion:18081",
       "qz43zul2x56jexzoqgkx2trzwcfnr6l3hbtfcfx54g4r3eahy3bssjyd.onion:18089",
       "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:18089",
       "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18089",
-      "cakexmrl7bonq7ovjka5kuwuyd3f7qnkz6z6s6dmsy3uckwra7bvggyd.onion:18081"
+      "cakexmrl7bonq7ovjka5kuwuyd3f7qnkz6z6s6dmsy3uckwra7bvggyd.onion:18081",
+      "rino4muoj3zk223twblr53hwt4ukqemjqw4fbiwdcrqqevcrclpuzyyd.onion:18081",
+      "majesticrepik35vnngouksfl7jiwf6sj7s2doj3bvdffq27tgqoeayd.onion:18089"
     ],
     "clearnet": [
       "node.community.rino.io:18081",
       "node.sethforprivacy.com:18089",
-      "node2.sethforprivacy.com:18089",
       "selsta1.featherwallet.net:18081",
       "selsta2.featherwallet.net:18081",
       "node.monerooutreach.org:18081",
@@ -31,10 +25,8 @@
       "node.majesticbank.su:18089",
       "xmr-node-eu.cakewallet.com:18081",
       "xmr-node-usa-east.cakewallet.com:18081",
-      "canada.node.xmr.pm:18089",
       "singapore.node.xmr.pm:18089",
       "nodes.hashvault.pro:18081",
-      "node.supportxmr.com:18081",
       "node.xmr.ru:18081",
       "node.monerodevs.org:18089",
       "node2.monerodevs.org:18089"
