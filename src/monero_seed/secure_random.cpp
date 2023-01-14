@@ -6,6 +6,7 @@
 #include <monero_seed/secure_random.hpp>
 #include <stdexcept>
 #include <cstdlib>
+#include <errno.h>
 
 #if defined(_WIN32) || defined(__CYGWIN__)
 	#define WINAPI
