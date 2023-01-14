@@ -40,7 +40,7 @@ private:
     QUrl m_url;
     QTimer m_pingTimer;
     QTimer m_connectionTimeout;
-    int m_timeout = 10;
+    int m_timeout = 20;
     int m_websocketUrlIndex = 0;
     bool m_stopped = false;
 };

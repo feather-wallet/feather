@@ -97,6 +97,7 @@ void WebsocketClient::nextWebsocketUrl() {
 void WebsocketClient::onConnectionTimeout() {
     qWarning() << "Websocket connection timeout";
     m_timeout = std::min(m_timeout + 5, 60);
+    m_connectionTimeout.setInterval(m_timeout*1000);
     this->onDisconnected();
 }
 
