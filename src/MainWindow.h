@@ -14,6 +14,7 @@
 #include "SettingsDialog.h"
 
 #include "dialog/AboutDialog.h"
+#include "dialog/AccountSwitcherDialog.h"
 #include "dialog/SignVerifyDialog.h"
 #include "dialog/VerifyProofDialog.h"
 #include "dialog/SeedDialog.h"
@@ -230,6 +231,7 @@ private:
 
     CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;
+    AccountSwitcherDialog *m_accountSwitcherDialog = nullptr;
 
 #ifdef HAS_XMRIG
     XMRigWidget *m_xmrig = nullptr;

@@ -10,7 +10,6 @@
 
 #include "config-feather.h"
 #include "constants.h"
-#include "dialog/AccountSwitcherDialog.h"
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
 #include "dialog/PasswordDialog.h"
@@ -53,6 +52,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
+    m_accountSwitcherDialog = new AccountSwitcherDialog(m_ctx, this);
 
     this->restoreGeo();
 
@@ -1030,8 +1030,7 @@ void MainWindow::showWalletCacheDebugDialog() {
 }
 
 void MainWindow::showAccountSwitcherDialog() {
-    AccountSwitcherDialog dialog{m_ctx, this};
-    dialog.exec();
+    m_accountSwitcherDialog->show();
 }
 
 void MainWindow::showAddressChecker() {
