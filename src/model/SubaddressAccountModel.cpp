@@ -76,6 +76,9 @@ QVariant SubaddressAccountModel::parseSubaddressAccountRow(const Monero::Subaddr
 {
     switch (index.column()) {
         case Number:
+            if (role == Qt::UserRole) {
+                return index.row();
+            }
             return QString("#%1").arg(QString::number(index.row()));
         case Address:
             return QString::fromStdString(row.getAddress());
@@ -152,4 +155,5 @@ Monero::SubaddressAccountRow* SubaddressAccountModel::entryFromIndex(const QMode
 SubaddressAccountProxyModel::SubaddressAccountProxyModel(QObject *parent)
     : QSortFilterProxyModel(parent)
 {
+    setSortRole(Qt::UserRole);
 }
