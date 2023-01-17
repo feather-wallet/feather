@@ -78,7 +78,6 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
     if (tls) {
         arguments << "--tls";
     }
-    arguments << "--donate-level" << "1";
     QString cmd = QString("%1 %2").arg(path, arguments.join(" "));
     emit output(cmd.toUtf8());
 
