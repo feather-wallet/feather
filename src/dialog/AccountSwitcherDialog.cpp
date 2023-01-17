@@ -54,22 +54,28 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
 }
 
 void AccountSwitcherDialog::switchAccount() {
-    QModelIndex index = ui->accounts->currentIndex();
-    m_ctx->wallet->switchSubaddressAccount(index.row());
+    auto row = this->currentEntry();
+    if (!row) {
+        return;
+    }
+
+    m_ctx->wallet->switchSubaddressAccount(row->getRowId());
 }
 
 void AccountSwitcherDialog::copyLabel() {
     auto row = this->currentEntry();
-    if (!row)
+    if (!row) {
         return;
+    }
 
     Utils::copyToClipboard(QString::fromStdString(row->getLabel()));
 }
 
 void AccountSwitcherDialog::copyBalance() {
     auto row = this->currentEntry();
-    if (!row)
+    if (!row) {
         return;
+    }
 
     Utils::copyToClipboard(QString::fromStdString(row->getBalance()));
 }
@@ -101,7 +107,7 @@ void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
 }
 
 Monero::SubaddressAccountRow* AccountSwitcherDialog::currentEntry() {
-    QModelIndex index = ui->accounts->currentIndex();
+    QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
     return m_ctx->wallet->subaddressAccountModel()->entryFromIndex(index);
 }
 
