@@ -34,6 +34,7 @@
 #include "widgets/CCSWidget.h"
 #include "widgets/RedditWidget.h"
 #include "widgets/TickerWidget.h"
+#include "widgets/WalletUnlockWidget.h"
 #include "wizard/WalletWizard.h"
 
 #include "ContactsWidget.h"
@@ -221,6 +222,9 @@ private:
     void fillSendTab(const QString &address, const QString &description);
     void userActivity();
     void checkUserActivity();
+    void lockWallet();
+    void unlockWallet(const QString &password);
+    void closeQDialogChildren(QObject *object);
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();
@@ -233,6 +237,7 @@ private:
     SplashDialog *m_splashDialog = nullptr;
     AccountSwitcherDialog *m_accountSwitcherDialog = nullptr;
 
+    WalletUnlockWidget *m_walletUnlockWidget = nullptr;
 #ifdef HAS_XMRIG
     XMRigWidget *m_xmrig = nullptr;
 #endif
@@ -277,6 +282,7 @@ private:
     QTimer m_txTimer;
 
     bool cleanedUp = false;
+    bool m_locked = false;
     bool m_criticalWarningShown = false;
 
     EventFilter *m_eventFilter = nullptr;

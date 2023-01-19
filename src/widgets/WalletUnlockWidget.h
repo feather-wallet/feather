@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
+
+#ifndef FEATHER_WALLETUNLOCKWIDGET_H
+#define FEATHER_WALLETUNLOCKWIDGET_H
+
+#include <QWidget>
+#include <QMenu>
+
+namespace Ui {
+    class WalletUnlockWidget;
+}
+
+class WalletUnlockWidget : public QWidget
+{
+Q_OBJECT
+
+public:
+    explicit WalletUnlockWidget(QWidget *parent = nullptr);
+    ~WalletUnlockWidget();
+
+    void setWalletName(const QString &walletName);
+    void reset();
+    void incorrectPassword();
+
+signals:
+    void unlockWallet(const QString &password);
+    void closeWallet();
+
+private slots:
+    void tryUnlock();
+
+protected:
+    void keyPressEvent(QKeyEvent* e) override;
+
+private:
+    QScopedPointer<Ui::WalletUnlockWidget> ui;
+};
+
+#endif //FEATHER_WALLETUNLOCKWIDGET_H

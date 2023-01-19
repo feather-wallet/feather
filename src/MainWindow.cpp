@@ -224,6 +224,15 @@ void MainWindow::initWidgets() {
     connect(ui->btn_resetCoinControl, &QPushButton::clicked, [this]{
        m_ctx->setSelectedInputs({});
     });
+
+    m_walletUnlockWidget = new WalletUnlockWidget(this);
+    m_walletUnlockWidget->setWalletName(this->walletName());
+    ui->walletUnlockLayout->addWidget(m_walletUnlockWidget);
+
+    connect(m_walletUnlockWidget, &WalletUnlockWidget::closeWallet, this, &MainWindow::close);
+    connect(m_walletUnlockWidget, &WalletUnlockWidget::unlockWallet, this, &MainWindow::unlockWallet);
+
+    ui->stackedWidget->setCurrentIndex(0);
 }
 
 void MainWindow::initMenu() {
@@ -231,6 +240,7 @@ void MainWindow::initMenu() {
     // [File]
     connect(ui->actionOpen,        &QAction::triggered, this, &MainWindow::menuOpenClicked);
     connect(ui->actionNew_Restore, &QAction::triggered, this, &MainWindow::menuNewRestoreClicked);
+    connect(ui->actionLock,        &QAction::triggered, this, &MainWindow::lockWallet);
     connect(ui->actionClose,       &QAction::triggered, this, &MainWindow::menuWalletCloseClicked); // Close current wallet
     connect(ui->actionQuit,        &QAction::triggered, this, &MainWindow::menuQuitClicked);        // Quit application
     connect(ui->actionSettings,    &QAction::triggered, this, &MainWindow::menuSettingsClicked);
@@ -352,6 +362,7 @@ void MainWindow::initMenu() {
     ui->actionRefresh_tabs->setShortcut(QKeySequence("Ctrl+R"));
     ui->actionOpen->setShortcut(QKeySequence("Ctrl+O"));
     ui->actionNew_Restore->setShortcut(QKeySequence("Ctrl+N"));
+    ui->actionLock->setShortcut(QKeySequence("Ctrl+L"));
     ui->actionClose->setShortcut(QKeySequence("Ctrl+W"));
     ui->actionShow_debug_info->setShortcut(QKeySequence("Ctrl+D"));
     ui->actionSettings->setShortcut(QKeySequence("Ctrl+Alt+S"));
@@ -1655,6 +1666,16 @@ void MainWindow::userActivity() {
     m_userLastActive = QDateTime::currentSecsSinceEpoch();
 }
 
+void MainWindow::closeQDialogChildren(QObject *object) {
+    for (QObject *child : object->children()) {
+        if (auto *childDlg = dynamic_cast<QDialog*>(child)) {
+            qDebug() << "Closing dialog: " << childDlg->objectName();
+            childDlg->close();
+        }
+        this->closeQDialogChildren(child);
+    }
+}
+
 void MainWindow::checkUserActivity() {
     if (!config()->get(Config::inactivityLockEnabled).toBool()) {
         return;
@@ -1665,32 +1686,54 @@ void MainWindow::checkUserActivity() {
     }
 
     if ((m_userLastActive + (config()->get(Config::inactivityLockTimeout).toInt()*60)) < QDateTime::currentSecsSinceEpoch()) {
-        m_checkUserActivity.stop();
         qInfo() << "Locking wallet for inactivity";
-        ui->tabWidget->hide();
-        this->statusBar()->hide();
-        this->menuBar()->hide();
-        if (!this->verifyPassword(false)) {
-            this->setEnabled(false);
-            this->close();
-            // This doesn't close the wallet immediately.
-            // FIXME
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            do {
-#endif
-                QApplication::processEvents();
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-            // Because running it a single time is apparently not enough.
-            // TODO: Qt bug? Need proper fix for this.
-            } while (QApplication::hasPendingEvents());
-#endif
-        } else {
-            ui->tabWidget->show();
-            this->statusBar()->show();
-            this->menuBar()->show();
-            m_checkUserActivity.start();
-        }
+        this->lockWallet();
     }
+}
+
+void MainWindow::lockWallet() {
+    if (m_locked) {
+        return;
+    }
+
+    if (m_constructingTransaction) {
+        QMessageBox::warning(this, "Lock wallet", "Unable to lock wallet during transaction construction");
+        return;
+    }
+    m_walletUnlockWidget->reset();
+
+    // Close all open QDialogs
+    this->closeQDialogChildren(this);
+
+    ui->tabWidget->hide();
+    this->statusBar()->hide();
+    this->menuBar()->hide();
+    ui->stackedWidget->setCurrentIndex(1);
+
+    m_checkUserActivity.stop();
+
+    m_locked = true;
+}
+
+void MainWindow::unlockWallet(const QString &password) {
+    if (!m_locked) {
+        return;
+    }
+
+    if (password != m_ctx->wallet->getPassword()) {
+        m_walletUnlockWidget->incorrectPassword();
+        return;
+    }
+    m_walletUnlockWidget->reset();
+
+    ui->tabWidget->show();
+    this->statusBar()->show();
+    this->menuBar()->show();
+    ui->stackedWidget->setCurrentIndex(0);
+
+    m_checkUserActivity.start();
+
+    m_locked = false;
 }
 
 void MainWindow::toggleSearchbar(bool visible) {
