@@ -5,7 +5,7 @@ cmake-build-debug/*
 *.user
 *.stash
 build/*
-guix-*
+guix-build-*
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
