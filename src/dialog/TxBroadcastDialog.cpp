@@ -46,15 +46,18 @@ void TxBroadcastDialog::broadcastTx() {
 }
 
 void TxBroadcastDialog::onApiResponse(const DaemonRpc::DaemonResponse &resp) {
+    if (resp.endpoint != DaemonRpc::Endpoint::SEND_RAW_TRANSACTION) {
+        return;
+    }
+
     if (!resp.ok) {
         QMessageBox::warning(this, "Transaction broadcast", resp.status);
         return;
     }
 
-    if (resp.endpoint == DaemonRpc::Endpoint::SEND_RAW_TRANSACTION) {
-        QMessageBox::information(this, "Transaction broadcast", "Transaction submitted successfully.\n\n"
-                                                      "If the transaction belongs to this wallet it may take several minutes before it shows up in the history tab.");
-    }
+    this->accept();
+    QMessageBox::information(this, "Transaction broadcast", "Transaction submitted successfully.\n\n"
+                                                            "If the transaction belongs to this wallet it may take several minutes before it shows up in the history tab.");
 }
 
 TxBroadcastDialog::~TxBroadcastDialog() = default;
