@@ -26,6 +26,14 @@ apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-
     libx11-xcb-dev libprotobuf-dev libhidapi-dev
 ```
 
+#### Void Linux
+
+```bash
+xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodium-devel libzbar-devel zlib-devel qt6-base-devel \
+                qt6-svg-devel qt6-websockets-devel qt6-multimedia-devel libgcrypt-devel libzip-devel hidapi-devel protobuf \
+                protobuf-devel qrencode-devel
+```
+
 #### macOS
 
 For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies.
@@ -52,6 +60,14 @@ systemctl enable --now tor
 ```bash
 apt update && apt install tor
 systemctl enable --now tor
+```
+
+#### Void Linux
+
+```bash
+xbps-install tor
+ln -s /etc/sv/tor /var/service/.
+sv start tor
 ```
 
 #### macOS
@@ -93,11 +109,13 @@ After the target is configured, `Run -> Run 'feather'` or press Shift + F10 to b
 To build Feather without an IDE:
 
 ```bash
-mkdir build && \
-cd build && \
-cmake .. && \
+mkdir build
+cd build
+cmake ..
 cmake --build . -j $(nproc)
 ```
+
+On platforms without `execinfo.h` use `cmake -DSTACK_TRACE:BOOL=OFF ..` instead of `cmake ..`
 
 ### CMake
 
