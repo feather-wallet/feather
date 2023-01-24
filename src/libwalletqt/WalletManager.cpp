@@ -110,7 +110,7 @@ void WalletManager::openWalletAsync(const QString &path, const QString &password
 }
 
 
-Wallet *WalletManager::recoveryWallet(const QString &path, const QString &password, const QString &seed, const QString &seed_offset, NetworkType::Type nettype, quint64 restoreHeight, quint64 kdfRounds)
+Wallet *WalletManager::recoveryWallet(const QString &path, const QString &password, const QString &seed, const QString &seed_offset, NetworkType::Type nettype, quint64 restoreHeight, quint64 kdfRounds, const QString &subaddressLookahead)
 {
     QMutexLocker locker(&m_mutex);
 
@@ -120,20 +120,21 @@ Wallet *WalletManager::recoveryWallet(const QString &path, const QString &passwo
 
 Wallet *WalletManager::createWalletFromKeys(const QString &path, const QString &password, const QString &language,
                                             NetworkType::Type nettype, const QString &address, const QString &viewkey,
-                                            const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds)
+                                            const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds, const QString &subaddressLookahead)
 {
     QMutexLocker locker(&m_mutex);
     Monero::Wallet * w = m_pimpl->createWalletFromKeys(path.toStdString(), password.toStdString(), language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
-                                                       address.toStdString(), viewkey.toStdString(), spendkey.toStdString(), kdfRounds);
+                                                       address.toStdString(), viewkey.toStdString(), spendkey.toStdString(), kdfRounds, subaddressLookahead.toStdString());
     return new Wallet(w);
 }
 
 Wallet *WalletManager::createDeterministicWalletFromSpendKey(const QString &path, const QString &password, const QString &language, NetworkType::Type nettype,
-                                                             const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds, const QString &offset_passphrase)
+                                                             const QString &spendkey, quint64 restoreHeight, quint64 kdfRounds, const QString &offset_passphrase,
+                                                             const QString &subaddressLookahead)
 {
     QMutexLocker locker(&m_mutex);
     Monero::Wallet * w = m_pimpl->createDeterministicWalletFromSpendKey(path.toStdString(), password.toStdString(), language.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight,
-                                                                        spendkey.toStdString(), kdfRounds, offset_passphrase.toStdString());
+                                                                        spendkey.toStdString(), kdfRounds, offset_passphrase.toStdString(), subaddressLookahead.toStdString());
     return new Wallet(w);
 }
 

@@ -251,7 +251,7 @@ bool WindowManager::autoOpenWallet() {
 // ######################## WALLET CREATION ########################
 
 void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage,
-                                    const QString &seedOffset) {
+                                    const QString &seedOffset, const QString &subaddressLookahead) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
         this->handleWalletError(err);
@@ -265,7 +265,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
 
     Wallet *wallet = nullptr;
     if (seed.type == Seed::Type::POLYSEED || seed.type == Seed::Type::TEVADOR) {
-        wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, constants::networkType, seed.spendKey, seed.restoreHeight, constants::kdfRounds, seedOffset);
+        wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, constants::networkType, seed.spendKey, seed.restoreHeight, constants::kdfRounds, seedOffset, subaddressLookahead);
     }
     else if (seed.type == Seed::Type::MONERO) {
         wallet = m_walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, constants::networkType, seed.restoreHeight, constants::kdfRounds);
@@ -282,7 +282,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     this->onWalletOpened(wallet);
 }
 
-void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight)
+void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead)
 {
     if (Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
@@ -291,11 +291,11 @@ void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString
     }
 
     m_openingWallet = true;
-    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, deviceName, restoreHeight);
+    m_walletManager->createWalletFromDeviceAsync(path, password, constants::networkType, deviceName, restoreHeight, subaddressLookahead);
 }
 
 void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address,
-                                            const QString &viewkey, const QString &spendkey, quint64 restoreHeight) {
+                                            const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString &subaddressLookahead) {
     if (Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
         this->handleWalletError(err);
@@ -320,7 +320,7 @@ void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &
         return;
     }
 
-    Wallet *wallet = m_walletManager->createWalletFromKeys(path, password, constants::seedLanguage, constants::networkType, address, viewkey, spendkey, restoreHeight);
+    Wallet *wallet = m_walletManager->createWalletFromKeys(path, password, constants::seedLanguage, constants::networkType, address, viewkey, spendkey, restoreHeight, constants::kdfRounds, subaddressLookahead);
     m_openingWallet = true;
     m_walletManager->walletOpened(wallet);
 }

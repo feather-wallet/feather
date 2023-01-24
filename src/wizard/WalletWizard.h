@@ -31,8 +31,9 @@ struct WizardFields {
     QString walletName;
     QString walletDir;
     Seed seed;
-    bool seedOffsetPassphraseEnabled = false;
-    bool seedCreationDateOverridden = false;
+    bool showSetSeedPassphrasePage = false;
+    bool showSetRestoreHeightPage = false;
+    bool showSetSubaddressLookaheadPage = false;
     QString seedOffsetPassphrase;
     QString seedLanguage = constants::seedLanguage;
     QString password;
@@ -44,9 +45,23 @@ struct WizardFields {
     int restoreHeight = 0;
     Seed::Type seedType;
     DeviceType deviceType;
+    QString subaddressLookahead;
+
+    void clearFields() {
+        showSetSeedPassphrasePage = false;
+        showSetRestoreHeightPage = false;
+        showSetSubaddressLookaheadPage = false;
+        seedOffsetPassphrase = "";
+        password = "";
+        address = "";
+        secretViewKey = "";
+        secretSpendKey = "";
+        restoreHeight = 0;
+        subaddressLookahead = "";
+    }
 
     WizardFields(): deviceType(DeviceType::LEDGER), mode(WizardMode::CreateWallet),
-    seedType(Seed::POLYSEED), seedOffsetPassphraseEnabled(false), restoreHeight(0) {}
+                    seedType(Seed::POLYSEED), restoreHeight(0) {}
 };
 
 class WalletWizard : public QWizard
@@ -55,11 +70,12 @@ class WalletWizard : public QWizard
 
 public:
     enum Page {
-        Page_Menu,
+        Page_Menu = 0,
         Page_WalletFile,
         Page_CreateWalletSeed,
         Page_SetSeedPassphrase,
         Page_SetPasswordPage,
+        Page_SetSubaddressLookahead,
         Page_OpenWallet,
         Page_Network,
         Page_WalletRestoreSeed,
@@ -79,9 +95,9 @@ signals:
     void openWallet(QString path, QString password);
     void defaultWalletDirChanged(QString walletDir);
 
-    void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight);
-    void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, bool deterministic = false);
-    void createWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset = "");
+    void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead);
+    void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString subaddressLookahead = "");
+    void createWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset = "", const QString &subaddressLookahead = "");
 
 private slots:
     void onCreateWallet();

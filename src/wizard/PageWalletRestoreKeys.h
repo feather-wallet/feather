@@ -28,6 +28,8 @@ public:
     int nextId() const override;
 
 private:
+    void onOptionsClicked();
+
     Ui::PageWalletRestoreKeys *ui;
     WizardFields *m_fields;
 };

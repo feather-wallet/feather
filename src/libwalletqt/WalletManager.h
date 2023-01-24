@@ -44,7 +44,7 @@ public:
     void openWalletAsync(const QString &path, const QString &password, NetworkType::Type nettype = NetworkType::MAINNET, quint64 kdfRounds = 1, const QString &ringDatabasePath = "");
 
     Wallet * recoveryWallet(const QString &path, const QString &password, const QString &seed, const QString &seed_offset,
-                            NetworkType::Type nettype = NetworkType::MAINNET, quint64 restoreHeight = 0, quint64 kdfRounds = 1);
+                            NetworkType::Type nettype = NetworkType::MAINNET, quint64 restoreHeight = 0, quint64 kdfRounds = 1, const QString &subaddressLookahead = "");
 
     Wallet * createWalletFromKeys(const QString &path,
                                   const QString &password,
@@ -54,7 +54,9 @@ public:
                                   const QString &viewkey,
                                   const QString &spendkey = "",
                                   quint64 restoreHeight = 0,
-                                  quint64 kdfRounds = 1);
+                                  quint64 kdfRounds = 1,
+                                  const QString &subaddressLookahead = ""
+                                  );
 
     Wallet * createDeterministicWalletFromSpendKey(const QString &path,
                                                    const QString &password,
@@ -63,7 +65,8 @@ public:
                                                    const QString &spendkey,
                                                    quint64 restoreHeight,
                                                    quint64 kdfRounds,
-                                                   const QString &offset_passphrase = "");
+                                                   const QString &offset_passphrase = "",
+                                                   const QString &subaddressLookahead = "");
 
     Wallet * createWalletFromDevice(const QString &path,
                                     const QString &password,

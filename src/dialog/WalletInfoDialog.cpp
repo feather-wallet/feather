@@ -19,6 +19,7 @@ WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *pare
     ui->label_netType->setText(Utils::QtEnumToString(m_ctx->wallet->nettype()));
     ui->label_seedType->setText(QString("%1 word").arg(m_ctx->wallet->seedLength()));
     ui->label_viewOnly->setText(m_ctx->wallet->viewOnly() ? "True" : "False");
+    ui->label_subaddressLookahead->setText(m_ctx->wallet->getSubaddressLookahead());
     ui->label_keysFile->setText(m_ctx->wallet->keysPath());
     ui->label_cacheFile->setText(m_ctx->wallet->cachePath());
     ui->label_cacheSize->setText(QString("%1 MB").arg(QString::number(cache.size() / 1e6, 'f', 2)));

@@ -50,6 +50,7 @@ private:
 
     void onSeedTypeToggled();
     void onSeedLanguageChanged(const QString &language);
+    void onOptionsClicked();
 
     Ui::PageWalletRestoreSeed *ui;
     WizardFields *m_fields;

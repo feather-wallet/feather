@@ -25,5 +25,9 @@ bool PageSetSeedPassphrase::validatePage() {
 }
 
 int PageSetSeedPassphrase::nextId() const {
+    if (m_fields->showSetSubaddressLookaheadPage) {
+        return WalletWizard::Page_SetSubaddressLookahead;
+    }
+
     return WalletWizard::Page_WalletFile;
 }

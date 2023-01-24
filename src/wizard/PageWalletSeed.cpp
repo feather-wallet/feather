@@ -94,9 +94,10 @@ void PageWalletSeed::displaySeed(const QString &seed){
 
 void PageWalletSeed::onOptionsClicked() {
     QDialog dialog(this);
+    dialog.setWindowTitle("Options");
     QVBoxLayout layout;
     QCheckBox checkbox("Extend this seed with a passphrase");
-    checkbox.setChecked(m_fields->seedOffsetPassphraseEnabled);
+    checkbox.setChecked(m_fields->showSetSeedPassphrasePage);
     layout.addWidget(&checkbox);
     QDialogButtonBox buttons(QDialogButtonBox::Ok);
     layout.addWidget(&buttons);
@@ -105,11 +106,11 @@ void PageWalletSeed::onOptionsClicked() {
         dialog.close();
     });
     dialog.exec();
-    m_fields->seedOffsetPassphraseEnabled = checkbox.isChecked();
+    m_fields->showSetSeedPassphrasePage = checkbox.isChecked();
 }
 
 int PageWalletSeed::nextId() const {
-    if (m_fields->seedOffsetPassphraseEnabled) {
+    if (m_fields->showSetSeedPassphrasePage) {
         return WalletWizard::Page_SetSeedPassphrase;
     }
     return WalletWizard::Page_WalletFile;

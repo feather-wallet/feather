@@ -46,7 +46,7 @@ void PageSetRestoreHeight::initializePage() {
     ui->frame_scanWarning->hide();
     ui->frame_walletAgeWarning->hide();
 
-    if (m_fields->seedCreationDateOverridden) {
+    if (m_fields->showSetRestoreHeightPage && m_fields->mode == WizardMode::RestoreFromSeed) {
         auto creationDate = QDateTime::fromSecsSinceEpoch(m_fields->seed.time);
         ui->line_creationDate->setText(creationDate.toString("yyyy-MM-dd"));
         this->onCreationDateEdited();
@@ -103,6 +103,14 @@ bool PageSetRestoreHeight::validatePage() {
 }
 
 int PageSetRestoreHeight::nextId() const {
+    if (m_fields->showSetSeedPassphrasePage) {
+        return WalletWizard::Page_SetSeedPassphrase;
+    }
+
+    if (m_fields->showSetSubaddressLookaheadPage) {
+        return WalletWizard::Page_SetSubaddressLookahead;
+    }
+
     return WalletWizard::Page_WalletFile;
 }
 

@@ -122,17 +122,7 @@
         <item>
          <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather recently switched to a new seed scheme called &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-          </property>
-          <property name="wordWrap">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QLabel" name="label_12">
-          <property name="text">
-           <string>For more information visit: docs.featherwallet.org/guides/seed-scheme</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather uses &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;. For more information visit: docs.featherwallet.org/guides/seed-scheme&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -935,7 +925,7 @@
         <enum>Qt::NoFocus</enum>
        </property>
        <property name="text">
-        <string>Generate</string>
+        <string>Generate new</string>
        </property>
       </widget>
      </item>

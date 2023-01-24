@@ -14,6 +14,7 @@
 #include "PageSetPassword.h"
 #include "PageSetRestoreHeight.h"
 #include "PageSetSeedPassphrase.h"
+#include "PageSetSubaddressLookahead.h"
 #include "PageHardwareDevice.h"
 #include "PageNetworkTor.h"
 #include "PageNetworkWebsocket.h"
@@ -41,6 +42,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     auto createWalletSeed = new PageWalletSeed(&m_wizardFields, this);
     auto walletSetPasswordPage = new PageSetPassword(&m_wizardFields, this);
     auto walletSetSeedPassphrasePage = new PageSetSeedPassphrase(&m_wizardFields, this);
+    auto walletSetSubaddressLookaheadPage = new PageSetSubaddressLookahead(&m_wizardFields, this);
     setPage(Page_Menu, menuPage);
     setPage(Page_WalletFile, createWallet);
     setPage(Page_OpenWallet, openWalletPage);
@@ -54,6 +56,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_SetRestoreHeight, new PageSetRestoreHeight(&m_wizardFields, this));
     setPage(Page_HardwareDevice, new PageHardwareDevice(&m_wizardFields, this));
     setPage(Page_SetSeedPassphrase, walletSetSeedPassphrasePage);
+    setPage(Page_SetSubaddressLookahead, walletSetSubaddressLookaheadPage);
 
     setStartId(Page_Menu);
 
@@ -112,7 +115,7 @@ void WalletWizard::onCreateWallet() {
                 deviceName = "Trezor";
         }
 
-        emit createWalletFromDevice(walletPath, m_wizardFields.password, deviceName, restoreHeight);
+        emit createWalletFromDevice(walletPath, m_wizardFields.password, deviceName, restoreHeight, m_wizardFields.subaddressLookahead);
         return;
     }
 
@@ -122,7 +125,8 @@ void WalletWizard::onCreateWallet() {
                                   m_wizardFields.address,
                                   m_wizardFields.secretViewKey,
                                   m_wizardFields.secretSpendKey,
-                                  m_wizardFields.restoreHeight);
+                                  m_wizardFields.restoreHeight,
+                                  m_wizardFields.subaddressLookahead);
         return;
     }
 
@@ -132,9 +136,9 @@ void WalletWizard::onCreateWallet() {
         m_wizardFields.seed.restoreHeight = currentBlockHeight;
     }
 
-    if (m_wizardFields.mode == WizardMode::RestoreFromSeed && (m_wizardFields.seedType == Seed::Type::MONERO || m_wizardFields.seedCreationDateOverridden)) {
+    if (m_wizardFields.mode == WizardMode::RestoreFromSeed && (m_wizardFields.seedType == Seed::Type::MONERO || m_wizardFields.showSetRestoreHeightPage)) {
         m_wizardFields.seed.setRestoreHeight(m_wizardFields.restoreHeight);
     }
 
-    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase);
+    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead);
 }

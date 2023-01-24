@@ -4,7 +4,10 @@
 #include "PageWalletRestoreKeys.h"
 #include "ui_PageWalletRestoreKeys.h"
 
+#include <QCheckBox>
+#include <QDialogButtonBox>
 #include <QPlainTextEdit>
+#include <QPushButton>
 
 #include "WalletWizard.h"
 #include "constants.h"
@@ -31,6 +34,8 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
     } else if (constants::networkType == NetworkType::Type::STAGENET) {
         ui->line_address->setPlaceholderText("5...");
     }
+
+    connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreKeys::onOptionsClicked);
 }
 
 void PageWalletRestoreKeys::initializePage() {
@@ -79,4 +84,24 @@ bool PageWalletRestoreKeys::validatePage() {
     m_fields->secretViewKey = viewkey;
     m_fields->secretSpendKey = spendkey;
     return true;
+}
+
+void PageWalletRestoreKeys::onOptionsClicked() {
+    QDialog dialog(this);
+    dialog.setWindowTitle("Options");
+
+    QVBoxLayout layout;
+    QCheckBox check_subaddressLookahead("Set subaddress lookahead");
+    check_subaddressLookahead.setChecked(m_fields->showSetSubaddressLookaheadPage);
+
+    layout.addWidget(&check_subaddressLookahead);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok);
+    layout.addWidget(&buttons);
+    dialog.setLayout(&layout);
+    connect(&buttons, &QDialogButtonBox::accepted, [&dialog]{
+        dialog.close();
+    });
+    dialog.exec();
+
+    m_fields->showSetSubaddressLookaheadPage = check_subaddressLookahead.isChecked();
 }

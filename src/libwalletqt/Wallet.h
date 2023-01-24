@@ -213,6 +213,7 @@ public:
     QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
     void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
     void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
+    QString getSubaddressLookahead() const;
 
     //! hw-device backed wallets
     bool isHwBacked() const;

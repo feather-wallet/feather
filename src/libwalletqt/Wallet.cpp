@@ -411,6 +411,13 @@ void Wallet::deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, 
     });
 }
 
+QString Wallet::getSubaddressLookahead() const
+{
+    auto lookahead = m_walletImpl->getSubaddressLookahead();
+
+    return QString("%1:%2").arg(QString::number(lookahead.first), QString::number(lookahead.second));
+}
+
 bool Wallet::refreshHeights()
 {
     // daemonHeight and targetHeight will be 0 if call to get_info fails

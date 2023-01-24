@@ -49,6 +49,8 @@ int PageMenu::nextId() const {
 }
 
 bool PageMenu::validatePage() {
+    m_fields->clearFields();
+
     if (ui->radioCreate->isChecked()) {
         m_fields->mode = WizardMode::CreateWallet;
         m_fields->modeText = "Create wallet";

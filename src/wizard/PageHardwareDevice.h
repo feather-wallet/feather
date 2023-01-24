@@ -28,6 +28,8 @@ public:
     bool isComplete() const override;
 
 private:
+    void onOptionsClicked();
+
     Ui::PageHardwareDevice *ui;
     WizardFields *m_fields;
 };
