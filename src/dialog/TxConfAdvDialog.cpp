@@ -205,6 +205,11 @@ void TxConfAdvDialog::signedCopy() {
 }
 
 void TxConfAdvDialog::txKeyCopy() {
+    if (m_ctx->wallet->isHwBacked()) {
+        QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
+        return;
+    }
+
     Utils::copyToClipboard(m_tx->transaction(0)->txKey());
 }
 

@@ -30,6 +30,15 @@ struct TxProof {
     QString error;
 };
 
+struct TxKeyResult {
+    bool succes = false;
+    bool good = false;
+    QString amount;
+    bool inPool;
+    uint64_t confirmations;
+    QString errorString;
+};
+
 struct SubaddressIndex {
     SubaddressIndex(int major, int minor) {
         this->major = major;
@@ -410,7 +419,7 @@ public:
     QString getTxKey(const QString &txid) const;
     void getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback);
 
-    QString checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
+    TxKeyResult checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
     TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
    // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
     //QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);

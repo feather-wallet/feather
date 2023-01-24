@@ -47,6 +47,11 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
                 ui->input_inMessage->clear();
                 ui->input_InProof->clear();
                 break;
+            case 3:
+                ui->line_keyTxID->clear();
+                ui->line_keyTxKey->clear();
+                ui->line_keyAddress->clear();
+                break;
         }
     });
 
@@ -66,6 +71,9 @@ void VerifyProofDialog::checkProof() {
             break;
         case 2:
             this->checkInProof();
+            break;
+        case 3:
+            this->checkTxKey();
             break;
     }
 }
@@ -89,6 +97,24 @@ void VerifyProofDialog::checkOutProof() {
 
 void VerifyProofDialog::checkInProof() {
     this->checkTxProof(ui->lineEdit_inTxID->text(), ui->lineEdit_inAddress->text(), ui->input_inMessage->toPlainText(), ui->input_InProof->toPlainText());
+}
+
+void VerifyProofDialog::checkTxKey() {
+    ui->btn_verifyFormattedProof->setEnabled(false);
+    ui->btn_verify->setEnabled(false);
+    TxKeyResult res = m_wallet->checkTxKey(ui->line_keyTxID->text(), ui->line_keyTxKey->text(), ui->line_keyAddress->text());
+
+    if (!res.succes) {
+        this->proofStatus(false, QString("Error: %1").arg(res.errorString));
+        return;
+    }
+
+    if (!res.good) {
+        this->proofStatus(false, QString("Tx secret key does not decode any outputs for this transaction."));
+        return;
+    }
+
+    this->proofStatus(true, QString("Proof is valid.\n\nThis address received %1 XMR, with %2 confirmations").arg(res.amount, QString::number(res.confirmations)));
 }
 
 void VerifyProofDialog::checkFormattedProof() {

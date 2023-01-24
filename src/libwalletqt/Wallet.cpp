@@ -995,14 +995,15 @@ void Wallet::getTxKeyAsync(const QString &txid, const std::function<void (QVaria
     }, callback);
 }
 
-QString Wallet::checkTxKey(const QString &txid, const QString &tx_key, const QString &address)
+TxKeyResult Wallet::checkTxKey(const QString &txid, const QString &tx_key, const QString &address)
 {
     uint64_t received;
     bool in_pool;
     uint64_t confirmations;
     bool success = m_walletImpl->checkTxKey(txid.toStdString(), tx_key.toStdString(), address.toStdString(), received, in_pool, confirmations);
-    std::string result = std::string(success ? "true" : "false") + "|" + QString::number(received).toStdString() + "|" + std::string(in_pool ? "true" : "false") + "|" + QString::number(confirmations).toStdString();
-    return QString::fromStdString(result);
+    QString errorString = success ? "" : this->errorString();
+    bool good = received > 0;
+    return {success, good, QString::fromStdString(Monero::Wallet::displayAmount(received)), in_pool, confirmations, errorString};
 }
 
 TxProof Wallet::getTxProof(const QString &txid, const QString &address, const QString &message) const

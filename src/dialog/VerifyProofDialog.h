@@ -30,6 +30,7 @@ private:
     void checkSpendProof(const QString &txId, const QString &message, const QString &signature);
     void checkOutProof();
     void checkInProof();
+    void checkTxKey();
     void checkFormattedProof();
     void proofStatus(bool success, const QString &message);
     void onTxProofVerified(TxProofResult result);

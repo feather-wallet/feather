@@ -161,6 +161,11 @@ void TxInfoDialog::copyTxID() {
 }
 
 void TxInfoDialog::copyTxKey() {
+    if (m_ctx->wallet->isHwBacked()) {
+        QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
+        return;
+    }
+
     m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
         QString txKey = map.value("tx_key").toString();
         if (txKey.isEmpty()) {
