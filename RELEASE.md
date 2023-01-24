@@ -4,6 +4,7 @@
   - To obtain values, run `contrib/generate-restore-heights/heights.py`
 - Update `m_defaultPools` in `src/widgets/XMRigWidget.h` (before minor release)
 - Update default node lists in `src/assets/nodes.json` (before minor release)
+- Update `src/assets/ack.txt`
 - Update `SOURCE_DATE_EPOCH` in `contrib/guix/guix-build`
 - Update the version number in `CMakeLists.txt`
   - A hardfork-ready release must bump major version
