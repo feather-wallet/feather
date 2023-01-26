@@ -163,6 +163,12 @@ void WindowManager::tryOpenWallet(const QString &path, const QString &password) 
 }
 
 void WindowManager::onWalletOpened(Wallet *wallet) {
+    if (!wallet) {
+        QString err{"Unable to open wallet"};
+        this->handleWalletError(err);
+        return;
+    }
+
     auto status = wallet->status();
     if (status != Wallet::Status_Ok) {
         QString errMsg = wallet->errorString();
@@ -305,27 +311,34 @@ void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &
         return;
     }
 
-    if (!WalletManager::addressValid(address, constants::networkType)) {
-        auto err = QString("Failed to create wallet. Invalid address provided.").arg(path);
-        this->handleWalletError(err);
-        return;
+    Wallet *wallet;
+    if (address.isEmpty() && viewkey.isEmpty() && !spendkey.isEmpty()) {
+        wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, constants::seedLanguage, constants::networkType, spendkey, restoreHeight, constants::kdfRounds, "", subaddressLookahead);
+    }
+    else {
+        if (!spendkey.isEmpty() && !WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
+            auto err = QString("Failed to create wallet. Invalid spendkey provided.").arg(path);
+            this->handleWalletError(err);
+            return;
+        }
+
+        if (!WalletManager::addressValid(address, constants::networkType)) {
+            auto err = QString("Failed to create wallet. Invalid address provided.").arg(path);
+            this->handleWalletError(err);
+            return;
+        }
+
+        if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
+            auto err = QString("Failed to create wallet. Invalid viewkey provided.").arg(path);
+            this->handleWalletError(err);
+            return;
+        }
+
+        wallet = m_walletManager->createWalletFromKeys(path, password, constants::seedLanguage, constants::networkType, address, viewkey, spendkey, restoreHeight, constants::kdfRounds, subaddressLookahead);
     }
 
-    if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
-        auto err = QString("Failed to create wallet. Invalid viewkey provided.").arg(path);
-        this->handleWalletError(err);
-        return;
-    }
-
-    if (!spendkey.isEmpty() && !WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
-        auto err = QString("Failed to create wallet. Invalid spendkey provided.").arg(path);
-        this->handleWalletError(err);
-        return;
-    }
-
-    Wallet *wallet = m_walletManager->createWalletFromKeys(path, password, constants::seedLanguage, constants::networkType, address, viewkey, spendkey, restoreHeight, constants::kdfRounds, subaddressLookahead);
     m_openingWallet = true;
-    m_walletManager->walletOpened(wallet);
+    this->onWalletOpened(wallet);
 }
 
 void WindowManager::onWalletCreated(Wallet *wallet) {

@@ -21,14 +21,22 @@ class PageWalletRestoreKeys : public QWizardPage
 {
     Q_OBJECT
 
+    enum walletType {
+        ViewOnly = 0,
+        Spendable = 1,
+        Spendable_Nondeterministic = 2
+    };
+
 public:
     explicit PageWalletRestoreKeys(WizardFields *fields, QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
+    void showInputLines();
 
 private:
     void onOptionsClicked();
+    int walletType();
 
     Ui::PageWalletRestoreKeys *ui;
     WizardFields *m_fields;

@@ -21,9 +21,6 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
     this->setTitle("Restore wallet from keys");
     ui->label_errorString->hide();
 
-    QPixmap pixmap = QPixmap(":/assets/images/key.png");
-    ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
-
 #ifndef QT_NO_CURSOR
     QGuiApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QGuiApplication::restoreOverrideCursor();
@@ -35,17 +32,46 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
         ui->line_address->setPlaceholderText("5...");
     }
 
+    QRegularExpression keyRe(R"([0-9a-fA-F]{64})");
+    QValidator *keyValidator = new QRegularExpressionValidator(keyRe, this);
+
+    ui->line_viewkey->setValidator(keyValidator);
+    ui->line_spendkey->setValidator(keyValidator);
+
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreKeys::onOptionsClicked);
+    connect(ui->combo_walletType, &QComboBox::currentTextChanged, this, &PageWalletRestoreKeys::showInputLines);
 }
 
 void PageWalletRestoreKeys::initializePage() {
-    ui->line_address->setText("");
-    ui->line_viewkey->setText("");
-    ui->line_spendkey->setText("");
+    this->showInputLines();
 }
 
 int PageWalletRestoreKeys::nextId() const {
     return WalletWizard::Page_SetRestoreHeight;
+}
+
+void PageWalletRestoreKeys::showInputLines() {
+    ui->label_errorString->hide();
+
+    if (ui->combo_walletType->currentIndex() == walletType::ViewOnly) {
+        ui->frame_address->show();
+        ui->frame_viewKey->show();
+        ui->frame_spendKey->hide();
+    }
+    else if (ui->combo_walletType->currentIndex() == walletType::Spendable) {
+        ui->frame_address->hide();
+        ui->frame_viewKey->hide();
+        ui->frame_spendKey->show();
+    }
+    else {
+        ui->frame_address->show();
+        ui->frame_viewKey->show();
+        ui->frame_spendKey->show();
+    }
+
+    ui->line_address->setText("");
+    ui->line_viewkey->setText("");
+    ui->line_spendkey->setText("");
 }
 
 bool PageWalletRestoreKeys::validatePage() {
@@ -59,25 +85,32 @@ bool PageWalletRestoreKeys::validatePage() {
     QString viewkey = ui->line_viewkey->text().trimmed();
     QString spendkey = ui->line_spendkey->text().trimmed();
 
-    if(!WalletManager::addressValid(address, constants::networkType)){
-        ui->label_errorString->show();
-        ui->label_errorString->setText("Invalid address.");
-        ui->line_address->setStyleSheet(errStyle);
-        return false;
+    if (walletType() == walletType::ViewOnly || walletType() == walletType::Spendable_Nondeterministic) {
+        if (!WalletManager::addressValid(address, constants::networkType)){
+            ui->label_errorString->show();
+            ui->label_errorString->setText("Error: Invalid address.");
+            ui->line_address->setStyleSheet(errStyle);
+            return false;
+        }
+
+        if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
+            ui->label_errorString->show();
+            ui->label_errorString->setText("Error: Invalid key.");
+            ui->line_viewkey->setStyleSheet(errStyle);
+            return false;
+        }
     }
 
-    if(!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
-        ui->label_errorString->show();
-        ui->label_errorString->setText("Invalid key.");
-        ui->line_viewkey->setStyleSheet(errStyle);
-        return false;
-    }
+    if (walletType() == walletType::Spendable || walletType() == walletType::Spendable_Nondeterministic) {
+        bool spendKeyValid = (ui->line_spendkey->hasAcceptableInput() && walletType() == walletType::Spendable)
+                || (WalletManager::keyValid(spendkey, address, false, constants::networkType) && walletType() == walletType::Spendable_Nondeterministic);
 
-    if(!spendkey.isEmpty() && !WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
-        ui->label_errorString->show();
-        ui->label_errorString->setText("Invalid key.");
-        ui->line_viewkey->setStyleSheet(errStyle);
-        return false;
+        if (!spendKeyValid) {
+            ui->label_errorString->show();
+            ui->label_errorString->setText("Error: Invalid key.");
+            ui->line_spendkey->setStyleSheet(errStyle);
+            return false;
+        }
     }
 
     m_fields->address = address;
@@ -104,4 +137,8 @@ void PageWalletRestoreKeys::onOptionsClicked() {
     dialog.exec();
 
     m_fields->showSetSubaddressLookaheadPage = check_subaddressLookahead.isChecked();
+}
+
+int PageWalletRestoreKeys::walletType() {
+    return ui->combo_walletType->currentIndex();
 }
