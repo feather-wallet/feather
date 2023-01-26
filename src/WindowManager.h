@@ -69,6 +69,7 @@ private:
     void buildTrayMenu();
     void startupWarning();
     void showWarningMessageBox(const QString &title, const QString &message);
+    void showCrashLogs();
 
     void quitAfterLastWindow();
 

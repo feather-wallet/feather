@@ -3,6 +3,7 @@
 
 #include "WindowManager.h"
 
+#include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
 
@@ -37,6 +38,8 @@ WindowManager::WindowManager(EventFilter *eventFilter)
     m_tray->show();
 
     this->initSkins();
+
+    this->showCrashLogs();
 
     if (!config()->get(Config::firstRun).toBool() || TailsOS::detect() || WhonixOS::detect()) {
         this->onInitialNetworkConfigured();
@@ -408,6 +411,58 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     if (openLinkButton && msgBox.clickedButton() == openLinkButton) {
         Utils::externalLinkWarning(nullptr, link);
     }
+}
+
+void WindowManager::showCrashLogs() {
+    QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
+    QFile crashLogFile{crashLogPath};
+
+    if (!crashLogFile.exists()) {
+        return;
+    }
+
+    bool r = crashLogFile.open(QIODevice::ReadOnly);
+    if (!r) {
+        qWarning() << "Unable to open crash log file: " << crashLogPath;
+        return;
+    }
+
+    QTextStream log(&crashLogFile);
+    QString logString = log.readAll();
+    crashLogFile.close();
+
+    bool renamed = false;
+    for (int i = 1; i < 999; i++) {
+        QString name{QString("/crash_report_%1.txt").arg(QString::number(i))};
+        if (crashLogFile.rename(Config::defaultConfigDir().path() + name)) {
+            renamed = true;
+            break;
+        }
+    }
+
+    if (!renamed) {
+        crashLogFile.remove();
+    }
+
+    QDialog dialog(nullptr);
+    dialog.setWindowTitle("Crash report");
+
+    QVBoxLayout layout;
+    QLabel msg{"Feather encountered an unrecoverable error.\n\nPlease send a copy of these logs to the developers. Logs are not automatically reported.\n"};
+    QTextEdit logs;
+    logs.setText(logString);
+
+    layout.addWidget(&msg);
+    layout.addWidget(&logs);
+    QDialogButtonBox buttons(QDialogButtonBox::Ok);
+    layout.addWidget(&buttons);
+    dialog.setLayout(&layout);
+    QObject::connect(&buttons, &QDialogButtonBox::accepted, [&dialog]{
+        dialog.close();
+    });
+    dialog.exec();
+
+    exit(0);
 }
 
 // ######################## DEVICE ########################

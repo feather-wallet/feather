@@ -12,6 +12,16 @@
 #include "MainWindow.h"
 #include "utils/EventFilter.h"
 #include "WindowManager.h"
+#include "config.h"
+
+#if defined(Q_OS_LINUX) && defined(STACK_TRACE)
+#define BOOST_STACKTRACE_LINK
+#include <signal.h>
+#include <boost/stacktrace.hpp>
+#include <fstream>
+#endif
+
+#include <QObject>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -22,9 +32,34 @@
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
 #endif
 
+#if defined(Q_OS_LINUX) && defined(STACK_TRACE)
+void signal_handler(int signum) {
+    ::signal(signum, SIG_DFL);
+    std::stringstream keyStream;
+    keyStream << boost::stacktrace::stacktrace();
+    std::cout << keyStream.str();
+
+    // Write stack trace to disk
+    QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
+    std::ofstream out(crashLogPath.toStdString());
+    out << keyStream.str();
+    out.close();
+
+    // Make a last ditch attempt to restart the application
+    QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
+
+    ::raise(SIGABRT);
+}
+#endif
+
 int main(int argc, char *argv[])
 {
     Q_INIT_RESOURCE(assets);
+
+#if defined(Q_OS_LINUX) && defined(STACK_TRACE)
+    ::signal(SIGSEGV, &signal_handler);
+    ::signal(SIGABRT, &signal_handler);
+#endif
 
 #if defined(HAS_TOR_BIN)
     Q_INIT_RESOURCE(assets_tor);

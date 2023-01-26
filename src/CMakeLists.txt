@@ -117,6 +117,13 @@ set_target_properties(feather PROPERTIES
         LINK_FLAGS_RELEASE -s
 )
 
+if(STACK_TRACE)
+    message(STATUS "Stack Trace Enabled")
+    if (STATIC)
+        set_property(TARGET feather APPEND PROPERTY LINK_FLAGS "-Wl,--wrap=__cxa_throw")
+    endif()
+endif()
+
 target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
         ${CMAKE_SOURCE_DIR}/monero/include
@@ -184,6 +191,10 @@ target_compile_definitions(feather PRIVATE HAS_WEBSOCKET=1)
 
 if(PLATFORM_INSTALLER)
     target_compile_definitions(feather PRIVATE PLATFORM_INSTALLER=1)
+endif()
+
+if(STACK_TRACE)
+    target_compile_definitions(feather PRIVATE STACK_TRACE=1)
 endif()
 
 if(HAVE_SYS_PRCTL_H)
@@ -288,6 +299,10 @@ if(DEPENDS AND APPLE)
     # TODO: Needed for ___isOSVersionAtLeast
     target_link_libraries(feather
             ${CMAKE_OSX_SYSROOT}/lib/darwin/libclang_rt.osx.a)
+endif()
+
+if(STACK_TRACE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
+    target_link_libraries(feather -rdynamic)
 endif()
 
 install(TARGETS feather

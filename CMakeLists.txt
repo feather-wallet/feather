@@ -26,6 +26,7 @@ option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OF
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
 option(DONATE_BEG "Prompt donation window every once in a while" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
+option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
@@ -105,8 +106,8 @@ if(MINGW)
     set(Boost_THREADAPI win32)
 endif()
 
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.58 REQUIRED COMPONENTS
+
+set(BOOST_COMPONENTS
         system
         filesystem
         thread
@@ -116,7 +117,15 @@ find_package(Boost 1.58 REQUIRED COMPONENTS
         serialization
         program_options
         locale
-        )
+)
+
+if(STACK_TRACE AND UNIX AND NOT APPLE)
+    list(APPEND BOOST_COMPONENTS
+            stacktrace_basic)
+endif()
+
+set(Boost_USE_MULTITHREADED ON)
+find_package(Boost 1.58 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 
 if(UNIX AND NOT APPLE)
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
