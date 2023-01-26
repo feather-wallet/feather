@@ -214,7 +214,7 @@ private:
     QString getHardwareDevice();
     void updateTitle();
     void donationNag();
-    void addToRecentlyOpened(const QString &filename);
+    void addToRecentlyOpened(QString filename);
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
     bool verifyPassword(bool sensitive = true);

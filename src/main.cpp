@@ -179,7 +179,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     // Setup wallet directory
     QString walletDir = config()->get(Config::walletDirectory).toString();
-    if (walletDir.isEmpty()) {
+    if (walletDir.isEmpty() || Utils::isPortableMode()) {
         walletDir = Utils::defaultWalletDir();
         config()->set(Config::walletDirectory, walletDir);
     }

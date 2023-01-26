@@ -1601,8 +1601,13 @@ void MainWindow::donationNag() {
     config()->set(Config::donateBeg, donationCounter);
 }
 
-void MainWindow::addToRecentlyOpened(const QString &keysFile) {
+void MainWindow::addToRecentlyOpened(QString keysFile) {
     auto recent = config()->get(Config::recentlyOpenedWallets).toList();
+
+    if (Utils::isPortableMode()) {
+        QDir appPath{Utils::applicationPath()};
+        keysFile = appPath.relativeFilePath(keysFile);
+    }
 
     if (recent.contains(keysFile)) {
         recent.removeOne(keysFile);
@@ -1631,7 +1636,7 @@ void MainWindow::updateRecentlyOpenedMenu() {
     const QStringList recentWallets = config()->get(Config::recentlyOpenedWallets).toStringList();
     for (const auto &walletPath : recentWallets) {
         QFileInfo fileInfo{walletPath};
-        ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, walletPath, ""));
+        ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, fileInfo.absoluteFilePath(), ""));
     }
     ui->menuRecently_open->addSeparator();
     ui->menuRecently_open->addAction(m_clearRecentlyOpenAction);
