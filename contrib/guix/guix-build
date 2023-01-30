@@ -231,7 +231,7 @@ host_to_commonname() {
     esac
 }
 
-SOURCE_DATE_EPOCH="1672070414"
+SOURCE_DATE_EPOCH="1675093785"
 
 # Precious directories are those which should not be cleaned between successive
 # guix builds
