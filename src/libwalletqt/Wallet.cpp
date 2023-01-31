@@ -164,14 +164,14 @@ QString Wallet::errorString() const
     return QString::fromStdString(m_walletImpl->errorString());
 }
 
-bool Wallet::setPassword(const QString &password)
+bool Wallet::setPassword(const QString &oldPassword, const QString &newPassword)
 {
-    return m_walletImpl->setPassword(password.toStdString());
+    return m_walletImpl->setPassword(oldPassword.toStdString(), newPassword.toStdString());
 }
 
-QString Wallet::getPassword()
+bool Wallet::verifyPassword(const QString &password)
 {
-    return QString::fromStdString(m_walletImpl->getPassword());
+    return m_walletImpl->verifyPassword(password.toStdString());
 }
 
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const
@@ -198,9 +198,9 @@ QString Wallet::keysPath() const
     return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->keysFilename()));;
 }
 
-void Wallet::store(const QString &path)
+void Wallet::store()
 {
-    m_walletImpl->store(path.toStdString());
+    m_walletImpl->store();
 }
 
 bool Wallet::init(const QString &daemonAddress, bool trustedDaemon, quint64 upperTransactionLimit, bool isRecovering, bool isRecoveringFromDevice, quint64 restoreHeight, const QString& proxyAddress)
@@ -1416,7 +1416,7 @@ Wallet::~Wallet()
     //Monero::WalletManagerFactory::getWalletManager()->closeWallet(m_walletImpl);
     if(status() == Status_Critical || status() == Status_BadPassword)
         qDebug("Not storing wallet cache");
-    else if( m_walletImpl->store(""))
+    else if( m_walletImpl->store())
         qDebug("Wallet cache stored successfully");
     else
         qDebug("Error storing wallet cache");

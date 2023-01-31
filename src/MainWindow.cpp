@@ -798,7 +798,8 @@ void MainWindow::showPasswordDialog() {
 }
 
 void MainWindow::updatePasswordIcon() {
-    QIcon icon = m_ctx->wallet->getPassword().isEmpty() ? icons()->icon("unlock.svg") : icons()->icon("lock.svg");
+    bool emptyPassword = m_ctx->wallet->verifyPassword("");
+    QIcon icon = emptyPassword ? icons()->icon("unlock.svg") : icons()->icon("lock.svg");
     m_statusBtnPassword->setIcon(icon);
 }
 
@@ -1650,7 +1651,8 @@ bool MainWindow::verifyPassword(bool sensitive) {
         if (ret == QDialog::Rejected) {
             return false;
         }
-        if (passwordDialog.password != m_ctx->wallet->getPassword()) {
+
+        if (!m_ctx->wallet->verifyPassword(passwordDialog.password)) {
             incorrectPassword = true;
             continue;
         }
@@ -1725,7 +1727,7 @@ void MainWindow::unlockWallet(const QString &password) {
         return;
     }
 
-    if (password != m_ctx->wallet->getPassword()) {
+    if (!m_ctx->wallet->verifyPassword(password)) {
         m_walletUnlockWidget->incorrectPassword();
         return;
     }

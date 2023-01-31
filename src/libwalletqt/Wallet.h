@@ -144,10 +144,10 @@ public:
     QString errorString() const;
 
     //! changes the password using existing parameters (path, seed, seed lang)
-    bool setPassword(const QString &password);
+    bool setPassword(const QString &oldPassword, const QString &newPassword);
 
-    //! get current wallet password
-    QString getPassword();
+    //! verify wallet password
+    bool verifyPassword(const QString &password);
 
     //! returns wallet's public address
     QString address(quint32 accountIndex, quint32 addressIndex) const;
@@ -163,7 +163,7 @@ public:
 
     //! saves wallet to the file by given path
     //! empty path stores in current location
-    void store(const QString &path = "");
+    void store();
    // void storeAsync(const QJSValue &callback, const QString &path = "");
 
     //! initializes wallet asynchronously

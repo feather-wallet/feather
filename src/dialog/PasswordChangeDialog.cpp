@@ -13,8 +13,7 @@ PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)
 {
     ui->setupUi(this);
 
-    bool noPassword = wallet->getPassword().isEmpty();
-
+    bool noPassword = wallet->verifyPassword("");
     QString warning_str = noPassword ? "Your wallet is not password protected. Use this dialog to add a password to your wallet." :
                          "Your wallet is password protected and encrypted. Use this dialog to change your password.";
     ui->label_warning->setText(warning_str);
@@ -50,14 +49,14 @@ void PasswordChangeDialog::setPassword() {
     QString currentPassword = ui->lineEdit_currentPassword->text();
     QString newPassword = ui->lineEdit_newPassword->text();
 
-    if (currentPassword != m_wallet->getPassword()) {
+    if (!m_wallet->verifyPassword(currentPassword)) {
         QMessageBox::warning(this, "Error", "Incorrect password");
         ui->lineEdit_currentPassword->setText("");
         ui->lineEdit_currentPassword->setFocus();
         return;
     }
 
-    if (m_wallet->setPassword(newPassword)) {
+    if (m_wallet->setPassword(currentPassword, newPassword)) {
         QMessageBox::information(this, "Information", "Password changed successfully");
         this->accept();
     }
