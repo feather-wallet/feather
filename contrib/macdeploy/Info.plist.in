@@ -25,10 +25,10 @@
   <string>Copyright © 2014-@COPYRIGHT_YEAR@ @COPYRIGHT_HOLDERS@</string>
 
   <key>CFBundleShortVersionString</key>
-  <string>@VERSION@</string>
+  <string>@PROJECT_VERSION@</string>
 
   <key>CFBundleVersion</key>
-  <string>@VERSION@</string>
+  <string>@PROJECT_VERSION@</string>
 
   <key>CFBundleSignature</key>
   <string>????</string>
