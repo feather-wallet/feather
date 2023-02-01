@@ -27,8 +27,8 @@ namespace constants
 
     // websocket constants
     const QVector<QUrl> websocketUrls = {
-        QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws")),
-        QUrl(QStringLiteral("ws://an5ecwgzyujqe7jverkp42d22zhvjes2mrhvol6tpqcgfkzwseqrafqd.onion/ws"))
+        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
+        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
     };
 
     // website constants
