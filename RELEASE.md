@@ -1,9 +1,11 @@
 # Release process
 
-- Update `src/assets/restore_heights_monero_{mainnet,stagenet}.txt` (before minor releases)
-  - To obtain values, run `contrib/generate-restore-heights/heights.py`
-- Update `m_defaultPools` in `src/widgets/XMRigWidget.h` (before minor release)
-- Update default node lists in `src/assets/nodes.json` (before minor release)
+- Before a minor release:
+  - Update `src/assets/restore_heights_monero_{mainnet,stagenet}.txt`
+    - To obtain values, run `contrib/generate-restore-heights/heights.py`
+  - Update `m_defaultPools` in `src/widgets/XMRigWidget.h`
+  - Update default node lists in `src/assets/nodes.json`
+  - Bump `openssl`, `qt`, `tor_*` packages in `contrib/depends/packages`
 - Update `src/assets/ack.txt`
 - Update `SOURCE_DATE_EPOCH` in `contrib/guix/guix-build`
 - Update the version number in `CMakeLists.txt`
