@@ -6,11 +6,152 @@
 #include <common/util.h>
 #include <openpgp/hash.h>
 
+#include "config-feather.h"
+#include "constants.h"
 #include "Utils.h"
+#include "utils/AsyncTask.h"
+#include "utils/networking.h"
+#include "utils/NetworkManager.h"
+#include "utils/SemanticVersion.h"
 
-Updater::Updater() {
+Updater::Updater(QObject *parent) :
+    QObject(parent)
+{
     std::string featherWallet = Utils::fileOpen(":/assets/gpg_keys/featherwallet.asc").toStdString();
     m_maintainers.emplace_back(featherWallet);
+}
+
+void Updater::checkForUpdates() {
+    UtilsNetworking network{getNetworkTor()};
+    QNetworkReply *reply = network.getJson("https://featherwallet.org/updates.json");
+
+    connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onUpdateCheckResponse, this, reply));
+}
+
+void Updater::onUpdateCheckResponse(QNetworkReply *reply) {
+    const QString err = reply->errorString();
+
+    QByteArray data = reply->readAll();
+    reply->deleteLater();
+
+    QJsonObject updates;
+    if (!data.isEmpty() && Utils::validateJSON(data)) {
+        auto doc = QJsonDocument::fromJson(data);
+        updates = doc.object();
+    }
+    else {
+        qWarning() << err;
+        emit updateCheckFailed(err);
+        return;
+    }
+
+    this->wsUpdatesReceived(updates);
+}
+
+void Updater::wsUpdatesReceived(const QJsonObject &updates) {
+    QString featherVersionStr{FEATHER_VERSION};
+
+    auto featherVersion = SemanticVersion::fromString(featherVersionStr);
+
+    QString platformTag = getPlatformTag();
+    if (platformTag.isEmpty()) {
+        QString err{"Unsupported platform, unable to fetch update"};
+        emit updateCheckFailed(err);
+        qWarning() << err;
+        return;
+    }
+
+    QJsonObject platformData = updates["platform"].toObject()[platformTag].toObject();
+    if (platformData.isEmpty()) {
+        QString err{"Unable to find current platform in updates data"};
+        emit updateCheckFailed(err);
+        qWarning() << err;
+        return;
+    }
+
+    QString newVersion = platformData["version"].toString();
+    if (SemanticVersion::fromString(newVersion) <= featherVersion) {
+        emit noUpdateAvailable();
+        return;
+    }
+
+    // Hooray! New update available
+
+    QString hashesUrl = QString("%1/files/releases/hashes-%2-plain.txt").arg(constants::websiteUrl, newVersion);
+
+    UtilsNetworking network{getNetworkTor()};
+    QNetworkReply *reply = network.get(hashesUrl);
+
+    connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onSignedHashesReceived, this, reply, platformTag, newVersion));
+}
+
+void Updater::onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version) {
+    if (reply->error() != QNetworkReply::NoError) {
+        QString err{QString("Unable to fetch signed hashed: %1").arg(reply->errorString())};
+        emit updateCheckFailed(err);
+        qWarning() << err;
+        return;
+    }
+
+    QByteArray armoredSignedHashes = reply->readAll();
+    reply->deleteLater();
+
+    const QString binaryFilename = QString("feather-%1-%2.zip").arg(version, platformTag);
+    QByteArray signedHash{};
+    QString signer;
+    try {
+         signedHash = this->verifyParseSignedHashes(armoredSignedHashes, binaryFilename, signer);
+    }
+    catch (const std::exception &e) {
+        QString err{QString("Failed to fetch and verify signed hash: %1").arg(e.what())};
+        emit updateCheckFailed(err);
+        qWarning() << err;
+        return;
+    }
+
+    QString hash = signedHash.toHex();
+    qInfo() << "Update found: " << binaryFilename << hash << "signed by:" << signer;
+
+    this->state = Updater::State::UPDATE_AVAILABLE;
+    this->version = version;
+    this->binaryFilename = binaryFilename;
+    this->downloadUrl = QString("https://featherwallet.org/files/releases/%1/%2").arg(platformTag, binaryFilename);
+    this->hash = hash;
+    this->signer = signer;
+    this->platformTag = platformTag;
+
+    emit updateAvailable();
+}
+
+QString Updater::getPlatformTag() {
+#ifdef Q_OS_MACOS
+    return "mac";
+#endif
+#ifdef Q_OS_WIN
+    #ifdef PLATFORM_INSTALLER
+    return "win-installer";
+#endif
+    return "win";
+#endif
+#ifdef Q_OS_LINUX
+    QString tag = "";
+
+    QString arch = QSysInfo::buildCpuArchitecture();
+    if (arch == "arm64") {
+        tag += "linux-arm64";
+    } else if (arch == "arm") {
+        tag += "linux-arm";
+    } else {
+        tag += "linux";
+    }
+
+    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
+        tag += "-appimage";
+    }
+
+    return tag;
+#endif
+    return "";
 }
 
 QByteArray Updater::verifyParseSignedHashes(

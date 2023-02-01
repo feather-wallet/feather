@@ -7,6 +7,8 @@
 #include <QDialog>
 #include <QNetworkReply>
 
+#include "utils/Updater.h"
+
 namespace Ui {
     class UpdateDialog;
 }
@@ -16,7 +18,7 @@ class UpdateDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer, QString platformTag);
+    explicit UpdateDialog(QWidget *parent, QSharedPointer<Updater> updater);
     ~UpdateDialog() override;
 
 private slots:
@@ -27,21 +29,22 @@ private slots:
     void onInstallUpdate();
     void onInstallError(const QString &errMsg);
     void onRestartClicked();
+    void onUpdateCheckFailed(const QString &onUpdateCheckFailed);
 
 signals:
     void restartWallet(const QString &binaryFilename);
 
 private:
+    void checkForUpdates();
+    void noUpdateAvailable();
+    void updateAvailable();
     void setStatus(const QString &msg, bool success = false);
     void installUpdateMac();
 
     QScopedPointer<Ui::UpdateDialog> ui;
+    QSharedPointer<Updater> m_updater;
 
-    QString m_version;
     QString m_downloadUrl;
-    QString m_hash;
-    QString m_signer;
-    QString m_platformTag;
 
     QString m_updatePath;
 

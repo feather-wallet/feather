@@ -591,6 +591,7 @@
      <string>Help</string>
     </property>
     <addaction name="actionAbout"/>
+    <addaction name="actionCheckForUpdates"/>
     <addaction name="actionOfficialWebsite"/>
     <addaction name="separator"/>
     <addaction name="actionDocumentation"/>
@@ -940,6 +941,11 @@
   <action name="actionLock">
    <property name="text">
     <string>Lock wallet</string>
+   </property>
+  </action>
+  <action name="actionCheckForUpdates">
+   <property name="text">
+    <string>Check for updates</string>
    </property>
   </action>
  </widget>

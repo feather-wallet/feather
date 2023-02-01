@@ -6,6 +6,7 @@
 
 #include <QFileDialog>
 
+#include "constants.h"
 #include "utils/AsyncTask.h"
 #include "utils/networking.h"
 #include "utils/NetworkManager.h"
@@ -14,24 +15,23 @@
 
 #include "zip.h"
 
-UpdateDialog::UpdateDialog(QWidget *parent, QString version, QString downloadUrl, QString hash, QString signer, QString platformTag)
-        : QDialog(parent)
-        , ui(new Ui::UpdateDialog)
-        , m_version(std::move(version))
-        , m_downloadUrl(std::move(downloadUrl))
-        , m_hash(std::move(hash))
-        , m_signer(std::move(signer))
-        , m_platformTag(std::move(platformTag))
+UpdateDialog::UpdateDialog(QWidget *parent, QSharedPointer<Updater> updater)
+    : QDialog(parent)
+    , ui(new Ui::UpdateDialog)
+    , m_updater(std::move(updater))
 {
     ui->setupUi(this);
 
-    ui->btn_installUpdate->hide();
-    ui->btn_restart->hide();
-    ui->progressBar->hide();
-
     auto bigFont = Utils::relativeFont(4);
     ui->label_header->setFont(bigFont);
-    ui->label_header->setText(QString("New Feather version %1 is available").arg(m_version));
+    ui->frame->hide();
+
+    bool updateAvailable = (m_updater->state == Updater::State::UPDATE_AVAILABLE);
+    if (updateAvailable) {
+        this->updateAvailable();
+    } else {
+        this->checkForUpdates();
+    }
 
     connect(ui->btn_cancel, &QPushButton::clicked, [this]{
         if (m_reply) {
@@ -43,7 +43,34 @@ UpdateDialog::UpdateDialog(QWidget *parent, QString version, QString downloadUrl
     connect(ui->btn_installUpdate, &QPushButton::clicked, this, &UpdateDialog::onInstallUpdate);
     connect(ui->btn_restart, &QPushButton::clicked, this, &UpdateDialog::onRestartClicked);
 
+    connect(m_updater.data(), &Updater::updateAvailable, this, &UpdateDialog::updateAvailable);
+    connect(m_updater.data(), &Updater::noUpdateAvailable, this, &UpdateDialog::noUpdateAvailable);
+    connect(m_updater.data(), &Updater::updateCheckFailed, this, &UpdateDialog::onUpdateCheckFailed);
+
     this->adjustSize();
+}
+
+void UpdateDialog::checkForUpdates() {
+    ui->label_header->setText("Checking for updates...");
+    ui->label_body->setText("...");
+    m_updater->checkForUpdates();
+}
+
+void UpdateDialog::noUpdateAvailable() {
+    this->setStatus("Feather is up-to-date.", true);
+}
+
+void UpdateDialog::updateAvailable() {
+    ui->frame->show();
+    ui->btn_installUpdate->hide();
+    ui->btn_restart->hide();
+    ui->progressBar->hide();
+    ui->label_header->setText(QString("New Feather version %1 is available").arg(m_updater->version));
+    ui->label_body->setText("Do you want to download and verify the new version?");
+}
+
+void UpdateDialog::onUpdateCheckFailed(const QString &errorMsg) {
+    this->setStatus(QString("Failed to check for updates: %1").arg(errorMsg), false);
 }
 
 void UpdateDialog::onDownloadClicked() {
@@ -53,7 +80,7 @@ void UpdateDialog::onDownloadClicked() {
 
     UtilsNetworking network{getNetworkTor()};
 
-    m_reply = network.get(m_downloadUrl);
+    m_reply = network.get(m_updater->downloadUrl);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &UpdateDialog::onDownloadProgress);
     connect(m_reply, &QNetworkReply::finished, this, &UpdateDialog::onDownloadFinished);
 }
@@ -83,7 +110,7 @@ void UpdateDialog::onDownloadFinished() {
             return Updater().getHash(&responseStr[0], responseStr.size());
         });
 
-        const QByteArray signedHash = QByteArray::fromHex(m_hash.toUtf8());
+        const QByteArray signedHash = QByteArray::fromHex(m_updater->hash.toUtf8());
 
         if (signedHash != calculatedHash) {
             this->onDownloadError("Error: Hash sum mismatch.");
@@ -180,7 +207,7 @@ void UpdateDialog::onInstallUpdate() {
 
     QDir applicationDir(Utils::applicationPath());
     QString filePath = applicationDir.filePath(name);
-    if (m_platformTag == "win-installer") {
+    if (m_updater->platformTag == "win-installer") {
         filePath = QString("%1/%2").arg(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation), name);
     }
 
@@ -205,7 +232,7 @@ void UpdateDialog::onInstallUpdate() {
         return;
     }
 
-    if (m_platformTag == "win-installer") {
+    if (m_updater->platformTag == "win-installer") {
         this->setStatus("Installer written. Click 'restart' to close Feather and start the installer.");
     } else {
         this->setStatus("Installation successful. Do you want to restart Feather now?");
@@ -219,7 +246,7 @@ void UpdateDialog::installUpdateMac() {
     if (appPath.endsWith("Contents/MacOS")) {
         appDir.cd("../../..");
     }
-    QString appName = QString("feather-%1").arg(m_version);
+    QString appName = QString("feather-%1").arg(m_updater->version);
     QString zipName = QString("%1.zip").arg(appName);
     QString fPath = appDir.filePath(zipName);
 

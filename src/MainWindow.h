@@ -31,6 +31,7 @@
 #include "utils/networking.h"
 #include "utils/config.h"
 #include "utils/EventFilter.h"
+#include "utils/Updater.h"
 #include "widgets/CCSWidget.h"
 #include "widgets/RedditWidget.h"
 #include "widgets/TickerWidget.h"
@@ -136,9 +137,7 @@ private slots:
     void loadSignedTxFromText();
 
     void onTorConnectionStateChanged(bool connected);
-    void onCheckUpdatesComplete(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
-    void onShowUpdateCheck(const QString &version, const QString &binaryFilename, const QString &hash, const QString &signer);
-    void onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version);
+    void showUpdateDialog();
     void onInitiateTransaction();
     void onEndTransaction();
     void onKeysCorrupted();
@@ -181,10 +180,10 @@ private slots:
     void onDeviceButtonPressed();
     void onWalletPassphraseNeeded(bool on_device);
     void menuHwDeviceClicked();
-    void onUpdatesAvailable(const QJsonObject &updates);
     void toggleSearchbar(bool enabled);
     void tryStoreWallet();
     void onWebsocketStatusChanged(bool enabled);
+    void showUpdateNotification();
 
 private:
     friend WindowManager;
@@ -287,6 +286,8 @@ private:
 
     EventFilter *m_eventFilter = nullptr;
     qint64 m_userLastActive = QDateTime::currentSecsSinceEpoch();
+
+    QSharedPointer<Updater> m_updater = nullptr;
 };
 
 #endif // FEATHER_MAINWINDOW_H

@@ -54,6 +54,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     m_splashDialog = new SplashDialog(this);
     m_accountSwitcherDialog = new AccountSwitcherDialog(m_ctx, this);
 
+    m_updater = QSharedPointer<Updater>(new Updater(this));
+
     this->restoreGeo();
 
     this->initStatusBar();
@@ -67,7 +69,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(websocketNotifier(), &WebsocketNotifier::BountyReceived, ui->bountiesWidget->model(), &BountiesModel::updateBounties);
     connect(websocketNotifier(), &WebsocketNotifier::RedditReceived, ui->redditWidget->model(), &RedditModel::updatePosts);
     connect(websocketNotifier(), &WebsocketNotifier::RevuoReceived, ui->revuoWidget, &RevuoWidget::updateItems);
-    connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, this, &MainWindow::onUpdatesAvailable);
+    connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, m_updater.data(), &Updater::wsUpdatesReceived);
 #ifdef HAS_XMRIG
     connect(websocketNotifier(), &WebsocketNotifier::XMRigDownloadsReceived, m_xmrig, &XMRigWidget::onDownloads);
 #endif
@@ -79,6 +81,8 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
+
+    connect(m_updater.data(), &Updater::updateAvailable, this, &MainWindow::showUpdateNotification);
 
     ColorScheme::updateFromWidget(this);
     QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
@@ -350,6 +354,11 @@ void MainWindow::initMenu() {
 
     // [Help]
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
+#if defined(CHECK_UPDATES)
+    connect(ui->actionCheckForUpdates,   &QAction::triggered, this, &MainWindow::showUpdateDialog);
+#else
+    ui->actionCheckForUpdates->setVisible(false);
+#endif
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
     connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentation);
@@ -1341,9 +1350,8 @@ void MainWindow::onTorConnectionStateChanged(bool connected) {
         m_statusBtnTor->setIcon(icons()->icon("tor_logo_disabled.png"));
 }
 
-void MainWindow::onCheckUpdatesComplete(const QString &version, const QString &binaryFilename,
-                                        const QString &hash, const QString &signer) {
-    QString versionDisplay{version};
+void MainWindow::showUpdateNotification() {
+    QString versionDisplay{m_updater->version};
     versionDisplay.replace("beta", "Beta");
     QString updateText = QString("Update to Feather %1 is available").arg(versionDisplay);
     m_statusUpdateAvailable->setText(updateText);
@@ -1351,80 +1359,13 @@ void MainWindow::onCheckUpdatesComplete(const QString &version, const QString &b
     m_statusUpdateAvailable->show();
 
     m_statusUpdateAvailable->disconnect();
-    connect(m_statusUpdateAvailable, &StatusBarButton::clicked, [this, version, binaryFilename, hash, signer] {
-        this->onShowUpdateCheck(version, binaryFilename, hash, signer);
-    });
+    connect(m_statusUpdateAvailable, &StatusBarButton::clicked, this, &MainWindow::showUpdateDialog);
 }
 
-void MainWindow::onShowUpdateCheck(const QString &version, const QString &binaryFilename,
-                                   const QString &hash, const QString &signer) {
-    QString platformTag = this->getPlatformTag();
-    QString downloadUrl = QString("https://featherwallet.org/files/releases/%1/%2").arg(platformTag, binaryFilename);
-
-    UpdateDialog updateDialog{this, version, downloadUrl, hash, signer, platformTag};
+void MainWindow::showUpdateDialog() {
+    UpdateDialog updateDialog{this, m_updater};
     connect(&updateDialog, &UpdateDialog::restartWallet, m_windowManager, &WindowManager::restartApplication);
     updateDialog.exec();
-}
-
-void MainWindow::onUpdatesAvailable(const QJsonObject &updates) {
-    QString featherVersionStr{FEATHER_VERSION};
-
-    auto featherVersion = SemanticVersion::fromString(featherVersionStr);
-
-    QString platformTag = getPlatformTag();
-    if (platformTag.isEmpty()) {
-        qWarning() << "Unsupported platform, unable to fetch update";
-        return;
-    }
-
-    QJsonObject platformData = updates["platform"].toObject()[platformTag].toObject();
-    if (platformData.isEmpty()) {
-        qWarning() << "Unable to find current platform in updates data";
-        return;
-    }
-
-    QString newVersion = platformData["version"].toString();
-    if (SemanticVersion::fromString(newVersion) <= featherVersion) {
-        return;
-    }
-
-    // Hooray! New update available
-
-    QString hashesUrl = QString("%1/files/releases/hashes-%2-plain.txt").arg(constants::websiteUrl, newVersion);
-
-    UtilsNetworking network{getNetworkTor()};
-    QNetworkReply *reply = network.get(hashesUrl);
-
-    connect(reply, &QNetworkReply::finished, this, std::bind(&MainWindow::onSignedHashesReceived, this, reply, platformTag, newVersion));
-}
-
-void MainWindow::onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version) {
-    if (reply->error() != QNetworkReply::NoError) {
-        qWarning() << "Unable to fetch signed hashes: " << reply->errorString();
-        return;
-    }
-
-    QByteArray armoredSignedHashes = reply->readAll();
-    reply->deleteLater();
-
-    const QString binaryFilename = QString("feather-%1-%2.zip").arg(version, platformTag);
-    QString signer;
-    QByteArray signedHash = AsyncTask::runAndWaitForFuture([armoredSignedHashes, binaryFilename, &signer]{
-        try {
-            return Updater().verifyParseSignedHashes(armoredSignedHashes, binaryFilename, signer);
-        }
-        catch (const std::exception &e) {
-            qWarning() << "Failed to fetch and verify signed hash: " << e.what();
-            return QByteArray{};
-        }
-    });
-    if (signedHash.isEmpty()) {
-        return;
-    }
-
-    QString hash = signedHash.toHex();
-    qInfo() << "Update found: " << binaryFilename << hash << "signed by:" << signer;
-    this->onCheckUpdatesComplete(version, binaryFilename, hash, signer);
 }
 
 void MainWindow::onInitiateTransaction() {
