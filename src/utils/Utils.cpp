@@ -235,14 +235,14 @@ QString xdgDesktopEntry(){
             "Name=Feather\n"
             "GenericName=Feather\n"
             "X-GNOME-FullName=Feather\n"
-            "Comment=a free Monero desktop wallet\n"
+            "Comment=a free, open source Monero desktop wallet\n"
             "Keywords=Monero;\n"
             "Exec=\"%1\" %u\n"
             "Terminal=false\n"
             "Type=Application\n"
-            "Icon=monero\n"
+            "Icon=feather\n"
             "Categories=Network;GNOME;Qt;\n"
-            "StartupNotify=true\n"
+            "StartupNotify=false\n"
     ).arg(QApplication::applicationFilePath());
 }
 
@@ -273,7 +273,7 @@ bool xdgDesktopEntryRegister() {
     if (!fileExists(pathIcon)) {
         pixmapWrite(pathIcon, appIcon);
     }
-    xdgDesktopEntryWrite(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation));
+    xdgDesktopEntryWrite(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + "/feather-wallet.desktop");
 
     xdgRefreshApplications();
     return true;
