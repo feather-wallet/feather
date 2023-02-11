@@ -6,9 +6,9 @@
 
 #include <QNetworkAccessManager>
 
-QNetworkAccessManager* getNetworkTor();
+QNetworkAccessManager* getNetworkSocks5();
 QNetworkAccessManager* getNetworkClearnet();
 
-//void setTorProxy(const QNetworkProxy &proxy);
+QNetworkAccessManager* getNetwork(const QString &address = "");
 
 #endif //FEATHER_NETWORKMANAGER_H

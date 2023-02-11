@@ -43,7 +43,7 @@ public:
 
 signals:
     void connectionStateChanged(bool connected);
-    void startupFailure(QString reason);
+    void statusChanged(QString reason);
     void logsUpdated();
 
 private slots:
@@ -55,6 +55,7 @@ private slots:
 private:
     bool shouldStartTorDaemon();
     void setConnectionState(bool connected);
+    void setErrorMessage(const QString &msg);
 
     static QPointer<TorManager> m_instance;
 

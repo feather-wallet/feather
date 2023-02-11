@@ -82,7 +82,7 @@ public:
         Page_WalletRestoreKeys,
         Page_SetRestoreHeight,
         Page_HardwareDevice,
-        Page_NetworkTor,
+        Page_NetworkProxy,
         Page_NetworkWebsocket
     };
 
@@ -91,7 +91,7 @@ public:
 
 signals:
     void initialNetworkConfigured();
-    void skinChanged(const QString &skin);
+    void showSettings();
     void openWallet(QString path, QString password);
     void defaultWalletDirChanged(QString walletDir);
 

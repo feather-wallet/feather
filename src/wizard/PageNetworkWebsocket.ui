@@ -30,7 +30,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather can connect to an onion service hosted by the Feather developers to obtain pricing information, a curated list of remote nodes, Home feeds, the latest version of Feather Wallet and more.&lt;/p&gt;&lt;p&gt;This service is only used to fetch information and can only be reached over Tor. The wallet does not send information about its state or your transactions to the server. It is not used for any telemetry or crash reports.&lt;/p&gt;&lt;p&gt;If you opt to disable this connection some wallet functionality will be disabled. You can re-enable it at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather can connect to a service hosted by the developers to obtain pricing information, a curated list of remote nodes, Home feeds, the latest version of Feather Wallet and more.&lt;/p&gt;&lt;p&gt;This service is only used to fetch information. The wallet does not send information about its state or your transactions to the server. It is not used for any telemetry or crash reports.&lt;/p&gt;&lt;p&gt;If you disable this connection some wallet functionality will be unavailable. You can re-enable it at any time.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>

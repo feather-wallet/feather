@@ -16,7 +16,7 @@ TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext>
     ui->setupUi(this);
 
     auto node = m_ctx->nodes->connection();
-    m_rpc = new DaemonRpc(this, getNetworkTor(), node.toAddress());
+    m_rpc = new DaemonRpc(this, node.toAddress());
 
     connect(ui->btn_Broadcast, &QPushButton::clicked, this, &TxBroadcastDialog::broadcastTx);
     connect(ui->btn_Close, &QPushButton::clicked, this, &TxBroadcastDialog::reject);
@@ -35,12 +35,6 @@ void TxBroadcastDialog::broadcastTx() {
 
     FeatherNode node = ui->radio_useCustom->isChecked() ? FeatherNode(ui->customNode->text()) : m_ctx->nodes->connection();
 
-    if (node.isLocal()) {
-        m_rpc->setNetwork(getNetworkClearnet());
-    } else {
-        m_rpc->setNetwork(getNetworkTor());
-    }
-
     m_rpc->setDaemonAddress(node.toURL());
     m_rpc->sendRawTransaction(tx);
 }
@@ -56,6 +50,7 @@ void TxBroadcastDialog::onApiResponse(const DaemonRpc::DaemonResponse &resp) {
     }
 
     this->accept();
+
     QMessageBox::information(this, "Transaction broadcast", "Transaction submitted successfully.\n\n"
                                                             "If the transaction belongs to this wallet it may take several minutes before it shows up in the history tab.");
 }

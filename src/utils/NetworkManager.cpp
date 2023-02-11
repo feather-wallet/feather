@@ -5,21 +5,26 @@
 
 #include <QCoreApplication>
 #include <QNetworkProxy>
+#include <QRegularExpression>
+#include <QUrl>
 
-QNetworkAccessManager *g_networkManagerTor = nullptr;
+#include "utils/config.h"
+#include "utils/Utils.h"
+
+QNetworkAccessManager *g_networkManagerSocks5 = nullptr;
 QNetworkAccessManager *g_networkManagerClearnet = nullptr;
 
-QNetworkAccessManager* getNetworkTor()
+QNetworkAccessManager* getNetworkSocks5()
 {
-    if (!g_networkManagerTor) {
-        g_networkManagerTor = new QNetworkAccessManager(QCoreApplication::instance());
+    if (!g_networkManagerSocks5) {
+        g_networkManagerSocks5 = new QNetworkAccessManager(QCoreApplication::instance());
         QNetworkProxy proxy;
         proxy.setType(QNetworkProxy::Socks5Proxy);
         proxy.setHostName("127.0.0.1");
         proxy.setPort(9050);
-        g_networkManagerTor->setProxy(proxy);
+        g_networkManagerSocks5->setProxy(proxy);
     }
-    return g_networkManagerTor;
+    return g_networkManagerSocks5;
 }
 
 QNetworkAccessManager* getNetworkClearnet()
@@ -30,8 +35,17 @@ QNetworkAccessManager* getNetworkClearnet()
     return g_networkManagerClearnet;
 }
 
-//void setTorProxy(const QNetworkProxy &proxy)
-//{
-//    QNetworkAccessManager *network = getNetworkTor();
-//    network->setProxy(proxy);
-//}
+
+QNetworkAccessManager* getNetwork(const QString &address)
+{
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::None) {
+        return getNetworkClearnet();
+    }
+
+    // Ignore proxy rules for local addresses
+    if (!address.isEmpty() && Utils::isLocalUrl(QUrl(address))) {
+        return getNetworkClearnet();
+    }
+
+    return getNetworkSocks5();
+}

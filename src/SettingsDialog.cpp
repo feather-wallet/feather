@@ -160,7 +160,7 @@ void Settings::setupPrivacyTab() {
 }
 
 void Settings::setupNodeTab() {
-    ui->nodeWidget->setupUI(m_ctx);
+//    ui->nodeWidget->setupUI(m_ctx);
     connect(ui->nodeWidget, &NodeWidget::nodeSourceChanged, m_ctx->nodes, &Nodes::onNodeSourceChanged);
     connect(ui->nodeWidget, &NodeWidget::connectToNode, m_ctx->nodes, QOverload<const FeatherNode&>::of(&Nodes::connectToNode));
 }

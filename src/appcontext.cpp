@@ -22,9 +22,9 @@
 
 AppContext::AppContext(Wallet *wallet)
     : wallet(wallet)
-    , nodes(new Nodes(this, this))
+    , nodes(new Nodes(this))
     , networkType(constants::networkType)
-    , m_rpc(new DaemonRpc{this, getNetworkTor(), ""})
+    , m_rpc(new DaemonRpc{this, ""})
 {
     connect(this->wallet, &Wallet::moneySpent,               this, &AppContext::onMoneySpent);
     connect(this->wallet, &Wallet::moneyReceived,            this, &AppContext::onMoneyReceived);
@@ -38,14 +38,13 @@ AppContext::AppContext(Wallet *wallet)
     connect(this->wallet, &Wallet::deviceError,              this, &AppContext::onDeviceError);
     connect(this->wallet, &Wallet::deviceButtonRequest,      this, &AppContext::onDeviceButtonRequest);
     connect(this->wallet, &Wallet::deviceButtonPressed,      this, &AppContext::onDeviceButtonPressed);
-    connect(this->wallet, &Wallet::connectionStatusChanged, [this]{
-        this->nodes->autoConnect();
-    });
     connect(this->wallet, &Wallet::currentSubaddressAccountChanged, [this]{
         this->updateBalance();
     });
 
     connect(this, &AppContext::createTransactionError, this, &AppContext::onCreateTransactionError);
+
+    nodes->setContext(this);
 
     // Store the wallet every 2 minutes
     m_storeTimer.start(2 * 60 * 1000);
@@ -188,15 +187,12 @@ void AppContext::setSelectedInputs(const QStringList &selectedInputs) {
     emit selectedInputsChanged(selectedInputs);
 }
 
-void AppContext::onTorSettingsChanged() {
+void AppContext::onProxySettingsChanged() {
     if (Utils::isTorsocks()) {
         return;
     }
 
     this->nodes->connectToNode();
-
-    auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
-    qDebug() << "Changed privacyLevel to " << privacyLevel;
 }
 
 void AppContext::stopTimers() {

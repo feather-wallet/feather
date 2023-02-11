@@ -51,16 +51,22 @@ UpdateDialog::UpdateDialog(QWidget *parent, QSharedPointer<Updater> updater)
 }
 
 void UpdateDialog::checkForUpdates() {
-    ui->label_header->setText("Checking for updates...");
-    ui->label_body->setText("...");
+    ui->label_header->setText("Checking for updates");
+    ui->label_body->setText("..");
+    connect(&m_waitingTimer, &QTimer::timeout, [this]{
+       ui->label_body->setText(ui->label_body->text() + ".");
+    });
+    m_waitingTimer.start(500);
     m_updater->checkForUpdates();
 }
 
 void UpdateDialog::noUpdateAvailable() {
+    m_waitingTimer.stop();
     this->setStatus("Feather is up-to-date.", true);
 }
 
 void UpdateDialog::updateAvailable() {
+    m_waitingTimer.stop();
     ui->frame->show();
     ui->btn_installUpdate->hide();
     ui->btn_restart->hide();
@@ -70,6 +76,7 @@ void UpdateDialog::updateAvailable() {
 }
 
 void UpdateDialog::onUpdateCheckFailed(const QString &errorMsg) {
+    m_waitingTimer.stop();
     this->setStatus(QString("Failed to check for updates: %1").arg(errorMsg), false);
 }
 
@@ -78,7 +85,7 @@ void UpdateDialog::onDownloadClicked() {
     ui->btn_download->hide();
     ui->progressBar->show();
 
-    UtilsNetworking network{getNetworkTor()};
+    UtilsNetworking network{this};
 
     m_reply = network.get(m_updater->downloadUrl);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &UpdateDialog::onDownloadProgress);

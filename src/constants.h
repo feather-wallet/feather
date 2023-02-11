@@ -24,15 +24,6 @@ namespace constants
     // donation constants
     const QString donationAddress = "47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f";
     const int donationBoundary = 25;
-
-    // websocket constants
-    const QVector<QUrl> websocketUrls = {
-        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
-        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
-    };
-
-    // website constants
-    const QString websiteUrl = "https://featherwallet.org";
 }
 
 #endif //FEATHER_CONSTANTS_H

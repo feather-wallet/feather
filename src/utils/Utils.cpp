@@ -464,9 +464,6 @@ void externalLinkWarning(QWidget *parent, const QString &url){
 
     QString body = QString("You are about to open the following link:\n\n%1").arg(url);
 
-    if (!(TailsOS::detect() || WhonixOS::detect()))
-        body += "\n\nYou will NOT be using Tor.";
-
     QMessageBox linkWarning(parent);
     linkWarning.setWindowTitle("External link warning");
     linkWarning.setText(body);
@@ -573,5 +570,10 @@ QFont relativeFont(int delta) {
     auto font = QApplication::font();
     font.setPointSize(font.pointSize() + delta);
     return font;
+}
+
+bool isLocalUrl(const QUrl &url) {
+    QRegularExpression localNetwork(R"((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))");
+    return (localNetwork.match(url.host()).hasMatch() || url.host() == "localhost");
 }
 }

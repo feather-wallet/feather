@@ -24,7 +24,6 @@ public:
         firstRun,
         warnOnStagenet,
         warnOnTestnet,
-        logLevel,
 
         homeWidget,
         donateBeg,
@@ -64,39 +63,61 @@ public:
 
         // Settings
         lastSettingsPage,
-        preferredFiatCurrency,
+
+        // Appearance
         skin,
         amountPrecision,
         dateFormat,
         timeFormat,
         balanceDisplay,
-        inactivityLockEnabled,
-        inactivityLockTimeout,
-        disableWebsocket,
-        offlineMode,
+        preferredFiatCurrency,
 
-        multiBroadcast,
-        warnOnExternalLink,
-        hideBalance,
-        disableLogging,
-        hideNotifications,
-
-        blockExplorer,
-        redditFrontend,
-        localMoneroFrontend,
-        bountiesFrontend,
-
-        fiatSymbols,
-        cryptoSymbols,
-
-        // Tor
-        torPrivacyLevel,
+        // Network -> Proxy
+        proxy,
         socks5Host,
         socks5Port,
         socks5User,
         socks5Pass,
         useLocalTor, // Prevents Feather from starting bundled Tor daemon
-        initSyncThreshold
+        torOnlyAllowOnion,
+        torPrivacyLevel, // Tor node network traffic strategy
+        torManagedPort, // Port for managed Tor daemon
+        initSyncThreshold, // Switch to Tor after initial sync threshold blocks
+
+        // Network -> Websocket
+        disableWebsocket,
+
+        // Network -> Offline
+        offlineMode,
+
+        // Storage -> Logging
+        writeStackTraceToDisk,
+        disableLogging,
+        logLevel,
+
+        // Storage -> Misc
+        writeRecentlyOpenedWallets,
+
+        // Display
+        hideBalance,
+        hideUpdateNotifications,
+        hideNotifications,
+        warnOnExternalLink,
+        inactivityLockEnabled,
+        inactivityLockTimeout,
+        lockOnMinimize,
+
+        // Transactions
+        multiBroadcast,
+
+        // Misc
+        blockExplorer,
+        redditFrontend,
+        localMoneroFrontend,
+        bountiesFrontend, // unused
+
+        fiatSymbols,
+        cryptoSymbols,
     };
 
     enum PrivacyLevel {
@@ -114,6 +135,13 @@ public:
     enum MiningMode {
         Pool = 0,
         Solo
+    };
+
+    enum Proxy {
+        None = 0,
+        Tor,
+        i2p,
+        socks5
     };
 
     ~Config() override;

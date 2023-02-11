@@ -8,7 +8,6 @@
 #include <QRegularExpression>
 #include <QApplication>
 #include <QtNetwork>
-#include <QNetworkAccessManager>
 #include <QNetworkReply>
 
 #include "model/NodeModel.h"
@@ -83,6 +82,14 @@ struct FeatherNode {
         return url.host().endsWith(".onion");
     }
 
+    bool isI2P() const {
+        return url.host().endsWith(".i2p");
+    }
+
+    bool isAnonymityNetwork() const {
+        return isOnion() || isI2P();
+    };
+
     QString toAddress() const {
         return QString("%1:%2").arg(url.host(), QString::number(url.port()));
     }
@@ -111,7 +118,8 @@ class Nodes : public QObject {
     Q_OBJECT
 
 public:
-    explicit Nodes(AppContext *ctx, QObject *parent = nullptr);
+    explicit Nodes(QObject *parent = nullptr);
+    void setContext(AppContext *ctx);
     void loadConfig();
 
     NodeSource source();
@@ -132,17 +140,11 @@ public slots:
     void setCustomNodes(const QList<FeatherNode>& nodes);
     void autoConnect(bool forceReconnect = false);
 
-    void onTorSettingsChanged();
-
-signals:
-    void WSNodeExhausted();
-    void nodeExhausted();
-
 private slots:
     void onWalletRefreshed();
 
 private:
-    AppContext *m_ctx;
+    AppContext *m_ctx = nullptr;
     QJsonObject m_configJson;
 
     NodeList m_nodes;
@@ -155,20 +157,17 @@ private:
     FeatherNode m_connection;  // current active connection, if any
 
     bool m_wsNodesReceived = false;
-    bool m_wsExhaustedWarningEmitted = true;
-    bool m_customExhaustedWarningEmitted = true;
     bool m_enableAutoconnect = true;
 
     FeatherNode pickEligibleNode();
 
     bool useOnionNodes();
-    bool useTorProxy(const FeatherNode &node);
+    bool useI2PNodes();
+    bool useSocks5Proxy(const FeatherNode &node);
 
     void updateModels();
     void resetLocalState();
     void exhausted();
-    void WSNodeExhaustedWarning();
-    void nodeExhaustedWarning();
     int modeHeight(const QList<FeatherNode> &nodes);
 };
 

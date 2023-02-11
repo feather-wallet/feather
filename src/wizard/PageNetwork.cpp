@@ -7,6 +7,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "constants.h"
+#include "utils/os/Prestium.h"
 #include "Utils.h"
 #include "WalletWizard.h"
 
@@ -55,7 +56,11 @@ PageNetwork::PageNetwork(QWidget *parent)
 }
 
 int PageNetwork::nextId() const {
-    return WalletWizard::Page_NetworkTor;
+    if (Prestium::detect()) {
+        return WalletWizard::Page_NetworkWebsocket;
+    }
+
+    return WalletWizard::Page_NetworkProxy;
 }
 
 bool PageNetwork::validatePage() {

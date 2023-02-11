@@ -4,10 +4,11 @@
 #include "Updater.h"
 
 #include <common/util.h>
+#undef config
 #include <openpgp/hash.h>
 
+#include "utils/config.h"
 #include "config-feather.h"
-#include "constants.h"
 #include "Utils.h"
 #include "utils/AsyncTask.h"
 #include "utils/networking.h"
@@ -22,8 +23,12 @@ Updater::Updater(QObject *parent) :
 }
 
 void Updater::checkForUpdates() {
-    UtilsNetworking network{getNetworkTor()};
-    QNetworkReply *reply = network.getJson("https://featherwallet.org/updates.json");
+    UtilsNetworking network{this};
+    QNetworkReply *reply = network.getJson(QString("%1/updates.json").arg(this->getWebsiteUrl()));
+    if (!reply) {
+        emit updateCheckFailed("Can't check for websites: offline mode enabled");
+        return;
+    }
 
     connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onUpdateCheckResponse, this, reply));
 }
@@ -77,9 +82,10 @@ void Updater::wsUpdatesReceived(const QJsonObject &updates) {
 
     // Hooray! New update available
 
-    QString hashesUrl = QString("%1/files/releases/hashes-%2-plain.txt").arg(constants::websiteUrl, newVersion);
+    QString hashesUrl = QString("%1/files/releases/hashes-%2-plain.txt").arg(this->getWebsiteUrl(), newVersion);
+    qDebug() << hashesUrl;
 
-    UtilsNetworking network{getNetworkTor()};
+    UtilsNetworking network{this};
     QNetworkReply *reply = network.get(hashesUrl);
 
     connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onSignedHashesReceived, this, reply, platformTag, newVersion));
@@ -115,7 +121,7 @@ void Updater::onSignedHashesReceived(QNetworkReply *reply, const QString &platfo
     this->state = Updater::State::UPDATE_AVAILABLE;
     this->version = version;
     this->binaryFilename = binaryFilename;
-    this->downloadUrl = QString("https://featherwallet.org/files/releases/%1/%2").arg(platformTag, binaryFilename);
+    this->downloadUrl = QString("%1/files/releases/%2/%3").arg(this->getWebsiteUrl(), platformTag, binaryFilename);
     this->hash = hash;
     this->signer = signer;
     this->platformTag = platformTag;
@@ -152,6 +158,18 @@ QString Updater::getPlatformTag() {
     return tag;
 #endif
     return "";
+}
+
+QString Updater::getWebsiteUrl() {
+        if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+            return "http://featherdvtpi7ckdbkb2yxjfwx3oyvr3xjz3oo4rszylfzjdg6pbm3id.onion";
+        }
+        else if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
+            return "http://rwzulgcql2y3n6os2jhmhg6un2m33rylazfnzhf56likav47aylq.b32.i2p";
+        }
+        else {
+            return "https://featherwallet.org";
+        }
 }
 
 QByteArray Updater::verifyParseSignedHashes(

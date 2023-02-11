@@ -7,6 +7,8 @@
 
 #include <QFileDialog>
 
+#include "SettingsNewDialog.h"
+
 PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageMenu)
@@ -16,14 +18,9 @@ PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget 
     ui->setupUi(this);
     this->setButtonText(QWizard::FinishButton, "Open recent wallet");
 
-#if defined(Q_OS_MAC)
-    ui->check_darkMode->setVisible(false);
-#endif
-
     QString settingsSkin = config()->get(Config::skin).toString();
-    ui->check_darkMode->setChecked(settingsSkin == "QDarkStyle");
 
-    connect(ui->check_darkMode, &QCheckBox::toggled, this, &PageMenu::enableDarkMode);
+    connect(ui->btn_openSettings, &QPushButton::clicked, this, &PageMenu::showSettings);
 }
 
 void PageMenu::initializePage() {

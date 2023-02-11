@@ -90,13 +90,13 @@ QVariant BountiesModel::headerData(int section, Qt::Orientation orientation, int
     {
         switch(section) {
             case Votes:
-                return QString("🡅");
+                return QString(" 🡅 ");
             case Title:
                 return QString("Title");
             case Status:
-                return QString("Status");
+                return QString(" Status ");
             case Bounty:
-                return QString("Bounty");
+                return QString(" Bounty ");
             default:
                 return QVariant();
         }

@@ -68,14 +68,18 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::balanceDisplay, {QS("balanceDisplay"), Config::BalanceDisplay::spendablePlusUnconfirmed}},
         {Config::inactivityLockEnabled, {QS("inactivityLockEnabled"), false}},
         {Config::inactivityLockTimeout, {QS("inactivityLockTimeout"), 10}},
+        {Config::lockOnMinimize, {QS("lockOnMinimize"), false}},
         {Config::disableWebsocket, {QS("disableWebsocket"), false}},
         {Config::offlineMode, {QS("offlineMode"), false}},
 
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
-         {Config::hideNotifications, {QS("hideNotifications"), false}},
-        {Config::disableLogging, {QS("disableLogging"), false}},
+        {Config::hideNotifications, {QS("hideNotifications"), false}},
+        {Config::hideUpdateNotifications, {QS("hideUpdateNotifications"), false}},
+        {Config::disableLogging, {QS("disableLogging"), true}},
+        {Config::writeStackTraceToDisk, {QS("writeStackTraceToDisk"), true}},
+        {Config::writeRecentlyOpenedWallets, {QS("writeRecentlyOpenedWallets"), true}},
 
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
@@ -86,11 +90,14 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
 
         // Tor
+        {Config::proxy, {QS("proxy"), Config::Proxy::Tor}},
         {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
+        {Config::torOnlyAllowOnion, {QS("torOnlyAllowOnion"), false}},
         {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},
         {Config::socks5Port, {QS("socks5Port"), "9050"}},
         {Config::socks5User, {QS("socks5User"), ""}}, // Unused
         {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
+        {Config::torManagedPort, {QS("torManagedPort"), "19450"}},
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}}
 };

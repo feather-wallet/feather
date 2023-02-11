@@ -38,6 +38,7 @@ WindowManager::WindowManager(EventFilter *eventFilter)
     m_tray->show();
 
     this->initSkins();
+    this->patchMacStylesheet();
 
     this->showCrashLogs();
 
@@ -133,6 +134,34 @@ void WindowManager::raise() {
         // This shouldn't happen
         this->close();
     }
+}
+
+// ######################## SETTINGS ########################
+
+void WindowManager::showSettings(QSharedPointer<AppContext> ctx, QWidget *parent, bool showProxyTab) {
+    SettingsNew settings{ctx, parent};
+
+    connect(&settings, &SettingsNew::preferredFiatCurrencyChanged, [this]{
+        for (const auto &window : m_windows) {
+            window->onPreferredFiatCurrencyChanged();
+        }
+    });
+    connect(&settings, &SettingsNew::skinChanged, this, &WindowManager::onChangeTheme);
+    connect(&settings, &SettingsNew::updateBalance, this, &WindowManager::updateBalance);
+    connect(&settings, &SettingsNew::proxySettingsChanged, this, &WindowManager::onProxySettingsChanged);
+    connect(&settings, &SettingsNew::websocketStatusChanged, this, &WindowManager::onWebsocketStatusChanged);
+    connect(&settings, &SettingsNew::offlineMode, this, &WindowManager::offlineMode);
+    connect(&settings, &SettingsNew::hideUpdateNotifications, [this](bool hidden){
+        for (const auto &window : m_windows) {
+            window->onHideUpdateNotifications(hidden);
+        }
+    });
+
+    if (showProxyTab) {
+        settings.showNetworkProxyTab();
+    }
+
+    settings.exec();
 }
 
 // ######################## WALLET OPEN ########################
@@ -544,60 +573,56 @@ void WindowManager::onInitialNetworkConfigured() {
         m_initialNetworkConfigured = true;
         appData();
 
-        this->initTor();
-        this->initWS();
+        this->onProxySettingsChanged();
     }
 }
 
-void WindowManager::initTor() {
-    torManager()->init();
-    torManager()->start();
-
-    this->onTorSettingsChanged();
-}
-
-void WindowManager::onTorSettingsChanged() {
+void WindowManager::onProxySettingsChanged() {
     if (Utils::isTorsocks()) {
         return;
     }
 
-    // use local tor -> bundled tor
-    QString host = config()->get(Config::socks5Host).toString();
-    quint16 port = config()->get(Config::socks5Port).toString().toUShort();
-    if (!torManager()->isLocalTor()) {
-        host = torManager()->featherTorHost;
-        port = torManager()->featherTorPort;
+    // Will kill the process if necessary
+    torManager()->init();
+    torManager()->start();
+
+    QNetworkProxy proxy{QNetworkProxy::NoProxy};
+    if (config()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        QString host = config()->get(Config::socks5Host).toString();
+        quint16 port = config()->get(Config::socks5Port).toString().toUShort();
+
+        if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
+            host = torManager()->featherTorHost;
+            port = torManager()->featherTorPort;
+        }
+
+        proxy = QNetworkProxy{QNetworkProxy::Socks5Proxy, host, port};
+        getNetworkSocks5()->setProxy(proxy);
     }
 
-    QNetworkProxy proxy{QNetworkProxy::Socks5Proxy, host, port};
-    getNetworkTor()->setProxy(proxy);
-    websocketNotifier()->websocketClient.webSocket.setProxy(proxy);
+    qWarning() << "Proxy: " << proxy.hostName() << " " << proxy.port();
 
-    emit torSettingsChanged();
+    // Switch websocket to new proxy and update URL
+    websocketNotifier()->websocketClient.stop();
+    websocketNotifier()->websocketClient.webSocket.setProxy(proxy);
+    websocketNotifier()->websocketClient.nextWebsocketUrl();
+    websocketNotifier()->websocketClient.restart();
+
+    emit proxySettingsChanged();
 }
 
 void WindowManager::onWebsocketStatusChanged(bool enabled) {
     emit websocketStatusChanged(enabled);
 }
 
-void WindowManager::initWS() {
-    if (config()->get(Config::offlineMode).toBool()) {
-        return;
-    }
-
-    if (config()->get(Config::disableWebsocket).toBool()) {
-        return;
-    }
-
-    websocketNotifier()->websocketClient.start();
-}
-
 // ######################## WIZARD ########################
 
-WalletWizard* WindowManager::createWizard(WalletWizard::Page startPage) const {
+WalletWizard* WindowManager::createWizard(WalletWizard::Page startPage) {
     auto *wizard = new WalletWizard;
     connect(wizard, &WalletWizard::initialNetworkConfigured, this, &WindowManager::onInitialNetworkConfigured);
-    connect(wizard, &WalletWizard::skinChanged, this, &WindowManager::changeSkin);
+    connect(wizard, &WalletWizard::showSettings, [this, wizard]{
+        this->showSettings(nullptr, wizard);
+    });
     connect(wizard, &WalletWizard::openWallet, this, &WindowManager::tryOpenWallet);
     connect(wizard, &WalletWizard::createWallet, this, &WindowManager::tryCreateWallet);
     connect(wizard, &WalletWizard::createWalletFromKeys, this, &WindowManager::tryCreateWalletFromKeys);
@@ -667,13 +692,32 @@ QString WindowManager::loadStylesheet(const QString &resource) {
     return data;
 }
 
-void WindowManager::changeSkin(const QString &skinName) {
+void WindowManager::onChangeTheme(const QString &skinName) {
     if (!m_skins.contains(skinName)) {
         qWarning() << QString("No such skin %1").arg(skinName);
         return;
     }
 
     config()->set(Config::skin, skinName);
+
     qApp->setStyleSheet(m_skins[skinName]);
     qDebug() << QString("Skin changed to %1").arg(skinName);
+
+    this->patchMacStylesheet();
+
+    for (const auto &window : m_windows) {
+        window->skinChanged(skinName);
+    }
+}
+
+void WindowManager::patchMacStylesheet() {
+#if defined(Q_OS_MACOS)
+    QString styleSheet = qApp->styleSheet();
+
+    auto patch = Utils::fileOpenQRC(":assets/macStylesheet.patch");
+    auto patch_text = Utils::barrayToString(patch);
+    styleSheet += patch_text;
+
+    qApp->setStyleSheet(styleSheet);
+#endif
 }

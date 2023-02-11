@@ -3,21 +3,22 @@
 
 #include "LocalMoneroApi.h"
 
-LocalMoneroApi::LocalMoneroApi(QObject *parent, UtilsNetworking *network, const QString &baseUrl)
+#include "utils/config.h"
+
+LocalMoneroApi::LocalMoneroApi(QObject *parent, UtilsNetworking *network)
     : QObject(parent)
     , m_network(network)
-    , m_baseUrl(baseUrl)
 {
 }
 
 void LocalMoneroApi::countryCodes() {
-    QString url = QString("%1/countrycodes").arg(m_baseUrl);
+    QString url = QString("%1/countrycodes").arg(this->getBaseUrl());
     QNetworkReply *reply = m_network->getJson(url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::COUNTRY_CODES));
 }
 
 void LocalMoneroApi::currencies() {
-    QString url = QString("%1/currencies").arg(m_baseUrl);
+    QString url = QString("%1/currencies").arg(this->getBaseUrl());
     QNetworkReply *reply = m_network->getJson(url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::CURRENCIES));
 }
@@ -25,9 +26,9 @@ void LocalMoneroApi::currencies() {
 void LocalMoneroApi::paymentMethods(const QString &countryCode) {
     QString url;
     if (countryCode.isEmpty()) {
-        url = QString("%1/payment_methods").arg(m_baseUrl);
+        url = QString("%1/payment_methods").arg(this->getBaseUrl());
     } else {
-        url = QString("%1/payment_methods/%2").arg(m_baseUrl, countryCode);
+        url = QString("%1/payment_methods/%2").arg(this->getBaseUrl(), countryCode);
     }
     QNetworkReply *reply = m_network->getJson(url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::PAYMENT_METHODS));
@@ -50,7 +51,7 @@ void LocalMoneroApi::sellMoneroOnline(const QString &currencyCode, const QString
 }
 
 void LocalMoneroApi::accountInfo(const QString &username) {
-    QString url = QString("%1/account_info/%2").arg(m_baseUrl, username);
+    QString url = QString("%1/account_info/%2").arg(this->getBaseUrl(), username);
     QNetworkReply *reply = m_network->getJson(url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::ACCOUNT_INFO));
 }
@@ -88,7 +89,7 @@ void LocalMoneroApi::onResponse(QNetworkReply *reply, LocalMoneroApi::Endpoint e
 QString LocalMoneroApi::getBuySellUrl(bool buy, const QString &currencyCode, const QString &countryCode,
                                       const QString &paymentMethod, const QString &amount, int page)
 {
-    QString url = QString("%1/%2-monero-online/%3").arg(m_baseUrl, buy ? "buy" : "sell", currencyCode);
+    QString url = QString("%1/%2-monero-online/%3").arg(this->getBaseUrl(), buy ? "buy" : "sell", currencyCode);
     if (!countryCode.isEmpty() && paymentMethod.isEmpty())
         url += QString("/%1").arg(countryCode);
     else if (countryCode.isEmpty() && !paymentMethod.isEmpty())
@@ -103,4 +104,16 @@ QString LocalMoneroApi::getBuySellUrl(bool buy, const QString &currencyCode, con
         query.addQueryItem("page", QString::number(page));
     url += "?" + query.toString();
     return url;
+}
+
+QString LocalMoneroApi::getBaseUrl() {
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+        return "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion/api/v1";
+    }
+
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
+        return "http://yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p/api/v1";
+    }
+
+    return "https://agoradesk.com/api/v1";
 }

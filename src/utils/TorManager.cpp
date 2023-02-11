@@ -42,6 +42,8 @@ void TorManager::init() {
     if (m_localTor && (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting)) {
         m_process.kill();
     }
+
+    featherTorPort = config()->get(Config::torManagedPort).toString().toUShort();
 }
 
 void TorManager::stop() {
@@ -58,12 +60,12 @@ void TorManager::start() {
 
     auto state = m_process.state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
-        this->errorMsg = "Can't start Tor, already running or starting";
+        this->setErrorMessage("Can't start Tor, already running or starting");
         return;
     }
 
     if (Utils::portOpen(featherTorHost, featherTorPort)) {
-        this->errorMsg = QString("Unable to start Tor on %1:%2. Port already in use.").arg(featherTorHost, QString::number(featherTorPort));
+        this->setErrorMessage(QString("Unable to start Tor on %1:%2. Port already in use.").arg(featherTorHost, QString::number(featherTorPort)));
         return;
     }
 
@@ -71,7 +73,7 @@ void TorManager::start() {
 
     m_restarts += 1;
     if (m_restarts > 4) {
-        this->errorMsg = "Tor failed to start: maximum retries exceeded";
+        this->setErrorMessage("Tor failed to start: maximum retries exceeded");
         return;
     }
 
@@ -107,6 +109,10 @@ void TorManager::checkConnection() {
         this->setConnectionState(code == 0);
     }
 
+    else if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+        this->setConnectionState(false);
+    }
+
     else if (m_localTor) {
         QString host = config()->get(Config::socks5Host).toString();
         quint16 port = config()->get(Config::socks5Port).toString().toUShort();
@@ -125,6 +131,7 @@ void TorManager::setConnectionState(bool connected) {
 
 void TorManager::stateChanged(QProcess::ProcessState state) {
     if (state == QProcess::ProcessState::Running) {
+        this->setErrorMessage("");
         qWarning() << "Tor started, awaiting bootstrap";
     }
     else if (state == QProcess::ProcessState::NotRunning) {
@@ -155,7 +162,7 @@ void TorManager::handleProcessError(QProcess::ProcessError error) {
     if (error == QProcess::ProcessError::Crashed)
         qWarning() << "Tor crashed or killed";
     else if (error == QProcess::ProcessError::FailedToStart) {
-        this->errorMsg = "Tor binary failed to start: " + this->torPath;
+        this->setErrorMessage("Tor binary failed to start: " + this->torPath);
         this->m_stopRetries = true;
     }
 }
@@ -236,6 +243,11 @@ bool TorManager::shouldStartTorDaemon() {
     return false;
 #endif
 
+    // Don't start a Tor daemon if our proxy config isn't set to Tor
+    if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+        return false;
+    }
+
     // Don't start a Tor daemon if --use-local-tor is specified
     if (config()->get(Config::useLocalTor).toBool()) {
         return false;
@@ -250,7 +262,7 @@ bool TorManager::shouldStartTorDaemon() {
     if (!unpacked) {
         // Don't try to start a Tor daemon if unpacking failed
         qWarning() << "Error unpacking embedded Tor. Assuming --use-local-tor";
-        this->errorMsg = "Error unpacking embedded Tor. Assuming --use-local-tor";
+        this->setErrorMessage("Error unpacking embedded Tor. Assuming --use-local-tor");
         return false;
     }
 
@@ -278,6 +290,11 @@ SemanticVersion TorManager::getVersion(const QString &fileName) {
     }
 
     return SemanticVersion::fromString(output);
+}
+
+void TorManager::setErrorMessage(const QString &msg) {
+    this->errorMsg = msg;
+    emit statusChanged(msg);
 }
 
 TorManager* TorManager::instance()

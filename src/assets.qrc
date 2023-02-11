@@ -20,6 +20,7 @@
     <file>assets/images/camera_dark.png</file>
     <file>assets/images/camera_white.png</file>
     <file>assets/images/change_account.png</file>
+    <file>assets/images/chipset_32px.png</file>
     <file>assets/images/clock1.png</file>
     <file>assets/images/clock2.png</file>
     <file>assets/images/clock3.png</file>
@@ -44,10 +45,14 @@
     <file>assets/images/eye_blind.png</file>
     <file>assets/images/feather.png</file>
     <file>assets/images/file.png</file>
+    <file>assets/images/file_manager_32px.png</file>
     <file>assets/images/gnome-calc.png</file>
+    <file>assets/images/hd_32px.png</file>
     <file>assets/images/history.png</file>
+    <file>assets/images/i2p.png</file>
     <file>assets/images/info.png</file>
     <file>assets/images/info2.svg</file>
+    <file>assets/images/interface_32px.png</file>
     <file>assets/images/key.png</file>
     <file>assets/images/ledger.png</file>
     <file>assets/images/ledger_unpaired.png</file>
@@ -65,6 +70,7 @@
     <file>assets/images/microphone.png</file>
     <file>assets/images/mining.png</file>
     <file>assets/images/network.png</file>
+    <file>assets/images/nw_32px.png</file>
     <file>assets/images/offline_tx.png</file>
     <file>assets/images/person.svg</file>
     <file>assets/images/preferences.png</file>
@@ -81,6 +87,7 @@
     <file>assets/images/securityLevelSafestWhite.png</file>
     <file>assets/images/securityLevelStandardWhite.png</file>
     <file>assets/images/seed.png</file>
+    <file>assets/images/settings_disabled_32px.png</file>
     <file>assets/images/speaker.png</file>
     <file>assets/images/status_connected_fork.png</file>
     <file>assets/images/status_connected.png</file>
@@ -93,6 +100,7 @@
     <file>assets/images/status_lagging_fork.png</file>
     <file>assets/images/status_lagging.png</file>
     <file>assets/images/status_lagging.svg</file>
+    <file>assets/images/status_offline.svg</file>
     <file>assets/images/status_waiting.png</file>
     <file>assets/images/status_waiting.svg</file>
     <file>assets/images/tab_addresses.png</file>
@@ -117,6 +125,7 @@
     <file>assets/images/unpaid.png</file>
     <file>assets/images/update.png</file>
     <file>assets/images/warning.png</file>
+    <file>assets/images/vrdp_32px.png</file>
     <file>assets/images/xmrig.ico</file>
     <file>assets/images/xmrig.svg</file>
     <file>assets/images/zoom.png</file>

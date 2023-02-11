@@ -86,7 +86,7 @@ QVariant RedditModel::headerData(int section, Qt::Orientation orientation, int r
             case Author:
                 return QString("Author");
             case Comments:
-                return QString("Comments");
+                return QString(" Comments ");
             default:
                 return QVariant();
         }

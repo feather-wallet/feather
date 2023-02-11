@@ -66,6 +66,8 @@ namespace Utils
     QString getAccountName();
     QFont relativeFont(int delta);
 
+    bool isLocalUrl(const QUrl &url);
+
     template<typename QEnum>
     QString QtEnumToString (QEnum value) {
         return QString::fromStdString(std::string(QMetaEnum::fromType<QEnum>().valueToKey(value)));

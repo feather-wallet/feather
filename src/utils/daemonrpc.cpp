@@ -3,9 +3,9 @@
 
 #include "daemonrpc.h"
 
-DaemonRpc::DaemonRpc(QObject *parent, QNetworkAccessManager *network, QString daemonAddress)
+DaemonRpc::DaemonRpc(QObject *parent, QString daemonAddress)
         : QObject(parent)
-        , m_network(new UtilsNetworking(network, this))
+        , m_network(new UtilsNetworking(this))
         , m_daemonAddress(std::move(daemonAddress))
 {
 }
@@ -18,7 +18,9 @@ void DaemonRpc::sendRawTransaction(const QString &tx_as_hex, bool do_not_relay, 
 
     QString url = QString("%1/send_raw_transaction").arg(m_daemonAddress);
     QNetworkReply *reply = m_network->postJson(url, req);
-    connect(reply, &QNetworkReply::finished, std::bind(&DaemonRpc::onResponse, this, reply, Endpoint::SEND_RAW_TRANSACTION));
+    connect(reply, &QNetworkReply::finished, [this, reply]{
+        onResponse(reply, Endpoint::SEND_RAW_TRANSACTION);
+    });
 }
 
 void DaemonRpc::getTransactions(const QStringList &txs_hashes, bool decode_as_json, bool prune) {
@@ -29,12 +31,19 @@ void DaemonRpc::getTransactions(const QStringList &txs_hashes, bool decode_as_js
 
     QString url = QString("%1/get_transactions").arg(m_daemonAddress);
     QNetworkReply *reply = m_network->postJson(url, req);
-    connect(reply, &QNetworkReply::finished, std::bind(&DaemonRpc::onResponse, this, reply, Endpoint::GET_TRANSACTIONS));
+    connect(reply, &QNetworkReply::finished, [this, reply]{
+        onResponse(reply, Endpoint::GET_TRANSACTIONS);
+    });
 }
 
 void DaemonRpc::onResponse(QNetworkReply *reply, Endpoint endpoint) {
-    const auto ok = reply->error() == QNetworkReply::NoError;
-    const auto err = reply->errorString();
+    if (!reply) {
+        emit ApiResponse(DaemonResponse(false, endpoint, "Offline mode"));
+        return;
+    }
+
+    bool ok = reply->error() == QNetworkReply::NoError;
+    QString err = reply->errorString();
 
     QByteArray data = reply->readAll();
     reply->deleteLater();
@@ -92,8 +101,4 @@ QString DaemonRpc::onSendRawTransactionFailed(const QJsonObject &obj) {
 
 void DaemonRpc::setDaemonAddress(const QString &daemonAddress) {
     m_daemonAddress = daemonAddress;
-}
-
-void DaemonRpc::setNetwork(QNetworkAccessManager *network) {
-    m_network = new UtilsNetworking(network, this);
 }

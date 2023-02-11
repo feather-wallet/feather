@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef FEATHER_PAGENETWORKTOR_H
-#define FEATHER_PAGENETWORKTOR_H
+#ifndef FEATHER_PageNetworkProxy_H
+#define FEATHER_PageNetworkProxy_H
 
 #include <QWizardPage>
 
 #include "appcontext.h"
 
 namespace Ui {
-    class PageNetworkTor;
+    class PageNetworkProxy;
 }
 
-class PageNetworkTor : public QWizardPage
+class PageNetworkProxy : public QWizardPage
 {
 Q_OBJECT
 
 public:
-    explicit PageNetworkTor(QWidget *parent = nullptr);
+    explicit PageNetworkProxy(QWidget *parent = nullptr);
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
@@ -26,7 +26,7 @@ signals:
     void initialNetworkConfigured();
 
 private:
-    Ui::PageNetworkTor *ui;
+    Ui::PageNetworkProxy *ui;
 };
 
-#endif //FEATHER_PAGENETWORKTOR_H
+#endif //FEATHER_PageNetworkProxy_H

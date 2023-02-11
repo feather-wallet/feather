@@ -16,7 +16,7 @@ class UtilsNetworking : public QObject
 Q_OBJECT
 
 public:
-    explicit UtilsNetworking(QNetworkAccessManager *networkAccessManager, QObject *parent = nullptr);
+    explicit UtilsNetworking(QObject *parent = nullptr);
 
     QNetworkReply* get(const QString &url);
     QNetworkReply* getJson(const QString &url);
@@ -24,7 +24,7 @@ public:
     void setUserAgent(const QString &userAgent);
 
 private:
-    QString m_userAgent = "Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0";
+    QString m_userAgent = "Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0";
     QNetworkAccessManager *m_networkAccessManager;
 };
 

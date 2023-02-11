@@ -26,7 +26,8 @@ public:
     ~NodeWidget();
     void setWSModel(NodeModel *model);
     void setCustomModel(NodeModel *model);
-    void setupUI(QSharedPointer<AppContext> ctx);
+    void setupUI(Nodes *nodes);
+    void setCanConnect(bool canConnect);
     NodeModel* model();
 
 public slots:
@@ -50,9 +51,10 @@ private:
     FeatherNode selectedNode();
 
     QScopedPointer<Ui::NodeWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Nodes *m_nodes;
     NodeModel  *m_customModel;
     NodeModel *m_wsModel;
+    bool m_canConnect = true;
 
     QTreeView *m_activeView;
 

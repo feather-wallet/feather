@@ -27,7 +27,7 @@ public:
         QJsonObject obj;
     };
 
-    explicit LocalMoneroApi(QObject *parent, UtilsNetworking *network, const QString &baseUrl = "https://agoradesk.com/api/v1");
+    explicit LocalMoneroApi(QObject *parent, UtilsNetworking *network);
 
     void countryCodes();
     void currencies();
@@ -44,9 +44,9 @@ private slots:
 
 private:
     QString getBuySellUrl(bool buy, const QString &currencyCode, const QString &countryCode="", const QString &paymentMethod="", const QString &amount = "", int page = 0);
+    QString getBaseUrl();
 
     UtilsNetworking *m_network;
-    QString m_baseUrl;
 };
 
 

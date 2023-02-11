@@ -94,16 +94,21 @@ void NodeList::ensureStructure(QJsonObject &obj, NetworkType::Type networkType) 
     obj[networkTypeStr] = netTypeObj;
 }
 
-Nodes::Nodes(AppContext *ctx, QObject *parent)
+Nodes::Nodes(QObject *parent)
     : QObject(parent)
     , modelWebsocket(new NodeModel(NodeSource::websocket, this))
     , modelCustom(new NodeModel(NodeSource::custom, this))
-    , m_ctx(ctx)
     , m_connection(FeatherNode())
 {
+    // TODO: This class is in desperate need of refactoring
+
     this->loadConfig();
-    connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);
     connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this, &Nodes::onWSNodesReceived);
+}
+
+void Nodes::setContext(AppContext *ctx) {
+    m_ctx = ctx;
+    connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);
 }
 
 void Nodes::loadConfig() {
@@ -165,6 +170,9 @@ void Nodes::loadConfig() {
             for (const auto &node : nodes_json[netKey].toObject()["clearnet"].toArray()) {
                 nodes_list.append(node);
             }
+            for (const auto &node : nodes_json[netKey].toObject()["i2p"].toArray()) {
+                nodes_list.append(node);
+            }
 
             for (auto node: nodes_list) {
                 FeatherNode wsNode(node.toString());
@@ -183,30 +191,40 @@ void Nodes::loadConfig() {
 
 void Nodes::connectToNode() {
     // auto connect
-    m_wsExhaustedWarningEmitted = false;
-    m_customExhaustedWarningEmitted = false;
     this->autoConnect(true);
 }
 
 void Nodes::connectToNode(const FeatherNode &node) {
-    if (!node.isValid())
+    if (!m_ctx) {
         return;
+    }
+
+    if (!node.isValid()) {
+        return;
+    }
 
     if (config()->get(Config::offlineMode).toBool()) {
         return;
     }
 
-    qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress()).arg(node.custom ? "custom" : "ws");
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+        if (!node.isOnion()) {
+            return;
+        }
+    }
 
-    if (!node.url.userName().isEmpty() && !node.url.password().isEmpty())
+    qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress(), node.custom ? "custom" : "ws");
+
+    if (!node.url.userName().isEmpty() && !node.url.password().isEmpty()) {
         m_ctx->wallet->setDaemonLogin(node.url.userName(), node.url.password());
+    }
 
-    // Don't use SSL over Tor
-    m_ctx->wallet->setUseSSL(!node.isOnion());
+    // Don't use SSL over Tor/i2p
+    m_ctx->wallet->setUseSSL(!node.isAnonymityNetwork());
 
     QString proxyAddress;
-    if (useTorProxy(node)) {
-        if (!torManager()->isLocalTor()) {
+    if (useSocks5Proxy(node)) {
+        if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
             proxyAddress = QString("%1:%2").arg(torManager()->featherTorHost, QString::number(torManager()->featherTorPort));
         } else {
             proxyAddress = QString("%1:%2").arg(config()->get(Config::socks5Host).toString(),
@@ -225,6 +243,10 @@ void Nodes::connectToNode(const FeatherNode &node) {
 }
 
 void Nodes::autoConnect(bool forceReconnect) {
+    if (!m_ctx) {
+        return;
+    }
+
     // this function is responsible for automatically connecting to a daemon.
     if (m_ctx->wallet == nullptr || !m_enableAutoconnect) {
         return;
@@ -234,7 +256,7 @@ void Nodes::autoConnect(bool forceReconnect) {
     bool wsMode = (this->source() == NodeSource::websocket);
 
     if (wsMode && !m_wsNodesReceived && websocketNodes().count() == 0) {
-        // this situation should rarely occur due to the usage of the websocket node cache on startup.
+        // this situation should rarely onneccur due to the usage of the websocket node cache on startup.
         qInfo() << "Feather is in websocket connection mode but was not able to receive any nodes (yet).";
         return;
     }
@@ -244,7 +266,7 @@ void Nodes::autoConnect(bool forceReconnect) {
             m_recentFailures << m_connection.toAddress();
         }
 
-        // try a connect
+        // try connect
         FeatherNode node = this->pickEligibleNode();
         this->connectToNode(node);
         return;
@@ -257,8 +279,6 @@ void Nodes::autoConnect(bool forceReconnect) {
         m_connection.isActive = true;
 
         // reset node exhaustion state
-        m_wsExhaustedWarningEmitted = false;
-        m_customExhaustedWarningEmitted = false;
         m_recentFailures.clear();
     }
 
@@ -374,7 +394,7 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 }
 
 void Nodes::onWalletRefreshed() {
-    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
+    if (config()->get(Config::proxy) == Config::Proxy::Tor && config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
         // Don't reconnect if we're connected to a local node (traffic will not be routed through Tor)
         if (m_connection.isLocal())
             return;
@@ -388,20 +408,29 @@ void Nodes::onWalletRefreshed() {
 }
 
 bool Nodes::useOnionNodes() {
+    if (config()->get(Config::proxy) != Config::Proxy::Tor) {
+        return false;
+    }
+
+    if (config()->get(Config::torOnlyAllowOnion).toBool()) {
+        return true;
+    }
+
     auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
     if (privacyLevel == Config::allTor) {
         return true;
     }
 
     if (privacyLevel == Config::allTorExceptInitSync) {
-        if (m_ctx->refreshed)
+        if (m_ctx && m_ctx->refreshed) {
             return true;
+        }
 
         if (appData()->heights.contains(constants::networkType)) {
             int initSyncThreshold = config()->get(Config::initSyncThreshold).toInt();
             int networkHeight = appData()->heights[constants::networkType];
 
-            if (m_ctx->wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
+            if (m_ctx && m_ctx->wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
                 return true;
             }
         }
@@ -410,7 +439,15 @@ bool Nodes::useOnionNodes() {
     return false;
 }
 
-bool Nodes::useTorProxy(const FeatherNode &node) {
+bool Nodes::useI2PNodes() {
+    if (config()->get(Config::proxy) == Config::Proxy::i2p) {
+        return true;
+    }
+
+    return false;
+}
+
+bool Nodes::useSocks5Proxy(const FeatherNode &node) {
     if (node.isLocal()) {
         return false;
     }
@@ -423,7 +460,15 @@ bool Nodes::useTorProxy(const FeatherNode &node) {
         return true;
     }
 
-    return this->useOnionNodes();
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
+        return this->useOnionNodes();
+    }
+
+    if (config()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        return true;
+    }
+
+    return false;
 }
 
 void Nodes::updateModels() {
@@ -450,28 +495,7 @@ void Nodes::resetLocalState() {
 }
 
 void Nodes::exhausted() {
-    if (this->source() == NodeSource::websocket)
-        this->WSNodeExhaustedWarning();
-    else
-        this->nodeExhaustedWarning();
-}
-
-void Nodes::nodeExhaustedWarning(){
-    if (m_customExhaustedWarningEmitted)
-        return;
-
-    emit nodeExhausted();
-    qWarning() << "Could not find an eligible custom node to connect to.";
-    m_customExhaustedWarningEmitted = true;
-}
-
-void Nodes::WSNodeExhaustedWarning() {
-    if (m_wsExhaustedWarningEmitted)
-        return;
-
-    emit WSNodeExhausted();
-    qWarning() << "Could not find an eligible websocket node to connect to.";
-    m_wsExhaustedWarningEmitted = true;
+    // Do nothing
 }
 
 QList<FeatherNode> Nodes::nodes() {
@@ -485,6 +509,7 @@ QList<FeatherNode> Nodes::customNodes() {
 
 QList<FeatherNode> Nodes::websocketNodes() {
     bool onionNode = this->useOnionNodes();
+    bool i2pNode = this->useI2PNodes();
 
     QList<FeatherNode> nodes;
     for (const auto &node : m_websocketNodes) {
@@ -492,7 +517,15 @@ QList<FeatherNode> Nodes::websocketNodes() {
             continue;
         }
 
+        if (i2pNode && !node.isI2P()) {
+            continue;
+        }
+
         if (!onionNode && node.isOnion()) {
+            continue;
+        }
+
+        if (!i2pNode && node.isI2P()) {
             continue;
         }
 
@@ -500,10 +533,6 @@ QList<FeatherNode> Nodes::websocketNodes() {
     }
 
     return nodes;
-}
-
-void Nodes::onTorSettingsChanged() {
-    this->autoConnect(true);
 }
 
 FeatherNode Nodes::connection() {

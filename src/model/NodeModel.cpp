@@ -9,8 +9,8 @@
 NodeModel::NodeModel(int nodeSource, QObject *parent)
         : QAbstractTableModel(parent)
         , m_nodeSource(nodeSource)
-        , m_offline(icons()->icon("expired_icon.png"))
-        , m_online(icons()->icon("confirmed_icon.png"))
+        , m_offline(icons()->icon("status_offline.svg"))
+        , m_online(icons()->icon("status_connected.svg"))
 {
 }
 
@@ -60,8 +60,9 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     else if (role == Qt::DecorationRole) {
         switch (index.column()) {
             case NodeModel::URL: {
-                if(m_nodeSource == NodeSource::websocket)
+                if (m_nodeSource == NodeSource::websocket && !config()->get(Config::offlineMode).toBool()) {
                     return QVariant(node.online ? m_online : m_offline);
+                }
                 return QVariant();
             }
             default: {
@@ -72,6 +73,8 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     else if (role == Qt::ToolTipRole) {
         switch (index.column()) {
             case NodeModel::URL: {
+                if (node.isConnecting)
+                    return QString("Feather is connecting to this node.");
                 if (node.isActive)
                     return QString("Feather is connected to this node.");
             }
@@ -95,7 +98,7 @@ QVariant NodeModel::headerData(int section, Qt::Orientation orientation, int rol
             case NodeModel::URL:
                 return QString("Node");
             case NodeModel::Height:
-                return QString("Height");
+                return QString("Height ");
             default:
                 return QVariant();
         }

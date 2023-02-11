@@ -62,7 +62,7 @@ public slots:
     void onDeviceButtonPressed();
     void onDeviceError(const QString &message);
 
-    void onTorSettingsChanged(); // should not be here
+    void onProxySettingsChanged(); // should not be here
 
 private slots:
     void onMoneySpent(const QString &txId, quint64 amount);

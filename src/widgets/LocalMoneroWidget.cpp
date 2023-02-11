@@ -25,7 +25,7 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext>
 
     ui->combo_currency->addItem(config()->get(Config::preferredFiatCurrency).toString());
 
-    m_network = new UtilsNetworking(getNetworkTor(), this);
+    m_network = new UtilsNetworking(this);
     m_api = new LocalMoneroApi(this, m_network);
 
     m_model = new LocalMoneroModel(this);

@@ -6,6 +6,8 @@
 #include <QCoreApplication>
 #include "utils/Utils.h"
 
+#include "utils/config.h"
+
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)
 {
@@ -27,7 +29,7 @@ WebsocketClient::WebsocketClient(QObject *parent)
 
     connect(&m_connectionTimeout, &QTimer::timeout, this, &WebsocketClient::onConnectionTimeout);
 
-    m_websocketUrlIndex = QRandomGenerator::global()->bounded(constants::websocketUrls.length());
+    m_websocketUrlIndex = QRandomGenerator::global()->bounded(m_websocketUrls[this->networkType()].length());
     this->nextWebsocketUrl();
 }
 
@@ -42,10 +44,18 @@ void WebsocketClient::start() {
         return;
     }
 
+    if (config()->get(Config::offlineMode).toBool()) {
+        return;
+    }
+
+    if (config()->get(Config::disableWebsocket).toBool()) {
+        return;
+    }
+
     // connect & reconnect on errors/close
-    qDebug() << "WebSocket connect:" << m_url.url();
     auto state = webSocket.state();
     if (state != QAbstractSocket::ConnectedState && state != QAbstractSocket::ConnectingState) {
+        qDebug() << "WebSocket connect:" << m_url.url();
         webSocket.open(m_url);
     }
 }
@@ -90,8 +100,22 @@ void WebsocketClient::onError(QAbstractSocket::SocketError error) {
 }
 
 void WebsocketClient::nextWebsocketUrl() {
-    m_url = constants::websocketUrls[m_websocketUrlIndex];
-    m_websocketUrlIndex = (m_websocketUrlIndex+1)%constants::websocketUrls.length();
+    Config::Proxy networkType = this->networkType();
+    m_websocketUrlIndex = (m_websocketUrlIndex+1)%m_websocketUrls[networkType].length();
+    m_url = m_websocketUrls[networkType][m_websocketUrlIndex];
+}
+
+Config::Proxy WebsocketClient::networkType() {
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+        // Websocket performance with onion services is abysmal, connect to clearnet server unless instructed otherwise
+        return Config::Proxy::Tor;
+    }
+    else if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
+        return Config::Proxy::i2p;
+    }
+    else {
+        return Config::Proxy::None;
+    }
 }
 
 void WebsocketClient::onConnectionTimeout() {

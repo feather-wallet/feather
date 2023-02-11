@@ -6,6 +6,7 @@
 
 #include <QDialog>
 #include <QNetworkReply>
+#include <QTimer>
 
 #include "utils/Updater.h"
 
@@ -45,10 +46,11 @@ private:
     QSharedPointer<Updater> m_updater;
 
     QString m_downloadUrl;
-
     QString m_updatePath;
 
     std::string m_updateZipArchive;
+
+    QTimer m_waitingTimer;
 
     QNetworkReply *m_reply = nullptr;
 };

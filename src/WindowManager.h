@@ -24,18 +24,21 @@ public:
     void close();
     void closeWindow(MainWindow *window);
     void showWizard(WalletWizard::Page startPage);
-    void changeSkin(const QString &skinName);
     void restartApplication(const QString &binaryFilename);
     void raise();
+
+    void showSettings(QSharedPointer<AppContext> ctx, QWidget *parent, bool showProxyTab = false);
 
     EventFilter *eventFilter;
 
 signals:
-    void torSettingsChanged();
+    void proxySettingsChanged();
     void websocketStatusChanged(bool enabled);
+    void updateBalance();
+    void offlineMode(bool offline);
 
 public slots:
-    void onTorSettingsChanged();
+    void onProxySettingsChanged();
     void onWebsocketStatusChanged(bool enabled);
     void tryOpenWallet(const QString &path, const QString &password);
 
@@ -48,6 +51,7 @@ private slots:
     void onDeviceButtonPressed();
     void onDeviceError(const QString &errorMessage);
     void onWalletPassphraseNeeded(bool on_device);
+    void onChangeTheme(const QString &themeName);
 
 private:
     void tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead);
@@ -57,15 +61,15 @@ private:
     bool autoOpenWallet();
 
     void initWizard();
-    WalletWizard* createWizard(WalletWizard::Page startPage) const;
+    WalletWizard* createWizard(WalletWizard::Page startPage);
 
     void handleWalletError(const QString &message);
     void displayWalletErrorMessage(const QString &message);
 
-    void initTor();
-    void initWS();
     void initSkins();
     QString loadStylesheet(const QString &resource);
+    void patchMacStylesheet();
+
     void buildTrayMenu();
     void startupWarning();
     void showWarningMessageBox(const QString &title, const QString &message);

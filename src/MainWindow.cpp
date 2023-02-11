@@ -37,6 +37,8 @@
 #include "utils/Updater.h"
 #include "utils/WebsocketNotifier.h"
 
+//#include "misc_log_ex.h"
+
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -46,6 +48,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     ui->setupUi(this);
 
     qDebug() << "Platform tag: " << this->getPlatformTag();
+//    MCWARNING("feather", "Platform tag: " << this->getPlatformTag().toStdString());
 
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
@@ -78,7 +81,19 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
     this->onWebsocketStatusChanged(!config()->get(Config::disableWebsocket).toBool());
 
-    connect(m_windowManager, &WindowManager::torSettingsChanged, m_ctx.get(), &AppContext::onTorSettingsChanged);
+    connect(m_windowManager, &WindowManager::proxySettingsChanged, [this]{
+        m_ctx->onProxySettingsChanged();
+        this->onProxySettingsChanged();
+    });
+    connect(m_windowManager, &WindowManager::updateBalance, m_ctx.data(), &AppContext::updateBalance);
+    connect(m_windowManager, &WindowManager::offlineMode, [this](bool offline){
+       if (!m_ctx->wallet) {
+           return;
+       }
+       m_ctx->wallet->setOffline(offline);
+       this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
+    });
+
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
 
@@ -113,10 +128,6 @@ void MainWindow::initStatusBar() {
     this->statusBar()->setStyleSheet("QStatusBar::item {border: None;}");
 #endif
 
-#if defined(Q_OS_MACOS)
-    this->patchStylesheetMac();
-#endif
-
     this->statusBar()->setFixedHeight(30);
 
     m_statusLabelStatus = new QLabel("Idle", this);
@@ -143,9 +154,10 @@ void MainWindow::initStatusBar() {
 
     m_statusBtnConnectionStatusIndicator = new StatusBarButton(icons()->icon("status_disconnected.svg"), "Connection status", this);
     connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, [this](){
-        this->onShowSettingsPage(2);
+        this->onShowSettingsPage(SettingsNew::Pages::NETWORK);
     });
     this->statusBar()->addPermanentWidget(m_statusBtnConnectionStatusIndicator);
+    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
 
     m_statusAccountSwitcher = new StatusBarButton(icons()->icon("change_account.png"), "Account switcher", this);
     connect(m_statusAccountSwitcher, &StatusBarButton::clicked, this, &MainWindow::showAccountSwitcherDialog);
@@ -163,9 +175,10 @@ void MainWindow::initStatusBar() {
     connect(m_statusBtnSeed, &StatusBarButton::clicked, this, &MainWindow::showSeedDialog);
     this->statusBar()->addPermanentWidget(m_statusBtnSeed);
 
-    m_statusBtnTor = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Tor settings", this);
-    connect(m_statusBtnTor, &StatusBarButton::clicked, this, &MainWindow::menuTorClicked);
-    this->statusBar()->addPermanentWidget(m_statusBtnTor);
+    m_statusBtnProxySettings = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Proxy settings", this);
+    connect(m_statusBtnProxySettings, &StatusBarButton::clicked, this, &MainWindow::menuProxySettingsClicked);
+    this->statusBar()->addPermanentWidget(m_statusBtnProxySettings);
+    this->onProxySettingsChanged();
 
     m_statusBtnHwDevice = new StatusBarButton(this->hardwareDevicePairedIcon(), this->getHardwareDevice(), this);
     connect(m_statusBtnHwDevice, &StatusBarButton::clicked, this, &MainWindow::menuHwDeviceClicked);
@@ -417,12 +430,12 @@ void MainWindow::initWalletContext() {
     connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
     connect(m_ctx.get(), &AppContext::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
 
-    // Nodes
-    connect(m_ctx->nodes, &Nodes::nodeExhausted,   this, &MainWindow::showNodeExhaustedMessage);
-    connect(m_ctx->nodes, &Nodes::WSNodeExhausted, this, &MainWindow::showWSNodeExhaustedMessage);
-
     // Wallet
-    connect(m_ctx->wallet, &Wallet::connectionStatusChanged, this, &MainWindow::onConnectionStatusChanged);
+    connect(m_ctx->wallet, &Wallet::connectionStatusChanged, [this](int status){
+        // Order is important, first inform UI about a potential disconnect, then reconnect
+        this->onConnectionStatusChanged(status);
+        this->m_ctx->nodes->autoConnect();
+    });
     connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
     connect(m_ctx->wallet, &Wallet::walletPassphraseNeeded, this, &MainWindow::onWalletPassphraseNeeded);
 }
@@ -521,7 +534,9 @@ void MainWindow::onWalletOpened() {
     m_ctx->nodes->connectToNode();
     m_updateBytes.start(250);
 
-    this->addToRecentlyOpened(m_ctx->wallet->cachePath());
+    if (config()->get(Config::writeRecentlyOpenedWallets).toBool()) {
+        this->addToRecentlyOpened(m_ctx->wallet->cachePath());
+    }
 }
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
@@ -593,6 +608,24 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
 #endif
 }
 
+void MainWindow::onProxySettingsChanged() {
+    int proxy = config()->get(Config::proxy).toInt();
+
+    if (proxy == Config::Proxy::Tor) {
+        this->onTorConnectionStateChanged(torManager()->torConnected);
+        m_statusBtnProxySettings->show();
+        return;
+    }
+
+    if (proxy == Config::Proxy::i2p) {
+        m_statusBtnProxySettings->setIcon(icons()->icon("i2p.png"));
+        m_statusBtnProxySettings->show();
+        return;
+    }
+
+    m_statusBtnProxySettings->hide();
+}
+
 void MainWindow::onSynchronized() {
     this->updateNetStats();
     this->setStatusText("Synchronized");
@@ -617,28 +650,33 @@ void MainWindow::onConnectionStatusChanged(int status)
     // Update connection info in status bar.
 
     QIcon icon;
-    switch(status){
-        case Wallet::ConnectionStatus_Disconnected:
-            icon = icons()->icon("status_disconnected.svg");
-            this->setStatusText("Disconnected");
-            break;
-        case Wallet::ConnectionStatus_Connecting:
-            icon = icons()->icon("status_lagging.svg");
-            this->setStatusText("Connecting to node");
-            break;
-        case Wallet::ConnectionStatus_WrongVersion:
-            icon = icons()->icon("status_disconnected.svg");
-            this->setStatusText("Incompatible node");
-            break;
-        case Wallet::ConnectionStatus_Synchronizing:
-            icon = icons()->icon("status_waiting.svg");
-            break;
-        case Wallet::ConnectionStatus_Synchronized:
-            icon = icons()->icon("status_connected.svg");
-            break;
-        default:
-            icon = icons()->icon("status_disconnected.svg");
-            break;
+    if (config()->get(Config::offlineMode).toBool()) {
+        icon = icons()->icon("status_offline.svg");
+        this->setStatusText("Offline");
+    } else {
+        switch(status){
+            case Wallet::ConnectionStatus_Disconnected:
+                icon = icons()->icon("status_disconnected.svg");
+                this->setStatusText("Disconnected");
+                break;
+            case Wallet::ConnectionStatus_Connecting:
+                icon = icons()->icon("status_lagging.svg");
+                this->setStatusText("Connecting to node");
+                break;
+            case Wallet::ConnectionStatus_WrongVersion:
+                icon = icons()->icon("status_disconnected.svg");
+                this->setStatusText("Incompatible node");
+                break;
+            case Wallet::ConnectionStatus_Synchronizing:
+                icon = icons()->icon("status_waiting.svg");
+                break;
+            case Wallet::ConnectionStatus_Synchronized:
+                icon = icons()->icon("status_connected.svg");
+                break;
+            default:
+                icon = icons()->icon("status_disconnected.svg");
+                break;
+        }
     }
 
     m_statusBtnConnectionStatusIndicator->setIcon(icon);
@@ -826,13 +864,6 @@ void MainWindow::showViewOnlyDialog() {
     dialog.exec();
 }
 
-void MainWindow::menuTorClicked() {
-    auto *dialog = new TorInfoDialog(m_ctx, this);
-    connect(dialog, &TorInfoDialog::torSettingsChanged, m_windowManager, &WindowManager::onTorSettingsChanged);
-    dialog->exec();
-    dialog->deleteLater();
-}
-
 void MainWindow::menuHwDeviceClicked() {
     QMessageBox::information(this, "Hardware Device", QString("This wallet is backed by a %1 hardware device.").arg(this->getHardwareDevice()));
 }
@@ -854,21 +885,17 @@ void MainWindow::menuWalletCloseClicked() {
     this->close();
 }
 
+void MainWindow::menuProxySettingsClicked() {
+    this->menuSettingsClicked(true);
+}
+
 void MainWindow::menuAboutClicked() {
     AboutDialog dialog{this};
     dialog.exec();
 }
 
-void MainWindow::menuSettingsClicked() {
-    Settings settings{m_ctx, this};
-    for (const auto &widget: m_tickerWidgets) {
-        connect(&settings, &Settings::preferredFiatCurrencyChanged, widget, &TickerWidgetBase::updateDisplay);
-    }
-    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_balanceTickerWidget, &BalanceTickerWidget::updateDisplay);
-    connect(&settings, &Settings::preferredFiatCurrencyChanged, m_sendWidget, QOverload<>::of(&SendWidget::onPreferredFiatCurrencyChanged));
-    connect(&settings, &Settings::skinChanged, this, &MainWindow::skinChanged);
-    connect(&settings, &Settings::websocketStatusChanged, m_windowManager, &WindowManager::onWebsocketStatusChanged);
-    settings.exec();
+void MainWindow::menuSettingsClicked(bool showProxyTab) {
+    m_windowManager->showSettings(m_ctx, this, showProxyTab);
 }
 
 void MainWindow::menuSignVerifyClicked() {
@@ -887,13 +914,8 @@ void MainWindow::onShowSettingsPage(int page) {
 }
 
 void MainWindow::skinChanged(const QString &skinName) {
-    m_windowManager->changeSkin(skinName);
     ColorScheme::updateFromWidget(this);
     this->updateWidgetIcons();
-
-#if defined(Q_OS_MACOS)
-    this->patchStylesheetMac();
-#endif
 }
 
 void MainWindow::updateWidgetIcons() {
@@ -947,6 +969,17 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     }
 
     event->accept();
+}
+
+void MainWindow::changeEvent(QEvent* event)
+{
+    if ((event->type() == QEvent::WindowStateChange) && this->isMinimized()) {
+        if (config()->get(Config::lockOnMinimize).toBool()) {
+            this->lockWallet();
+        }
+    } else {
+        QMainWindow::changeEvent(event);
+    }
 }
 
 void MainWindow::donateButtonClicked() {
@@ -1073,22 +1106,6 @@ void MainWindow::showAddressChecker() {
     } else {
         QMessageBox::information(this, "Address Checker", QString("This address belongs to Account #%1").arg(index.major));
     }
-}
-
-void MainWindow::showNodeExhaustedMessage() {
-    // Spawning dialogs inside a lambda can cause system freezes on linux so we have to do it this way ¯\_(ツ)_/¯
-
-    auto msg = "Feather is in 'custom node connection mode' but could not "
-               "find an eligible node to connect to. Please go to Settings->Node "
-               "and enter a node manually.";
-    QMessageBox::warning(this, "Could not connect to a node", msg);
-}
-
-void MainWindow::showWSNodeExhaustedMessage() {
-    auto msg = "Feather is in 'automatic node connection mode' but the "
-               "websocket server returned no available nodes. Please go to Settings->Node "
-               "and enter a node manually.";
-    QMessageBox::warning(this, "Could not connect to a node", msg);
 }
 
 void MainWindow::exportKeyImages() {
@@ -1343,14 +1360,39 @@ void MainWindow::bringToFront() {
     activateWindow();
 }
 
+void MainWindow::onPreferredFiatCurrencyChanged() {
+    for (const auto &widget : m_tickerWidgets) {
+        widget->updateDisplay();
+    }
+    m_balanceTickerWidget->updateDisplay();
+    m_sendWidget->onPreferredFiatCurrencyChanged();
+}
+
+void MainWindow::onHideUpdateNotifications(bool hidden) {
+    if (hidden) {
+        m_statusUpdateAvailable->hide();
+    }
+    else if (m_updater->state == Updater::State::UPDATE_AVAILABLE) {
+        m_statusUpdateAvailable->show();
+    }
+}
+
 void MainWindow::onTorConnectionStateChanged(bool connected) {
+    if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+        return;
+    }
+
     if (connected)
-        m_statusBtnTor->setIcon(icons()->icon("tor_logo.png"));
+        m_statusBtnProxySettings->setIcon(icons()->icon("tor_logo.png"));
     else
-        m_statusBtnTor->setIcon(icons()->icon("tor_logo_disabled.png"));
+        m_statusBtnProxySettings->setIcon(icons()->icon("tor_logo_disabled.png"));
 }
 
 void MainWindow::showUpdateNotification() {
+    if (config()->get(Config::hideUpdateNotifications).toBool()) {
+        return;
+    }
+
     QString versionDisplay{m_updater->version};
     versionDisplay.replace("beta", "Beta");
     QString updateText = QString("Update to Feather %1 is available").arg(versionDisplay);
@@ -1600,14 +1642,6 @@ bool MainWindow::verifyPassword(bool sensitive) {
         break;
     }
     return true;
-}
-
-void MainWindow::patchStylesheetMac() {
-    auto patch = Utils::fileOpenQRC(":assets/macStylesheet.patch");
-    auto patch_text = Utils::barrayToString(patch);
-
-    QString styleSheet = qApp->styleSheet() + patch_text;
-    qApp->setStyleSheet(styleSheet);
 }
 
 void MainWindow::userActivity() {

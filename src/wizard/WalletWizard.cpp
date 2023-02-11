@@ -16,9 +16,10 @@
 #include "PageSetSeedPassphrase.h"
 #include "PageSetSubaddressLookahead.h"
 #include "PageHardwareDevice.h"
-#include "PageNetworkTor.h"
+#include "PageNetworkProxy.h"
 #include "PageNetworkWebsocket.h"
 #include "constants.h"
+#include "SettingsNewDialog.h"
 
 #include <QLineEdit>
 #include <QVBoxLayout>
@@ -34,7 +35,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     m_walletKeysFilesModel->refresh();
 
     auto networkPage = new PageNetwork(this);
-    auto networkTorPage = new PageNetworkTor(this);
+    auto networkProxyPage = new PageNetworkProxy(this);
     auto networkWebsocketPage = new PageNetworkWebsocket(this);
     auto menuPage = new PageMenu(&m_wizardFields, m_walletKeysFilesModel, this);
     auto openWalletPage = new PageOpenWallet(m_walletKeysFilesModel, this);
@@ -49,7 +50,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_CreateWalletSeed, createWalletSeed);
     setPage(Page_SetPasswordPage, walletSetPasswordPage);
     setPage(Page_Network, networkPage);
-    setPage(Page_NetworkTor, networkTorPage);
+    setPage(Page_NetworkProxy, networkProxyPage);
     setPage(Page_NetworkWebsocket, networkWebsocketPage);
     setPage(Page_WalletRestoreSeed, new PageWalletRestoreSeed(&m_wizardFields, this));
     setPage(Page_WalletRestoreKeys, new PageWalletRestoreKeys(&m_wizardFields, this));
@@ -69,12 +70,7 @@ WalletWizard::WalletWizard(QWidget *parent)
         emit initialNetworkConfigured();
     });
 
-    connect(menuPage, &PageMenu::enableDarkMode, [this](bool enable){
-        if (enable)
-            emit skinChanged("QDarkStyle");
-        else
-            emit skinChanged("Native");
-    });
+    connect(menuPage, &PageMenu::showSettings, this, &WalletWizard::showSettings);
 
     connect(walletSetPasswordPage, &PageSetPassword::createWallet, this, &WalletWizard::onCreateWallet);
 

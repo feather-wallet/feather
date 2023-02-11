@@ -50,6 +50,7 @@ private:
     QString verifySignature(const epee::span<const uint8_t> data, const openpgp::signature_rsa &signature) const;
     void onSignedHashesReceived(QNetworkReply *reply, const QString &platformTag, const QString &version);
     QString getPlatformTag();
+    QString getWebsiteUrl();
 
 private:
     std::vector<openpgp::public_key_block> m_maintainers;

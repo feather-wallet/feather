@@ -8,7 +8,6 @@
 #include <QDesktopServices>
 #include <QInputDialog>
 #include <QMenu>
-#include <QMessageBox>
 #include <QTableWidget>
 
 #include "model/NodeModel.h"
@@ -20,39 +19,43 @@ NodeWidget::NodeWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    connect(ui->btn_add_custom, &QPushButton::clicked, this, &NodeWidget::onCustomAddClicked);
+    connect(ui->btn_addCustomNodes, &QPushButton::clicked, this, &NodeWidget::onCustomAddClicked);
 
-    ui->nodeBtnGroup->setId(ui->radioButton_websocket, NodeSource::websocket);
-    ui->nodeBtnGroup->setId(ui->radioButton_custom, NodeSource::custom);
-
-    connect(ui->nodeBtnGroup, &QButtonGroup::idClicked, [this](int id){
-        config()->set(Config::nodeSource, id);
-        emit nodeSourceChanged(static_cast<NodeSource>(id));
+    connect(ui->checkBox_websocketList, &QCheckBox::stateChanged, [this](int id){
+        bool custom = (id == 0);
+        ui->stackedWidget->setCurrentIndex(custom);
+        ui->frame_addCustomNodes->setVisible(custom);
+        config()->set(Config::nodeSource, custom);
+        emit nodeSourceChanged(static_cast<NodeSource>(custom));
     });
 
     m_contextActionRemove = new QAction("Remove", this);
-    m_contextActionConnect = new QAction(icons()->icon("connect.svg"), "Connect to node", this);
-    m_contextActionOpenStatusURL = new QAction(icons()->icon("network.png"), "Visit status page", this);
-    m_contextActionCopy = new QAction(icons()->icon("copy.png"), "Copy", this);
+    m_contextActionConnect = new QAction("Connect to node", this);
+    m_contextActionOpenStatusURL = new QAction("Visit status page", this);
+    m_contextActionCopy = new QAction("Copy", this);
     connect(m_contextActionConnect, &QAction::triggered, this, &NodeWidget::onContextConnect);
     connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
     connect(m_contextActionOpenStatusURL, &QAction::triggered, this, &NodeWidget::onContextStatusURL);
     connect(m_contextActionCopy, &QAction::triggered, this, &NodeWidget::onContextNodeCopy);
     connect(m_contextActionRemove, &QAction::triggered, this, &NodeWidget::onContextCustomNodeRemove);
 
-    ui->wsView->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->customView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(ui->wsView, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowWSContextMenu);
-    connect(ui->customView, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowCustomContextMenu);
+    ui->treeView_websocket->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->treeView_custom->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeView_websocket, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowWSContextMenu);
+    connect(ui->treeView_custom, &QTreeView::customContextMenuRequested, this, &NodeWidget::onShowCustomContextMenu);
 
-    connect(ui->customView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
-    connect(ui->wsView, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
+    connect(ui->treeView_websocket, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
+    connect(ui->treeView_custom, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
+
+    int index = config()->get(Config::nodeSource).toInt();
+    ui->stackedWidget->setCurrentIndex(config()->get(Config::nodeSource).toInt());
+    ui->frame_addCustomNodes->setVisible(index);
 
     this->onWebsocketStatusChanged();
 }
 
 void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
-    m_activeView = ui->wsView;
+    m_activeView = ui->treeView_websocket;
     FeatherNode node = this->selectedNode();
     if (node.toAddress().isEmpty()) return;
 
@@ -60,7 +63,7 @@ void NodeWidget::onShowWSContextMenu(const QPoint &pos) {
 }
 
 void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
-    m_activeView = ui->customView;
+    m_activeView = ui->treeView_custom;
     FeatherNode node = this->selectedNode();
     if (node.toAddress().isEmpty()) return;
 
@@ -69,33 +72,32 @@ void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
 
 void NodeWidget::onWebsocketStatusChanged() {
     bool disabled = config()->get(Config::disableWebsocket).toBool() || config()->get(Config::offlineMode).toBool();
-    QString labelText = disabled ? "From cached list" : "From websocket (recommended)";
-    ui->radioButton_websocket->setText(labelText);
-    ui->wsView->setColumnHidden(1, disabled);
+    ui->treeView_websocket->setColumnHidden(1, disabled);
 }
 
 void NodeWidget::showContextMenu(const QPoint &pos, const FeatherNode &node) {
     QMenu menu(this);
 
-    if (!node.isActive) {
+    if (m_canConnect && !node.isActive) {
         menu.addAction(m_contextActionConnect);
     }
 
     menu.addAction(m_contextActionOpenStatusURL);
     menu.addAction(m_contextActionCopy);
 
-    if (m_activeView == ui->customView)
+    if (m_activeView == ui->treeView_custom) {
         menu.addAction(m_contextActionRemove);
+    }
 
     menu.exec(m_activeView->viewport()->mapToGlobal(pos));
 }
 
 void NodeWidget::onContextConnect() {
     QObject *obj = sender();
-    if (obj == ui->customView)
-        m_activeView = ui->customView;
+    if (obj == ui->treeView_custom)
+        m_activeView = ui->treeView_custom;
     else
-        m_activeView = ui->wsView;
+        m_activeView = ui->treeView_websocket;
 
     FeatherNode node = this->selectedNode();
     if (!node.toAddress().isEmpty())
@@ -118,7 +120,7 @@ FeatherNode NodeWidget::selectedNode() {
     if (!index.isValid()) return FeatherNode();
 
     FeatherNode node;
-    if (m_activeView == ui->customView) {
+    if (m_activeView == ui->treeView_custom) {
         node = m_customModel->node(index.row());
     } else {
         node = m_wsModel->node(index.row());
@@ -127,21 +129,23 @@ FeatherNode NodeWidget::selectedNode() {
 }
 
 void NodeWidget::onContextCustomNodeRemove() {
-    QModelIndex index = ui->customView->currentIndex();
-    if (!index.isValid()) return;
+    QModelIndex index = ui->treeView_custom->currentIndex();
+    if (!index.isValid()) {
+        return;
+    }
     FeatherNode node = m_customModel->node(index.row());
 
-    auto nodes = m_ctx->nodes->customNodes();
+    auto nodes = m_nodes->customNodes();
     QMutableListIterator<FeatherNode> i(nodes);
     while (i.hasNext())
         if (i.next() == node)
             i.remove();
 
-    m_ctx->nodes->setCustomNodes(nodes);
+    m_nodes->setCustomNodes(nodes);
 }
 
 void NodeWidget::onCustomAddClicked(){
-    auto currentNodes = m_ctx->nodes->customNodes();
+    auto currentNodes = m_nodes->customNodes();
     QString currentNodesText;
 
     for (auto &entry: currentNodes) {
@@ -149,51 +153,52 @@ void NodeWidget::onCustomAddClicked(){
     }
 
     bool ok;
-    QString text = QInputDialog::getMultiLineText(this, "Add custom node(s).", "E.g: user:password@127.0.0.1:18081", currentNodesText, &ok);
-    if (!ok || text.isEmpty())
+    QString text = QInputDialog::getMultiLineText(this, "Add custom node(s).", "One node per line\nE.g: user:password@127.0.0.1:18081", currentNodesText, &ok);
+    if (!ok || text.isEmpty()) {
         return;
+    }
 
     QList<FeatherNode> nodesList;
     auto newNodesList = text.split("\n");
     for (auto &newNodeText: newNodesList) {
         newNodeText = newNodeText.replace("\r", "").trimmed();
-        if (newNodeText.isEmpty())
+        if (newNodeText.isEmpty()) {
             continue;
+        }
 
         auto node = FeatherNode(newNodeText);
         node.custom = true;
         nodesList.append(node);
     }
 
-    m_ctx->nodes->setCustomNodes(nodesList);
+    m_nodes->setCustomNodes(nodesList);
 }
 
-void NodeWidget::setupUI(QSharedPointer<AppContext> ctx) {
-    m_ctx = ctx;
+void NodeWidget::setupUI(Nodes *nodes) {
+    m_nodes = nodes;
+    
+    auto nodeSource = m_nodes->source();
+    ui->checkBox_websocketList->setChecked(nodeSource == NodeSource::websocket);
 
-    auto nodeSource = m_ctx->nodes->source();
+    this->setWSModel(m_nodes->modelWebsocket);
+    this->setCustomModel(m_nodes->modelCustom);
+}
 
-    if(nodeSource == NodeSource::websocket){
-        ui->radioButton_websocket->setChecked(true);
-    } else if(nodeSource == NodeSource::custom) {
-        ui->radioButton_custom->setChecked(true);
-    }
-
-    this->setWSModel(m_ctx->nodes->modelWebsocket);
-    this->setCustomModel(m_ctx->nodes->modelCustom);
+void NodeWidget::setCanConnect(bool canConnect) {
+    m_canConnect = canConnect;
 }
 
 void NodeWidget::setWSModel(NodeModel *model) {
     m_wsModel = model;
-    ui->wsView->setModel(m_wsModel);
-    ui->wsView->header()->setSectionResizeMode(NodeModel::URL, QHeaderView::Stretch);
-    ui->wsView->header()->setSectionResizeMode(NodeModel::Height, QHeaderView::ResizeToContents);
+    ui->treeView_websocket->setModel(m_wsModel);
+    ui->treeView_websocket->header()->setSectionResizeMode(NodeModel::URL, QHeaderView::Stretch);
+    ui->treeView_websocket->header()->setSectionResizeMode(NodeModel::Height, QHeaderView::ResizeToContents);
 }
 
 void NodeWidget::setCustomModel(NodeModel *model) {
     m_customModel = model;
-    ui->customView->setModel(m_customModel);
-    ui->customView->header()->setSectionResizeMode(NodeModel::URL, QHeaderView::Stretch);
+    ui->treeView_custom->setModel(m_customModel);
+    ui->treeView_custom->header()->setSectionResizeMode(NodeModel::URL, QHeaderView::Stretch);
 }
 
 NodeModel* NodeWidget::model() {

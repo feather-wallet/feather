@@ -10,6 +10,7 @@
 #include <QLabel>
 #include <QPlainTextEdit>
 #include <QLineEdit>
+#include <QListWidget>
 
 class DoublePixmapLabel : public QLabel
 {

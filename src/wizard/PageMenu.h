@@ -25,7 +25,7 @@ public:
     int nextId() const override;
 
 signals:
-    void enableDarkMode(bool enable);
+    void showSettings();
 
 private:
     Ui::PageMenu *ui;

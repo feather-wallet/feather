@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "MainWindow.h"
 #include "utils/EventFilter.h"
+#include "utils/os/Prestium.h"
 #include "WindowManager.h"
 #include "config.h"
 
@@ -40,10 +41,12 @@ void signal_handler(int signum) {
     std::cout << keyStream.str();
 
     // Write stack trace to disk
-    QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
-    std::ofstream out(crashLogPath.toStdString());
-    out << keyStream.str();
-    out.close();
+    if (config()->get(Config::writeStackTraceToDisk).toBool()) {
+        QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
+        std::ofstream out(crashLogPath.toStdString());
+        out << keyStream.str();
+        out.close();
+    }
 
     // Make a last ditch attempt to restart the application
     QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
@@ -90,12 +93,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     QCommandLineOption useLocalTorOption(QStringList() << "use-local-tor", "Use system wide installed Tor instead of the bundled.");
     parser.addOption(useLocalTorOption);
-
-    QCommandLineOption torHostOption(QStringList() << "tor-host", "Address of running Tor instance.", "torHost");
-    parser.addOption(torHostOption);
-
-    QCommandLineOption torPortOption(QStringList() << "tor-port", "Port of running Tor instance.", "torPort");
-    parser.addOption(torPortOption);
 
     QCommandLineOption quietModeOption(QStringList() << "quiet", "Limit console output");
     parser.addOption(quietModeOption);
@@ -164,16 +161,17 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     bool logLevelFromEnv;
     int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
-    if (!logLevelFromEnv) {
-        logLevel = 0;
+    if (logLevelFromEnv) {
+        config()->set(Config::logLevel, logLevel);
+    } else {
+        logLevel = config()->get(Config::logLevel).toInt();
     }
-    config()->set(Config::logLevel, logLevel);
 
     if (parser.isSet("quiet") || config()->get(Config::disableLogging).toBool()) {
         qWarning() << "Logging is disabled";
         WalletManager::instance()->setLogLevel(-1);
     }
-    else if (logLevelFromEnv && logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max) {
+    else if (logLevel >= 0 && logLevel <= Monero::WalletManagerFactory::LogLevel_Max) {
         Monero::WalletManagerFactory::setLogLevel(logLevel);
     }
 
@@ -186,11 +184,12 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     if (!QDir().mkpath(walletDir))
         qCritical() << "Unable to create dir: " << walletDir;
 
-    // Setup Tor config
-    if (parser.isSet("tor-host"))
-        config()->set(Config::socks5Host, parser.value("tor-host"));
-    if (parser.isSet("tor-port"))
-        config()->set(Config::socks5Port, parser.value("tor-port"));
+    // Prestium initial config
+    if (config()->get(Config::firstRun).toBool() && Prestium::detect()) {
+        config()->set(Config::proxy, Config::Proxy::i2p);
+        config()->set(Config::socks5Port, 4448);
+    }
+
     if (parser.isSet("use-local-tor"))
         config()->set(Config::useLocalTor, true);
 

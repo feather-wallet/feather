@@ -12,6 +12,7 @@
 #include "components.h"
 #include "CalcWindow.h"
 #include "SettingsDialog.h"
+#include "SettingsNewDialog.h"
 
 #include "dialog/AboutDialog.h"
 #include "dialog/AccountSwitcherDialog.h"
@@ -102,8 +103,15 @@ public:
     void showOrHide();
     void bringToFront();
 
+public slots:
+    void onPreferredFiatCurrencyChanged();
+    void onHideUpdateNotifications(bool hidden);
+
 signals:
     void closed();
+
+protected:
+    void changeEvent(QEvent* event) override;
 
 private slots:
     // TODO: use a consistent naming convention for slots
@@ -111,12 +119,12 @@ private slots:
     void menuOpenClicked();
     void menuNewRestoreClicked();
     void menuQuitClicked();
-    void menuSettingsClicked();
+    void menuSettingsClicked(bool showProxytab = false);
     void menuAboutClicked();
     void menuSignVerifyClicked();
     void menuVerifyTxProof();
     void menuWalletCloseClicked();
-    void menuTorClicked();
+    void menuProxySettingsClicked();
     void menuToggleTabVisible(const QString &key);
     void menuClearHistoryClicked();
     void onExportHistoryCSV(bool checked);
@@ -184,6 +192,7 @@ private slots:
     void tryStoreWallet();
     void onWebsocketStatusChanged(bool enabled);
     void showUpdateNotification();
+    void onProxySettingsChanged();
 
 private:
     friend WindowManager;
@@ -199,8 +208,6 @@ private:
     void saveGeo();
     void restoreGeo();
     void showDebugInfo();
-    void showNodeExhaustedMessage();
-    void showWSNodeExhaustedMessage();
     void createUnsignedTxDialog(UnsignedTransaction *tx);
     void updatePasswordIcon();
     void updateNetStats();
@@ -217,7 +224,6 @@ private:
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();
     bool verifyPassword(bool sensitive = true);
-    void patchStylesheetMac();
     void fillSendTab(const QString &address, const QString &description);
     void userActivity();
     void checkUserActivity();
@@ -264,7 +270,7 @@ private:
     StatusBarButton *m_statusBtnPassword;
     StatusBarButton *m_statusBtnPreferences;
     StatusBarButton *m_statusBtnSeed;
-    StatusBarButton *m_statusBtnTor;
+    StatusBarButton *m_statusBtnProxySettings;
     StatusBarButton *m_statusBtnHwDevice;
 
     QSignalMapper *m_tabShowHideSignalMapper;
