@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.5.0-beta1
+$(package)_version=6.5.0-beta2
 $(package)_download_path=https://download.qt.io/development_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=8357aa58c86ade1eeda535177b5e40578662a1a3f75571bfb799e1eae356b2ce
+$(package)_sha256_hash=15f7af35c1cfb7a4cf6103879d61aa5e682f4ed577bb0bb73c56f0d927208a15
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_cmake native_qt native_libxkbcommon
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor
@@ -30,22 +30,22 @@ $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
-$(package)_qttranslations_sha256_hash=b2a9f1225d613d5958f0993e28cbdc75c115a430df2054a544cdd2bb87656982
+$(package)_qttranslations_sha256_hash=a18dab61430ce487e82c63bfa5f730f217646e90ef74e220d1e4b75829653d58
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=ee62073cf9e0866e15c4d4f643bca094329c57a534ad3f4b1789803be45ab1af
+$(package)_qttools_sha256_hash=c1dcb509c37e61971a8b2c1cde2bf7efafa43d92209d3d144a983019dbfb9ab6
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=20e96ef340491c49b4150e7153a37263dac064b9655f7944088f6d1cbfbfd446
+$(package)_qtsvg_sha256_hash=c13fcefa9a23813cd9546d07e59c044c9d7e6081a4b7eaa911ed72ae7a7cce7f
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=26f207d5532fb06316fe1193f99e5a02d2a95f52986a40101effea516f2fa889
+$(package)_qtwebsockets_sha256_hash=5d8ea552cc524e4fed0b5e0ac0c335c3346405c7fbc1cd9a7915b2e484f84738
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=3cd15bee887d49593db1f3a075c7b4b5854c1816d665862d9b31b966eabee32e
+$(package)_qtmultimedia_sha256_hash=7a323953de91ff87c1231733002033d25676a388e3bab82b058ed15ae8563a83
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=58e37ea1fabcf383768c7fa93cb74d981ea95915a2802283deea8d82134668f8
+$(package)_qtshadertools_sha256_hash=511f4cbcf3b394b5218f23c56211f6fb4083806be052a4023707654440ae7d39
 
 $(package)_extra_sources  = $($(package)_qttranslations_file_name)
 $(package)_extra_sources += $($(package)_qttools_file_name)
@@ -128,7 +128,6 @@ $(package)_config_opts += -no-feature-vnc
 #$(package)_config_opts += -no-feature-wizard # Needed
 
 $(package)_config_opts_darwin = -no-dbus
-$(package)_config_opts_darwin += -no-opengl
 $(package)_config_opts_darwin += -no-pch
 $(package)_config_opts_darwin += -no-freetype
 $(package)_config_opts_darwin += QMAKE_MACOSX_DEPLOYMENT_TARGET=$(OSX_MIN_VERSION)
@@ -346,6 +345,7 @@ define $(package)_build_cmds
 endef
 else ifneq (,$(findstring x86_64,$(HOST)))
 define $(package)_build_cmds
+  export LD_LIBRARY_PATH=${host_prefix}/lib/ && \
   cmake --build . --target syncqt_build && \
   $(MAKE)
 endef
