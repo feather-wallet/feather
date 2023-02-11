@@ -11,7 +11,6 @@
 #include "appcontext.h"
 #include "components.h"
 #include "CalcWindow.h"
-#include "SettingsDialog.h"
 #include "SettingsNewDialog.h"
 
 #include "dialog/AboutDialog.h"
