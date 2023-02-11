@@ -10,7 +10,6 @@ $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxk
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = aarch64Toolchain.cmake
-$(package)_patches += cocoa-no-badge.patch
 $(package)_patches += dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += gnueabihfToolchain.cmake
@@ -262,9 +261,6 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
-  cd qtbase && \
-  patch -p1 -i $($(package)_patch_dir)/cocoa-no-badge.patch && \
-  cd .. && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
