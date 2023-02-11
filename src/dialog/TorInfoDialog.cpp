@@ -51,4 +51,6 @@ void TorInfoDialog::onStatusChanged(const QString &msg) {
     }
 }
 
-TorInfoDialog::~TorInfoDialog() = default;
+TorInfoDialog::~TorInfoDialog() {
+    disconnect(torManager(), nullptr, this, nullptr);
+}
