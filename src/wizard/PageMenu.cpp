@@ -7,8 +7,6 @@
 
 #include <QFileDialog>
 
-#include "SettingsNewDialog.h"
-
 PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageMenu)

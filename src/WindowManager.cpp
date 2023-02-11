@@ -139,19 +139,19 @@ void WindowManager::raise() {
 // ######################## SETTINGS ########################
 
 void WindowManager::showSettings(QSharedPointer<AppContext> ctx, QWidget *parent, bool showProxyTab) {
-    SettingsNew settings{ctx, parent};
+    Settings settings{ctx, parent};
 
-    connect(&settings, &SettingsNew::preferredFiatCurrencyChanged, [this]{
+    connect(&settings, &Settings::preferredFiatCurrencyChanged, [this]{
         for (const auto &window : m_windows) {
             window->onPreferredFiatCurrencyChanged();
         }
     });
-    connect(&settings, &SettingsNew::skinChanged, this, &WindowManager::onChangeTheme);
-    connect(&settings, &SettingsNew::updateBalance, this, &WindowManager::updateBalance);
-    connect(&settings, &SettingsNew::proxySettingsChanged, this, &WindowManager::onProxySettingsChanged);
-    connect(&settings, &SettingsNew::websocketStatusChanged, this, &WindowManager::onWebsocketStatusChanged);
-    connect(&settings, &SettingsNew::offlineMode, this, &WindowManager::offlineMode);
-    connect(&settings, &SettingsNew::hideUpdateNotifications, [this](bool hidden){
+    connect(&settings, &Settings::skinChanged, this, &WindowManager::onChangeTheme);
+    connect(&settings, &Settings::updateBalance, this, &WindowManager::updateBalance);
+    connect(&settings, &Settings::proxySettingsChanged, this, &WindowManager::onProxySettingsChanged);
+    connect(&settings, &Settings::websocketStatusChanged, this, &WindowManager::onWebsocketStatusChanged);
+    connect(&settings, &Settings::offlineMode, this, &WindowManager::offlineMode);
+    connect(&settings, &Settings::hideUpdateNotifications, [this](bool hidden){
         for (const auto &window : m_windows) {
             window->onHideUpdateNotifications(hidden);
         }

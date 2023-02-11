@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#include "SettingsNewDialog.h"
-#include "ui_SettingsNewDialog.h"
+#include "SettingsDialog.h"
+#include "ui_SettingsDialog.h"
 
 #include <QCloseEvent>
 #include <QDesktopServices>
@@ -13,9 +13,9 @@
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
 
-SettingsNew::SettingsNew(QSharedPointer<AppContext> ctx, QWidget *parent)
+Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
         : QDialog(parent)
-        , ui(new Ui::SettingsNew)
+        , ui(new Ui::Settings)
         , m_ctx(std::move(ctx))
 {
     ui->setupUi(this);
@@ -68,7 +68,7 @@ SettingsNew::SettingsNew(QSharedPointer<AppContext> ctx, QWidget *parent)
     this->adjustSize();
 }
 
-void SettingsNew::setupAppearanceTab() {
+void Settings::setupAppearanceTab() {
     // [Theme]
     this->setupThemeComboBox();
     auto settingsTheme = config()->get(Config::skin).toString();
@@ -148,7 +148,7 @@ void SettingsNew::setupAppearanceTab() {
     });
 }
 
-void SettingsNew::setupNetworkTab() {
+void Settings::setupNetworkTab() {
     // Node
     if (m_ctx) {
         ui->nodeWidget->setupUI(m_ctx->nodes);
@@ -161,7 +161,7 @@ void SettingsNew::setupNetworkTab() {
     }
 
     // Proxy
-    connect(ui->proxyWidget, &NetworkProxyWidget::proxySettingsChanged, this, &SettingsNew::onProxySettingsChanged);
+    connect(ui->proxyWidget, &NetworkProxyWidget::proxySettingsChanged, this, &Settings::onProxySettingsChanged);
 
     // Websocket
     // [Obtain third-party data]
@@ -180,7 +180,7 @@ void SettingsNew::setupNetworkTab() {
     });
 }
 
-void SettingsNew::setupStorageTab() {
+void Settings::setupStorageTab() {
     // Paths
     ui->lineEdit_defaultWalletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
@@ -250,7 +250,7 @@ void SettingsNew::setupStorageTab() {
     });
 }
 
-void SettingsNew::setupDisplayTab() {
+void Settings::setupDisplayTab() {
     // [Hide balance]
     ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
@@ -295,11 +295,11 @@ void SettingsNew::setupDisplayTab() {
     });
 }
 
-void SettingsNew::setupMemoryTab() {
+void Settings::setupMemoryTab() {
     // Nothing here, yet
 }
 
-void SettingsNew::setupTransactionsTab() {
+void Settings::setupTransactionsTab() {
     // [Multibroadcast outgoing transactions]
     ui->checkBox_multibroadcast->setChecked(config()->get(Config::multiBroadcast).toBool());
     connect(ui->checkBox_multibroadcast, &QCheckBox::toggled, [](bool toggled){
@@ -314,7 +314,7 @@ void SettingsNew::setupTransactionsTab() {
     ui->checkBox_requirePasswordToSpend->hide();
 }
 
-void SettingsNew::setupMiscTab() {
+void Settings::setupMiscTab() {
     // [Block explorer]
     ui->comboBox_blockExplorer->setCurrentIndex(ui->comboBox_blockExplorer->findText(config()->get(Config::blockExplorer).toString()));
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
@@ -344,7 +344,7 @@ void SettingsNew::setupMiscTab() {
     });
 }
 
-void SettingsNew::onProxySettingsChanged() {
+void Settings::onProxySettingsChanged() {
     ui->closeButton->addButton(QDialogButtonBox::Apply);
     connect(ui->closeButton->button(QDialogButtonBox::Apply), &QAbstractButton::clicked, [this](){
         ui->proxyWidget->setProxySettings();
@@ -353,12 +353,12 @@ void SettingsNew::onProxySettingsChanged() {
     });
 }
 
-void SettingsNew::showNetworkProxyTab() {
-    this->setSelection(SettingsNew::Pages::NETWORK);
+void Settings::showNetworkProxyTab() {
+    this->setSelection(Settings::Pages::NETWORK);
     ui->tabWidget_network->setCurrentIndex(1);
 }
 
-void SettingsNew::setupThemeComboBox() {
+void Settings::setupThemeComboBox() {
 #if defined(Q_OS_WIN)
     m_themes.removeOne("Breeze/Dark");
     m_themes.removeOne("Breeze/Light");
@@ -369,7 +369,7 @@ void SettingsNew::setupThemeComboBox() {
     ui->comboBox_theme->insertItems(0, m_themes);
 }
 
-void SettingsNew::setSelection(int index) {
+void Settings::setSelection(int index) {
     // You'd really think there is a better way
     QListWidgetItem *item = ui->selector->item(index);
     QModelIndex idx = ui->selector->indexFromItem(item);
@@ -377,7 +377,7 @@ void SettingsNew::setSelection(int index) {
     ui->selector->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
-void SettingsNew::enableWebsocket(bool enabled) {
+void Settings::enableWebsocket(bool enabled) {
     if (enabled && !config()->get(Config::offlineMode).toBool() && !config()->get(Config::disableWebsocket).toBool()) {
         websocketNotifier()->websocketClient.restart();
     } else {
@@ -387,4 +387,4 @@ void SettingsNew::enableWebsocket(bool enabled) {
     emit websocketStatusChanged(enabled);
 }
 
-SettingsNew::~SettingsNew() = default;
+Settings::~Settings() = default;

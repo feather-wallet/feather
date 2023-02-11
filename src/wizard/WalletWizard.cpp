@@ -19,7 +19,6 @@
 #include "PageNetworkProxy.h"
 #include "PageNetworkWebsocket.h"
 #include "constants.h"
-#include "SettingsNewDialog.h"
 
 #include <QLineEdit>
 #include <QVBoxLayout>

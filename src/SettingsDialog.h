@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef FEATHER_SETTINGSNEWDIALOG_H
-#define FEATHER_SETTINGSNEWDIALOG_H
+#ifndef FEATHER_SettingsDIALOG_H
+#define FEATHER_SettingsDIALOG_H
 
 
 #include <QAbstractButton>
@@ -13,16 +13,16 @@
 #include "widgets/NodeWidget.h"
 
 namespace Ui {
-    class SettingsNew;
+    class Settings;
 }
 
-class SettingsNew : public QDialog
+class Settings : public QDialog
 {
 Q_OBJECT
 
 public:
-    explicit SettingsNew(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
-    ~SettingsNew() override;
+    explicit Settings(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    ~Settings() override;
 
     void showNetworkProxyTab();
 
@@ -66,7 +66,7 @@ private:
     void setSelection(int index);
     void enableWebsocket(bool enabled);
 
-    QScopedPointer<Ui::SettingsNew> ui;
+    QScopedPointer<Ui::Settings> ui;
     QSharedPointer<AppContext> m_ctx;
     Nodes *m_nodes = nullptr;
 
@@ -75,4 +75,4 @@ private:
     QStringList m_timeFormats{"hh:mm", "hh:mm ap"};
 };
 
-#endif //FEATHER_SETTINGSNEWDIALOG_H
+#endif //FEATHER_SettingsDIALOG_H

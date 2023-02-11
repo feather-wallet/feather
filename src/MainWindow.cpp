@@ -154,7 +154,7 @@ void MainWindow::initStatusBar() {
 
     m_statusBtnConnectionStatusIndicator = new StatusBarButton(icons()->icon("status_disconnected.svg"), "Connection status", this);
     connect(m_statusBtnConnectionStatusIndicator, &StatusBarButton::clicked, [this](){
-        this->onShowSettingsPage(SettingsNew::Pages::NETWORK);
+        this->onShowSettingsPage(Settings::Pages::NETWORK);
     });
     this->statusBar()->addPermanentWidget(m_statusBtnConnectionStatusIndicator);
     this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
