@@ -14,7 +14,6 @@ $(package)_patches += dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += gnueabihfToolchain.cmake
 $(package)_patches += guix_cross_lib_path.patch
-$(package)_patches += mac-qmake.conf
 $(package)_patches += MacToolchain.cmake
 $(package)_patches += no_pthread_cond_clockwait.patch
 $(package)_patches += no-renameat2.patch
@@ -267,7 +266,6 @@ define $(package)_preprocess_cmds
   cd .. && \
   mkdir -p qtbase/mkspecs/macx-clang-linux &&\
   cp -f qtbase/mkspecs/macx-clang/qplatformdefs.h qtbase/mkspecs/macx-clang-linux/ &&\
-  cp -f $($(package)_patch_dir)/mac-qmake.conf qtbase/mkspecs/macx-clang-linux/qmake.conf && \
   cp -r qtbase/mkspecs/linux-arm-gnueabi-g++ qtbase/mkspecs/bitcoin-linux-g++ && \
   sed -i.old "s|arm-linux-gnueabi-gcc|$($($(package)_type)_CC)|" qtbase/mkspecs/bitcoin-linux-g++/qmake.conf && \
   sed -i.old "s|arm-linux-gnueabi-g++|$($($(package)_type)_CXX)|" qtbase/mkspecs/bitcoin-linux-g++/qmake.conf && \
