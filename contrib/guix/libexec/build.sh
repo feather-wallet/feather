@@ -364,6 +364,12 @@ mkdir -p "$DISTSRC"
     (
         cd installed
 
+        case "$HOST" in
+            *linux*)
+                mv feather "${DISTNAME}"
+                ;;
+        esac
+
         # Finally, deterministically produce {non-,}debug binary tarballs ready
         # for release
         case "$HOST" in
