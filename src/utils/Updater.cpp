@@ -26,7 +26,7 @@ void Updater::checkForUpdates() {
     UtilsNetworking network{this};
     QNetworkReply *reply = network.getJson(QString("%1/updates.json").arg(this->getWebsiteUrl()));
     if (!reply) {
-        emit updateCheckFailed("Can't check for websites: offline mode enabled");
+        emit updateCheckFailed("offline mode enabled");
         return;
     }
 

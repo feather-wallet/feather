@@ -26,6 +26,10 @@ UpdateDialog::UpdateDialog(QWidget *parent, QSharedPointer<Updater> updater)
     ui->label_header->setFont(bigFont);
     ui->frame->hide();
 
+    connect(m_updater.data(), &Updater::updateAvailable, this, &UpdateDialog::updateAvailable);
+    connect(m_updater.data(), &Updater::noUpdateAvailable, this, &UpdateDialog::noUpdateAvailable);
+    connect(m_updater.data(), &Updater::updateCheckFailed, this, &UpdateDialog::onUpdateCheckFailed);
+
     bool updateAvailable = (m_updater->state == Updater::State::UPDATE_AVAILABLE);
     if (updateAvailable) {
         this->updateAvailable();
@@ -42,10 +46,6 @@ UpdateDialog::UpdateDialog(QWidget *parent, QSharedPointer<Updater> updater)
     connect(ui->btn_download, &QPushButton::clicked, this, &UpdateDialog::onDownloadClicked);
     connect(ui->btn_installUpdate, &QPushButton::clicked, this, &UpdateDialog::onInstallUpdate);
     connect(ui->btn_restart, &QPushButton::clicked, this, &UpdateDialog::onRestartClicked);
-
-    connect(m_updater.data(), &Updater::updateAvailable, this, &UpdateDialog::updateAvailable);
-    connect(m_updater.data(), &Updater::noUpdateAvailable, this, &UpdateDialog::noUpdateAvailable);
-    connect(m_updater.data(), &Updater::updateCheckFailed, this, &UpdateDialog::onUpdateCheckFailed);
 
     this->adjustSize();
 }
