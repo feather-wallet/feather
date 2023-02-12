@@ -449,26 +449,36 @@ bool Nodes::useI2PNodes() {
 
 bool Nodes::useSocks5Proxy(const FeatherNode &node) {
     if (node.isLocal()) {
+        // When Feather is connected to a local node, ignore proxy settings.
         return false;
     }
 
     if (Utils::isTorsocks()) {
+        // When Feather is started with torsocks, let torsocks handle traffic.
         return false;
     }
 
-    if (TailsOS::detect() || WhonixOS::detect()) {
+    if (config()->get(Config::proxy).toInt() == Config::Proxy::None) {
+        return false;
+    }
+
+    if (TailsOS::detect()) {
+        // Tails does not transparently route traffic over Tor.
+        return true;
+    }
+
+    if (WhonixOS::detect()) {
         return true;
     }
 
     if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
+        // Don't use socks5 proxy if initial sync traffic is excluded.
         return this->useOnionNodes();
     }
 
     if (config()->get(Config::proxy).toInt() != Config::Proxy::None) {
         return true;
     }
-
-    return false;
 }
 
 void Nodes::updateModels() {
