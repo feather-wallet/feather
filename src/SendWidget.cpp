@@ -236,6 +236,10 @@ void SendWidget::updateConversionLabel() {
         return;
     }
 
+    if (config()->get(Config::disableWebsocket).toBool()) {
+        return;
+    }
+
     QString conversionAmountStr = [this]{
         QString currency = ui->comboCurrencySelection->currentText();
         if (currency != "XMR") {
@@ -329,6 +333,16 @@ void SendWidget::onEndTransaction() {
 void SendWidget::disableSendButton() {
     m_sendDisabled = true;
     ui->btnSend->setEnabled(false);
+}
+
+void SendWidget::setWebsocketEnabled(bool enabled) {
+    this->updateConversionLabel();
+    if (enabled) {
+        this->setupComboBox();
+    } else {
+        ui->comboCurrencySelection->clear();
+        ui->comboCurrencySelection->insertItem(0, "XMR");
+    }
 }
 
 void SendWidget::onDataPasted(const QString &data) {

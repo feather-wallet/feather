@@ -606,6 +606,7 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && config()->get(Config::showTabExchange).toBool());
 
     m_historyWidget->setWebsocketEnabled(enabled);
+    m_sendWidget->setWebsocketEnabled(enabled);
 
 #ifdef HAS_XMRIG
     m_xmrig->setDownloadsTabEnabled(enabled);

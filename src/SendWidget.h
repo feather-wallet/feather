@@ -41,6 +41,7 @@ public slots:
     void onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid);
     void onPreferredFiatCurrencyChanged();
     void disableSendButton();
+    void setWebsocketEnabled(bool enabled);
 
     void onInitiateTransaction();
     void onEndTransaction();
