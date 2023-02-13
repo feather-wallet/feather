@@ -41,6 +41,7 @@ void TorManager::init() {
     auto state = m_process.state();
     if (m_localTor && (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting)) {
         m_process.kill();
+        m_started = false;
     }
 
     featherTorPort = config()->get(Config::torManagedPort).toString().toUShort();
@@ -48,6 +49,7 @@ void TorManager::init() {
 
 void TorManager::stop() {
     m_process.kill();
+    m_started = false;
 }
 
 void TorManager::start() {
@@ -168,6 +170,10 @@ void TorManager::handleProcessError(QProcess::ProcessError error) {
 }
 
 bool TorManager::unpackBins() {
+    if (m_unpacked) {
+        return true;
+    }
+
     QString torBin = "tor";
 #if defined(Q_OS_WIN)
    torBin += ".exe";
@@ -211,6 +217,7 @@ bool TorManager::unpackBins() {
     | QFile::ReadOwner | QFile::ReadGroup | QFile::ReadOther);
 #endif
 
+    m_unpacked = true;
     return true;
 }
 
@@ -253,6 +260,10 @@ bool TorManager::shouldStartTorDaemon() {
         return false;
     }
 
+    if (m_started) {
+        return true;
+    }
+
     // Don't start a Tor daemon if one is already running
     if (Utils::portOpen(torHost, torPort)) {
         return false;
@@ -267,10 +278,8 @@ bool TorManager::shouldStartTorDaemon() {
     }
 
     // Tor daemon (or other service) is already running on our port (19450)
+
     if (Utils::portOpen(featherTorHost, featherTorPort)) {
-        // TODO: this is a hack, fix it later
-        config()->set(Config::socks5Host, featherTorHost);
-        config()->set(Config::socks5Port, featherTorPort);
         return false;
     }
 

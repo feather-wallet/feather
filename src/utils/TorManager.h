@@ -64,6 +64,7 @@ private:
     bool m_stopRetries = false;
     bool m_localTor;
     bool m_started = false;
+    bool m_unpacked = false;
     QTimer *m_checkConnectionTimer;
 };
 

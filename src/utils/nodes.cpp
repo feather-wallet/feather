@@ -208,7 +208,8 @@ void Nodes::connectToNode(const FeatherNode &node) {
     }
 
     if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
-        if (!node.isOnion()) {
+        if (!node.isOnion() && !node.isLocal()) {
+            // We only want to connect to .onion nodes, but local nodes get an exception.
             return;
         }
     }
