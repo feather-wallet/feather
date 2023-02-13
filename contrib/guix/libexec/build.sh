@@ -286,7 +286,7 @@ mkdir -p "$DISTSRC"
         *linux*)
             CMAKEVARS+=" -DSTACK_TRACE=ON"
             case "$OPTIONS" in
-                tails)
+                no-tor-bundle)
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ;;
             esac
