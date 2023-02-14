@@ -59,7 +59,7 @@ private:
 
     static QPointer<TorManager> m_instance;
 
-    ChildProcess m_process;
+    ChildProcess *m_process;
     int m_restarts = 0;
     bool m_stopRetries = false;
     bool m_localTor;

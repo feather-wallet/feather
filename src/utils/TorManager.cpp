@@ -15,6 +15,7 @@
 TorManager::TorManager(QObject *parent)
     : QObject(parent)
     , m_checkConnectionTimer(new QTimer(this))
+    , m_process(new ChildProcess(this))
 {
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
@@ -26,11 +27,11 @@ TorManager::TorManager(QObject *parent)
 
     this->torDataPath = Config::defaultConfigDir().filePath("tor/data");
 
-    m_process.setProcessChannelMode(QProcess::MergedChannels);
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
 
-    connect(&m_process, &QProcess::readyReadStandardOutput, this, &TorManager::handleProcessOutput);
-    connect(&m_process, &QProcess::errorOccurred, this, &TorManager::handleProcessError);
-    connect(&m_process, &QProcess::stateChanged, this, &TorManager::stateChanged);
+    connect(m_process, &QProcess::readyReadStandardOutput, this, &TorManager::handleProcessOutput);
+    connect(m_process, &QProcess::errorOccurred, this, &TorManager::handleProcessError);
+    connect(m_process, &QProcess::stateChanged, this, &TorManager::stateChanged);
 }
 
 QPointer<TorManager> TorManager::m_instance(nullptr);
@@ -38,9 +39,9 @@ QPointer<TorManager> TorManager::m_instance(nullptr);
 void TorManager::init() {
     m_localTor = !shouldStartTorDaemon();
 
-    auto state = m_process.state();
+    auto state = m_process->state();
     if (m_localTor && (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting)) {
-        m_process.kill();
+        m_process->kill();
         m_started = false;
     }
 
@@ -48,7 +49,7 @@ void TorManager::init() {
 }
 
 void TorManager::stop() {
-    m_process.kill();
+    m_process->kill();
     m_started = false;
 }
 
@@ -60,7 +61,7 @@ void TorManager::start() {
         return;
     }
 
-    auto state = m_process.state();
+    auto state = m_process->state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
         this->setErrorMessage("Can't start Tor, already running or starting");
         return;
@@ -90,7 +91,7 @@ void TorManager::start() {
 
     qDebug() << QString("%1 %2").arg(this->torPath, arguments.join(" "));
 
-    m_process.start(this->torPath, arguments);
+    m_process->start(this->torPath, arguments);
     m_started = true;
 }
 
@@ -149,7 +150,7 @@ void TorManager::stateChanged(QProcess::ProcessState state) {
 }
 
 void TorManager::handleProcessOutput() {
-    QByteArray output = m_process.readAllStandardOutput();
+    QByteArray output = m_process->readAllStandardOutput();
     this->torLogs.append(Utils::barrayToString(output));
     emit logsUpdated();
     if(output.contains(QByteArray("Bootstrapped 100%"))) {

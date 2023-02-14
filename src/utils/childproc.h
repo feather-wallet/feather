@@ -14,7 +14,7 @@
 class ChildProcess : public QProcess {
     Q_OBJECT
 public:
-    explicit ChildProcess(QObject* parent = nullptr);
+    explicit ChildProcess(QObject *parent);
     ~ChildProcess() override;
 protected:
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)

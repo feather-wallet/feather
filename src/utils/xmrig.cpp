@@ -11,25 +11,26 @@
 
 XmRig::XmRig(const QString &configDir, QObject *parent)
     : QObject(parent)
+    , m_process(new ChildProcess(this))
 {
-    m_process.setProcessChannelMode(QProcess::MergedChannels);
-    connect(&m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
-    connect(&m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
-    connect(&m_process, &QProcess::stateChanged, this, &XmRig::onStateChanged);
+    m_process->setProcessChannelMode(QProcess::MergedChannels);
+    connect(m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);
+    connect(m_process, &QProcess::errorOccurred, this, &XmRig::handleProcessError);
+    connect(m_process, &QProcess::stateChanged, this, &XmRig::onStateChanged);
 }
 
 void XmRig::stop() {
-    qDebug() << m_process.processId();
-    if (m_process.state() == QProcess::Running) {
+    qDebug() << m_process->processId();
+    if (m_process->state() == QProcess::Running) {
 #if defined(Q_OS_WIN)
-        m_process.kill(); // https://doc.qt.io/qt-5/qprocess.html#terminate
+        m_process->kill(); // https://doc.qt.io/qt-5/qprocess.html#terminate
 #elif defined(Q_OS_LINUX)
         if (m_elevated) {
-            m_killProcess.start("pkexec", QStringList() << "kill" << QString::number(m_process.processId()));
+            m_killProcess.start("pkexec", QStringList() << "kill" << QString::number(m_process->processId()));
             return;
         }
 #endif
-        m_process.terminate();
+        m_process->terminate();
     }
 }
 
@@ -38,7 +39,7 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
 {
     m_elevated = elevated;
 
-    auto state = m_process.state();
+    auto state = m_process->state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
         emit error("Can't start XMRig, already running or starting");
         return;
@@ -82,9 +83,9 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
     emit output(cmd.toUtf8());
 
     if (m_elevated) {
-        m_process.start("pkexec", arguments);
+        m_process->start("pkexec", arguments);
     } else {
-        m_process.start(path, arguments);
+        m_process->start(path, arguments);
     }
 }
 
@@ -101,7 +102,7 @@ void XmRig::onStateChanged(QProcess::ProcessState state) {
 }
 
 void XmRig::handleProcessOutput() {
-    QByteArray _output = m_process.readAllStandardOutput();
+    QByteArray _output = m_process->readAllStandardOutput();
     if(_output.contains("miner") && _output.contains("speed")) {
         // detect hashrate
         auto str = Utils::barrayToString(_output);

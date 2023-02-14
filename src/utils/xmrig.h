@@ -36,7 +36,7 @@ private slots:
     void handleProcessError(QProcess::ProcessError error);
 
 private:
-    ChildProcess m_process;
+    ChildProcess *m_process;
     QProcess m_killProcess;
     bool m_elevated;
 };
