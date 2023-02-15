@@ -63,7 +63,6 @@ void TorManager::start() {
 
     auto state = m_process->state();
     if (state == QProcess::ProcessState::Running || state == QProcess::ProcessState::Starting) {
-        this->setErrorMessage("Can't start Tor, already running or starting");
         return;
     }
 
