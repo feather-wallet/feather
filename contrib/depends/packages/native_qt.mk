@@ -1,9 +1,9 @@
 package=native_qt
-$(package)_version=6.5.0-beta2
+$(package)_version=6.5.0-beta3
 $(package)_download_path=https://download.qt.io/development_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=15f7af35c1cfb7a4cf6103879d61aa5e682f4ed577bb0bb73c56f0d927208a15
+$(package)_sha256_hash=0cf7498b34900a1d9f6c070a44495f7171eb4a4cb66a7ceea53e8721c8812701
 $(package)_dependencies=native_libxcb native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm native_libxcb_util_cursor
 $(package)_mingw32_dependencies=native_cmake
 $(package)_qt_libs=corelib network widgets gui plugins testlib
@@ -20,19 +20,19 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 
 $(package)_qttranslations_file_name=qttranslations-$($(package)_suffix)
-$(package)_qttranslations_sha256_hash=a18dab61430ce487e82c63bfa5f730f217646e90ef74e220d1e4b75829653d58
+$(package)_qttranslations_sha256_hash=a52911e58374c15f36c84697021c865ff148f380acc7b83a3db8fc5cfabc18ca
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=c1dcb509c37e61971a8b2c1cde2bf7efafa43d92209d3d144a983019dbfb9ab6
+$(package)_qttools_sha256_hash=f959d0e91616ee16ca8bb843307214c4c90ebcd1283854f24c7b33eb88bbb418
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=c13fcefa9a23813cd9546d07e59c044c9d7e6081a4b7eaa911ed72ae7a7cce7f
+$(package)_qtsvg_sha256_hash=0bb327206418384d6fd6cfe52d4350041982816847cdbbea74681582117de6a8
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=7a323953de91ff87c1231733002033d25676a388e3bab82b058ed15ae8563a83
+$(package)_qtmultimedia_sha256_hash=873473fe7150082993dad04bec4c993f7a24af9449696150b24ab784494871df
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=511f4cbcf3b394b5218f23c56211f6fb4083806be052a4023707654440ae7d39
+$(package)_qtshadertools_sha256_hash=e238b3494e25db4841cfa06db27ddd30e8241f25cbeeface6d7916fb34d1ee51
 
 $(package)_extra_sources  = $($(package)_qttranslations_file_name)
 $(package)_extra_sources += $($(package)_qttools_file_name)
