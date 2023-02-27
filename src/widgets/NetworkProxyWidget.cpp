@@ -19,7 +19,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
     ui->setupUi(this);
 
     ui->comboBox_proxy->setCurrentIndex(config()->get(Config::proxy).toInt());
-    connect(ui->comboBox_proxy, &QComboBox::currentIndexChanged, [this](int index){
+    connect(ui->comboBox_proxy, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
         this->onProxySettingsChanged();
         ui->frame_proxy->setVisible(index != Config::Proxy::None);
         ui->groupBox_proxySettings->setTitle(QString("%1 settings").arg(ui->comboBox_proxy->currentText()));
@@ -64,7 +64,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
 
     // [Node traffic]
     ui->comboBox_torNodeTraffic->setCurrentIndex(config()->get(Config::torPrivacyLevel).toInt());
-    connect(ui->comboBox_torNodeTraffic, &QComboBox::currentIndexChanged, this, &NetworkProxyWidget::onProxySettingsChanged);
+    connect(ui->comboBox_torNodeTraffic, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Show Tor logs]
     ui->frame_torShowLogs->setVisible(!config()->get(Config::useLocalTor).toBool());

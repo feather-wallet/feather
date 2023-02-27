@@ -221,7 +221,7 @@ void Settings::setupStorageTab() {
 
     // [Log level]
     ui->comboBox_logLevel->setCurrentIndex(config()->get(Config::logLevel).toInt());
-    connect(ui->comboBox_logLevel, &QComboBox::currentIndexChanged, [](int index){
+    connect(ui->comboBox_logLevel, QOverload<int>::of(&QComboBox::currentIndexChanged), [](int index){
        config()->set(Config::logLevel, index);
        if (!config()->get(Config::disableLogging).toBool()) {
            WalletManager::instance()->setLogLevel(index);
