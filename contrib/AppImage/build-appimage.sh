@@ -16,7 +16,8 @@ cp "src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
 cp "build/bin/feather" "$APPDIR/usr/bin/feather"
 chmod +x "$APPDIR/usr/bin/feather"
 
-export LD_LIBRARY_PATH=/feather/contrib/depends/x86_64-linux-gnu/lib/:/gnu/store:/gnu/store/yk91cxchassi5ykxsyd4vci32vncgjkf-gcc-cross-x86_64-linux-gnu-10.3.0-lib/x86_64-linux-gnu/lib
+# libgcc_s.so.1 not found
+export LD_LIBRARY_PATH=/feather/contrib/depends/x86_64-linux-gnu/lib/:/gnu/store:/gnu/store/0wfxmi621h9xn4169xzhzd1p5g91cj9m-gcc-cross-x86_64-linux-gnu-10.3.0-lib/x86_64-linux-gnu/lib/
 
 # linuxdeployqt glibc moaning bypass
 mkdir -p "$APPDIR/usr/share/doc/libc6"
