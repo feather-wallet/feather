@@ -1,0 +1,187 @@
+From 9c96f214a8ce9c8445a713d5589a7fbc0fea5d50 Mon Sep 17 00:00:00 2001
+From: tevador <tevador@gmail.com>
+Date: Sat, 18 Feb 2023 18:42:09 +0100
+Subject: [PATCH] Get rid of time_t to support 32-bit systems
+
+---
+ CMakeLists.txt     |  4 ++--
+ README.md          |  2 +-
+ include/polyseed.h |  3 +--
+ src/birthday.h     | 10 ++++------
+ src/dependency.c   |  6 +++++-
+ src/dependency.h   |  2 +-
+ src/polyseed.c     |  2 +-
+ tests/tests.c      | 13 ++++++-------
+ 8 files changed, 21 insertions(+), 21 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 8839b25..8a8e7c2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -34,8 +34,8 @@ set_property(TARGET polyseed PROPERTY PUBLIC_HEADER include/polyseed.h)
+ include_directories(polyseed
+   include/)
+ target_compile_definitions(polyseed PRIVATE POLYSEED_SHARED)
+-set_target_properties(polyseed PROPERTIES VERSION 1.0.0
+-                                          SOVERSION 1
++set_target_properties(polyseed PROPERTIES VERSION 2.0.0
++                                          SOVERSION 2
+                                           C_STANDARD 11
+                                           C_STANDARD_REQUIRED ON)
+ 
+diff --git a/README.md b/README.md
+index 6e51a87..251c2e5 100644
+--- a/README.md
++++ b/README.md
+@@ -94,7 +94,7 @@ Additional 3 functions are optional dependencies. If they are not provided (the
+ 
+ | dependency | description | libc function |
+ |------------|-------------|----------------|
+-| time  | Function to get the current unix time | `time_t time(time_t *arg);` |
++| time  | Function to get the current unix time | `uint64_t time(void);` |
+ | alloc | Function to allocate memory | `void* malloc(size_t size);` |
+ | free | Function to free memory | `void free(void* ptr)` |
+ 
+diff --git a/include/polyseed.h b/include/polyseed.h
+index d8fc913..9579699 100644
+--- a/include/polyseed.h
++++ b/include/polyseed.h
+@@ -6,7 +6,6 @@
+ 
+ #include <stddef.h>
+ #include <stdint.h>
+-#include <time.h>
+ 
+ /* Number of words in the mnemonic phrase */
+ #define POLYSEED_NUM_WORDS 16
+@@ -29,7 +28,7 @@ typedef void polyseed_pbkdf2(const uint8_t* pw, size_t pwlen,
+     const uint8_t* salt, size_t saltlen, uint64_t iterations,
+     uint8_t* key, size_t keylen);
+ typedef size_t polyseed_transform(const char* str, polyseed_str norm);
+-typedef time_t polyseed_time(time_t* t);
++typedef uint64_t polyseed_time(void);
+ typedef void polyseed_memzero(void* const ptr, const size_t len);
+ typedef void* polyseed_malloc(size_t n);
+ typedef void polyseed_mfree(void* ptr);
+diff --git a/src/birthday.h b/src/birthday.h
+index 822883a..5f3aa87 100644
+--- a/src/birthday.h
++++ b/src/birthday.h
+@@ -4,20 +4,18 @@
+ #ifndef BIRTHDAY_H
+ #define BIRTHDAY_H
+ 
+-#include <time.h>
++#include <stdint.h>
+ #include <assert.h>
+ 
+-static_assert(sizeof(time_t) == 8, "time_t must be a 64-bit type.");
+-
+ #define EPOCH ((uint64_t)1635768000)  /* 1st November 2021 12:00 UTC */
+ #define TIME_STEP ((uint64_t)2629746) /* 30.436875 days = 1/12 of the Gregorian year */
+ 
+ #define DATE_BITS 10
+ #define DATE_MASK ((1u << DATE_BITS) - 1)
+ 
+-static inline unsigned birthday_encode(time_t time) {
+-    assert(time >= EPOCH);
+-    if (time == (time_t)-1) {
++static inline unsigned birthday_encode(uint64_t time) {
++    /* Handle broken time() implementations. */
++    if (time == (uint64_t)-1 || time < EPOCH) {
+         return 0;
+     }
+     return ((time - EPOCH) / TIME_STEP) & DATE_MASK;
+diff --git a/src/dependency.c b/src/dependency.c
+index 786ce63..822eecc 100644
+--- a/src/dependency.c
++++ b/src/dependency.c
+@@ -10,10 +10,14 @@
+ 
+ POLYSEED_PRIVATE polyseed_dependency polyseed_deps;
+ 
++static uint64_t stdlib_time() {
++    return (uint64_t)time(NULL);
++}
++
+ void polyseed_inject(const polyseed_dependency* deps) {
+     polyseed_deps = *deps;
+     if (polyseed_deps.time == NULL) {
+-        polyseed_deps.time = &time;
++        polyseed_deps.time = &stdlib_time;
+     }
+     if (polyseed_deps.alloc == NULL) {
+         polyseed_deps.alloc = &malloc;
+diff --git a/src/dependency.h b/src/dependency.h
+index 8ffe1e3..9a8f526 100644
+--- a/src/dependency.h
++++ b/src/dependency.h
+@@ -45,7 +45,7 @@ static size_t utf8_nfkd_lazy(const char* str, polyseed_str norm) {
+ #define MEMZERO_PTR(x, type) polyseed_deps.memzero((x), sizeof(type))
+ #define UTF8_COMPOSE(a, b) polyseed_deps.u8_nfc((a), (b))
+ #define UTF8_DECOMPOSE(a, b) utf8_nfkd_lazy((a), (b))
+-#define GET_TIME() polyseed_deps.time(NULL)
++#define GET_TIME() polyseed_deps.time()
+ #define ALLOC(x) polyseed_deps.alloc(x)
+ #define FREE(x) polyseed_deps.free(x)
+ 
+diff --git a/src/polyseed.c b/src/polyseed.c
+index 82e6bed..b315dd6 100644
+--- a/src/polyseed.c
++++ b/src/polyseed.c
+@@ -9,7 +9,7 @@
+ #include "gf.h"
+ #include "storage.h"
+ 
+-#include <time.h>
++#include <stdint.h>
+ #include <assert.h>
+ #include <stdbool.h>
+ #include <string.h>
+diff --git a/tests/tests.c b/tests/tests.c
+index 4b41ea0..9aa5887 100644
+--- a/tests/tests.c
++++ b/tests/tests.c
+@@ -12,7 +12,6 @@
+ #include <stdbool.h>
+ #include <stdio.h>
+ #include <string.h>
+-#include <time.h>
+ #include <limits.h>
+ #include <stdlib.h>
+ 
+@@ -21,9 +20,9 @@ typedef void multitest_func(void);
+ 
+ static int g_test_no = 0;
+ 
+-#define SEED_TIME1 ((time_t)1638446400) /* Dec 2021 */
+-#define SEED_TIME2 ((time_t)3118651200) /* Oct 2068 */
+-#define SEED_TIME3 ((time_t)4305268800) /* Jun 2106 */
++#define SEED_TIME1 ((uint64_t)1638446400) /* Dec 2021 */
++#define SEED_TIME2 ((uint64_t)3118651200) /* Oct 2068 */
++#define SEED_TIME3 ((uint64_t)4305268800) /* Jun 2106 */
+ 
+ #define FEATURE_FOO 1
+ #define FEATURE_BAR 2
+@@ -254,15 +253,15 @@ static size_t u8_nfkd_spaces(const char* str, polyseed_str norm) {
+     return i;
+ }
+ 
+-static time_t time1(time_t* t) {
++static uint64_t time1() {
+     return SEED_TIME1;
+ }
+ 
+-static time_t time2(time_t* t) {
++static uint64_t time2() {
+     return SEED_TIME2;
+ }
+ 
+-static time_t time3(time_t* t) {
++static uint64_t time3() {
+     return SEED_TIME3;
+ }
+ 
+-- 
+2.39.2
+
