@@ -10,13 +10,5 @@
 
 bool Prestium::detect()
 {
-    // Temporary detect
-    if (Utils::fileExists("/etc/hostname")) {
-        QByteArray data = Utils::fileOpen("/etc/hostname");
-        if (data == "prestium\n") {
-            return true;
-        }
-    }
-
     return QSysInfo::prettyProductName().contains("Prestium");
 }
