@@ -6,9 +6,9 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
 #include "libwalletqt/Wallet.h"
+#include "utils/nodes.h"
 
 namespace Ui {
     class DebugInfoDialog;
@@ -19,7 +19,7 @@ class DebugInfoDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit DebugInfoDialog(Wallet *wallet, Nodes *nodes, QWidget *parent = nullptr);
     ~DebugInfoDialog() override;
 
 private:
@@ -28,7 +28,8 @@ private:
     void updateInfo();
 
     QScopedPointer<Ui::DebugInfoDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
+    Nodes *m_nodes;
 
     QTimer m_updateTimer;
 };

@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class KeysDialog;
@@ -18,7 +18,7 @@ class KeysDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit KeysDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~KeysDialog() override;
 
 private:

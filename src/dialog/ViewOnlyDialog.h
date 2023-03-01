@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class ViewOnlyDialog;
@@ -18,7 +18,7 @@ class ViewOnlyDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit ViewOnlyDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~ViewOnlyDialog() override;
 
 private slots:
@@ -28,7 +28,7 @@ private:
     void copyToClipboard();
 
     QScopedPointer<Ui::ViewOnlyDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 

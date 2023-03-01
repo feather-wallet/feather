@@ -9,6 +9,7 @@
 #include <QTableWidget>
 
 #include "CCSProgressDelegate.h"
+#include "utils/Utils.h"
 
 CCSWidget::CCSWidget(QWidget *parent)
         : QWidget(parent)
@@ -37,8 +38,9 @@ void CCSWidget::linkClicked() {
     QModelIndex index = ui->tableView->currentIndex();
     auto entry = m_model->entry(index.row());
 
-    if (entry)
+    if (entry) {
         Utils::externalLinkWarning(this, entry->url);
+    }
 }
 
 void CCSWidget::donateClicked() {

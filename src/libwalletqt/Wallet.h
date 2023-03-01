@@ -10,9 +10,9 @@
 #include <QList>
 #include <QtConcurrent/QtConcurrent>
 
-#include "wallet/api/wallet2_api.h" // we need to have an access to the Monero::Wallet::Status enum here;
+#include "wallet/api/wallet2_api.h"
 #include "utils/scheduler.h"
-#include "PendingTransaction.h" // we need to have an access to the PendingTransaction::Priority enum here;
+#include "PendingTransaction.h"
 #include "UnsignedTransaction.h"
 #include "utils/networktype.h"
 #include "PassphraseHelper.h"
@@ -86,8 +86,7 @@ class Wallet : public QObject, public PassphrasePrompter
 Q_OBJECT
 
 public:
-    explicit Wallet(QObject *parent = nullptr);
-    explicit Wallet(Monero::Wallet *w, QObject * parent = nullptr);
+    explicit Wallet(Monero::Wallet *w, QObject *parent = nullptr);
     ~Wallet() override;
 
     enum Status {
@@ -109,8 +108,63 @@ public:
 
     Q_ENUM(ConnectionStatus)
 
+    // ##### Status #####
+    //! returns last operation's status
+    Status status() const;
+
     //! return connection status
     ConnectionStatus connectionStatus() const;
+
+    //! returns true if wallet is currently synchronized
+    bool isSynchronized() const;
+
+    //! return true if wallet is connected to a node
+    bool isConnected() const;
+
+    //! returns last operation's error message
+    QString errorString() const;
+
+    //! returns network type of the wallet.
+    NetworkType::Type nettype() const;
+
+    //! returns if view only wallet
+    bool viewOnly() const;
+
+    //! return true if deterministic keys
+    bool isDeterministic() const;
+
+    // ##### Balance #####
+    //! returns balance
+    quint64 balance() const;
+    quint64 balance(quint32 accountIndex) const;
+    quint64 balanceAll() const;
+
+    //! returns unlocked balance
+    quint64 unlockedBalance() const;
+    quint64 unlockedBalance(quint32 accountIndex) const;
+    quint64 unlockedBalanceAll() const;
+
+    void updateBalance();
+
+    // ##### Subaddresses and Accounts #####
+    //! returns wallet's public address
+    QString address(quint32 accountIndex, quint32 addressIndex) const;
+
+    //! returns the subaddress index of the address
+    SubaddressIndex subaddressIndex(const QString &address) const;
+
+    quint32 currentSubaddressAccount() const;
+    void switchSubaddressAccount(quint32 accountIndex);
+    void addSubaddressAccount(const QString& label);
+    quint32 numSubaddressAccounts() const;
+    quint32 numSubaddresses(quint32 accountIndex) const;
+    void addSubaddress(const QString& label);
+    QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
+    void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
+    void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
+    QString getSubaddressLookahead() const;
+
+    // ##### Seed #####
 
     //! returns mnemonic seed
     QString getSeed(const QString &seedOffset) const;
@@ -123,69 +177,15 @@ public:
     //! set seed language
     void setSeedLanguage(const QString &lang);
 
-    //! returns last operation's status
-    Status status() const;
+    //! Get wallet keys
+    QString getSecretViewKey() const {return QString::fromStdString(m_walletImpl->secretViewKey());}
+    QString getPublicViewKey() const {return QString::fromStdString(m_walletImpl->publicViewKey());}
+    QString getSecretSpendKey() const {return QString::fromStdString(m_walletImpl->secretSpendKey());}
+    QString getPublicSpendKey() const {return QString::fromStdString(m_walletImpl->publicSpendKey());}
 
-    //! returns network type of the wallet.
-    NetworkType::Type nettype() const;
-
-    //! returns true if wallet was ever synchronized
-    bool synchronized() const;
-
-    //! returns true if wallet is currently synchronized
-    bool isSynchronized() const;
-
-    //! return true if wallet is connected to a node
-    bool isConnected() const;
+    // ##### Node connection #####
 
     void setOffline(bool offline) const;
-
-    //! returns last operation's error message
-    QString errorString() const;
-
-    //! changes the password using existing parameters (path, seed, seed lang)
-    bool setPassword(const QString &oldPassword, const QString &newPassword);
-
-    //! verify wallet password
-    bool verifyPassword(const QString &password);
-
-    //! returns wallet's public address
-    QString address(quint32 accountIndex, quint32 addressIndex) const;
-
-    //! returns the subaddress index of the address
-    SubaddressIndex subaddressIndex(const QString &address) const;
-
-    //! returns wallet cache file path
-    QString cachePath() const;
-
-    //! returns wallet keys file path
-    QString keysPath() const;
-
-    //! saves wallet to the file by given path
-    //! empty path stores in current location
-    void store();
-   // void storeAsync(const QJSValue &callback, const QString &path = "");
-
-    //! initializes wallet asynchronously
-    void initAsync(
-            const QString &daemonAddress,
-            bool trustedDaemon = false,
-            quint64 upperTransactionLimit = 0,
-            bool isRecovering = false,
-            bool isRecoveringFromDevice = false,
-            quint64 restoreHeight = 0,
-            const QString &proxyAddress = "");
-
-    bool setDaemon(const QString &daemonAddress);
-
-    // Set daemon rpc user/pass
-    void setDaemonLogin(const QString &daemonUsername = "", const QString &daemonPassword = "");
-
-    //! create a view only wallet
-    bool createViewOnly(const QString &path, const QString &password) const;
-
-    //! connects to daemon
-    bool connectToDaemon();
 
     //! indicates if daemon is trusted
     void setTrustedDaemon(bool arg);
@@ -193,45 +193,48 @@ public:
     //! indicates if ssl should be used to connect to daemon
     void setUseSSL(bool ssl);
 
-    //! returns balance
-    quint64 balance() const;
-    quint64 balance(quint32 accountIndex) const;
-    quint64 balanceAll() const;
+    //! Set daemon rpc user/pass
+    void setDaemonLogin(const QString &daemonUsername = "", const QString &daemonPassword = "");
 
-    //! returns unlocked balance
-    quint64 unlockedBalance() const;
-    quint64 unlockedBalance(quint32 accountIndex) const;
-    quint64 unlockedBalanceAll() const;
+    //! initializes wallet asynchronously
+    void initAsync(const QString &daemonAddress,
+                   bool trustedDaemon = false,
+                   quint64 upperTransactionLimit = 0,
+                   const QString &proxyAddress = "");
 
-    //! account/address management
-    quint32 currentSubaddressAccount() const;
-    void switchSubaddressAccount(quint32 accountIndex);
-    void addSubaddressAccount(const QString& label);
-    quint32 numSubaddressAccounts() const;
-    quint32 numSubaddresses(quint32 accountIndex) const;
-    void addSubaddress(const QString& label);
-    QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
-    void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
-    void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
-    QString getSubaddressLookahead() const;
+    // ##### Synchronization (Refresh) #####
+    void startRefresh();
+    void pauseRefresh();
 
-    //! hw-device backed wallets
+    //! returns current wallet's block height
+    //! (can be less than daemon's blockchain height when wallet sync in progress)
+    quint64 blockChainHeight() const;
+
+    //! returns daemon's blockchain height
+    quint64 daemonBlockChainHeight() const;
+
+    //! returns daemon's blockchain target height
+    quint64 daemonBlockChainTargetHeight() const;
+
+    void syncStatusUpdated(quint64 height, quint64 target);
+
+    void refreshModels();
+
+    // ##### Hardware wallet #####
     bool isHwBacked() const;
     bool isLedger() const;
     bool isTrezor() const;
 
+    bool isDeviceConnected() const;
+
     //! attempt to reconnect to hw-device
     bool reconnectDevice();
 
-    //! returns if view only wallet
-    bool viewOnly() const;
+    // Passphrase entry for hardware wallets
+    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
+    void onWalletPassphraseNeeded(bool on_device) override;
 
-    //! return true if deterministic keys
-    bool isDeterministic() const;
-
-    //! refresh daemon blockchain and target height
-    bool refreshHeights();
-
+    // ##### Import / Export #####
     //! export/import key images
     bool exportKeyImages(const QString& path, bool all = false);
     bool importKeyImages(const QString& path);
@@ -242,6 +245,35 @@ public:
 
     //! import a transaction
     bool importTransaction(const QString& txid);
+
+    // ##### Wallet cache #####
+    //! saves wallet to the file by given path
+    //! empty path stores in current location
+    void store();
+    void storeSafer();
+
+    //! returns wallet cache file path
+    QString cachePath() const;
+
+    //! returns wallet keys file path
+    QString keysPath() const;
+
+    //! changes the password using existing parameters (path, seed, seed lang)
+    bool setPassword(const QString &oldPassword, const QString &newPassword);
+
+    //! verify wallet password
+    bool verifyPassword(const QString &password);
+
+    //! Namespace your cacheAttribute keys to avoid collisions
+    bool cacheAttributeExists(const QString &key);
+    bool setCacheAttribute(const QString &key, const QString &val);
+    QString getCacheAttribute(const QString &key) const;
+
+    void addCacheTransaction(const QString &txid, const QString &txHex);
+    QString getCacheTransaction(const QString &txid) const;
+
+    bool setUserNote(const QString &txid, const QString &note);
+    QString getUserNote(const QString &txid) const;
 
     QString printBlockchain();
     QString printTransfers();
@@ -261,77 +293,25 @@ public:
     QString printAddressBook();
     QString printScannedPoolTxs();
 
+    // ##### Transactions #####
+    void setSelectedInputs(const QStringList &selected);
+
+    void createTransaction(const QString &address, quint64 amount, const QString &description, bool all);
+    void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
+    void sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
+
+    void onCreateTransactionError(const QString &msg);
+    void commitTransaction(PendingTransaction *tx, const QString &description="");
+
+    //! deletes transaction and frees memory
+    void disposeTransaction(PendingTransaction * t);
+
+    //! deletes unsigned transaction and frees memory
+    void disposeTransaction(UnsignedTransaction * t);
+
+    // ##### Transaction import #####
     //! does wallet have txid
     bool haveTransaction(const QString &txid);
-
-    //! refreshes the wallet
-    bool refresh(bool historyAndSubaddresses = false);
-
-    // pause/resume refresh
-    void startRefresh();
-    void pauseRefresh();
-
-    //! returns current wallet's block height
-    //! (can be less than daemon's blockchain height when wallet sync in progress)
-    quint64 blockChainHeight() const;
-
-    //! returns daemon's blockchain height
-    quint64 daemonBlockChainHeight() const;
-
-    //! returns daemon's blockchain target height
-    quint64 daemonBlockChainTargetHeight() const;
-
-    //! creates transaction
-    PendingTransaction * createTransaction(const QString &dst_addr, const QString &payment_id,
-                                           quint64 amount, quint32 mixin_count,
-                                           PendingTransaction::Priority priority,
-                                           const QStringList &preferredInputs);
-
-    //! creates async transaction
-    void createTransactionAsync(const QString &dst_addr, const QString &payment_id,
-                                quint64 amount, quint32 mixin_count,
-                                PendingTransaction::Priority priority, const QStringList &preferredInputs);
-
-    //! creates multi-destination transaction
-    PendingTransaction * createTransactionMultiDest(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
-                                                    PendingTransaction::Priority priority, const QStringList &preferredInputs);
-
-    //! creates async multi-destination transaction
-    void createTransactionMultiDestAsync(const QVector<QString> &dst_addr, const QVector<quint64> &amount,
-                                         PendingTransaction::Priority priority, const QStringList &preferredInputs);
-
-
-    //! creates transaction with all outputs
-    PendingTransaction * createTransactionAll(const QString &dst_addr, const QString &payment_id,
-                                              quint32 mixin_count, PendingTransaction::Priority priority,
-                                              const QStringList &preferredInputs);
-
-    //! creates async transaction with all outputs
-    void createTransactionAllAsync(const QString &dst_addr, const QString &payment_id,
-                                   quint32 mixin_count, PendingTransaction::Priority priority,
-                                   const QStringList &preferredInputs);
-
-    //! creates transaction with single input
-    PendingTransaction * createTransactionSingle(const QString &key_image, const QString &dst_addr,
-            size_t outputs, PendingTransaction::Priority priority);
-
-    //! creates async transaction with single input
-    void createTransactionSingleAsync(const QString &key_image, const QString &dst_addr,
-            size_t outputs, PendingTransaction::Priority priority);
-
-    //! creates transaction with selected inputs
-    PendingTransaction * createTransactionSelected(const QVector<QString> &key_images, const QString &dst_addr,
-                                                   size_t outputs, PendingTransaction::Priority priority);
-
-    //! creates async transaction with selected inputs
-    void createTransactionSelectedAsync(const QVector<QString> &key_images, const QString &dst_addr,
-                                        size_t outputs, PendingTransaction::Priority priority);
-
-    //! creates sweep unmixable transaction
-    PendingTransaction * createSweepUnmixableTransaction();
-
-    //! creates async sweep unmixable transaction
-    void createSweepUnmixableTransactionAsync();
 
     //! Sign a transfer from file
     UnsignedTransaction * loadTxFile(const QString &fileName);
@@ -345,136 +325,73 @@ public:
     //! Submit a transfer from file
     bool submitTxFile(const QString &fileName) const;
 
-    //! asynchronous transaction commit
-    void commitTransactionAsync(PendingTransaction * t, const QString &description="");
+    // ##### Models #####
+    TransactionHistory* history() const;
+    TransactionHistoryProxyModel* historyModel();
+    TransactionHistoryModel* transactionHistoryModel() const;
+    AddressBook* addressBook() const;
+    AddressBookModel* addressBookModel() const;
+    Subaddress* subaddress() const;
+    SubaddressModel* subaddressModel() const;
+    SubaddressAccount* subaddressAccount() const;
+    SubaddressAccountModel* subaddressAccountModel() const;
+    Coins* coins() const;
+    CoinsModel* coinsModel() const;
 
-    //! deletes transaction and frees memory
-    void disposeTransaction(PendingTransaction * t);
+    // ##### Transaction proofs #####
 
-    //! deletes unsigned transaction and frees memory
-    void disposeTransaction(UnsignedTransaction * t);
+    QString getTxKey(const QString &txid) const;
+    void getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback);
 
-//    void estimateTransactionFeeAsync(const QString &destination,
-//                                                 quint64 amount,
-//                                                 PendingTransaction::Priority priority,
-//                                                 const QJSValue &callback);
+    TxKeyResult checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
+    TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
+    TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    void checkTxProofAsync(const QString &txid, const QString &address, const QString &message, const QString &signature);
+    TxProof getSpendProof(const QString &txid, const QString &message) const;
+    QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
+    void checkSpendProofAsync(const QString &txid, const QString &message, const QString &signature);
 
-    //! returns transaction history
-    TransactionHistory * history() const;
-
-    //! returns transaction history model
-    TransactionHistoryProxyModel *historyModel() const;
-
-    //! returns transaction history model (the real one)
-    TransactionHistoryModel *transactionHistoryModel() const;
-
-    //! returns Address book
-    AddressBook *addressBook() const;
-
-    //! returns address book model
-    AddressBookModel *addressBookModel() const;
-
-    //! returns subaddress
-    Subaddress *subaddress();
-
-    //! returns subaddress model
-    SubaddressModel *subaddressModel();
-
-    //! returns subaddress account
-    SubaddressAccount *subaddressAccount() const;
-
-    //! returns subaddress account model
-    SubaddressAccountModel *subaddressAccountModel() const;
-
-    //! returns coins
-    Coins *coins() const;
-
-    //! return coins model
-    CoinsModel *coinsModel() const;
-
-    //! generate payment id
-    QString generatePaymentId() const;
-
-    //! integrated address
-    QString integratedAddress(const QString &paymentId) const;
-
+    // ##### Sign / Verify message #####
     //! signing a message
     QString signMessage(const QString &message, bool filename = false, const QString &address = "") const;
 
     //! verify a signed message
     bool verifySignedMessage(const QString &message, const QString &address, const QString &signature, bool filename = false) const;
 
-    //! Parse URI
+    // ##### URI Parsing #####
     bool parse_uri(const QString &uri, QString &address, QString &payment_id, uint64_t &amount, QString &tx_description, QString &recipient_name, QVector<QString> &unknown_parameters, QString &error) const;
     QVariantMap parse_uri_to_object(const QString &uri) const;
 
     QString make_uri(const QString &address, quint64 &amount, const QString &description, const QString &recipient) const;
 
-    //! Namespace your cacheAttribute keys to avoid collisions
-    bool cacheAttributeExists(const QString &key);
-    bool setCacheAttribute(const QString &key, const QString &val);
-    QString getCacheAttribute(const QString &key) const;
-
-    bool setUserNote(const QString &txid, const QString &note);
-    QString getUserNote(const QString &txid) const;
-    QString getTxKey(const QString &txid) const;
-    void getTxKeyAsync(const QString &txid, const std::function<void (QVariantMap)> &callback);
-
-    TxKeyResult checkTxKey(const QString &txid, const QString &tx_key, const QString &address);
-    TxProof getTxProof(const QString &txid, const QString &address, const QString &message) const;
-   // void getTxProofAsync(const QString &txid, const QString &address, const QString &message, const QJSValue &callback);
-    //QString checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    TxProofResult checkTxProof(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    void checkTxProofAsync(const QString &txid, const QString &address, const QString &message, const QString &signature);
-    TxProof getSpendProof(const QString &txid, const QString &message) const;
-   // void getSpendProofAsync(const QString &txid, const QString &message, const QJSValue &callback);
-    QPair<bool, bool> checkSpendProof(const QString &txid, const QString &message, const QString &signature) const;
-    void checkSpendProofAsync(const QString &txid, const QString &message, const QString &signature);
-    // Rescan spent outputs
-    bool rescanSpent();
-
-    // check if fork rules should be used
-    bool useForkRules(quint8 version, quint64 earlyBlocks = 0) const;
-
-    //! Get wallet keys
-    QString getSecretViewKey() const {return QString::fromStdString(m_walletImpl->secretViewKey());}
-    QString getPublicViewKey() const {return QString::fromStdString(m_walletImpl->publicViewKey());}
-    QString getSecretSpendKey() const {return QString::fromStdString(m_walletImpl->secretSpendKey());}
-    QString getPublicSpendKey() const {return QString::fromStdString(m_walletImpl->publicSpendKey());}
-
-    quint64 getWalletCreationHeight() const {return m_walletImpl->getRefreshFromBlockHeight();}
-    void setWalletCreationHeight(quint64 height);
-
-    QString getDaemonLogPath() const;
-
-    // Blackballed outputs
-    bool blackballOutput(const QString &amount, const QString &offset);
-    bool blackballOutputs(const QList<QString> &outputs, bool add);
-    bool blackballOutputs(const QString &filename, bool add);
-    bool unblackballOutput(const QString &amount, const QString &offset);
-
-    // Rings
-    QString getRing(const QString &key_image);
-    QString getRings(const QString &txid);
-    bool setRing(const QString &key_image, const QString &ring, bool relative);
-
-    // key reuse mitigation options
-    void segregatePreForkOutputs(bool segregate);
-    void segregationHeight(quint64 height);
-    void keyReuseMitigation2(bool mitigation);
-
-    // Passphrase entry for hardware wallets
-    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
-    void onWalletPassphraseNeeded(bool on_device) override;
+    // ##### Misc / Unused #####
 
     quint64 getBytesReceived() const;
     quint64 getBytesSent() const;
 
-    bool isDeviceConnected() const;
+    QString getDaemonLogPath() const;
 
     bool setRingDatabase(const QString &path);
 
-    // TODO: setListener() when it implemented in API
+    quint64 getWalletCreationHeight() const {return m_walletImpl->getRefreshFromBlockHeight();}
+    void setWalletCreationHeight(quint64 height);
+
+    //! Rescan spent outputs
+    bool rescanSpent();
+
+    //! Indicates that the wallet is new
+    void setNewWallet();
+
+    //! create a view only wallet
+    bool createViewOnly(const QString &path, const QString &password) const;
+
+    PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
+
+    QString tmpTxDescription; // TODO: remove the need for this var
+    bool refreshedOnce = false;
+
+    void onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targetHeight);
+
 signals:
     // emitted on every event happened with wallet
     // (money sent/received, new block)
@@ -488,15 +405,12 @@ signals:
     void moneyReceived(const QString &txId, quint64 amount);
     void unconfirmedMoneyReceived(const QString &txId, quint64 amount);
     void newBlock(quint64 height, quint64 targetHeight);
-    void addressBookChanged() const;
-    void historyModelChanged() const;
     void walletCreationHeightChanged();
     void deviceButtonRequest(quint64 buttonCode);
     void deviceButtonPressed();
     void deviceError(const QString &message);
     void walletPassphraseNeeded(bool onDevice);
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
-    void heightRefreshed(quint64 walletHeight, quint64 daemonHeight, quint64 targetHeight) const;
     void deviceShowAddressShowed();
     void transactionProofVerified(TxProofResult result);
     void spendProofVerified(QPair<bool, bool> result);
@@ -506,72 +420,82 @@ signals:
 
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;
-    void disconnectedChanged() const;
-    void proxyAddressChanged() const;
-    void refreshingChanged() const;
+
+    void refreshSync(int height, int target);
+    void blockchainSync(int height, int target);
+    void synchronized();
+    void balanceUpdated(quint64 balance, quint64 spendable);
+    void keysCorrupted();
+
+    void endTransaction();
+    void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
+    void donationSent();
+    void walletRefreshed();
+
+    void initiateTransaction();
+    void createTransactionError(QString message);
+
+    void selectedInputsChanged(const QStringList &selectedInputs);
+
+    void multiBroadcast(PendingTransaction *tx);
+    void heightsRefreshed(bool success, quint64 daemonHeight, quint64 targetHeight);
 
 private:
-    //! initializes wallet
-    bool init(
-            const QString &daemonAddress,
-            bool trustedDaemon,
-            quint64 upperTransactionLimit,
-            bool isRecovering,
-            bool isRecoveringFromDevice,
-            quint64 restoreHeight,
-            const QString& proxyAddress);
-
-    bool disconnected() const;
-    bool refreshing() const;
-    void refreshingSet(bool value);
-    void onRefreshed(bool success);
-
+    // ###### Status ######
     void setConnectionStatus(ConnectionStatus value);
-    QString getProxyAddress() const;
-    void setProxyAddress(QString address);
-    void startRefreshThread();
 
+    // ##### Synchronization (Refresh) #####
+    void startRefreshThread();
     void onNewBlock(uint64_t height);
+    void onUpdated();
+    void onRefreshed(bool success, const QString &message);
+
+    // ##### Transactions #####
+    void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
 
 private:
     friend class WalletManager;
     friend class WalletListenerImpl;
-    //! libwallet's
-    Monero::Wallet * m_walletImpl;
-    // history lifetime managed by wallet;
-    TransactionHistory * m_history;
-    // Used for UI history view
-    mutable TransactionHistoryModel * m_historyModel;
-    mutable TransactionHistoryProxyModel * m_historySortFilterModel;
-    QString m_paymentId;
-    AddressBook * m_addressBook;
-    mutable AddressBookModel * m_addressBookModel;
-    mutable quint64 m_daemonBlockChainHeight;
-    mutable quint64 m_daemonBlockChainTargetHeight;
 
-    mutable ConnectionStatus m_connectionStatus;
+    Monero::Wallet *m_walletImpl;
 
-    bool m_disconnected;
-    mutable bool m_initialized;
+    TransactionHistory *m_history;
+    TransactionHistoryModel *m_historyModel;
+    TransactionHistoryProxyModel *m_historySortFilterModel;
+
+    AddressBook *m_addressBook;
+    AddressBookModel *m_addressBookModel;
+
+    quint64 m_daemonBlockChainHeight;
+    quint64 m_daemonBlockChainTargetHeight;
+
+    ConnectionStatus m_connectionStatus;
+
     uint32_t m_currentSubaddressAccount;
-    Subaddress * m_subaddress;
-    mutable SubaddressModel * m_subaddressModel;
-    SubaddressAccount * m_subaddressAccount;
-    mutable SubaddressAccountModel * m_subaddressAccountModel;
-    Coins * m_coins;
-    mutable CoinsModel * m_coinsModel;
+    Subaddress *m_subaddress;
+    SubaddressModel *m_subaddressModel;
+    SubaddressAccount *m_subaddressAccount;
+    SubaddressAccountModel *m_subaddressAccountModel;
+
+    Coins *m_coins;
+    CoinsModel *m_coinsModel;
+
     QMutex m_asyncMutex;
     QString m_daemonUsername;
     QString m_daemonPassword;
-    QString m_proxyAddress;
-    mutable QMutex m_proxyMutex;
+
+    QMutex m_proxyMutex;
     std::atomic<bool> m_refreshNow;
     std::atomic<bool> m_refreshEnabled;
-    std::atomic<bool> m_refreshing;
     WalletListenerImpl *m_walletListener;
     FutureScheduler m_scheduler;
-    int m_connectionTimeout = 30;
+
     bool m_useSSL;
+    bool donationSending = false;
+    bool m_newWallet = false;
+
+    QTimer *m_storeTimer = nullptr;
+    std::set<std::string> m_selectedInputs;
 };
 
 

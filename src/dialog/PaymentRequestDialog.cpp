@@ -10,11 +10,12 @@
 #include <QRegularExpressionValidator>
 
 #include "WalletManager.h"
+#include "utils/Utils.h"
 
-PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, QSharedPointer<AppContext> ctx, QString address)
+PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, Wallet *wallet, QString address)
     : WindowModalDialog(parent)
     , ui(new Ui::PaymentRequestDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
     , m_address(std::move(address))
 {
     ui->setupUi(this);
@@ -45,7 +46,7 @@ void PaymentRequestDialog::updatePaymentRequest() {
     QString recipient = ui->line_recipient->text();
     quint64 amount = WalletManager::amountFromString(ui->line_amountXMR->text());
 
-    QString uri = m_ctx->wallet->make_uri(m_address, amount, description, recipient);
+    QString uri = m_wallet->make_uri(m_address, amount, description, recipient);
 
     ui->line_paymentRequestUri->setText(uri);
     ui->line_paymentRequestUri->setCursorPosition(0);

@@ -8,7 +8,6 @@
 #include <QSystemTrayIcon>
 #include <QMenu>
 
-#include "appcontext.h"
 #include "components.h"
 #include "CalcWindow.h"
 #include "SettingsDialog.h"
@@ -30,6 +29,7 @@
 #include "model/CoinsProxyModel.h"
 #include "utils/networking.h"
 #include "utils/config.h"
+#include "utils/daemonrpc.h"
 #include "utils/EventFilter.h"
 #include "utils/Updater.h"
 #include "widgets/CCSWidget.h"
@@ -192,6 +192,7 @@ private slots:
     void onWebsocketStatusChanged(bool enabled);
     void showUpdateNotification();
     void onProxySettingsChanged();
+    void onOfflineMode(bool offline);
 
 private:
     friend WindowManager;
@@ -235,7 +236,9 @@ private:
 
     QScopedPointer<Ui::MainWindow> ui;
     WindowManager *m_windowManager;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet = nullptr;
+    Nodes *m_nodes;
+    DaemonRpc *m_rpc;
 
     CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;

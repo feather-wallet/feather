@@ -6,26 +6,26 @@
 
 #include "constants.h"
 
-SeedDialog::SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::SeedDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
 {
     ui->setupUi(this);
     ui->label_seedIcon->setPixmap(QPixmap(":/assets/images/seed.png").scaledToWidth(64, Qt::SmoothTransformation));
 
-    ui->label_restoreHeight->setText(QString::number(m_ctx->wallet->getWalletCreationHeight()));
+    ui->label_restoreHeight->setText(QString::number(m_wallet->getWalletCreationHeight()));
 
-    if (m_ctx->wallet->getSeedLanguage().isEmpty()) {
+    if (m_wallet->getSeedLanguage().isEmpty()) {
         qDebug() << "No seed language set, using default";
-        m_ctx->wallet->setSeedLanguage(constants::seedLanguage);
+        m_wallet->setSeedLanguage(constants::seedLanguage);
     }
 
-    QString seedOffset = m_ctx->wallet->getCacheAttribute("feather.seedoffset");
-    QString seed = m_ctx->wallet->getCacheAttribute("feather.seed");
-    auto seedLength = m_ctx->wallet->seedLength();
+    QString seedOffset = m_wallet->getCacheAttribute("feather.seedoffset");
+    QString seed = m_wallet->getCacheAttribute("feather.seed");
+    auto seedLength = m_wallet->seedLength();
 
-    QString seed_25_words = m_ctx->wallet->getSeed(seedOffset);
+    QString seed_25_words = m_wallet->getSeed(seedOffset);
 
     if (seedLength >= 24) {
         ui->check_toggleSeedType->hide();

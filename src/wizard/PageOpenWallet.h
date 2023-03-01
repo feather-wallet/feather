@@ -5,10 +5,10 @@
 #define FEATHER_OPENWALLET_H
 
 #include <QLabel>
+#include <QStandardItemModel>
 #include <QWizardPage>
 #include <QWidget>
 
-#include "appcontext.h"
 #include "model/WalletKeysFilesModel.h"
 
 namespace Ui {

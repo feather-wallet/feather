@@ -6,11 +6,12 @@
 
 #include "constants.h"
 #include "utils/AppData.h"
+#include "utils/config.h"
 
-TickerWidgetBase::TickerWidgetBase(QWidget *parent, QSharedPointer<AppContext> ctx)
+TickerWidgetBase::TickerWidgetBase(QWidget *parent, Wallet *wallet)
         : QWidget(parent)
         , ui(new Ui::TickerWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -53,8 +54,8 @@ void TickerWidgetBase::setDisplayText(const QString &text) {
 }
 
 // BalanceTickerWidget
-BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, bool totalBalance)
-        : TickerWidgetBase(parent, std::move(ctx))
+BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, Wallet *wallet, bool totalBalance)
+        : TickerWidgetBase(parent, wallet)
         , m_totalBalance(totalBalance)
 {
     if (totalBalance)
@@ -64,13 +65,13 @@ BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, QSharedPointer<AppCont
 
     this->setPercentageVisible(false);
 
-    connect(m_ctx.get(), &AppContext::balanceUpdated, this, &BalanceTickerWidget::updateDisplay);
+    connect(m_wallet, &Wallet::balanceUpdated, this, &BalanceTickerWidget::updateDisplay);
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &BalanceTickerWidget::updateDisplay);
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &BalanceTickerWidget::updateDisplay);
 }
 
 void BalanceTickerWidget::updateDisplay() {
-    double balance = (m_totalBalance ? m_ctx->wallet->balanceAll() : m_ctx->wallet->balance()) / constants::cdiv;
+    double balance = (m_totalBalance ? m_wallet->balanceAll() : m_wallet->balance()) / constants::cdiv;
     QString fiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
     double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance);
     if (balanceFiatAmount < 0)
@@ -79,8 +80,8 @@ void BalanceTickerWidget::updateDisplay() {
 }
 
 // PriceTickerWidget
-PriceTickerWidget::PriceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol)
-        : TickerWidgetBase(parent, std::move(ctx))
+PriceTickerWidget::PriceTickerWidget(QWidget *parent, Wallet *wallet, QString symbol)
+        : TickerWidgetBase(parent, wallet)
         , m_symbol(std::move(symbol))
 {
     this->setTitle(m_symbol);
@@ -107,8 +108,8 @@ void PriceTickerWidget::updateDisplay() {
 }
 
 //RatioTickerWidget
-RatioTickerWidget::RatioTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol1, QString symbol2)
-        : TickerWidgetBase(parent, std::move(ctx))
+RatioTickerWidget::RatioTickerWidget(QWidget *parent, Wallet *wallet, QString symbol1, QString symbol2)
+        : TickerWidgetBase(parent, wallet)
         , m_symbol1(std::move(symbol1))
         , m_symbol2(std::move(symbol2))
 {

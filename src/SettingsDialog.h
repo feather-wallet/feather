@@ -9,7 +9,6 @@
 #include <QDialog>
 #include <QSettings>
 
-#include "appcontext.h"
 #include "widgets/NodeWidget.h"
 
 namespace Ui {
@@ -21,7 +20,7 @@ class Settings : public QDialog
 Q_OBJECT
 
 public:
-    explicit Settings(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit Settings(Nodes *nodes, QWidget *parent = nullptr);
     ~Settings() override;
 
     void showNetworkProxyTab();
@@ -67,7 +66,6 @@ private:
     void enableWebsocket(bool enabled);
 
     QScopedPointer<Ui::Settings> ui;
-    QSharedPointer<AppContext> m_ctx;
     Nodes *m_nodes = nullptr;
 
     QStringList m_themes{"Native", "QDarkStyle", "Breeze/Dark", "Breeze/Light"};

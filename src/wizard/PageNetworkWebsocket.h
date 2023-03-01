@@ -6,8 +6,6 @@
 
 #include <QWizardPage>
 
-#include "appcontext.h"
-
 namespace Ui {
     class PageNetworkWebsocket;
 }

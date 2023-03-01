@@ -4,10 +4,10 @@
 #include <QScreen>
 #include <QDesktopServices>
 
+#include "utils/config.h"
 #include "utils/Utils.h"
 #include "utils/xmrig.h"
 #include "utils/TorManager.h"
-#include "appcontext.h"
 
 XmRig::XmRig(const QString &configDir, QObject *parent)
     : QObject(parent)

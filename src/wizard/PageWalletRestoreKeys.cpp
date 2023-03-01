@@ -11,6 +11,7 @@
 
 #include "WalletWizard.h"
 #include "constants.h"
+#include "libwalletqt/WalletManager.h"
 
 PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)

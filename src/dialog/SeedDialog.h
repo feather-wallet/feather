@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class SeedDialog;
@@ -18,14 +18,14 @@ class SeedDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit SeedDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit SeedDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~SeedDialog() override;
 
 private:
     void setSeed(const QString &seed);
 
     QScopedPointer<Ui::SeedDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 

@@ -6,7 +6,7 @@
 
 #include <QWidget>
 
-#include "appcontext.h"
+#include "libwalletqt/Wallet.h"
 #include "widgets/CCSWidget.h"
 
 namespace Ui {
@@ -18,7 +18,7 @@ class SendWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit SendWidget(Wallet *wallet, QWidget *parent = nullptr);
     void fill(const QString &address, const QString &description, double amount = 0);
     void fill(double amount);
     void clearFields();
@@ -57,7 +57,7 @@ private:
     double conversionAmount();
 
     QScopedPointer<Ui::SendWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     bool m_sendDisabled = false;
 };
 

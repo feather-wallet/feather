@@ -8,8 +8,8 @@
 #include <QWidget>
 #include <QSvgWidget>
 
-#include "appcontext.h"
 #include "libwalletqt/Subaddress.h"
+#include "libwalletqt/Wallet.h"
 #include "model/SubaddressProxyModel.h"
 #include "model/SubaddressModel.h"
 #include "qrcode/QrCode.h"
@@ -23,7 +23,7 @@ class ReceiveWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit ReceiveWidget(Wallet *wallet, QWidget *parent = nullptr);
     ~ReceiveWidget() override;
 
     void setSearchbarVisible(bool visible);
@@ -53,7 +53,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::ReceiveWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     QMenu *m_headerMenu;
     QAction *m_showFullAddressesAction;
     QAction *m_showUsedAddressesAction;

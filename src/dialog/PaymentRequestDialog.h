@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 #include "qrcode/QrCode.h"
 
 namespace Ui {
@@ -19,7 +19,7 @@ class PaymentRequestDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit PaymentRequestDialog(QWidget *parent, QSharedPointer<AppContext> ctx, QString address);
+    explicit PaymentRequestDialog(QWidget *parent, Wallet *wallet, QString address);
     ~PaymentRequestDialog() override;
 
 private slots:
@@ -30,7 +30,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::PaymentRequestDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     QString m_address;
     QrCode *m_qrCode;
 };

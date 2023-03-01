@@ -9,9 +9,9 @@
 #include <QStandardItemModel>
 #include <QTextCharFormat>
 
-#include "appcontext.h"
 #include "components.h"
 #include "libwalletqt/PendingTransaction.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class TxConfAdvDialog;
@@ -22,7 +22,7 @@ class TxConfAdvDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent = nullptr);
+    explicit TxConfAdvDialog(Wallet *wallet, const QString &description, QWidget *parent = nullptr);
     ~TxConfAdvDialog() override;
 
     void setTransaction(PendingTransaction *tx, bool isSigned = true); // #TODO: have libwallet return a UnsignedTransaction, this is just dumb
@@ -46,7 +46,7 @@ private:
     void txKeyCopy();
 
     QScopedPointer<Ui::TxConfAdvDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     PendingTransaction *m_tx = nullptr;
     UnsignedTransaction *m_utx = nullptr;
     QMenu *m_exportUnsignedMenu;

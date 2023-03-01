@@ -8,14 +8,14 @@
 
 #include "utils/NetworkManager.h"
 
-TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex)
+TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, Nodes *nodes, const QString &transactionHex)
         : WindowModalDialog(parent)
         , ui(new Ui::TxBroadcastDialog)
-        , m_ctx(std::move(ctx))
+        , m_nodes(nodes)
 {
     ui->setupUi(this);
 
-    auto node = m_ctx->nodes->connection();
+    auto node = m_nodes->connection();
     m_rpc = new DaemonRpc(this, node.toAddress());
 
     connect(ui->btn_Broadcast, &QPushButton::clicked, this, &TxBroadcastDialog::broadcastTx);
@@ -33,7 +33,7 @@ TxBroadcastDialog::TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext>
 void TxBroadcastDialog::broadcastTx() {
     QString tx = ui->transaction->toPlainText();
 
-    FeatherNode node = ui->radio_useCustom->isChecked() ? FeatherNode(ui->customNode->text()) : m_ctx->nodes->connection();
+    FeatherNode node = ui->radio_useCustom->isChecked() ? FeatherNode(ui->customNode->text()) : m_nodes->connection();
 
     m_rpc->setDaemonAddress(node.toURL());
     m_rpc->sendRawTransaction(tx);

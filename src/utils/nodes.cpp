@@ -4,9 +4,10 @@
 #include <QObject>
 
 #include "nodes.h"
+#include "utils/AppData.h"
 #include "utils/Utils.h"
 #include "utils/os/tails.h"
-#include "appcontext.h"
+#include "utils/os/whonix.h"
 #include "constants.h"
 #include "utils/WebsocketNotifier.h"
 #include "utils/TorManager.h"
@@ -94,21 +95,21 @@ void NodeList::ensureStructure(QJsonObject &obj, NetworkType::Type networkType) 
     obj[networkTypeStr] = netTypeObj;
 }
 
-Nodes::Nodes(QObject *parent)
+Nodes::Nodes(QObject *parent, Wallet *wallet)
     : QObject(parent)
     , modelWebsocket(new NodeModel(NodeSource::websocket, this))
     , modelCustom(new NodeModel(NodeSource::custom, this))
     , m_connection(FeatherNode())
+    , m_wallet(wallet)
 {
     // TODO: This class is in desperate need of refactoring
 
     this->loadConfig();
     connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this, &Nodes::onWSNodesReceived);
-}
 
-void Nodes::setContext(AppContext *ctx) {
-    m_ctx = ctx;
-    connect(m_ctx, &AppContext::walletRefreshed, this, &Nodes::onWalletRefreshed);
+    if (m_wallet) {
+        connect(m_wallet, &Wallet::walletRefreshed, this, &Nodes::onWalletRefreshed);
+    }
 }
 
 void Nodes::loadConfig() {
@@ -195,7 +196,11 @@ void Nodes::connectToNode() {
 }
 
 void Nodes::connectToNode(const FeatherNode &node) {
-    if (!m_ctx) {
+    if (!m_wallet) {
+        return;
+    }
+
+    if (!m_allowConnection) {
         return;
     }
 
@@ -217,11 +222,11 @@ void Nodes::connectToNode(const FeatherNode &node) {
     qInfo() << QString("Attempting to connect to %1 (%2)").arg(node.toAddress(), node.custom ? "custom" : "ws");
 
     if (!node.url.userName().isEmpty() && !node.url.password().isEmpty()) {
-        m_ctx->wallet->setDaemonLogin(node.url.userName(), node.url.password());
+        m_wallet->setDaemonLogin(node.url.userName(), node.url.password());
     }
 
     // Don't use SSL over Tor/i2p
-    m_ctx->wallet->setUseSSL(!node.isAnonymityNetwork());
+    m_wallet->setUseSSL(!node.isAnonymityNetwork());
 
     QString proxyAddress;
     if (useSocks5Proxy(node)) {
@@ -233,7 +238,7 @@ void Nodes::connectToNode(const FeatherNode &node) {
         }
     }
 
-    m_ctx->wallet->initAsync(node.toAddress(), true, 0, false, false, 0, proxyAddress);
+    m_wallet->initAsync(node.toAddress(), true, 0, proxyAddress);
 
     m_connection = node;
     m_connection.isActive = false;
@@ -244,16 +249,16 @@ void Nodes::connectToNode(const FeatherNode &node) {
 }
 
 void Nodes::autoConnect(bool forceReconnect) {
-    if (!m_ctx) {
+    if (!m_wallet) {
         return;
     }
 
     // this function is responsible for automatically connecting to a daemon.
-    if (m_ctx->wallet == nullptr || !m_enableAutoconnect) {
+    if (m_wallet == nullptr || !m_enableAutoconnect) {
         return;
     }
 
-    Wallet::ConnectionStatus status = m_ctx->wallet->connectionStatus();
+    Wallet::ConnectionStatus status = m_wallet->connectionStatus();
     bool wsMode = (this->source() == NodeSource::websocket);
 
     if (wsMode && !m_wsNodesReceived && websocketNodes().count() == 0) {
@@ -423,7 +428,7 @@ bool Nodes::useOnionNodes() {
     }
 
     if (privacyLevel == Config::allTorExceptInitSync) {
-        if (m_ctx && m_ctx->refreshed) {
+        if (m_wallet && m_wallet->refreshedOnce) {
             return true;
         }
 
@@ -431,7 +436,7 @@ bool Nodes::useOnionNodes() {
             int initSyncThreshold = config()->get(Config::initSyncThreshold).toInt();
             int networkHeight = appData()->heights[constants::networkType];
 
-            if (m_ctx && m_ctx->wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
+            if (m_wallet && m_wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
                 return true;
             }
         }
@@ -584,4 +589,12 @@ int Nodes::modeHeight(const QList<FeatherNode> &nodes) {
     }
 
     return mode_height;
+}
+
+void Nodes::allowConnection() {
+    m_allowConnection = true;
+}
+
+Nodes::~Nodes() {
+    qDebug() << "~Nodes";
 }

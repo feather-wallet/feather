@@ -10,7 +10,6 @@
 #include <QProgressBar>
 #include <QWidget>
 
-#include "appcontext.h"
 #include "model/CCSModel.h"
 #include "widgets/CCSEntry.h"
 

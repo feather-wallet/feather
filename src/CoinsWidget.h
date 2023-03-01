@@ -8,10 +8,10 @@
 #include <QWidget>
 #include <QSvgWidget>
 
-#include "appcontext.h"
 #include "model/CoinsModel.h"
 #include "model/CoinsProxyModel.h"
 #include "libwalletqt/Coins.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class CoinsWidget;
@@ -22,7 +22,7 @@ class CoinsWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit CoinsWidget(Wallet *wallet, QWidget *parent = nullptr);
     void setModel(CoinsModel * model, Coins * coins);
     ~CoinsWidget() override;
 
@@ -62,7 +62,7 @@ private:
     };
 
     QScopedPointer<Ui::CoinsWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 
     QMenu *m_contextMenu;
     QMenu *m_headerMenu;

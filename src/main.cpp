@@ -232,7 +232,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     EventFilter filter;
     app.installEventFilter(&filter);
 
-    WindowManager windowManager(&filter);
+    WindowManager windowManager(QCoreApplication::instance(), &filter);
 
     QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
         windowManager.raise();

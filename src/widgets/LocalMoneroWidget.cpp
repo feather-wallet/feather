@@ -13,10 +13,10 @@
 #include "utils/NetworkManager.h"
 #include "utils/WebsocketNotifier.h"
 
-LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx)
+LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, Wallet *wallet)
         : QWidget(parent)
         , ui(new Ui::LocalMoneroWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 

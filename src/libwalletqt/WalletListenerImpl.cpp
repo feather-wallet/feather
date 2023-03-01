@@ -3,6 +3,7 @@
 
 #include "WalletListenerImpl.h"
 #include "Wallet.h"
+#include "WalletManager.h"
 
 WalletListenerImpl::WalletListenerImpl(Wallet * w)
     : m_wallet(w)
@@ -11,28 +12,40 @@ WalletListenerImpl::WalletListenerImpl(Wallet * w)
 
 }
 
+// Beware!
+// Do not call non-signal m_wallet functions here
+// Nothing here runs in the GUI thread
+
 void WalletListenerImpl::moneySpent(const std::string &txId, uint64_t amount)
 {
-    qDebug() << __FUNCTION__;
-    emit m_wallet->moneySpent(QString::fromStdString(txId), amount);
+    // Outgoing tx included in a block
+    QString qTxId = QString::fromStdString(txId);
+    qDebug() << Q_FUNC_INFO << qTxId << " " << WalletManager::displayAmount(amount);
+
+    emit m_wallet->moneySpent(qTxId, amount);
 }
 
 void WalletListenerImpl::moneyReceived(const std::string &txId, uint64_t amount)
 {
-    qDebug() << __FUNCTION__;
-    emit m_wallet->moneyReceived(QString::fromStdString(txId), amount);
+    // Incoming tx included in a block.
+    QString qTxId = QString::fromStdString(txId);
+    qDebug() << Q_FUNC_INFO << qTxId << " " << WalletManager::displayAmount(amount);
+
+    emit m_wallet->moneyReceived(qTxId, amount);
 }
 
 void WalletListenerImpl::unconfirmedMoneyReceived(const std::string &txId, uint64_t amount)
 {
-    qDebug() << __FUNCTION__;
-    emit m_wallet->unconfirmedMoneyReceived(QString::fromStdString(txId), amount);
+    // Incoming tx in pool
+    QString qTxId = QString::fromStdString(txId);
+    qDebug() << Q_FUNC_INFO << qTxId << " " << WalletManager::displayAmount(amount);
+
+    emit m_wallet->unconfirmedMoneyReceived(qTxId, amount);
 }
 
 void WalletListenerImpl::newBlock(uint64_t height)
 {
-    // qDebug() << __FUNCTION__;
-    m_wallet->onNewBlock(height);
+    // Called whenever a new block gets scanned by the wallet
     emit m_wallet->newBlock(height, m_wallet->daemonBlockChainTargetHeight());
 }
 
@@ -45,7 +58,6 @@ void WalletListenerImpl::updated()
 void WalletListenerImpl::refreshed(bool success)
 {
     QString message = m_wallet->errorString();
-    m_wallet->onRefreshed(success);
     emit m_wallet->refreshed(success, message);
 }
 

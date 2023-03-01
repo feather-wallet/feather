@@ -6,7 +6,7 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
+#include "libwalletqt/Wallet.h"
 #include "components.h"
 #include "model/SubaddressAccountModel.h"
 
@@ -19,7 +19,7 @@ class AccountSwitcherDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit AccountSwitcherDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~AccountSwitcherDialog() override;
 
 private slots:
@@ -35,7 +35,7 @@ private:
     Monero::SubaddressAccountRow* currentEntry();
 
     QScopedPointer<Ui::AccountSwitcherDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     SubaddressAccountModel *m_model;
     SubaddressAccountProxyModel *m_proxyModel;
 };

@@ -9,7 +9,9 @@
 #include "ColorScheme.h"
 #include "constants.h"
 #include "utils/AppData.h"
+#include "utils/config.h"
 #include "Icons.h"
+#include "libwalletqt/WalletManager.h"
 
 #if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include "qrcode_scanner/QrCodeScanDialog.h"
@@ -19,10 +21,10 @@
 #include <QMediaDevices>
 #endif
 
-SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     : QWidget(parent)
     , ui(new Ui::SendWidget)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -32,8 +34,8 @@ SendWidget::SendWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->lineAmount->setValidator(validator);
 
-    connect(m_ctx.get(), &AppContext::initiateTransaction, this, &SendWidget::onInitiateTransaction);
-    connect(m_ctx.get(), &AppContext::endTransaction, this, &SendWidget::onEndTransaction);
+    connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::onInitiateTransaction);
+    connect(m_wallet, &Wallet::endTransaction, this, &SendWidget::onEndTransaction);
 
     connect(WalletManager::instance(), &WalletManager::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
 
@@ -143,14 +145,14 @@ void SendWidget::scanClicked() {
 }
 
 void SendWidget::sendClicked() {
-    if (!m_ctx->wallet->isConnected()) {
+    if (!m_wallet->isConnected()) {
         QMessageBox::warning(this, "Error", "Unable to create transaction:\n\n"
                                             "Wallet is not connected to a node.\n"
                                             "Go to File -> Settings -> Node to manually connect to a node.");
         return;
     }
 
-    if (!m_ctx->wallet->isSynchronized()) {
+    if (!m_wallet->isSynchronized()) {
         QMessageBox::warning(this, "Error", "Wallet is not synchronized, unable to create transaction.\n\n"
                                             "Wait for synchronization to complete.");
         return;
@@ -189,7 +191,7 @@ void SendWidget::sendClicked() {
             amounts.push_back(output.amount);
         }
 
-        m_ctx->onCreateTransactionMultiDest(addresses, amounts, description);
+        m_wallet->createTransactionMultiDest(addresses, amounts, description);
         return;
     }
 
@@ -207,7 +209,7 @@ void SendWidget::sendClicked() {
         amount = WalletManager::amountFromDouble(this->conversionAmount());
     }
 
-    m_ctx->onCreateTransaction(recipient, amount, description, sendAll);
+    m_wallet->createTransaction(recipient, amount, description, sendAll);
 }
 
 void SendWidget::aliasClicked() {
@@ -347,7 +349,7 @@ void SendWidget::setWebsocketEnabled(bool enabled) {
 
 void SendWidget::onDataPasted(const QString &data) {
     if (!data.isEmpty()) {
-        QVariantMap uriData = m_ctx->wallet->parse_uri_to_object(data);
+        QVariantMap uriData = m_wallet->parse_uri_to_object(data);
         if (!uriData.contains("error")) {
             ui->lineAddress->setText(uriData.value("address").toString());
             ui->lineDescription->setText(uriData.value("tx_description").toString());

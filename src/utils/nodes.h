@@ -118,9 +118,11 @@ class Nodes : public QObject {
     Q_OBJECT
 
 public:
-    explicit Nodes(QObject *parent = nullptr);
-    void setContext(AppContext *ctx);
+    explicit Nodes(QObject *parent, Wallet *wallet);
+    ~Nodes() override;
+
     void loadConfig();
+    void allowConnection();
 
     NodeSource source();
     FeatherNode connection();
@@ -144,7 +146,7 @@ private slots:
     void onWalletRefreshed();
 
 private:
-    AppContext *m_ctx = nullptr;
+    Wallet *m_wallet = nullptr;
     QJsonObject m_configJson;
 
     NodeList m_nodes;
@@ -158,6 +160,8 @@ private:
 
     bool m_wsNodesReceived = false;
     bool m_enableAutoconnect = true;
+
+    bool m_allowConnection = false;
 
     FeatherNode pickEligibleNode();
 

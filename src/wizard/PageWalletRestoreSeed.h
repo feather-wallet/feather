@@ -11,7 +11,6 @@
 #include <QCompleter>
 
 #include "utils/textedit.h"
-#include "appcontext.h"
 
 namespace Ui {
     class PageWalletRestoreSeed;

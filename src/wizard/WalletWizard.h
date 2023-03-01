@@ -8,10 +8,10 @@
 #include <QLabel>
 #include <QRadioButton>
 
-#include "appcontext.h"
 #include "model/WalletKeysFilesModel.h"
 #include "utils/RestoreHeightLookup.h"
 #include "utils/config.h"
+#include "utils/Seed.h"
 #include "constants.h"
 
 enum WizardMode {

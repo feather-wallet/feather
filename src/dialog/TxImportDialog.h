@@ -6,9 +6,9 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
 #include "utils/daemonrpc.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class TxImportDialog;
@@ -19,7 +19,7 @@ class TxImportDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx);
+    explicit TxImportDialog(QWidget *parent, Wallet *wallet);
     ~TxImportDialog() override;
 
 private slots:
@@ -27,7 +27,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::TxImportDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 

@@ -11,11 +11,12 @@
 #include "TxConfAdvDialog.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
+#include "utils/config.h"
 
-TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
+TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
         : WindowModalDialog(parent)
         , ui(new Ui::TxConfDialog)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
         , m_tx(tx)
         , m_address(address)
         , m_description(description)
@@ -53,7 +54,7 @@ TxConfDialog::TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *t
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
     ui->label_total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
 
-    auto subaddressIndex = m_ctx->wallet->subaddressIndex(address);
+    auto subaddressIndex = m_wallet->subaddressIndex(address);
     QString addressExtra;
 
     ui->label_address->setText(ModelUtils::displayAddress(address, 2));

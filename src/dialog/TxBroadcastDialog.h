@@ -6,9 +6,9 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
 #include "utils/daemonrpc.h"
+#include "utils/nodes.h"
 
 namespace Ui {
     class TxBroadcastDialog;
@@ -19,7 +19,7 @@ class TxBroadcastDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit TxBroadcastDialog(QWidget *parent, QSharedPointer<AppContext> ctx, const QString &transactionHex = "");
+    explicit TxBroadcastDialog(QWidget *parent, Nodes *nodes, const QString &transactionHex = "");
     ~TxBroadcastDialog() override;
 
 private slots:
@@ -28,7 +28,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::TxBroadcastDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Nodes *m_nodes;
     DaemonRpc *m_rpc;
 };
 

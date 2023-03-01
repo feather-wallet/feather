@@ -9,14 +9,16 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include "libwalletqt/WalletManager.h"
+#include "utils/AppData.h"
 #include "utils/Icons.h"
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
 
-Settings::Settings(QSharedPointer<AppContext> ctx, QWidget *parent)
+Settings::Settings(Nodes *nodes, QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::Settings)
-        , m_ctx(std::move(ctx))
+        , m_nodes(nodes)
 {
     ui->setupUi(this);
 
@@ -150,12 +152,12 @@ void Settings::setupAppearanceTab() {
 
 void Settings::setupNetworkTab() {
     // Node
-    if (m_ctx) {
-        ui->nodeWidget->setupUI(m_ctx->nodes);
-        connect(ui->nodeWidget, &NodeWidget::nodeSourceChanged, m_ctx->nodes, &Nodes::onNodeSourceChanged);
-        connect(ui->nodeWidget, &NodeWidget::connectToNode, m_ctx->nodes, QOverload<const FeatherNode&>::of(&Nodes::connectToNode));
+    if (m_nodes) {
+        ui->nodeWidget->setupUI(m_nodes);
+        connect(ui->nodeWidget, &NodeWidget::nodeSourceChanged, m_nodes, &Nodes::onNodeSourceChanged);
+        connect(ui->nodeWidget, &NodeWidget::connectToNode, m_nodes, QOverload<const FeatherNode&>::of(&Nodes::connectToNode));
     } else {
-        m_nodes = new Nodes(this);
+        m_nodes = new Nodes(this, nullptr);
         ui->nodeWidget->setupUI(m_nodes);
         ui->nodeWidget->setCanConnect(false);
     }

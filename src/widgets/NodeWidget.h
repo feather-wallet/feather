@@ -8,7 +8,6 @@
 #include <QTreeView>
 #include <QWidget>
 
-#include "appcontext.h"
 #include "model/NodeModel.h"
 #include "utils/nodes.h"
 

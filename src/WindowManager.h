@@ -10,6 +10,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "MainWindow.h"
+#include "utils/nodes.h"
 #include "wizard/WalletWizard.h"
 
 class MainWindow;
@@ -17,7 +18,7 @@ class WindowManager : public QObject {
 Q_OBJECT
 
 public:
-    explicit WindowManager(EventFilter *eventFilter);
+    explicit WindowManager(QObject *parent, EventFilter *eventFilter);
     ~WindowManager() override;
 
     void wizardOpenWallet();
@@ -27,7 +28,7 @@ public:
     void restartApplication(const QString &binaryFilename);
     void raise();
 
-    void showSettings(QSharedPointer<AppContext> ctx, QWidget *parent, bool showProxyTab = false);
+    void showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab = false);
 
     EventFilter *eventFilter;
 

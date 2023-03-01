@@ -8,21 +8,23 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-ViewOnlyDialog::ViewOnlyDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+#include "utils/Utils.h"
+
+ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::ViewOnlyDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
 {
     ui->setupUi(this);
 
-    ui->label_restoreHeight->setText(QString::number(m_ctx->wallet->getWalletCreationHeight()));
-    ui->label_primaryAddress->setText(m_ctx->wallet->address(0, 0));
-    ui->label_secretViewKey->setText(m_ctx->wallet->getSecretViewKey());
+    ui->label_restoreHeight->setText(QString::number(m_wallet->getWalletCreationHeight()));
+    ui->label_primaryAddress->setText(m_wallet->address(0, 0));
+    ui->label_secretViewKey->setText(m_wallet->getSecretViewKey());
 
     connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboard);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
 
-    if (m_ctx->wallet->viewOnly()) {
+    if (m_wallet->viewOnly()) {
         ui->btn_Save->setEnabled(false);
         ui->btn_Save->setToolTip("Wallet is already view-only");
     }
@@ -45,7 +47,7 @@ void ViewOnlyDialog::onWriteViewOnlyWallet(){
     if((bool)passwordDialog.exec())
         passwd = passwordDialog.textValue();
 
-    m_ctx->wallet->createViewOnly(fn, passwd);
+    m_wallet->createViewOnly(fn, passwd);
 
     QMessageBox::information(this, "Information", "View-only wallet successfully written to disk.");
 }

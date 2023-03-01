@@ -7,7 +7,6 @@
 #include <QWidget>
 #include <QMenu>
 
-#include "appcontext.h"
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/Wallet.h"
 #include "model/TransactionHistoryModel.h"
@@ -22,7 +21,7 @@ class HistoryWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit HistoryWidget(Wallet *wallet, QWidget *parent = nullptr);
     ~HistoryWidget() override;
 
     void setSearchbarVisible(bool visible);
@@ -58,7 +57,7 @@ private:
     void showSyncNoticeMsg();
 
     QScopedPointer<Ui::HistoryWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     QMenu *m_contextMenu;
     QMenu *m_copyMenu;
     TransactionHistoryProxyModel *m_model;

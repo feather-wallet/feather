@@ -8,9 +8,9 @@
 #include <QWidget>
 #include <QMenu>
 
-#include "appcontext.h"
 #include "model/AddressBookModel.h"
 #include "model/AddressBookProxyModel.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
 class ContactsWidget;
@@ -21,7 +21,7 @@ class ContactsWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit ContactsWidget(Wallet *wallet, QWidget *parent = nullptr);
     ~ContactsWidget() override;
 
     void setSearchbarVisible(bool visible);
@@ -44,7 +44,7 @@ private slots:
 
 private:
     QScopedPointer<Ui::ContactsWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 
     QAction *m_showFullAddressesAction;
     QMenu *m_rowMenu;

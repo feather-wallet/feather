@@ -6,7 +6,7 @@
 
 #include <QWidget>
 
-#include "appcontext.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class TickerWidget;
@@ -17,7 +17,7 @@ class TickerWidgetBase : public QWidget
     Q_OBJECT
 
 public:
-    explicit TickerWidgetBase(QWidget *parent, QSharedPointer<AppContext> ctx);
+    explicit TickerWidgetBase(QWidget *parent, Wallet *wallet);
     ~TickerWidgetBase() override;
 
     void setTitle(const QString &title);
@@ -34,7 +34,7 @@ private:
     QScopedPointer<Ui::TickerWidget> ui;
 
 protected:
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 class BalanceTickerWidget : public TickerWidgetBase
@@ -42,7 +42,7 @@ class BalanceTickerWidget : public TickerWidgetBase
     Q_OBJECT
 
 public:
-    explicit BalanceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, bool totalBalance);
+    explicit BalanceTickerWidget(QWidget *parent, Wallet *wallet, bool totalBalance);
 
 public slots:
     void updateDisplay() override;
@@ -56,7 +56,7 @@ class PriceTickerWidget : public TickerWidgetBase
     Q_OBJECT
 
 public:
-    explicit PriceTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol);
+    explicit PriceTickerWidget(QWidget *parent, Wallet *wallet, QString symbol);
 
 public slots:
     void updateDisplay() override;
@@ -70,7 +70,7 @@ class RatioTickerWidget : public TickerWidgetBase
     Q_OBJECT
 
 public:
-    explicit RatioTickerWidget(QWidget *parent, QSharedPointer<AppContext> ctx, QString symbol1, QString symbol2);
+    explicit RatioTickerWidget(QWidget *parent, Wallet *wallet, QString symbol1, QString symbol2);
 
 public slots:
     void updateDisplay() override;

@@ -7,7 +7,6 @@
 #include <QWizardPage>
 #include <QWidget>
 
-#include "appcontext.h"
 #include "WalletWizard.h"
 
 namespace Ui {

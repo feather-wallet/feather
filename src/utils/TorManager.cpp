@@ -7,9 +7,10 @@
 #include <QDesktopServices>
 #include <QRegularExpression>
 
+#include "utils/config.h"
 #include "utils/Utils.h"
 #include "utils/os/tails.h"
-#include "appcontext.h"
+#include "utils/os/whonix.h"
 #include "config-feather.h"
 
 TorManager::TorManager(QObject *parent)
@@ -313,4 +314,8 @@ TorManager* TorManager::instance()
     }
 
     return m_instance;
+}
+
+TorManager::~TorManager() {
+    qDebug() << "~TorManager";
 }

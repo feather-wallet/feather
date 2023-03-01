@@ -9,7 +9,6 @@
 #include <QTextEdit>
 #include <QSvgWidget>
 
-#include "appcontext.h"
 #include "dialog/TxProofDialog.h"
 
 namespace Ui {
@@ -21,7 +20,7 @@ class TxInfoDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent = nullptr);
+    explicit TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent = nullptr);
     ~TxInfoDialog() override;
 
 signals:
@@ -37,7 +36,7 @@ private:
     void viewOnBlockExplorer();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     TransactionInfo *m_txInfo;
     TxProofDialog *m_txProofDialog;
     QString m_txid;

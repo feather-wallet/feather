@@ -6,20 +6,20 @@
 
 #include <QMessageBox>
 
-#include "appcontext.h"
 #include "dialog/TxInfoDialog.h"
 #include "dialog/TxProofDialog.h"
+#include "libwalletqt/WalletManager.h"
 #include "utils/config.h"
 #include "utils/Icons.h"
 #include "WebsocketNotifier.h"
 
-HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+HistoryWidget::HistoryWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::HistoryWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
         , m_contextMenu(new QMenu(this))
         , m_copyMenu(new QMenu("Copy", this))
-        , m_model(m_ctx->wallet->historyModel())
+        , m_model(wallet->historyModel())
 {
     ui->setupUi(this);
     m_contextMenu->addMenu(m_copyMenu);
@@ -49,7 +49,7 @@ HistoryWidget::HistoryWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
         ui->syncNotice->hide();
     });
 
-    connect(m_ctx.get(), &AppContext::walletRefreshed, this, &HistoryWidget::onWalletRefreshed);
+    connect(m_wallet, &Wallet::walletRefreshed, this, &HistoryWidget::onWalletRefreshed);
 
     ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
     ui->history->setHistoryModel(m_model);
@@ -119,7 +119,7 @@ void HistoryWidget::showTxDetails() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    auto *dialog = new TxInfoDialog(m_ctx, tx, this);
+    auto *dialog = new TxInfoDialog(m_wallet, tx, this);
     connect(dialog, &TxInfoDialog::resendTranscation, [this](const QString &txid){
        emit resendTransaction(txid);
     });
@@ -148,7 +148,7 @@ void HistoryWidget::createTxProof() {
     auto *tx = ui->history->currentEntry();
     if (!tx) return;
 
-    TxProofDialog dialog{this, m_ctx, tx};
+    TxProofDialog dialog{this, m_wallet, tx};
     dialog.getTxKey();
     dialog.exec();
 }

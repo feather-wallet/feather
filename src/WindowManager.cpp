@@ -13,11 +13,13 @@
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
-WindowManager::WindowManager(EventFilter *eventFilter)
-    : eventFilter(eventFilter)
+WindowManager::WindowManager(QObject *parent, EventFilter *eventFilter)
+    : QObject(parent)
+    , eventFilter(eventFilter)
 {
     m_walletManager = WalletManager::instance();
     m_splashDialog = new SplashDialog;
@@ -83,12 +85,15 @@ void WindowManager::close() {
 }
 
 void WindowManager::closeWindow(MainWindow *window) {
+    qDebug() << "closing Window";
     m_windows.removeOne(window);
 
-    // Move Wallet to a different thread for cleanup so it doesn't block GUI thread
-    window->m_ctx->wallet->moveToThread(m_cleanupThread);
+    // Move Wallet to a different thread for cleanup, so it doesn't block GUI thread
+    window->m_wallet->moveToThread(m_cleanupThread);
     m_cleanupThread->start();
-    window->m_ctx->wallet->deleteLater();
+    window->m_wallet->deleteLater();
+
+    window->deleteLater();
 }
 
 void WindowManager::restartApplication(const QString &binaryFilename) {
@@ -138,8 +143,8 @@ void WindowManager::raise() {
 
 // ######################## SETTINGS ########################
 
-void WindowManager::showSettings(QSharedPointer<AppContext> ctx, QWidget *parent, bool showProxyTab) {
-    Settings settings{ctx, parent};
+void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab) {
+    Settings settings{nodes, parent};
 
     connect(&settings, &Settings::preferredFiatCurrencyChanged, [this]{
         for (const auto &window : m_windows) {
@@ -301,6 +306,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
 
     wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
     wallet->setCacheAttribute("feather.seedoffset", seedOffset);
+    wallet->setNewWallet();
 
     this->onWalletOpened(wallet);
 }
@@ -359,6 +365,7 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
     // Currently only called when a wallet is created from device.
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {
+        wallet->setNewWallet();
         qDebug() << Q_FUNC_INFO << QString("Wallet open error: %1").arg(wallet->errorString());
         this->displayWalletErrorMessage(wallet->errorString());
         m_splashDialog->hide();

@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class WalletCacheDebugDialog;
@@ -18,14 +18,14 @@ class WalletCacheDebugDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit WalletCacheDebugDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit WalletCacheDebugDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~WalletCacheDebugDialog() override;
 
 private:
     void setOutput(const QString &output);
 
     QScopedPointer<Ui::WalletCacheDebugDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 

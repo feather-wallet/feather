@@ -8,10 +8,10 @@
 
 #include "utils/NetworkManager.h"
 
-TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
+TxImportDialog::TxImportDialog(QWidget *parent, Wallet *wallet)
         : WindowModalDialog(parent)
         , ui(new Ui::TxImportDialog)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -23,15 +23,15 @@ TxImportDialog::TxImportDialog(QWidget *parent, QSharedPointer<AppContext> ctx)
 void TxImportDialog::onImport() {
     QString txid = ui->line_txid->text();
 
-    if (m_ctx->wallet->haveTransaction(txid)) {
+    if (m_wallet->haveTransaction(txid)) {
         QMessageBox::warning(this, "Warning", "This transaction already exists in the wallet. "
                                               "If you can't find it in your history, "
                                               "check if it belongs to a different account (Wallet -> Account)");
         return;
     }
 
-    if (m_ctx->wallet->importTransaction(txid)) {
-        if (!m_ctx->wallet->haveTransaction(txid)) {
+    if (m_wallet->importTransaction(txid)) {
+        if (!m_wallet->haveTransaction(txid)) {
             QMessageBox::warning(this, "Import transaction", "This transaction does not belong to this wallet.");
             return;
         }
@@ -39,7 +39,7 @@ void TxImportDialog::onImport() {
     } else {
         QMessageBox::warning(this, "Import transaction", "Transaction import failed.");
     }
-    m_ctx->refreshModels();
+    m_wallet->refreshModels();
 }
 
 TxImportDialog::~TxImportDialog() = default;

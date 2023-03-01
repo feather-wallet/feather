@@ -11,13 +11,17 @@
 #include "dialog/QrCodeDialog.h"
 #include "libwalletqt/Input.h"
 #include "libwalletqt/Transfer.h"
+#include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
 #include "qrcode/QrCode.h"
+#include "utils/AppData.h"
+#include "utils/config.h"
+#include "utils/Utils.h"
 
-TxConfAdvDialog::TxConfAdvDialog(QSharedPointer<AppContext> ctx, const QString &description, QWidget *parent)
+TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::TxConfAdvDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
     , m_exportUnsignedMenu(new QMenu(this))
     , m_exportSignedMenu(new QMenu(this))
     , m_exportTxKeyMenu(new QMenu(this))
@@ -65,7 +69,7 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
     PendingTransactionInfo *ptx = m_tx->transaction(0); //Todo: support split transactions
 
     // TODO: implement hasTxKey()
-    if (!m_ctx->wallet->isHwBacked() && m_tx->transaction(0)->txKey() == "0100000000000000000000000000000000000000000000000000000000000000") {
+    if (!m_wallet->isHwBacked() && m_tx->transaction(0)->txKey() == "0100000000000000000000000000000000000000000000000000000000000000") {
         ui->btn_exportTxKey->hide();
     }
 
@@ -148,7 +152,7 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     for (const auto& o: outputs) {
         auto address = o->address();
         auto amount = WalletManager::displayAmount(o->amount());
-        auto index = m_ctx->wallet->subaddressIndex(address);
+        auto index = m_wallet->subaddressIndex(address);
         cursor.insertText(address, Utils::addressTextFormat(index, o->amount()));
         cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
         cursor.insertBlock();
@@ -205,7 +209,7 @@ void TxConfAdvDialog::signedCopy() {
 }
 
 void TxConfAdvDialog::txKeyCopy() {
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
         return;
     }
@@ -218,15 +222,15 @@ void TxConfAdvDialog::signedQrCode() {
 
 void TxConfAdvDialog::broadcastTransaction() {
     if (m_tx == nullptr) return;
-    m_ctx->commitTransaction(m_tx, ui->line_description->text());
+    m_wallet->commitTransaction(m_tx, ui->line_description->text());
     QDialog::accept();
 }
 
 void TxConfAdvDialog::closeDialog() {
     if (m_tx != nullptr)
-        m_ctx->wallet->disposeTransaction(m_tx);
+        m_wallet->disposeTransaction(m_tx);
     if (m_utx != nullptr)
-        m_ctx->wallet->disposeTransaction(m_utx);
+        m_wallet->disposeTransaction(m_utx);
     QDialog::reject();
 }
 

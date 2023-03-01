@@ -4,7 +4,7 @@
 #include "KeysDialog.h"
 #include "ui_KeysDialog.h"
 
-KeysDialog::KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+KeysDialog::KeysDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::KeysDialog)
 {
@@ -12,12 +12,12 @@ KeysDialog::KeysDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     QString unavailable = "Unavailable: Key is stored on hardware device";
 
-    ui->label_restoreHeight->setText(QString::number(ctx->wallet->getWalletCreationHeight()));
-    ui->label_primaryAddress->setText(ctx->wallet->address(0, 0));
-    ui->label_secretSpendKey->setText(ctx->wallet->isHwBacked() ? unavailable : ctx->wallet->getSecretSpendKey());
-    ui->label_secretViewKey->setText(ctx->wallet->getSecretViewKey());
-    ui->label_publicSpendKey->setText(ctx->wallet->getPublicSpendKey());
-    ui->label_publicViewKey->setText(ctx->wallet->getPublicViewKey());
+    ui->label_restoreHeight->setText(QString::number(wallet->getWalletCreationHeight()));
+    ui->label_primaryAddress->setText(wallet->address(0, 0));
+    ui->label_secretSpendKey->setText(wallet->isHwBacked() ? unavailable : wallet->getSecretSpendKey());
+    ui->label_secretViewKey->setText(wallet->getSecretViewKey());
+    ui->label_publicSpendKey->setText(wallet->getPublicSpendKey());
+    ui->label_publicViewKey->setText(wallet->getPublicViewKey());
 
     this->adjustSize();
 }

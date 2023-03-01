@@ -10,10 +10,10 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
-TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, TransactionInfo *txInfo)
+TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *txInfo)
     : WindowModalDialog(parent)
     , ui(new Ui::TxProofDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -26,7 +26,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
     }
 
     for (auto const &s: txInfo->subaddrIndex()) {
-        m_InDestinations.push_back(m_ctx->wallet->address(txInfo->subaddrAccount(), s));
+        m_InDestinations.push_back(m_wallet->address(txInfo->subaddrAccount(), s));
     }
 
     // Due to some logic in core we can't create OutProofs
@@ -57,7 +57,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, QSharedPointer<AppContext> ctx, Tr
 void TxProofDialog::getTxKey() {
     if (!m_txKey.isEmpty()) return;
 
-    m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
+    m_wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
         m_txKey = map.value("tx_key").toString();
     });
 }
@@ -75,7 +75,7 @@ void TxProofDialog::selectSpendProof() {
         return;
     }
 
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         this->showWarning("SpendProof creation is not supported on this hardware device.");
         return;
     }
@@ -150,7 +150,7 @@ void TxProofDialog::showWarning(const QString &message) {
 void TxProofDialog::getFormattedProof() {
     QString message = ui->message->toPlainText();
     QString address = ui->combo_address->currentText();
-    QString nettype = Utils::QtEnumToString(m_ctx->wallet->nettype()).toLower();
+    QString nettype = Utils::QtEnumToString(m_wallet->nettype()).toLower();
     nettype = nettype.replace(0, 1, nettype[0].toUpper()); // Capitalize first letter
 
     TxProof proof = this->getProof();
@@ -231,12 +231,12 @@ TxProof TxProofDialog::getProof() {
     TxProof proof = [this, message, address]{
         switch (m_mode) {
             case Mode::SpendProof: {
-                return m_ctx->wallet->getSpendProof(m_txid, message);
+                return m_wallet->getSpendProof(m_txid, message);
             }
             case Mode::OutProof:
             case Mode::InProof:
             default: { // Todo: split this into separate functions
-                return m_ctx->wallet->getTxProof(m_txid, address, message);
+                return m_wallet->getTxProof(m_txid, address, message);
             }
         }
     }();

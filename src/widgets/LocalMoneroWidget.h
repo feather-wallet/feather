@@ -7,8 +7,8 @@
 #include <QWidget>
 
 #include "api/LocalMoneroApi.h"
-#include "appcontext.h"
 #include "model/LocalMoneroModel.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class LocalMoneroWidget;
@@ -19,7 +19,7 @@ class LocalMoneroWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit LocalMoneroWidget(QWidget *parent, QSharedPointer<AppContext> ctx);
+    explicit LocalMoneroWidget(QWidget *parent, Wallet *wallet);
     ~LocalMoneroWidget() override;
 
 public slots:
@@ -42,7 +42,7 @@ private:
     void updatePaymentMethods();
 
     QScopedPointer<Ui::LocalMoneroWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 
     int m_currentPage = 0;
 

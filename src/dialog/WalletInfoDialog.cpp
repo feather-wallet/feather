@@ -6,22 +6,24 @@
 
 #include <QDesktopServices>
 
-WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+#include "utils/Utils.h"
+
+WalletInfoDialog::WalletInfoDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::WalletInfoDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
 {
     ui->setupUi(this);
 
-    QFileInfo cache(m_ctx->wallet->cachePath());
+    QFileInfo cache(m_wallet->cachePath());
 
-    ui->label_walletName->setText(QFileInfo(m_ctx->wallet->cachePath()).fileName());
-    ui->label_netType->setText(Utils::QtEnumToString(m_ctx->wallet->nettype()));
-    ui->label_seedType->setText(QString("%1 word").arg(m_ctx->wallet->seedLength()));
-    ui->label_viewOnly->setText(m_ctx->wallet->viewOnly() ? "True" : "False");
-    ui->label_subaddressLookahead->setText(m_ctx->wallet->getSubaddressLookahead());
-    ui->label_keysFile->setText(m_ctx->wallet->keysPath());
-    ui->label_cacheFile->setText(m_ctx->wallet->cachePath());
+    ui->label_walletName->setText(QFileInfo(m_wallet->cachePath()).fileName());
+    ui->label_netType->setText(Utils::QtEnumToString(m_wallet->nettype()));
+    ui->label_seedType->setText(QString("%1 word").arg(m_wallet->seedLength()));
+    ui->label_viewOnly->setText(m_wallet->viewOnly() ? "True" : "False");
+    ui->label_subaddressLookahead->setText(m_wallet->getSubaddressLookahead());
+    ui->label_keysFile->setText(m_wallet->keysPath());
+    ui->label_cacheFile->setText(m_wallet->cachePath());
     ui->label_cacheSize->setText(QString("%1 MB").arg(QString::number(cache.size() / 1e6, 'f', 2)));
 
     connect(ui->btn_openWalletDir, &QPushButton::clicked, this, &WalletInfoDialog::openWalletDir);
@@ -40,7 +42,7 @@ WalletInfoDialog::WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *pare
 }
 
 void WalletInfoDialog::openWalletDir() {
-    QFileInfo file(m_ctx->wallet->keysPath());
+    QFileInfo file(m_wallet->keysPath());
     QDesktopServices::openUrl(QUrl::fromLocalFile(file.absolutePath()));
 }
 

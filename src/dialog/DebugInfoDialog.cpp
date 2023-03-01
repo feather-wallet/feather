@@ -5,15 +5,18 @@
 #include "ui_DebugInfoDialog.h"
 
 #include "config-feather.h"
+#include "utils/AppData.h"
 #include "utils/os/tails.h"
+#include "utils/os/whonix.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketClient.h"
 #include "utils/WebsocketNotifier.h"
 
-DebugInfoDialog::DebugInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+DebugInfoDialog::DebugInfoDialog(Wallet *wallet, Nodes *nodes, QWidget *parent)
         : WindowModalDialog(parent)
         , ui(new Ui::DebugInfoDialog)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
+        , m_nodes(nodes)
 {
     ui->setupUi(this);
 
@@ -47,16 +50,16 @@ void DebugInfoDialog::updateInfo() {
 
     ui->label_featherVersion->setText(QString("%1-%2").arg(FEATHER_VERSION, FEATHER_COMMIT));
 
-    ui->label_walletHeight->setText(QString::number(m_ctx->wallet->blockChainHeight()));
-    ui->label_daemonHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainHeight()));
-    ui->label_targetHeight->setText(QString::number(m_ctx->wallet->daemonBlockChainTargetHeight()));
-    QDateTime restoreDate = appData()->restoreHeights[constants::networkType]->heightToDate(m_ctx->wallet->getWalletCreationHeight());
-    ui->label_restoreHeight->setText(QString("%1 (%2)").arg(QString::number(m_ctx->wallet->getWalletCreationHeight()), restoreDate.toString("yyyy-MM-dd")));
-    ui->label_synchronized->setText(m_ctx->wallet->isSynchronized() ? "True" : "False");
+    ui->label_walletHeight->setText(QString::number(m_wallet->blockChainHeight()));
+    ui->label_daemonHeight->setText(QString::number(m_wallet->daemonBlockChainHeight()));
+    ui->label_targetHeight->setText(QString::number(m_wallet->daemonBlockChainTargetHeight()));
+    QDateTime restoreDate = appData()->restoreHeights[constants::networkType]->heightToDate(m_wallet->getWalletCreationHeight());
+    ui->label_restoreHeight->setText(QString("%1 (%2)").arg(QString::number(m_wallet->getWalletCreationHeight()), restoreDate.toString("yyyy-MM-dd")));
+    ui->label_synchronized->setText(m_wallet->isSynchronized() ? "True" : "False");
 
-    auto node = m_ctx->nodes->connection();
+    auto node = m_nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
-    ui->label_walletStatus->setText(this->statusToString(m_ctx->wallet->connectionStatus()));
+    ui->label_walletStatus->setText(this->statusToString(m_wallet->connectionStatus()));
     QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State");
     if (config()->get(Config::disableWebsocket).toBool()) {
         websocketStatus = "Disabled";
@@ -66,16 +69,16 @@ void DebugInfoDialog::updateInfo() {
     ui->label_torLevel->setText(config()->get(Config::torPrivacyLevel).toString());
 
     QString seedType = [this](){
-        if (m_ctx->wallet->isHwBacked())
+        if (m_wallet->isHwBacked())
             return QString("Hardware");
-        return QString("%1 word").arg(m_ctx->wallet->seedLength());
+        return QString("%1 word").arg(m_wallet->seedLength());
     }();
 
     QString deviceType = [this](){
-        if (m_ctx->wallet->isHwBacked()) {
-            if (m_ctx->wallet->isLedger())
+        if (m_wallet->isHwBacked()) {
+            if (m_wallet->isLedger())
                 return "Ledger";
-            else if (m_ctx->wallet->isTrezor())
+            else if (m_wallet->isTrezor())
                 return "Trezor";
             else
                 return "Unknown";
@@ -85,15 +88,15 @@ void DebugInfoDialog::updateInfo() {
         }
     }();
 
-    QString networkType = Utils::QtEnumToString(m_ctx->wallet->nettype());
+    QString networkType = Utils::QtEnumToString(m_wallet->nettype());
     if (config()->get(Config::offlineMode).toBool()) {
         networkType += " (offline)";
     }
     ui->label_netType->setText(networkType);
     ui->label_seedType->setText(seedType);
     ui->label_deviceType->setText(deviceType);
-    ui->label_viewOnly->setText(m_ctx->wallet->viewOnly() ? "True" : "False");
-    ui->label_primaryOnly->setText(m_ctx->wallet->balance(0) == m_ctx->wallet->balanceAll() ? "True" : "False");
+    ui->label_viewOnly->setText(m_wallet->viewOnly() ? "True" : "False");
+    ui->label_primaryOnly->setText(m_wallet->balance(0) == m_wallet->balanceAll() ? "True" : "False");
 
     QString os = QSysInfo::prettyProductName();
     if (TailsOS::detect()) {

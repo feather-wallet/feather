@@ -10,7 +10,6 @@
 #include <QTextEdit>
 #include <QCompleter>
 
-#include "appcontext.h"
 #include "WalletWizard.h"
 
 namespace Ui {

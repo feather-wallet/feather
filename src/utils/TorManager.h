@@ -18,6 +18,7 @@ Q_OBJECT
 
 public:
     explicit TorManager(QObject *parent = nullptr);
+    ~TorManager() override;
 
     void init();
     void start();

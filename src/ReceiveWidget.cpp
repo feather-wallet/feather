@@ -12,15 +12,15 @@
 #include "model/ModelUtils.h"
 #include "utils/Icons.h"
 
-ReceiveWidget::ReceiveWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::ReceiveWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
-    m_model = m_ctx->wallet->subaddressModel();
-    m_proxyModel = new SubaddressProxyModel(this, m_ctx->wallet->subaddress());
+    m_model = m_wallet->subaddressModel();
+    m_proxyModel = new SubaddressProxyModel(this, m_wallet->subaddress());
     m_proxyModel->setSourceModel(m_model);
     m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
 
@@ -112,7 +112,7 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
         menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
     }
 
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         menu->addAction("Show on device", this, &ReceiveWidget::showOnDevice);
     }
 
@@ -127,7 +127,7 @@ void ReceiveWidget::createPaymentRequest() {
 
     QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
 
-    PaymentRequestDialog dialog{this, m_ctx, address};
+    PaymentRequestDialog dialog{this, m_wallet, address};
     dialog.exec();
 }
 
@@ -189,13 +189,13 @@ void ReceiveWidget::showAddress()
 void ReceiveWidget::showOnDevice() {
     Monero::SubaddressRow* row = this->currentEntry();
     if (!row) return;
-    m_ctx->wallet->deviceShowAddressAsync(m_ctx->wallet->currentSubaddressAccount(), row->getRowId(), "");
+    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRowId(), "");
 }
 
 void ReceiveWidget::generateSubaddress() {
-    bool r = m_ctx->wallet->subaddress()->addRow(m_ctx->wallet->currentSubaddressAccount(), "");
+    bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
     if (!r) {
-        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_ctx->wallet->subaddress()->errorString()));
+        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_wallet->subaddress()->errorString()));
     }
 }
 
@@ -229,7 +229,7 @@ void ReceiveWidget::showQrCodeDialog() {
 }
 
 QStringList ReceiveWidget::getHiddenAddresses() {
-    QString data = m_ctx->wallet->getCacheAttribute("feather.hiddenaddresses");
+    QString data = m_wallet->getCacheAttribute("feather.hiddenaddresses");
     return data.split(",");
 }
 
@@ -239,14 +239,14 @@ void ReceiveWidget::addHiddenAddress(const QString& address) {
         hiddenAddresses.append(address);
     }
     QString data = hiddenAddresses.join(",");
-    m_ctx->wallet->setCacheAttribute("feather.hiddenaddresses", data);
+    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
 }
 
 void ReceiveWidget::removeHiddenAddress(const QString &address) {
     QStringList hiddenAddresses = this->getHiddenAddresses();
     hiddenAddresses.removeAll(address);
     QString data = hiddenAddresses.join(",");
-    m_ctx->wallet->setCacheAttribute("feather.hiddenaddresses", data);
+    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
 }
 
 Monero::SubaddressRow* ReceiveWidget::currentEntry() {

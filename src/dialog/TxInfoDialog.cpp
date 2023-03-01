@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QScrollBar>
 
-#include "appcontext.h"
 #include "config.h"
 #include "constants.h"
 #include "libwalletqt/Coins.h"
@@ -19,12 +18,12 @@
 #include "Utils.h"
 #include "utils/Icons.h"
 
-TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txInfo, QWidget *parent)
+TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::TxInfoDialog)
-    , m_ctx(std::move(ctx))
+    , m_wallet(wallet)
     , m_txInfo(txInfo)
-    , m_txProofDialog(new TxProofDialog(this, m_ctx, txInfo))
+    , m_txProofDialog(new TxProofDialog(this, wallet, txInfo))
 {
     ui->setupUi(this);
 
@@ -39,7 +38,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
     connect(ui->btn_CopyTxKey, &QPushButton::clicked, this, &TxInfoDialog::copyTxKey);
     connect(ui->btn_createTxProof, &QPushButton::clicked, this, &TxInfoDialog::createTxProof);
 
-    connect(m_ctx->wallet, &Wallet::newBlock, this, &TxInfoDialog::updateData);
+    connect(m_wallet, &Wallet::newBlock, this, &TxInfoDialog::updateData);
 
     this->setData(txInfo);
 
@@ -79,7 +78,7 @@ TxInfoDialog::TxInfoDialog(QSharedPointer<AppContext> ctx, TransactionInfo *txIn
         for (const auto& transfer : transfers) {
             auto address = transfer->address();
             auto amount = WalletManager::displayAmount(transfer->amount());
-            auto index = m_ctx->wallet->subaddressIndex(address);
+            auto index = m_wallet->subaddressIndex(address);
             cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
             cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
             cursor.insertBlock();
@@ -151,7 +150,7 @@ void TxInfoDialog::setData(TransactionInfo *tx) {
 }
 
 void TxInfoDialog::updateData() {
-    TransactionInfo *tx = m_ctx->wallet->history()->transaction(m_txid);
+    TransactionInfo *tx = m_wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
 }
@@ -161,12 +160,12 @@ void TxInfoDialog::copyTxID() {
 }
 
 void TxInfoDialog::copyTxKey() {
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
         return;
     }
 
-    m_ctx->wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
+    m_wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
         QString txKey = map.value("tx_key").toString();
         if (txKey.isEmpty()) {
             QMessageBox::warning(this, "Unable to copy transaction key", "Transaction key unknown");

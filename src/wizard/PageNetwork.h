@@ -8,7 +8,6 @@
 #include <QWizardPage>
 #include <QWidget>
 
-#include "appcontext.h"
 #include "utils/nodes.h"
 
 namespace Ui {

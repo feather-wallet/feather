@@ -9,11 +9,12 @@
 #include "dialog/OutputInfoDialog.h"
 #include "dialog/OutputSweepDialog.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
-CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+CoinsWidget::CoinsWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::CoinsWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
         , m_headerMenu(new QMenu(this))
         , m_copyMenu(new QMenu("Copy",this))
 {
@@ -71,7 +72,7 @@ CoinsWidget::CoinsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
 
     connect(ui->search, &QLineEdit::textChanged, this, &CoinsWidget::setSearchFilter);
 
-    connect(m_ctx.get(), &AppContext::selectedInputsChanged, this, &CoinsWidget::selectCoins);
+    connect(m_wallet, &Wallet::selectedInputsChanged, this, &CoinsWidget::selectCoins);
 }
 
 void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
@@ -84,7 +85,7 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     ui->coins->setColumnHidden(CoinsModel::SpentHeight, true);
     ui->coins->setColumnHidden(CoinsModel::Frozen, true);
 
-    if (!m_ctx->wallet->viewOnly()) {
+    if (!m_wallet->viewOnly()) {
         ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, true);
     } else {
         ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, false);
@@ -188,7 +189,7 @@ void CoinsWidget::spendSelected() {
         keyimages << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
     }
 
-    m_ctx->setSelectedInputs(keyimages);
+    m_wallet->setSelectedInputs(keyimages);
     this->selectCoins(keyimages);
 }
 
@@ -239,7 +240,7 @@ void CoinsWidget::onSweepOutputs() {
     int ret = dialog.exec();
     if (!ret) return;
 
-    m_ctx->onSweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
+    m_wallet->sweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
 }
 
 void CoinsWidget::copy(copyField field) {
@@ -298,18 +299,18 @@ QVector<CoinsInfo*> CoinsWidget::currentEntries() {
 
 void CoinsWidget::freezeCoins(QStringList &pubkeys) {
     for (auto &pubkey : pubkeys) {
-        m_ctx->wallet->coins()->freeze(pubkey);
+        m_wallet->coins()->freeze(pubkey);
     }
-    m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
-    m_ctx->updateBalance();
+    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->updateBalance();
 }
 
 void CoinsWidget::thawCoins(QStringList &pubkeys) {
     for (auto &pubkey : pubkeys) {
-        m_ctx->wallet->coins()->thaw(pubkey);
+        m_wallet->coins()->thaw(pubkey);
     }
-    m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
-    m_ctx->updateBalance();
+    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->updateBalance();
 }
 
 void CoinsWidget::selectCoins(const QStringList &keyimages) {

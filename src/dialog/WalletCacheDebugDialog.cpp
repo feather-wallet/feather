@@ -8,81 +8,81 @@
 
 #include "model/ModelUtils.h"
 
-WalletCacheDebugDialog::WalletCacheDebugDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+WalletCacheDebugDialog::WalletCacheDebugDialog(Wallet *wallet, QWidget *parent)
         : WindowModalDialog(parent)
         , ui(new Ui::WalletCacheDebugDialog)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
     ui->output->setFont(ModelUtils::getMonospaceFont());
 
     connect(ui->m_blockchain, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printBlockchain());
+        this->setOutput(m_wallet->printBlockchain());
     });
 
     connect(ui->m_transfers, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printTransfers());
+        this->setOutput(m_wallet->printTransfers());
     });
 
     connect(ui->m_unconfirmed_payments, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printUnconfirmedPayments());
+        this->setOutput(m_wallet->printUnconfirmedPayments());
     });
 
     connect(ui->m_confirmed_txs, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printConfirmedTransferDetails());
+        this->setOutput(m_wallet->printConfirmedTransferDetails());
     });
 
     connect(ui->m_unconfirmed_txs, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printUnconfirmedTransferDetails());
+        this->setOutput(m_wallet->printUnconfirmedTransferDetails());
     });
 
     connect(ui->m_payments, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printPayments());
+        this->setOutput(m_wallet->printPayments());
     });
 
     connect(ui->m_pub_keys, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printPubKeys());
+        this->setOutput(m_wallet->printPubKeys());
     });
 
     connect(ui->m_tx_notes, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printTxNotes());
+        this->setOutput(m_wallet->printTxNotes());
     });
 
     connect(ui->m_subaddresses, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printSubaddresses());
+        this->setOutput(m_wallet->printSubaddresses());
     });
 
     connect(ui->m_subaddress_labels, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printSubaddressLabels());
+        this->setOutput(m_wallet->printSubaddressLabels());
     });
 
     connect(ui->m_additional_tx_keys, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printAdditionalTxKeys());
+        this->setOutput(m_wallet->printAdditionalTxKeys());
     });
 
     connect(ui->m_attributes, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printAttributes());
+        this->setOutput(m_wallet->printAttributes());
     });
 
     connect(ui->m_key_images, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printKeyImages());
+        this->setOutput(m_wallet->printKeyImages());
     });
 
     connect(ui->m_account_tags, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printAccountTags());
+        this->setOutput(m_wallet->printAccountTags());
     });
 
     connect(ui->m_tx_keys, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printTxKeys());
+        this->setOutput(m_wallet->printTxKeys());
     });
 
     connect(ui->m_address_book, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printAddressBook());
+        this->setOutput(m_wallet->printAddressBook());
     });
 
     connect(ui->m_scanned_pool_txs, &QRadioButton::pressed, [this]{
-        this->setOutput(m_ctx->wallet->printScannedPoolTxs());
+        this->setOutput(m_wallet->printScannedPoolTxs());
     });
 
     this->adjustSize();

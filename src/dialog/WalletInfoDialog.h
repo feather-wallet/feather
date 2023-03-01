@@ -6,8 +6,8 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class WalletInfoDialog;
@@ -18,14 +18,14 @@ class WalletInfoDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit WalletInfoDialog(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit WalletInfoDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~WalletInfoDialog() override;
 
 private:
     void openWalletDir();
 
     QScopedPointer<Ui::WalletInfoDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
 };
 
 #endif //FEATHER_WALLETINFODIALOG_H

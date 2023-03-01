@@ -6,10 +6,10 @@
 
 #include <QDialog>
 
-#include "appcontext.h"
 #include "components.h"
 #include "libwalletqt/PendingTransaction.h"
 #include "libwalletqt/WalletManager.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class TxConfDialog;
@@ -20,7 +20,7 @@ class TxConfDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit TxConfDialog(QSharedPointer<AppContext> ctx, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent = nullptr);
+    explicit TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent = nullptr);
     ~TxConfDialog() override;
 
     bool showAdvanced = false;
@@ -29,7 +29,7 @@ private:
     void setShowAdvanced();
 
     QScopedPointer<Ui::TxConfDialog> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     PendingTransaction *m_tx;
     QString m_address;
     QString m_description;

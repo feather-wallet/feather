@@ -8,8 +8,6 @@
 #include <QWizardPage>
 #include <QWidget>
 
-#include "appcontext.h"
-
 namespace Ui {
     class PageMenu;
 }

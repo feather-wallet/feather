@@ -43,7 +43,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_windowManager(windowManager)
-    , m_ctx(new AppContext(wallet))
+    , m_wallet(wallet)
+    , m_nodes(new Nodes(this, wallet))
+    , m_rpc(new DaemonRpc(this, ""))
 {
     ui->setupUi(this);
 
@@ -55,7 +57,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
-    m_accountSwitcherDialog = new AccountSwitcherDialog(m_ctx, this);
+    m_accountSwitcherDialog = new AccountSwitcherDialog(m_wallet, this);
 
     m_updater = QSharedPointer<Updater>(new Updater(this));
 
@@ -81,18 +83,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
     this->onWebsocketStatusChanged(!config()->get(Config::disableWebsocket).toBool());
 
-    connect(m_windowManager, &WindowManager::proxySettingsChanged, [this]{
-        m_ctx->onProxySettingsChanged();
-        this->onProxySettingsChanged();
-    });
-    connect(m_windowManager, &WindowManager::updateBalance, m_ctx.data(), &AppContext::updateBalance);
-    connect(m_windowManager, &WindowManager::offlineMode, [this](bool offline){
-       if (!m_ctx->wallet) {
-           return;
-       }
-       m_ctx->wallet->setOffline(offline);
-       this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
-    });
+    connect(m_windowManager, &WindowManager::proxySettingsChanged, this, &MainWindow::onProxySettingsChanged);
+    connect(m_windowManager, &WindowManager::updateBalance, m_wallet, &Wallet::updateBalance);
+    connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
 
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
@@ -191,20 +184,20 @@ void MainWindow::initWidgets() {
     ui->tabHomeWidget->setCurrentIndex(TabsHome(homeWidget));
 
     // [History]
-    m_historyWidget = new HistoryWidget(m_ctx, this);
+    m_historyWidget = new HistoryWidget(m_wallet, this);
     ui->historyWidgetLayout->addWidget(m_historyWidget);
     connect(m_historyWidget, &HistoryWidget::viewOnBlockExplorer, this, &MainWindow::onViewOnBlockExplorer);
     connect(m_historyWidget, &HistoryWidget::resendTransaction, this, &MainWindow::onResendTransaction);
 
     // [Send]
-    m_sendWidget = new SendWidget(m_ctx, this);
+    m_sendWidget = new SendWidget(m_wallet, this);
     ui->sendWidgetLayout->addWidget(m_sendWidget);
     // --------------
-    m_contactsWidget = new ContactsWidget(m_ctx, this);
+    m_contactsWidget = new ContactsWidget(m_wallet, this);
     ui->contactsWidgetLayout->addWidget(m_contactsWidget);
 
     // [Receive]
-    m_receiveWidget = new ReceiveWidget(m_ctx, this);
+    m_receiveWidget = new ReceiveWidget(m_wallet, this);
     ui->receiveWidgetLayout->addWidget(m_receiveWidget);
     connect(m_receiveWidget, &ReceiveWidget::showTransactions, [this](const QString &text) {
         m_historyWidget->setSearchText(text);
@@ -213,18 +206,18 @@ void MainWindow::initWidgets() {
     connect(m_contactsWidget, &ContactsWidget::fillAddress, m_sendWidget, &SendWidget::fillAddress);
 
     // [Coins]
-    m_coinsWidget = new CoinsWidget(m_ctx, this);
+    m_coinsWidget = new CoinsWidget(m_wallet, this);
     ui->coinsWidgetLayout->addWidget(m_coinsWidget);
 
 #ifdef HAS_LOCALMONERO
-    m_localMoneroWidget = new LocalMoneroWidget(this, m_ctx);
+    m_localMoneroWidget = new LocalMoneroWidget(this, m_wallet);
     ui->localMoneroLayout->addWidget(m_localMoneroWidget);
 #else
     ui->tabWidgetExchanges->setTabVisible(0, false);
 #endif
 
 #ifdef HAS_XMRIG
-    m_xmrig = new XMRigWidget(m_ctx, this);
+    m_xmrig = new XMRigWidget(m_wallet, this);
     ui->xmrRigLayout->addWidget(m_xmrig);
 
     connect(m_xmrig, &XMRigWidget::miningStarted, [this]{ this->updateTitle(); });
@@ -239,7 +232,7 @@ void MainWindow::initWidgets() {
 
     ui->frame_coinControl->setVisible(false);
     connect(ui->btn_resetCoinControl, &QPushButton::clicked, [this]{
-       m_ctx->setSelectedInputs({});
+       m_wallet->setSelectedInputs({});
     });
 
     m_walletUnlockWidget = new WalletUnlockWidget(this);
@@ -276,8 +269,8 @@ void MainWindow::initMenu() {
 
     // [Wallet] -> [Advanced]
     connect(ui->actionStore_wallet,          &QAction::triggered, this, &MainWindow::tryStoreWallet);
-    connect(ui->actionUpdate_balance,        &QAction::triggered, [this]{m_ctx->updateBalance();});
-    connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_ctx->refreshModels();});
+    connect(ui->actionUpdate_balance,        &QAction::triggered, [this]{m_wallet->updateBalance();});
+    connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_wallet->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
 
@@ -399,14 +392,14 @@ void MainWindow::initMenu() {
 
 void MainWindow::initHome() {
     // Ticker widgets
-    m_tickerWidgets.append(new PriceTickerWidget(this, m_ctx, "XMR"));
-    m_tickerWidgets.append(new PriceTickerWidget(this, m_ctx, "BTC"));
-    m_tickerWidgets.append(new RatioTickerWidget(this, m_ctx, "XMR", "BTC"));
+    m_tickerWidgets.append(new PriceTickerWidget(this, m_wallet, "XMR"));
+    m_tickerWidgets.append(new PriceTickerWidget(this, m_wallet, "BTC"));
+    m_tickerWidgets.append(new RatioTickerWidget(this, m_wallet, "XMR", "BTC"));
     for (const auto &widget : m_tickerWidgets) {
         ui->tickerLayout->addWidget(widget);
     }
 
-    m_balanceTickerWidget = new BalanceTickerWidget(this, m_ctx, false);
+    m_balanceTickerWidget = new BalanceTickerWidget(this, m_wallet, false);
     ui->fiatTickerLayout->addWidget(m_balanceTickerWidget);
 
     connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
@@ -419,29 +412,56 @@ void MainWindow::initHome() {
 }
 
 void MainWindow::initWalletContext() {
-    connect(m_ctx.get(), &AppContext::balanceUpdated,           this, &MainWindow::onBalanceUpdated);
-    connect(m_ctx.get(), &AppContext::synchronized,             this, &MainWindow::onSynchronized);
-    connect(m_ctx.get(), &AppContext::blockchainSync,           this, &MainWindow::onBlockchainSync);
-    connect(m_ctx.get(), &AppContext::refreshSync,              this, &MainWindow::onRefreshSync);
-    connect(m_ctx.get(), &AppContext::createTransactionError,   this, &MainWindow::onCreateTransactionError);
-    connect(m_ctx.get(), &AppContext::createTransactionSuccess, this, &MainWindow::onCreateTransactionSuccess);
-    connect(m_ctx.get(), &AppContext::transactionCommitted,     this, &MainWindow::onTransactionCommitted);
-    connect(m_ctx.get(), &AppContext::deviceError,              this, &MainWindow::onDeviceError);
-    connect(m_ctx.get(), &AppContext::deviceButtonRequest,      this, &MainWindow::onDeviceButtonRequest);
-    connect(m_ctx.get(), &AppContext::deviceButtonPressed,      this, &MainWindow::onDeviceButtonPressed);
-    connect(m_ctx.get(), &AppContext::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
-    connect(m_ctx.get(), &AppContext::endTransaction,           this, &MainWindow::onEndTransaction);
-    connect(m_ctx.get(), &AppContext::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
-    connect(m_ctx.get(), &AppContext::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
+    connect(m_wallet, &Wallet::balanceUpdated,           this, &MainWindow::onBalanceUpdated);
+    connect(m_wallet, &Wallet::synchronized,             this, &MainWindow::onSynchronized); //TODO
+    connect(m_wallet, &Wallet::blockchainSync,           this, &MainWindow::onBlockchainSync);
+    connect(m_wallet, &Wallet::refreshSync,              this, &MainWindow::onRefreshSync);
+    connect(m_wallet, &Wallet::createTransactionError,   this, &MainWindow::onCreateTransactionError);
+    connect(m_wallet, &Wallet::createTransactionSuccess, this, &MainWindow::onCreateTransactionSuccess);
+    connect(m_wallet, &Wallet::transactionCommitted,     this, &MainWindow::onTransactionCommitted);
+    connect(m_wallet, &Wallet::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
+    connect(m_wallet, &Wallet::endTransaction,           this, &MainWindow::onEndTransaction);
+    connect(m_wallet, &Wallet::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
+    connect(m_wallet, &Wallet::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
 
     // Wallet
-    connect(m_ctx->wallet, &Wallet::connectionStatusChanged, [this](int status){
+    connect(m_wallet, &Wallet::connectionStatusChanged, [this](int status){
         // Order is important, first inform UI about a potential disconnect, then reconnect
         this->onConnectionStatusChanged(status);
-        this->m_ctx->nodes->autoConnect();
+        m_nodes->autoConnect();
     });
-    connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
-    connect(m_ctx->wallet, &Wallet::walletPassphraseNeeded, this, &MainWindow::onWalletPassphraseNeeded);
+    connect(m_wallet, &Wallet::currentSubaddressAccountChanged, this, &MainWindow::updateTitle);
+    connect(m_wallet, &Wallet::walletPassphraseNeeded, this, &MainWindow::onWalletPassphraseNeeded);
+
+    connect(m_wallet, &Wallet::unconfirmedMoneyReceived, this, [this](const QString &txId, uint64_t amount){
+       if (m_wallet->isSynchronized()) {
+           auto notify = QString("%1 XMR (pending)").arg(WalletManager::displayAmount(amount, false));
+           Utils::desktopNotify("Payment received", notify, 5000);
+       }
+    });
+
+    // Device
+    connect(m_wallet, &Wallet::deviceButtonRequest, this, &MainWindow::onDeviceButtonRequest);
+    connect(m_wallet, &Wallet::deviceButtonPressed, this, &MainWindow::onDeviceButtonPressed);
+    connect(m_wallet, &Wallet::deviceError,         this, &MainWindow::onDeviceError);
+
+    connect(m_wallet, &Wallet::donationSent,        this, []{
+        config()->set(Config::donateBeg, -1);
+    });
+    
+    connect(m_wallet, &Wallet::multiBroadcast,      this, [this](PendingTransaction *tx){
+        quint64 count = tx->txCount();
+        for (quint64 i = 0; i < count; i++) {
+            QString txData = tx->signedTxToHex(i);
+
+            for (const auto& node: m_nodes->nodes()) {
+                QString address = node.toURL();
+                qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
+                m_rpc->setDaemonAddress(address);
+                m_rpc->sendRawTransaction(txData);
+            }
+        }
+    });
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -459,15 +479,15 @@ void MainWindow::menuClearHistoryClicked() {
 }
 
 QString MainWindow::walletName() {
-    return QFileInfo(m_ctx->wallet->cachePath()).fileName();
+    return QFileInfo(m_wallet->cachePath()).fileName();
 }
 
 QString MainWindow::walletCachePath() {
-    return m_ctx->wallet->cachePath();
+    return m_wallet->cachePath();
 }
 
 QString MainWindow::walletKeysPath() {
-    return m_ctx->wallet->keysPath();
+    return m_wallet->keysPath();
 }
 
 void MainWindow::displayWalletErrorMsg(const QString &err) {
@@ -497,10 +517,10 @@ void MainWindow::onWalletOpened() {
     qDebug() << Q_FUNC_INFO;
     m_splashDialog->hide();
 
-    m_ctx->wallet->setRingDatabase(Utils::ringDatabasePath());
+    m_wallet->setRingDatabase(Utils::ringDatabasePath());
 
-    m_ctx->updateBalance();
-    if (m_ctx->wallet->isHwBacked()) {
+    m_wallet->updateBalance();
+    if (m_wallet->isHwBacked()) {
         m_statusBtnHwDevice->show();
     }
 
@@ -508,38 +528,39 @@ void MainWindow::onWalletOpened() {
     this->setEnabled(true);
 
     // receive page
-    m_ctx->wallet->subaddress()->refresh(m_ctx->wallet->currentSubaddressAccount());
-    if (m_ctx->wallet->subaddress()->count() == 1) {
+    m_wallet->subaddress()->refresh(m_wallet->currentSubaddressAccount());
+    if (m_wallet->subaddress()->count() == 1) {
         for (int i = 0; i < 10; i++) {
-            m_ctx->wallet->subaddress()->addRow(m_ctx->wallet->currentSubaddressAccount(), "");
+            m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
         }
     }
-    m_ctx->wallet->subaddressModel()->setCurrentSubaddressAccount(m_ctx->wallet->currentSubaddressAccount());
+    m_wallet->subaddressModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
 
     // history page
-    m_ctx->wallet->history()->refresh(m_ctx->wallet->currentSubaddressAccount());
+    m_wallet->history()->refresh(m_wallet->currentSubaddressAccount());
 
     // coins page
-    m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
-    m_coinsWidget->setModel(m_ctx->wallet->coinsModel(), m_ctx->wallet->coins());
-    m_ctx->wallet->coinsModel()->setCurrentSubaddressAccount(m_ctx->wallet->currentSubaddressAccount());
+    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_coinsWidget->setModel(m_wallet->coinsModel(), m_wallet->coins());
+    m_wallet->coinsModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
 
     // Coin labeling uses set_tx_note, so we need to refresh history too
-    connect(m_ctx->wallet->coins(), &Coins::descriptionChanged, [this] {
-        m_ctx->wallet->history()->refresh(m_ctx->wallet->currentSubaddressAccount());
+    connect(m_wallet->coins(), &Coins::descriptionChanged, [this] {
+        m_wallet->history()->refresh(m_wallet->currentSubaddressAccount());
     });
     // Vice versa
-    connect(m_ctx->wallet->history(), &TransactionHistory::txNoteChanged, [this] {
-        m_ctx->wallet->coins()->refresh(m_ctx->wallet->currentSubaddressAccount());
+    connect(m_wallet->history(), &TransactionHistory::txNoteChanged, [this] {
+        m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
     });
 
     this->updatePasswordIcon();
     this->updateTitle();
-    m_ctx->nodes->connectToNode();
+    m_nodes->allowConnection();
+    m_nodes->connectToNode();
     m_updateBytes.start(250);
 
     if (config()->get(Config::writeRecentlyOpenedWallets).toBool()) {
-        this->addToRecentlyOpened(m_ctx->wallet->cachePath());
+        this->addToRecentlyOpened(m_wallet->cachePath());
     }
 }
 
@@ -587,13 +608,13 @@ void MainWindow::setStatusText(const QString &text, bool override, int timeout) 
 }
 
 void MainWindow::tryStoreWallet() {
-    if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus::ConnectionStatus_Synchronizing) {
+    if (m_wallet->connectionStatus() == Wallet::ConnectionStatus::ConnectionStatus_Synchronizing) {
         QMessageBox::warning(this, "Save wallet", "Unable to save wallet during synchronization.\n\n"
                                                   "Wait until synchronization is finished and try again.");
         return;
     }
 
-    m_ctx->wallet->store();
+    m_wallet->store();
 }
 
 void MainWindow::onWebsocketStatusChanged(bool enabled) {
@@ -614,6 +635,8 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
 }
 
 void MainWindow::onProxySettingsChanged() {
+    m_nodes->connectToNode();
+
     int proxy = config()->get(Config::proxy).toInt();
 
     if (proxy == Config::Proxy::Tor) {
@@ -629,6 +652,14 @@ void MainWindow::onProxySettingsChanged() {
     }
 
     m_statusBtnProxySettings->hide();
+}
+
+void MainWindow::onOfflineMode(bool offline) {
+    if (!m_wallet) {
+        return;
+    }
+    m_wallet->setOffline(offline);
+    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
 }
 
 void MainWindow::onSynchronized() {
@@ -693,13 +724,13 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         QString tx_err = tx->errorString();
         qCritical() << tx_err;
 
-        if (m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
+        if (m_wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
             err = QString("%1 Wrong node version: %2").arg(err, tx_err);
         else
             err = QString("%1 %2").arg(err, tx_err);
 
         if (tx_err.contains("Node response did not include the requested real output")) {
-            QString currentNode = m_ctx->nodes->connection().toAddress();
+            QString currentNode = m_nodes->connection().toAddress();
 
             err += QString("\nYou are currently connected to: %1\n\n"
                            "This node may be acting maliciously. You are strongly recommended to disconnect from this node."
@@ -708,21 +739,21 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
 
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
-        m_ctx->wallet->disposeTransaction(tx);
+        m_wallet->disposeTransaction(tx);
         return;
     }
     else if (tx->txCount() == 0) {
         err = QString("%1 %2").arg(err, "No unmixable outputs to sweep.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
-        m_ctx->wallet->disposeTransaction(tx);
+        m_wallet->disposeTransaction(tx);
         return;
     }
     else if (tx->txCount() > 1) {
         err = QString("%1 %2").arg(err, "Split transactions are not supported. Try sending a smaller amount.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
-        m_ctx->wallet->disposeTransaction(tx);
+        m_wallet->disposeTransaction(tx);
         return;
     }
 
@@ -743,35 +774,36 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         err = QString("%1 %2").arg(err, "Constructed transaction doesn't appear to send to (all) specified destination address(es). Try creating the transaction again.");
         qDebug() << Q_FUNC_INFO << err;
         this->displayWalletErrorMsg(err);
-        m_ctx->wallet->disposeTransaction(tx);
+        m_wallet->disposeTransaction(tx);
         return;
     }
 
-    m_ctx->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
+    m_wallet->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
     // Show advanced dialog on multi-destination transactions
-    if (address.size() > 1 || m_ctx->wallet->viewOnly()) {
-        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
-        dialog_adv.setTransaction(tx, !m_ctx->wallet->viewOnly());
+    if (address.size() > 1 || m_wallet->viewOnly()) {
+        TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx, !m_wallet->viewOnly());
         dialog_adv.exec();
         return;
     }
 
-    TxConfDialog dialog{m_ctx, tx, address[0], m_ctx->tmpTxDescription, this};
+    TxConfDialog dialog{m_wallet, tx, address[0], m_wallet->tmpTxDescription, this};
     switch (dialog.exec()) {
         case QDialog::Rejected:
         {
-            if (!dialog.showAdvanced)
-                m_ctx->onCancelTransaction(tx, address);
+            if (!dialog.showAdvanced) {
+                m_wallet->disposeTransaction(tx);
+            }
             break;
         }
         case QDialog::Accepted:
-            m_ctx->commitTransaction(tx, m_ctx->tmpTxDescription);
+            m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
             break;
     }
 
     if (dialog.showAdvanced) {
-        TxConfAdvDialog dialog_adv{m_ctx, m_ctx->tmpTxDescription, this};
+        TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
         dialog_adv.setTransaction(tx);
         dialog_adv.exec();
     }
@@ -789,8 +821,8 @@ void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, con
         msgBox.exec();
         if (msgBox.clickedButton() == showDetailsButton) {
             this->showHistoryTab();
-            TransactionInfo *txInfo = m_ctx->wallet->history()->transaction(txid.first());
-            auto *dialog = new TxInfoDialog(m_ctx, txInfo, this);
+            TransactionInfo *txInfo = m_wallet->history()->transaction(txid.first());
+            auto *dialog = new TxInfoDialog(m_wallet, txInfo, this);
             connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
             dialog->show();
             dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -815,22 +847,22 @@ void MainWindow::onCreateTransactionError(const QString &message) {
 }
 
 void MainWindow::showWalletInfoDialog() {
-    WalletInfoDialog dialog{m_ctx, this};
+    WalletInfoDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
 void MainWindow::showSeedDialog() {
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         QMessageBox::information(this, "Information", "Seed unavailable: Wallet keys are stored on hardware device.");
         return;
     }
 
-    if (m_ctx->wallet->viewOnly()) {
+    if (m_wallet->viewOnly()) {
         QMessageBox::information(this, "Information", "Wallet is view-only and has no seed.\n\nTo obtain wallet keys go to Wallet -> View-Only");
         return;
     }
 
-    if (!m_ctx->wallet->isDeterministic()) {
+    if (!m_wallet->isDeterministic()) {
         QMessageBox::information(this, "Information", "Wallet is non-deterministic and has no seed.\n\nTo obtain wallet keys go to Wallet -> Keys");
         return;
     }
@@ -839,18 +871,18 @@ void MainWindow::showSeedDialog() {
         return;
     }
 
-    SeedDialog dialog{m_ctx, this};
+    SeedDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
 void MainWindow::showPasswordDialog() {
-    PasswordChangeDialog dialog{this, m_ctx->wallet};
+    PasswordChangeDialog dialog{this, m_wallet};
     dialog.exec();
     this->updatePasswordIcon();
 }
 
 void MainWindow::updatePasswordIcon() {
-    bool emptyPassword = m_ctx->wallet->verifyPassword("");
+    bool emptyPassword = m_wallet->verifyPassword("");
     QIcon icon = emptyPassword ? icons()->icon("unlock.svg") : icons()->icon("lock.svg");
     m_statusBtnPassword->setIcon(icon);
 }
@@ -860,12 +892,12 @@ void MainWindow::showKeysDialog() {
         return;
     }
 
-    KeysDialog dialog{m_ctx, this};
+    KeysDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
 void MainWindow::showViewOnlyDialog() {
-    ViewOnlyDialog dialog{m_ctx, this};
+    ViewOnlyDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
@@ -900,16 +932,16 @@ void MainWindow::menuAboutClicked() {
 }
 
 void MainWindow::menuSettingsClicked(bool showProxyTab) {
-    m_windowManager->showSettings(m_ctx, this, showProxyTab);
+    m_windowManager->showSettings(m_nodes, this, showProxyTab);
 }
 
 void MainWindow::menuSignVerifyClicked() {
-    SignVerifyDialog dialog{m_ctx->wallet, this};
+    SignVerifyDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
 void MainWindow::menuVerifyTxProof() {
-    VerifyProofDialog dialog{m_ctx->wallet, this};
+    VerifyProofDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
@@ -936,18 +968,18 @@ void MainWindow::updateWidgetIcons() {
 
 QIcon MainWindow::hardwareDevicePairedIcon() {
     QString filename;
-    if (m_ctx->wallet->isLedger())
+    if (m_wallet->isLedger())
         filename = "ledger.png";
-    else if (m_ctx->wallet->isTrezor())
+    else if (m_wallet->isTrezor())
         filename = ColorScheme::darkScheme ? "trezor_white.png" : "trezor.png";
     return icons()->icon(filename);
 }
 
 QIcon MainWindow::hardwareDeviceUnpairedIcon() {
     QString filename;
-    if (m_ctx->wallet->isLedger())
+    if (m_wallet->isLedger())
         filename = "ledger_unpaired.png";
-    else if (m_ctx->wallet->isTrezor())
+    else if (m_wallet->isTrezor())
         filename = ColorScheme::darkScheme ? "trezor_unpaired_white.png" : "trezor_unpaired.png";
     return icons()->icon(filename);
 }
@@ -964,10 +996,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
         m_updateBytes.stop();
         m_txTimer.stop();
-        m_ctx->stopTimers();
 
         // Wallet signal may fire after AppContext is gone, causing segv
-        m_ctx->wallet->disconnect();
+        m_wallet->disconnect();
+        this->disconnect();
 
         this->saveGeo();
         m_windowManager->closeWindow(this);
@@ -1031,16 +1063,16 @@ void MainWindow::onViewOnBlockExplorer(const QString &txid) {
 }
 
 void MainWindow::onResendTransaction(const QString &txid) {
-    QString txHex = m_ctx->getCacheTransaction(txid);
+    QString txHex = m_wallet->getCacheTransaction(txid);
     if (txHex.isEmpty()) {
         QMessageBox::warning(this, "Unable to resend transaction", "Transaction was not found in transaction cache. Unable to resend.");
         return;
     }
 
     // Connect to a different node so chances of successful relay are higher
-    m_ctx->nodes->autoConnect(true);
+    m_nodes->autoConnect(true);
 
-    TxBroadcastDialog dialog{this, m_ctx, txHex};
+    TxBroadcastDialog dialog{this, m_nodes, txHex};
     dialog.exec();
 }
 
@@ -1048,14 +1080,14 @@ void MainWindow::importContacts() {
     const QString targetFile = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
     if(targetFile.isEmpty()) return;
 
-    auto *model = m_ctx->wallet->addressBookModel();
+    auto *model = m_wallet->addressBookModel();
     QMapIterator<QString, QString> i(model->readCSV(targetFile));
     int inserts = 0;
     while (i.hasNext()) {
         i.next();
-        bool addressValid = WalletManager::addressValid(i.value(), m_ctx->wallet->nettype());
+        bool addressValid = WalletManager::addressValid(i.value(), m_wallet->nettype());
         if(addressValid) {
-            m_ctx->wallet->addressBook()->addRow(i.value(), "", i.key());
+            m_wallet->addressBook()->addRow(i.value(), "", i.key());
             inserts++;
         }
     }
@@ -1075,7 +1107,7 @@ void MainWindow::restoreGeo() {
 }
 
 void MainWindow::showDebugInfo() {
-    DebugInfoDialog dialog{m_ctx, this};
+    DebugInfoDialog dialog{m_wallet, m_nodes, this};
     dialog.exec();
 }
 
@@ -1084,7 +1116,7 @@ void MainWindow::showWalletCacheDebugDialog() {
         return;
     }
 
-    WalletCacheDebugDialog dialog{m_ctx, this};
+    WalletCacheDebugDialog dialog{m_wallet, this};
     dialog.exec();
 }
 
@@ -1103,7 +1135,7 @@ void MainWindow::showAddressChecker() {
         return;
     }
 
-    SubaddressIndex index = m_ctx->wallet->subaddressIndex(address);
+    SubaddressIndex index = m_wallet->subaddressIndex(address);
     if (!index.isValid()) {
         // TODO: probably mention lookahead here
         QMessageBox::warning(this, "Address Checker", "This address does not belong to this wallet.");
@@ -1117,9 +1149,9 @@ void MainWindow::exportKeyImages() {
     QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_keyImages")) fn += "_keyImages";
-    bool r = m_ctx->wallet->exportKeyImages(fn, true);
+    bool r = m_wallet->exportKeyImages(fn, true);
     if (!r) {
-        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(m_ctx->wallet->errorString()));
+        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(m_wallet->errorString()));
     } else {
         QMessageBox::information(this, "Key image export", "Successfully exported key images.");
     }
@@ -1128,12 +1160,12 @@ void MainWindow::exportKeyImages() {
 void MainWindow::importKeyImages() {
     QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages)");
     if (fn.isEmpty()) return;
-    bool r = m_ctx->wallet->importKeyImages(fn);
+    bool r = m_wallet->importKeyImages(fn);
     if (!r) {
-        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(m_ctx->wallet->errorString()));
+        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(m_wallet->errorString()));
     } else {
         QMessageBox::information(this, "Key image import", "Successfully imported key images");
-        m_ctx->refreshModels();
+        m_wallet->refreshModels();
     }
 }
 
@@ -1141,9 +1173,9 @@ void MainWindow::exportOutputs() {
     QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
     if (!fn.endsWith("_outputs")) fn += "_outputs";
-    bool r = m_ctx->wallet->exportOutputs(fn, true);
+    bool r = m_wallet->exportOutputs(fn, true);
     if (!r) {
-        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(m_ctx->wallet->errorString()));
+        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(m_wallet->errorString()));
     } else {
         QMessageBox::information(this, "Outputs export", "Successfully exported outputs.");
     }
@@ -1152,20 +1184,20 @@ void MainWindow::exportOutputs() {
 void MainWindow::importOutputs() {
     QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs)");
     if (fn.isEmpty()) return;
-    bool r = m_ctx->wallet->importOutputs(fn);
+    bool r = m_wallet->importOutputs(fn);
     if (!r) {
-        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(m_ctx->wallet->errorString()));
+        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(m_wallet->errorString()));
     } else {
         QMessageBox::information(this, "Outputs import", "Successfully imported outputs");
-        m_ctx->refreshModels();
+        m_wallet->refreshModels();
     }
 }
 
 void MainWindow::loadUnsignedTx() {
     QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx)");
     if (fn.isEmpty()) return;
-    UnsignedTransaction *tx = m_ctx->wallet->loadTxFile(fn);
-    auto err = m_ctx->wallet->errorString();
+    UnsignedTransaction *tx = m_wallet->loadTxFile(fn);
+    auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
         QMessageBox::warning(this, "Load transaction from file", QString("Failed to load transaction.\n\n%1").arg(err));
         return;
@@ -1180,8 +1212,8 @@ void MainWindow::loadUnsignedTxFromClipboard() {
         QMessageBox::warning(this, "Load unsigned transaction from clipboard", "Clipboard is empty");
         return;
     }
-    UnsignedTransaction *tx = m_ctx->wallet->loadTxFromBase64Str(unsigned_tx);
-    auto err = m_ctx->wallet->errorString();
+    UnsignedTransaction *tx = m_wallet->loadTxFromBase64Str(unsigned_tx);
+    auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
         QMessageBox::warning(this, "Load unsigned transaction from clipboard", QString("Failed to load transaction.\n\n%1").arg(err));
         return;
@@ -1193,25 +1225,25 @@ void MainWindow::loadUnsignedTxFromClipboard() {
 void MainWindow::loadSignedTx() {
     QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*signed_monero_tx)");
     if (fn.isEmpty()) return;
-    PendingTransaction *tx = m_ctx->wallet->loadSignedTxFile(fn);
-    auto err = m_ctx->wallet->errorString();
+    PendingTransaction *tx = m_wallet->loadSignedTxFile(fn);
+    auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
         QMessageBox::warning(this, "Load signed transaction from file", err);
         return;
     }
 
-    TxConfAdvDialog dialog{m_ctx, "", this};
+    TxConfAdvDialog dialog{m_wallet, "", this};
     dialog.setTransaction(tx);
     dialog.exec();
 }
 
 void MainWindow::loadSignedTxFromText() {
-    TxBroadcastDialog dialog{this, m_ctx};
+    TxBroadcastDialog dialog{this, m_nodes};
     dialog.exec();
 }
 
 void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
-    TxConfAdvDialog dialog{m_ctx, "", this};
+    TxConfAdvDialog dialog{m_wallet, "", this};
     dialog.setUnsignedTransaction(tx);
     dialog.exec();
 }
@@ -1229,11 +1261,13 @@ void MainWindow::importTransaction() {
         }
     }
 
-    TxImportDialog dialog(this, m_ctx);
+    TxImportDialog dialog(this, m_wallet);
     dialog.exec();
 }
 
 void MainWindow::onDeviceError(const QString &error) {
+    qCritical() << "Device error: " << error;
+
     if (m_showDeviceError) {
         return;
     }
@@ -1243,7 +1277,7 @@ void MainWindow::onDeviceError(const QString &error) {
         m_showDeviceError = true;
         auto result = QMessageBox::question(this, "Hardware device", "Lost connection to hardware device. Attempt to reconnect?");
         if (result == QMessageBox::Yes) {
-            bool r = m_ctx->wallet->reconnectDevice();
+            bool r = m_wallet->reconnectDevice();
             if (r) {
                 break;
             }
@@ -1254,14 +1288,14 @@ void MainWindow::onDeviceError(const QString &error) {
         }
     }
     m_statusBtnHwDevice->setIcon(this->hardwareDevicePairedIcon());
-    m_ctx->wallet->startRefresh();
+    m_wallet->startRefresh();
     m_showDeviceError = false;
 }
 
 void MainWindow::onDeviceButtonRequest(quint64 code) {
     qDebug() << "DeviceButtonRequest, code: " << code;
 
-    if (m_ctx->wallet->isTrezor()) {
+    if (m_wallet->isTrezor()) {
         switch (code) {
             case 1:
             {
@@ -1306,41 +1340,41 @@ void MainWindow::onWalletPassphraseNeeded(bool on_device) {
                                                                              "the hardware wallet for better security.",
                                         QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
     if (button == QMessageBox::Yes) {
-        m_ctx->wallet->onPassphraseEntered("", true, false);
+        m_wallet->onPassphraseEntered("", true, false);
         return;
     }
 
     bool ok;
     QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
     if (ok) {
-        m_ctx->wallet->onPassphraseEntered(passphrase, false, false);
+        m_wallet->onPassphraseEntered(passphrase, false, false);
     } else {
-        m_ctx->wallet->onPassphraseEntered(passphrase, false, true);
+        m_wallet->onPassphraseEntered(passphrase, false, true);
     }
 }
 
 void MainWindow::updateNetStats() {
-    if (!m_ctx->wallet || m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected
-                       || m_ctx->wallet->connectionStatus() == Wallet::ConnectionStatus_Synchronized)
+    if (!m_wallet || m_wallet->connectionStatus() == Wallet::ConnectionStatus_Disconnected
+                       || m_wallet->connectionStatus() == Wallet::ConnectionStatus_Synchronized)
     {
         m_statusLabelNetStats->hide();
         return;
     }
 
     m_statusLabelNetStats->show();
-    m_statusLabelNetStats->setText(QString("(D: %1)").arg(Utils::formatBytes(m_ctx->wallet->getBytesReceived())));
+    m_statusLabelNetStats->setText(QString("(D: %1)").arg(Utils::formatBytes(m_wallet->getBytesReceived())));
 }
 
 void MainWindow::rescanSpent() {
-    if (!m_ctx->wallet->rescanSpent()) {
-        QMessageBox::warning(this, "Rescan spent", m_ctx->wallet->errorString());
+    if (!m_wallet->rescanSpent()) {
+        QMessageBox::warning(this, "Rescan spent", m_wallet->errorString());
     } else {
         QMessageBox::information(this, "Rescan spent", "Successfully rescanned spent outputs.");
     }
 }
 
 void MainWindow::showBalanceDialog() {
-    BalanceDialog dialog{this, m_ctx->wallet};
+    BalanceDialog dialog{this, m_wallet};
     dialog.exec();
 }
 
@@ -1420,7 +1454,7 @@ void MainWindow::onInitiateTransaction() {
     m_constructingTransaction = true;
     m_txTimer.start(1000);
 
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         QString message = "Constructing transaction: action may be required on device.";
         m_splashDialog->setMessage(message);
         m_splashDialog->setIcon(QPixmap(":/assets/images/unconfirmed.png"));
@@ -1435,7 +1469,7 @@ void MainWindow::onEndTransaction() {
     m_txTimer.stop();
     this->setStatusText(m_statusText);
 
-    if (m_ctx->wallet->isHwBacked()) {
+    if (m_wallet->isHwBacked()) {
         m_splashDialog->hide();
     }
 }
@@ -1456,7 +1490,7 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
 
     if (numInputs > 0) {
         quint64 totalAmount = 0;
-        auto coins = m_ctx->wallet->coins()->coinsFromKeyImage(selectedInputs);
+        auto coins = m_wallet->coins()->coinsFromKeyImage(selectedInputs);
         for (const auto coin : coins) {
             totalAmount += coin->amount();
         }
@@ -1467,20 +1501,20 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
 }
 
 void MainWindow::onExportHistoryCSV(bool checked) {
-    if (m_ctx->wallet == nullptr)
+    if (m_wallet == nullptr)
         return;
     QString fn = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
     if (fn.isEmpty())
         return;
     if (!fn.endsWith(".csv"))
         fn += ".csv";
-    m_ctx->wallet->history()->writeCSV(fn);
+    m_wallet->history()->writeCSV(fn);
     QMessageBox::information(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
 }
 
 void MainWindow::onExportContactsCSV(bool checked) {
-    if (m_ctx->wallet == nullptr) return;
-    auto *model = m_ctx->wallet->addressBookModel();
+    if (m_wallet == nullptr) return;
+    auto *model = m_wallet->addressBookModel();
     if (model->rowCount() <= 0){
         QMessageBox::warning(this, "Error", "Addressbook empty");
         return;
@@ -1540,19 +1574,19 @@ QString MainWindow::getPlatformTag() {
 }
 
 QString MainWindow::getHardwareDevice() {
-    if (!m_ctx->wallet->isHwBacked())
+    if (!m_wallet->isHwBacked())
         return "";
-    if (m_ctx->wallet->isTrezor())
+    if (m_wallet->isTrezor())
         return "Trezor";
-    if (m_ctx->wallet->isLedger())
+    if (m_wallet->isLedger())
         return "Ledger";
     return "Unknown";
 }
 
 void MainWindow::updateTitle() {
-    QString title = QString("%1 (#%2)").arg(this->walletName(), QString::number(m_ctx->wallet->currentSubaddressAccount()));
+    QString title = QString("%1 (#%2)").arg(this->walletName(), QString::number(m_wallet->currentSubaddressAccount()));
 
-    if (m_ctx->wallet->viewOnly())
+    if (m_wallet->viewOnly())
         title += " [view-only]";
 #ifdef HAS_XMRIG
     if (m_xmrig->isMining())
@@ -1565,13 +1599,13 @@ void MainWindow::updateTitle() {
 }
 
 void MainWindow::donationNag() {
-    if (m_ctx->networkType != NetworkType::Type::MAINNET)
+    if (m_wallet->nettype() != NetworkType::Type::MAINNET)
         return;
 
-    if (m_ctx->wallet->viewOnly())
+    if (m_wallet->viewOnly())
         return;
 
-    if (m_ctx->wallet->balanceAll() == 0)
+    if (m_wallet->balanceAll() == 0)
         return;
 
     auto donationCounter = config()->get(Config::donateBeg).toInt();
@@ -1640,7 +1674,7 @@ bool MainWindow::verifyPassword(bool sensitive) {
             return false;
         }
 
-        if (!m_ctx->wallet->verifyPassword(passwordDialog.password)) {
+        if (!m_wallet->verifyPassword(passwordDialog.password)) {
             incorrectPassword = true;
             continue;
         }
@@ -1707,7 +1741,7 @@ void MainWindow::unlockWallet(const QString &password) {
         return;
     }
 
-    if (!m_ctx->wallet->verifyPassword(password)) {
+    if (!m_wallet->verifyPassword(password)) {
         m_walletUnlockWidget->incorrectPassword();
         return;
     }
@@ -1742,4 +1776,6 @@ void MainWindow::toggleSearchbar(bool visible) {
         m_coinsWidget->focusSearchbar();
 }
 
-MainWindow::~MainWindow() = default;
+MainWindow::~MainWindow() {
+    qDebug() << "~MainWindow";
+};

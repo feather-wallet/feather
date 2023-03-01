@@ -9,8 +9,6 @@
 #include <QWidget>
 #include <QDir>
 
-#include "appcontext.h"
-
 namespace Ui {
     class PageWalletFile;
 }

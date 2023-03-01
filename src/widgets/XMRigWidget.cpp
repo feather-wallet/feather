@@ -13,11 +13,12 @@
 #include <QTableWidget>
 
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
-XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::XMRigWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
         , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
         , m_model(new QStandardItemModel(this))
         , m_contextMenu(new QMenu(this))
@@ -96,25 +97,25 @@ XMRigWidget::XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->relayTor->setChecked(config()->get(Config::xmrigNetworkTor).toBool());
 
     // Receiving address
-    auto username = m_ctx->wallet->getCacheAttribute("feather.xmrig_username");
+    auto username = m_wallet->getCacheAttribute("feather.xmrig_username");
     if (!username.isEmpty()) {
         ui->lineEdit_address->setText(username);
     }
     connect(ui->lineEdit_address, &QLineEdit::textChanged, [=]() {
-        m_ctx->wallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
+        m_wallet->setCacheAttribute("feather.xmrig_username", ui->lineEdit_address->text());
     });
     connect(ui->btn_fillPrimaryAddress, &QPushButton::clicked, this, &XMRigWidget::onUsePrimaryAddressClicked);
 
     // Password
-    auto password = m_ctx->wallet->getCacheAttribute("feather.xmrig_password");
+    auto password = m_wallet->getCacheAttribute("feather.xmrig_password");
     if (!password.isEmpty()) {
         ui->lineEdit_password->setText(password);
     } else {
         ui->lineEdit_password->setText("featherwallet");
-        m_ctx->wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+        m_wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
     }
     connect(ui->lineEdit_password, &QLineEdit::textChanged, [=]() {
-        m_ctx->wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
+        m_wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
     });
 
     // [Status] tab
@@ -171,7 +172,7 @@ void XMRigWidget::onClearClicked() {
 }
 
 void XMRigWidget::onUsePrimaryAddressClicked() {
-    ui->lineEdit_address->setText(m_ctx->wallet->address(0, 0));
+    ui->lineEdit_address->setText(m_wallet->address(0, 0));
 }
 
 void XMRigWidget::onStartClicked() {
@@ -193,8 +194,8 @@ void XMRigWidget::onStartClicked() {
     }
 
     // username is receiving address usually
-    auto username = m_ctx->wallet->getCacheAttribute("feather.xmrig_username");
-    auto password = m_ctx->wallet->getCacheAttribute("feather.xmrig_password");
+    auto username = m_wallet->getCacheAttribute("feather.xmrig_username");
+    auto password = m_wallet->getCacheAttribute("feather.xmrig_password");
 
     if (username.isEmpty()) {
         ui->console->appendPlainText("Please specify a receiving address on the Settings screen.");
@@ -203,7 +204,7 @@ void XMRigWidget::onStartClicked() {
 
     if (address.contains("cryptonote.social") && !username.contains(".")) {
         // cryptonote social requires <addr>.<username>, we'll just grab a few chars from primary addy
-        username = QString("%1.%2").arg(username, m_ctx->wallet->address(0, 0).mid(0, 6));
+        username = QString("%1.%2").arg(username, m_wallet->address(0, 0).mid(0, 6));
     }
 
     int threads = ui->threadSlider->value();

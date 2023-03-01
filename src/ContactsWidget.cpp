@@ -8,13 +8,14 @@
 
 #include "dialog/ContactsDialog.h"
 #include "libwalletqt/AddressBook.h"
+#include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
 #include "utils/Icons.h"
 
-ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
+ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::ContactsWidget)
-        , m_ctx(std::move(ctx))
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
 
@@ -23,7 +24,7 @@ ContactsWidget::ContactsWidget(QSharedPointer<AppContext> ctx, QWidget *parent)
     ui->searchLayout->addWidget(m_btn_addContact, 0, Qt::AlignRight);
     connect(m_btn_addContact, &QPushButton::clicked, [this]{this->newContact();});
 
-    m_model = m_ctx->wallet->addressBookModel();
+    m_model = m_wallet->addressBookModel();
     m_proxyModel = new AddressBookProxyModel;
     m_proxyModel->setSourceModel(m_model);
     ui->contacts->setModel(m_proxyModel);
@@ -124,17 +125,17 @@ void ContactsWidget::newContact(QString address, QString name)
     address = dialog.getAddress();
     name = dialog.getName();
 
-    bool addressValid = WalletManager::addressValid(address, m_ctx->wallet->nettype());
+    bool addressValid = WalletManager::addressValid(address, m_wallet->nettype());
     if (!addressValid) {
         QMessageBox::warning(this, "Invalid address", "Invalid address");
         return;
     }
 
-    int num_addresses = m_ctx->wallet->addressBook()->count();
+    int num_addresses = m_wallet->addressBook()->count();
     QString address_entry;
     QString name_entry;
     for (int i=0; i<num_addresses; i++) {
-        m_ctx->wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
+        m_wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
             address_entry = entry.address();
             name_entry = entry.description();
         });
@@ -151,7 +152,7 @@ void ContactsWidget::newContact(QString address, QString name)
         }
     }
 
-    m_ctx->wallet->addressBook()->addRow(address, "", name);
+    m_wallet->addressBook()->addRow(address, "", name);
 }
 
 void ContactsWidget::deleteContact()

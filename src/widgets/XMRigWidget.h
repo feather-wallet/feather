@@ -7,10 +7,11 @@
 #include <QMenu>
 #include <QWidget>
 #include <QItemSelection>
+#include <QStandardItemModel>
 
-#include "appcontext.h"
 #include "utils/xmrig.h"
 #include "utils/config.h"
+#include "libwalletqt/Wallet.h"
 
 namespace Ui {
     class XMRigWidget;
@@ -21,7 +22,7 @@ class XMRigWidget : public QWidget
     Q_OBJECT
 
 public:
-    explicit XMRigWidget(QSharedPointer<AppContext> ctx, QWidget *parent = nullptr);
+    explicit XMRigWidget(Wallet *wallet, QWidget *parent = nullptr);
     ~XMRigWidget() override;
     QStandardItemModel *model();
 
@@ -63,7 +64,7 @@ private:
     bool checkXMRigPath();
 
     QScopedPointer<Ui::XMRigWidget> ui;
-    QSharedPointer<AppContext> m_ctx;
+    Wallet *m_wallet;
     XmRig *m_XMRig;
     QStandardItemModel *m_model;
     QMenu *m_contextMenu;

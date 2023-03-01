@@ -7,23 +7,25 @@
 #include <QMenu>
 
 #include "libwalletqt/SubaddressAccount.h"
+#include "libwalletqt/WalletManager.h"
 #include "model/ModelUtils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
-AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWidget *parent)
+AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
     , ui(new Ui::AccountSwitcherDialog)
-    , m_ctx(std::move(ctx))
-    , m_model(m_ctx->wallet->subaddressAccountModel())
+    , m_wallet(wallet)
+    , m_model(wallet->subaddressAccountModel())
     , m_proxyModel(new SubaddressAccountProxyModel(this))
 {
     ui->setupUi(this);
 
-    m_ctx->wallet->subaddressAccount()->refresh();
+    m_wallet->subaddressAccount()->refresh();
     m_proxyModel->setSourceModel(m_model);
 
     ui->label_totalBalance->setFont(ModelUtils::getMonospaceFont());
-    ui->label_totalBalance->setText(WalletManager::displayAmount(m_ctx->wallet->balanceAll()));
+    ui->label_totalBalance->setText(WalletManager::displayAmount(m_wallet->balanceAll()));
 
     this->setWindowModality(Qt::WindowModal);
 
@@ -43,12 +45,12 @@ AccountSwitcherDialog::AccountSwitcherDialog(QSharedPointer<AppContext> ctx, QWi
     connect(ui->accounts, &QTreeView::customContextMenuRequested, this, &AccountSwitcherDialog::showContextMenu);
 
     connect(ui->btn_newAccount, &QPushButton::clicked, [this]{
-       m_ctx->wallet->addSubaddressAccount("New account");
-       m_ctx->wallet->subaddressAccount()->refresh();
+       m_wallet->addSubaddressAccount("New account");
+       m_wallet->subaddressAccount()->refresh();
     });
 
-    connect(m_ctx->wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
-    connect(m_ctx->wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
+    connect(m_wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
+    connect(m_wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
 
     this->updateSelection();
 }
@@ -59,7 +61,7 @@ void AccountSwitcherDialog::switchAccount() {
         return;
     }
 
-    m_ctx->wallet->switchSubaddressAccount(row->getRowId());
+    m_wallet->switchSubaddressAccount(row->getRowId());
 }
 
 void AccountSwitcherDialog::copyLabel() {
@@ -81,13 +83,13 @@ void AccountSwitcherDialog::copyBalance() {
 }
 
 void AccountSwitcherDialog::editLabel() {
-    QModelIndex index = ui->accounts->currentIndex().siblingAtColumn(m_ctx->wallet->subaddressAccountModel()->Column::Label);
+    QModelIndex index = ui->accounts->currentIndex().siblingAtColumn(m_wallet->subaddressAccountModel()->Column::Label);
     ui->accounts->setCurrentIndex(index);
     ui->accounts->edit(index);
 }
 
 void AccountSwitcherDialog::updateSelection() {
-    QModelIndex index = m_model->index(m_ctx->wallet->currentSubaddressAccount(), 0);
+    QModelIndex index = m_model->index(m_wallet->currentSubaddressAccount(), 0);
     ui->accounts->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
@@ -108,7 +110,7 @@ void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
 
 Monero::SubaddressAccountRow* AccountSwitcherDialog::currentEntry() {
     QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
-    return m_ctx->wallet->subaddressAccountModel()->entryFromIndex(index);
+    return m_wallet->subaddressAccountModel()->entryFromIndex(index);
 }
 
 AccountSwitcherDialog::~AccountSwitcherDialog() = default;
