@@ -372,11 +372,7 @@ void Settings::setupThemeComboBox() {
 }
 
 void Settings::setSelection(int index) {
-    // You'd really think there is a better way
-    QListWidgetItem *item = ui->selector->item(index);
-    QModelIndex idx = ui->selector->indexFromItem(item);
     ui->selector->setCurrentRow(index);
-    ui->selector->selectionModel()->select(idx, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
 void Settings::enableWebsocket(bool enabled) {
