@@ -78,6 +78,8 @@ void WindowManager::close() {
         window->close();
     }
 
+    m_wizard->deleteLater();
+
     torManager()->stop();
     m_tray->hide();
 
