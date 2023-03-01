@@ -268,6 +268,7 @@ mkdir -p "$DISTSRC"
 
     # Set appropriate CMake options for build type
     CMAKEVARS="-DWITH_SCANNER=On -DCHECK_UPDATES=On -DSELF_CONTAINED=On -DDONATE_BEG=On"
+    ANONDIST=""
     case "$HOST" in
         *mingw32)
             case "$OPTIONS" in
@@ -281,7 +282,7 @@ mkdir -p "$DISTSRC"
             case "$OPTIONS" in
                 no-tor-bundle)
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
-                    DISTNAME+="-a"
+                    ANONDIST+="-a"
                     ;;
             esac
             ;;
@@ -316,9 +317,10 @@ mkdir -p "$DISTSRC"
     case "$HOST" in
         *linux*)
             bash contrib/AppImage/build-appimage.sh
-            mv feather.AppImage ${DISTNAME}${LINUX_ARCH}.AppImage
-            cp ${DISTNAME}${LINUX_ARCH}.AppImage "${INSTALLPATH}/"
-            cp ${DISTNAME}${LINUX_ARCH}.AppImage "${OUTDIR}/"
+            APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
+            mv feather.AppImage "${APPIMAGENAME}"
+            cp "${APPIMAGENAME}" "${INSTALLPATH}/"
+            cp "${APPIMAGENAME}" "${OUTDIR}/"
             ;;
     esac
 
@@ -389,18 +391,22 @@ mkdir -p "$DISTSRC"
                 esac
                 ;;
             *linux*)
-                find . -not -name "*.AppImage" -print0 \
-                    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                find . -not -name "*.AppImage" \
-                    | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" && exit 1 )
+                case "$OPTIONS" in
+                    "")
+                        find . -not -name "*.AppImage" -print0 \
+                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                        find . -not -name "*.AppImage" \
+                            | sort \
+                            | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" \
+                            || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
+                        ;;
+                esac
                 find . -name "*.AppImage" -print0 \
                     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                 find . -name "*.AppImage" \
                     | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" && exit 1 )
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
                 ;;
         esac
 
