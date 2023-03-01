@@ -215,7 +215,6 @@ private:
     void setStatusText(const QString &text, bool override = false, int timeout = 1000);
     void showBalanceDialog();
     QString statusDots();
-    QString getPlatformTag();
     void displayWalletErrorMsg(const QString &err);
     QString getHardwareDevice();
     void updateTitle();

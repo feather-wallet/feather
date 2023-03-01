@@ -20,6 +20,8 @@ Updater::Updater(QObject *parent) :
 {
     std::string featherWallet = Utils::fileOpen(":/assets/gpg_keys/featherwallet.asc").toStdString();
     m_maintainers.emplace_back(featherWallet);
+
+    qDebug() << "Platform tag: " << this->getPlatformTag();
 }
 
 void Updater::checkForUpdates() {
@@ -154,6 +156,10 @@ QString Updater::getPlatformTag() {
     if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
         tag += "-appimage";
     }
+
+#if !defined(HAS_TOR_BIN)
+    tag += "-a";
+#endif
 
     return tag;
 #endif

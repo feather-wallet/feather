@@ -49,7 +49,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 {
     ui->setupUi(this);
 
-    qDebug() << "Platform tag: " << this->getPlatformTag();
 //    MCWARNING("feather", "Platform tag: " << this->getPlatformTag().toStdString());
 
     // Ensure the destructor is called after closeEvent()
@@ -1540,37 +1539,6 @@ void MainWindow::onShowDocumentation() {
 
 void MainWindow::onReportBug(bool checked) {
     Utils::externalLinkWarning(this, "https://docs.featherwallet.org/guides/report-an-issue");
-}
-
-QString MainWindow::getPlatformTag() {
-#ifdef Q_OS_MACOS
-    return "mac";
-#endif
-#ifdef Q_OS_WIN
-#ifdef PLATFORM_INSTALLER
-    return "win-installer";
-#endif
-    return "win";
-#endif
-#ifdef Q_OS_LINUX
-    QString tag = "";
-
-    QString arch = QSysInfo::buildCpuArchitecture();
-    if (arch == "arm64") {
-        tag += "linux-arm64";
-    } else if (arch == "arm") {
-        tag += "linux-arm";
-    } else {
-        tag += "linux";
-    }
-
-    if (!qEnvironmentVariableIsEmpty("APPIMAGE")) {
-        tag += "-appimage";
-    }
-
-    return tag;
-#endif
-    return "";
 }
 
 QString MainWindow::getHardwareDevice() {
