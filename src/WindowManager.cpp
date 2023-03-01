@@ -22,8 +22,8 @@ WindowManager::WindowManager(QObject *parent, EventFilter *eventFilter)
     , eventFilter(eventFilter)
 {
     m_walletManager = WalletManager::instance();
-    m_splashDialog = new SplashDialog;
-    m_cleanupThread = new QThread();
+    m_splashDialog = new SplashDialog();
+    m_cleanupThread = new QThread(this);
 
     connect(m_walletManager, &WalletManager::walletOpened,        this, &WindowManager::onWalletOpened);
     connect(m_walletManager, &WalletManager::walletCreated,       this, &WindowManager::onWalletCreated);
@@ -79,9 +79,10 @@ void WindowManager::close() {
     }
 
     m_wizard->deleteLater();
+    m_splashDialog->deleteLater();
+    m_tray->deleteLater();
 
     torManager()->stop();
-    m_tray->hide();
 
     QApplication::quit();
 }
@@ -612,10 +613,10 @@ void WindowManager::onProxySettingsChanged() {
     qWarning() << "Proxy: " << proxy.hostName() << " " << proxy.port();
 
     // Switch websocket to new proxy and update URL
-    websocketNotifier()->websocketClient.stop();
-    websocketNotifier()->websocketClient.webSocket.setProxy(proxy);
-    websocketNotifier()->websocketClient.nextWebsocketUrl();
-    websocketNotifier()->websocketClient.restart();
+    websocketNotifier()->websocketClient->stop();
+    websocketNotifier()->websocketClient->webSocket->setProxy(proxy);
+    websocketNotifier()->websocketClient->nextWebsocketUrl();
+    websocketNotifier()->websocketClient->restart();
 
     emit proxySettingsChanged();
 }

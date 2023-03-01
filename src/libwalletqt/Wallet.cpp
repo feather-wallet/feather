@@ -444,8 +444,6 @@ void Wallet::onUpdated() {
 }
 
 void Wallet::onRefreshed(bool success, const QString &message) {
-    qDebug() << "onRefreshed";
-
     if (!success) {
         setConnectionStatus(ConnectionStatus_Disconnected);
         // Something went wrong during refresh, in some cases we need to notify the user

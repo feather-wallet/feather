@@ -595,6 +595,4 @@ void Nodes::allowConnection() {
     m_allowConnection = true;
 }
 
-Nodes::~Nodes() {
-    qDebug() << "~Nodes";
-}
+Nodes::~Nodes() = default;

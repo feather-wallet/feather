@@ -60,7 +60,7 @@ void DebugInfoDialog::updateInfo() {
     auto node = m_nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_wallet->connectionStatus()));
-    QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient.webSocket.state()).remove("State");
+    QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient->webSocket->state()).remove("State");
     if (config()->get(Config::disableWebsocket).toBool()) {
         websocketStatus = "Disabled";
     }

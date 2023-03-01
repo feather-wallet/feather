@@ -24,7 +24,7 @@ public:
     explicit WebsocketNotifier(QObject *parent);
 
     QMap<NetworkType::Type, int> heights;
-    WebsocketClient websocketClient;
+    WebsocketClient *websocketClient;
 
     static WebsocketNotifier* instance();
     void emitCache();

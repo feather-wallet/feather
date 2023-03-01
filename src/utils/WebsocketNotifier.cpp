@@ -12,7 +12,7 @@ WebsocketNotifier::WebsocketNotifier(QObject *parent)
     : QObject(parent)
     , websocketClient(new WebsocketClient(this))
 {
-    connect(&websocketClient, &WebsocketClient::WSMessage, this, &WebsocketNotifier::onWSMessage);
+    connect(websocketClient, &WebsocketClient::WSMessage, this, &WebsocketNotifier::onWSMessage);
 }
 
 QPointer<WebsocketNotifier> WebsocketNotifier::m_instance(nullptr);

@@ -381,9 +381,9 @@ void Settings::setSelection(int index) {
 
 void Settings::enableWebsocket(bool enabled) {
     if (enabled && !config()->get(Config::offlineMode).toBool() && !config()->get(Config::disableWebsocket).toBool()) {
-        websocketNotifier()->websocketClient.restart();
+        websocketNotifier()->websocketClient->restart();
     } else {
-        websocketNotifier()->websocketClient.stop();
+        websocketNotifier()->websocketClient->stop();
     }
     ui->nodeWidget->onWebsocketStatusChanged();
     emit websocketStatusChanged(enabled);

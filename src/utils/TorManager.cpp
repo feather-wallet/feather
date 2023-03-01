@@ -316,6 +316,4 @@ TorManager* TorManager::instance()
     return m_instance;
 }
 
-TorManager::~TorManager() {
-    qDebug() << "~TorManager";
-}
+TorManager::~TorManager() = default;

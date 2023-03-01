@@ -10,18 +10,19 @@
 
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)
+    , webSocket(new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this))
 {
-    connect(&webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
-    connect(&webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
-    connect(&webSocket, &QWebSocket::disconnected, this, &WebsocketClient::onDisconnected);
-    connect(&webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WebsocketClient::onError);
+    connect(webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
+    connect(webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
+    connect(webSocket, &QWebSocket::disconnected, this, &WebsocketClient::onDisconnected);
+    connect(webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WebsocketClient::onError);
 
-    connect(&webSocket, &QWebSocket::binaryMessageReceived, this, &WebsocketClient::onbinaryMessageReceived);
+    connect(webSocket, &QWebSocket::binaryMessageReceived, this, &WebsocketClient::onbinaryMessageReceived);
 
     // Keep websocket connection alive
     connect(&m_pingTimer, &QTimer::timeout, [this]{
-        if (webSocket.state() == QAbstractSocket::ConnectedState) {
-            webSocket.ping();
+        if (webSocket->state() == QAbstractSocket::ConnectedState) {
+            webSocket->ping();
         }
     });
     m_pingTimer.setInterval(30 * 1000);
@@ -34,8 +35,8 @@ WebsocketClient::WebsocketClient(QObject *parent)
 }
 
 void WebsocketClient::sendMsg(const QByteArray &data) {
-    if (webSocket.state() == QAbstractSocket::ConnectedState) {
-        webSocket.sendBinaryMessage(data);
+    if (webSocket->state() == QAbstractSocket::ConnectedState) {
+        webSocket->sendBinaryMessage(data);
     }
 }
 
@@ -53,10 +54,10 @@ void WebsocketClient::start() {
     }
 
     // connect & reconnect on errors/close
-    auto state = webSocket.state();
+    auto state = webSocket->state();
     if (state != QAbstractSocket::ConnectedState && state != QAbstractSocket::ConnectingState) {
         qDebug() << "WebSocket connect:" << m_url.url();
-        webSocket.open(m_url);
+        webSocket->open(m_url);
     }
 }
 
@@ -67,7 +68,7 @@ void WebsocketClient::restart() {
 
 void WebsocketClient::stop() {
     m_stopped = true;
-    webSocket.close();
+    webSocket->close();
     m_connectionTimeout.stop();
 }
 
@@ -93,9 +94,9 @@ void WebsocketClient::onStateChanged(QAbstractSocket::SocketState state) {
 
 void WebsocketClient::onError(QAbstractSocket::SocketError error) {
     qCritical() << "WebSocket error: " << error;
-    auto state = webSocket.state();
+    auto state = webSocket->state();
     if (state == QAbstractSocket::ConnectedState || state == QAbstractSocket::ConnectingState) {
-        webSocket.abort();
+        webSocket->abort();
     }
 }
 
@@ -143,8 +144,4 @@ void WebsocketClient::onbinaryMessageReceived(const QByteArray &message) {
     emit WSMessage(object);
 }
 
-WebsocketClient::~WebsocketClient() {
-    // webSocket may fire QWebSocket::disconnected after WebsocketClient is destroyed
-    // explicitly disconnect to prevent crash
-    webSocket.disconnect();
-}
+WebsocketClient::~WebsocketClient() = default;

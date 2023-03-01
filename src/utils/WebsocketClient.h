@@ -23,7 +23,7 @@ public:
     void sendMsg(const QByteArray &data);
     void nextWebsocketUrl();
 
-    QWebSocket webSocket;
+    QWebSocket *webSocket;
 
 signals:
     void connectionEstablished();
