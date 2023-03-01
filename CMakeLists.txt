@@ -276,20 +276,14 @@ configure_file("${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi.in" "${
 
 if(APPLE AND CMAKE_CROSSCOMPILING)
     set(macos_app "Feather.app")
-    configure_file(contrib/macdeploy/background.tiff contrib/macdeploy/background.tiff COPYONLY)
     configure_file(contrib/macdeploy/Info.plist.in ${macos_app}/Contents/Info.plist @ONLY)
     configure_file(src/assets/images/appicons/appicon.icns ${macos_app}/Contents/Resources/appicon.icns COPYONLY)
 
-    set(xorrisofs_options)
-    if(DEFINED ENV{SOURCE_DATE_EPOCH})
-        set(xorrisofs_options -volume_date all_file_dates =$ENV{SOURCE_DATE_EPOCH})
-    endif()
     add_custom_target(deploy
             COMMAND "${CMAKE_COMMAND}" --install "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --prefix "${CMAKE_BINARY_DIR}/release" --strip
             COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS"
             COMMAND "${CMAKE_COMMAND}" -E rename "${CMAKE_BINARY_DIR}/bin/$<TARGET_FILE_NAME:feather>" "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS/feather"
-            COMMAND PYTHONPATH=${PYTHONPATH} INSTALL_NAME_TOOL=${CMAKE_INSTALL_NAME_TOOL} OTOOL=${OTOOL} STRIP=${CMAKE_STRIP} ${CMAKE_SOURCE_DIR}/contrib/macdeploy/macdeployqtplus ${macos_app} ${PACKAGE_NAME}
-            COMMAND xorrisofs -D -l -V "${PACKAGE_NAME}" -no-pad -r -dir-mode 0755 -o ${PACKAGE_NAME}.dmg ${CMAKE_BINARY_DIR}/dist -- ${xorrisofs_options}
+            COMMAND PYTHONPATH=${PYTHONPATH} INSTALL_NAME_TOOL=${CMAKE_INSTALL_NAME_TOOL} OTOOL=${OTOOL} STRIP=${CMAKE_STRIP} ${CMAKE_SOURCE_DIR}/contrib/macdeploy/macdeployqtplus ${macos_app} ${PACKAGE_NAME} -zip
             VERBATIM
             )
 endif()

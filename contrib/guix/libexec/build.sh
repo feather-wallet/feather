@@ -353,7 +353,7 @@ mkdir -p "$DISTSRC"
     case "$HOST" in
         *darwin*)
             make -C build deploy ${V:+V=1}
-            mv build/feather.dmg "${OUTDIR}/${DISTNAME}.dmg"
+            mv build/feather.zip "${OUTDIR}/${DISTNAME}.zip"
             ;;
     esac
 
