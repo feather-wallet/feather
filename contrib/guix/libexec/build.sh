@@ -281,6 +281,7 @@ mkdir -p "$DISTSRC"
             case "$OPTIONS" in
                 no-tor-bundle)
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    DISTNAME+="-a"
                     ;;
             esac
             ;;
