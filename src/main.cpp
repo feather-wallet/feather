@@ -232,6 +232,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     EventFilter filter;
     app.installEventFilter(&filter);
 
+    auto *pool = QThreadPool::globalInstance();
+    if (pool->maxThreadCount() < 8) {
+        pool->setMaxThreadCount(8);
+    }
+
     WindowManager windowManager(QCoreApplication::instance(), &filter);
 
     QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
