@@ -448,19 +448,7 @@ void MainWindow::initWalletContext() {
         config()->set(Config::donateBeg, -1);
     });
     
-    connect(m_wallet, &Wallet::multiBroadcast,      this, [this](PendingTransaction *tx){
-        quint64 count = tx->txCount();
-        for (quint64 i = 0; i < count; i++) {
-            QString txData = tx->signedTxToHex(i);
-
-            for (const auto& node: m_nodes->nodes()) {
-                QString address = node.toURL();
-                qDebug() << QString("Relaying %1 to: %2").arg(tx->txid()[i], address);
-                m_rpc->setDaemonAddress(address);
-                m_rpc->sendRawTransaction(txData);
-            }
-        }
-    });
+    connect(m_wallet, &Wallet::multiBroadcast,      this, &MainWindow::onMultiBroadcast);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -661,6 +649,19 @@ void MainWindow::onOfflineMode(bool offline) {
     this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
 }
 
+void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
+    QMapIterator<QString, QString> i(txHexMap);
+    while (i.hasNext()) {
+        i.next();
+        for (const auto& node: m_nodes->nodes()) {
+            QString address = node.toURL();
+            qDebug() << QString("Relaying %1 to: %2").arg(i.key(), address);
+            m_rpc->setDaemonAddress(address);
+            m_rpc->sendRawTransaction(i.value());
+        }
+    }
+}
+
 void MainWindow::onSynchronized() {
     this->updateNetStats();
     this->setStatusText("Synchronized");
@@ -808,8 +809,8 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
     }
 }
 
-void MainWindow::onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid) {
-    if (status) { // success
+void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid) {
+    if (success) {
         QMessageBox msgBox{this};
         QPushButton *showDetailsButton = msgBox.addButton("Show details", QMessageBox::ActionRole);
         msgBox.addButton(QMessageBox::Ok);

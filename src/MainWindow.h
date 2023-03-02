@@ -193,6 +193,7 @@ private slots:
     void showUpdateNotification();
     void onProxySettingsChanged();
     void onOfflineMode(bool offline);
+    void onMultiBroadcast(const QMap<QString, QString> &txHexMap);
 
 private:
     friend WindowManager;

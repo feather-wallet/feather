@@ -302,6 +302,7 @@ public:
 
     void onCreateTransactionError(const QString &msg);
     void commitTransaction(PendingTransaction *tx, const QString &description="");
+    void onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid, const QMap<QString, QString> &txHexMap);
 
     //! deletes transaction and frees memory
     void disposeTransaction(PendingTransaction * t);
@@ -410,13 +411,13 @@ signals:
     void deviceButtonPressed();
     void deviceError(const QString &message);
     void walletPassphraseNeeded(bool onDevice);
-    void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid);
+    void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid, const QMap<QString, QString> &txHexMap);
     void deviceShowAddressShowed();
     void transactionProofVerified(TxProofResult result);
     void spendProofVerified(QPair<bool, bool> result);
 
     // emitted when transaction is created async
-    void transactionCreated(PendingTransaction * transaction, QVector<QString> address);
+    void transactionCreated(Monero::PendingTransaction *ptImpl, QVector<QString> address);
 
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;
@@ -437,7 +438,7 @@ signals:
 
     void selectedInputsChanged(const QStringList &selectedInputs);
 
-    void multiBroadcast(PendingTransaction *tx);
+    void multiBroadcast(const QMap<QString, QString> &txHexMap);
     void heightsRefreshed(bool success, quint64 daemonHeight, quint64 targetHeight);
 
 private:
@@ -451,7 +452,7 @@ private:
     void onRefreshed(bool success, const QString &message);
 
     // ##### Transactions #####
-    void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
+    void onTransactionCreated(Monero::PendingTransaction *mtx, const QVector<QString> &address);
 
 private:
     friend class WalletManager;

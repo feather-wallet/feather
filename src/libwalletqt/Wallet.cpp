@@ -80,6 +80,7 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     connect(this, &Wallet::updated, this, &Wallet::onUpdated);
     connect(this, &Wallet::heightsRefreshed, this, &Wallet::onHeightsRefreshed);
     connect(this, &Wallet::transactionCreated, this, &Wallet::onTransactionCreated);
+    connect(this, &Wallet::transactionCommitted, this, &Wallet::onTransactionCommitted);
 }
 
 // #################### Status ####################
@@ -693,17 +694,15 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
     }
 
     qInfo() << "Creating transaction";
-
     m_scheduler.run([this, all, address, amount] {
         std::set<uint32_t> subaddr_indices;
 
-        Monero::PendingTransaction * ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? Monero::optional<uint64_t>() : Monero::optional<uint64_t>(amount), constants::mixin,
-                                                                              static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
-                                                                              currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
-        PendingTransaction *tx = new PendingTransaction(ptImpl, this);
+        Monero::PendingTransaction *ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? Monero::optional<uint64_t>() : Monero::optional<uint64_t>(amount), constants::mixin,
+                                                                             static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
+                                                                             currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
 
         QVector<QString> addresses{address};
-        emit transactionCreated(tx, addresses);
+        emit transactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
@@ -738,8 +737,8 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amount, constants::mixin,
                                                                                      static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
                                                                                      currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
-        PendingTransaction *tx = new PendingTransaction(ptImpl);
-        emit transactionCreated(tx, addresses);
+
+        emit transactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
@@ -757,10 +756,9 @@ void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bo
             kis.push_back(key_image.toStdString());
         }
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis, address.toStdString(), outputs, static_cast<Monero::PendingTransaction::Priority>(this->tx_priority));
-        PendingTransaction *tx = new PendingTransaction(ptImpl, this);
 
         QVector<QString> addresses {address};
-        emit transactionCreated(tx, addresses);
+        emit transactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
@@ -773,8 +771,10 @@ void Wallet::onCreateTransactionError(const QString &msg) {
     emit endTransaction();
 }
 
-void Wallet::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
+void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector<QString> &address) {
     qDebug() << Q_FUNC_INFO;
+
+    PendingTransaction *tx = new PendingTransaction(mtx, this);
 
     for (auto &addr : address) {
         if (addr == constants::donationAddress) {
@@ -795,14 +795,12 @@ void Wallet::commitTransaction(PendingTransaction *tx, const QString &descriptio
     // Clear list of selected transfers
     this->setSelectedInputs({});
 
-    // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
-    // To mitigate transactions failing we just send the transaction to every node we know about over Tor
-    if (config()->get(Config::multiBroadcast).toBool()) {
-        // Let MainWindow handle this
-        emit multiBroadcast(tx);
+    QMap<QString, QString> txHexMap;
+    for (int i = 0; i < tx->txCount(); i++) {
+        txHexMap[tx->txid()[i]] = tx->signedTxToHex(i);
     }
 
-    m_scheduler.run([this, tx, description] {
+    m_scheduler.run([this, tx, description, txHexMap] {
         auto txIdList = tx->txid();  // retrieve before commit
         bool success = tx->commit();
 
@@ -812,22 +810,34 @@ void Wallet::commitTransaction(PendingTransaction *tx, const QString &descriptio
             }
         }
 
-        // Store wallet immediately, so we don't risk losing tx key if wallet crashes
-        this->storeSafer();
-
-        this->history()->refresh(this->currentSubaddressAccount());
-        this->coins()->refresh(this->currentSubaddressAccount());
-
-        this->updateBalance();
-
-        // this tx was a donation to Feather, stop our nagging
-        if (this->donationSending) {
-            this->donationSending = false;
-            emit donationSent();
-        }
-
-        emit transactionCommitted(success, tx, txIdList);
+        emit transactionCommitted(success, tx, txIdList, txHexMap);
     });
+}
+
+void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList &txid, const QMap<QString, QString> &txHexMap) {
+    // Store wallet immediately, so we don't risk losing tx key if wallet crashes
+    this->storeSafer();
+
+    this->history()->refresh(this->currentSubaddressAccount());
+    this->coins()->refresh(this->currentSubaddressAccount());
+    this->updateBalance();
+
+    if (!success) {
+        return;
+    }
+
+    // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
+    // To mitigate transactions failing we just send the transaction to every node we know about over Tor
+    if (config()->get(Config::multiBroadcast).toBool()) {
+        // Let MainWindow handle this
+        emit multiBroadcast(txHexMap);
+    }
+
+    // this tx was a donation to Feather, stop our nagging
+    if (this->donationSending) {
+        this->donationSending = false;
+        emit donationSent();
+    }
 }
 
 void Wallet::disposeTransaction(PendingTransaction *t) {

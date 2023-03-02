@@ -95,7 +95,8 @@ void PendingTransaction::refresh()
 }
 
 PendingTransaction::PendingTransaction(Monero::PendingTransaction *pt, QObject *parent)
-    : QObject(parent), m_pimpl(pt)
+    : QObject(parent)
+    , m_pimpl(pt)
 {
 
 }
