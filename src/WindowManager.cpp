@@ -282,7 +282,7 @@ bool WindowManager::autoOpenWallet() {
 // ######################## WALLET CREATION ########################
 
 void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage,
-                                    const QString &seedOffset, const QString &subaddressLookahead) {
+                                    const QString &seedOffset, const QString &subaddressLookahead, bool newWallet) {
     if(Utils::fileExists(path)) {
         auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
         this->handleWalletError(err);
@@ -309,7 +309,10 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
 
     wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
     wallet->setCacheAttribute("feather.seedoffset", seedOffset);
-    wallet->setNewWallet();
+
+    if (newWallet) {
+        wallet->setNewWallet();
+    }
 
     this->onWalletOpened(wallet);
 }
@@ -368,7 +371,6 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
     // Currently only called when a wallet is created from device.
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {
-        wallet->setNewWallet();
         qDebug() << Q_FUNC_INFO << QString("Wallet open error: %1").arg(wallet->errorString());
         this->displayWalletErrorMessage(wallet->errorString());
         m_splashDialog->hide();

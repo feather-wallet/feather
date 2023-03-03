@@ -135,5 +135,7 @@ void WalletWizard::onCreateWallet() {
         m_wizardFields.seed.setRestoreHeight(m_wizardFields.restoreHeight);
     }
 
-    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead);
+    bool newWallet = m_wizardFields.mode == WizardMode::CreateWallet;
+
+    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead, newWallet);
 }
