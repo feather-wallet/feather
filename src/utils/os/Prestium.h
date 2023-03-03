@@ -8,6 +8,7 @@
 class Prestium {
 public:
     static bool detect();
+    static int i2pPort();
 };
 
 #endif //FEATHER_PRESTIUM_H

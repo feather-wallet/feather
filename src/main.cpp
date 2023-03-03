@@ -189,7 +189,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     // Prestium initial config
     if (config()->get(Config::firstRun).toBool() && Prestium::detect()) {
         config()->set(Config::proxy, Config::Proxy::i2p);
-        config()->set(Config::socks5Port, 4448);
+        config()->set(Config::socks5Port, Prestium::i2pPort());
     }
 
     if (parser.isSet("use-local-tor"))
