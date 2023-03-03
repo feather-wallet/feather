@@ -549,11 +549,7 @@ void WindowManager::onWalletPassphraseNeeded(bool on_device) {
 
     bool ok;
     QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
-    if (ok) {
-        m_walletManager->onPassphraseEntered(passphrase, false, false);
-    } else {
-        m_walletManager->onPassphraseEntered(passphrase, false, true);
-    }
+    m_walletManager->onPassphraseEntered(passphrase, false, false);
 }
 
 // ######################## TRAY ########################
