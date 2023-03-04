@@ -23,7 +23,7 @@ int Prestium::i2pPort()
     }
 
     int port = portStr.toInt();
-    if (port < 1 || port > 65535) {
+    if (port < 1024 || port > 65535) {
         return PRESTIUM_DEFAULT_PORT;
     }
 
