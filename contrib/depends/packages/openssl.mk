@@ -1,8 +1,8 @@
 package=openssl
-$(package)_version=1.1.1t
+$(package)_version=3.0.8
 $(package)_download_path=https://www.openssl.org/source
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=8dee9b24bdb1dcbf0c3d1e9b02fb8f6bf22165e807f45adeb7c9677536859d3b
+$(package)_sha256_hash=6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
@@ -48,11 +48,6 @@ $(package)_config_opts_i686_mingw32=mingw
 $(package)_config_opts_x86_64_freebsd=BSD-x86_64
 endef
 
-define $(package)_preprocess_cmds
-  printenv && \
-  sed -i.old 's|"engines", "apps", "test", "util", "tools", "fuzz"|"engines", "tools"|' Configure
-endef
-
 define $(package)_config_cmds
   ./Configure $($(package)_config_opts)
 endef
@@ -66,5 +61,6 @@ define $(package)_stage_cmds
 endef
 
 define $(package)_postprocess_cmds
+  mv lib64 lib && \
   rm -rf share bin etc
 endef
