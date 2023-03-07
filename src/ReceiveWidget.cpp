@@ -26,9 +26,9 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
 
     ui->addresses->setModel(m_proxyModel);
     ui->addresses->setColumnHidden(SubaddressModel::isUsed, true);
-    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Address, QHeaderView::Stretch);
-    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::ResizeToContents);
-    ui->addresses->header()->setMinimumSectionSize(200);
+    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Index, QHeaderView::ResizeToContents);
+    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Address, QHeaderView::ResizeToContents);
+    ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::Stretch);
 
     connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentChanged, [=](QModelIndex current, QModelIndex prev){
         this->updateQrCode();

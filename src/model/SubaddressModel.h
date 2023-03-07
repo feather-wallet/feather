@@ -19,7 +19,8 @@ class SubaddressModel : public QAbstractTableModel
 public:
     enum ModelColumn
     {
-         Address = 0,
+         Index = 0,
+         Address,
          Label,
          isUsed,
          COUNT

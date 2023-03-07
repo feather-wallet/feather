@@ -96,6 +96,10 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
 QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subaddress, const QModelIndex &index, int role) const
 {
     switch (index.column()) {
+        case Index:
+        {
+            return "#" + QString::number(subaddress.getRowId());
+        }
         case Address:
         {
             QString address = QString::fromStdString(subaddress.getAddress());
@@ -123,6 +127,8 @@ QVariant SubaddressModel::headerData(int section, Qt::Orientation orientation, i
     if (orientation == Qt::Horizontal)
     {
         switch(section) {
+            case Index:
+                return QString("#");
             case Address:
                 return QString("Address");
             case Label:
