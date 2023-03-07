@@ -31,6 +31,7 @@
 
 #if defined(Q_OS_LINUX) && defined(STATIC)
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
+Q_IMPORT_PLUGIN(QComposePlatformInputContextPlugin) // Needed for dead keys on Linux
 #endif
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)

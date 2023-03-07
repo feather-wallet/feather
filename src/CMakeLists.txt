@@ -295,6 +295,10 @@ if(STATIC AND NOT Qt6_FOUND)
     endif()
 endif()
 
+if(STATIC AND UNIX AND Qt6_FOUND)
+    target_link_libraries(feather Qt6::QComposePlatformInputContextPlugin)
+endif()
+
 if(DEPENDS AND APPLE)
     # TODO: Needed for ___isOSVersionAtLeast
     target_link_libraries(feather
