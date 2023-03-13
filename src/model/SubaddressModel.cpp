@@ -98,7 +98,7 @@ QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subadd
     switch (index.column()) {
         case Index:
         {
-            return "#" + QString::number(subaddress.getRowId());
+            return "#" + QString::number(subaddress.getRowId()) + " ";
         }
         case Address:
         {
