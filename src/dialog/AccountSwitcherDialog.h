@@ -22,6 +22,8 @@ public:
     explicit AccountSwitcherDialog(Wallet *wallet, QWidget *parent = nullptr);
     ~AccountSwitcherDialog() override;
 
+    void update();
+
 private slots:
     void showContextMenu(const QPoint& point);
     void updateSelection();

@@ -21,11 +21,9 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_wallet->subaddressAccount()->refresh();
     m_proxyModel->setSourceModel(m_model);
 
     ui->label_totalBalance->setFont(ModelUtils::getMonospaceFont());
-    ui->label_totalBalance->setText(WalletManager::displayAmount(m_wallet->balanceAll()));
 
     this->setWindowModality(Qt::WindowModal);
 
@@ -52,7 +50,13 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
     connect(m_wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
     connect(m_wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
 
+    this->update();
     this->updateSelection();
+}
+
+void AccountSwitcherDialog::update() {
+    ui->label_totalBalance->setText(WalletManager::displayAmount(m_wallet->balanceAll()));
+    m_wallet->subaddressAccount()->refresh();
 }
 
 void AccountSwitcherDialog::switchAccount() {

@@ -1122,6 +1122,7 @@ void MainWindow::showWalletCacheDebugDialog() {
 
 void MainWindow::showAccountSwitcherDialog() {
     m_accountSwitcherDialog->show();
+    m_accountSwitcherDialog->update();
 }
 
 void MainWindow::showAddressChecker() {
