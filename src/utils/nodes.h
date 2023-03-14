@@ -74,8 +74,31 @@ struct FeatherNode {
     }
 
     bool isLocal() const {
-        QRegularExpression localNetwork(R"((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))");
-        return (localNetwork.match(url.host()).hasMatch() || url.host() == "localhost");
+        QString host = url.host();
+
+        if (host == "localhost") {
+            return true;
+        }
+
+        QHostAddress address(host);
+
+        bool validipv4;
+        quint32 ipv4 = address.toIPv4Address(&validipv4);
+
+        if (!validipv4) {
+            return false;
+        }
+
+        bool local = (
+                ((ipv4 & 0xff000000) == 0x0a000000) || /*       10/8 */
+                ((ipv4 & 0xff000000) == 0x00000000) || /*        0/8 */
+                ((ipv4 & 0xff000000) == 0x7f000000) || /*      127/8 */
+                ((ipv4 & 0xffc00000) == 0x64400000) || /*  100.64/10 */
+                ((ipv4 & 0xffff0000) == 0xa9fe0000) || /* 169.254/16 */
+                ((ipv4 & 0xfff00000) == 0xac100000) || /*  172.16/12 */
+                ((ipv4 & 0xffff0000) == 0xc0a80000));  /* 192.168/16 */
+
+        return local;
     }
 
     bool isOnion() const {
