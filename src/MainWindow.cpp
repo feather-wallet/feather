@@ -364,9 +364,6 @@ void MainWindow::initMenu() {
 #else
     ui->actionCheckForUpdates->setVisible(false);
 #endif
-#if defined(Q_OS_MACOS)
-    ui->actionCheckForUpdates->setVisible(false);
-#endif
 
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);

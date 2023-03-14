@@ -295,7 +295,7 @@ if(STATIC AND NOT Qt6_FOUND)
     endif()
 endif()
 
-if(STATIC AND UNIX AND Qt6_FOUND)
+if(STATIC AND UNIX AND NOT APPLE AND Qt6_FOUND)
     target_link_libraries(feather Qt6::QComposePlatformInputContextPlugin)
 endif()
 

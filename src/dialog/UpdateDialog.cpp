@@ -12,6 +12,7 @@
 #include "utils/NetworkManager.h"
 #include "utils/Updater.h"
 #include "utils/Utils.h"
+#include "utils/SemanticVersion.h"
 
 #include "zip.h"
 
@@ -251,17 +252,33 @@ void UpdateDialog::installUpdateMac() {
     QString appPath = Utils::applicationPath();
     QDir appDir(appPath);
     if (appPath.endsWith("Contents/MacOS")) {
-        appDir.cd("../../..");
+        appDir.cd("../..");
     }
+
+    if (appPath.contains("AppTranslocation")) {
+        this->onInstallError("Error: Application is translocated. Please move it to the Applications folder and try again.");
+        return;
+    }
+
+    if (!SemanticVersion::isValid(SemanticVersion::fromString(m_updater->version))) {
+        this->onInstallError(QString("Error: Invalid version: %1").arg(m_updater->version));
+        return;
+    }
+
     QString appName = QString("feather-%1").arg(m_updater->version);
     QString zipName = QString("%1.zip").arg(appName);
-    QString fPath = appDir.filePath(zipName);
 
+    QString downloadsPath = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    if (downloadsPath.isEmpty()) {
+        this->onInstallError(QString("Error: Could not determine download location"));
+        return;
+    }
+
+    QString fPath = QString("%1/%2").arg(downloadsPath, zipName);
     QFile file(fPath);
     qDebug() << "Writing zip file to " << fPath;
-    if (!file.open(QIODevice::WriteOnly))
-    {
-        this->onInstallError(QString("Error: Could not write to application path: %1").arg(fPath));
+    if (!file.open(QIODevice::WriteOnly)) {
+        this->onInstallError(QString("Error: Could not write to download location: %1").arg(fPath));
         return;
     }
 
@@ -271,14 +288,20 @@ void UpdateDialog::installUpdateMac() {
     }
 
     QProcess unzip;
-    unzip.start("/usr/bin/unzip", {"-n", fPath, "-d", appDir.path()});
+    unzip.start("/usr/bin/unzip", {"-o", fPath, "-d", appDir.absolutePath()});
     unzip.waitForFinished();
 
-    m_updatePath = QString("%1.app/Contents/MacOS/feather").arg(appDir.filePath(appName));
+    if (unzip.exitStatus() != QProcess::NormalExit) {
+        this->onInstallError(QString("Error: Unable to extract: %1").arg(fPath));
+        return;
+    }
+
+    m_updatePath = QString("%1/Contents/MacOS/feather").arg(appDir.absolutePath());
+    qDebug() << "Update path: " << m_updatePath;
 
     file.remove();
 
-    this->setStatus("Installation successful. Do you want to restart Feather now?");
+    this->setStatus(QString("Installation successful: Do you want to restart Feather now?").arg(m_updatePath));
     ui->btn_restart->show();
 }
 
