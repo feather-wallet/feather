@@ -93,7 +93,6 @@ signals:
     void initialNetworkConfigured();
     void showSettings();
     void openWallet(QString path, QString password);
-    void defaultWalletDirChanged(QString walletDir);
 
     void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead);
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString subaddressLookahead = "");

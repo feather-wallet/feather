@@ -24,20 +24,25 @@ PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString currentWalletDir = config()->get(Config::walletDirectory).toString();
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", currentWalletDir, QFileDialog::ShowDirsOnly);
-        if(walletDir.isEmpty()) return;
+        if (walletDir.isEmpty()) {
+            return;
+        }
         ui->line_walletDir->setText(walletDir);
-        config()->set(Config::walletDirectory, walletDir);
-        emit defaultWalletDirChanged(walletDir);
     });
 
     connect(ui->line_walletName, &QLineEdit::textChanged, this, &PageWalletFile::validateWidgets);
-    connect(ui->line_walletDir, &QLineEdit::textChanged, this, &PageWalletFile::validateWidgets);
+    connect(ui->line_walletDir, &QLineEdit::textChanged, this, [this](){
+        ui->check_defaultWalletDirectory->setVisible(true);
+        this->validateWidgets();
+    });
 }
 
 void PageWalletFile::initializePage() {
     this->setTitle(m_fields->modeText);
     ui->line_walletDir->setText(config()->get(Config::walletDirectory).toString());
     ui->line_walletName->setText(this->defaultWalletName());
+    ui->check_defaultWalletDirectory->setVisible(false);
+    ui->check_defaultWalletDirectory->setChecked(false);
 }
 
 bool PageWalletFile::validateWidgets(){
@@ -84,6 +89,12 @@ bool PageWalletFile::validatePage() {
 
     m_fields->walletName = ui->line_walletName->text();
     m_fields->walletDir = ui->line_walletDir->text();
+
+    QString walletDir = ui->line_walletDir->text();
+    bool dirChanged = config()->get(Config::walletDirectory).toString() != walletDir;
+    if (dirChanged && ui->check_defaultWalletDirectory->isChecked()) {
+        config()->set(Config::walletDirectory, walletDir);
+    }
 
     return true;
 }

@@ -73,11 +73,6 @@ WalletWizard::WalletWizard(QWidget *parent)
 
     connect(walletSetPasswordPage, &PageSetPassword::createWallet, this, &WalletWizard::onCreateWallet);
 
-
-    connect(createWallet, &PageWalletFile::defaultWalletDirChanged, [this](const QString &walletDir){
-        emit defaultWalletDirChanged(walletDir);
-    });
-
     connect(openWalletPage, &PageOpenWallet::openWallet, [=](const QString &path){
         emit openWallet(path, "");
     });

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>317</height>
+    <width>849</width>
+    <height>579</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -113,11 +113,19 @@
      </property>
     </spacer>
    </item>
+   <item row="6" column="0">
+    <widget class="QCheckBox" name="check_defaultWalletDirectory">
+     <property name="text">
+      <string>Set as default wallet directory</string>
+     </property>
+    </widget>
+   </item>
   </layout>
   <zorder>label_9</zorder>
   <zorder>label</zorder>
   <zorder>line_walletName</zorder>
   <zorder>frame</zorder>
+  <zorder>check_defaultWalletDirectory</zorder>
  </widget>
  <tabstops>
   <tabstop>line_walletName</tabstop>

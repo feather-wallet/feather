@@ -24,9 +24,6 @@ public:
     int nextId() const override;
     bool isComplete() const override;
 
-signals:
-    void defaultWalletDirChanged(QString walletDir);
-
 private:
     QString defaultWalletName();
     bool walletPathExists(const QString &walletName);
