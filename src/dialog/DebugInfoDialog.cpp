@@ -65,6 +65,24 @@ void DebugInfoDialog::updateInfo() {
         websocketStatus = "Disabled";
     }
     ui->label_websocketStatus->setText(websocketStatus);
+
+    QString proxy = [](){
+        int proxy = config()->get(Config::proxy).toInt();
+        switch (proxy) {
+            case 0:
+                return "None";
+            case 1:
+                return "Tor";
+            case 2:
+                return "i2p";
+            case 3:
+                return "socks5";
+            default:
+                return "invalid";
+        }
+    }();
+
+    ui->label_proxy->setText(proxy);
     ui->label_torStatus->setText(torStatus);
     ui->label_torLevel->setText(config()->get(Config::torPrivacyLevel).toString());
 
