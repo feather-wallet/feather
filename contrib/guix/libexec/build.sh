@@ -349,20 +349,15 @@ mkdir -p "$DISTSRC"
             ;;
     esac
 
-    # Make macOS DMG
-    case "$HOST" in
-        *darwin*)
-            make -C build deploy ${V:+V=1}
-            mv build/feather.zip "${OUTDIR}/${DISTNAME}.zip"
-            ;;
-    esac
-
     (
         cd installed
 
         case "$HOST" in
             *linux*)
                 mv feather "${DISTNAME}"
+                ;;
+            *darwin*)
+                mv "feather.app" "Feather.app"
                 ;;
         esac
 
@@ -407,6 +402,14 @@ mkdir -p "$DISTSRC"
                     | sort \
                     | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
                     || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                ;;
+            *darwin*)
+                find . -print0 \
+                    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                find . \
+                    | sort \
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-mac.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-mac.zip" && exit 1 )
                 ;;
         esac
 

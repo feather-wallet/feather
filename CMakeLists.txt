@@ -274,18 +274,17 @@ add_subdirectory(src)
 
 configure_file("${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi.in" "${CMAKE_SOURCE_DIR}/contrib/installers/windows/setup.nsi" @ONLY)
 
-if(APPLE AND CMAKE_CROSSCOMPILING)
-    set(macos_app "Feather.app")
-    configure_file(contrib/macdeploy/Info.plist.in ${macos_app}/Contents/Info.plist @ONLY)
-    configure_file(src/assets/images/appicons/appicon.icns ${macos_app}/Contents/Resources/appicon.icns COPYONLY)
+if(APPLE)
+    configure_file(${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist.in ${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist @ONLY)
 
-    add_custom_target(deploy
-            COMMAND "${CMAKE_COMMAND}" --install "${CMAKE_BINARY_DIR}" --config "$<CONFIG>" --prefix "${CMAKE_BINARY_DIR}/release" --strip
-            COMMAND "${CMAKE_COMMAND}" -E make_directory "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS"
-            COMMAND "${CMAKE_COMMAND}" -E rename "${CMAKE_BINARY_DIR}/bin/$<TARGET_FILE_NAME:feather>" "${CMAKE_BINARY_DIR}/${macos_app}/Contents/MacOS/feather"
-            COMMAND PYTHONPATH=${PYTHONPATH} INSTALL_NAME_TOOL=${CMAKE_INSTALL_NAME_TOOL} OTOOL=${OTOOL} STRIP=${CMAKE_STRIP} ${CMAKE_SOURCE_DIR}/contrib/macdeploy/macdeployqtplus ${macos_app} ${PACKAGE_NAME} -zip
-            VERBATIM
-            )
+    set_target_properties(feather PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist"
+            LINK_FLAGS_RELEASE -s
+    )
+
+    file(COPY "${CMAKE_SOURCE_DIR}/src/assets/images/appicons/appicon.icns" DESTINATION "${CMAKE_SOURCE_DIR}/installed/feather.app/Contents/Resources/" )
 endif()
 
 message("\n")
