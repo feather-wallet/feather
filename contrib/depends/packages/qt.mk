@@ -22,6 +22,7 @@ $(package)_patches += no_wraprt_on_apple.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += qtmultimedia-fixes.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
+$(package)_patches += riscvToolchain.cmake
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
@@ -175,6 +176,9 @@ $(package)_config_opts_arm_linux += -- -DCMAKE_TOOLCHAIN_FILE=gnueabihfToolchain
 $(package)_config_opts_aarch64_linux += -qt-host-path $(build_prefix)/qt-host
 $(package)_config_opts_aarch64_linux += -- -DCMAKE_TOOLCHAIN_FILE=aarch64Toolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
 
+$(package)_config_opts_riscv64_linux += -qt-host-path $(build_prefix)/qt-host
+$(package)_config_opts_riscv64_linux += -- -DCMAKE_TOOLCHAIN_FILE=riscvToolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
+
 $(package)_config_opts_mingw32 += -no-opengl
 $(package)_config_opts_mingw32 += -no-dbus
 $(package)_config_opts_mingw32 += -no-freetype
@@ -260,6 +264,7 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
+  mv $($(package)_patch_dir)/riscvToolchain.cmake . && \
   cd qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
