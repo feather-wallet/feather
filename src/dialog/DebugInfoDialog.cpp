@@ -158,6 +158,7 @@ void DebugInfoDialog::copyToClipboard() {
     text += QString("Remote node: %1  \n").arg(ui->label_remoteNode->text());
     text += QString("Wallet status: %1  \n").arg(ui->label_walletStatus->text());
     text += QString("Websocket status: %1  \n").arg(ui->label_websocketStatus->text());
+    text += QString("Proxy: %1  \n").arg(ui->label_proxy->text());
     text += QString("Tor status: %1  \n").arg(ui->label_torStatus->text());
     text += QString("Tor level: %1  \n").arg(ui->label_torLevel->text());
 
