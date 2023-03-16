@@ -1,13 +1,5 @@
 # MacOS Deployment
 
-The `macdeployqtplus` script should not be run manually. Instead, after building as usual:
-
-```bash
-make deploy
-```
-
-When complete, it will have produced `Feather.zip`.
-
 ## SDK Extraction
 
 ### Step 1: Obtaining `Xcode.app`
@@ -24,7 +16,7 @@ and search for [`Xcode 12.2`](https://developer.apple.com/download/all/?q=Xcode%
 
 An Apple ID and cookies enabled for the hostname are needed to download this.
 
-The `sha256sum` of the downloaded XIP archive should be `332477876917786b26dd7c3fc1665d2c5cdca81c72755e6a9754f308de77d33b`.
+The `sha256sum` of the downloaded XIP archive should be `28d352f8c14a43d9b8a082ac6338dc173cb153f964c6e8fb6ba389e5be528bd0`.
 
 After Xcode version 7.x, Apple started shipping the `Xcode.app` in a `.xip`
 archive. This makes the SDK less-trivial to extract on non-macOS machines. One
@@ -58,7 +50,7 @@ previous stage) as the first argument.
 ./contrib/macdeploy/gen-sdk '/path/to/Xcode.app'
 ```
 
-The `sha256sum` of the generated TAR.GZ archive should be `df75d30ecafc429e905134333aeae56ac65fac67cb4182622398fd717df77619`.
+The `sha256sum` of the generated TAR.GZ archive should be `332477876917786b26dd7c3fc1665d2c5cdca81c72755e6a9754f308de77d33b`.
 
 ## Deterministic macOS App Notes
 
