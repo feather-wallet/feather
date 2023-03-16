@@ -33,6 +33,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
     ui->groupBox_proxySettings->setTitle(QString("%1 settings").arg(ui->comboBox_proxy->currentText()));
 
     // [Host]
+    ui->line_host->setText(config()->get(Config::socks5Host).toString());
     connect(ui->line_host, &QLineEdit::textChanged, this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Port]
