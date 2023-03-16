@@ -132,7 +132,7 @@ $(package)_config_opts_darwin += QMAKE_MACOSX_DEPLOYMENT_TARGET=$(OSX_MIN_VERSIO
 
 ifneq ($(build_os),darwin)
 $(package)_config_opts_darwin += -xplatform macx-clang
-$(package)_config_opts_darwin += -device-option MAC_SDK_PATH=$(OSX_SDK)
+$(package)_config_opts_darwin += -device-option MAC_SDK_PATH=$(host_prefix)/native/SDK
 $(package)_config_opts_darwin += -device-option MAC_SDK_VERSION=$(OSX_SDK_VERSION)
 $(package)_config_opts_darwin += -device-option CROSS_COMPILE="$(host)-"
 $(package)_config_opts_darwin += -device-option MAC_TARGET=$(host)

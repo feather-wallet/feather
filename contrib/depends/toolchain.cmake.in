@@ -15,7 +15,7 @@ SET(BUILD_TESTS @build_tests@)
 SET(TREZOR_DEBUG @build_tests@)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH @prefix@ /feather/contrib/depends/SDKs/ /home/user/.guix-profile/@HOST@)
+SET(CMAKE_FIND_ROOT_PATH @prefix@ /home/user/.guix-profile/@HOST@)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND ARCHITECTURE STREQUAL "x86_64")
   SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /home/user/.guix-profile/)
@@ -60,6 +60,8 @@ SET(Protobuf_LIBRARY @prefix@/lib/libprotobuf.a CACHE FILEPATH "Protobuf library
 endif()
 
 endif()
+
+set(ICONV_LIBRARIES @prefix@/lib/libiconv.a)
 
 SET(ZMQ_INCLUDE_PATH @prefix@/include)
 SET(ZMQ_LIB @prefix@/lib/libzmq.a)
@@ -111,7 +113,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   SET(BUILD_64 ON)
   SET(BREW OFF)
   SET(PORT OFF)
-  SET(CMAKE_OSX_SYSROOT "@prefix@/../SDKs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers/")
+  SET(CMAKE_OSX_SYSROOT "@prefix@/native/SDK")
   SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.14")
   SET(CMAKE_CXX_STANDARD 14)
   SET(LLVM_ENABLE_PIC OFF)

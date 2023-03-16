@@ -4,7 +4,7 @@ XCODE_VERSION=12.2
 XCODE_BUILD_ID=12B45b
 LD64_VERSION=609
 
-OSX_SDK=$(SDK_PATH)/Xcode-$(XCODE_VERSION)-$(XCODE_BUILD_ID)-extracted-SDK-with-libcxx-headers
+OSX_SDK=$(host_prefix)/native/SDK
 
 darwin_native_binutils=native_cctools
 
@@ -13,7 +13,7 @@ ifeq ($(strip $(FORCE_USE_SYSTEM_CLANG)),)
 # from llvm.org
 
 # Clang is a dependency of native_cctools when FORCE_USE_SYSTEM_CLANG is empty
-darwin_native_toolchain=native_cctools
+darwin_native_toolchain=native_cctools darwin_sdk
 
 clang_prog=$(build_prefix)/bin/clang
 clangxx_prog=$(clang_prog)++
@@ -23,7 +23,7 @@ else
 # FORCE_USE_SYSTEM_CLANG is non-empty, so we use the clang from the user's
 # system
 
-darwin_native_toolchain=
+darwin_native_toolchain=darwin_sdk
 
 # We can't just use $(shell command -v clang) because GNU Make handles builtins
 # in a special way and doesn't know that `command` is a POSIX-standard builtin

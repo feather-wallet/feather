@@ -109,7 +109,7 @@ Hint: To blow everything away, you may want to use:
   $ ./contrib/guix/guix-clean
 
 Specifically, this will remove all files without an entry in the index,
-excluding the SDK directory, the depends download cache, the depends built
+excluding the depends download cache, the depends built
 packages cache, the garbage collector roots for Guix environments, and the
 output directory.
 EOF
@@ -120,25 +120,6 @@ exit 1
 else
     mkdir -p "$DISTSRC_BASE"
 fi
-
-################
-# When building for darwin, the macOS SDK should exist
-################
-
-for host in $HOSTS; do
-    case "$host" in
-        *darwin*)
-            OSX_SDK="$(make -C "${PWD}/contrib/depends" --no-print-directory HOST="$host" print-OSX_SDK | sed 's@^[^=]\+=@@g')"
-            if [ -e "$OSX_SDK" ]; then
-                echo "Found macOS SDK at '${OSX_SDK}', using..."
-                break
-            else
-                echo "macOS SDK does not exist at '${OSX_SDK}', please place the extracted, untarred SDK there to perform darwin builds, or define SDK_PATH environment variable. Exiting..."
-                exit 1
-            fi
-            ;;
-    esac
-done
 
 ################
 # VERSION_BASE should have enough space
@@ -237,7 +218,7 @@ SOURCE_DATE_EPOCH="1676215618"
 
 # Precious directories are those which should not be cleaned between successive
 # guix builds
-depends_precious_dir_names='SOURCES_PATH BASE_CACHE SDK_PATH'
+depends_precious_dir_names='SOURCES_PATH BASE_CACHE'
 precious_dir_names="${depends_precious_dir_names} OUTDIR_BASE PROFILES_BASE"
 
 # Usage: contains IFS-SEPARATED-LIST ITEM
@@ -332,7 +313,7 @@ Hint: To blow everything away, you may want to use:
   $ ./contrib/guix/guix-clean
 
 Specifically, this will remove all files without an entry in the index,
-excluding the SDK directory, the depends download cache, the depends built
+excluding the depends download cache, the depends built
 packages cache, the garbage collector roots for Guix environments, and the
 output directory.
 EOF
@@ -441,7 +422,6 @@ EOF
                                  --expose="$(git rev-parse --git-common-dir)" \
                                  ${SOURCES_PATH:+--share="$SOURCES_PATH"} \
                                  ${BASE_CACHE:+--share="$BASE_CACHE"} \
-                                 ${SDK_PATH:+--share="$SDK_PATH"} \
                                  --cores="$JOBS" \
                                  --keep-failed \
                                  --fallback \
@@ -457,7 +437,6 @@ EOF
                                         ${V:+V=1} \
                                         ${SOURCES_PATH:+SOURCES_PATH="$SOURCES_PATH"} \
                                         ${BASE_CACHE:+BASE_CACHE="$BASE_CACHE"} \
-                                        ${SDK_PATH:+SDK_PATH="$SDK_PATH"} \
                                         DISTSRC="$(DISTSRC_BASE=/distsrc-base && distsrc_for_host "$host")" \
                                         OUTDIR="$(OUTDIR_BASE=/outdir-base && outdir_for_host "$host")" \
                                         DIST_ARCHIVE_BASE=/outdir-base/dist-archive \

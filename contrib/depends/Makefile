@@ -31,7 +31,6 @@ MAKEOVERRIDES := $(filter V=%,$(MAKEOVERRIDES))
 SOURCES_PATH ?= $(BASEDIR)/sources
 WORK_PATH = $(BASEDIR)/work
 BASE_CACHE ?= $(BASEDIR)/built
-SDK_PATH ?= $(BASEDIR)/SDKs
 FALLBACK_DOWNLOAD_PATH ?= https://featherwallet.org/files/sources
 
 BUILD = $(shell ./config.guess)

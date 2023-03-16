@@ -32,10 +32,6 @@ add_subdirectory(openpgp)
 
 qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
 
-if (DEPENDS)
-    find_library(ICONV_LIBRARIES iconv)
-endif()
-
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
         "*.h"

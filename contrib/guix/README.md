@@ -27,29 +27,6 @@ If you don't have Guix installed and set up, please follow the instructions in
 If you haven't considered your security model yet, please read [the relevant
 section](#choosing-your-security-model) before proceeding to perform a build.
 
-## Making the Xcode SDK available for macOS cross-compilation
-
-In order to perform a build for macOS (which is included in the default set of
-platform triples to build), you'll need to extract the macOS SDK tarball using
-tools found in the [`macdeploy` directory](../macdeploy/README.md).
-
-You can then either point to the SDK using the `SDK_PATH` environment variable:
-
-```sh
-# Extract the SDK tarball to /path/to/parent/dir/of/extracted/SDK/Xcode-<foo>-<bar>-extracted-SDK-with-libcxx-headers
-tar -C /path/to/parent/dir/of/extracted/SDK -xaf /path/to/Xcode-<foo>-<bar>-extracted-SDK-with-libcxx-headers.tar.gz
-
-# Indicate where to locate the SDK tarball
-export SDK_PATH=/path/to/parent/dir/of/extracted/SDK
-```
-
-or extract it into `depends/SDKs`:
-
-```sh
-mkdir -p depends/SDKs
-tar -C depends/SDKs -xaf /path/to/SDK/tarball
-```
-
 ## Building
 
 *The author highly recommends at least reading over the [common usage patterns
@@ -79,17 +56,17 @@ worktree to save disk space:
 
 ## Common `guix-build` invocation patterns and examples
 
-### Keeping caches and SDKs outside of the worktree
+### Keeping caches outside of the worktree
 
 If you perform a lot of builds and have a bunch of worktrees, you may find it
-more efficient to keep the depends tree's download cache, build cache, and SDKs
+more efficient to keep the depends tree's download cache and build cache
 outside of the worktrees to avoid duplicate downloads and unnecessary builds. To
 help with this situation, the `guix-build` script honours the `SOURCES_PATH`,
-`BASE_CACHE`, and `SDK_PATH` environment variables and will pass them on to the
+`BASE_CACHE` environment variables and will pass them on to the
 depends tree so that you can do something like:
 
 ```sh
-env SOURCES_PATH="$HOME/depends-SOURCES_PATH" BASE_CACHE="$HOME/depends-BASE_CACHE" SDK_PATH="$HOME/macOS-SDKs" ./contrib/guix/guix-build
+env SOURCES_PATH="$HOME/depends-SOURCES_PATH" BASE_CACHE="$HOME/depends-BASE_CACHE" ./contrib/guix/guix-build
 ```
 
 Note that the paths that these environment variables point to **must be
@@ -186,16 +163,6 @@ details.
   Set the depends tree cache for built packages. This is passed through to the
   depends tree. Setting this to the same directory across multiple builds of the
   depends tree can eliminate unnecessary building of packages.
-
-  The path that this environment variable points to **must be a directory**, and
-  **NOT a symlink to a directory**.
-
-* _**SDK_PATH**_
-
-  Set the path where _extracted_ SDKs can be found. This is passed through to
-  the depends tree. Note that this is should be set to the _parent_ directory of
-  the actual SDK (e.g. `SDK_PATH=$HOME/Downloads/macOS-SDKs` instead of
-  `$HOME/Downloads/macOS-SDKs/Xcode-12.2-12B45b-extracted-SDK-with-libcxx-headers`).
 
   The path that this environment variable points to **must be a directory**, and
   **NOT a symlink to a directory**.
