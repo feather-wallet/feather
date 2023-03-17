@@ -69,7 +69,7 @@ VERSION="${FORCE_VERSION:-$(git_head_version)}"
 DISTNAME="${DISTNAME:-feather-${VERSION}}"
 
 VERSION_BASE_DIR="${VERSION_BASE_DIR:-${PWD}}"
-version_base_prefix="${VERSION_BASE_DIR}/guix-build-"
+version_base_prefix="${VERSION_BASE_DIR}/guix/guix-build-"
 VERSION_BASE="${version_base_prefix}${VERSION}"  # TOP
 
 DISTSRC_BASE="${DISTSRC_BASE:-${VERSION_BASE}}"

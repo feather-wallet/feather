@@ -16,6 +16,6 @@ src/assets_tor.qrc
 feather.AppDir/*
 src/assets/tor/*
 !src/assets/tor/.gitkeep
-guix-build-*
 contrib/installers/windows/setup.nsi
 githash.txt
+guix/guix-build-*
