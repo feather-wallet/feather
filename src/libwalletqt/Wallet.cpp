@@ -429,18 +429,11 @@ void Wallet::onNewBlock(uint64_t walletHeight) {
     this->syncStatusUpdated(walletHeight, daemonHeight);
 
     if (this->isSynchronized()) {
-        this->coins()->refreshUnlocked();
-        this->history()->refresh(this->currentSubaddressAccount());
-        // Todo: only refresh tx confirmations
+        this->refreshModels();
     }
 }
 
 void Wallet::onUpdated() {
-    if (m_walletImpl->synchronized()) {
-        this->refreshModels();
-        this->storeSafer();
-    }
-
     this->updateBalance();
 }
 
@@ -453,7 +446,6 @@ void Wallet::onRefreshed(bool success, const QString &message) {
     }
 
     if (!this->refreshedOnce) {
-        this->refreshModels();
         this->refreshedOnce = true;
         emit walletRefreshed();
         // store wallet immediately upon finishing synchronization
