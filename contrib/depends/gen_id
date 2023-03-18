@@ -67,7 +67,7 @@
     echo "END STRIP"
 
     echo "END ALL"
-) | if [ -n "$DEBUG" ] && command -v tee > /dev/null 2>&1; then
+) | if [ -n "$DEBUG_GENID" ] && command -v tee > /dev/null 2>&1; then
         # When debugging and `tee` is available, output the preimage to stderr
         # in addition to passing through stdin to stdout
         tee >(cat 1>&2)

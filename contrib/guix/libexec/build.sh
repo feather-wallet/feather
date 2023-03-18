@@ -6,6 +6,7 @@
 export LC_ALL=C
 set -e -o pipefail
 export TZ=UTC
+export DEBUG_GENID=1
 
 # shellcheck source=contrib/shell/git-utils.bash
 source contrib/shell/git-utils.bash
@@ -197,12 +198,15 @@ case "$HOST" in
     *mingw*)  HOST_LDFLAGS="-Wl,--no-insert-timestamp" ;;
 esac
 
+mkdir -p "$OUTDIR"
+
 # Build the depends tree, overriding variables that assume multilib gcc
 make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    ${V:+V=1} \
                                    ${SOURCES_PATH+SOURCES_PATH="$SOURCES_PATH"} \
                                    ${BASE_CACHE+BASE_CACHE="$BASE_CACHE"} \
                                    ${SDK_PATH+SDK_PATH="$SDK_PATH"} \
+                                   OUTDIR="$OUTDIR" \
                                    x86_64_linux_CC=x86_64-linux-gnu-gcc \
                                    x86_64_linux_CXX=x86_64-linux-gnu-g++ \
                                    x86_64_linux_AR=x86_64-linux-gnu-ar \
@@ -227,8 +231,6 @@ if [ ! -e "$GIT_ARCHIVE" ]; then
     ( git ls-files --recurse-submodules ; echo "githash.txt" ) | cat | tar --transform "s,^,${DISTNAME}/," -caf ${GIT_ARCHIVE} -T-
     sha256sum "$GIT_ARCHIVE"
 fi
-
-mkdir -p "$OUTDIR"
 
 ###########################
 # Binary Tarball Building #
