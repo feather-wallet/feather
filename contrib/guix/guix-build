@@ -346,6 +346,8 @@ INFO: Building ${VERSION:?not set} for platform triple ${HOST:?not set}:
           ...bind-mounted in container to: '$(OUTDIR_BASE=/outdir-base && outdir_for_host "$HOST")'
 EOF
 
+       rm -f "$(profiledir_for_host "${HOST}")"
+
         # Run the build script 'contrib/guix/libexec/build.sh' in the build
         # container specified by 'contrib/guix/manifest.scm'.
         #
