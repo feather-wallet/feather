@@ -1156,7 +1156,7 @@ void MainWindow::exportKeyImages() {
 }
 
 void MainWindow::importKeyImages() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages)");
+    QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages);;All Files (*)");
     if (fn.isEmpty()) return;
     bool r = m_wallet->importKeyImages(fn);
     if (!r) {
@@ -1180,7 +1180,7 @@ void MainWindow::exportOutputs() {
 }
 
 void MainWindow::importOutputs() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs)");
+    QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs);;All Files (*)");
     if (fn.isEmpty()) return;
     bool r = m_wallet->importOutputs(fn);
     if (!r) {
