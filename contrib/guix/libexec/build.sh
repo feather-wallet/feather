@@ -314,6 +314,9 @@ mkdir -p "$DISTSRC"
         arm-linux*)
             LINUX_ARCH="-arm"
             ;;
+        riscv64-linux*)
+            LINUX_ARCH="-riscv64"
+            ;;
     esac
 
     case "$HOST" in
