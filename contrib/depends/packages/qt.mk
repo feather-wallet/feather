@@ -10,6 +10,7 @@ $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxk
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = aarch64Toolchain.cmake
+$(package)_patches += arm64-apple-toolchain.cmake
 $(package)_patches += dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += gnueabihfToolchain.cmake
@@ -140,13 +141,9 @@ $(package)_config_opts_darwin += -device-option XCODE_VERSION=$(XCODE_VERSION)
 $(package)_config_opts_darwin += -qt-host-path $(build_prefix)/qt-host
 endif
 
-ifneq ($(build_arch),$(host_arch))
-$(package)_config_opts_aarch64_darwin += -device-option QMAKE_APPLE_DEVICE_ARCHS=arm64
-$(package)_config_opts_x86_64_darwin += -device-option QMAKE_APPLE_DEVICE_ARCHS=x86_64
-endif
-
 $(package)_config_opts_darwin += -no-feature-ffmpeg
-$(package)_config_opts_darwin += -- -DCMAKE_TOOLCHAIN_FILE=MacToolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
+$(package)_config_opts_aarch64_darwin += -- -DCMAKE_TOOLCHAIN_FILE=arm64-apple-toolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
+$(package)_config_opts_x86_64_darwin += -- -DCMAKE_TOOLCHAIN_FILE=MacToolchain.cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib
 
 $(package)_config_opts_linux = -xcb
 $(package)_config_opts_linux += -no-xcb-xlib
@@ -263,6 +260,7 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/WindowsToolchain.cmake . && \
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
+  mv $($(package)_patch_dir)/arm64-apple-toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
   mv $($(package)_patch_dir)/riscvToolchain.cmake . && \
   cd qtmultimedia && \

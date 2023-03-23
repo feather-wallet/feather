@@ -8,6 +8,10 @@ define $(package)_set_vars
   $(package)_build_opts=CFLAGS="-fPIE"
 endef
 
+define $(package)_preprocess_cmds
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux
+endef
+
 define $(package)_config_cmds
     $($(package)_autoconf) --enable-static --disable-shared
 endef

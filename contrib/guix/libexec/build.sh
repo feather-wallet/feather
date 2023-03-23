@@ -319,6 +319,13 @@ mkdir -p "$DISTSRC"
             ;;
     esac
 
+    DARWIN_ARCH=""
+    case "$HOST" in
+        arm64-apple-darwin)
+            DARWIN_ARCH="-arm64"
+            ;;
+    esac
+
     case "$HOST" in
         *linux*)
             bash contrib/AppImage/build-appimage.sh
@@ -363,6 +370,12 @@ mkdir -p "$DISTSRC"
                 ;;
             *darwin*)
                 mv "feather.app" "Feather.app"
+                ;;
+        esac
+
+        case "$HOST" in
+            arm64-apple-darwin)
+                /feather/contrib/depends/arm64-apple-darwin/native/bin/rcodesign sign Feather.app
                 ;;
         esac
 
@@ -413,8 +426,8 @@ mkdir -p "$DISTSRC"
                     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                 find . \
                     | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-mac.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-mac.zip" && exit 1 )
+                    | zip -X@ "${OUTDIR}/${DISTNAME}-mac${DARWIN_ARCH}.zip" \
+                    || ( rm -f "${OUTDIR}/${DISTNAME}-mac${DARWIN_ARCH}.zip" && exit 1 )
                 ;;
         esac
 

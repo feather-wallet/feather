@@ -12,6 +12,9 @@ define $(package)_set_vars
 endef
 
 define $(package)_config_cmds
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub . && \
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub ./third_party/googletest/googletest/build-aux/ && \
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub ./third_party/googletest/googlemock/build-aux/ && \
   $($(package)_autoconf)
 endef
 

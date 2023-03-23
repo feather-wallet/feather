@@ -77,7 +77,7 @@ export HOSTS="${HOSTS:-x86_64-linux-gnu aarch64-linux-gnu arm-linux-gnueabihf
                        x86_64-linux-gnu.no-tor-bundle
                        riscv64-linux-gnu
                        x86_64-w64-mingw32 x86_64-w64-mingw32.installer
-                       x86_64-apple-darwin}"
+                       x86_64-apple-darwin arm64-apple-darwin}"
 
 # Usage: distsrc_for_host HOST
 #

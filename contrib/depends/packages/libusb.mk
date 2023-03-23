@@ -5,6 +5,7 @@ $(package)_file_name=$(package)-$($(package)_version).tar.bz2
 $(package)_sha256_hash=12ce7a61fc9854d1d2a1ffe095f7b5fac19ddba095c259e6067a46500381b5a5
 
 define $(package)_preprocess_cmds
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub . && \
   autoreconf -i
 endef
 
@@ -15,17 +16,9 @@ define $(package)_set_vars
   $(package)_config_opts_darwin=--disable-udev
 endef
 
-ifneq ($(host_os),darwin)
-  define $(package)_config_cmds
-    cp -f $(BASEDIR)/config.guess config.guess &&\
-    cp -f $(BASEDIR)/config.sub config.sub &&\
-    $($(package)_autoconf)
-  endef
-else
-  define $(package)_config_cmds
-    $($(package)_autoconf)
-  endef
-endif
+define $(package)_config_cmds
+  $($(package)_autoconf)
+endef
 
 define $(package)_build_cmd
   $(MAKE)

@@ -11,6 +11,7 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
+  cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux/ && \
   patch -p1 < $($(package)_patch_dir)/disable-glibc-getrandom-getentropy.patch &&\
   autoconf &&\
   patch -p1 < $($(package)_patch_dir)/fix-whitespace.patch
