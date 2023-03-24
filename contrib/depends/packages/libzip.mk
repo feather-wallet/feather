@@ -4,7 +4,6 @@ $(package)_download_path=https://libzip.org/download/
 $(package)_file_name=libzip-1.9.2.tar.gz
 $(package)_sha256_hash=fd6a7f745de3d69cf5603edc9cb33d2890f0198e415255d0987a0cf10d824c6f
 $(package)_dependencies=zlib
-$(package)_mingw32_dependencies=native_cmake
 $(package)_patches += no-clonefile.patch
 
 define $(package)_preprocess_cmds

@@ -5,7 +5,7 @@ $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=0cf7498b34900a1d9f6c070a44495f7171eb4a4cb66a7ceea53e8721c8812701
 $(package)_darwin_dependencies=native_cctools native_qt openssl
-$(package)_mingw32_dependencies=openssl native_cmake native_qt native_libxkbcommon
+$(package)_mingw32_dependencies=openssl native_qt native_libxkbcommon
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
@@ -301,7 +301,7 @@ define $(package)_config_cmds
    export V=1 && \
    export VERBOSE=1 && \
    cd qtbase && \
-  ./configure -top-level $($(package)_config_opts) -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib --debug-find-pkg=WMF -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+  ./configure -top-level $($(package)_config_opts) -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 endef
 else
 define $(package)_config_cmds
