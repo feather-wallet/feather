@@ -20,6 +20,7 @@
              (gnu packages gnome)
              (gnu packages gperf)
              (gnu packages installers)
+             (gnu packages libusb)
              (gnu packages linux)
              (gnu packages llvm)
              (gnu packages mingw)
@@ -622,6 +623,38 @@ inspecting signatures in Mach-O binaries.")
     Can be used for Qt and other applications ")
     (license license:gpl3+)))
 
+(define-public ldid
+  (package
+    (name "ldid")
+    (version "v2.1.5-procursus7")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://github.com/ProcursusTeam/"
+                     name "/archive/refs/tags/" version ".tar.gz"))
+              (sha256
+                (base32
+                  "0ppzy4d9sl4m0sn8nk8wpi39qfimvka6h2ycr67y8r97y3363r04"))))
+    (build-system gnu-build-system)
+    (arguments
+      `(#:phases
+         (modify-phases %standard-phases
+           (delete 'configure)
+           (replace 'build (lambda _ (invoke "make")))
+           (delete 'check)
+           (replace 'install
+             (lambda* (#:key outputs #:allow-other-keys)
+               (let* ((out (assoc-ref outputs "out"))
+                       (bin (string-append out "/bin")))
+                 (install-file "ldid" bin)
+                 #t)))
+           )))
+    (native-inputs (list pkg-config))
+    (inputs (list openssl libplist))
+    (home-page "https://github.com/ProcursusTeam/ldid")
+    (synopsis "Link Identity Editor.")
+    (description "Put real or fake signatures in a Mach-O.")
+    (license license:gpl3+)))
+
 (packages->manifest
  (append
   (list ;; The Basics
@@ -679,5 +712,5 @@ inspecting signatures in Mach-O binaries.")
           ((string-contains target "-linux-")
            (list (make-bitcoin-cross-toolchain target) cmake))
           ((string-contains target "darwin")
-           (list clang-toolchain-10 binutils cmake python-signapple))
+           (list clang-toolchain-10 binutils cmake python-signapple ldid))
           (else '())))))

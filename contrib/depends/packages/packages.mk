@@ -5,7 +5,7 @@ linux_packages := eudev liblzma libarchive libfuse libsquashfuse libappimage app
 linux_native_packages = native_patchelf
 
 darwin_packages :=
-darwin_native_packages = darwin_sdk native_cctools native_libtapi native_clang native_rcodesign
+darwin_native_packages = darwin_sdk native_cctools native_libtapi native_clang
 
 mingw32_packages = icu4c
 mingw32_native_packages = native_cmake

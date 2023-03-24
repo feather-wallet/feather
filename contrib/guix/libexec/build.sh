@@ -373,9 +373,10 @@ mkdir -p "$DISTSRC"
                 ;;
         esac
 
+        # Ad-hoc code signing
         case "$HOST" in
             arm64-apple-darwin)
-                /feather/contrib/depends/arm64-apple-darwin/native/bin/rcodesign sign Feather.app
+                ldid -S -Cadhoc,linker-signed Feather.app
                 ;;
         esac
 
