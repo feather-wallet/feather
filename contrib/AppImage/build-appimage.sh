@@ -3,40 +3,41 @@
 set -e
 unset SOURCE_DATE_EPOCH
 
+# Manually create the AppImage (reproducibly) since linuxdeployqt is not able to create cross-compiled AppImages
+
 APPDIR="$PWD/feather.AppDir"
 
 mkdir -p "$APPDIR"
 mkdir -p "$APPDIR/usr/share/applications/"
 mkdir -p "$APPDIR/usr/bin"
 mkdir -p "$APPDIR/usr/lib"
-mkdir -p "$APPDIR/usr/plugins"
 
 cp "src/assets/feather.desktop" "$APPDIR/usr/share/applications/feather.desktop"
+cp "src/assets/feather.desktop" "$APPDIR/feather.desktop"
 cp "src/assets/images/appicons/64x64.png" "$APPDIR/feather.png"
 cp "build/bin/feather" "$APPDIR/usr/bin/feather"
 chmod +x "$APPDIR/usr/bin/feather"
 
-# libgcc_s.so.1 not found
-export LD_LIBRARY_PATH=/feather/contrib/depends/x86_64-linux-gnu/lib/:/gnu/store:/gnu/store/0wfxmi621h9xn4169xzhzd1p5g91cj9m-gcc-cross-x86_64-linux-gnu-10.3.0-lib/x86_64-linux-gnu/lib/
+mkdir -p "${APPDIR}/usr/lib"
 
-# linuxdeployqt glibc moaning bypass
-mkdir -p "$APPDIR/usr/share/doc/libc6"
-touch "$APPDIR/usr/share/doc/libc6/copyright"
+XCB_LIBS=(libxcb-cursor.so.0 libxcb-render.so.0 libxcb-xfixes.so.0 libxcb-icccm.so.4 libxcb-render-util.so.0
+          libxcb-xkb.so.1 libxcb-image.so.0 libxcb-shape.so.0 libxkbcommon.so.0 libxcb-keysyms.so.1
+          libxcb-shm.so.0 libxkbcommon-x11.so.0 libxcb-randr.so.0 libxcb-sync.so.1)
 
-# TODO: linuxdeployqt can't build ARM appimages on x86_64, skip this step for ARM builds
-case "$HOST" in
-    x86_64*)
-        linuxdeployqt feather.AppDir/usr/share/applications/feather.desktop -verbose=2 -bundle-non-qt-libs -unsupported-allow-new-glibc
-        rm "$APPDIR/AppRun"
-        ;;
-esac
+for lib in "${XCB_LIBS[@]}"
+do
+    echo "${lib}"
+    cp "/feather/contrib/depends/${HOST}/lib/${lib}" "${APPDIR}/usr/lib/"
+    "${HOST}-strip" "${APPDIR}/usr/lib/${lib}"
+    patchelf --set-rpath "\$ORIGIN" "${APPDIR}/usr/lib/${lib}"
+done
+
+patchelf --set-rpath "\$ORIGIN/../lib" "$APPDIR/usr/bin/feather"
 
 cp "contrib/AppImage/AppRun" "$APPDIR/"
 chmod +x "$APPDIR/AppRun"
 
 find feather.AppDir/ -exec touch -h -a -m -t 202101010100.00 {} \;
-
-# Manually create AppImage (reproducibly)
 
 mksquashfs feather.AppDir feather.squashfs -info -root-owned -no-xattrs -noappend -fstime 0
 # mksquashfs writes a timestamp to the header

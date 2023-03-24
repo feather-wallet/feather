@@ -2,7 +2,7 @@ packages := boost openssl libiconv unbound qrencode zbar sodium polyseed hidapi 
 native_packages := native_libxcb native_xcb_proto native_libXau native_xproto native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_cursor native_libxcb_util_wm native_qt native_protobuf
 
 linux_packages := eudev liblzma libarchive libfuse libsquashfuse libappimage appimage_runtime
-linux_native_packages = native_patchelf
+linux_native_packages =
 
 darwin_packages :=
 darwin_native_packages = darwin_sdk native_cctools native_libtapi native_clang

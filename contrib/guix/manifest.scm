@@ -33,7 +33,6 @@
              (gnu packages shells)
              (gnu packages tls)
              (gnu packages version-control)
-             (gnu packages qt)
              (guix build-system gnu)
              (guix build-system perl)
              (guix build-system python)
@@ -286,45 +285,6 @@ parse, modify and abstract ELF, PE and MachO formats.")
                                            "glibc-2.27-fcommon.patch"
                                            "glibc-2.27-guix-prefix.patch"))))))
 
-(define-public linuxdeployqt
-  (package
-    (name "linuxdeployqt")
-    (version "b4697483c98120007019c3456914cfd1dba58384")
-    (source
-      (origin
-        (method git-fetch)
-        (uri (git-reference
-               (url "https://github.com/probonopd/linuxdeployqt")
-               (commit version)))
-        (file-name (git-file-name name version))
-        (sha256
-          (base32
-            "0zp1c5pya39g5nwkly1ix58svj08lfsfmv530jyf2ya7m4vvkhfs"))))
-    (build-system gnu-build-system)
-    (arguments
-        `(#:phases
-           (modify-phases %standard-phases
-             (replace 'configure
-               (lambda* (#:key outputs #:allow-other-keys)
-                 (let ((out (assoc-ref outputs "out")))
-                   (invoke "qmake"
-                     (string-append "PREFIX=" out)
-                     "linuxdeployqt.pro"))))
-             (replace 'install
-               ;; Messes up for some reason.
-               (lambda* (#:key outputs #:allow-other-keys)
-                 (let* ((out (assoc-ref outputs "out"))
-                        (bin (string-append out "/bin")))
-                   (install-file "bin/linuxdeployqt" bin)
-                   #t))))))
-    (native-inputs (list qtbase-5))
-    (home-page "https://github.com/probonopd/linuxdeployqt")
-    (synopsis "Linux deploy tool")
-    (description "Makes Linux applications self-contained by copying in the libraries
-    and plugins that the application uses, and optionally generates an AppImage.
-    Can be used for Qt and other applications ")
-    (license license:gpl3+)))
-
 (define-public ldid
   (package
     (name "ldid")
@@ -393,7 +353,6 @@ parse, modify and abstract ELF, PE and MachO formats.")
         gperf
         gettext-minimal
         squashfs-tools
-        linuxdeployqt
         ;; Native GCC 10 toolchain
         gcc-toolchain-10
         (list gcc-toolchain-10 "static")
