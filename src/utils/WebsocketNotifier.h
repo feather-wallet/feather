@@ -11,10 +11,10 @@
 #include "networktype.h"
 #include "nodes.h"
 #include "prices.h"
-#include "widgets/Bounty.h"
-#include "widgets/RedditPost.h"
-#include "widgets/CCSEntry.h"
-#include "widgets/RevuoItem.h"
+#include "plugins/bounties/Bounty.h"
+#include "plugins/reddit/RedditPost.h"
+#include "plugins/ccs/CCSEntry.h"
+#include "plugins/revuo/RevuoItem.h"
 #include "TxFiatHistory.h"
 
 class WebsocketNotifier : public QObject {

@@ -8,7 +8,7 @@
 #include <QLabel>
 
 #include "components.h"
-#include "model/LocalMoneroModel.h"
+#include "LocalMoneroModel.h"
 
 namespace Ui {
     class LocalMoneroInfoDialog;

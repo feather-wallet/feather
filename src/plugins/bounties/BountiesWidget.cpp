@@ -8,7 +8,7 @@
 #include <QStandardItemModel>
 #include <QTableWidget>
 
-#include "model/BountiesModel.h"
+#include "BountiesModel.h"
 #include "utils/Utils.h"
 #include "utils/config.h"
 

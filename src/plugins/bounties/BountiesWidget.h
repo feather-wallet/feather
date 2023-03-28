@@ -8,7 +8,7 @@
 #include <QMenu>
 #include <QWidget>
 
-#include "model/BountiesModel.h"
+#include "BountiesModel.h"
 
 namespace Ui {
     class BountiesWidget;

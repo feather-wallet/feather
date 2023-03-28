@@ -6,7 +6,7 @@
 
 #include <QStyledItemDelegate>
 
-#include "model/CCSModel.h"
+#include "CCSModel.h"
 
 class CCSProgressDelegate : public QStyledItemDelegate
 {

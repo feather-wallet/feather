@@ -8,7 +8,7 @@
 #include <QStandardItemModel>
 #include <QTableWidget>
 
-#include "model/RedditModel.h"
+#include "RedditModel.h"
 #include "utils/Utils.h"
 #include "utils/config.h"
 

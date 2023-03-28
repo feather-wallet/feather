@@ -72,6 +72,8 @@ file(GLOB SOURCE_FILES
         "monero_seed/*.cpp"
         "monero_seed/*.c"
         "monero_seed/*.hpp"
+        "plugins/*/*.cpp"
+        "plugins/*/*.h"
         )
 
 if (WITH_SCANNER AND NOT Qt6_FOUND)

@@ -1,29 +1,28 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef FEATHER_BOUNTIESMODEL_H
-#define FEATHER_BOUNTIESMODEL_H
+#ifndef FEATHER_CCSMODEL_H
+#define FEATHER_CCSMODEL_H
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 
-#include "widgets/Bounty.h"
+#include "CCSEntry.h"
 
-class BountiesModel : public QAbstractTableModel
+class CCSModel : public QAbstractTableModel
 {
-    Q_OBJECT
+Q_OBJECT
 
 public:
     enum ModelColumn
     {
         Title = 0,
-        Votes,
-        Status,
-        Bounty,
+        Author,
+        Progress,
         COUNT
     };
 
-    explicit BountiesModel(QObject *parent);
+    explicit CCSModel(QObject *parent);
 
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -31,13 +30,13 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     void clear();
-    void updateBounties(const QList<QSharedPointer<BountyEntry>>& posts);
+    void updateEntries(const QList<QSharedPointer<CCSEntry>>& entries);
 
-    QSharedPointer<BountyEntry> post(int row);
+    QSharedPointer<CCSEntry> entry(int row);
 
 private:
-    QList<QSharedPointer<BountyEntry>> m_bounties;
+    QList<QSharedPointer<CCSEntry>> m_entries;
 };
 
 
-#endif //FEATHER_BOUNTIESMODEL_H
+#endif //FEATHER_CCSMODEL_H

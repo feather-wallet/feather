@@ -6,7 +6,7 @@
 
 #include "utils/config.h"
 #include "utils/Utils.h"
-#include "utils/xmrig.h"
+#include "xmrig.h"
 #include "utils/TorManager.h"
 
 XmRig::XmRig(const QString &configDir, QObject *parent)

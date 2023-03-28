@@ -8,7 +8,7 @@
 #include <QMenu>
 #include <QWidget>
 
-#include "model/RedditModel.h"
+#include "RedditModel.h"
 
 namespace Ui {
     class RedditWidget;

@@ -32,8 +32,8 @@
 #include "utils/daemonrpc.h"
 #include "utils/EventFilter.h"
 #include "utils/Updater.h"
-#include "widgets/CCSWidget.h"
-#include "widgets/RedditWidget.h"
+#include "plugins/ccs/CCSWidget.h"
+#include "plugins/reddit/RedditWidget.h"
 #include "widgets/TickerWidget.h"
 #include "widgets/WalletUnlockWidget.h"
 #include "wizard/WalletWizard.h"
@@ -47,11 +47,11 @@
 #include "WindowManager.h"
 
 #ifdef HAS_LOCALMONERO
-#include "widgets/LocalMoneroWidget.h"
+#include "plugins/localmonero/LocalMoneroWidget.h"
 #endif
 
 #ifdef HAS_XMRIG
-#include "widgets/XMRigWidget.h"
+#include "plugins/xmrig/XMRigWidget.h"
 #endif
 
 namespace Ui {

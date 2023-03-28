@@ -10,8 +10,8 @@
 #include <QProgressBar>
 #include <QWidget>
 
-#include "model/CCSModel.h"
-#include "widgets/CCSEntry.h"
+#include "CCSModel.h"
+#include "CCSEntry.h"
 
 namespace Ui {
     class CSSWidget;

@@ -1,28 +1,29 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef FEATHER_REDDITMODEL_H
-#define FEATHER_REDDITMODEL_H
+#ifndef FEATHER_BOUNTIESMODEL_H
+#define FEATHER_BOUNTIESMODEL_H
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 
-#include "widgets/RedditPost.h"
+#include "Bounty.h"
 
-class RedditModel : public QAbstractTableModel
+class BountiesModel : public QAbstractTableModel
 {
-Q_OBJECT
+    Q_OBJECT
 
 public:
     enum ModelColumn
     {
         Title = 0,
-        Author,
-        Comments,
+        Votes,
+        Status,
+        Bounty,
         COUNT
     };
 
-    explicit RedditModel(QObject *parent);
+    explicit BountiesModel(QObject *parent);
 
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -30,12 +31,13 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     void clear();
-    void updatePosts(const QList<QSharedPointer<RedditPost>>& posts);
+    void updateBounties(const QList<QSharedPointer<BountyEntry>>& posts);
 
-    QSharedPointer<RedditPost> post(int row);
+    QSharedPointer<BountyEntry> post(int row);
 
 private:
-    QList<QSharedPointer<RedditPost>> m_posts;
+    QList<QSharedPointer<BountyEntry>> m_bounties;
 };
 
-#endif //FEATHER_REDDITMODEL_H
+
+#endif //FEATHER_BOUNTIESMODEL_H

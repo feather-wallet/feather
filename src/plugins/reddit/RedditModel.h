@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef FEATHER_CCSMODEL_H
-#define FEATHER_CCSMODEL_H
+#ifndef FEATHER_REDDITMODEL_H
+#define FEATHER_REDDITMODEL_H
 
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 
-#include "widgets/CCSEntry.h"
+#include "RedditPost.h"
 
-class CCSModel : public QAbstractTableModel
+class RedditModel : public QAbstractTableModel
 {
 Q_OBJECT
 
@@ -18,11 +18,11 @@ public:
     {
         Title = 0,
         Author,
-        Progress,
+        Comments,
         COUNT
     };
 
-    explicit CCSModel(QObject *parent);
+    explicit RedditModel(QObject *parent);
 
     int rowCount(const QModelIndex &parent) const override;
     int columnCount(const QModelIndex &parent) const override;
@@ -30,13 +30,12 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
     void clear();
-    void updateEntries(const QList<QSharedPointer<CCSEntry>>& entries);
+    void updatePosts(const QList<QSharedPointer<RedditPost>>& posts);
 
-    QSharedPointer<CCSEntry> entry(int row);
+    QSharedPointer<RedditPost> post(int row);
 
 private:
-    QList<QSharedPointer<CCSEntry>> m_entries;
+    QList<QSharedPointer<RedditPost>> m_posts;
 };
 
-
-#endif //FEATHER_CCSMODEL_H
+#endif //FEATHER_REDDITMODEL_H

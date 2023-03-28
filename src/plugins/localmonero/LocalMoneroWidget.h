@@ -6,8 +6,8 @@
 
 #include <QWidget>
 
-#include "api/LocalMoneroApi.h"
-#include "model/LocalMoneroModel.h"
+#include "LocalMoneroApi.h"
+#include "LocalMoneroModel.h"
 #include "libwalletqt/Wallet.h"
 
 namespace Ui {

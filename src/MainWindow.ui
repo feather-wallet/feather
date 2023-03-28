@@ -960,25 +960,25 @@
   <customwidget>
    <class>CCSWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/CCSWidget.h</header>
+   <header>plugins/ccs/CCSWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>RedditWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/RedditWidget.h</header>
+   <header>plugins/reddit/RedditWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>RevuoWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/RevuoWidget.h</header>
+   <header>plugins/revuo/RevuoWidget.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
    <class>BountiesWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/BountiesWidget.h</header>
+   <header>plugins/bounties/BountiesWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -7,10 +7,9 @@
 #include <QMessageBox>
 #include <QMenu>
 
-#include "dialog/LocalMoneroInfoDialog.h"
+#include "LocalMoneroInfoDialog.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
-#include "utils/NetworkManager.h"
 #include "utils/WebsocketNotifier.h"
 
 LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, Wallet *wallet)

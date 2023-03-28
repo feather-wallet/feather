@@ -9,7 +9,7 @@
 #include <QItemSelection>
 #include <QStandardItemModel>
 
-#include "utils/xmrig.h"
+#include "xmrig.h"
 #include "utils/config.h"
 #include "libwalletqt/Wallet.h"
 

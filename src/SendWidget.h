@@ -7,7 +7,6 @@
 #include <QWidget>
 
 #include "libwalletqt/Wallet.h"
-#include "widgets/CCSWidget.h"
 
 namespace Ui {
     class SendWidget;
