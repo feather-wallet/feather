@@ -4,10 +4,10 @@
 #include "CoinsModel.h"
 #include "CoinsInfo.h"
 #include "Coins.h"
-#include "ModelUtils.h"
 #include "constants.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 #include "libwalletqt/WalletManager.h"
 
 #include <QBrush>
@@ -104,7 +104,7 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
                 case PubKey:
                 case TxID:
                 case Address:
-                    result = ModelUtils::getMonospaceFont();
+                    result = Utils::getMonospaceFont();
             }
         }
         else if (role == Qt::ToolTipRole) {
@@ -224,7 +224,7 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case BlockHeight:
             return cInfo.blockHeight();
         case Address:
-            return ModelUtils::displayAddress(cInfo.address(), 1, "");
+            return Utils::displayAddress(cInfo.address(), 1, "");
         case Label: {
             if (!cInfo.description().isEmpty())
                 return cInfo.description();

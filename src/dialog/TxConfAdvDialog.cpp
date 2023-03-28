@@ -12,7 +12,6 @@
 #include "libwalletqt/Input.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
 #include "qrcode/QrCode.h"
 #include "utils/AppData.h"
 #include "utils/config.h"
@@ -46,12 +45,12 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
     connect(ui->btn_send, &QPushButton::clicked, this, &TxConfAdvDialog::broadcastTransaction);
     connect(ui->btn_close, &QPushButton::clicked, this, &TxConfAdvDialog::closeDialog);
 
-    ui->amount->setFont(ModelUtils::getMonospaceFont());
-    ui->fee->setFont(ModelUtils::getMonospaceFont());
-    ui->total->setFont(ModelUtils::getMonospaceFont());
+    ui->amount->setFont(Utils::getMonospaceFont());
+    ui->fee->setFont(Utils::getMonospaceFont());
+    ui->total->setFont(Utils::getMonospaceFont());
 
-    ui->inputs->setFont(ModelUtils::getMonospaceFont());
-    ui->outputs->setFont(ModelUtils::getMonospaceFont());
+    ui->inputs->setFont(Utils::getMonospaceFont());
+    ui->outputs->setFont(Utils::getMonospaceFont());
 
     this->adjustSize();
 }

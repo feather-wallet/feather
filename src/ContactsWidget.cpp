@@ -9,8 +9,8 @@
 #include "dialog/ContactsDialog.h"
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
 ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
@@ -85,12 +85,12 @@ void ContactsWidget::focusSearchbar() {
 
 void ContactsWidget::copyAddress() {
     QModelIndex index = ui->contacts->currentIndex();
-    ModelUtils::copyColumn(&index, AddressBookModel::Address);
+    Utils::copyColumn(&index, AddressBookModel::Address);
 }
 
 void ContactsWidget::copyName() {
     QModelIndex index = ui->contacts->currentIndex();
-    ModelUtils::copyColumn(&index, AddressBookModel::Description);
+    Utils::copyColumn(&index, AddressBookModel::Description);
 }
 
 void ContactsWidget::payTo() {

@@ -9,8 +9,8 @@
 
 #include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"
-#include "model/ModelUtils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
 ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
@@ -74,12 +74,12 @@ void ReceiveWidget::focusSearchbar() {
 
 void ReceiveWidget::copyAddress() {
     QModelIndex index = ui->addresses->currentIndex();
-    ModelUtils::copyColumn(&index, SubaddressModel::Address);
+    Utils::copyColumn(&index, SubaddressModel::Address);
 }
 
 void ReceiveWidget::copyLabel() {
     QModelIndex index = ui->addresses->currentIndex();
-    ModelUtils::copyColumn(&index, SubaddressModel::Label);
+    Utils::copyColumn(&index, SubaddressModel::Label);
 }
 
 void ReceiveWidget::editLabel() {

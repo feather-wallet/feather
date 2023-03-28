@@ -7,7 +7,6 @@
 #include <QMessageBox>
 
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
 #include "utils/Utils.h"
 
 VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
@@ -58,7 +57,7 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
     connect(m_wallet, &Wallet::transactionProofVerified, this, &VerifyProofDialog::onTxProofVerified);
     connect(m_wallet, &Wallet::spendProofVerified, this, &VerifyProofDialog::onSpendProofVerified);
 
-    ui->input_formattedProof->setFont(ModelUtils::getMonospaceFont());
+    ui->input_formattedProof->setFont(Utils::getMonospaceFont());
 }
 
 void VerifyProofDialog::checkProof() {

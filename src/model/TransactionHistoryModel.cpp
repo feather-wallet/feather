@@ -9,7 +9,7 @@
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 #include "utils/AppData.h"
-#include "ModelUtils.h"
+#include "utils/Utils.h"
 
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
@@ -127,7 +127,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
             switch(index.column()) {
                 case Column::TxID:
                 {
-                    result = ModelUtils::getMonospaceFont();
+                    result = Utils::getMonospaceFont();
                 }
             }
         }
@@ -163,7 +163,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             return amount;
         }
         case Column::TxID: {
-            return ModelUtils::displayAddress(tInfo.hash(), 1);
+            return Utils::displayAddress(tInfo.hash(), 1);
         }
         case Column::FiatAmount:
         {

@@ -3,9 +3,8 @@
 
 #include "AddressBookModel.h"
 #include "AddressBook.h"
-#include "ModelUtils.h"
-#include "utils/Utils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
 AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
     : QAbstractTableModel(parent)
@@ -78,7 +77,7 @@ QVariant AddressBookModel::data(const QModelIndex &index, int role) const
                 {
                     QString address = row.address();
                     if (!m_showFullAddresses && role != Qt::UserRole) {
-                        address = ModelUtils::displayAddress(address);
+                        address = Utils::displayAddress(address);
                     }
                     result = address;
                     break;
@@ -93,7 +92,7 @@ QVariant AddressBookModel::data(const QModelIndex &index, int role) const
         else if (role == Qt::FontRole) {
             switch (index.column()) {
                 case Address:
-                    result = ModelUtils::getMonospaceFont();
+                    result = Utils::getMonospaceFont();
             }
         }
         else if (role == Qt::DecorationRole) {

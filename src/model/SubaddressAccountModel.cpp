@@ -4,9 +4,8 @@
 #include "SubaddressAccountModel.h"
 #include "SubaddressAccount.h"
 
-#include <QDebug>
 #include <QFont>
-#include "ModelUtils.h"
+#include "utils/Utils.h"
 
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
     : QAbstractTableModel(parent)
@@ -54,7 +53,7 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
         }
         else if (role == Qt::FontRole) {
             if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
-                result = ModelUtils::getMonospaceFont();
+                result = Utils::getMonospaceFont();
             }
         }
         else if (role == Qt::TextAlignmentRole) {

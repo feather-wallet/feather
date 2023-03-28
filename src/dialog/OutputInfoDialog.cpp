@@ -4,7 +4,6 @@
 #include "OutputInfoDialog.h"
 #include "ui_OutputInfoDialog.h"
 
-#include "model/ModelUtils.h"
 #include "utils/Utils.h"
 
 OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
@@ -13,7 +12,7 @@ OutputInfoDialog::OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent)
 {
     ui->setupUi(this);
 
-    QFont font = ModelUtils::getMonospaceFont();
+    QFont font = Utils::getMonospaceFont();
     ui->label_pubKey->setFont(font);
     ui->label_keyImage->setFont(font);
     ui->label_txid->setFont(font);

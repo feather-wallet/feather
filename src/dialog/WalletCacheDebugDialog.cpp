@@ -6,7 +6,7 @@
 
 #include <QRadioButton>
 
-#include "model/ModelUtils.h"
+#include "utils/Utils.h"
 
 WalletCacheDebugDialog::WalletCacheDebugDialog(Wallet *wallet, QWidget *parent)
         : WindowModalDialog(parent)
@@ -15,7 +15,7 @@ WalletCacheDebugDialog::WalletCacheDebugDialog(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->output->setFont(ModelUtils::getMonospaceFont());
+    ui->output->setFont(Utils::getMonospaceFont());
 
     connect(ui->m_blockchain, &QRadioButton::pressed, [this]{
         this->setOutput(m_wallet->printBlockchain());

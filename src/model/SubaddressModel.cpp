@@ -3,12 +3,13 @@
 
 #include "SubaddressModel.h"
 #include "Subaddress.h"
-#include "ModelUtils.h"
-#include "utils/ColorScheme.h"
 
 #include <QPoint>
 #include <QColor>
 #include <QBrush>
+
+#include "utils/ColorScheme.h"
+#include "utils/Utils.h"
 
 SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
     : QAbstractTableModel(parent)
@@ -69,7 +70,7 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
             switch(index.column()) {
                 case Address:
                 {
-                   result = ModelUtils::getMonospaceFont();
+                   result = Utils::getMonospaceFont();
                 }
             }
         }
@@ -104,7 +105,7 @@ QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subadd
         {
             QString address = QString::fromStdString(subaddress.getAddress());
             if (!m_showFullAddresses && role != Qt::UserRole) {
-                address = ModelUtils::displayAddress(address);
+                address = Utils::displayAddress(address);
             }
             return address;
         }

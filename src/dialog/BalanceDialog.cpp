@@ -5,7 +5,7 @@
 #include "ui_BalanceDialog.h"
 
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
+#include "utils/Utils.h"
 
 BalanceDialog::BalanceDialog(QWidget *parent, Wallet *wallet)
         : WindowModalDialog(parent)
@@ -17,13 +17,13 @@ BalanceDialog::BalanceDialog(QWidget *parent, Wallet *wallet)
                                             "This will take 20 minutes on average.");
 
     ui->label_unconfirmed->setText(WalletManager::displayAmount(wallet->balance() - wallet->unlockedBalance()));
-    ui->label_unconfirmed->setFont(ModelUtils::getMonospaceFont());
+    ui->label_unconfirmed->setFont(Utils::getMonospaceFont());
 
     ui->label_spendable->setText(WalletManager::displayAmount(wallet->unlockedBalance()));
-    ui->label_spendable->setFont(ModelUtils::getMonospaceFont());
+    ui->label_spendable->setFont(Utils::getMonospaceFont());
 
     ui->label_total->setText(WalletManager::displayAmount(wallet->balance()));
-    ui->label_total->setFont(ModelUtils::getMonospaceFont());
+    ui->label_total->setFont(Utils::getMonospaceFont());
 
     this->adjustSize();
 }

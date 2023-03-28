@@ -7,11 +7,11 @@
 #include <QMessageBox>
 
 #include "constants.h"
-#include "model/ModelUtils.h"
 #include "TxConfAdvDialog.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"
+#include "utils/Utils.h"
 
 TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent)
         : WindowModalDialog(parent)
@@ -46,9 +46,9 @@ TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString
     int maxLengthFiat = Utils::maxLength(amounts_fiat);
     std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
 
-    ui->label_amount->setFont(ModelUtils::getMonospaceFont());
-    ui->label_fee->setFont(ModelUtils::getMonospaceFont());
-    ui->label_total->setFont(ModelUtils::getMonospaceFont());
+    ui->label_amount->setFont(Utils::getMonospaceFont());
+    ui->label_fee->setFont(Utils::getMonospaceFont());
+    ui->label_total->setFont(Utils::getMonospaceFont());
 
     ui->label_amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
     ui->label_fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
@@ -57,8 +57,8 @@ TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString
     auto subaddressIndex = m_wallet->subaddressIndex(address);
     QString addressExtra;
 
-    ui->label_address->setText(ModelUtils::displayAddress(address, 2));
-    ui->label_address->setFont(ModelUtils::getMonospaceFont());
+    ui->label_address->setText(Utils::displayAddress(address, 2));
+    ui->label_address->setFont(Utils::getMonospaceFont());
     ui->label_address->setToolTip(address);
 
     if (subaddressIndex.isValid()) {

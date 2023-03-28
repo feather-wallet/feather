@@ -11,12 +11,12 @@
 #include <QtGlobal>
 
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
 #include "qrcode_utils/QrCodeUtils.h"
+#include "utils/Utils.h"
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
-    this->setFont(ModelUtils::getMonospaceFont());
+    this->setFont(Utils::getMonospaceFont());
 
     connect(this->document(), &QTextDocument::contentsChanged, this, &PayToEdit::updateSize);
     connect(this, &QPlainTextEdit::textChanged, this, &PayToEdit::checkText);

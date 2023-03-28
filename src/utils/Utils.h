@@ -36,6 +36,7 @@ namespace Utils
 
     void copyToClipboard(const QString &string);
     QString copyFromClipboard();
+    void copyColumn(QModelIndex * index, int column);
 
     QString xdgDesktopEntry();
     bool xdgDesktopEntryWrite(const QString &path);
@@ -60,11 +61,16 @@ namespace Utils
     void externalLinkWarning(QWidget *parent, const QString &url);
 
     void desktopNotify(const QString &title, const QString &message, int duration);
+
+    QString displayAddress(const QString& address, int sections = 3, const QString & sep = " ");
     QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount);
+
+    QFont getMonospaceFont();
+    QFont relativeFont(int delta);
+
     void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
     QString barrayToString(const QByteArray &data);
     QString getAccountName();
-    QFont relativeFont(int delta);
 
     bool isLocalUrl(const QUrl &url);
 

@@ -14,9 +14,8 @@
 #include "libwalletqt/TransactionHistory.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
-#include "Utils.h"
 #include "utils/Icons.h"
+#include "utils/Utils.h"
 
 TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
     : QDialog(parent)

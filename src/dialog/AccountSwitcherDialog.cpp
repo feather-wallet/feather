@@ -8,7 +8,6 @@
 
 #include "libwalletqt/SubaddressAccount.h"
 #include "libwalletqt/WalletManager.h"
-#include "model/ModelUtils.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
@@ -23,7 +22,7 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
 
     m_proxyModel->setSourceModel(m_model);
 
-    ui->label_totalBalance->setFont(ModelUtils::getMonospaceFont());
+    ui->label_totalBalance->setFont(Utils::getMonospaceFont());
 
     this->setWindowModality(Qt::WindowModal);
 
