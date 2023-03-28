@@ -16,7 +16,7 @@
 TorManager::TorManager(QObject *parent)
     : QObject(parent)
     , m_checkConnectionTimer(new QTimer(this))
-    , m_process(new ChildProcess(this))
+    , m_process(new QProcess(this))
 {
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 

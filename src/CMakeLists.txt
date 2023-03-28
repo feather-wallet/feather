@@ -195,10 +195,6 @@ if(STACK_TRACE)
     target_compile_definitions(feather PRIVATE STACK_TRACE=1)
 endif()
 
-if(HAVE_SYS_PRCTL_H)
-    target_compile_definitions(feather PRIVATE HAVE_SYS_PRCTL_H=1)
-endif()
-
 if(STATIC)
     target_compile_definitions(feather PRIVATE STATIC=1)
 endif()

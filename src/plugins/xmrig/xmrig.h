@@ -4,15 +4,7 @@
 #ifndef FEATHER_XMRIG_H
 #define FEATHER_XMRIG_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <QRegularExpression>
-#include <QtNetwork>
-#include <QApplication>
-#include <QMainWindow>
-
-#include "utils/childproc.h"
+#include <QProcess>
 
 class XmRig : public QObject
 {
@@ -36,7 +28,7 @@ private slots:
     void handleProcessError(QProcess::ProcessError error);
 
 private:
-    ChildProcess *m_process;
+    QProcess *m_process;
     QProcess m_killProcess;
     bool m_elevated;
 };

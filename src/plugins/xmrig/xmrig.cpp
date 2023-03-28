@@ -11,7 +11,7 @@
 
 XmRig::XmRig(const QString &configDir, QObject *parent)
     : QObject(parent)
-    , m_process(new ChildProcess(this))
+    , m_process(new QProcess(this))
 {
     m_process->setProcessChannelMode(QProcess::MergedChannels);
     connect(m_process, &QProcess::readyReadStandardOutput, this, &XmRig::handleProcessOutput);

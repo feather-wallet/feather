@@ -9,7 +9,6 @@
 #include <iostream>
 #include <QRegularExpression>
 #include <QtNetwork>
-#include "utils/childproc.h"
 #include "utils/SemanticVersion.h"
 
 class TorManager : public QObject
@@ -60,7 +59,7 @@ private:
 
     static QPointer<TorManager> m_instance;
 
-    ChildProcess *m_process;
+    QProcess *m_process;
     int m_restarts = 0;
     bool m_stopRetries = false;
     bool m_localTor;

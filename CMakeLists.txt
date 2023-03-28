@@ -39,9 +39,6 @@ if(DEBUG)
     set(CMAKE_VERBOSE_MAKEFILE ON)
 endif()
 
-check_include_file(sys/prctl.h HAVE_SYS_PRCTL_H)
-check_symbol_exists(prctl "sys/prctl.h" HAVE_PRCTL)
-
 # Monero configuration
 set(BUILD_GUI_DEPS ON)
 set(BUILD_64 ON)
