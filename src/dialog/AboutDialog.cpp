@@ -15,8 +15,7 @@ AboutDialog::AboutDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    // cute fox (c) Diego "rehrar" Salazar :-D
-    QPixmap p(":assets/images/cutexmrfox.png");
+    QPixmap p(":assets/images/appicons/256x256.png");
     ui->aboutImage->setPixmap(p.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     auto about = Utils::fileOpenQRC(":assets/about.txt");
     auto about_text = Utils::barrayToString(about);
@@ -28,10 +27,6 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");
     auto ack_text = Utils::barrayToString(ack);
     ui->ackText->setText(ack_text);
-
-    connect(ui->aboutImage, &ClickableLabel::clicked, [this](){
-        QMessageBox::information(this, "...", "Foxes don't have feathers.");
-    });
 
     this->adjustSize();
 }
