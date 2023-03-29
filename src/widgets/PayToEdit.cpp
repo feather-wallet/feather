@@ -8,7 +8,6 @@
 #include <QClipboard>
 #include <QMimeData>
 #include <QScrollBar>
-#include <QtGlobal>
 
 #include "libwalletqt/WalletManager.h"
 #include "qrcode/QrCodeUtils.h"

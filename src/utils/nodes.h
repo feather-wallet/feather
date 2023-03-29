@@ -6,9 +6,7 @@
 
 #include <QTimer>
 #include <QRegularExpression>
-#include <QApplication>
-#include <QtNetwork>
-#include <QNetworkReply>
+#include <QHostAddress>
 
 #include "model/NodeModel.h"
 #include "utils/Utils.h"

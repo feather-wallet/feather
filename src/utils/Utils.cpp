@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
+#include <QApplication>
 #include <QMessageBox>
-#include <QtNetwork>
 #include <QClipboard>
 #include <QDesktopServices>
 #include <QPushButton>
 #include <QFontDatabase>
+#include <QTcpSocket>
 
 #include "constants.h"
 #include "networktype.h"
@@ -25,7 +26,7 @@ bool fileExists(const QString &path) {
 QByteArray fileOpen(const QString &path) {
     QFile file(path);
     if (!file.open(QFile::ReadOnly | QFile::Text)) {
-        return QByteArray();
+        return {};
     }
 
     QByteArray data = file.readAll();
@@ -37,7 +38,7 @@ QByteArray fileOpenQRC(const QString &path) {
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly)) {
         qDebug() << "error: " << file.errorString();
-        return QByteArray();
+        return {};
     }
 
     QByteArray data = file.readAll();

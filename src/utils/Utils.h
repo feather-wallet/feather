@@ -6,7 +6,6 @@
 
 #include <QRegularExpression>
 #include <QStandardItemModel>
-#include <QApplication>
 #include <QTextCharFormat>
 
 #include "libwalletqt/Wallet.h"

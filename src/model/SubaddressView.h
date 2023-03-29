@@ -6,7 +6,6 @@
 
 #include <QTreeView>
 #include <QKeyEvent>
-#include <QApplication>
 #include <QClipboard>
 
 class SubaddressView : public QTreeView

@@ -4,9 +4,6 @@
 #ifndef TAILSOS_H
 #define TAILSOS_H
 
-#include <QApplication>
-
-
 class TailsOS
 {
 public:

@@ -53,7 +53,6 @@
 #include <QKeyEvent>
 #include <QAbstractItemView>
 #include <QtDebug>
-#include <QApplication>
 #include <QScrollBar>
 #include <QFile>
 

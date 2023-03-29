@@ -3,6 +3,7 @@
 
 #include "WindowManager.h"
 
+#include <QApplication>
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
