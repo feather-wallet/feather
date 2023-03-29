@@ -37,59 +37,6 @@ public:
     explicit StatusBarButton(const QIcon &icon, const QString &tooltip, QWidget *parent = nullptr);
 };
 
-class WWLabel : public QLabel
-{
-    Q_OBJECT
-
-public:
-    explicit WWLabel(const QString& label="", QWidget *parent = nullptr);
-};
-
-class PasswordLineEdit : public QLineEdit
-{
-    Q_OBJECT
-
-public:
-    explicit PasswordLineEdit(QWidget *parent = nullptr);
-};
-
-class Buttons : public QHBoxLayout
-{
-    Q_OBJECT
-
-public:
-    explicit Buttons(QPushButton* arr[], int size, QWidget *parent = nullptr);
-};
-
-
-class CloseButton : public QPushButton
-{
-Q_OBJECT
-
-public:
-    explicit CloseButton(QDialog *dialog, QWidget *parent = nullptr);
-};
-
-class OkButton : public QPushButton
-{
-Q_OBJECT
-
-public:
-    explicit OkButton(QDialog *dialog, const QString& label, QWidget *parent = nullptr);
-};
-
-
-class ButtonsTextEdit : public QPlainTextEdit
-{
-    Q_OBJECT
-
-public:
-    void setText(const QString &text);
-    QString text();
-
-    explicit ButtonsTextEdit(const QString &text = "");
-};
-
 class HelpLabel : public QLabel
 {
     Q_OBJECT

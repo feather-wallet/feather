@@ -32,46 +32,6 @@ StatusBarButton::StatusBarButton(const QIcon &icon, const QString &tooltip, QWid
     setCursor(QCursor(Qt::PointingHandCursor));
 }
 
-WWLabel::WWLabel(const QString& text, QWidget *parent) : QLabel(text, parent){
-    setWordWrap(true);
-    setTextInteractionFlags(Qt::TextSelectableByMouse);
-}
-
-PasswordLineEdit::PasswordLineEdit(QWidget *parent) : QLineEdit(parent) {
-    setEchoMode(Password);
-}
-
-Buttons::Buttons(QPushButton* arr[], int size, QWidget *parent) : QHBoxLayout(parent) {
-    addStretch();
-    for (int n=0; n < size; n++) {
-        addWidget(arr[n]);
-    }
-}
-
-OkButton::OkButton(QDialog *dialog, const QString& label = nullptr, QWidget *parent) : QPushButton(parent){
-    setText(label == nullptr ? label : "OK");
-    connect(this, &OkButton::clicked, dialog, &QDialog::accept);
-    setDefault(true);
-}
-
-CloseButton::CloseButton(QDialog *dialog, QWidget *parent) : QPushButton(parent) {
-    setText("Close");
-    connect(this, &CloseButton::clicked, dialog, &QDialog::close);
-    setDefault(true);
-}
-
-ButtonsTextEdit::ButtonsTextEdit(const QString &text) : QPlainTextEdit(text) {
-
-}
-
-void ButtonsTextEdit::setText(const QString &text) {
-    this->setPlainText(text);
-}
-
-QString ButtonsTextEdit::text(){
-    return this->toPlainText();
-}
-
 void HelpLabel::setHelpText(const QString &text)
 {
     this->help_text = text;
