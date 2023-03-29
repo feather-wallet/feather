@@ -4,7 +4,7 @@ $(package)_download_path=https://download.qt.io/development_releases/qt/6.5/$($(
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=0cf7498b34900a1d9f6c070a44495f7171eb4a4cb66a7ceea53e8721c8812701
-$(package)_dependencies=native_libxcb native_libxkbcommon native_libxcb_util native_libxcb_util_render native_libxcb_util_keysyms native_libxcb_util_image native_libxcb_util_wm native_libxcb_util_cursor
+$(package)_dependencies=native_libxcb native_libxkbcommon
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = dont_hardcode_pwd.patch
@@ -186,6 +186,7 @@ define $(package)_config_cmds
   export PKG_CONFIG_LIBDIR=$(build_prefix)/lib/pkgconfig && \
   export QT_MAC_SDK_NO_VERSION_CHECK=1 && \
   unset CMAKE_PREFIX_PATH && \
+  export CMAKE_PREFIX_PATH="$(QT_LIBS)" && \
   cd qtbase && \
   ./configure -top-level $($(package)_config_opts)
 endef

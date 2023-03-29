@@ -33,6 +33,7 @@
              (gnu packages shells)
              (gnu packages tls)
              (gnu packages version-control)
+             (gnu packages xorg)
              (guix build-system gnu)
              (guix build-system perl)
              (guix build-system python)
@@ -364,6 +365,13 @@ parse, modify and abstract ELF, PE and MachO formats.")
         git
         ;; Tests
         lief
+        ;; Xcb
+        xcb-util
+        xcb-util-cursor
+        xcb-util-image
+        xcb-util-keysyms
+        xcb-util-renderutil
+        xcb-util-wm
     )
   (let ((target (getenv "HOST")))
     (cond ((string-suffix? "-mingw32" target)
