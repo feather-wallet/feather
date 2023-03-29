@@ -65,8 +65,6 @@ file(GLOB SOURCE_FILES
         "polyseed/*.h"
         "polyseed/*.cpp"
         "polyseed/*.c"
-        "qrcode_utils/QrCodeUtils.cpp"
-        "qrcode_utils/QrCodeUtils.h"
         "monero_seed/argon2/blake2/*.c"
         "monero_seed/argon2/*.c"
         "monero_seed/*.cpp"
@@ -78,14 +76,14 @@ file(GLOB SOURCE_FILES
 
 if (WITH_SCANNER AND NOT Qt6_FOUND)
     file(GLOB SCANNER_FILES
-            "qrcode_scanner/*.h"
-            "qrcode_scanner/*.cpp")
+            "qrcode/scanner/*.h"
+            "qrcode/scanner/*.cpp")
 endif()
 
 if (WITH_SCANNER AND Qt6_FOUND)
     file(GLOB SCANNER_FILES
-            "qrcode_scanner_qt6/*.h"
-            "qrcode_scanner_qt6/*.cpp")
+            "qrcode/scanner_qt6/*.h"
+            "qrcode/scanner_qt6/*.cpp")
 endif()
 
 list(APPEND SOURCE_FILES

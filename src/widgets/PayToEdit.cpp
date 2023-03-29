@@ -11,7 +11,7 @@
 #include <QtGlobal>
 
 #include "libwalletqt/WalletManager.h"
-#include "qrcode_utils/QrCodeUtils.h"
+#include "qrcode/QrCodeUtils.h"
 #include "utils/Utils.h"
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
