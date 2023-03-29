@@ -556,15 +556,6 @@ QString barrayToString(const QByteArray &data) {
     return QString::fromUtf8(data);
 }
 
-QString getAccountName() {
-    QString accountName = qgetenv("USER"); // mac/linux
-    if (accountName.isEmpty())
-        accountName = qgetenv("USERNAME"); // Windows
-    if (accountName.isEmpty())
-        throw std::runtime_error("Could derive system account name from env vars: USER or USERNAME");
-    return accountName;
-}
-
 QFont getMonospaceFont()
 {
     if (QFontInfo(QApplication::font()).fixedPitch()) {

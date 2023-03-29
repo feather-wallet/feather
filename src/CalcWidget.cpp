@@ -10,7 +10,6 @@
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"
-#include "utils/WebsocketClient.h"
 #include "utils/WebsocketNotifier.h"
 
 CalcWidget::CalcWidget(QWidget *parent)

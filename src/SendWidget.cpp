@@ -67,8 +67,11 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
 }
 
 void SendWidget::currencyComboChanged(int index) {
+    Q_UNUSED(index)
     QString amount = ui->lineAmount->text();
-    if(amount.isEmpty()) return;
+    if (amount.isEmpty()) {
+        return;
+    }
     this->amountEdited(amount);
 }
 
@@ -91,6 +94,7 @@ void SendWidget::addressEdited() {
 }
 
 void SendWidget::amountEdited(const QString &text) {
+    Q_UNUSED(text)
     this->updateConversionLabel();
 }
 

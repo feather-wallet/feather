@@ -56,10 +56,9 @@ private:
     Wallet *m_wallet;
     QMenu *m_headerMenu;
     QAction *m_showFullAddressesAction;
-    QAction *m_showUsedAddressesAction;
     QAction *m_showTransactionsAction;
-    SubaddressModel * m_model;
-    SubaddressProxyModel * m_proxyModel;
+    SubaddressModel *m_model;
+    SubaddressProxyModel *m_proxyModel;
 
     void updateQrCode();
     void showQrCodeDialog();

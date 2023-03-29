@@ -126,11 +126,11 @@ private slots:
     void menuProxySettingsClicked();
     void menuToggleTabVisible(const QString &key);
     void menuClearHistoryClicked();
-    void onExportHistoryCSV(bool checked);
-    void onExportContactsCSV(bool checked);
-    void onCreateDesktopEntry(bool checked);
+    void onExportHistoryCSV();
+    void onExportContactsCSV();
+    void onCreateDesktopEntry();
     void onShowDocumentation();
-    void onReportBug(bool checked);
+    void onReportBug();
     void onShowSettingsPage(int page);
 
     // offline tx signing
@@ -172,7 +172,6 @@ private slots:
     void donateButtonClicked();
     void showCalcWindow();
     void payToMany();
-    void showSendTab();
     void showHistoryTab();
     void showSendScreen(const CCSEntry &entry);
     void skinChanged(const QString &skinName);

@@ -8,7 +8,6 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
-#include "config-feather.h"
 #include "constants.h"
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
@@ -30,8 +29,6 @@
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
-#include "utils/NetworkManager.h"
-#include "utils/os/tails.h"
 #include "utils/SemanticVersion.h"
 #include "utils/TorManager.h"
 #include "utils/Updater.h"
@@ -1026,11 +1023,6 @@ void MainWindow::showHistoryTab() {
     ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
 }
 
-void MainWindow::showSendTab() {
-    this->raise();
-    ui->tabWidget->setCurrentIndex(Tabs::SEND);
-}
-
 void MainWindow::fillSendTab(const QString &address, const QString &description) {
     m_sendWidget->fill(address, description);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
@@ -1498,7 +1490,7 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
     }
 }
 
-void MainWindow::onExportHistoryCSV(bool checked) {
+void MainWindow::onExportHistoryCSV() {
     if (m_wallet == nullptr)
         return;
     QString fn = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
@@ -1510,7 +1502,7 @@ void MainWindow::onExportHistoryCSV(bool checked) {
     QMessageBox::information(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
 }
 
-void MainWindow::onExportContactsCSV(bool checked) {
+void MainWindow::onExportContactsCSV() {
     if (m_wallet == nullptr) return;
     auto *model = m_wallet->addressBookModel();
     if (model->rowCount() <= 0){
@@ -1521,13 +1513,13 @@ void MainWindow::onExportContactsCSV(bool checked) {
     const QString targetDir = QFileDialog::getExistingDirectory(this, "Select CSV output directory ", QDir::homePath(), QFileDialog::ShowDirsOnly);
     if(targetDir.isEmpty()) return;
 
-    qint64 now = QDateTime::currentDateTime().currentMSecsSinceEpoch();
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
     QString fn = QString("%1/monero-contacts_%2.csv").arg(targetDir, QString::number(now / 1000));
     if(model->writeCSV(fn))
         QMessageBox::information(this, "Address book exported", QString("Address book exported to %1").arg(fn));
 }
 
-void MainWindow::onCreateDesktopEntry(bool checked) {
+void MainWindow::onCreateDesktopEntry() {
     auto msg = Utils::xdgDesktopEntryRegister() ? "Desktop entry created" : "Desktop entry not created due to an error.";
     QMessageBox::information(this, "Desktop entry", msg);
 }
@@ -1536,7 +1528,7 @@ void MainWindow::onShowDocumentation() {
     Utils::externalLinkWarning(this, "https://docs.featherwallet.org");
 }
 
-void MainWindow::onReportBug(bool checked) {
+void MainWindow::onReportBug() {
     Utils::externalLinkWarning(this, "https://docs.featherwallet.org/guides/report-an-issue");
 }
 
@@ -1745,4 +1737,4 @@ void MainWindow::toggleSearchbar(bool visible) {
 
 MainWindow::~MainWindow() {
     qDebug() << "~MainWindow";
-};
+}

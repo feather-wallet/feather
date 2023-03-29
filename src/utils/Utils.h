@@ -67,7 +67,6 @@ namespace Utils
 
     void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg);
     QString barrayToString(const QByteArray &data);
-    QString getAccountName();
 
     bool isLocalUrl(const QUrl &url);
 
