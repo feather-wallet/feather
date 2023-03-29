@@ -465,7 +465,7 @@ QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettyp
             return QString("https://testnet.xmrchain.net/tx/%1").arg(txid);
     }
 
-    return QString("");
+    return {};
 }
 
 void externalLinkWarning(QWidget *parent, const QString &url){
@@ -491,33 +491,6 @@ void externalLinkWarning(QWidget *parent, const QString &url){
     } else if (linkWarning.result() == QMessageBox::Ok) {
         QDesktopServices::openUrl(QUrl(url));
     }
-}
-
-void desktopNotify(const QString &title, const QString &message, int duration) {
-    if (config()->get(Config::hideNotifications).toBool()) {
-        return;
-    }
-
-    QStringList notify_send = QStringList() << title << message << "-t" << QString::number(duration);
-    QStringList kdialog = QStringList() << title << message;
-    QStringList macos = QStringList() << "-e" << QString(R"(display notification "%1" with title "%2")").arg(message).arg(title);
-#if defined(Q_OS_LINUX)
-    QProcess process;
-    if (fileExists("/usr/bin/kdialog"))
-        process.start("/usr/bin/kdialog", kdialog);
-    else if (fileExists("/usr/bin/notify-send"))
-        process.start("/usr/bin/notify-send", notify_send);
-    process.waitForFinished(-1);
-    QString stdout = process.readAllStandardOutput();
-    QString stderr = process.readAllStandardError();
-#elif defined(Q_OS_MACOS)
-    QProcess process;
-    // @TODO: need to escape special chars with "\"
-    process.start("osascript", macos);
-    process.waitForFinished(-1);
-    QString stdout = process.readAllStandardOutput();
-    QString stderr = process.readAllStandardError();
-#endif
 }
 
 QString displayAddress(const QString& address, int sections, const QString& sep) {
@@ -557,23 +530,23 @@ void applicationLogHandler(QtMsgType type, const QMessageLogContext &context, co
 
     switch (type) {
         case QtDebugMsg:
-            line = QString("[%1 D] %2(:%3) %4\n").arg(date).arg(fn).arg(context.line).arg(msg);
+            line = QString("[%1 D] %2(:%3) %4\n").arg(date, fn, QString::number(context.line), msg);
             fprintf(stderr, "%s", line.toLatin1().data());
             break;
         case QtInfoMsg:
-            line = QString("[%1 I] %2\n").arg(date).arg(msg);
+            line = QString("[%1 I] %2\n").arg(date, msg);
             fprintf(stdout, "%s", line.toLatin1().data());
             break;
         case QtWarningMsg:
-            line = QString("[%1 W] %2(:%3) %4\n").arg(date).arg(fn).arg(context.line).arg(msg);
+            line = QString("[%1 W] %2(:%3) %4\n").arg(date, fn, QString::number(context.line), msg);
             fprintf(stdout, "%s", line.toLatin1().data());
             break;
         case QtCriticalMsg:
-            line = QString("[%1 C] %2(:%3) %4\n").arg(date).arg(fn).arg(context.line).arg(msg);
+            line = QString("[%1 C] %2(:%3) %4\n").arg(date, fn, QString::number(context.line), msg);
             fprintf(stderr, "%s", line.toLatin1().data());
             break;
         case QtFatalMsg:
-            line = QString("[%1 F] %2(:%3) %4\n").arg(date).arg(fn).arg(context.line).arg(msg);
+            line = QString("[%1 F] %2(:%3) %4\n").arg(date, fn, QString::number(context.line), msg);
             fprintf(stderr, "%s", line.toLatin1().data());
             break;
     }

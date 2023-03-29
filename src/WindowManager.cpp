@@ -579,6 +579,18 @@ void WindowManager::buildTrayMenu() {
     menu->addAction("Exit Feather", this, &WindowManager::close);
 }
 
+void WindowManager::notify(const QString &title, const QString &message, int duration) {
+    if (!m_tray || !QSystemTrayIcon::supportsMessages()) {
+        return;
+    }
+
+    if (config()->get(Config::hideNotifications).toBool()) {
+        return;
+    }
+
+    m_tray->showMessage(title, message, icons()->icon("appicons/64x64.png"), duration);
+}
+
 // ######################## NETWORKING ########################
 
 void WindowManager::onInitialNetworkConfigured() {

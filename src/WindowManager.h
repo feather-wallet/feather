@@ -30,6 +30,8 @@ public:
 
     void showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab = false);
 
+    void notify(const QString &title, const QString &message, int duration);
+
     EventFilter *eventFilter;
 
 signals:

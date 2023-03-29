@@ -59,8 +59,6 @@ namespace Utils
     QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid);
     void externalLinkWarning(QWidget *parent, const QString &url);
 
-    void desktopNotify(const QString &title, const QString &message, int duration);
-
     QString displayAddress(const QString& address, int sections = 3, const QString & sep = " ");
     QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount);
 
