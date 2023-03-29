@@ -1307,7 +1307,7 @@ void MainWindow::onDeviceButtonRequest(quint64 code) {
                 }
 
                 m_splashDialog->setMessage("Confirm action on device to proceed");
-                m_splashDialog->setIcon(QPixmap(":/assets/images/confirmed.png"));
+                m_splashDialog->setIcon(QPixmap(":/assets/images/confirmed.svg"));
                 m_splashDialog->show();
                 m_splashDialog->setEnabled(true);
                 break;

@@ -18,7 +18,7 @@ PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)
                          "Your wallet is password protected and encrypted. Use this dialog to change your password.";
     ui->label_warning->setText(warning_str);
 
-    QPixmap pixmap = noPassword ? QPixmap(":/assets/images/unlock.png") : QPixmap(":/assets/images/lock.png");
+    QPixmap pixmap = noPassword ? QPixmap(":/assets/images/unlock.svg") : QPixmap(":/assets/images/lock.svg");
     ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     if (noPassword) {

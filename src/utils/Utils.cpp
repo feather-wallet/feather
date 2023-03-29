@@ -280,7 +280,7 @@ bool xdgDesktopEntryRegister() {
     return false;
 #endif
 
-    QPixmap appIcon(":assets/images/feather.png");
+    QPixmap appIcon(":assets/images/appicons/64x64.png");
     QString pathIcon = QString("%1/.local/share/icons/feather.png").arg(QDir::homePath());
     if (!fileExists(pathIcon)) {
         pixmapWrite(pathIcon, appIcon);

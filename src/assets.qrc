@@ -13,10 +13,7 @@
     <file>assets/images/appicons/128x128.png</file>
     <file>assets/images/appicons/256x256.png</file>
     <file>assets/images/arrow.svg</file>
-    <file>assets/images/banners/1.png</file>
-    <file>assets/images/banners/2.png</file>
     <file>assets/images/banners/3.png</file>
-    <file>assets/images/bitcoin.png</file>
     <file>assets/images/camera_dark.png</file>
     <file>assets/images/camera_white.png</file>
     <file>assets/images/change_account.png</file>
@@ -29,21 +26,16 @@
     <file>assets/images/coins.png</file>
     <file>assets/images/coldcard.png</file>
     <file>assets/images/coldcard_unpaired.png</file>
-    <file>assets/images/confirmed.png</file>
-    <file>assets/images/confirmed_icon.png</file>
     <file>assets/images/confirmed.svg</file>
     <file>assets/images/connect.svg</file>
     <file>assets/images/copy.png</file>
-    <file>assets/images/cutexmrfox.png</file>
     <file>assets/images/edit.png</file>
     <file>assets/images/external-link.svg</file>
     <file>assets/images/exchange.png</file>
     <file>assets/images/exchange_white.png</file>
     <file>assets/images/expired.png</file>
-    <file>assets/images/expired_icon.png</file>
     <file>assets/images/eye1.png</file>
     <file>assets/images/eye_blind.png</file>
-    <file>assets/images/feather.png</file>
     <file>assets/images/file.png</file>
     <file>assets/images/file_manager_32px.png</file>
     <file>assets/images/gnome-calc.png</file>
@@ -64,8 +56,6 @@
     <file>assets/images/localMonero_sell_white.svg</file>
     <file>assets/images/localMonero_logo.png</file>
     <file>assets/images/localMonero_register.svg</file>
-    <file>assets/images/lock.png</file>
-    <file>assets/images/lock_icon.png</file>
     <file>assets/images/lock.svg</file>
     <file>assets/images/microphone.png</file>
     <file>assets/images/mining.png</file>
@@ -73,7 +63,6 @@
     <file>assets/images/nw_32px.png</file>
     <file>assets/images/offline_tx.png</file>
     <file>assets/images/person.svg</file>
-    <file>assets/images/preferences.png</file>
     <file>assets/images/preferences.svg</file>
     <file>assets/images/qrcode.png</file>
     <file>assets/images/qrcode_white.png</file>
@@ -89,19 +78,11 @@
     <file>assets/images/seed.png</file>
     <file>assets/images/settings_disabled_32px.png</file>
     <file>assets/images/speaker.png</file>
-    <file>assets/images/status_connected_fork.png</file>
-    <file>assets/images/status_connected.png</file>
-    <file>assets/images/status_connected_proxy_fork.png</file>
-    <file>assets/images/status_connected_proxy.png</file>
     <file>assets/images/status_connected_proxy.svg</file>
     <file>assets/images/status_connected.svg</file>
-    <file>assets/images/status_disconnected.png</file>
     <file>assets/images/status_disconnected.svg</file>
-    <file>assets/images/status_lagging_fork.png</file>
-    <file>assets/images/status_lagging.png</file>
     <file>assets/images/status_lagging.svg</file>
     <file>assets/images/status_offline.svg</file>
-    <file>assets/images/status_waiting.png</file>
     <file>assets/images/status_waiting.svg</file>
     <file>assets/images/tab_addresses.png</file>
     <file>assets/images/tab_coins.png</file>
@@ -120,13 +101,11 @@
     <file>assets/images/trezor_unpaired.png</file>
     <file>assets/images/trezor_unpaired_white.png</file>
     <file>assets/images/unconfirmed.png</file>
-    <file>assets/images/unlock.png</file>
     <file>assets/images/unlock.svg</file>
     <file>assets/images/unpaid.png</file>
     <file>assets/images/update.png</file>
     <file>assets/images/warning.png</file>
     <file>assets/images/vrdp_32px.png</file>
-    <file>assets/images/xmrig.ico</file>
     <file>assets/images/xmrig.svg</file>
     <file>assets/images/zoom.png</file>
     <file>assets/restore_heights_monero_mainnet.txt</file>

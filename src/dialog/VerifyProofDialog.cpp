@@ -16,7 +16,7 @@ VerifyProofDialog::VerifyProofDialog(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_success = QPixmap(":/assets/images/confirmed.png").scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    m_success = QPixmap(":/assets/images/confirmed.svg").scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     m_failure = QPixmap(":/assets/images/expired.png").scaled(32, 32, Qt::KeepAspectRatio, Qt::SmoothTransformation);
 
     ui->frame_status->hide();

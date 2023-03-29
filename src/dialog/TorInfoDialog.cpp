@@ -34,11 +34,11 @@ void TorInfoDialog::onConnectionStatusChanged(bool connected) {
         ui->label_testConnectionStatus->setText("Not running");
     }
     else if (connected) {
-        ui->icon_connectionStatus->setPixmap(QPixmap(":/assets/images/status_connected.png").scaledToWidth(16, Qt::SmoothTransformation));
+        ui->icon_connectionStatus->setPixmap(QPixmap(":/assets/images/status_connected.svg").scaledToWidth(16, Qt::SmoothTransformation));
         ui->label_testConnectionStatus->setText("Connected");
     }
     else {
-        ui->icon_connectionStatus->setPixmap(QPixmap(":/assets/images/status_disconnected.png").scaledToWidth(16, Qt::SmoothTransformation));
+        ui->icon_connectionStatus->setPixmap(QPixmap(":/assets/images/status_disconnected.svg").scaledToWidth(16, Qt::SmoothTransformation));
         ui->label_testConnectionStatus->setText("Disconnected");
     }
 }

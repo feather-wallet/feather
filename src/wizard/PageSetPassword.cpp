@@ -13,7 +13,7 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
     ui->setupUi(this);
     this->setFinalPage(true);
 
-    QPixmap pixmap = QPixmap(":/assets/images/lock.png");
+    QPixmap pixmap = QPixmap(":/assets/images/lock.svg");
     ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     connect(ui->line_password, &QLineEdit::textChanged, [this]{

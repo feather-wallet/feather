@@ -95,7 +95,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                     else if (tInfo.confirmations() < tInfo.confirmationsRequired())
                         result = QVariant(icons()->icon("clock5.png"));
                     else if (tInfo.confirmations())
-                        result = QVariant(icons()->icon("confirmed.png"));
+                        result = QVariant(icons()->icon("confirmed.svg"));
                 }
             }
         }
