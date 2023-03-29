@@ -5,7 +5,7 @@
 
 #include "utils/config.h"
 
-LocalMoneroApi::LocalMoneroApi(QObject *parent, UtilsNetworking *network)
+LocalMoneroApi::LocalMoneroApi(QObject *parent, Networking *network)
     : QObject(parent)
     , m_network(network)
 {

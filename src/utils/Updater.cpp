@@ -11,7 +11,7 @@
 #include "config-feather.h"
 #include "Utils.h"
 #include "utils/AsyncTask.h"
-#include "utils/networking.h"
+#include "utils/Networking.h"
 #include "utils/NetworkManager.h"
 #include "utils/SemanticVersion.h"
 
@@ -25,7 +25,7 @@ Updater::Updater(QObject *parent) :
 }
 
 void Updater::checkForUpdates() {
-    UtilsNetworking network{this};
+    Networking network{this};
     QNetworkReply *reply = network.getJson(QString("%1/updates.json").arg(this->getWebsiteUrl()));
     if (!reply) {
         emit updateCheckFailed("offline mode enabled");
@@ -87,7 +87,7 @@ void Updater::wsUpdatesReceived(const QJsonObject &updates) {
     QString hashesUrl = QString("%1/files/releases/hashes-%2-plain.txt").arg(this->getWebsiteUrl(), newVersion);
     qDebug() << hashesUrl;
 
-    UtilsNetworking network{this};
+    Networking network{this};
     QNetworkReply *reply = network.get(hashesUrl);
 
     connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onSignedHashesReceived, this, reply, platformTag, newVersion));

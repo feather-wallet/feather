@@ -5,7 +5,7 @@
 #define FEATHER_LOCALMONEROAPI_H
 
 #include <QObject>
-#include "utils/networking.h"
+#include "utils/Networking.h"
 
 class LocalMoneroApi : public QObject {
     Q_OBJECT
@@ -27,7 +27,7 @@ public:
         QJsonObject obj;
     };
 
-    explicit LocalMoneroApi(QObject *parent, UtilsNetworking *network);
+    explicit LocalMoneroApi(QObject *parent, Networking *network);
 
     void countryCodes();
     void currencies();
@@ -46,7 +46,7 @@ private:
     QString getBuySellUrl(bool buy, const QString &currencyCode, const QString &countryCode="", const QString &paymentMethod="", const QString &amount = "", int page = 0);
     QString getBaseUrl();
 
-    UtilsNetworking *m_network;
+    Networking *m_network;
 };
 
 

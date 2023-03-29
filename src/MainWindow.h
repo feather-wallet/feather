@@ -27,7 +27,7 @@
 #include "model/TransactionHistoryModel.h"
 #include "model/CoinsModel.h"
 #include "model/CoinsProxyModel.h"
-#include "utils/networking.h"
+#include "utils/Networking.h"
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
 #include "utils/EventFilter.h"

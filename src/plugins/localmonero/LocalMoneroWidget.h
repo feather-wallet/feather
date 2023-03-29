@@ -48,7 +48,7 @@ private:
 
     LocalMoneroApi *m_api;
     LocalMoneroModel *m_model;
-    UtilsNetworking *m_network;
+    Networking *m_network;
     QJsonObject m_paymentMethods;
 };
 

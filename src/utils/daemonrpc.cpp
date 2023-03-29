@@ -5,7 +5,7 @@
 
 DaemonRpc::DaemonRpc(QObject *parent, QString daemonAddress)
         : QObject(parent)
-        , m_network(new UtilsNetworking(this))
+        , m_network(new Networking(this))
         , m_daemonAddress(std::move(daemonAddress))
 {
 }

@@ -6,7 +6,7 @@
 
 #include <QObject>
 
-#include "utils/networking.h"
+#include "utils/Networking.h"
 
 class DaemonRpc : public QObject {
     Q_OBJECT
@@ -42,7 +42,7 @@ private slots:
     QString onSendRawTransactionFailed(const QJsonObject &obj);
 
 private:
-    UtilsNetworking *m_network;
+    Networking *m_network;
     QString m_daemonAddress;
 };
 

@@ -8,7 +8,7 @@
 
 #include "constants.h"
 #include "utils/AsyncTask.h"
-#include "utils/networking.h"
+#include "utils/Networking.h"
 #include "utils/NetworkManager.h"
 #include "utils/Updater.h"
 #include "utils/Utils.h"
@@ -86,7 +86,7 @@ void UpdateDialog::onDownloadClicked() {
     ui->btn_download->hide();
     ui->progressBar->show();
 
-    UtilsNetworking network{this};
+    Networking network{this};
 
     m_reply = network.get(m_updater->downloadUrl);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &UpdateDialog::onDownloadProgress);

@@ -4,19 +4,17 @@
 #ifndef FEATHER_NETWORKING_H
 #define FEATHER_NETWORKING_H
 
-#include <QRegularExpression>
-#include <QtNetwork>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
 
 #include "utils/Utils.h"
 
-class UtilsNetworking : public QObject
+class Networking : public QObject
 {
 Q_OBJECT
 
 public:
-    explicit UtilsNetworking(QObject *parent = nullptr);
+    explicit Networking(QObject *parent = nullptr);
 
     QNetworkReply* get(const QString &url);
     QNetworkReply* getJson(const QString &url);
