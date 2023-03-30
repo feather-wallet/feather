@@ -1,7 +1,7 @@
 packages := boost openssl libiconv unbound qrencode zbar sodium polyseed hidapi protobuf libusb zlib libgpg-error libgcrypt expat libzip
 native_packages := native_libxcb native_xcb_proto native_libXau native_xproto native_libxkbcommon native_qt native_protobuf
 
-linux_packages := eudev liblzma libarchive libfuse libsquashfuse libappimage appimage_runtime
+linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
 linux_native_packages =
 
 darwin_packages :=

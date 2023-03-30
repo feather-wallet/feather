@@ -1,0 +1,24 @@
+--- a/src/runtime/Makefile
++++ b/src/runtime/Makefile
+@@ -1,15 +1,15 @@
+ CC            = gcc
+ CFLAGS        = -std=gnu99 -s -Os -D_FILE_OFFSET_BITS=64 -DGIT_COMMIT=\"${GIT_COMMIT}\" -T data_sections.ld -ffunction-sections -fdata-sections -Wl,--gc-sections -static
+-LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lz
++LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lpthread
+ 
+ all: runtime-fuse2 runtime-fuse3
+ 
+ # Compile runtime
+ runtime-fuse2.o: runtime.c
+-	$(CC) -I/usr/local/include/squashfuse -I/usr/include/fuse -o runtime-fuse2.o -c $(CFLAGS) $^
++	$(CC) -I${host_prefix}/include -I${host_prefix}/include/fuse -o runtime-fuse2.o -c $(CFLAGS) $^
+ 
+ runtime-fuse2: runtime-fuse2.o
+-	$(CC) $(CFLAGS) $^ $(LIBS) -lfuse -o runtime-fuse2
++	$(CC) $(CFLAGS) $^ -L${host_prefix}/lib $(LIBS) -lfuse -lpthread -o runtime-fuse2
+ 
+ runtime-fuse3.o: runtime.c
+ 	$(CC) -I/usr/local/include/squashfuse -I/usr/include/fuse3 -o runtime-fuse3.o -c $(CFLAGS) $^
+-- 
+2.40.0
+

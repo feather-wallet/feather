@@ -39,7 +39,7 @@ chmod +x "$APPDIR/AppRun"
 
 find feather.AppDir/ -exec touch -h -a -m -t 202101010100.00 {} \;
 
-mksquashfs feather.AppDir feather.squashfs -info -root-owned -no-xattrs -noappend -fstime 0
+mksquashfs feather.AppDir feather.squashfs -comp zstd -info -root-owned -no-xattrs -noappend -fstime 0
 # mksquashfs writes a timestamp to the header
 printf '\x00\x00\x00\x00' | dd conv=notrunc of=feather.squashfs bs=1 seek=$((0x8))
 

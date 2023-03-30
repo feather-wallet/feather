@@ -308,23 +308,23 @@ endif
 
 ifeq ($(host_os),darwin)
 define $(package)_build_cmds
-  export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
+  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
   env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH  $(MAKE)
 endef
 else ifeq ($(host_os),mingw32)
 define $(package)_build_cmds
-  export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
+  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
   $(MAKE)
 endef
 else ifneq (,$(findstring x86_64,$(HOST)))
 define $(package)_build_cmds
-  export LD_LIBRARY_PATH=${host_prefix}/lib/ && \
+  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
   cmake --build . --target syncqt_build && \
   $(MAKE)
 endef
 else
 define $(package)_build_cmds
-  export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
+  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
   $(MAKE)
 endef
 endif

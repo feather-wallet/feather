@@ -1,24 +1,24 @@
-# TODO: we're not actually using the sources downloaded here. Perhaps host patches in a github repo.
 package=appimage_runtime
-$(package)_version=13
-$(package)_download_path=https://github.com/AppImage/AppImageKit/archive/refs/tags/
+$(package)_version=c1ea7509bc179a05d907baca64f41875662f35f2
+$(package)_download_path=https://github.com/AppImage/type2-runtime/archive/
 $(package)_file_name=$($(package)_version).tar.gz
-$(package)_sha256_hash=51b837c78dd99ecc1cf3dd283f4a98a1be665b01457da0edc1ff736d12974b1a
-$(package)_dependencies=libsquashfuse libappimage liblzma
-$(package)_patches=CMakeLists.txt runtime.c notify.c
+$(package)_sha256_hash=a7906c7d1610eacb6c67a16c554fac8875b05424fea49e291311c3e5db2237a3
+$(package)_dependencies=libsquashfuse zstd
+$(package)_patches=depends-fix.patch
 
 define $(package)_preprocess_cmds
-    cp -v $($(package)_patch_dir)/* .
-endef
-
-define $(package)_config_cmds
-    $($(package)_cmake) -DCMAKE_INSTALL_PREFIX=$(host_prefix) -DHOST=$(host) -DGLIBC_DYNAMIC_LINKER=$(GLIBC_DYNAMIC_LINKER) .
+  patch -p1 < $($(package)_patch_dir)/depends-fix.patch
 endef
 
 define $(package)_build_cmds
-    $(MAKE)
+    cd src/runtime && \
+    export host_prefix="$(host_prefix)" && \
+    $(MAKE) runtime-fuse2 -e CC=$($(package)_cc) LDLAGS="$($(package)_ldflags)" && \
+    "${HOST}-strip" runtime-fuse2 && \
+    echo -ne 'AI\x02' | dd of=runtime-fuse2 bs=1 count=3 seek=8 conv=notrunc
 endef
 
 define $(package)_stage_cmds
-    cp -a runtime $($(package)_staging_prefix_dir)/runtime
+    cd src/runtime && \
+    cp -a runtime-fuse2 $($(package)_staging_prefix_dir)/runtime
 endef
