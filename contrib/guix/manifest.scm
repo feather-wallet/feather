@@ -289,7 +289,7 @@ chain for " target " development."))
   (list ;; The Basics
         bash
         which
-        coreutils
+        coreutils-minimal
         util-linux
         ;; File(system) inspection
         file
@@ -320,15 +320,15 @@ chain for " target " development."))
         gperf
         gettext-minimal
         squashfs-tools
-        cmake
+        cmake-minimal
         ;; Native GCC 10 toolchain
         gcc-toolchain-10
         (list gcc-toolchain-10 "static")
         ;; Scripting
         perl
-        python-3
+        python-minimal
         ;; Git
-        git
+        git-minimal
         ;; Xcb
         xcb-util
         xcb-util-cursor
