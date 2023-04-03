@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.5.0-beta3
-$(package)_download_path=https://download.qt.io/development_releases/qt/6.5/$($(package)_version)/submodules
+$(package)_version=6.5.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=0cf7498b34900a1d9f6c070a44495f7171eb4a4cb66a7ceea53e8721c8812701
+$(package)_sha256_hash=fde1aa7b4fbe64ec1b4fc576a57f4688ad1453d2fab59cbadd948a10a6eaf5ef
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt native_libxkbcommon
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor
@@ -30,19 +30,19 @@ $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=f959d0e91616ee16ca8bb843307214c4c90ebcd1283854f24c7b33eb88bbb418
+$(package)_qttools_sha256_hash=49c33d96b0a44988be954269b8ce3d1a495b439726e03a6be7c0d50a686369c4
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=0bb327206418384d6fd6cfe52d4350041982816847cdbbea74681582117de6a8
+$(package)_qtsvg_sha256_hash=64ca7e61f44d51e28bcbb4e0509299b53a9a7e38879e00a7fe91643196067a4f
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=8051d793cf4a8890c516217f3ef95dfa9ff950430fd3fb721b26807a3a95e852
+$(package)_qtwebsockets_sha256_hash=bc087bd656bb34da120ccab6e927036a219f75fd88f1543744c426bfca616308
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=873473fe7150082993dad04bec4c993f7a24af9449696150b24ab784494871df
+$(package)_qtmultimedia_sha256_hash=9480d0c73abdd01aec4899e340938cec046a3f404b9f9ed945288be574dca146
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=e238b3494e25db4841cfa06db27ddd30e8241f25cbeeface6d7916fb34d1ee51
+$(package)_qtshadertools_sha256_hash=86618d037f3071f1f7ac5eb7ab76ae4e6f51cfddded0a402bb9aa7f3f79f5775
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
