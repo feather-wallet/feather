@@ -50,6 +50,10 @@
 #include "plugins/localmonero/LocalMoneroWidget.h"
 #endif
 
+#ifdef HAS_TROCADORAPP
+#include "plugins/trocadorapp/TrocadorAppWidget.h"
+#endif
+
 #ifdef HAS_XMRIG
 #include "plugins/xmrig/XMRigWidget.h"
 #endif
@@ -252,6 +256,11 @@ private:
     SendWidget *m_sendWidget = nullptr;
     ReceiveWidget *m_receiveWidget = nullptr;
     CoinsWidget *m_coinsWidget = nullptr;
+
+#ifdef HAS_TROCADORAPP
+    TrocadorAppWidget *m_trocadorAppWidget = nullptr;
+#endif
+
 #ifdef HAS_LOCALMONERO
     LocalMoneroWidget *m_localMoneroWidget = nullptr;
 #endif
