@@ -133,7 +133,11 @@ void Updater::onSignedHashesReceived(QNetworkReply *reply, const QString &platfo
 
 QString Updater::getPlatformTag() {
 #ifdef Q_OS_MACOS
-    return "mac";
+    if (QString(FEATHER_TARGET_TRIPLET) == "arm64-apple-darwin") {
+        return "mac-arm64";
+    } else {
+        return "mac";
+    }
 #endif
 #ifdef Q_OS_WIN
     #ifdef PLATFORM_INSTALLER
@@ -149,6 +153,8 @@ QString Updater::getPlatformTag() {
         tag += "linux-arm64";
     } else if (arch == "arm") {
         tag += "linux-arm";
+    } else if (arch == "riscv64") {
+        tag += "linux-riscv64";
     } else {
         tag += "linux";
     }

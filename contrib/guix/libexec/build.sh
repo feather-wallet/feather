@@ -273,7 +273,7 @@ mkdir -p "$DISTSRC"
 
 
     # Set appropriate CMake options for build type
-    CMAKEVARS="-DWITH_SCANNER=On -DCHECK_UPDATES=On -DSELF_CONTAINED=On -DDONATE_BEG=On"
+    CMAKEVARS="-DWITH_SCANNER=On -DCHECK_UPDATES=On -DSELF_CONTAINED=On -DDONATE_BEG=On -DFEATHER_TARGET_TRIPLET=${HOST}"
     ANONDIST=""
     case "$HOST" in
         *mingw32)
