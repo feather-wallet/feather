@@ -119,7 +119,7 @@ void TrocadorAppWidget::onApiResponse(const TrocadorAppApi::TrocadorAppResponse 
         bool hasNextPage = resp.obj["pagination"].toObject().contains("next");
         ui->frame_loadMore->setVisible(hasNextPage);
 
-        m_model->addData(resp.obj["data"].toObject()["ad_list"].toArray());
+        m_model->addData(resp.obj["quotes"].toObject()["quotes"].toArray());
     }
 }
 

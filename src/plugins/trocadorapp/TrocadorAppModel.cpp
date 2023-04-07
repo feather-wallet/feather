@@ -38,7 +38,7 @@ QVariant TrocadorAppModel::headerData(int section, Qt::Orientation orientation, 
 
 QVariant TrocadorAppModel::data(const QModelIndex &index, int role) const {
     const int col = index.column();
-    const auto row = m_data.at(index.row()).toObject()["quotes"].toObject();
+    const auto row = m_data.at(index.row()).toObject();
 
     if (row.isEmpty()) {
         return QVariant();
