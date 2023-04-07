@@ -83,6 +83,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
 
         {Config::blockExplorer,{QS("blockExplorer"), "exploremonero.com"}},
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
+        {Config::trocadorAppFrontend, {QS("trocadorAppFrontend"), "https://trocador.app/en"}},
         {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}},
         {Config::bountiesFrontend, {QS("bountiesFrontend"), "https://bounties.monero.social"}},
 

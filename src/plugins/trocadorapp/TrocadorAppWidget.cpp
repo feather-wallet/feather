@@ -142,10 +142,8 @@ void TrocadorAppWidget::openOfferUrl() {
     }
 
     QJsonObject offerData = m_model->getOffer(index.row());
-    QString frontend = config()->get(Config::localMoneroFrontend).toString();
-
-    QString offerUrl = QString("%1/ad/%2").arg(frontend, offerData["data"].toObject()["ad_id"].toString());
-
+    QString frontend = config()->get(Config::trocadorAppFrontend).toString();
+    QString offerUrl = QString("%1/exchange/%2").arg(frontend, offerData["trade_id"].toString());
     Utils::externalLinkWarning(this, offerUrl);
 }
 

@@ -50,10 +50,10 @@ QVariant TrocadorAppModel::data(const QModelIndex &index, int role) const {
                 return row["provider"].toString();
             }
             case Column::Rate: {
-                return row["waste"].toString();
+                return row["insurance"].toInt();
             }
             case Column::Spread: {
-                return row["insurance"].toString();
+                return row["waste"].toString();
             }
             case Column::KYC: {
                 return row["kycrating"].toString();

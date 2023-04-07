@@ -113,6 +113,7 @@ public:
         // Misc
         blockExplorer,
         redditFrontend,
+        trocadorAppFrontend,
         localMoneroFrontend,
         bountiesFrontend, // unused
 
