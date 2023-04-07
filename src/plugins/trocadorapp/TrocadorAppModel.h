@@ -30,7 +30,6 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
 
     void setData(const QJsonArray &data);
-    void setPaymentMethods(const QJsonObject &data);
     void addData(const QJsonArray &data);
     void clearData();
 

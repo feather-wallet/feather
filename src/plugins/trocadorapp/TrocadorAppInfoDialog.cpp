@@ -15,13 +15,13 @@ TrocadorAppInfoDialog::TrocadorAppInfoDialog(QWidget *parent, TrocadorAppModel *
 {
     ui->setupUi(this);
 
-    setLabelText(ui->label_kyc, TrocadorAppModel::KYC);
     setLabelText(ui->label_exchange, TrocadorAppModel::Exchange);
     setLabelText(ui->label_rate, TrocadorAppModel::Rate);
     setLabelText(ui->label_spread, TrocadorAppModel::Spread);
+    setLabelText(ui->label_kyc, TrocadorAppModel::KYC);
 
     QJsonObject offerData = model->getOffer(row);
-    QString details = offerData["data"].toObject()["msg"].toString();
+    QString details = offerData["quotes"].toObject()["provider"].toString();
     details.remove("*");
 
     if (details.isEmpty()) {

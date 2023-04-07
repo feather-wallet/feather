@@ -12,11 +12,8 @@ class TrocadorAppApi : public QObject {
 
 public:
     enum Endpoint {
-        CURRENCIES,
-        SPREAD,
-        BUY_MONERO_ONLINE,
-        SELL_MONERO_ONLINE,
-        ACCOUNT_INFO
+        REQUEST_STANDARD,
+        REQUEST_PAYMENT
     };
 
     struct TrocadorAppResponse {
@@ -28,11 +25,10 @@ public:
 
     explicit TrocadorAppApi(QObject *parent, Networking *network);
 
-    void currencies();
-    void paymentMethods();
-    void buyMoneroOnline(const QString &currencyCode, const QString &paymentMethod="", const QString &amount = "", int page = 0);
-    void sellMoneroOnline(const QString &currencyCode, const QString &paymentMethod="", const QString &amount = "", int page = 0);
-    void accountInfo(const QString &username);
+    void requestStandard(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                         const QString &networkTo, const QString &amountFrom, const QString &paymentMethod);
+    void requestPayment(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                         const QString &networkTo, const QString &amountTo, const QString &paymentMethod);
 
 signals:
     void ApiResponse(TrocadorAppResponse resp);
@@ -41,7 +37,8 @@ private slots:
     void onResponse(QNetworkReply *reply, Endpoint endpoint);
 
 private:
-    QString getBuySellUrl(bool buy, const QString &currencyCode, const QString &paymentMethod="", const QString &amount = "", int page = 0);
+    QString getStandardPaymentUrl(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                                  const QString &networkTo, const QString &amount, const QString &paymentMethod);
     QString getBaseUrl();
 
     Networking *m_network;

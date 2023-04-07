@@ -11,39 +11,20 @@ TrocadorAppApi::TrocadorAppApi(QObject *parent, Networking *network)
 {
 }
 
-void TrocadorAppApi::currencies() {
-    QString url = QString("%1/currencies").arg(this->getBaseUrl());
-    QNetworkReply *reply = m_network->getJson(url);
-    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::CURRENCIES));
-}
-
-void TrocadorAppApi::paymentMethods() {
-    QString url;
-    url = QString("%1/spread").arg(this->getBaseUrl());
-    QNetworkReply *reply = m_network->getJson(url);
-    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::SPREAD));
-}
-
-void TrocadorAppApi::buyMoneroOnline(const QString &currencyCode,
-                                     const QString &paymentMethod, const QString &amount, int page)
+void TrocadorAppApi::requestStandard(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                                     const QString &networkTo, const QString &amountFrom, const QString &paymentMethod)
 {
-    QString url = this->getBuySellUrl(true, currencyCode, paymentMethod, amount, page);
+    QString url = this->getStandardPaymentUrl(currencyCode, networkFrom, tradeForCode, networkTo, amountFrom, paymentMethod);
     QNetworkReply *reply = m_network->getJson(url);
-    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::BUY_MONERO_ONLINE));
+    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::REQUEST_STANDARD));
 }
 
-void TrocadorAppApi::sellMoneroOnline(const QString &currencyCode,
-                                      const QString &paymentMethod, const QString &amount, int page)
+void TrocadorAppApi::requestPayment(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                                     const QString &networkTo, const QString &amountTo, const QString &paymentMethod)
 {
-    QString url = this->getBuySellUrl(false, currencyCode, paymentMethod, amount, page);
+    QString url = this->getStandardPaymentUrl(currencyCode, networkFrom, tradeForCode, networkTo, amountTo, paymentMethod);
     QNetworkReply *reply = m_network->getJson(url);
-    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::SELL_MONERO_ONLINE));
-}
-
-void TrocadorAppApi::accountInfo(const QString &username) {
-    QString url = QString("%1/account_info/%2").arg(this->getBaseUrl(), username);
-    QNetworkReply *reply = m_network->getJson(url);
-    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::ACCOUNT_INFO));
+    connect(reply, &QNetworkReply::finished, std::bind(&TrocadorAppApi::onResponse, this, reply, Endpoint::REQUEST_PAYMENT));
 }
 
 void TrocadorAppApi::onResponse(QNetworkReply *reply, TrocadorAppApi::Endpoint endpoint) {
@@ -63,7 +44,8 @@ void TrocadorAppApi::onResponse(QNetworkReply *reply, TrocadorAppApi::Endpoint e
         return;
     }
     else {
-        emit ApiResponse(TrocadorAppResponse{false, endpoint, "Invalid response from TrocadorApp", {}});
+        QString errorStr = "Invalid response from TrocadorApp. URL: " + reply->request().url().toString();
+        emit ApiResponse(TrocadorAppResponse{false, endpoint, errorStr, {}});
         return;
     }
 
@@ -76,30 +58,39 @@ void TrocadorAppApi::onResponse(QNetworkReply *reply, TrocadorAppApi::Endpoint e
     emit ApiResponse(TrocadorAppResponse{true, endpoint, "", obj});
 }
 
-QString TrocadorAppApi::getBuySellUrl(bool buy, const QString &currencyCode,
-                                      const QString &paymentMethod, const QString &amount, int page)
+QString TrocadorAppApi::getStandardPaymentUrl(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
+                                  const QString &networkTo, const QString &amount, const QString &paymentMethod)
 {
-    QString url = QString("%1/%2-monero-online/%3").arg(this->getBaseUrl(), buy ? "buy" : "sell", currencyCode);
-    if (!paymentMethod.isEmpty())
-        url += QString("/%1").arg(paymentMethod);
+    QString url = this->getBaseUrl();
 
     QUrlQuery query;
-    if (!amount.isEmpty() && amount != "0")
-        query.addQueryItem("amount", amount);
-    if (page > 0)
-        query.addQueryItem("page", QString::number(page));
+    if (!amount.isEmpty() && amount != "0"){
+        query.addQueryItem("ticker_from", currencyCode.toLower());
+        query.addQueryItem("network_from", networkFrom);
+        query.addQueryItem("ticker_to", tradeForCode.toLower());
+        query.addQueryItem("network_to", networkTo);
+
+        if(paymentMethod == "False"){
+            query.addQueryItem("amount_from", amount);
+            query.addQueryItem("payment", paymentMethod);
+        } else if (paymentMethod == "True"){
+            query.addQueryItem("amount_to", amount);
+            query.addQueryItem("payment", paymentMethod);
+        }
+    }
+    
     url += "?" + query.toString();
     return url;
 }
 
 QString TrocadorAppApi::getBaseUrl() {
     if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
-        return "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion/api/v1";
+        return "http://trocadorfyhlu27aefre5u7zri66gudtzdyelymftvr4yjwcxhfaqsid.onion/api/new_rate/";
     }
 
     if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
-        return "http://yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p/api/v1";
+        return "http://trocador.i2p/new_rate/";
     }
 
-    return "https://agoradesk.com/api/v1";
+    return "https://trocador.app/en/api/new_rate/";
 }

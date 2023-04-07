@@ -29,12 +29,9 @@ public slots:
 private slots:
     void onSearchClicked();
     void onApiResponse(const TrocadorAppApi::TrocadorAppResponse &resp);
-    void onLoadMore();
-    void onWsCurrenciesReceived(const QJsonArray &currencies);
-    void onWsPaymentMethodsReceived(const QJsonObject &payment_methods);
 
 private:
-    void searchOffers(int page = 0);
+    void searchOffers();
     void showContextMenu(const QPoint &point);
     void openOfferUrl();
     void viewOfferDetails();
