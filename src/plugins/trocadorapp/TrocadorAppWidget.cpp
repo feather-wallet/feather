@@ -120,6 +120,7 @@ void TrocadorAppWidget::onApiResponse(const TrocadorAppApi::TrocadorAppResponse 
         ui->frame_loadMore->setVisible(hasNextPage);
 
         m_model->addData(resp.obj["quotes"].toObject()["quotes"].toArray());
+        m_model->addTradeId(resp.obj["trade_id"].toString());
     }
 }
 
@@ -141,9 +142,9 @@ void TrocadorAppWidget::openOfferUrl() {
         return;
     }
 
-    QJsonObject offerData = m_model->getOffer(index.row());
+    QString tradeId = m_model->getTradeId();
     QString frontend = config()->get(Config::trocadorAppFrontend).toString();
-    QString offerUrl = QString("%1/exchange/%2").arg(frontend, offerData["trade_id"].toString());
+    QString offerUrl = QString("%1/exchange/%2").arg(frontend, tradeId);
     Utils::externalLinkWarning(this, offerUrl);
 }
 

@@ -39,9 +39,9 @@ void TrocadorAppInfoDialog::setLabelText(QLabel *label, TrocadorAppModel::Column
 }
 
 void TrocadorAppInfoDialog::onGoToOffer() {
-    QJsonObject offerData = m_model->getOffer(m_row);
+    QString tradeId = m_model->getTradeId();
     QString frontend = config()->get(Config::trocadorAppFrontend).toString();
-    QString offerUrl = QString("%1/exchange/%2").arg(frontend, offerData["trade_id"].toString());
+    QString offerUrl = QString("%1/exchange/%2").arg(frontend, tradeId);
     Utils::externalLinkWarning(this, offerUrl);
 }
 

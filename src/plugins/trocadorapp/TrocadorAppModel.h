@@ -33,12 +33,14 @@ public:
     void addData(const QJsonArray &data);
     void clearData();
 
+    void addTradeId(const QString &tradeId);
+    QString getTradeId() const;
+
     QJsonObject getOffer(int index) const;
 
 private:
     QJsonArray m_data;
-    QJsonObject m_rate;
-    QHash<QString, QString> m_spread;
+    QString m_tradeId;
 };
 
 #endif //FEATHER_TROCADORAPPMODEL_H

@@ -86,6 +86,16 @@ void TrocadorAppModel::clearData() {
     endResetModel();
 }
 
+void TrocadorAppModel::addTradeId(const QString &tradeId) {
+    beginResetModel();
+    m_tradeId = tradeId;
+    endResetModel();
+}
+
+QString TrocadorAppModel::getTradeId() const {
+    return m_tradeId;
+}
+
 QJsonObject TrocadorAppModel::getOffer(int index) const {
     return m_data.at(index).toObject();
 }
