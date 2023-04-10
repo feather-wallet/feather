@@ -32,28 +32,18 @@ TrocadorAppWidget::TrocadorAppWidget(QWidget *parent, Wallet *wallet)
     ui->combo_trade_for->addItems(config()->get(Config::cryptoSymbols).toStringList());
     ui->combo_trade_for->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("BTC").first());
 
-
     m_network = new Networking(this);
     m_api = new TrocadorAppApi(this, m_network);
 
     m_model = new TrocadorAppModel(this);
     ui->treeView->setModel(m_model);
 
-    ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    ui->treeView->header()->setSectionResizeMode(TrocadorAppModel::Spread, QHeaderView::Stretch);
-    ui->treeView->header()->setStretchLastSection(false);
+    ui->treeView->header()->setSectionResizeMode(QHeaderView::Stretch);
 
-    connect(ui->treeView, &QTreeView::doubleClicked, this, &TrocadorAppWidget::viewOfferDetails);
     connect(ui->treeView, &QTreeView::customContextMenuRequested, this, &TrocadorAppWidget::showContextMenu);
 
     connect(ui->btn_search, &QPushButton::clicked, this, &TrocadorAppWidget::onSearchClicked);
     connect(m_api, &TrocadorAppApi::ApiResponse, this, &TrocadorAppWidget::onApiResponse);
-
-    ui->frame_loadMore->hide();
-
-    QTimer::singleShot(1, [this]{
-        this->skinChanged();
-    });
 }
 
 void TrocadorAppWidget::onRadioButtonToggled(){
@@ -76,14 +66,8 @@ void TrocadorAppWidget::onRadioButtonToggled(){
     }
 }
 
-void TrocadorAppWidget::skinChanged() {
-    
-}
-
-
 void TrocadorAppWidget::onSearchClicked() {
     m_model->clearData();
-    m_currentPage = 0;
     ui->btn_search->setEnabled(false);
 
     this->searchOffers();
@@ -116,9 +100,6 @@ void TrocadorAppWidget::onApiResponse(const TrocadorAppApi::TrocadorAppResponse 
     if (resp.endpoint == TrocadorAppApi::REQUEST_STANDARD
         || resp.endpoint == TrocadorAppApi::REQUEST_PAYMENT)
     {
-        bool hasNextPage = resp.obj["pagination"].toObject().contains("next");
-        ui->frame_loadMore->setVisible(hasNextPage);
-
         m_model->addData(resp.obj["quotes"].toObject()["quotes"].toArray());
         m_model->addTradeId(resp.obj["trade_id"].toString());
     }
@@ -132,7 +113,6 @@ void TrocadorAppWidget::showContextMenu(const QPoint &point) {
 
     QMenu menu(this);
     menu.addAction("Go to offer", this, &TrocadorAppWidget::openOfferUrl);
-    menu.addAction("View offer details", this, &TrocadorAppWidget::viewOfferDetails);
     menu.exec(ui->treeView->viewport()->mapToGlobal(point));
 }
 
@@ -146,24 +126,6 @@ void TrocadorAppWidget::openOfferUrl() {
     QString frontend = config()->get(Config::trocadorAppFrontend).toString();
     QString offerUrl = QString("%1/exchange/%2").arg(frontend, tradeId);
     Utils::externalLinkWarning(this, offerUrl);
-}
-
-void TrocadorAppWidget::viewOfferDetails() {
-    QModelIndex index = ui->treeView->currentIndex();
-    if (!index.isValid()) {
-        return;
-    }
-
-    QJsonObject offerData = m_model->getOffer(index.row());
-    QString details = offerData["data"].toObject()["msg"].toString();
-    details.remove("*");
-
-    if (details.isEmpty()) {
-        details = "No details.";
-    }
-
-    TrocadorAppInfoDialog dialog(this, m_model, index.row());
-    dialog.exec();
 }
 
 TrocadorAppWidget::~TrocadorAppWidget() = default;

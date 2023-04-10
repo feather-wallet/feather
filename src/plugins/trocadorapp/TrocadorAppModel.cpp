@@ -63,7 +63,7 @@ QVariant TrocadorAppModel::data(const QModelIndex &index, int role) const {
                 if(row["fixed"].toString() == "True")
                     return "Fixed";
                 else
-                    return "Float";
+                    return "Floating";
             }
             case Column::Insurance: {
                 return QString("%1%").arg(row["insurance"].toInt());
@@ -136,8 +136,4 @@ void TrocadorAppModel::addTradeId(const QString &tradeId) {
 
 QString TrocadorAppModel::getTradeId() const {
     return m_tradeId;
-}
-
-QJsonObject TrocadorAppModel::getOffer(int index) const {
-    return m_data.at(index).toObject();
 }

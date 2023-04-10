@@ -23,7 +23,6 @@ public:
     ~TrocadorAppWidget() override;
 
 public slots:
-    void skinChanged();
     void onRadioButtonToggled();
 
 private slots:
@@ -34,17 +33,13 @@ private:
     void searchOffers();
     void showContextMenu(const QPoint &point);
     void openOfferUrl();
-    void viewOfferDetails();
 
     QScopedPointer<Ui::TrocadorAppWidget> ui;
     Wallet *m_wallet;
 
-    int m_currentPage = 0;
-
     TrocadorAppApi *m_api;
     TrocadorAppModel *m_model;
     Networking *m_network;
-    QJsonObject m_paymentMethods;
 };
 
 

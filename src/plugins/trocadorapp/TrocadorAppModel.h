@@ -38,8 +38,6 @@ public:
     void addTradeId(const QString &tradeId);
     QString getTradeId() const;
 
-    QJsonObject getOffer(int index) const;
-
 private:
     QJsonArray m_data;
     QString m_tradeId;

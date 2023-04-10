@@ -20,16 +20,6 @@ TrocadorAppInfoDialog::TrocadorAppInfoDialog(QWidget *parent, TrocadorAppModel *
     setLabelText(ui->label_spread, TrocadorAppModel::Spread);
     setLabelText(ui->label_kycrating, TrocadorAppModel::KYCRating);
 
-    QJsonObject offerData = model->getOffer(row);
-    QString details = offerData["quotes"].toObject()["provider"].toString();
-    details.remove("*");
-
-    if (details.isEmpty()) {
-        details = "No details.";
-    }
-
-    ui->info->setPlainText(details);
-
     connect(ui->btn_goToOffer, &QPushButton::clicked, this, &TrocadorAppInfoDialog::onGoToOffer);
 }
 

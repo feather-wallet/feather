@@ -956,9 +956,6 @@ void MainWindow::skinChanged(const QString &skinName) {
 
 void MainWindow::updateWidgetIcons() {
     m_sendWidget->skinChanged();
-#ifdef HAS_TROCADORAPP
-    m_trocadorAppWidget->skinChanged();
-#endif
 #ifdef HAS_LOCALMONERO
     m_localMoneroWidget->skinChanged();
 #endif
