@@ -16,9 +16,9 @@ TrocadorAppInfoDialog::TrocadorAppInfoDialog(QWidget *parent, TrocadorAppModel *
     ui->setupUi(this);
 
     setLabelText(ui->label_exchange, TrocadorAppModel::Exchange);
-    setLabelText(ui->label_rate, TrocadorAppModel::Rate);
+    setLabelText(ui->label_insurance, TrocadorAppModel::Insurance);
     setLabelText(ui->label_spread, TrocadorAppModel::Spread);
-    setLabelText(ui->label_kyc, TrocadorAppModel::KYC);
+    setLabelText(ui->label_kycrating, TrocadorAppModel::KYCRating);
 
     QJsonObject offerData = model->getOffer(row);
     QString details = offerData["quotes"].toObject()["provider"].toString();

@@ -23,12 +23,16 @@ QVariant TrocadorAppModel::headerData(int section, Qt::Orientation orientation, 
         switch (section) {
             case Exchange:
                 return QString("Exchange");
+            case Amount:
+                return QString("Amount");
             case Rate:
-                return QString("Rate");
+                return QString ("Rate");
+            case Insurance:
+                return QString("Insurance");
             case Spread:
                 return QString("Spread");
-            case KYC:
-                return QString("KYC");
+            case KYCRating:
+                return QString("KYC Rating");
             default:
                 return QVariant();
         }
@@ -49,19 +53,57 @@ QVariant TrocadorAppModel::data(const QModelIndex &index, int role) const {
             case Column::Exchange: {
                 return row["provider"].toString();
             }
+            case Column::Amount: {
+                if(row.contains("amount_to"))
+                    return row["amount_to"].toString();
+                else 
+                    return row["amount_from"].toString();
+            }
             case Column::Rate: {
-                return row["insurance"].toInt();
+                if(row["fixed"].toString() == "True")
+                    return "Fixed";
+                else
+                    return "Float";
+            }
+            case Column::Insurance: {
+                return QString("%1%").arg(row["insurance"].toInt());
             }
             case Column::Spread: {
-                return row["waste"].toString();
+                return QString("%1%").arg(row["waste"].toString());
             }
-            case Column::KYC: {
+            case Column::KYCRating: {
                 return row["kycrating"].toString();
+            }
+        }
+    }
+    
+    else if (role == Qt::ForegroundRole) {
+        switch (col) {
+            case Column::KYCRating: {
+                if (row["kycrating"].toString() == "A")
+                    return QVariant(QColor("#008000"));
+                else if (row["kycrating"].toString() == "B")
+                    return QVariant(QColor("#4ECB4E"));
+                else if (row["kycrating"].toString() == "C")
+                    return QVariant(QColor("#E9E90E"));
+                else if (row["kycrating"].toString() == "D")
+                    return QVariant(QColor("#D56242"));
+            }
+        }
+    }
+
+        else if (role == Qt::FontRole) {
+        switch (col) {
+            case Column::KYCRating: {
+                auto bigFont = Utils::relativeFont(2);
+                bigFont.setBold(true);
+                return bigFont;
             }
         }
     }
 
     return QVariant();
+
 }
 
 void TrocadorAppModel::setData(const QJsonArray &data) {

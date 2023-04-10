@@ -17,9 +17,11 @@ public:
     enum Column
     {
         Exchange,
+        Amount,
         Rate,
+        Insurance,
         Spread,
-        KYC,
+        KYCRating,
         COUNT
     };
 
