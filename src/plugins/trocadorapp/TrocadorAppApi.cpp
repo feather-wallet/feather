@@ -61,7 +61,7 @@ void TrocadorAppApi::onResponse(QNetworkReply *reply, TrocadorAppApi::Endpoint e
 QString TrocadorAppApi::getStandardPaymentUrl(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
                                   const QString &networkTo, const QString &amount, const QString &paymentMethod)
 {
-    QString url = this->getBaseUrl();
+    QString url = QString("%1new_rate/").arg(this->getBaseUrl());
 
     QUrlQuery query;
     if (!amount.isEmpty() && amount != "0"){
@@ -85,12 +85,12 @@ QString TrocadorAppApi::getStandardPaymentUrl(const QString &currencyCode, const
 
 QString TrocadorAppApi::getBaseUrl() {
     if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
-        return "http://trocadorfyhlu27aefre5u7zri66gudtzdyelymftvr4yjwcxhfaqsid.onion/api/new_rate/";
+        return "http://trocadorfyhlu27aefre5u7zri66gudtzdyelymftvr4yjwcxhfaqsid.onion/en/api/";
     }
 
     if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
-        return "http://trocador.i2p/new_rate/";
+        return "http://trocador.i2p/en/api/";
     }
 
-    return "https://trocador.app/en/api/new_rate/";
+    return "https://trocador.app/en/api/";
 }

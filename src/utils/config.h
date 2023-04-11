@@ -119,6 +119,7 @@ public:
 
         fiatSymbols,
         cryptoSymbols,
+        trocadorAppCryptoSymbols
     };
 
     enum PrivacyLevel {

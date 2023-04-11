@@ -89,6 +89,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
 
         {Config::fiatSymbols, {QS("fiatSymbols"), QStringList{"USD", "EUR", "GBP", "CAD", "AUD", "RUB"}}},
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
+        {Config::trocadorAppCryptoSymbols, {QS("trocadorAppCryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC", "BCH", "WOW", "ADA",
+         "USDC", "USDT", "DCR", "DASH", "DOGE", "XRP", "ERGO", "ETC", "XHV", "XNO", "DOT", "MATIC", "SOL", "RUNE", "TRX", "ALGO", "BDX"}}},
 
         // Tor
         {Config::proxy, {QS("proxy"), Config::Proxy::Tor}},

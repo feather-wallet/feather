@@ -22,15 +22,15 @@ TrocadorAppWidget::TrocadorAppWidget(QWidget *parent, Wallet *wallet)
     QPixmap logo(":/assets/images/trocadorApp_logo.png");
     ui->logo->setPixmap(logo.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     
-    ui->combo_currency->addItems(config()->get(Config::cryptoSymbols).toStringList());
-    ui->combo_currency->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("XMR").first());
+    ui->combo_currency->addItems(config()->get(Config::trocadorAppCryptoSymbols).toStringList());
+    ui->combo_currency->setCurrentText(config()->get(Config::trocadorAppCryptoSymbols).toStringList().filter("XMR").first());
     ui->line_trade_for->setEnabled(false);
 
     connect(ui->radio_standard, &QRadioButton::toggled, this, &TrocadorAppWidget::onRadioButtonToggled);
     connect(ui->radio_payment, &QRadioButton::toggled, this, &TrocadorAppWidget::onRadioButtonToggled);
 
-    ui->combo_trade_for->addItems(config()->get(Config::cryptoSymbols).toStringList());
-    ui->combo_trade_for->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("BTC").first());
+    ui->combo_trade_for->addItems(config()->get(Config::trocadorAppCryptoSymbols).toStringList());
+    ui->combo_trade_for->setCurrentText(config()->get(Config::trocadorAppCryptoSymbols).toStringList().filter("BTC").first());
 
     m_network = new Networking(this);
     m_api = new TrocadorAppApi(this, m_network);
@@ -48,16 +48,12 @@ TrocadorAppWidget::TrocadorAppWidget(QWidget *parent, Wallet *wallet)
 
 void TrocadorAppWidget::onRadioButtonToggled(){
     if (ui->radio_standard->isChecked()){
-        ui->combo_currency->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("XMR").first());
-        ui->combo_trade_for->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("BTC").first());
         ui->line_amount->setEnabled(true);
         ui->line_amount->setPlaceholderText("Amount you send");
         ui->line_trade_for->clear();
         ui->line_trade_for->setEnabled(false);
         ui->line_trade_for->setPlaceholderText("To trade for");
     }else if (ui->radio_payment->isChecked()){
-        ui->combo_currency->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("BTC").first());
-        ui->combo_trade_for->setCurrentText(config()->get(Config::cryptoSymbols).toStringList().filter("XMR").first());
         ui->line_amount->clear();
         ui->line_amount->setEnabled(false);
         ui->line_amount->setPlaceholderText("To be paid in");
@@ -76,16 +72,23 @@ void TrocadorAppWidget::onSearchClicked() {
 void TrocadorAppWidget::searchOffers() {
     QString currencyCode = ui->combo_currency->currentText();
     QString tradeForCode = ui->combo_trade_for->currentText();
+    QString networkFrom = "Mainnet";
+    QString networkTo = "Mainnet";
+
+    if(currencyCode == "USDC" || currencyCode == "USDT")
+        networkFrom = "ERC20";
+    else if (tradeForCode == "USDC" || tradeForCode == "USDT")
+        networkTo = "ERC20";
 
     if (ui->radio_standard->isChecked()){
         QString amountFrom = ui->line_amount->text();
-        QString paymentMethod = "False";
-        m_api->requestStandard(currencyCode, "Mainnet", tradeForCode, "Mainnet", amountFrom, paymentMethod);
+        QString paymentMethod = "False";      
+        m_api->requestStandard(currencyCode, networkFrom, tradeForCode, networkTo, amountFrom, paymentMethod);
     }
     else if (ui->radio_payment->isChecked()){
         QString amountTo = ui->line_trade_for->text();
         QString paymentMethod = "True";
-        m_api->requestPayment(currencyCode, "Mainnet", tradeForCode, "Mainnet", amountTo, paymentMethod);
+        m_api->requestPayment(currencyCode, networkFrom, tradeForCode, networkTo, amountTo, paymentMethod);
     }
 }
 
