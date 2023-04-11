@@ -7,6 +7,8 @@
 #include <QDialog>
 #include <QLabel>
 
+#include "TrocadorAppApi.h"
+
 #include "components.h"
 #include "TrocadorAppModel.h"
 
@@ -31,6 +33,8 @@ private:
     QScopedPointer<Ui::TrocadorAppInfoDialog> ui;
     TrocadorAppModel *m_model;
     int m_row;
+    TrocadorAppApi *m_api;
+    Networking *m_network;
 };
 
 

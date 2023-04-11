@@ -166,12 +166,12 @@ if (CHECK_UPDATES)
     target_compile_definitions(feather PRIVATE CHECK_UPDATES=1)
 endif()
 
-if(LOCALMONERO)
-    target_compile_definitions(feather PRIVATE HAS_LOCALMONERO=1)
-endif()
-
 if(TROCADORAPP)
     target_compile_definitions(feather PRIVATE HAS_TROCADORAPP=1)
+endif()
+
+if(LOCALMONERO)
+    target_compile_definitions(feather PRIVATE HAS_LOCALMONERO=1)
 endif()
 
 if(TOR_DIR)

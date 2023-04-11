@@ -126,8 +126,8 @@ void TrocadorAppWidget::openOfferUrl() {
     }
 
     QString tradeId = m_model->getTradeId();
-    QString frontend = config()->get(Config::trocadorAppFrontend).toString();
-    QString offerUrl = QString("%1/exchange/%2").arg(frontend, tradeId);
+    QString baseUrl = m_api->getBaseUrl();
+    QString offerUrl = QString("%1/exchange/%2").arg(baseUrl, tradeId);
     Utils::externalLinkWarning(this, offerUrl);
 }
 

@@ -21,6 +21,9 @@ TrocadorAppInfoDialog::TrocadorAppInfoDialog(QWidget *parent, TrocadorAppModel *
     setLabelText(ui->label_kycrating, TrocadorAppModel::KYCRating);
 
     connect(ui->btn_goToOffer, &QPushButton::clicked, this, &TrocadorAppInfoDialog::onGoToOffer);
+
+    m_network = new Networking(this);
+    m_api = new TrocadorAppApi(this, m_network);
 }
 
 void TrocadorAppInfoDialog::setLabelText(QLabel *label, TrocadorAppModel::Column column) {
@@ -30,8 +33,8 @@ void TrocadorAppInfoDialog::setLabelText(QLabel *label, TrocadorAppModel::Column
 
 void TrocadorAppInfoDialog::onGoToOffer() {
     QString tradeId = m_model->getTradeId();
-    QString frontend = config()->get(Config::trocadorAppFrontend).toString();
-    QString offerUrl = QString("%1/exchange/%2").arg(frontend, tradeId);
+    QString baseUrl = m_api->getBaseUrl();
+    QString offerUrl = QString("%1/exchange/%2").arg(baseUrl, tradeId);
     Utils::externalLinkWarning(this, offerUrl);
 }
 

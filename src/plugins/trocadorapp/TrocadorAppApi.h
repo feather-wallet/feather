@@ -29,6 +29,7 @@ public:
                          const QString &networkTo, const QString &amountFrom, const QString &paymentMethod);
     void requestPayment(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
                          const QString &networkTo, const QString &amountTo, const QString &paymentMethod);
+    QString getBaseUrl();
 
 signals:
     void ApiResponse(TrocadorAppResponse resp);
@@ -39,7 +40,6 @@ private slots:
 private:
     QString getStandardPaymentUrl(const QString &currencyCode, const QString &networkFrom, const QString &tradeForCode,
                                   const QString &networkTo, const QString &amount, const QString &paymentMethod);
-    QString getBaseUrl();
 
     Networking *m_network;
 };
