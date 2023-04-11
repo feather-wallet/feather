@@ -20,9 +20,9 @@ if (WITH_SCANNER)
             MultimediaWidgets)
 endif()
 
-find_package(Qt5 COMPONENTS ${QT_COMPONENTS})
-if (NOT Qt5_FOUND)
-    find_package(Qt6 REQUIRED COMPONENTS SvgWidgets)
+find_package(Qt6 COMPONENTS ${QT_COMPONENTS} SvgWidgets)
+if (NOT Qt6_FOUND)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS ${QT_COMPONENTS})
 endif()
 
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
