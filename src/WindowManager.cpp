@@ -431,7 +431,8 @@ void WindowManager::displayWalletErrorMessage(const QString &message) {
     }
 
     if (message.contains("SW_CLIENT_NOT_SUPPORTED")) {
-        errMsg += "\n\nIncompatible version: you may need to upgrade the Monero app on the Ledger device to the latest version.";
+        errMsg += "\n\nIncompatible version: upgrade your Ledger device firmware to the latest version using Ledger Live.\n"
+                  "Then upgrade the Monero app for the Ledger device to the latest version.";
     }
     else if (message.contains("Wrong Device Status")) {
         errMsg += "\n\nThe device may need to be unlocked.";
