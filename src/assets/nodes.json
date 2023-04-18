@@ -13,11 +13,13 @@
       "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18089",
       "cakexmrl7bonq7ovjka5kuwuyd3f7qnkz6z6s6dmsy3uckwra7bvggyd.onion:18081",
       "rino4muoj3zk223twblr53hwt4ukqemjqw4fbiwdcrqqevcrclpuzyyd.onion:18081",
-      "majesticrepik35vnngouksfl7jiwf6sj7s2doj3bvdffq27tgqoeayd.onion:18089"
+      "majesticrepik35vnngouksfl7jiwf6sj7s2doj3bvdffq27tgqoeayd.onion:18089",
+      "trocadorh642rks54sxufwy4kys23mrsgof3axowyro5ljb2dkgdlmad.onion:18089"
     ],
     "i2p": [
       "ynk3hrwte23asonojqeskoulek2g2cd6tqg4neghnenfyljrvhga.b32.i2p:18081",
-      "t7lce3j7mwxt32h755u3njjp3k6og3defgueo3iecgsexxnkoezouobc.b32.i2p:18089"
+      "t7lce3j7mwxt32h755u3njjp3k6og3defgueo3iecgsexxnkoezouobc.b32.i2p:18089",
+      "ecnfc7oyzzw3jmwc2omxzccbik33wyyaofxsfow7342z6kjanq6a.b32.i2p:18089"
     ],
     "clearnet": [
       "node.community.rino.io:18081",
@@ -32,7 +34,8 @@
       "nodes.hashvault.pro:18081",
       "node.xmr.ru:18081",
       "node.monerodevs.org:18089",
-      "node2.monerodevs.org:18089"
+      "node2.monerodevs.org:18089",
+      "node.trocador.app:18089"
     ]
   },
   "testnet": {
