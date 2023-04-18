@@ -374,13 +374,11 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
     if (success) {
         quint64 walletHeight = blockChainHeight();
 
-        if (this->connectionStatus() != Wallet::ConnectionStatus_Disconnected) {
-            if (daemonHeight < targetHeight) {
-                emit blockchainSync(daemonHeight, targetHeight);
-            }
-            else {
-                this->syncStatusUpdated(walletHeight, daemonHeight);
-            }
+        if (daemonHeight < targetHeight) {
+            emit blockchainSync(daemonHeight, targetHeight);
+        }
+        else {
+            this->syncStatusUpdated(walletHeight, daemonHeight);
         }
 
         if (walletHeight < (daemonHeight - 1)) {
