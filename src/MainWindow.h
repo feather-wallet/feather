@@ -31,7 +31,6 @@
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
 #include "utils/EventFilter.h"
-#include "utils/Updater.h"
 #include "plugins/ccs/CCSWidget.h"
 #include "plugins/reddit/RedditWidget.h"
 #include "widgets/TickerWidget.h"
@@ -45,6 +44,10 @@
 #include "CoinsWidget.h"
 
 #include "WindowManager.h"
+
+#ifdef CHECK_UPDATES
+#include "utils/updater/Updater.h"
+#endif
 
 #ifdef HAS_LOCALMONERO
 #include "plugins/localmonero/LocalMoneroWidget.h"
@@ -294,7 +297,9 @@ private:
     EventFilter *m_eventFilter = nullptr;
     qint64 m_userLastActive = QDateTime::currentSecsSinceEpoch();
 
+#ifdef CHECK_UPDATES
     QSharedPointer<Updater> m_updater = nullptr;
+#endif
 };
 
 #endif // FEATHER_MAINWINDOW_H

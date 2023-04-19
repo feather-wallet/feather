@@ -2,9 +2,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
-# pthread
-find_package(Threads REQUIRED)
-
 set(QT_COMPONENTS
         Core
         Widgets
@@ -28,7 +25,9 @@ endif()
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(third-party/singleapplication)
 
-add_subdirectory(openpgp)
+if (CHECK_UPDATES)
+    add_subdirectory(openpgp)
+endif()
 
 qt_add_resources(RESOURCES assets.qrc assets_tor.qrc)
 
@@ -74,6 +73,18 @@ file(GLOB SOURCE_FILES
         "plugins/*/*.h"
         )
 
+if (CHECK_UPDATES)
+    file(GLOB UPDATER_FILES
+            "utils/updater/*.h"
+            "utils/updater/*.cpp")
+endif()
+
+if (WITH_SCANNER)
+    file(GLOB QRCODE_UTILS_FILES
+            "qrcode/utils/*.h"
+            "qrcode/utils/*.cpp")
+endif()
+
 if (WITH_SCANNER AND NOT Qt6_FOUND)
     file(GLOB SCANNER_FILES
             "qrcode/scanner/*.h"
@@ -87,6 +98,8 @@ if (WITH_SCANNER AND Qt6_FOUND)
 endif()
 
 list(APPEND SOURCE_FILES
+        ${UPDATER_FILES}
+        ${QRCODE_UTILS_FILES}
         ${SCANNER_FILES})
 
 set(EXECUTABLE_FLAG)
@@ -143,12 +156,12 @@ target_include_directories(feather PUBLIC
         ${QtWebSockets_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
-        ${ZBAR_INCLUDE_DIR}
         ${POLYSEED_INCLUDE_DIR}
 )
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
+            ${ZBAR_INCLUDE_DIR}
             ${QtMultimedia_INCLUDE_DIRS}
             ${QtMultimediaWidgets_INCLUDE_DIRS}
     )
@@ -230,7 +243,6 @@ target_link_libraries(feather
         ringct
         ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}
-        ${CMAKE_DL_LIBS}
         ${EXTRA_LIBRARIES}
         Qt::Core
         Qt::Widgets
@@ -238,16 +250,18 @@ target_link_libraries(feather
         Qt::Network
         Qt::Svg
         Qt::WebSockets
-        openpgp
         Threads::Threads
         ${QRENCODE_LIBRARY}
-        ${ZBAR_LIBRARIES}
         ${POLYSEED_LIBRARY}
         SingleApplication::SingleApplication
         ${ICU_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZLIB_LIBRARIES}
 )
+
+if(CHECK_UPDATES)
+    target_link_libraries(feather openpgp)
+endif()
 
 if(DEPENDS)
     target_link_libraries(feather ${ICONV_LIBRARIES})
@@ -263,6 +277,7 @@ endif()
 
 if (WITH_SCANNER)
     target_link_libraries(feather
+            ${ZBAR_LIBRARIES}
             Qt::Multimedia
             Qt::MultimediaWidgets
     )

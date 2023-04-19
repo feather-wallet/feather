@@ -8,7 +8,7 @@
 #include <QNetworkReply>
 #include <QTimer>
 
-#include "utils/Updater.h"
+#include "utils/updater/Updater.h"
 
 namespace Ui {
     class UpdateDialog;

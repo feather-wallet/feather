@@ -64,6 +64,9 @@ get_directory_property(UNBOUND_LIBRARY DIRECTORY "monero" DEFINITION UNBOUND_LIB
 get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_TREZOR_READY)
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
 
+# pthread
+find_package(Threads REQUIRED)
+
 # Easylogging
 include_directories(${EASYLOGGING_INCLUDE})
 link_directories(${EASYLOGGING_LIBRARY_DIRS})
@@ -75,22 +78,26 @@ message(STATUS "libsodium: libraries at ${SODIUM_LIBRARY}")
 # QrEncode
 find_package(QREncode REQUIRED)
 
-# ZBAR
-find_package(ZBAR REQUIRED)
-message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
-message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
-
 # Polyseed
 find_package(Polyseed REQUIRED)
 if(Polyseed_SUBMODULE)
     add_subdirectory(src/third-party/polyseed EXCLUDE_FROM_ALL)
 endif()
 
+# ZBAR
+if(WITH_SCANNER)
+    find_package(ZBAR REQUIRED)
+    message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
+    message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
+endif()
+
 # libzip
-set(ZLIB_USE_STATIC_LIBS "ON")
-find_package(ZLIB REQUIRED)
-find_path(LIBZIP_INCLUDE_DIRS zip.h)
-find_library(LIBZIP_LIBRARIES zip)
+if(CHECK_UPDATES)
+    set(ZLIB_USE_STATIC_LIBS "ON")
+    find_package(ZLIB REQUIRED)
+    find_path(LIBZIP_INCLUDE_DIRS zip.h)
+    find_library(LIBZIP_LIBRARIES zip)
+endif()
 
 # Boost
 if(DEBUG)
@@ -181,8 +188,6 @@ elseif(NOT MSVC AND NOT DEPENDS)
     find_library(RT rt)
     set(EXTRA_LIBRARIES ${RT})
 endif()
-
-list(APPEND EXTRA_LIBRARIES ${CMAKE_DL_LIBS})
 
 if(APPLE)
     cmake_policy(SET CMP0042 NEW)

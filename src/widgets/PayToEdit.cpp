@@ -10,8 +10,11 @@
 #include <QScrollBar>
 
 #include "libwalletqt/WalletManager.h"
-#include "qrcode/QrCodeUtils.h"
 #include "utils/Utils.h"
+
+#if defined(WITH_SCANNER)
+#include "qrcode/utils/QrCodeUtils.h"
+#endif
 
 PayToEdit::PayToEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -108,10 +111,12 @@ void PayToEdit::pasteEvent(const QMimeData *mimeData) {
         return;
     }
 
+#if defined(WITH_SCANNER)
     image.convertTo(QImage::Format_RGB32);
     QString result = QrCodeUtils::scanImage(image);
 
     dataPasted(result);
+#endif
 }
 
 void PayToEdit::checkText() {

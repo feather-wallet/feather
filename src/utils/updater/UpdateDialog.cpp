@@ -10,7 +10,7 @@
 #include "utils/AsyncTask.h"
 #include "utils/Networking.h"
 #include "utils/NetworkManager.h"
-#include "utils/Updater.h"
+#include "utils/updater/Updater.h"
 #include "utils/Utils.h"
 #include "utils/SemanticVersion.h"
 

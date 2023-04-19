@@ -21,7 +21,6 @@
 #include "dialog/ViewOnlyDialog.h"
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
-#include "dialog/UpdateDialog.h"
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/CoinsInfo.h"
 #include "libwalletqt/Transfer.h"
@@ -31,9 +30,11 @@
 #include "utils/Icons.h"
 #include "utils/SemanticVersion.h"
 #include "utils/TorManager.h"
-#include "utils/Updater.h"
 #include "utils/WebsocketNotifier.h"
 
+#ifdef CHECK_UPDATES
+#include "utils/updater/UpdateDialog.h"
+#endif
 //#include "misc_log_ex.h"
 
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
@@ -55,7 +56,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     m_splashDialog = new SplashDialog(this);
     m_accountSwitcherDialog = new AccountSwitcherDialog(m_wallet, this);
 
+#ifdef CHECK_UPDATES
     m_updater = QSharedPointer<Updater>(new Updater(this));
+#endif
 
     this->restoreGeo();
 
@@ -70,7 +73,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(websocketNotifier(), &WebsocketNotifier::BountyReceived, ui->bountiesWidget->model(), &BountiesModel::updateBounties);
     connect(websocketNotifier(), &WebsocketNotifier::RedditReceived, ui->redditWidget->model(), &RedditModel::updatePosts);
     connect(websocketNotifier(), &WebsocketNotifier::RevuoReceived, ui->revuoWidget, &RevuoWidget::updateItems);
+#ifdef CHECK_UPDATES
     connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, m_updater.data(), &Updater::wsUpdatesReceived);
+#endif
 #ifdef HAS_XMRIG
     connect(websocketNotifier(), &WebsocketNotifier::XMRigDownloadsReceived, m_xmrig, &XMRigWidget::onDownloads);
 #endif
@@ -86,7 +91,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
 
+#ifdef CHECK_UPDATES
     connect(m_updater.data(), &Updater::updateAvailable, this, &MainWindow::showUpdateNotification);
+#endif
 
     ColorScheme::updateFromWidget(this);
     QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
@@ -1402,9 +1409,11 @@ void MainWindow::onHideUpdateNotifications(bool hidden) {
     if (hidden) {
         m_statusUpdateAvailable->hide();
     }
+#ifdef CHECK_UPDATES
     else if (m_updater->state == Updater::State::UPDATE_AVAILABLE) {
         m_statusUpdateAvailable->show();
     }
+#endif
 }
 
 void MainWindow::onTorConnectionStateChanged(bool connected) {
@@ -1419,6 +1428,7 @@ void MainWindow::onTorConnectionStateChanged(bool connected) {
 }
 
 void MainWindow::showUpdateNotification() {
+#ifdef CHECK_UPDATES
     if (config()->get(Config::hideUpdateNotifications).toBool()) {
         return;
     }
@@ -1432,12 +1442,15 @@ void MainWindow::showUpdateNotification() {
 
     m_statusUpdateAvailable->disconnect();
     connect(m_statusUpdateAvailable, &StatusBarButton::clicked, this, &MainWindow::showUpdateDialog);
+#endif
 }
 
 void MainWindow::showUpdateDialog() {
+#ifdef CHECK_UPDATES
     UpdateDialog updateDialog{this, m_updater};
     connect(&updateDialog, &UpdateDialog::restartWallet, m_windowManager, &WindowManager::restartApplication);
     updateDialog.exec();
+#endif
 }
 
 void MainWindow::onInitiateTransaction() {
