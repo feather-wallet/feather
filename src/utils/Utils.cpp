@@ -298,7 +298,7 @@ bool portOpen(const QString &hostname, quint16 port) { // TODO: this call should
     qDebug() << QString("Checking for open port on: %1:%2").arg(hostname, QString::number(port));
 
     QTcpSocket socket;
-    socket.connectToHost(hostname, port);
+    socket.connectToHost(hostname, port, QIODeviceBase::ReadOnly);
     bool res = socket.waitForConnected(600);
     qDebug() << QString("Port " + (res ? QString("Open") : QString("Closed")));
     return res;
