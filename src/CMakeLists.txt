@@ -283,23 +283,12 @@ if (WITH_SCANNER)
     )
 endif()
 
-if(NOT APPLE AND NOT Qt6_FOUND)
+if(UNIX AND NOT APPLE AND STATIC AND NOT Qt6_FOUND)
     target_link_libraries(feather
             Qt5::QSvgIconPlugin
             Qt5::QSvgPlugin
+            Qt5::QXcbIntegrationPlugin
     )
-endif()
-
-if(STATIC AND NOT Qt6_FOUND)
-    if(NOT Qt6_FOUND)
-    target_link_libraries(feather
-            Qt5::QSvgIconPlugin
-            Qt5::QSvgPlugin)
-    endif()
-    if(UNIX AND NOT APPLE)
-        target_link_libraries(feather
-            Qt5::QXcbIntegrationPlugin)
-    endif()
 endif()
 
 if(STATIC AND UNIX AND NOT APPLE AND Qt6_FOUND)
