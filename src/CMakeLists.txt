@@ -316,6 +316,17 @@ if(STACK_TRACE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(feather -rdynamic)
 endif()
 
-install(TARGETS feather
-        DESTINATION ${CMAKE_INSTALL_PREFIX}
-)
+if(DEPENDS)
+    install(TARGETS feather
+            DESTINATION ${CMAKE_INSTALL_PREFIX}
+    )
+else()
+    install(TARGETS feather
+            DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+    )
+
+    if (UNIX AND NOT APPLE)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/assets/feather.desktop DESTINATION ${CMAKE_INSTALL_PREFIX}/share/applications)
+        install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/assets/images/appicons/256x256.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps RENAME "feather.png")
+    endif()
+endif()
