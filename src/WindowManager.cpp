@@ -380,6 +380,7 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
         this->displayWalletErrorMessage(wallet->errorString());
         m_splashDialog->hide();
         this->showWizard(WalletWizard::Page_Menu);
+        m_openingWallet = false;
         return;
     }
 
