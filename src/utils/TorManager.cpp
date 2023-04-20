@@ -96,6 +96,7 @@ void TorManager::start() {
 }
 
 void TorManager::checkConnection() {
+    qDebug() << "Checking Tor connection";
     // We might not be able to connect to localhost if torsocks is used to start feather
     if (Utils::isTorsocks()) {
         this->setConnectionState(true);
@@ -117,6 +118,7 @@ void TorManager::checkConnection() {
     }
 
     else if (m_localTor) {
+        qDebug() << "Tor daemon is local";
         QString host = config()->get(Config::socks5Host).toString();
         quint16 port = config()->get(Config::socks5Port).toString().toUShort();
         this->setConnectionState(Utils::portOpen(host, port));
