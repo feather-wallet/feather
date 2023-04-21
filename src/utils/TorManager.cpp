@@ -72,6 +72,12 @@ void TorManager::start() {
         return;
     }
 
+    QFile torFile{this->torPath};
+    QString alternativeTorFile = QCoreApplication::applicationDirPath() + "/tor";
+    if (!torFile.exists() && QFileInfo(alternativeTorFile).isFile()) {
+        this->torPath = alternativeTorFile;
+    }
+
     qDebug() << QString("Start process: %1").arg(this->torPath);
 
     m_restarts += 1;
