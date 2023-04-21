@@ -21,9 +21,15 @@ TorManager::TorManager(QObject *parent)
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
     this->torDir = Config::defaultConfigDir().filePath("tor");
+
 #if defined(TOR_INSTALLED)
-    // When installed, use directory relative to application path.
-    this->torDir = QDir(Utils::applicationPath()).filePath("tor");
+    QString installedTorPath = QDir(Utils::applicationPath()).filePath("tor");
+    bool installedTorPathIsDir = QFileInfo(torPath).isDir();
+    if (installedTorPathIsDir) {
+        this->torDir = installedTorPath;
+    } else {
+        this->torDir = Utils::applicationPath();
+    }
 #endif
 
     this->torDataPath = Config::defaultConfigDir().filePath("tor/data");
