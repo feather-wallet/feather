@@ -187,6 +187,10 @@ if(TOR_DIR)
     target_compile_definitions(feather PRIVATE HAS_TOR_BIN=1)
 endif()
 
+if(TOR_INSTALLED)
+    target_compile_definitions(feather PRIVATE TOR_INSTALLED=1)
+endif()
+
 if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()

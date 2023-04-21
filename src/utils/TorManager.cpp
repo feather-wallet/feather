@@ -21,7 +21,7 @@ TorManager::TorManager(QObject *parent)
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
     this->torDir = Config::defaultConfigDir().filePath("tor");
-#if defined(PLATFORM_INSTALLER)
+#if defined(TOR_INSTALLED)
     // When installed, use directory relative to application path.
     this->torDir = QDir(Utils::applicationPath()).filePath("tor");
 #endif
@@ -73,10 +73,6 @@ void TorManager::start() {
     }
 
     QFile torFile{this->torPath};
-    QString alternativeTorFile = QCoreApplication::applicationDirPath() + "/tor";
-    if (!torFile.exists() && QFileInfo(alternativeTorFile).isFile()) {
-        this->torPath = alternativeTorFile;
-    }
 
     qDebug() << QString("Start process: %1").arg(this->torPath);
 
@@ -190,7 +186,7 @@ bool TorManager::unpackBins() {
 
     this->torPath = QDir(this->torDir).filePath(torBin);
 
-#if defined(PLATFORM_INSTALLER)
+#if defined(TOR_INSTALLED)
     // We don't need to unpack if Tor was installed using the installer
     return true;
 #endif
@@ -254,7 +250,7 @@ bool TorManager::shouldStartTorDaemon() {
     }
 
     // Don't start a Tor daemon if we don't have one
-#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
+#if !defined(HAS_TOR_BIN) && !defined(TOR_INSTALLED)
     qWarning() << "Feather built without embedded Tor. Assuming --use-local-tor";
     return false;
 #endif

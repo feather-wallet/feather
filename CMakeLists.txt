@@ -18,15 +18,24 @@ set(COPYRIGHT_HOLDERS "The Monero Project")
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
-option(LOCALMONERO "Include LocalMonero module" ON)
-option(XMRIG "Include XMRig module" ON)
-option(TOR_DIR "Directory containing Tor binaries to embed inside Feather" OFF)
+option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
+option(DONATE_BEG "Prompt donation window every once in a while" OFF)
+
+# Updater
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
-option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
-option(DONATE_BEG "Prompt donation window every once in a while" OFF)
+
+# Tor
+option(TOR_DIR "Directory containing Tor binaries to embed inside Feather" OFF)
+option(TOR_VERSION "Tor version for bundled Tor binary" OFF)
+option(TOR_INSTALLED "Tor binary is available in the installation directory" OFF)
+
+# Components
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
-option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
+option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
+option(LOCALMONERO "Include LocalMonero module" ON)
+option(XMRIG "Include XMRig module" ON)
+
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
