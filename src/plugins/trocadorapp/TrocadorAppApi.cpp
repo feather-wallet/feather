@@ -65,6 +65,7 @@ QString TrocadorAppApi::getStandardPaymentUrl(const QString &currencyCode, const
 
     QUrlQuery query;
     if (!amount.isEmpty() && amount != "0"){
+        query.addQueryItem("api_key", "NoApiKey");
         query.addQueryItem("ticker_from", currencyCode.toLower());
         query.addQueryItem("network_from", networkFrom);
         query.addQueryItem("ticker_to", tradeForCode.toLower());
