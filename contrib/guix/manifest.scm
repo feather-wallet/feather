@@ -17,30 +17,24 @@
              (gnu packages gawk)
              (gnu packages gcc)
              (gnu packages gettext)
-             (gnu packages glib)
              (gnu packages gnome)
              (gnu packages gperf)
-             (gnu packages man)
              (gnu packages installers)
              (gnu packages libusb)
              (gnu packages linux)
              (gnu packages llvm)
-             (gnu packages m4)
              (gnu packages mingw)
              (gnu packages moreutils)
-             (gnu packages package-management)
              (gnu packages perl)
              (gnu packages pkg-config)
              (gnu packages python)
              (gnu packages python-crypto)
              (gnu packages python-web)
-             (gnu packages serialization)
              (gnu packages shells)
              (gnu packages tls)
              (gnu packages version-control)
              (gnu packages xorg)
              (guix build-system gnu)
-             (guix build-system meson)
              (guix build-system perl)
              (guix build-system python)
              (guix build-system trivial)
@@ -290,104 +284,6 @@ chain for " target " development."))
     (description "Put real or fake signatures in a Mach-O.")
     (license license:gpl3+)))
 
-(define-public debugedit
-  (package
-    (name "debugedit")
-    (version "5.0")
-    (source
-      (origin
-        (method git-fetch)
-        (uri (git-reference
-               (url "https://sourceware.org/git/debugedit.git")
-               (commit (string-append name "-" version) )))
-        (file-name (git-file-name name version))
-        (sha256
-          (base32 "1jxiizzzvx89dhs99aky48kl5s49i5zr9d7j4753gp0knk4pndjm"))))
-    (build-system gnu-build-system)
-    (arguments '(#:tests? #f))
-    (propagated-inputs (list elfutils))
-    (inputs (list zlib xz))
-    (native-inputs
-      (list
-        autoconf automake m4 util-linux libtool help2man pkg-config))
-    (home-page "https://sourceware.org/git/debugedit.git")
-    (synopsis "Tool for debugging")
-    (description
-      "The debugedit project provides programs and scripts for creating
- debuginfo and source file distributions, collect build-ids and rewrite
- source paths in DWARF data for debugging, tracing and profiling.
-
- It is based on code originally from the rpm project plus libiberty and
- binutils.  It depends on the elfutils libelf and libdw libraries to
- read and write ELF files, DWARF data and build-ids.")
-    (license license:lgpl2.1)))
-
-(define-public flatpak-builder
-  (package
-    (name "flatpak-builder")
-    (version "1.3.3")
-    (source
-      (origin
-        (method git-fetch)
-        (uri (git-reference
-               (url "https://github.com/flatpak/flatpak-builder.git")
-               (commit version)
-               (recursive? #t)))
-        (file-name (git-file-name name version))
-        (sha256
-          (base32 "01pvkayamvgqrv62msqncz61xd0w8h3rr3bycy408s69j3zhbpsd"))))
-    (build-system gnu-build-system)
-    (arguments
-      '(#:configure-flags
-         (list
-           "--enable-documentation=no"
-           "--with-system-debugedit")
-         #:phases
-         (modify-phases %standard-phases
-           ;; Test are supposed to be done in /var/tmp because of the need for
-           ;; xattrs. Nonetheless, moving it back to /tmp makes tests suceed.
-           (add-before 'check 'allow-tests
-             (lambda _
-               (substitute* '("buildutil/tap-test" "tests/libtest.sh")
-                 (("\\/var\\/tmp\\/")
-                   "/tmp/")))))))
-    (propagated-inputs (list flatpak debugedit elfutils))
-    (inputs
-      (list libsoup-minimal-2
-            libostree
-            json-glib
-            curl
-            libyaml))
-    (native-inputs
-      `(("autoconf" ,autoconf)
-        ("automake" ,automake)
-        ("m4" ,m4)
-         ("libtool" ,libtool)
-         ("pkg-config" ,pkg-config)
-         ("gettext-minimal" ,gettext-minimal)
-         ("which" ,which)
-        ))
-    (home-page "https://github.com/flatpak/flatpak-builder.git")
-    (synopsis "Tool to build flatpaks from source")
-    (description "@code{flatpak-builder} is a wrapper around the flatpak build
-command that automates the building of applications and their dependencies.
-It is one option you can use to build applications.
-
-The goal of flatpak-builder is to push as much knowledge about how to build
-modules to the individual upstream projects.  An invocation of flatpak-builder
-proceeds in these stages, each being specified in detail in json format in
-the file MANIFEST :
-
-@itemize
-@item Download all sources
-@item Initialize the application directory with flatpak build-init
-@item Build and install each module with flatpak build
-@item Clean up the final build tree by removing unwanted files and
-e.g. stripping binaries
-@item Finish the application directory with flatpak build-finish
-@end itemize")
-    (license license:lgpl2.1)))
-
 (packages->manifest
  (append
   (list ;; The Basics
@@ -440,9 +336,6 @@ e.g. stripping binaries
         xcb-util-keysyms
         xcb-util-renderutil
         xcb-util-wm
-        ;; Flatpak
-        debugedit
-        flatpak-builder
     )
   (let ((target (getenv "HOST")))
     (cond ((string-suffix? "-mingw32" target)
