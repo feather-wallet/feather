@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Feather Wallet
+GenericName=Monero Wallet
+Comment=A free Monero desktop wallet
+Icon=org.featherwallet.Feather
+Exec=/app/startup.sh
+Terminal=false
+Categories=Network;Qt;Finance
+StartupNotify=false
+StartupWMClass=feather

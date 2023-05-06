@@ -1,0 +1,11 @@
+[Application]
+name=org.featherwallet.Feather
+runtime=org.featherwallet.Empty/x86_64/stable
+sdk=org.featherwallet.Empty/x86_64/stable
+command=/app/startup.sh
+
+[Context]
+shared=network;ipc;
+sockets=x11;wayland;
+devices=all;
+filesystems=~/Monero:create;

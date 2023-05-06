@@ -86,6 +86,8 @@ jobs:
             host: "x86_64-linux-gnu"
           - name: "x86_64-linux-gnu.no-tor-bundle"
             host: "x86_64-linux-gnu.no-tor-bundle"
+          - name: "x86_64-linux-gnu.flatpak"
+            host: "x86_64-linux-gnu.flatpak"
           - name: "aarch64-linux-gnu"
             host: "aarch64-linux-gnu"
           - name: "arm-linux-gnueabihf"
