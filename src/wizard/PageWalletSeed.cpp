@@ -126,11 +126,11 @@ bool PageWalletSeed::validatePage() {
                         "• Never type it on a website\n"
                         "• Store it safely (offline)\n"
                         "• Do not lose your seed!");
-    seedWarning.addButton("Go back", QMessageBox::RejectRole);
+    auto btn_goBack = seedWarning.addButton("Go back", QMessageBox::RejectRole);
     seedWarning.addButton("I understand", QMessageBox::AcceptRole);
-    int res = seedWarning.exec();
 
-    if (res == QMessageBox::Rejected) {
+    seedWarning.exec();
+    if (seedWarning.clickedButton() == btn_goBack) {
         return false;
     }
 
