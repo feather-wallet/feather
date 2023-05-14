@@ -87,7 +87,6 @@ void PageWalletRestoreSeed::onSeedTypeToggled() {
     ui->label_errorString->hide();
     ui->seedEdit->setStyleSheet("");
     ui->seedEdit->setCompleter(&m_mode->completer);
-    ui->seedEdit->setText("");
 }
 
 void PageWalletRestoreSeed::onSeedLanguageChanged(const QString &language) {
