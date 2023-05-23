@@ -299,11 +299,8 @@ bool portOpen(const QString &hostname, quint16 port) { // TODO: this call should
 
     QTcpSocket socket;
     socket.connectToHost(hostname, port);
-    bool res = socket.waitForConnected(1000);
+    bool res = socket.waitForConnected(600);
     qDebug() << QString("Port " + (res ? QString("Open") : QString("Closed")));
-    if (!res) {
-        qDebug() << "Error: " << socket.error() << " - " << socket.errorString();
-    }
     return res;
 }
 
