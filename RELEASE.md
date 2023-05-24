@@ -6,6 +6,8 @@
   - Update `m_defaultPools` in `src/widgets/XMRigWidget.h`
   - Update default node lists in `src/assets/nodes.json`
   - Bump `openssl`, `qt`, `tor_*` packages in `contrib/depends/packages`
+  - Check all statically linked dependencies for known vulnerabilities using `depends/vulns.py`
+  - Rebase on top of latest Monero version
 - Update `src/assets/ack.txt`
 - Update `SOURCE_DATE_EPOCH` in `contrib/guix/guix-build`
 - Update the version number in `CMakeLists.txt`
@@ -21,11 +23,8 @@
     cd feather
     git checkout <TAG>
     git submodule update --init --recursive
-    mkdir contrib/depends/SDKs
-    tar -C contrib/depends/SDKs -xaf /path/to/Xcode-<foo>-<bar>-extracted-SDK-with-libcxx-headers.tar.gz
     ./contrib/guix/guix-build
     ```
-  - To obtain `Xcode-<foo>-<bar>-extracted-SDK-with-libcxx-headers.tar.gz` follow the instructions in `contrib/macdeploy`.
   - Use at least two machines to verify that the builds are reproducible:
     ```bash
     cd guix-build-x.x.x/output
