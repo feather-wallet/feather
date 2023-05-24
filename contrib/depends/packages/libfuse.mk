@@ -1,4 +1,3 @@
-# Needed for libsquashfuse
 package=libfuse
 $(package)_version=2.9.9
 $(package)_download_path=https://github.com/libfuse/libfuse/releases/download/fuse-2.9.9/

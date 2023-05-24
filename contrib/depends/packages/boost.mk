@@ -1,7 +1,7 @@
 package=boost
-$(package)_version=1_68_0
-$(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/1.68.0/
-$(package)_file_name=$(package)_$($(package)_version).tar.bz2
+$(package)_version=1.68.0
+$(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/$($(package)_version)/
+$(package)_file_name=$(package)_$(subst .,_,$($(package)_version)).tar.bz2
 $(package)_sha256_hash=7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7
 $(package)_dependencies=libiconv
 $(package)_patches=fix_aroptions.patch fix_arm_arch.patch fix_coalesce.patch
