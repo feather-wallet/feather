@@ -29,6 +29,11 @@ $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 
+# Remove >= 6.5.1
+$(package)_patches += CVE-2023-32573-qtsvg-6.5.diff
+$(package)_patches += CVE-2023-32762-qtbase-6.5.diff
+$(package)_patches += CVE-2023-32763-qtbase-6.5.diff
+
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
 $(package)_qttools_sha256_hash=49c33d96b0a44988be954269b8ce3d1a495b439726e03a6be7c0d50a686369c4
 
@@ -255,7 +260,12 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/arm64-apple-toolchain.cmake . && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
   mv $($(package)_patch_dir)/riscvToolchain.cmake . && \
-  cd qtmultimedia && \
+  cd qtbase && \
+  patch -p1 -i $($(package)_patch_dir)/CVE-2023-32762-qtbase-6.5.diff && \
+  patch -p1 -i $($(package)_patch_dir)/CVE-2023-32763-qtbase-6.5.diff && \
+  cd ../qtsvg && \
+  patch -p1 -i $($(package)_patch_dir)/CVE-2023-32573-qtsvg-6.5.diff && \
+  cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
 endef
