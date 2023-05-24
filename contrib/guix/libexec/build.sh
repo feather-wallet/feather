@@ -279,7 +279,7 @@ mkdir -p "$DISTSRC"
         *mingw32)
             case "$OPTIONS" in
                 installer)
-                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_DIR=Off -DTOR_VERSION=Off -DTOR_INSTALLED=On"
+                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ;;
             esac
             ;;
