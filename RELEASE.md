@@ -6,7 +6,8 @@
   - Update `m_defaultPools` in `src/widgets/XMRigWidget.h`
   - Update default node lists in `src/assets/nodes.json`
   - Bump `openssl`, `qt`, `tor_*` packages in `contrib/depends/packages`
-  - Check all statically linked dependencies for known vulnerabilities using `depends/vulns.py`
+  - Update or patch any statically linked dependencies that have known vulnerabilities
+    - Run `feather-utils/depends/vulns.py` to check
   - Rebase on top of latest Monero version
 - Update `src/assets/ack.txt`
 - Update `SOURCE_DATE_EPOCH` in `contrib/guix/guix-build`
@@ -25,24 +26,18 @@
     git submodule update --init --recursive
     ./contrib/guix/guix-build
     ```
+  - Alternatively, run `feather-utils/guix/run-build.sh`
   - Use at least two machines to verify that the builds are reproducible:
-    ```bash
-    cd guix-build-x.x.x/output
-    find . -type f -not -name "SHA*" -exec sha256sum {} \; | sort -k2
-    ```
     - In absence of a system for verified reproduction, at least one machine should be air-gapped.
+    - Use the `feather-utils/guix/compare-builds.sh` script to compare two build directories and identify any reproducibility defects.
     - If builds are not reproducible: fix any reproducibility defects and bump patch version. Do not sign or release non-reproducible builds.
-     - To quickly identify any non-reproducible `depends` packages:
-        ```bash
-        cd contrib/depends/built
-        find . -name "*.hash" -exec cat {} \; | sort -k2
-        ```
 - Sign release artifacts and hashlists.
   - Transfer files in `guix-build-x.x.x/output` to release signing machine
-  - Run `make-release.sh`
+  - Run `feather-utils/release/make-release.sh`
 - Update documentation (`feather-wallet/feather-docs`)
 - Update the site (`feather-wallet/feather-site`)
-  - Add a changelog in `content/changelog`
+  - Run the `feather-utils/site/bump-version.py` script to create a template commit.
+  - Edit the changelog in `content/changelog`
   - Update the version number, file sizes and paths in `data/release.json`
   - Upload releases, signatures and signed hashlists.
     - Follow the directory structure defined in `MainWindow::onShowUpdateCheck`.
