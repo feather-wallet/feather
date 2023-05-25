@@ -38,6 +38,7 @@
 - Update the site (`feather-wallet/feather-site`)
   - Run the `feather-utils/site/bump-version.py` script to create a template commit.
   - Edit the changelog in `content/changelog`
+    - If a release includes security fixes add "(includes security fixes)" to the title.
   - Update the version number, file sizes and paths in `data/release.json`
   - Upload releases, signatures and signed hashlists.
     - Follow the directory structure defined in `MainWindow::onShowUpdateCheck`.
