@@ -183,11 +183,10 @@ define $(package)_config_cmds
   ./configure -top-level $($(package)_config_opts)
 endef
 
-# https://bugreports.qt.io/browse/QTBUG-112018
 define $(package)_build_cmds
   export LD_LIBRARY_PATH=${build_prefix}/lib/ && \
   unset CMAKE_PREFIX_PATH && \
-  $(MAKE) || $(MAKE)
+  cmake --build . --parallel
 endef
 
 define $(package)_stage_cmds

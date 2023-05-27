@@ -5,6 +5,7 @@
              (gnu packages base)
              (gnu packages bash)
              (gnu packages bison)
+             (gnu packages build-tools)
              (gnu packages certs)
              (gnu packages check)
              (gnu packages cmake)
@@ -25,6 +26,7 @@
              (gnu packages llvm)
              (gnu packages mingw)
              (gnu packages moreutils)
+             (gnu packages ninja)
              (gnu packages perl)
              (gnu packages pkg-config)
              (gnu packages python)
@@ -321,6 +323,8 @@ chain for " target " development."))
         gettext-minimal
         squashfs-tools
         cmake-minimal
+        meson
+        ninja
         ;; Native GCC 10 toolchain
         gcc-toolchain-10
         (list gcc-toolchain-10 "static")

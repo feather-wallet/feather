@@ -692,8 +692,8 @@ index 000000000..c07c0ebc7
 +#ifdef Q_OS_DARWIN
 +#include "qavfcamera_p.h"
 +#elif defined(Q_OS_WINDOWS)
-+#include "qwindowscamera_p.h"
-+#include "qwindowsvideodevices_p.h"
++#include "../windows/mediacapture/qwindowscamera_p.h"
++#include "../windows/qwindowsvideodevices_p.h"
 +#endif
 +
 +#if QT_CONFIG(linux_v4l)
