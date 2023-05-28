@@ -1,0 +1,101 @@
+name: ci/gh-actions/guix
+
+on:
+  push:
+
+env:
+  APT_SET_CONF: |
+    echo "Acquire::Retries \"3\";"         | sudo tee -a /etc/apt/apt.conf.d/80-custom
+    echo "Acquire::http::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
+    echo "Acquire::ftp::Timeout \"120\";"  | sudo tee -a /etc/apt/apt.conf.d/80-custom
+jobs:
+  build-cross:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - name: "x86_64-linux-gnu"
+            host: "x86_64-linux-gnu"
+          - name: "x86_64-linux-gnu.no-tor-bundle"
+            host: "x86_64-linux-gnu.no-tor-bundle"
+          - name: "aarch64-linux-gnu"
+            host: "aarch64-linux-gnu"
+          - name: "arm-linux-gnueabihf"
+            host: "arm-linux-gnueabihf"
+          - name: "riscv64-linux-gnu"
+            host: "riscv64-linux-gnu"
+          - name: "x86_64-w64-mingw32"
+            host: "x86_64-w64-mingw32"
+          - name: "x86_64-w64-mingw32.installer"
+            host: "x86_64-w64-mingw32.installer"
+          - name: "x86_64-apple-darwin"
+            host: "x86_64-apple-darwin"
+          - name: "arm64-apple-darwin"
+            host: "arm64-apple-darwin"
+    name: ${{ matrix.toolchain.name }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          submodules: recursive
+      - name: guix cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            gnu/store
+            guix_db.sqlite
+          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
+          restore-keys: |
+            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
+            depends-${{ matrix.toolchain.host }}-
+      - name: move guix store
+        run: |
+          if [[ -e "guix_db.sqlite" ]]; then
+              sudo mkdir -p /var/guix/db
+              sudo mv gnu /gnu
+              sudo cp guix_db.sqlite /var/guix/db/db.sqlite
+          
+              sudo chmod 1775 /gnu/store
+              sudo chown 0644 /var/guix/db/db.sqlite
+              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
+          fi
+      - name: depends cache
+        uses: actions/cache@v3
+        with:
+          path: contrib/depends/built
+          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+          restore-keys: |
+            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+            depends-${{ matrix.toolchain.host }}-
+      - name: depends sources cache
+        uses: actions/cache@v3
+        with:
+          path: contrib/depends/sources
+          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+          restore-keys: |
+            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+            depends-${{ matrix.toolchain.host }}-
+      - name: set apt conf
+        run: ${{env.APT_SET_CONF}}
+      - name: install dependencies
+        run: sudo apt update; sudo apt -y install wget git ca-certificates ${{ matrix.toolchain.packages }}
+      - name: install guix
+        run: |
+          cd /tmp
+          wget https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh
+          chmod +x guix-install.sh
+          yes '' | sudo GUIX_ALLOW_OVERWRITE=1 ./guix-install.sh
+      - name: build
+        run: |
+          SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.host }}" JOBS=2 ./contrib/guix/guix-build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.toolchain.name }}
+          path: |
+            guix/guix-build-*/output/${{ matrix.toolchain.host }}/*
+      - name: prepare guix store for caching
+        run: |
+          sudo systemctl stop guix-daemon
+          sudo mv /gnu gnu
+          sudo mv /var/guix/db/db.sqlite guix_db.sqlite
