@@ -15,15 +15,11 @@ SET(BUILD_TESTS @build_tests@)
 SET(TREZOR_DEBUG @build_tests@)
 
 # where is the target environment 
-SET(CMAKE_FIND_ROOT_PATH @prefix@ /home/user/.guix-profile/@HOST@)
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux" AND ARCHITECTURE STREQUAL "x86_64")
-  SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /home/user/.guix-profile/)
-endif()
+SET(CMAKE_FIND_ROOT_PATH @prefix@)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-  # MWF libs
-  SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} /gnu/store/3hw9n6yl57lgv01ffi15nk3cj2rjk1km-mingw-w64-x86_64-winpthreads-10.0.0-10.0.0)
+  # WMF libs
+  SET(CMAKE_FIND_ROOT_PATH ${CMAKE_FIND_ROOT_PATH} $ENV{WMF_LIBS})
 endif()
 
 SET(ENV{PKG_CONFIG_PATH} @prefix@/lib/pkgconfig)

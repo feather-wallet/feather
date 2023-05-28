@@ -155,6 +155,7 @@ $(package)_config_opts_linux += -system-freetype
 $(package)_config_opts_linux += -fontconfig
 $(package)_config_opts_linux += -no-opengl
 $(package)_config_opts_linux += -no-feature-vulkan
+$(package)_config_opts_linux += -no-feature-backtrace
 $(package)_config_opts_linux += -dbus-runtime
 ifneq ($(LTO),)
 $(package)_config_opts_linux += -ltcg
@@ -251,8 +252,14 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/no_wraprt_on_apple.patch && \
   mv $($(package)_patch_dir)/WindowsToolchain.cmake . && \
   mv $($(package)_patch_dir)/MacToolchain.cmake . && \
+  sed -i -e 's|@cmake_c_flags@|$(darwin_CC_)|' \
+      -e 's|@cmake_cxx_flags@|$(darwin_CXX_)|' \
+      MacToolchain.cmake && \
   mv $($(package)_patch_dir)/aarch64Toolchain.cmake . && \
   mv $($(package)_patch_dir)/arm64-apple-toolchain.cmake . && \
+  sed -i -e 's|@cmake_c_flags@|$(darwin_CC_)|' \
+      -e 's|@cmake_cxx_flags@|$(darwin_CXX_)|' \
+      arm64-apple-toolchain.cmake && \
   mv $($(package)_patch_dir)/gnueabihfToolchain.cmake . && \
   mv $($(package)_patch_dir)/riscvToolchain.cmake . && \
   cd qtbase && \
@@ -275,18 +282,18 @@ define $(package)_config_cmds
 endef
 else ifeq ($(host_os),mingw32)
 define $(package)_config_cmds
-  cp $(HOME)/.guix-profile/lib/libstrmiids.a \
-     $(HOME)/.guix-profile/lib/libamstrmid.a \
-     $(HOME)/.guix-profile/lib/libdmoguids.a \
-     $(HOME)/.guix-profile/lib/libuuid.a \
-     $(HOME)/.guix-profile/lib/libmsdmo.a \
-     $(HOME)/.guix-profile/lib/libole32.a \
-     $(HOME)/.guix-profile/lib/liboleaut32.a \
-     $(HOME)/.guix-profile/lib/libmf.a \
-     $(HOME)/.guix-profile/lib/libmfuuid.a \
-     $(HOME)/.guix-profile/lib/libmfplat.a \
-     $(HOME)/.guix-profile/lib/libmfcore.a \
-     $(HOME)/.guix-profile/lib/libpropsys.a \
+  cp $(WMF_LIBS)/lib/libstrmiids.a \
+     $(WMF_LIBS)/lib/libamstrmid.a \
+     $(WMF_LIBS)/lib/libdmoguids.a \
+     $(WMF_LIBS)/lib/libuuid.a \
+     $(WMF_LIBS)/lib/libmsdmo.a \
+     $(WMF_LIBS)/lib/libole32.a \
+     $(WMF_LIBS)/lib/liboleaut32.a \
+     $(WMF_LIBS)/lib/libmf.a \
+     $(WMF_LIBS)/lib/libmfuuid.a \
+     $(WMF_LIBS)/lib/libmfplat.a \
+     $(WMF_LIBS)/lib/libmfcore.a \
+     $(WMF_LIBS)/lib/libpropsys.a \
      /feather/contrib/depends/x86_64-w64-mingw32/lib/ && \
    export OPENSSL_LIBS=${$(package)_openssl_flags_$(host_os)} \
    export PKG_CONFIG_SYSROOT_DIR=/ && \
