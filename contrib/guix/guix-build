@@ -353,6 +353,7 @@ EOF
                                  --container \
                                  --pure \
                                  --no-cwd \
+                                 ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                  -- env HOST="$HOST"
 
 
