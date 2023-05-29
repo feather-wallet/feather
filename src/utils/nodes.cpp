@@ -387,9 +387,9 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 
     QStringList nodesList;
     for (auto const &node: nodes) {
-        if (nodesList.contains(node.toAddress())) // skip duplicates
+        if (nodesList.contains(node.toFullAddress())) // skip duplicates
             continue;
-        nodesList.append(node.toAddress());
+        nodesList.append(node.toFullAddress());
         m_customNodes.append(node);
     }
 
