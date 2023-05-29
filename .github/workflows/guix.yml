@@ -79,16 +79,9 @@ jobs:
       - name: set apt conf
         run: ${{env.APT_SET_CONF}}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install wget git ca-certificates ${{ matrix.toolchain.packages }}
-      - name: install guix
-        run: |
-          cd /tmp
-          wget https://git.savannah.gnu.org/cgit/guix.git/plain/etc/guix-install.sh
-          chmod +x guix-install.sh
-          yes '' | sudo GUIX_ALLOW_OVERWRITE=1 ./guix-install.sh
+        run: sudo apt update; sudo apt -y install guix git ca-certificates ${{ matrix.toolchain.packages }}
       - name: build
-        run: |
-          SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.host }}" JOBS=2 ./contrib/guix/guix-build
+        run: SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.host }}" JOBS=2 ./contrib/guix/guix-build
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.toolchain.name }}
