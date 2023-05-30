@@ -45,7 +45,7 @@ jobs:
           path: |
             gnu/store
             guix_db.sqlite
-          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
+          key: guix-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
           restore-keys: |
             depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
             depends-${{ matrix.toolchain.host }}-
@@ -72,7 +72,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: contrib/depends/sources
-          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+          key: sources-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
           restore-keys: |
             depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
             depends-${{ matrix.toolchain.host }}-
