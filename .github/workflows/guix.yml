@@ -9,8 +9,23 @@ env:
     echo "Acquire::http::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
     echo "Acquire::ftp::Timeout \"120\";"  | sudo tee -a /etc/apt/apt.conf.d/80-custom
 jobs:
-  build-cross:
+  cache-sources:
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: depends sources cache
+        uses: actions/cache@v3
+        with:
+          path: contrib/depends/sources
+          key: sources-${{ hashFiles('contrib/depends/packages/*') }}
+      - name: download depends sources
+        run: make -C contrib/depends download
+
+  build-guix:
+    runs-on: ubuntu-latest
+    needs: [cache-sources]
     strategy:
       fail-fast: false
       matrix:
@@ -46,9 +61,6 @@ jobs:
             gnu/store
             guix_db.sqlite
           key: guix-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
-          restore-keys: |
-            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
-            depends-${{ matrix.toolchain.host }}-
       - name: move guix store
         run: |
           if [[ -e "guix_db.sqlite" ]]; then
@@ -65,17 +77,11 @@ jobs:
         with:
           path: contrib/depends/built
           key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
-          restore-keys: |
-            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
-            depends-${{ matrix.toolchain.host }}-
       - name: depends sources cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: contrib/depends/sources
-          key: sources-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
-          restore-keys: |
-            depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
-            depends-${{ matrix.toolchain.host }}-
+          key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: set apt conf
         run: ${{env.APT_SET_CONF}}
       - name: install dependencies
