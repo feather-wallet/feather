@@ -1,9 +1,8 @@
 package=openssl
-$(package)_version=3.0.8
+$(package)_version=3.0.9
 $(package)_download_path=https://www.openssl.org/source
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=6c13d2bf38fdf31eac3ce2a347073673f5d63263398f1f69d0df4a41253e4b3e
-$(package)_patches = CVE-2023-0464.patch CVE-2023-0465.patch CVE-2023-0466.patch CVE-2023-1255.patch
+$(package)_sha256_hash=eb1ab04781474360f77c318ab89d8c5a03abc38e63d65a603cabbf1b00a1dc90
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
@@ -49,10 +48,6 @@ $(package)_config_opts_x86_64_freebsd=BSD-x86_64
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 -i $($(package)_patch_dir)/CVE-2023-0464.patch && \
-  patch -p1 -i $($(package)_patch_dir)/CVE-2023-0465.patch && \
-  patch -p1 -i $($(package)_patch_dir)/CVE-2023-0466.patch && \
-  patch -p1 -i $($(package)_patch_dir)/CVE-2023-1255.patch && \
   sed -i.old 's|crypto ssl apps util tools fuzz providers doc|crypto ssl util tools providers|' build.info
 endef
 
