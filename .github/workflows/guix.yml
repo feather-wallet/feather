@@ -8,6 +8,7 @@ env:
     echo "Acquire::Retries \"3\";"         | sudo tee -a /etc/apt/apt.conf.d/80-custom
     echo "Acquire::http::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
     echo "Acquire::ftp::Timeout \"120\";"  | sudo tee -a /etc/apt/apt.conf.d/80-custom
+
 jobs:
   cache-sources:
     runs-on: ubuntu-latest
@@ -40,6 +41,7 @@ jobs:
             guix_db.sqlite
           key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
       - name: move guix store
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [[ -e "guix_db.sqlite" ]]; then
               sudo mkdir -p /var/guix/db
@@ -50,13 +52,23 @@ jobs:
               sudo chown 0644 /var/guix/db/db.sqlite
               sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
           fi
+      - name: depends sources cache
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: actions/cache/restore@v3
+        with:
+          path: contrib/depends/sources
+          key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: set apt conf
+        if: steps.cache.outputs.cache-hit != 'true'
         run: ${{env.APT_SET_CONF}}
       - name: install dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: sudo apt update; sudo apt -y install guix git ca-certificates
       - name: dry run
+        if: steps.cache.outputs.cache-hit != 'true'
         run: DRY_RUN=1 SUBSTITUTE_URLS='http://ci.guix.gnu.org' JOBS=2 ./contrib/guix/guix-build
       - name: prepare guix store for caching
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo systemctl stop guix-daemon
           sudo mv /gnu gnu
