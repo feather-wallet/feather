@@ -51,7 +51,7 @@ fi
 # Checkout git submodules if we haven't already
 ################
 
-git submodule update --init --recursive
+git submodule update --init --recursive --progress
 
 ################
 # The git worktree should not be dirty

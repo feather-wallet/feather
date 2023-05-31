@@ -58,7 +58,7 @@ include(VersionFeather)
 #### Dependencies
 # Monero
 if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/monero/CMakeLists.txt")
-    message(FATAL_ERROR "'monero/CMakeLists.txt' does not exist, did you forget to:\ngit submodule update --init --recursive")
+    message(FATAL_ERROR "'monero/CMakeLists.txt' does not exist, did you forget to:\ngit submodule update --init --recursive --progress")
 endif()
 add_subdirectory(monero EXCLUDE_FROM_ALL)
 set_property(TARGET wallet_merged PROPERTY FOLDER "monero")
