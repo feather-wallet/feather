@@ -16,16 +16,52 @@ jobs:
         with:
           fetch-depth: 0
       - name: depends sources cache
+        id: cache
         uses: actions/cache@v3
         with:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: download depends sources
+        if: steps.cache.outputs.cache-hit != 'true'
         run: make -C contrib/depends download
+
+  cache-guix:
+    runs-on: ubuntu-latest
+    needs: [cache-sources]
+    steps:
+      - name: guix cache
+        uses: actions/cache@v3
+        with:
+          path: |
+            gnu/store
+            guix_db.sqlite
+          key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
+      - name: move guix store
+        run: |
+          if [[ -e "guix_db.sqlite" ]]; then
+              sudo mkdir -p /var/guix/db
+              sudo mv gnu /gnu
+              sudo cp guix_db.sqlite /var/guix/db/db.sqlite
+
+              sudo chmod 1775 /gnu/store
+              sudo chown 0644 /var/guix/db/db.sqlite
+              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
+          fi
+      - name: set apt conf
+        run: ${{env.APT_SET_CONF}}
+      - name: install dependencies
+        run: sudo apt update; sudo apt -y install guix git ca-certificates
+      - name: dry run
+        run: DRY_RUN=1 SUBSTITUTE_URLS='http://ci.guix.gnu.org' JOBS=2 ./contrib/guix/guix-build
+      - name: prepare guix store for caching
+        run: |
+          sudo systemctl stop guix-daemon
+          sudo mv /gnu gnu
+          sudo mv /var/guix/db/db.sqlite guix_db.sqlite
 
   build-guix:
     runs-on: ubuntu-latest
-    needs: [cache-sources]
+    needs: [cache-guix]
     strategy:
       fail-fast: false
       matrix:
@@ -55,12 +91,12 @@ jobs:
           fetch-depth: 0
           submodules: recursive
       - name: guix cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: |
             gnu/store
             guix_db.sqlite
-          key: guix-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/guix/manifest.scm') }}
+          key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
       - name: move guix store
         run: |
           if [[ -e "guix_db.sqlite" ]]; then
@@ -85,7 +121,7 @@ jobs:
       - name: set apt conf
         run: ${{env.APT_SET_CONF}}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install guix git ca-certificates ${{ matrix.toolchain.packages }}
+        run: sudo apt update; sudo apt -y install guix git ca-certificates
       - name: build
         run: SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.host }}" JOBS=2 ./contrib/guix/guix-build
       - uses: actions/upload-artifact@v3
@@ -93,8 +129,3 @@ jobs:
           name: ${{ matrix.toolchain.name }}
           path: |
             guix/guix-build-*/output/${{ matrix.toolchain.host }}/*
-      - name: prepare guix store for caching
-        run: |
-          sudo systemctl stop guix-daemon
-          sudo mv /gnu gnu
-          sudo mv /var/guix/db/db.sqlite guix_db.sqlite
