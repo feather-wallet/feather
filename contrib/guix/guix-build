@@ -48,6 +48,12 @@ exit 1
 fi
 
 ################
+# Checkout git submodules if we haven't already
+################
+
+git submodule update --init --recursive
+
+################
 # The git worktree should not be dirty
 ################
 
