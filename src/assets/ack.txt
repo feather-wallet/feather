@@ -1,6 +1,6 @@
 • The wallet UI is heavily inspired by Electrum. We would like to recognize Thomas Voegtlin for his pioneering work on Bitcoin.
 
-• Feather uses the monero-seed library written by Tevador for 14 word mnemonic seeds.
+• Feather uses the polyseed library written by Tevador for 16 word mnemonic seeds.
 
 • Wizard banner art was adapted from a paper wallet design by the themonera (themonera.art).
 
