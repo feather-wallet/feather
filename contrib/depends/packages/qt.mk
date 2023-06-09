@@ -29,6 +29,7 @@ $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 $(package)_patches += revert_f99ee441.patch
+$(package)_patches += CVE-2023-34410-qtbase-6.5.diff
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
 $(package)_qttools_sha256_hash=5744df9e84b2a86f7f932ffc00341c7d7209e741fd1c0679a32b855fcceb2329
@@ -264,6 +265,7 @@ define $(package)_preprocess_cmds
   mv $($(package)_patch_dir)/riscvToolchain.cmake . && \
   cd qtbase && \
   patch -p1 -i $($(package)_patch_dir)/revert_f99ee441.patch && \
+  patch -p1 -i $($(package)_patch_dir)/CVE-2023-34410-qtbase-6.5.diff && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
