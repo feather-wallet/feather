@@ -9,17 +9,18 @@
 #include <sodium/randombytes.h>
 #include <boost/locale.hpp>
 
-#include <cstdint>
-#include <cstring>
-#include <algorithm>
 #include <array>
+
+#include <QString>
 
 namespace polyseed {
 
     static std::locale locale;
 
     static size_t utf8_nfc(const char* str, polyseed_str norm) {
-        auto s = boost::locale::normalize(str, boost::locale::norm_type::norm_nfc, locale);
+        auto Qstr = QString(str);
+        auto Qs = Qstr.normalized(QString::NormalizationForm_C);
+        auto s = Qs.toStdString();
         size_t size = std::min(s.size(), (size_t)POLYSEED_STR_SIZE - 1);
         s.copy(norm, size);
         norm[size] = '\0';
@@ -28,7 +29,9 @@ namespace polyseed {
     }
 
     static size_t utf8_nfkd(const char* str, polyseed_str norm) {
-        auto s = boost::locale::normalize(str, boost::locale::norm_type::norm_nfkd, locale);
+        auto Qstr = QString(str);
+        auto Qs = Qstr.normalized(QString::NormalizationForm_KD);
+        auto s = Qs.toStdString();
         size_t size = std::min(s.size(), (size_t)POLYSEED_STR_SIZE - 1);
         s.copy(norm, size);
         norm[size] = '\0';
