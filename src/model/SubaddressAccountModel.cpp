@@ -7,6 +7,8 @@
 #include <QFont>
 #include "utils/Utils.h"
 
+#include "libwalletqt/WalletManager.h"
+
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
     : QAbstractTableModel(parent)
     , m_subaddressAccount(subaddressAccount)
@@ -84,8 +86,14 @@ QVariant SubaddressAccountModel::parseSubaddressAccountRow(const Monero::Subaddr
         case Label:
             return QString::fromStdString(row.getLabel());
         case Balance:
+            if (role == Qt::UserRole) {
+                return WalletManager::amountFromString(QString::fromStdString(row.getBalance()));
+            }
             return QString::fromStdString(row.getBalance());
         case UnlockedBalance:
+            if (role == Qt::UserRole) {
+                return WalletManager::amountFromString(QString::fromStdString(row.getUnlockedBalance()));
+            }
             return QString::fromStdString(row.getUnlockedBalance());
         default:
             return QVariant();
