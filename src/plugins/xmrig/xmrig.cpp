@@ -35,7 +35,7 @@ void XmRig::stop() {
 }
 
 void XmRig::start(const QString &path, int threads, const QString &address, const QString &username,
-                  const QString &password, bool tor, bool tls, bool elevated)
+                  const QString &password, bool tor, bool tls, bool elevated, bool solo, const QStringList &extraOptions)
 {
     m_elevated = elevated;
 
@@ -60,7 +60,6 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
         arguments << path;
     }
     arguments << "-o" << address;
-    arguments << "-a" << "rx/0";
     arguments << "-u" << username;
     if (!password.isEmpty()) {
         arguments << "-p" << password;
@@ -79,6 +78,11 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
     if (tls) {
         arguments << "--tls";
     }
+    if (solo) {
+        arguments << "--daemon";
+    }
+    arguments += extraOptions;
+
     QString cmd = QString("%1 %2").arg(path, arguments.join(" "));
     emit output(cmd.toUtf8());
 

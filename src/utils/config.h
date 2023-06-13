@@ -57,6 +57,7 @@ public:
         xmrigElevated,
         xmrigThreads,
         xmrigPool,
+        xmrigDaemon,
         xmrigNetworkTLS,
         xmrigNetworkTor,
         pools,

@@ -90,6 +90,11 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
         this->updatePools();
     });
 
+    ui->lineEdit_solo->setText(config()->get(Config::xmrigDaemon).toString());
+    connect(ui->lineEdit_solo, &QLineEdit::textChanged, [this](){
+        config()->set(Config::xmrigDaemon, ui->lineEdit_solo->text());
+    });
+
     // Network settings
     connect(ui->check_tls, &QCheckBox::toggled, this, &XMRigWidget::onNetworkTLSToggled);
     connect(ui->relayTor, &QCheckBox::toggled, this, &XMRigWidget::onNetworkTorToggled);
@@ -108,12 +113,7 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
 
     // Password
     auto password = m_wallet->getCacheAttribute("feather.xmrig_password");
-    if (!password.isEmpty()) {
-        ui->lineEdit_password->setText(password);
-    } else {
-        ui->lineEdit_password->setText("featherwallet");
-        m_wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
-    }
+    ui->lineEdit_password->setText(password);
     connect(ui->lineEdit_password, &QLineEdit::textChanged, [=]() {
         m_wallet->setCacheAttribute("feather.xmrig_password", ui->lineEdit_password->text());
     });
@@ -208,9 +208,11 @@ void XMRigWidget::onStartClicked() {
     }
 
     int threads = ui->threadSlider->value();
+    bool solo = (ui->combo_miningMode->currentIndex() == Config::MiningMode::Solo);
+    QStringList extraOptions = ui->lineEdit_extraOptions->text().split(" ");
 
     m_XMRig->start(xmrigPath, threads, address, username, password, ui->relayTor->isChecked(), ui->check_tls->isChecked(),
-                   ui->radio_elevateYes->isChecked());
+                   ui->radio_elevateYes->isChecked(), solo, extraOptions);
 }
 
 void XMRigWidget::onStopClicked() {

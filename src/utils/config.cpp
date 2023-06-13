@@ -54,6 +54,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::xmrigElevated,{QS("xmrigElevated"), false}},
         {Config::xmrigThreads,{QS("xmrigThreads"), 1}},
         {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
+        {Config::xmrigDaemon,{QS("xmrigDaemon"), "127.0.0.1:18081"}},
         {Config::xmrigNetworkTLS,{QS("xmrigNetworkTLS"), true}},
         {Config::xmrigNetworkTor,{QS("xmrigNetworkTor"), false}},
         {Config::pools,{QS("pools"), {}}},
