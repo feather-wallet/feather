@@ -7,7 +7,8 @@ get_store_path() {
     find gnu/store -maxdepth 1 -type d -name "*$1*" | sort | head -n 1
 }
 
-cd /flatpak
+mkdir -p /output/flatpak
+cd /output/flatpak
 
 # Create build dir
 mkdir build

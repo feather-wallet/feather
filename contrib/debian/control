@@ -1,0 +1,7 @@
+Package: feather
+Version: VERSION
+Description: Monero desktop wallet
+Maintainer: tobtoht <tob@featherwallet.org>
+Architecture: amd64
+Priority: optional
+Section: misc

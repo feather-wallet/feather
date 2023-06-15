@@ -81,7 +81,7 @@ mkdir -p "$VERSION_BASE"
 # Default to building for all supported HOSTs (overridable by environment)
 export HOSTS="${HOSTS:-x86_64-linux-gnu aarch64-linux-gnu arm-linux-gnueabihf
                        x86_64-linux-gnu.no-tor-bundle
-                       x86_64-linux-gnu.flatpak
+                       x86_64-linux-gnu.pack
                        riscv64-linux-gnu
                        x86_64-w64-mingw32 x86_64-w64-mingw32.installer
                        x86_64-apple-darwin arm64-apple-darwin}"
@@ -446,26 +446,32 @@ EOF
 
 
         case "$OPTIONS" in
-            flatpak)
-                export FILE="$(outdir_for_host "$host")/${DISTNAME}-flatpak.zip"
+            pack)
+                export FILE="$(outdir_for_host "$host")/${DISTNAME}-pack.zip"
                 export HASH=$(guix hash "${FILE}")
                 export VERSION=${VERSION}
-                time-machine pack -S /opt/gnu/bin=bin --manifest="${PWD}/contrib/flatpak/flatpak.scm"
-                PACK=$(time-machine pack --manifest="${PWD}/contrib/flatpak/flatpak.scm")
-                time-machine environment --ad-hoc tar gzip findutils grep patchelf coreutils-minimal bash \
+                time-machine pack --manifest="${PWD}/contrib/guix/pack.scm"
+                PACK=$(time-machine pack --manifest="${PWD}/contrib/guix/pack.scm")
+                time-machine pack -R --manifest="${PWD}/contrib/guix/pack.scm"
+                RPACK=$(time-machine pack -R --manifest="${PWD}/contrib/guix/pack.scm")
+                time-machine environment --ad-hoc tar gzip findutils grep patchelf coreutils-minimal bash binutils sed \
                                          --container \
                                          --pure \
                                          --no-cwd \
                                          --share="$PWD"=/feather \
                                          --share="$PACK"=/pack \
-                                         --share="$(outdir_for_host "$host")"=/flatpak \
+                                         --share="$RPACK"=/rpack \
+                                         --share="$(outdir_for_host "$host")"=/output \
                                          --keep-failed \
                                          --fallback \
                                          --user="user" \
                                          ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                          ${ADDITIONAL_GUIX_COMMON_FLAGS} ${ADDITIONAL_GUIX_ENVIRONMENT_FLAGS} \
                                          -- env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
-                                         bash -c "cd /feather && bash contrib/flatpak/make_flatpak.sh"
+                                                VERSION="$VERSION" \
+                                         bash -c "cd /feather && \
+                                                  bash contrib/debian/make_deb.sh && \
+                                                  bash contrib/flatpak/make_flatpak.sh"
                 ;;
         esac
     )
