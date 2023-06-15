@@ -30,6 +30,7 @@ $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 $(package)_patches += revert_f99ee441.patch
 $(package)_patches += CVE-2023-34410-qtbase-6.5.diff
+#$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
 $(package)_qttools_sha256_hash=5744df9e84b2a86f7f932ffc00341c7d7209e741fd1c0679a32b855fcceb2329
@@ -72,7 +73,6 @@ $(package)_config_opts += -no-linuxfb
 #$(package)_config_opts += -no-libproxy # Needed
 $(package)_config_opts += -no-libudev
 $(package)_config_opts += -no-mtdev
-$(package)_config_opts += -no-openssl # Needed
 $(package)_config_opts += -openssl-linked
 $(package)_config_opts += -no-openvg
 $(package)_config_opts += -no-reduce-relocations

@@ -293,6 +293,9 @@ mkdir -p "$DISTSRC"
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ANONDIST+="-a"
                     ;;
+                flatpak)
+                    CMAKEVARS+=" -DCHECK_UPDATES=Off -DSELF_CONTAINED=Off"
+                    ;;
             esac
             ;;
         *gnueabihf)
@@ -335,11 +338,13 @@ mkdir -p "$DISTSRC"
 
     case "$HOST" in
         *linux*)
-            bash contrib/AppImage/build-appimage.sh
-            APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
-            mv feather.AppImage "${APPIMAGENAME}"
-            cp "${APPIMAGENAME}" "${INSTALLPATH}/"
-            cp "${APPIMAGENAME}" "${OUTDIR}/"
+            if [ "$OPTIONS" != "flatpak" ]; then
+                bash contrib/AppImage/build-appimage.sh
+                APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
+                mv feather.AppImage "${APPIMAGENAME}"
+                cp "${APPIMAGENAME}" "${INSTALLPATH}/"
+                cp "${APPIMAGENAME}" "${OUTDIR}/"
+            fi
             ;;
     esac
 
@@ -372,9 +377,6 @@ mkdir -p "$DISTSRC"
         cd installed
 
         case "$HOST" in
-            *linux*)
-                mv feather "${DISTNAME}"
-                ;;
             *darwin*)
                 mv "feather.app" "Feather.app"
                 ;;
@@ -412,22 +414,32 @@ mkdir -p "$DISTSRC"
                 esac
                 ;;
             *linux*)
-                case "$OPTIONS" in
-                    "")
-                        find . -not -name "*.AppImage" -print0 \
-                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                        find . -not -name "*.AppImage" \
-                            | sort \
-                            | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" \
-                            || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
-                        ;;
-                esac
-                find . -name "*.AppImage" -print0 \
-                    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                find . -name "*.AppImage" \
-                    | sort \
-                    | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
-                    || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                if [ "$OPTIONS" != "flatpak" ]; then
+                    mv feather "${DISTNAME}"
+                    case "$OPTIONS" in
+                        "")
+                            find . -not -name "*.AppImage" -print0 \
+                                | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                            find . -not -name "*.AppImage" \
+                                | sort \
+                                | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" \
+                                || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
+                            ;;
+                    esac
+                    find . -name "*.AppImage" -print0 \
+                        | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                    find . -name "*.AppImage" \
+                        | sort \
+                        | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
+                        || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                else
+                    find . -print0 \
+                        | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                    find . \
+                        | sort \
+                        | zip -X@ "${OUTDIR}/${DISTNAME}-flatpak.zip" \
+                        || ( rm -f "${OUTDIR}/${DISTNAME}-flatpak.zip" && exit 1 )
+                fi
                 ;;
             *darwin*)
                 find . -print0 \
