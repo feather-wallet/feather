@@ -433,6 +433,9 @@ void Wallet::onNewBlock(uint64_t walletHeight) {
 
 void Wallet::onUpdated() {
     this->updateBalance();
+    if (this->isSynchronized()) {
+        this->refreshModels();
+    }
 }
 
 void Wallet::onRefreshed(bool success, const QString &message) {
