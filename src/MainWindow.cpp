@@ -1192,7 +1192,7 @@ void MainWindow::importOutputs() {
 }
 
 void MainWindow::loadUnsignedTx() {
-    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx)");
+    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx);;All Files (*)");
     if (fn.isEmpty()) return;
     UnsignedTransaction *tx = m_wallet->loadTxFile(fn);
     auto err = m_wallet->errorString();
@@ -1221,7 +1221,7 @@ void MainWindow::loadUnsignedTxFromClipboard() {
 }
 
 void MainWindow::loadSignedTx() {
-    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*signed_monero_tx)");
+    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*signed_monero_tx);;All Files (*)");
     if (fn.isEmpty()) return;
     PendingTransaction *tx = m_wallet->loadSignedTxFile(fn);
     auto err = m_wallet->errorString();
