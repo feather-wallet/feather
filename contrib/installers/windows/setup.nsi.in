@@ -23,6 +23,7 @@ Unicode true
 !include Sections.nsh
 !include MUI2.nsh
 !include x64.nsh
+!include WinVer.nsh
 
 # Variables
 Var StartMenuGroup
@@ -110,6 +111,10 @@ Function .onInit
       SetRegView 64
     ${Else}
       MessageBox MB_OK|MB_ICONSTOP "Cannot install 64-bit version on a 32-bit system."
+      Abort
+    ${EndIf}
+    ${If} ${AtMostWin8.1}
+      MessageBox MB_OK|MB_ICONSTOP "This version of Windows is not supported. Upgrade to Windows 10 or later."
       Abort
     ${EndIf}
 FunctionEnd
