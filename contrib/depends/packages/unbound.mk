@@ -4,18 +4,18 @@ $(package)_download_path=https://www.nlnetlabs.nl/downloads/$(package)/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=ee4085cecce12584e600f3d814a28fa822dfaacec1f94c84bfd67f8a5571a5f4
 $(package)_dependencies=openssl expat
-$(package)_patches=disable-glibc-reallocarray.patch remove-SHA384_Init-check.patch
+$(package)_patches=disable-glibc-reallocarray.patch
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-shared --enable-static --without-pyunbound --prefix=$(host_prefix) --with-libexpat=$(host_prefix) --with-ssl=$(host_prefix) --with-libevent=no --without-pythonmodule --disable-flto --with-pthreads --with-libunbound-only
   $(package)_config_opts_linux=--with-pic
   $(package)_config_opts_w64=--enable-static-exe --sysconfdir=/etc --prefix=$(host_prefix) --target=$(host_prefix)
+  $(package)_config_opts_x86_64_darwin=ac_cv_func_SHA384_Init=yes
   $(package)_build_opts_mingw32=LDFLAGS="$($(package)_ldflags) -lpthread"
 endef
 
 define $(package)_preprocess_cmds
   patch -p1 < $($(package)_patch_dir)/disable-glibc-reallocarray.patch &&\
-  patch -p1 < $($(package)_patch_dir)/remove-SHA384_Init-check.patch &&\
   autoconf
 endef
 
