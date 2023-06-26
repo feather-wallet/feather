@@ -14,7 +14,7 @@ SET(ARCH "default")
 SET(BUILD_TESTS @build_tests@)
 SET(TREZOR_DEBUG @build_tests@)
 
-# where is the target environment 
+# where is the target environment
 SET(CMAKE_FIND_ROOT_PATH @prefix@)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
@@ -110,7 +110,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
   SET(BREW OFF)
   SET(PORT OFF)
   SET(CMAKE_OSX_SYSROOT "@prefix@/native/SDK")
-  SET(CMAKE_OSX_DEPLOYMENT_TARGET "10.14")
+  SET(CMAKE_OSX_DEPLOYMENT_TARGET "11")
   SET(CMAKE_CXX_STANDARD 14)
   SET(LLVM_ENABLE_PIC OFF)
   SET(LLVM_ENABLE_PIE OFF)
