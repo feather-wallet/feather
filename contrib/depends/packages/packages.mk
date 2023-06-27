@@ -5,7 +5,7 @@ linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
 linux_native_packages =
 
 darwin_packages :=
-darwin_native_packages = darwin_sdk native_cctools native_libtapi native_clang
+darwin_native_packages = darwin_sdk native_cctools native_libtapi
 
 mingw32_packages =
 mingw32_native_packages =

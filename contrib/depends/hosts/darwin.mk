@@ -8,20 +8,6 @@ OSX_SDK=$(host_prefix)/native/SDK
 
 darwin_native_binutils=native_cctools
 
-ifeq ($(strip $(FORCE_USE_SYSTEM_CLANG)),)
-# FORCE_USE_SYSTEM_CLANG is empty, so we use our depends-managed, pinned clang
-# from llvm.org
-
-# Clang is a dependency of native_cctools when FORCE_USE_SYSTEM_CLANG is empty
-darwin_native_toolchain=native_cctools darwin_sdk
-
-clang_prog=$(build_prefix)/bin/clang
-clangxx_prog=$(clang_prog)++
-
-else
-# FORCE_USE_SYSTEM_CLANG is non-empty, so we use the clang from the user's
-# system
-
 darwin_native_toolchain=darwin_sdk
 
 # We can't just use $(shell command -v clang) because GNU Make handles builtins
@@ -35,7 +21,6 @@ clang_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang")
 clangxx_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang++")
 
 clang_resource_dir=$(shell clang -print-resource-dir)
-endif
 
 cctools_TOOLS=AR RANLIB STRIP NM LIBTOOL OTOOL INSTALL_NAME_TOOL DSYMUTIL
 
