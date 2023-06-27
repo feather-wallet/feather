@@ -110,7 +110,15 @@ QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subadd
             return address;
         }
         case Label:
-            return index.row() == 0 ? tr("Primary address") : QString::fromStdString(subaddress.getLabel());
+        {
+            if (m_currentSubaddressAccount == 0 && index.row() == 0) {
+                return "Primary address";
+            }
+            else if (index.row() == 0) {
+                return "Change";
+            }
+            return QString::fromStdString(subaddress.getLabel());
+        }
         case isUsed:
             return subaddress.isUsed();
         default:

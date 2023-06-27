@@ -3,12 +3,12 @@
 
 #include "SubaddressProxyModel.h"
 
-SubaddressProxyModel::SubaddressProxyModel(QObject *parent, Subaddress *subaddress, bool hidePrimary)
+SubaddressProxyModel::SubaddressProxyModel(QObject *parent, Subaddress *subaddress, bool showChange)
     : QSortFilterProxyModel(parent)
     , m_subaddress(subaddress)
     , m_searchRegExp("")
     , m_searchCaseSensitiveRegExp("")
-    , m_hidePrimary(hidePrimary)
+    , m_showChange(showChange)
 {
     m_searchRegExp.setPatternOptions(QRegularExpression::CaseInsensitiveOption);
 }
@@ -23,9 +23,10 @@ bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &so
         label = QString::fromStdString(subaddress.getLabel());
     });
 
-    // Hide primary address
-    if (sourceRow == 0 && m_hidePrimary)
+    // Hide primary/change addresses
+    if (!m_showChange && sourceRow == 0) {
         return false;
+    }
 
     if (!m_showHidden && m_hiddenAddresses.contains(address)) {
         return false;

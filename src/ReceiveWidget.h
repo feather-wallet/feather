@@ -35,6 +35,7 @@ public slots:
     void editLabel();
     void showContextMenu(const QPoint& point);
     void setShowFullAddresses(bool show);
+    void setShowChangeAddresses(bool show);
     void setShowUsedAddresses(bool show);
     void setShowHiddenAddresses(bool show);
     void setSearchFilter(const QString &filter);
@@ -57,6 +58,7 @@ private:
     QMenu *m_headerMenu;
     QAction *m_showFullAddressesAction;
     QAction *m_showTransactionsAction;
+    QAction *m_showChangeAddressesAction;
     SubaddressModel *m_model;
     SubaddressProxyModel *m_proxyModel;
 

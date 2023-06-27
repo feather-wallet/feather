@@ -44,6 +44,8 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     m_headerMenu = new QMenu(this);
     m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ReceiveWidget::setShowFullAddresses);
     m_showFullAddressesAction->setCheckable(true);
+    m_showChangeAddressesAction = m_headerMenu->addAction("Show change addresses", this, &ReceiveWidget::setShowChangeAddresses);
+    m_showChangeAddressesAction->setCheckable(true);
     connect(ui->addresses->header(), &QHeaderView::customContextMenuRequested, this, &ReceiveWidget::showHeaderMenu);
 
     // context menu
@@ -139,6 +141,11 @@ void ReceiveWidget::onShowTransactions() {
 
     QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
     emit showTransactions(address);
+}
+
+void ReceiveWidget::setShowChangeAddresses(bool show) {
+    if (!m_proxyModel) return;
+    m_proxyModel->setShowChangeAddresses(show);
 }
 
 void ReceiveWidget::setShowFullAddresses(bool show) {

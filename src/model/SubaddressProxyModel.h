@@ -12,7 +12,7 @@ class SubaddressProxyModel : public QSortFilterProxyModel
 {
     Q_OBJECT
 public:
-    explicit SubaddressProxyModel(QObject* parent, Subaddress *subaddress, bool hidePrimary = true);
+    explicit SubaddressProxyModel(QObject* parent, Subaddress *subaddress, bool hidePrimary = false);
     bool filterAcceptsRow(int sourceRow,
                           const QModelIndex &sourceParent) const;
 
@@ -38,6 +38,11 @@ public slots:
         invalidateFilter();
     }
 
+    void setShowChangeAddresses(const bool showChange) {
+        m_showChange = showChange;
+        invalidateFilter();
+    }
+
 private:
     Subaddress *m_subaddress;
 
@@ -46,7 +51,7 @@ private:
     QRegularExpression m_searchCaseSensitiveRegExp;
     bool m_showUsed = false;
     bool m_showHidden = false;
-    bool m_hidePrimary;
+    bool m_showChange = false;
 };
 
 #endif //FEATHER_SUBADDRESSPROXYMODEL_H
