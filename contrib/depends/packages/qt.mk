@@ -112,6 +112,7 @@ $(package)_config_opts += -no-feature-printpreviewwidget
 $(package)_config_opts += -no-feature-printsupport
 $(package)_config_opts += -no-feature-sessionmanager
 #$(package)_config_opts += -no-feature-socks5 # Needed
+$(package)_config_opts += -no-feature-spatialaudio
 $(package)_config_opts += -no-feature-sql
 $(package)_config_opts += -no-feature-syntaxhighlighter
 #$(package)_config_opts += -no-feature-textbrowser # Needed
