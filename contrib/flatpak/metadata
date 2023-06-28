@@ -2,7 +2,7 @@
 name=org.featherwallet.Feather
 runtime=org.featherwallet.Empty/x86_64/stable
 sdk=org.featherwallet.Empty/x86_64/stable
-command=/app/startup.sh
+command=/app/startup
 
 [Context]
 shared=network;ipc;

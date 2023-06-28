@@ -292,7 +292,7 @@ mkdir -p "$DISTSRC"
                     CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ANONDIST+="-a"
                     ;;
-                flatpak)
+                pack)
                     CMAKEVARS+=" -DCHECK_UPDATES=Off -DSELF_CONTAINED=Off"
                     ;;
             esac
@@ -337,7 +337,7 @@ mkdir -p "$DISTSRC"
 
     case "$HOST" in
         *linux*)
-            if [ "$OPTIONS" != "flatpak" ]; then
+            if [ "$OPTIONS" != "pack" ]; then
                 bash contrib/AppImage/build-appimage.sh
                 APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
                 mv feather.AppImage "${APPIMAGENAME}"
@@ -413,7 +413,7 @@ mkdir -p "$DISTSRC"
                 esac
                 ;;
             *linux*)
-                if [ "$OPTIONS" != "flatpak" ]; then
+                if [ "$OPTIONS" != "pack" ]; then
                     mv feather "${DISTNAME}"
                     case "$OPTIONS" in
                         "")
@@ -436,8 +436,8 @@ mkdir -p "$DISTSRC"
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                     find . \
                         | sort \
-                        | zip -X@ "${OUTDIR}/${DISTNAME}-flatpak.zip" \
-                        || ( rm -f "${OUTDIR}/${DISTNAME}-flatpak.zip" && exit 1 )
+                        | zip -X@ "${OUTDIR}/${DISTNAME}-pack.zip" \
+                        || ( rm -f "${OUTDIR}/${DISTNAME}-pack.zip" && exit 1 )
                 fi
                 ;;
             *darwin*)
