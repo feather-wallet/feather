@@ -1,8 +1,8 @@
 package=native_libxcb
-$(package)_version=1.14
+$(package)_version=1.15
 $(package)_download_path=https://xcb.freedesktop.org/dist
 $(package)_file_name=libxcb-$($(package)_version).tar.xz
-$(package)_sha256_hash=a55ed6db98d43469801262d81dc2572ed124edc3db31059d4e9916eb9f844c34
+$(package)_sha256_hash=cc38744f817cf6814c847e2df37fcb8997357d72fa4bcbc228ae0fe47219a059
 $(package)_dependencies=native_xcb_proto native_libXau
 $(package)_patches = remove_pthread_stubs.patch
 
