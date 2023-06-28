@@ -9,7 +9,7 @@ cd /output/debian
 cp /feather/contrib/debian/control .
 sed -i "s/VERSION/${VERSION}/" control
 touch --no-dereference --date="@${SOURCE_DATE_EPOCH}" control
-tar -czvf control.tar.gz control
+tar --owner=0 --group=0 -czvf control.tar.gz control
 rm control
 
 #├── data.tar.gz
@@ -22,8 +22,14 @@ cd usr/bin
 cp /feather-bin feather
 cd ../..
 
+mkdir -p usr/share/applications
+cp /feather/src/assets/feather.desktop usr/share/applications/
+
+mkdir -p usr/share/icons/hicolor/128x128/apps
+cp /feather/src/assets/images/appicons/128x128.png usr/share/icons/hicolor/128x128/apps/feather.png
+
 find . -print0 | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-tar -czvf ../data.tar.gz .
+tar --owner=0 --group=0 -czvf ../data.tar.gz .
 
 cd /output/debian
 chmod -R 755 data
