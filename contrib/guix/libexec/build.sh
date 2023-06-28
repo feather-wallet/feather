@@ -434,10 +434,7 @@ mkdir -p "$DISTSRC"
                 else
                     find . -print0 \
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                    find . \
-                        | sort \
-                        | zip -X@ "${OUTDIR}/${DISTNAME}-pack.zip" \
-                        || ( rm -f "${OUTDIR}/${DISTNAME}-pack.zip" && exit 1 )
+                    cp feather "${OUTDIR}"
                 fi
                 ;;
             *darwin*)

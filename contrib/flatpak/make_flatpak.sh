@@ -24,8 +24,8 @@ cp /feather/contrib/flatpak/metadata .
 mkdir files
 cd files
 
-# Extract feather binary
-unzip /feather-zip
+# Copy feather binary
+cp /feather-bin feather
 
 # Copy metadata
 cp -a /feather/contrib/flatpak/share .

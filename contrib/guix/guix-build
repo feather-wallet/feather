@@ -447,27 +447,27 @@ EOF
 
         case "$OPTIONS" in
             pack)
-                FEATHER_ZIP="$(outdir_for_host "$host")/${DISTNAME}-pack.zip"
+                FEATHER_BIN="$(outdir_for_host "$host")/feather"
+                export VERSION=${VERSION}
                 time-machine pack -S /profile=. --manifest="${PWD}/contrib/guix/pack.scm"
                 PACK=$(time-machine pack --manifest="${PWD}/contrib/guix/pack.scm")
-                time-machine pack -R --manifest="${PWD}/contrib/guix/pack.scm"
-                RPACK=$(time-machine pack -R --manifest="${PWD}/contrib/guix/pack.scm")
                 time-machine environment --ad-hoc unzip tar gzip findutils grep patchelf coreutils-minimal bash binutils sed \
                                          --container \
                                          --pure \
                                          --no-cwd \
                                          --share="$PWD"=/feather \
                                          --share="$PACK"=/pack \
-                                         --share="$RPACK"=/rpack \
                                          --share="$(outdir_for_host "$host")"=/output \
-                                         --share="$FEATHER_ZIP"=/feather-zip \
+                                         --share="$FEATHER_BIN"=/feather-bin \
                                          --keep-failed \
                                          --fallback \
                                          --user="user" \
                                          ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                          ${ADDITIONAL_GUIX_COMMON_FLAGS} ${ADDITIONAL_GUIX_ENVIRONMENT_FLAGS} \
                                          -- env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
+                                                VERSION="$VERSION" \
                                          bash -c "cd /feather && \
+                                                  bash contrib/debian/make_deb.sh && \
                                                   bash contrib/flatpak/make_flatpak.sh"
                 ;;
         esac
