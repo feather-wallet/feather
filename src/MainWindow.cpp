@@ -664,9 +664,10 @@ void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
     }
 }
 
-void MainWindow::onSynchronized() {
+void MainWindow::onSynchronized(int height, int target) {
+    QString heightText = QString("Synchronized at height %1").arg(QString::number(height));
     this->updateNetStats();
-    this->setStatusText("Synchronized");
+    this->setStatusText(heightText);
 }
 
 void MainWindow::onBlockchainSync(int height, int target) {
