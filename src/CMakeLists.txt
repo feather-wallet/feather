@@ -301,6 +301,10 @@ if(DEPENDS AND APPLE)
             ${CMAKE_OSX_SYSROOT}/lib/darwin/libclang_rt.osx.a)
 endif()
 
+if(DEPENDS AND UNIX AND NOT APPLE)
+    target_link_libraries(XCB::XCB INTERFACE ${LIBXAU_LIBRARY})
+endif()
+
 if(STACK_TRACE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
     target_link_libraries(feather -rdynamic)
 endif()

@@ -67,6 +67,13 @@ get_directory_property(UNBOUND_LIBRARY DIRECTORY "monero" DEFINITION UNBOUND_LIB
 get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_TREZOR_READY)
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
 
+# libXau
+# workaround for: undefined reference to `XauGetBestAuthByAddr'
+if (DEPENDS AND UNIX AND NOT APPLE)
+    find_library(LIBXAU_LIBRARY Xau)
+    message(STATUS "libXau: libraries at ${LIBXAU_LIBRARY}")
+endif()
+
 # pthread
 find_package(Threads REQUIRED)
 

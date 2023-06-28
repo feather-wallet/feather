@@ -6,7 +6,7 @@ $(package)_sha256_hash=7c260a5294412aed429df1da2f8afd3bd07b7cba3fec772fba15a613a
 $(package)_dependencies=libxcb xproto
 
 define $(package)_set_vars
-$(package)_config_opts=--disable-static --disable-devel-docs --without-doxygen
+$(package)_config_opts=--disable-shared --disable-devel-docs --without-doxygen
 $(package)_config_opts += --disable-dependency-tracking --enable-option-checking
 endef
 

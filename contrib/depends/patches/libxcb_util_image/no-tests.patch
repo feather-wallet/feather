@@ -1,0 +1,23 @@
+diff --git a/Makefile.am b/Makefile.am
+index 23956fd..0f4c3c9 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -12,5 +12,5 @@ ChangeLog:
+ 
+ dist-hook: ChangeLog INSTALL
+ 
+-SUBDIRS = image test
++SUBDIRS = image
+ EXTRA_DIST = autogen.sh README.md
+diff --git a/configure.ac b/configure.ac
+index 9cf3f5a..0949d55 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -18,7 +18,6 @@ PKG_CHECK_MODULES(XCB_UTIL, xcb-util)
+ AC_CONFIG_FILES([
+ 	Makefile
+ 	image/Makefile
+-	test/Makefile
+ 	image/xcb-image.pc
+ ])
+ AC_OUTPUT
