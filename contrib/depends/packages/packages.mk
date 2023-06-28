@@ -10,7 +10,7 @@ darwin_native_packages = darwin_sdk native_cctools native_libtapi
 mingw32_packages =
 mingw32_native_packages =
 
-qt_linux_packages := libxcb xcb_proto libXau xproto libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_cursor libxcb_util_wm freetype fontconfig qt
+qt_linux_packages := libxcb xcb_proto libXau xproto libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_cursor libxcb_util_wm freetype fontconfig dbus qt
 qt_darwin_packages := qt
 qt_mingw32_packages := qt
 

@@ -6,7 +6,7 @@ $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt native_libxkbcommon
-$(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor
+$(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = aarch64Toolchain.cmake
@@ -157,7 +157,7 @@ $(package)_config_opts_linux += -fontconfig
 $(package)_config_opts_linux += -no-opengl
 $(package)_config_opts_linux += -no-feature-vulkan
 $(package)_config_opts_linux += -no-feature-backtrace
-$(package)_config_opts_linux += -dbus-runtime
+$(package)_config_opts_linux += -dbus-linked
 ifneq ($(LTO),)
 $(package)_config_opts_linux += -ltcg
 endif
