@@ -4,6 +4,8 @@ native_packages := native_libxcb native_xcb_proto native_libXau native_xproto na
 linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
 linux_native_packages =
 
+x86_64_linux_packages := flatstart
+
 darwin_packages :=
 darwin_native_packages = darwin_sdk native_cctools native_libtapi
 

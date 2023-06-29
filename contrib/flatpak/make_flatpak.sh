@@ -24,6 +24,9 @@ cp /feather/contrib/flatpak/metadata .
 mkdir files
 cd files
 
+# Copy flatstart binary
+cp /feather/contrib/depends/x86_64-linux-gnu/bin/startup .
+
 # Copy feather binary
 cp /feather-bin feather
 
@@ -40,7 +43,6 @@ GUIX_PROFILE=$(get_store_path "profile")
 GUIX_GLIBC=$(get_store_path "glibc")
 GUIX_FONTCONFIG=$(get_store_path "fontconfig")
 GUIX_GCC=$(get_store_path "gcc")
-LN_GUIX_STORE="$(get_store_path "ln-guix-store")/bin/ln-guix-store"
 
 # Patch Feather binary
 patchelf --set-interpreter "/${GUIX_GLIBC}/lib/ld-linux-x86-64.so.2" feather
@@ -74,13 +76,9 @@ rm -rf "${GUIX_GLIBC:?}/bin"
 ln -s "/run/host/fonts" share/fonts
 ln -s "/run/host/fonts-cache" share/fonts-cache
 ln -s "/${GUIX_PROFILE}/share/locale" share/locale
-ln -s "/${GUIX_PROFILE}/share/dbus-1" share/dbus-1
 ln -s "/${GUIX_PROFILE}/share/xml" share/xml
 
 # Setup profile symlink
 ln -s "/${GUIX_PROFILE}" profile
-
-# Setup startup symlink
-ln -s "/app/${LN_GUIX_STORE}" startup
 
 chmod -R 555 .

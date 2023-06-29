@@ -36,6 +36,7 @@
              (gnu packages tls)
              (gnu packages version-control)
              (gnu packages xorg)
+             (gnu packages zig)
              (guix build-system gnu)
              (guix build-system perl)
              (guix build-system python)
@@ -325,6 +326,7 @@ chain for " target " development."))
         cmake-minimal
         meson
         ninja
+        zig
         ;; Native GCC 10 toolchain
         gcc-toolchain-10
         (list gcc-toolchain-10 "static")
