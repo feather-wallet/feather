@@ -1,9 +1,8 @@
 package=eudev
-$(package)_version=3.2.6
-$(package)_download_path=https://github.com/gentoo/eudev/archive/
-$(package)_download_file=v$($(package)_version).tar.gz
-$(package)_file_name=$(package)-v$($(package)_version).tar.gz
-$(package)_sha256_hash=a96ecb8637667897b8bd4dee4c22c7c5f08b327be45186e912ce6bc768385852
+$(package)_version=3.2.12
+$(package)_download_path=https://github.com/eudev-project/eudev/releases/download/v$($(package)_version)/
+$(package)_file_name=eudev-$($(package)_version).tar.gz
+$(package)_sha256_hash=ccdd64ec3c381d3c3ed0e99d2e70d1f62988c7763de89ca7bdffafa5eacb9ad8
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared
