@@ -44,7 +44,19 @@ LN_GUIX_STORE="$(get_store_path "ln-guix-store")/bin/ln-guix-store"
 
 # Patch Feather binary
 patchelf --set-interpreter "/${GUIX_GLIBC}/lib/ld-linux-x86-64.so.2" feather
-patchelf --set-rpath "/${GUIX_GLIBC}/lib:/${GUIX_FONTCONFIG}/lib:/${GUIX_GCC}/lib" feather
+patchelf --set-rpath "/${GUIX_GLIBC}/lib:/${GUIX_FONTCONFIG}/lib:\$ORIGIN/lib" feather
+
+# Copy dynamically linked libraries
+mkdir lib
+cp "${GUIX_GCC}/lib/libgcc_s.so.1" lib/
+
+# Remove unneeded store items
+chmod -R 755 .
+rm -rf "$(get_store_path "bash-static")"
+rm -rf "$(get_store_path "bash-minimal")"
+rm -rf "$(get_store_path "gcc")"
+rm -rf "$(get_store_path "font-dejavu")"
+rm -rf "$(get_store_path "util-linux")"
 
 # Fonts
 # fontconfig looks in /app/share/fonts
@@ -59,3 +71,5 @@ ln -s "/${GUIX_PROFILE}" profile
 
 # Setup startup symlink
 ln -s "/app/${LN_GUIX_STORE}" startup
+
+chmod -R 555 .
