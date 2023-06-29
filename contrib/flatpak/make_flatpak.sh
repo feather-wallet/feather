@@ -57,6 +57,17 @@ rm -rf "$(get_store_path "bash-minimal")"
 rm -rf "$(get_store_path "gcc")"
 rm -rf "$(get_store_path "font-dejavu")"
 rm -rf "$(get_store_path "util-linux")"
+rm -rf "$(get_store_path "emacs-subdirs")"
+rm -rf "$(get_store_path "info-dir")"
+
+rm -rf "${GUIX_GLIBC:?}/share/i18n/locales"
+rm -rf "${GUIX_GLIBC:?}/share/i18n/charmaps"
+rm -rf "${GUIX_GLIBC:?}/share/locale"
+rm -rf "${GUIX_GLIBC:?}/share/info"
+rm -rf "${GUIX_GLIBC:?}/lib/gconv"
+rm -rf "${GUIX_GLIBC:?}/include"
+rm -rf "${GUIX_GLIBC:?}/sbin"
+rm -rf "${GUIX_GLIBC:?}/bin"
 
 # Fonts
 # fontconfig looks in /app/share/fonts
