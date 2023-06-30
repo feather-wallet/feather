@@ -1,0 +1,92 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+new file mode 100644
+index 0000000..a67d57a
+--- /dev/null
++++ b/CMakeLists.txt
+@@ -0,0 +1,49 @@
++cmake_minimum_required(VERSION 3.5)
++
++project(bcur)
++
++SET(CMAKE_CXX_STANDARD 17)
++
++set(bcur_sources
++        src/bytewords.cpp
++        src/fountain-encoder.cpp
++        src/fountain-decoder.cpp
++        src/fountain-utils.cpp
++        src/xoshiro256.cpp
++        src/utils.cpp
++        src/random-sampler.cpp
++        src/ur-decoder.cpp
++        src/ur.cpp
++        src/ur-encoder.cpp
++        src/memzero.c
++        src/crc32.c
++        src/sha2.c)
++
++install(FILES
++        src/ur-encoder.hpp
++        src/cbor-lite.hpp
++        src/fountain-utils.hpp
++        src/bc-ur.hpp
++        src/bytewords.hpp
++        src/ur.hpp
++        src/fountain-encoder.hpp
++        src/xoshiro256.hpp
++        src/utils.hpp
++        src/random-sampler.hpp
++        src/fountain-decoder.hpp
++        src/ur-decoder.hpp
++        DESTINATION include/bcur)
++
++set(CMAKE_BUILD_TYPE Release)
++
++add_library(bcur_static STATIC ${bcur_sources})
++set_property(TARGET bcur_static PROPERTY POSITION_INDEPENDENT_CODE ON)
++set_target_properties(bcur_static PROPERTIES OUTPUT_NAME bcur
++                                                 C_STANDARD 17
++                                                 C_STANDARD_REQUIRED ON)
++
++include(GNUInstallDirs)
++install(TARGETS bcur_static
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+diff --git a/src/cbor-lite.hpp b/src/cbor-lite.hpp
+index 945b6d5..267474a 100644
+--- a/src/cbor-lite.hpp
++++ b/src/cbor-lite.hpp
+@@ -12,6 +12,7 @@
+ #include <iterator>
+ #include <string>
+ #include <type_traits>
++#include <cstdint>
+ 
+ #ifndef __BYTE_ORDER__
+ #error __BYTE_ORDER__ not defined
+diff --git a/src/memzero.c b/src/memzero.c
+index 5edc797..b19923a 100644
+--- a/src/memzero.c
++++ b/src/memzero.c
+@@ -6,7 +6,7 @@
+ #include <string.h>
+ 
+ #ifdef _WIN32
+-#include <Windows.h>
++#include <windows.h>
+ #endif
+ 
+ #ifdef __unix__
+diff --git a/src/xoshiro256.cpp b/src/xoshiro256.cpp
+index 7e87833..2f40b8b 100644
+--- a/src/xoshiro256.cpp
++++ b/src/xoshiro256.cpp
+@@ -7,6 +7,7 @@
+ 
+ #include "xoshiro256.hpp"
+ #include <limits>
++#include <cstring>
+ 
+ /*  Written in 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org)
+ 
