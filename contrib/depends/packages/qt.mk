@@ -309,17 +309,6 @@ define $(package)_build_cmds
   export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
   env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH cmake --build . --parallel
 endef
-else ifeq ($(host_os),mingw32)
-define $(package)_build_cmds
-  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
-  cmake --build . --parallel
-endef
-else ifneq (,$(findstring x86_64,$(HOST)))
-define $(package)_build_cmds
-  export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
-  cmake --build . --target syncqt_build && \
-  cmake --build . --parallel
-endef
 else
 define $(package)_build_cmds
   export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
