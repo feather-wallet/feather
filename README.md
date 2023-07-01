@@ -10,6 +10,7 @@ Copyright (c) 2020-2023, The Monero Project.
 * Docs: [docs.featherwallet.org](https://docs.featherwallet.org)
 * Git: [github.com/feather-wallet/feather](https://github.com/feather-wallet/feather)
 * Reddit: [/r/FeatherWallet](https://old.reddit.com/r/FeatherWallet)
+* Lemmy: [monero.town/c/featherwallet](https://monero.town/c/featherwallet)
 * Mail: dev@featherwallet.org
 * IRC: `#feather` on OFTC
 * Matrix: `#feather:monero.social`
