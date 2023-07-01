@@ -5,7 +5,7 @@ $(package)_file_name=$($(package)_version).tar.gz
 $(package)_sha256_hash=e9694fcda4f9fcb00374da7a439b881296c0ce67ea98ca44bf2830d1a364365b
 
 define $(package)_build_cmds
-  zig build-exe ln-guix-store.zig --strip -OReleaseSmall
+  zig build-exe ln-guix-store.zig -target x86_64-linux-none --strip -OReleaseSmall
 endef
 
 define $(package)_stage_cmds
