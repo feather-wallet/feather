@@ -12,8 +12,6 @@ $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += guix_cross_lib_path.patch
 $(package)_patches += mac-qmake.conf
 $(package)_patches += no_pthread_cond_clockwait.patch
-$(package)_patches += no-renameat2.patch
-$(package)_patches += no-statx.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
@@ -168,8 +166,6 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/rcc_hardcode_timestamp.patch && \
   patch -p1 -i $($(package)_patch_dir)/fast_fixed_dtoa_no_optimize.patch && \
   patch -p1 -i $($(package)_patch_dir)/guix_cross_lib_path.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-statx.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-renameat2.patch && \
   patch -p1 -i $($(package)_patch_dir)/no_pthread_cond_clockwait.patch
 endef
 
