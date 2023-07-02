@@ -29,7 +29,7 @@ mkdir -p usr/share/icons/hicolor/128x128/apps
 cp /feather/src/assets/images/appicons/128x128.png usr/share/icons/hicolor/128x128/apps/feather.png
 
 find . -print0 | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-tar --owner=0 --group=0 -czvf ../data.tar.gz .
+find . | sort | tar --owner=0 --group=0 -czvf ../data.tar.gz -T -
 
 cd /output/debian
 chmod -R 755 data
