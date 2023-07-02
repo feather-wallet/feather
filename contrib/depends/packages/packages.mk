@@ -1,5 +1,5 @@
 packages := boost openssl libiconv unbound qrencode zbar sodium polyseed hidapi protobuf libusb zlib libgpg-error libgcrypt expat libzip bc-ur
-native_packages := native_libxcb native_xcb_proto native_libXau native_xproto native_libxkbcommon native_qt native_protobuf
+native_packages := native_qt native_protobuf
 
 linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
 linux_native_packages =

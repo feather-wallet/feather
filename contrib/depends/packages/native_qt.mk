@@ -4,9 +4,7 @@ $(package)_download_path=https://download.qt.io/official_releases/qt/6.5/$($(pac
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed
-$(package)_dependencies=native_libxcb native_libxkbcommon
 $(package)_qt_libs=corelib network widgets gui plugins testlib
-$(package)_linguist_tools = lrelease lupdate lconvert
 $(package)_patches  = dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += guix_cross_lib_path.patch
@@ -91,6 +89,7 @@ $(package)_config_opts += -no-feature-printpreviewdialog
 $(package)_config_opts += -no-feature-printpreviewwidget
 $(package)_config_opts += -no-feature-sessionmanager
 #$(package)_config_opts += -no-feature-socks5 # Needed
+$(package)_config_opts += -no-feature-spatialaudio
 $(package)_config_opts += -no-feature-sql
 $(package)_config_opts += -no-feature-syntaxhighlighter
 #$(package)_config_opts += -no-feature-textbrowser # Needed
@@ -106,11 +105,9 @@ $(package)_config_opts += -no-feature-vnc
 #$(package)_config_opts += -no-feature-wizard # Needed
 $(package)_config_opts += -no-feature-fontconfig
 
-$(package)_config_opts += -xcb
 $(package)_config_opts += -no-xcb-xlib
 $(package)_config_opts += -no-feature-xlib
-#$(package)_config_opts += -feature-ffmpeg
-#$(package)_config_opts += -feature-pulseaudio
+$(package)_config_opts += -no-feature-xkbcommon
 
 # https://bugreports.qt.io/browse/QTBUG-99957
 $(package)_config_opts += -no-pch
@@ -124,10 +121,6 @@ $(package)_config_opts += -platform linux-g++ -xplatform linux-g++
 ifneq (,$(findstring -stdlib=libc++,$($(1)_cxx)))
 $(package)_config_opts_x86_64 = -xplatform linux-clang-libc++
 endif
-
-$(package)_config_opts_aarch64_android += -android-arch arm64-v8a
-$(package)_config_opts_armv7a_android += -android-arch armeabi-v7a
-$(package)_config_opts_x86_64_android += -android-arch x86_64
 
 endef
 
