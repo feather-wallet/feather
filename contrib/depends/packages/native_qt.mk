@@ -51,7 +51,6 @@ $(package)_config_opts += -no-eglfs
 $(package)_config_opts += -no-evdev
 $(package)_config_opts += -no-feature-androiddeployqt
 $(package)_config_opts += -no-feature-colordialog
-$(package)_config_opts += -no-feature-dbus
 $(package)_config_opts += -no-feature-dial
 $(package)_config_opts += -no-feature-fontcombobox
 $(package)_config_opts += -no-feature-fontconfig
