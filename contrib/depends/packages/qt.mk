@@ -30,7 +30,6 @@ $(package)_patches += windows_func_fix.patch
 $(package)_patches += WindowsToolchain.cmake
 $(package)_patches += revert_f99ee441.patch
 $(package)_patches += CVE-2023-34410-qtbase-6.5.diff
-$(package)_patches += CVE-2023-37369-qtbase-6.5.diff
 $(package)_patches += xcb-util-image-fix.patch
 $(package)_patches += libxau-fix.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
@@ -254,7 +253,6 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/CVE-2023-34410-qtbase-6.5.diff && \
   patch -p1 -i $($(package)_patch_dir)/xcb-util-image-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
-  patch -pi -i $($(package)_patch_dir)/CVE-2023-37369-qtbase-6.5.diff && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
