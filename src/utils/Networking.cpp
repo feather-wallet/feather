@@ -16,7 +16,7 @@ void Networking::setUserAgent(const QString &userAgent) {
     this->m_userAgent = userAgent;
 }
 
-QNetworkReply* Networking::get(const QString &url) {
+QNetworkReply* Networking::get(QObject *parent, const QString &url) {
     if (config()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
@@ -27,10 +27,12 @@ QNetworkReply* Networking::get(const QString &url) {
     request.setUrl(QUrl(url));
     request.setRawHeader("User-Agent", m_userAgent.toUtf8());
 
-    return this->m_networkAccessManager->get(request);
+    QNetworkReply *reply = this->m_networkAccessManager->get(request);;
+    reply->setParent(parent);
+    return reply;
 }
 
-QNetworkReply* Networking::getJson(const QString &url) {
+QNetworkReply* Networking::getJson(QObject *parent, const QString &url) {
     if (config()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
@@ -42,10 +44,12 @@ QNetworkReply* Networking::getJson(const QString &url) {
     request.setRawHeader("User-Agent", m_userAgent.toUtf8());
     request.setRawHeader("Content-Type", "application/json");
 
-    return this->m_networkAccessManager->get(request);
+    QNetworkReply *reply = this->m_networkAccessManager->get(request);
+    reply->setParent(parent);
+    return reply;
 }
 
-QNetworkReply* Networking::postJson(const QString &url, const QJsonObject &data) {
+QNetworkReply* Networking::postJson(QObject *parent, const QString &url, const QJsonObject &data) {
     if (config()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
@@ -59,5 +63,8 @@ QNetworkReply* Networking::postJson(const QString &url, const QJsonObject &data)
 
     QJsonDocument doc(data);
     QByteArray bytes = doc.toJson();
-    return this->m_networkAccessManager->post(request, bytes);
+
+    QNetworkReply *reply = this->m_networkAccessManager->post(request, bytes);
+    reply->setParent(parent);
+    return reply;
 }

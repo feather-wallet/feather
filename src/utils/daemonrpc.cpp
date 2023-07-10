@@ -17,7 +17,7 @@ void DaemonRpc::sendRawTransaction(const QString &tx_as_hex, bool do_not_relay, 
     req["do_sanity_checks"] = do_sanity_checks;
 
     QString url = QString("%1/send_raw_transaction").arg(m_daemonAddress);
-    QNetworkReply *reply = m_network->postJson(url, req);
+    QNetworkReply *reply = m_network->postJson(this, url, req);
     connect(reply, &QNetworkReply::finished, [this, reply]{
         onResponse(reply, Endpoint::SEND_RAW_TRANSACTION);
     });
@@ -30,7 +30,7 @@ void DaemonRpc::getTransactions(const QStringList &txs_hashes, bool decode_as_js
     req["prune"] = prune;
 
     QString url = QString("%1/get_transactions").arg(m_daemonAddress);
-    QNetworkReply *reply = m_network->postJson(url, req);
+    QNetworkReply *reply = m_network->postJson(this, url, req);
     connect(reply, &QNetworkReply::finished, [this, reply]{
         onResponse(reply, Endpoint::GET_TRANSACTIONS);
     });

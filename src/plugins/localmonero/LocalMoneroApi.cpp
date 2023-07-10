@@ -13,13 +13,13 @@ LocalMoneroApi::LocalMoneroApi(QObject *parent, Networking *network)
 
 void LocalMoneroApi::countryCodes() {
     QString url = QString("%1/countrycodes").arg(this->getBaseUrl());
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::COUNTRY_CODES));
 }
 
 void LocalMoneroApi::currencies() {
     QString url = QString("%1/currencies").arg(this->getBaseUrl());
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::CURRENCIES));
 }
 
@@ -30,7 +30,7 @@ void LocalMoneroApi::paymentMethods(const QString &countryCode) {
     } else {
         url = QString("%1/payment_methods/%2").arg(this->getBaseUrl(), countryCode);
     }
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::PAYMENT_METHODS));
 }
 
@@ -38,7 +38,7 @@ void LocalMoneroApi::buyMoneroOnline(const QString &currencyCode, const QString 
                                      const QString &paymentMethod, const QString &amount, int page)
 {
     QString url = this->getBuySellUrl(true, currencyCode, countryCode, paymentMethod, amount, page);
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::BUY_MONERO_ONLINE));
 }
 
@@ -46,13 +46,13 @@ void LocalMoneroApi::sellMoneroOnline(const QString &currencyCode, const QString
                                       const QString &paymentMethod, const QString &amount, int page)
 {
     QString url = this->getBuySellUrl(false, currencyCode, countryCode, paymentMethod, amount, page);
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::SELL_MONERO_ONLINE));
 }
 
 void LocalMoneroApi::accountInfo(const QString &username) {
     QString url = QString("%1/account_info/%2").arg(this->getBaseUrl(), username);
-    QNetworkReply *reply = m_network->getJson(url);
+    QNetworkReply *reply = m_network->getJson(this, url);
     connect(reply, &QNetworkReply::finished, std::bind(&LocalMoneroApi::onResponse, this, reply, Endpoint::ACCOUNT_INFO));
 }
 
