@@ -33,6 +33,8 @@ WORK_PATH = $(BASEDIR)/work
 BASE_CACHE ?= $(BASEDIR)/built
 FALLBACK_DOWNLOAD_PATH ?= https://featherwallet.org/files/sources
 
+CXX_STANDARD ?= c++17
+
 BUILD = $(shell ./config.guess)
 HOST ?= $(BUILD)
 PATCHES_PATH = $(BASEDIR)/patches

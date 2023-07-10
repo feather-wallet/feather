@@ -76,7 +76,7 @@ darwin_CXX=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
              $(clangxx_prog) $(darwin_CXX_)
 
 darwin_CFLAGS=-pipe
-darwin_CXXFLAGS=$(darwin_CFLAGS)
+darwin_CXXFLAGS=-pipe -std=$(CXX_STANDARD)
 darwin_ARFLAGS=cr
 
 darwin_release_CFLAGS=-O2
