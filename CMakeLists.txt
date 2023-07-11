@@ -55,7 +55,7 @@ endif()
 include(CMakePackageConfigHelpers)
 include(VersionFeather)
 
-#### Dependencies
+#### Dependencies ####
 # Monero
 if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/monero/CMakeLists.txt")
     message(FATAL_ERROR "'monero/CMakeLists.txt' does not exist, did you forget to:\ngit submodule update --init --recursive --progress")
@@ -115,7 +115,6 @@ endif()
 if(MINGW)
     set(Boost_THREADAPI win32)
 endif()
-
 
 set(BOOST_COMPONENTS
         system
@@ -197,10 +196,11 @@ endif()
 
 if(APPLE)
     cmake_policy(SET CMP0042 NEW)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -std=c++11")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -std=c++17")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=default -DGTEST_HAS_TR1_TUPLE=0")
 endif()
 
+#### Security Flags ####
 # warnings
 add_c_flag_if_supported(-Wformat C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-Wformat CXX_SECURITY_FLAGS)
@@ -215,17 +215,21 @@ if (NOT OPENBSD)
     add_cxx_flag_if_supported(-fstack-protector-strong CXX_SECURITY_FLAGS)
 endif()
 
-# New in GCC 8.2
+# -fcf-protection=full
+# new in GCC 8.2
 if (NOT OPENBSD AND NOT (WIN32 AND (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND CMAKE_C_COMPILER_VERSION VERSION_LESS 9.1)))
     add_c_flag_if_supported(-fcf-protection=full C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fcf-protection=full CXX_SECURITY_FLAGS)
 endif()
+
+# -fstack-clash-protection
 if (NOT WIN32 AND NOT OPENBSD AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_c_flag_if_supported(-fstack-clash-protection C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fstack-clash-protection CXX_SECURITY_FLAGS)
 endif()
 
-# Removed in GCC 9.1 (or before ?), but still accepted, so spams the output
+# -mmitigate-rop
+# removed in GCC 9.1 (or before ?), but still accepted, so spams the output
 if (NOT (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 9.1))
     add_c_flag_if_supported(-mmitigate-rop C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-mmitigate-rop CXX_SECURITY_FLAGS)
@@ -270,12 +274,8 @@ endif()
 add_c_flag_if_supported(-fPIC C_SECURITY_FLAGS)
 add_cxx_flag_if_supported(-fPIC CXX_SECURITY_FLAGS)
 
-message(STATUS "Using C security hardening flags: ${C_SECURITY_FLAGS}")
-message(STATUS "Using C++ security hardening flags: ${CXX_SECURITY_FLAGS}")
-message(STATUS "Using linker security hardening flags: ${LD_SECURITY_FLAGS}")
-
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11 ${C_SECURITY_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 ${CXX_SECURITY_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CXX_SECURITY_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${LD_SECURITY_FLAGS} ${STATIC_FLAGS}")
 
 add_subdirectory(src)
@@ -295,6 +295,8 @@ if(APPLE)
     file(COPY "${CMAKE_SOURCE_DIR}/src/assets/images/appicons/appicon.icns" DESTINATION "${CMAKE_SOURCE_DIR}/installed/feather.app/Contents/Resources/" )
 endif()
 
+#### Summary ####
+
 message("\n")
 message("Configure summary")
 message("=================")
@@ -304,8 +306,9 @@ if(CMAKE_CROSSCOMPILING)
 else()
     set(cross_status "FALSE")
 endif()
+
 message("Cross compiling ....................... ${cross_status}")
-get_directory_property(definitions COMPILE_DEFINITIONS)
+get_target_property(definitions feather COMPILE_DEFINITIONS)
 message("Preprocessor defined macros ........... ${definitions}")
 message("C compiler ............................ ${CMAKE_C_COMPILER}")
 message("CFLAGS ................................ ${CMAKE_C_FLAGS}")
