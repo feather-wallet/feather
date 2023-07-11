@@ -88,7 +88,7 @@ void UpdateDialog::onDownloadClicked() {
 
     Networking network{this};
 
-    m_reply = network.get(m_updater->downloadUrl);
+    m_reply = network.get(this, m_updater->downloadUrl);
     connect(m_reply, &QNetworkReply::downloadProgress, this, &UpdateDialog::onDownloadProgress);
     connect(m_reply, &QNetworkReply::finished, this, &UpdateDialog::onDownloadFinished);
 }

@@ -26,7 +26,7 @@ Updater::Updater(QObject *parent) :
 
 void Updater::checkForUpdates() {
     Networking network{this};
-    QNetworkReply *reply = network.getJson(QString("%1/updates.json").arg(this->getWebsiteUrl()));
+    QNetworkReply *reply = network.getJson(this, QString("%1/updates.json").arg(this->getWebsiteUrl()));
     if (!reply) {
         emit updateCheckFailed("offline mode enabled");
         return;
@@ -88,7 +88,7 @@ void Updater::wsUpdatesReceived(const QJsonObject &updates) {
     qDebug() << hashesUrl;
 
     Networking network{this};
-    QNetworkReply *reply = network.get(hashesUrl);
+    QNetworkReply *reply = network.get(this, hashesUrl);
 
     connect(reply, &QNetworkReply::finished, this, std::bind(&Updater::onSignedHashesReceived, this, reply, platformTag, newVersion));
 }
