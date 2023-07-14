@@ -64,13 +64,22 @@ void TransactionHistory::refresh(quint32 accountIndex)
         m_locked = false;
         m_minutesToUnlock = 0;
 
+        quint64 balance = 0;
+
         m_pimpl->refresh();
         for (const auto i : m_pimpl->getAll()) {
             if (i->subaddrAccount() != accountIndex) {
                 continue;
             }
 
-            m_tinfo.append(new TransactionInfo(i, this));
+            if (i->direction() == Monero::TransactionInfo::Direction_In) {
+                balance += i->amount();
+            }
+            else if (i->direction() == Monero::TransactionInfo::Direction_Out) {
+                balance -= i->amount() + i->fee();
+            }
+
+            m_tinfo.append(new TransactionInfo(i, balance, this));
 
             const TransactionInfo *ti = m_tinfo.back();
             // looking for transactions timestamp scope
@@ -159,7 +168,7 @@ bool TransactionHistory::writeCSV(const QString &path) {
     });
 
     for (const auto &tx : transactions) {
-        TransactionInfo info(tx, this);
+        TransactionInfo info(tx, 0, this);
 
         // collect column data
         QDateTime timeStamp = info.timestamp();
