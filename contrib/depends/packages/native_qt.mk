@@ -1,9 +1,9 @@
 package=native_qt
-$(package)_version=6.5.1
+$(package)_version=6.5.2
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=db56fa1f4303a1189fe33418d25d1924931c7aef237f89eea9de58e858eebfed
+$(package)_sha256_hash=3db4c729b4d80a9d8fda8dd77128406353baff4755ca619177eda4cddae71269
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches  = dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
@@ -13,16 +13,16 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=5744df9e84b2a86f7f932ffc00341c7d7209e741fd1c0679a32b855fcceb2329
+$(package)_qttools_sha256_hash=551ffb22751d8fd4d88e9ebd55b9131f4ca55341ee497fdbbba4da8d10d94341
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=d58d29491d44f0f59b684686a9898fec0e6c4fb7c09d9393b4e9c211fe9608ef
+$(package)_qtsvg_sha256_hash=48b4cc1093af2e0ab3bea30f60651bddd877a2335d16e7207879a2e9e81963a3
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=0b1fc560e1c8cdda1ddb13db832c3b595f7e4079118d4847d8de18d82464e1cc
+$(package)_qtmultimedia_sha256_hash=948f00aa679e92839a2a71bd07245a92cc849af486607417ee4c334b2b998975
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=e5806761835944ef91d5aee0679e0c8231bf7a981e064480e65c751ebdf65052
+$(package)_qtshadertools_sha256_hash=ca3fb0db8576c59b9c38bb4b271cc6e10aebeb54e2121f429f4ee80671fc0a3d
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)

@@ -220,7 +220,6 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    x86_64_linux_RANLIB=x86_64-linux-gnu-gcc-ranlib \
                                    x86_64_linux_NM=x86_64-linux-gnu-gcc-nm \
                                    x86_64_linux_STRIP=x86_64-linux-gnu-strip \
-                                   qt_config_opts_x86_64_linux='-platform linux-g++ -xplatform linux-g++' \
                                    guix_ldflags="$HOST_LDFLAGS"
 
 
