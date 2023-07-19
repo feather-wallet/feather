@@ -9,6 +9,10 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    set(CMAKE_FIND_ROOT_PATH @host_prefix@;@wmf_libs@)
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(TARGET_SYSROOT @host_prefix@/native/SDK)
     set(CMAKE_SYSROOT ${TARGET_SYSROOT})

@@ -183,6 +183,7 @@ define $(package)_preprocess_cmds
 	     -e 's|@host_prefix@|$(host_prefix)|' \
 	     -e 's|@cmake_c_flags@|$(darwin_CC_)|' \
 	     -e 's|@cmake_cxx_flags@|$(darwin_CXX_)|' \
+	     -e 's|@wmf_libs@|$(WMF_LIBS)|' \
       toolchain.cmake && \
   cd qtbase && \
   patch -p1 -i $($(package)_patch_dir)/revert_f99ee441.patch && \
@@ -193,28 +194,6 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
 endef
 
-# TODO: find a better way to make WMF libraries available to Qt without polluting the environment
-ifeq ($(host_os),mingw32)
-define $(package)_config_cmds
-  cp $(WMF_LIBS)/lib/libstrmiids.a \
-     $(WMF_LIBS)/lib/libamstrmid.a \
-     $(WMF_LIBS)/lib/libdmoguids.a \
-     $(WMF_LIBS)/lib/libuuid.a \
-     $(WMF_LIBS)/lib/libmsdmo.a \
-     $(WMF_LIBS)/lib/libole32.a \
-     $(WMF_LIBS)/lib/liboleaut32.a \
-     $(WMF_LIBS)/lib/libmf.a \
-     $(WMF_LIBS)/lib/libmfuuid.a \
-     $(WMF_LIBS)/lib/libmfplat.a \
-     $(WMF_LIBS)/lib/libmfcore.a \
-     $(WMF_LIBS)/lib/libpropsys.a \
-     /feather/contrib/depends/x86_64-w64-mingw32/lib/ && \
-   export OPENSSL_LIBS=${$(package)_openssl_flags_$(host_os)} \
-   export PKG_CONFIG_SYSROOT_DIR=/ && \
-   export PKG_CONFIG_LIBDIR=$(host_prefix)/lib/pkgconfig && \
-   cmake -DCMAKE_LIBRARY_PATH=$(HOME)/.guix-profile/lib $($(package)_config_opts)
-endef
-else
 define $(package)_config_cmds
   export OPENSSL_LIBS=${$(package)_openssl_flags_$(host_os)} \
   export PKG_CONFIG_SYSROOT_DIR=/ && \
@@ -222,7 +201,6 @@ define $(package)_config_cmds
   export QT_MAC_SDK_NO_VERSION_CHECK=1 && \
   env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH cmake $($(package)_config_opts)
 endef
-endif
 
 define $(package)_build_cmds
   export LD_LIBRARY_PATH="${build_prefix}/lib/:$(QT_LIBS_LIBS)" && \
