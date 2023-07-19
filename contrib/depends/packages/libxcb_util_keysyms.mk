@@ -3,7 +3,7 @@ $(package)_version=0.4.1
 $(package)_download_path=https://xcb.freedesktop.org/dist
 $(package)_file_name=xcb-util-keysyms-$($(package)_version).tar.xz
 $(package)_sha256_hash=7c260a5294412aed429df1da2f8afd3bd07b7cba3fec772fba15a613a6d5c638
-$(package)_dependencies=libxcb xproto
+$(package)_dependencies=libxcb xorgproto
 
 define $(package)_set_vars
 $(package)_config_opts=--disable-shared --disable-devel-docs --without-doxygen

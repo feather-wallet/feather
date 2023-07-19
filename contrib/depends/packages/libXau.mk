@@ -3,7 +3,7 @@ $(package)_version=1.0.11
 $(package)_download_path=https://xorg.freedesktop.org/releases/individual/lib/
 $(package)_file_name=libXau-$($(package)_version).tar.xz
 $(package)_sha256_hash=f3fa3282f5570c3f6bd620244438dbfbdd580fc80f02f549587a0f8ab329bbeb
-$(package)_dependencies=xproto
+$(package)_dependencies=xorgproto
 
 # When updating this package, check the default value of
 # --disable-xthreads. It is currently enabled.
