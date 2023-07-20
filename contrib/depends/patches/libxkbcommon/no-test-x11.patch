@@ -1,0 +1,35 @@
+diff --git a/meson.build b/meson.build
+index 245e7b1..a80d050 100644
+--- a/meson.build
++++ b/meson.build
+@@ -666,16 +666,6 @@ test(
+     env: test_env,
+     suite: ['python-tests'],
+ )
+-if get_option('enable-x11')
+-    test(
+-        'x11',
+-        executable('test-x11', 'test/x11.c', dependencies: x11_test_dep),
+-        env: test_env,
+-    )
+-    # test/x11comp is meant to be run, but it is (temporarily?) disabled.
+-    # See: https://github.com/xkbcommon/libxkbcommon/issues/30
+-    executable('test-x11comp', 'test/x11comp.c', dependencies: x11_test_dep)
+-endif
+ if get_option('enable-xkbregistry')
+     test(
+         'registry',
+@@ -755,13 +745,6 @@ benchmark(
+     executable('bench-atom', 'bench/atom.c', dependencies: test_dep),
+     env: bench_env,
+ )
+-if get_option('enable-x11')
+-  benchmark(
+-      'x11',
+-      executable('bench-x11', 'bench/x11.c', dependencies: x11_test_dep),
+-      env: bench_env,
+-  )
+-endif
+ 
+ 
+ # Documentation.
