@@ -1,19 +1,17 @@
 package=boost
-$(package)_version=1.68.0
+$(package)_version=1.82.0
 $(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/$($(package)_version)/
 $(package)_file_name=$(package)_$(subst .,_,$($(package)_version)).tar.bz2
-$(package)_sha256_hash=7f6130bc3cf65f56a618888ce9d5ea704fa10b462be126ad053e80e553d6d8b7
+$(package)_sha256_hash=a6e1ab9b0860e6a2881dd7b21fe9f737a095e5f33a3a874afc6a345228597ee6
 $(package)_dependencies=libiconv
-$(package)_patches=fix_aroptions.patch fix_arm_arch.patch fix_coalesce.patch
 
 define $(package)_set_vars
-$(package)_config_opts_release=variant=release
-$(package)_config_opts_debug=variant=debug
-$(package)_config_opts=--layout=tagged --build-type=complete --user-config=user-config.jam
-$(package)_config_opts+=threading=multi link=static -sNO_BZIP2=1 -sNO_ZLIB=1
-$(package)_config_opts_linux=threadapi=pthread runtime-link=shared
+$(package)_config_opts=variant=release
+$(package)_config_opts+=--layout=system --user-config=user-config.jam
+$(package)_config_opts+=threading=multi link=static -sNO_BZIP2=1 -sNO_ZLIB=1 -sICONV_PATH=$(host_prefix)
+$(package)_config_opts_linux=threadapi=pthread runtime-link=static
 $(package)_config_opts_android=threadapi=pthread runtime-link=static target-os=android
-$(package)_config_opts_darwin=--toolset=darwin runtime-link=static
+$(package)_config_opts_darwin=--toolset=darwin runtime-link=shared target-os=darwin
 $(package)_config_opts_mingw32=binary-format=pe target-os=windows threadapi=win32 runtime-link=static
 $(package)_config_opts_x86_64_mingw32=address-model=64
 $(package)_config_opts_i686_mingw32=address-model=32
@@ -29,9 +27,6 @@ $(package)_cxxflags_freebsd=-fPIC
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 < $($(package)_patch_dir)/fix_aroptions.patch &&\
-  patch -p1 < $($(package)_patch_dir)/fix_arm_arch.patch &&\
-  patch -p1 < $($(package)_patch_dir)/fix_coalesce.patch &&\
   echo "using $(boost_toolset_$(host_os)) : : $($(package)_cxx) : <cxxflags>\"$($(package)_cxxflags) $($(package)_cppflags)\" <linkflags>\"$($(package)_ldflags)\" <archiver>\"$(boost_archiver_$(host_os))\" <arflags>\"$($(package)_arflags)\" <striper>\"$(host_STRIP)\"  <ranlib>\"$(host_RANLIB)\" <rc>\"$(host_WINDRES)\" : ;" > user-config.jam
 endef
 

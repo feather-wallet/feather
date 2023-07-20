@@ -233,6 +233,10 @@ if (WITH_SCANNER)
     )
 endif()
 
+if (DEPENDS)
+    target_link_directories(feather PRIVATE "${LIB_DIR}")
+endif()
+
 target_link_libraries(feather
         wallet_merged
         ${LMDB_LIBRARY}

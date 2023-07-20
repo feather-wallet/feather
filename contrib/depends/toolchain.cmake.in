@@ -16,6 +16,7 @@ SET(TREZOR_DEBUG @build_tests@)
 
 # where is the target environment
 SET(CMAKE_FIND_ROOT_PATH @prefix@)
+SET(LIB_DIR @prefix@/lib)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   # WMF libs
@@ -69,7 +70,10 @@ SET(BOOST_LIBRARYDIR @prefix@/lib)
 SET(Boost_IGNORE_SYSTEM_PATHS_DEFAULT OFF)
 SET(Boost_NO_SYSTEM_PATHS ON)
 SET(Boost_USE_STATIC_LIBS ON)
-SET(Boost_USE_STATIC_RUNTIME ON)
+
+if (NOT CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    SET(Boost_USE_STATIC_RUNTIME ON)
+endif()
 
 SET(OPENSSL_ROOT_DIR @prefix@)
 SET(ARCHITECTURE @arch@)
