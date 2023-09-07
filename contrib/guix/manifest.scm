@@ -76,28 +76,7 @@ FILE-NAME found in ./patches relative to the current file."
       (substitute-keyword-arguments (package-arguments mingw-w64-x86_64-winpthreads)
                ((#:parallel-build? _ #f) #f)))))
 
-(define (make-gcc-rpath-link xgcc)
-  "Given a XGCC package, return a modified package that replace each instance of
--rpath in the default system spec that's inserted by Guix with -rpath-link"
-  (package
-    (inherit xgcc)
-    (arguments
-     (substitute-keyword-arguments (package-arguments xgcc)
-       ((#:phases phases)
-        `(modify-phases ,phases
-           (add-after 'pre-configure 'replace-rpath-with-rpath-link
-             (lambda _
-               (substitute* (cons "gcc/config/rs6000/sysv4.h"
-                                  (find-files "gcc/config"
-                                              "^gnu-user.*\\.h$"))
-                 (("-rpath=") "-rpath-link="))
-               #t))))))))
-
 (define building-on (string-append "--build=" (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
-
-(define (explicit-cross-configure package)
-  (define building-on (string-append (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
-  (package-with-extra-configure-variable package "--build" building-on))
 
 (define (make-cross-toolchain target
                               base-gcc-for-libc
@@ -108,9 +87,9 @@ FILE-NAME found in ./patches relative to the current file."
   (let* ((xbinutils (cross-binutils target))
          ;; 1. Build a cross-compiling gcc without targeting any libc, derived
          ;; from BASE-GCC-FOR-LIBC
-         (xgcc-sans-libc (explicit-cross-configure (cross-gcc target
+         (xgcc-sans-libc (cross-gcc target
                                     #:xgcc base-gcc-for-libc
-                                    #:xbinutils xbinutils)))
+                                    #:xbinutils xbinutils))
          ;; 2. Build cross-compiled kernel headers with XGCC-SANS-LIBC, derived
          ;; from BASE-KERNEL-HEADERS
          (xkernel (cross-kernel-headers target
@@ -119,17 +98,17 @@ FILE-NAME found in ./patches relative to the current file."
                                         xbinutils))
          ;; 3. Build a cross-compiled libc with XGCC-SANS-LIBC and XKERNEL,
          ;; derived from BASE-LIBC
-         (xlibc (explicit-cross-configure (cross-libc target
+         (xlibc (cross-libc target
                             base-libc
                             xgcc-sans-libc
                             xbinutils
-                            xkernel)))
+                            xkernel))
          ;; 4. Build a cross-compiling gcc targeting XLIBC, derived from
          ;; BASE-GCC
-         (xgcc (explicit-cross-configure (cross-gcc target
+         (xgcc (cross-gcc target
                           #:xgcc base-gcc
                           #:xbinutils xbinutils
-                          #:libc xlibc))))
+                          #:libc xlibc)))
     ;; Define a meta-package that propagates the resulting XBINUTILS, XLIBC, and
     ;; XGCC
     (package
@@ -153,19 +132,12 @@ chain for " target " development."))
 (define base-gcc gcc-10)
 (define base-linux-kernel-headers linux-libre-headers-5.15)
 
-;; https://gcc.gnu.org/install/configure.html
-(define (hardened-gcc gcc)
-  (package-with-extra-configure-variable (
-    package-with-extra-configure-variable gcc
-    "--enable-default-ssp" "yes")
-    "--enable-default-pie" "yes"))
-
 (define* (make-bitcoin-cross-toolchain target
                                        #:key
-                                       (base-gcc-for-libc base-gcc)
+                                       (base-gcc-for-libc linux-base-gcc)
                                        (base-kernel-headers base-linux-kernel-headers)
-                                       (base-libc (hardened-glibc (make-glibc-without-werror glibc-2.27)))
-                                       (base-gcc (make-gcc-rpath-link (hardened-gcc base-gcc))))
+                                       (base-libc glibc-2.27)
+                                       (base-gcc linux-base-gcc))
   "Convenience wrapper around MAKE-CROSS-TOOLCHAIN with default values
 desirable for building Feather Wallet release binaries."
   (make-cross-toolchain target
@@ -215,13 +187,6 @@ chain for " target " development."))
 (define (make-glibc-without-werror glibc)
   (package-with-extra-configure-variable glibc "enable_werror" "no"))
 
-;; https://www.gnu.org/software/libc/manual/html_node/Configuring-and-compiling.html
-(define (hardened-glibc glibc)
-  (package-with-extra-configure-variable (
-    package-with-extra-configure-variable glibc
-    "--enable-stack-protector" "all")
-    "--enable-bind-now" "yes"))
-
 (define-public mingw-w64-base-gcc
   (package
     (inherit base-gcc)
@@ -238,6 +203,30 @@ chain for " target " development."))
           ;; and thus will ensure that this works properly.
           `(cons "gcc_cv_libc_provides_ssp=yes" ,flags))))))
 
+(define-public linux-base-gcc
+  (package
+    (inherit base-gcc)
+    (arguments
+      (substitute-keyword-arguments (package-arguments base-gcc)
+        ((#:configure-flags flags)
+          `(append ,flags
+            ;; https://gcc.gnu.org/install/configure.html
+            (list "--enable-initfini-array=yes",
+                  "--enable-default-ssp=yes",
+                  "--enable-default-pie=yes",
+                  building-on)))
+        ((#:phases phases)
+          `(modify-phases ,phases
+            ;; Given a XGCC package, return a modified package that replace each instance of
+            ;; -rpath in the default system spec that's inserted by Guix with -rpath-link
+            (add-after 'pre-configure 'replace-rpath-with-rpath-link
+             (lambda _
+               (substitute* (cons "gcc/config/rs6000/sysv4.h"
+                                  (find-files "gcc/config"
+                                              "^gnu-user.*\\.h$"))
+                 (("-rpath=") "-rpath-link="))
+               #t))))))))
+
 (define-public glibc-2.27
   (package
     (inherit glibc-2.31)
@@ -253,7 +242,28 @@ chain for " target " development."))
                 "0azpb9cvnbv25zg8019rqz48h8i2257ngyjg566dlnp74ivrs9vq"))
               (patches (search-our-patches "glibc-2.27-riscv64-Use-__has_include-to-include-asm-syscalls.h.patch"
                                            "glibc-2.27-fcommon.patch"
-                                           "glibc-2.27-guix-prefix.patch"))))))
+                                           "glibc-2.27-no-librt.patch"))))
+    (arguments
+      (substitute-keyword-arguments (package-arguments glibc)
+        ((#:configure-flags flags)
+          `(append ,flags
+            ;; https://www.gnu.org/software/libc/manual/html_node/Configuring-and-compiling.html
+            (list "--enable-stack-protector=all",
+                  "--enable-bind-now",
+                  "--disable-werror",
+                  building-on)))
+    ((#:phases phases)
+        `(modify-phases ,phases
+           (add-before 'configure 'set-etc-rpc-installation-directory
+             (lambda* (#:key outputs #:allow-other-keys)
+               ;; Install the rpc data base file under `$out/etc/rpc'.
+               ;; Otherwise build will fail with "Permission denied."
+               (let ((out (assoc-ref outputs "out")))
+                 (substitute* "sunrpc/Makefile"
+                   (("^\\$\\(inst_sysconfdir\\)/rpc(.*)$" _ suffix)
+                    (string-append out "/etc/rpc" suffix "\n"))
+                   (("^install-others =.*$")
+                    (string-append "install-others = " out "/etc/rpc\n"))))))))))))
 
 (define-public ldid
   (package
