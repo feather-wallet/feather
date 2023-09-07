@@ -149,8 +149,7 @@ desirable for building Feather Wallet release binaries."
 (define (gcc-mingw-patches gcc)
   (package-with-extra-patches gcc
     (search-our-patches "gcc-remap-guix-store.patch"
-                        "vmov-alignment.patch"
-                        "gcc-broken-longjmp.patch")))
+                        "vmov-alignment.patch")))
 
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
