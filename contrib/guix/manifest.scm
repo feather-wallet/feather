@@ -184,9 +184,6 @@ chain for " target " development."))
     (search-our-patches "nsis-gcc-10-memmove.patch"
                         "nsis-disable-installer-reloc.patch")))
 
-(define (make-glibc-without-werror glibc)
-  (package-with-extra-configure-variable glibc "enable_werror" "no"))
-
 (define-public mingw-w64-base-gcc
   (package
     (inherit base-gcc)
