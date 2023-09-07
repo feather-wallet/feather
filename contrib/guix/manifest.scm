@@ -178,11 +178,6 @@ chain for " target " development."))
       (home-page (package-home-page pthreads-xgcc))
       (license (package-license pthreads-xgcc)))))
 
-(define (make-nsis-for-gcc-10 base-nsis)
-  (package-with-extra-patches base-nsis
-    (search-our-patches "nsis-gcc-10-memmove.patch"
-                        "nsis-disable-installer-reloc.patch")))
-
 (define-public mingw-w64-base-gcc
   (package
     (inherit base-gcc)
@@ -348,7 +343,7 @@ chain for " target " development."))
     (cond ((string-suffix? "-mingw32" target)
            ;; Windows
            (list (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
-                 (make-nsis-for-gcc-10 nsis-x86_64)))
+                 nsis-x86_64))
           ((string-contains target "-linux-")
            (list (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
