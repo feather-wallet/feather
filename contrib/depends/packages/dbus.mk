@@ -1,8 +1,8 @@
 package=dbus
-$(package)_version=1.14.8
+$(package)_version=1.14.10
 $(package)_download_path=https://dbus.freedesktop.org/releases/dbus
 $(package)_file_name=dbus-$($(package)_version).tar.xz
-$(package)_sha256_hash=a6bd5bac5cf19f0c3c594bdae2565a095696980a683a0ef37cb6212e093bde35
+$(package)_sha256_hash=ba1f21d2bd9d339da2d4aa8780c09df32fea87998b73da24f49ab9df1e36a50f
 $(package)_dependencies=expat
 $(package)_patches=remove-DDBUS_STATIC_BUILD.patch
 
