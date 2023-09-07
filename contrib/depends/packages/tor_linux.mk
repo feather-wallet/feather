@@ -7,12 +7,13 @@ $(package)_dependencies=libevent openssl zlib
 
 define $(package)_set_vars
     $(package)_config_opts=--disable-asciidoc --disable-manpage --disable-html-manual --disable-system-torrc
-    $(package)_config_opts+=--disable-module-relay --disable-lzma --disable-zstd --enable-static-tor
+    $(package)_config_opts+=--disable-module-relay --disable-lzma --disable-zstd
     $(package)_config_opts+=--with-libevent-dir=$(host_prefix) --with-openssl-dir=$(host_prefix)
     $(package)_config_opts+=--with-zlib-dir=$(host_prefix) --disable-tool-name-check --enable-fatal-warnings
     $(package)_config_opts+=--prefix=$(host_prefix)
     $(package)_cflags+=-O2
     $(package)_cxxflags+=-O2
+    $(package)_ldflags+=$(guix_ldflags)
 endef
 
 define $(package)_config_cmds
