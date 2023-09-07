@@ -56,20 +56,6 @@ FILE-NAME found in ./patches relative to the current file."
       ((%patch-path (list (string-append (dirname (current-filename)) "/patches"))))
     (list (search-patch file-name) ...)))
 
-;(define (make-ssp-fixed-gcc xgcc)
-;  "Given a XGCC package, return a modified package that uses the SSP function
-;from glibc instead of from libssp.so. Our `symbol-check' script will complain if
-;we link against libssp.so, and thus will ensure that this works properly.
-;
-;Taken from:
-;http://www.linuxfromscratch.org/hlfs/view/development/chapter05/gcc-pass1.html"
-;  (package
-;    (inherit xgcc)
-;    (arguments
-;     (substitute-keyword-arguments (package-arguments xgcc)
-;       ((#:make-flags flags)
-;        `(cons "gcc_cv_libc_provides_ssp=yes" ,flags))))))
-
 (define-public mingw-w64-x86_64-winpthreads-10.0.0
   (package (inherit mingw-w64-x86_64-winpthreads)
     (name "mingw-w64-x86_64-winpthreads-10.0.0")
@@ -107,9 +93,10 @@ FILE-NAME found in ./patches relative to the current file."
                  (("-rpath=") "-rpath-link="))
                #t))))))))
 
-(define building-on (string-append (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
+(define building-on (string-append "--build=" (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
 
 (define (explicit-cross-configure package)
+  (define building-on (string-append (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
   (package-with-extra-configure-variable package "--build" building-on))
 
 (define (make-cross-toolchain target
@@ -187,26 +174,20 @@ desirable for building Feather Wallet release binaries."
                         base-libc
                         base-gcc))
 
-(define (make-gcc-with-pthreads gcc)
-  (package-with-extra-configure-variable
-    (package-with-extra-patches gcc
-      (search-our-patches "gcc-10-remap-guix-store.patch"))
-    "--enable-threads" "posix"))
-
-(define (make-mingw-w64-cross-gcc cross-gcc)
-  (package-with-extra-patches cross-gcc
-    (search-our-patches "vmov-alignment.patch"
+(define (gcc-mingw-patches gcc)
+  (package-with-extra-patches gcc
+    (search-our-patches "gcc-remap-guix-store.patch"
+                        "vmov-alignment.patch"
                         "gcc-broken-longjmp.patch")))
 
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
   (let* ((xbinutils (cross-binutils target))
          (pthreads-xlibc mingw-w64-x86_64-winpthreads-10.0.0)
-         (pthreads-xgcc (make-gcc-with-pthreads
-                         (cross-gcc target
-                                    #:xgcc (make-mingw-w64-cross-gcc base-gcc)
+         (pthreads-xgcc (cross-gcc target
+                                    #:xgcc (gcc-mingw-patches mingw-w64-base-gcc)
                                     #:xbinutils xbinutils
-                                    #:libc pthreads-xlibc))))
+                                    #:libc pthreads-xlibc)))
     ;; Define a meta-package that propagates the resulting XBINUTILS, XLIBC, and
     ;; XGCC
     (package
@@ -240,6 +221,17 @@ chain for " target " development."))
     package-with-extra-configure-variable glibc
     "--enable-stack-protector" "all")
     "--enable-bind-now" "yes"))
+
+(define-public mingw-w64-base-gcc
+  (package
+    (inherit base-gcc)
+    (arguments
+      (substitute-keyword-arguments (package-arguments base-gcc)
+        ((#:configure-flags flags)
+          `(append ,flags
+            ;; https://gcc.gnu.org/install/configure.html
+            (list "--enable-threads=posix",
+                  building-on)))))))
 
 (define-public glibc-2.27
   (package
