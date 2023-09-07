@@ -107,6 +107,11 @@ FILE-NAME found in ./patches relative to the current file."
                  (("-rpath=") "-rpath-link="))
                #t))))))))
 
+(define building-on (string-append (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
+
+(define (explicit-cross-configure package)
+  (package-with-extra-configure-variable package "--build" building-on))
+
 (define (make-cross-toolchain target
                               base-gcc-for-libc
                               base-kernel-headers
@@ -116,9 +121,9 @@ FILE-NAME found in ./patches relative to the current file."
   (let* ((xbinutils (cross-binutils target))
          ;; 1. Build a cross-compiling gcc without targeting any libc, derived
          ;; from BASE-GCC-FOR-LIBC
-         (xgcc-sans-libc (cross-gcc target
+         (xgcc-sans-libc (explicit-cross-configure (cross-gcc target
                                     #:xgcc base-gcc-for-libc
-                                    #:xbinutils xbinutils))
+                                    #:xbinutils xbinutils)))
          ;; 2. Build cross-compiled kernel headers with XGCC-SANS-LIBC, derived
          ;; from BASE-KERNEL-HEADERS
          (xkernel (cross-kernel-headers target
@@ -127,17 +132,17 @@ FILE-NAME found in ./patches relative to the current file."
                                         xbinutils))
          ;; 3. Build a cross-compiled libc with XGCC-SANS-LIBC and XKERNEL,
          ;; derived from BASE-LIBC
-         (xlibc (cross-libc target
+         (xlibc (explicit-cross-configure (cross-libc target
                             base-libc
                             xgcc-sans-libc
                             xbinutils
-                            xkernel))
+                            xkernel)))
          ;; 4. Build a cross-compiling gcc targeting XLIBC, derived from
          ;; BASE-GCC
-         (xgcc (cross-gcc target
+         (xgcc (explicit-cross-configure (cross-gcc target
                           #:xgcc base-gcc
                           #:xbinutils xbinutils
-                          #:libc xlibc)))
+                          #:libc xlibc))))
     ;; Define a meta-package that propagates the resulting XBINUTILS, XLIBC, and
     ;; XGCC
     (package
