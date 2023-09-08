@@ -52,6 +52,12 @@ PageOpenWallet::PageOpenWallet(WalletKeysFilesModel *wallets, QWidget *parent)
 
 void PageOpenWallet::initializePage() {
     m_walletKeysFilesModel->refresh();
+
+    // Select the first wallet, if it exists
+    auto index = ui->walletTable->model()->index(0, 0);
+    if (index.isValid()) {
+        ui->walletTable->setCurrentIndex(index);
+    }
 }
 
 void PageOpenWallet::updatePath() {
