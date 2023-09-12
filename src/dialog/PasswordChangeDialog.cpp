@@ -4,7 +4,7 @@
 #include "PasswordChangeDialog.h"
 #include "ui_PasswordChangeDialog.h"
 
-#include <QMessageBox>
+#include "Utils.h"
 
 PasswordChangeDialog::PasswordChangeDialog(QWidget *parent, Wallet *wallet)
         : WindowModalDialog(parent)
@@ -50,7 +50,7 @@ void PasswordChangeDialog::setPassword() {
     QString newPassword = ui->lineEdit_newPassword->text();
 
     if (!m_wallet->verifyPassword(currentPassword)) {
-        QMessageBox::warning(this, "Error", "Incorrect password");
+        Utils::showError(this, "Incorrect password", "");
         ui->lineEdit_currentPassword->setText("");
         ui->lineEdit_currentPassword->setFocus();
         return;
@@ -61,7 +61,7 @@ void PasswordChangeDialog::setPassword() {
         this->accept();
     }
     else {
-        QMessageBox::warning(this, "Error", QString("Error: %1").arg(m_wallet->errorString()));
+        Utils::showError(this, "Unable to change password", m_wallet->errorString());
     }
 }
 

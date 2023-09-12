@@ -36,7 +36,6 @@ public slots:
     void currencyComboChanged(int index);
     void fillAddress(const QString &address);
     void updateConversionLabel();
-    void onOpenAliasResolveError(const QString &err);
     void onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid);
     void onPreferredFiatCurrencyChanged();
     void disableSendButton();

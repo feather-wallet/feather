@@ -32,7 +32,7 @@ bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeL
     netTypeObj[sourceStr] = sourceArray;
     obj[networkTypeStr] = netTypeObj;
 
-    config()->set(Config::nodes, obj);
+    conf()->set(Config::nodes, obj);
     return true;
 }
 
@@ -49,7 +49,7 @@ void NodeList::setNodes(const QStringList &nodes, NetworkType::Type networkType,
     netTypeObj[sourceStr] = sourceArray;
     obj[networkTypeStr] = netTypeObj;
 
-    config()->set(Config::nodes, obj);
+    conf()->set(Config::nodes, obj);
 }
 
 QStringList NodeList::getNodes(NetworkType::Type networkType, NodeList::Type source) {
@@ -70,11 +70,11 @@ QStringList NodeList::getNodes(NetworkType::Type networkType, NodeList::Type sou
 }
 
 QJsonObject NodeList::getConfigData() {
-    QJsonObject obj = config()->get(Config::nodes).toJsonObject();
+    QJsonObject obj = conf()->get(Config::nodes).toJsonObject();
 
     // Load old config format
     if (obj.isEmpty()) {
-        auto jsonData = config()->get(Config::nodes).toByteArray();
+        auto jsonData = conf()->get(Config::nodes).toByteArray();
         if (Utils::validateJSON(jsonData)) {
             QJsonDocument doc = QJsonDocument::fromJson(jsonData);
             obj = doc.object();
@@ -208,11 +208,11 @@ void Nodes::connectToNode(const FeatherNode &node) {
         return;
     }
 
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return;
     }
 
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
         if (!node.isOnion() && !node.isLocal()) {
             // We only want to connect to .onion nodes, but local nodes get an exception.
             return;
@@ -230,11 +230,11 @@ void Nodes::connectToNode(const FeatherNode &node) {
 
     QString proxyAddress;
     if (useSocks5Proxy(node)) {
-        if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
+        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
             proxyAddress = QString("%1:%2").arg(torManager()->featherTorHost, QString::number(torManager()->featherTorPort));
         } else {
-            proxyAddress = QString("%1:%2").arg(config()->get(Config::socks5Host).toString(),
-                                                config()->get(Config::socks5Port).toString());
+            proxyAddress = QString("%1:%2").arg(conf()->get(Config::socks5Host).toString(),
+                                                conf()->get(Config::socks5Port).toString());
         }
     }
 
@@ -400,7 +400,7 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
 }
 
 void Nodes::onWalletRefreshed() {
-    if (config()->get(Config::proxy) == Config::Proxy::Tor && config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
+    if (conf()->get(Config::proxy) == Config::Proxy::Tor && conf()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
         // Don't reconnect if we're connected to a local node (traffic will not be routed through Tor)
         if (m_connection.isLocal())
             return;
@@ -414,15 +414,15 @@ void Nodes::onWalletRefreshed() {
 }
 
 bool Nodes::useOnionNodes() {
-    if (config()->get(Config::proxy) != Config::Proxy::Tor) {
+    if (conf()->get(Config::proxy) != Config::Proxy::Tor) {
         return false;
     }
 
-    if (config()->get(Config::torOnlyAllowOnion).toBool()) {
+    if (conf()->get(Config::torOnlyAllowOnion).toBool()) {
         return true;
     }
 
-    auto privacyLevel = config()->get(Config::torPrivacyLevel).toInt();
+    auto privacyLevel = conf()->get(Config::torPrivacyLevel).toInt();
     if (privacyLevel == Config::allTor) {
         return true;
     }
@@ -433,7 +433,7 @@ bool Nodes::useOnionNodes() {
         }
 
         if (appData()->heights.contains(constants::networkType)) {
-            int initSyncThreshold = config()->get(Config::initSyncThreshold).toInt();
+            int initSyncThreshold = conf()->get(Config::initSyncThreshold).toInt();
             int networkHeight = appData()->heights[constants::networkType];
 
             if (m_wallet && m_wallet->blockChainHeight() > (networkHeight - initSyncThreshold)) {
@@ -446,7 +446,7 @@ bool Nodes::useOnionNodes() {
 }
 
 bool Nodes::useI2PNodes() {
-    if (config()->get(Config::proxy) == Config::Proxy::i2p) {
+    if (conf()->get(Config::proxy) == Config::Proxy::i2p) {
         return true;
     }
 
@@ -464,7 +464,7 @@ bool Nodes::useSocks5Proxy(const FeatherNode &node) {
         return false;
     }
 
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::None) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::None) {
         return false;
     }
 
@@ -477,12 +477,12 @@ bool Nodes::useSocks5Proxy(const FeatherNode &node) {
         return true;
     }
 
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
         // Don't use socks5 proxy if initial sync traffic is excluded.
         return this->useOnionNodes();
     }
 
-    if (config()->get(Config::proxy).toInt() != Config::Proxy::None) {
+    if (conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
         return true;
     }
 }
@@ -556,7 +556,7 @@ FeatherNode Nodes::connection() {
 }
 
 NodeSource Nodes::source() {
-    return static_cast<NodeSource>(config()->get(Config::nodeSource).toInt());
+    return static_cast<NodeSource>(conf()->get(Config::nodeSource).toInt());
 }
 
 int Nodes::modeHeight(const QList<FeatherNode> &nodes) {

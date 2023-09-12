@@ -32,6 +32,8 @@
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
+#include "wallet/wallet_errors.h"
+
 #ifdef CHECK_UPDATES
 #include "utils/updater/UpdateDialog.h"
 #endif
@@ -82,7 +84,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     websocketNotifier()->emitCache(); // Get cached data
 
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
-    this->onWebsocketStatusChanged(!config()->get(Config::disableWebsocket).toBool());
+    this->onWebsocketStatusChanged(!conf()->get(Config::disableWebsocket).toBool());
 
     connect(m_windowManager, &WindowManager::proxySettingsChanged, this, &MainWindow::onProxySettingsChanged);
     connect(m_windowManager, &WindowManager::updateBalance, m_wallet, &Wallet::updateBalance);
@@ -104,7 +106,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
         m_statusLabelStatus->setText("Constructing transaction" + this->statusDots());
     });
 
-    config()->set(Config::firstRun, false);
+    conf()->set(Config::firstRun, false);
 
     this->onWalletOpened();
 
@@ -183,7 +185,7 @@ void MainWindow::initStatusBar() {
 }
 
 void MainWindow::initWidgets() {
-    int homeWidget = config()->get(Config::homeWidget).toInt();
+    int homeWidget = conf()->get(Config::homeWidget).toInt();
     ui->tabHomeWidget->setCurrentIndex(TabsHome(homeWidget));
 
     // [History]
@@ -295,7 +297,7 @@ void MainWindow::initMenu() {
     // [View]
     m_tabShowHideSignalMapper = new QSignalMapper(this);
     connect(ui->actionShow_Searchbar, &QAction::toggled, this, &MainWindow::toggleSearchbar);
-    ui->actionShow_Searchbar->setChecked(config()->get(Config::showSearchbar).toBool());
+    ui->actionShow_Searchbar->setChecked(conf()->get(Config::showSearchbar).toBool());
 
     // Show/Hide Home
     connect(ui->actionShow_Home, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
@@ -333,7 +335,7 @@ void MainWindow::initMenu() {
 
     for (const auto &key: m_tabShowHideMapper.keys()) {
         const auto toggleTab = m_tabShowHideMapper.value(key);
-        const bool show = config()->get(toggleTab->configKey).toBool();
+        const bool show = conf()->get(toggleTab->configKey).toBool();
         toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
         ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
     }
@@ -416,11 +418,9 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::synchronized,             this, &MainWindow::onSynchronized); //TODO
     connect(m_wallet, &Wallet::blockchainSync,           this, &MainWindow::onBlockchainSync);
     connect(m_wallet, &Wallet::refreshSync,              this, &MainWindow::onRefreshSync);
-    connect(m_wallet, &Wallet::createTransactionError,   this, &MainWindow::onCreateTransactionError);
-    connect(m_wallet, &Wallet::createTransactionSuccess, this, &MainWindow::onCreateTransactionSuccess);
+    connect(m_wallet, &Wallet::transactionCreated,       this, &MainWindow::onTransactionCreated);
     connect(m_wallet, &Wallet::transactionCommitted,     this, &MainWindow::onTransactionCommitted);
     connect(m_wallet, &Wallet::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
-    connect(m_wallet, &Wallet::endTransaction,           this, &MainWindow::onEndTransaction);
     connect(m_wallet, &Wallet::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
     connect(m_wallet, &Wallet::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
 
@@ -446,7 +446,7 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::deviceError,         this, &MainWindow::onDeviceError);
 
     connect(m_wallet, &Wallet::donationSent,        this, []{
-        config()->set(Config::donateBeg, -1);
+        conf()->set(Config::donateBeg, -1);
     });
     
     connect(m_wallet, &Wallet::multiBroadcast,      this, &MainWindow::onMultiBroadcast);
@@ -454,15 +454,15 @@ void MainWindow::initWalletContext() {
 
 void MainWindow::menuToggleTabVisible(const QString &key){
     const auto toggleTab = m_tabShowHideMapper[key];
-    bool show = config()->get(toggleTab->configKey).toBool();
+    bool show = conf()->get(toggleTab->configKey).toBool();
     show = !show;
-    config()->set(toggleTab->configKey, show);
+    conf()->set(toggleTab->configKey, show);
     ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
     toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
 }
 
 void MainWindow::menuClearHistoryClicked() {
-    config()->remove(Config::recentlyOpenedWallets);
+    conf()->remove(Config::recentlyOpenedWallets);
     this->updateRecentlyOpenedMenu();
 }
 
@@ -476,30 +476,6 @@ QString MainWindow::walletCachePath() {
 
 QString MainWindow::walletKeysPath() {
     return m_wallet->keysPath();
-}
-
-void MainWindow::displayWalletErrorMsg(const QString &err) {
-    QString errMsg = err;
-    if (err.contains("No device found")) {
-        errMsg += "\n\nThis wallet is backed by a hardware device. Make sure the Monero app is opened on the device.\n"
-                  "You may need to restart Feather before the device can get detected.";
-    }
-    if (errMsg.contains("Unable to open device")) {
-        errMsg += "\n\nThe device might be in use by a different application.";
-    }
-
-    if (errMsg.contains("SW_CLIENT_NOT_SUPPORTED")) {
-        errMsg += "\n\nIncompatible version: upgrade your Ledger device firmware to the latest version using Ledger Live.\n"
-                  "Then upgrade the Monero app for the Ledger device to the latest version.";
-    }
-    else if (errMsg.contains("Wrong Device Status")) {
-        errMsg += "\n\nThe device may need to be unlocked.";
-    }
-    else if (errMsg.contains("Wrong Channel")) {
-        errMsg += "\n\nRestart the hardware device and try again.";
-    }
-
-    QMessageBox::warning(this, "Wallet error", errMsg);
 }
 
 void MainWindow::onWalletOpened() {
@@ -548,15 +524,15 @@ void MainWindow::onWalletOpened() {
     m_nodes->connectToNode();
     m_updateBytes.start(250);
 
-    if (config()->get(Config::writeRecentlyOpenedWallets).toBool()) {
+    if (conf()->get(Config::writeRecentlyOpenedWallets).toBool()) {
         this->addToRecentlyOpened(m_wallet->cachePath());
     }
 }
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
-    bool hide = config()->get(Config::hideBalance).toBool();
-    int displaySetting = config()->get(Config::balanceDisplay).toInt();
-    int decimals = config()->get(Config::amountPrecision).toInt();
+    bool hide = conf()->get(Config::hideBalance).toBool();
+    int displaySetting = conf()->get(Config::balanceDisplay).toInt();
+    int decimals = conf()->get(Config::amountPrecision).toInt();
 
     QString balance_str = "Balance: ";
     if (hide) {
@@ -598,8 +574,7 @@ void MainWindow::setStatusText(const QString &text, bool override, int timeout) 
 
 void MainWindow::tryStoreWallet() {
     if (m_wallet->connectionStatus() == Wallet::ConnectionStatus::ConnectionStatus_Synchronizing) {
-        QMessageBox::warning(this, "Save wallet", "Unable to save wallet during synchronization.\n\n"
-                                                  "Wait until synchronization is finished and try again.");
+        Utils::showError(this, "Unable to save wallet", "Can't save wallet during synchronization", {"Wait until synchronization is finished and try again"}, "synchronization");
         return;
     }
 
@@ -611,9 +586,9 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     ui->actionShow_calc->setVisible(enabled);
     ui->actionShow_Exchange->setVisible(enabled);
 
-    ui->tabWidget->setTabVisible(Tabs::HOME, enabled && config()->get(Config::showTabHome).toBool());
-    ui->tabWidget->setTabVisible(Tabs::CALC, enabled && config()->get(Config::showTabCalc).toBool());
-    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && config()->get(Config::showTabExchange).toBool());
+    ui->tabWidget->setTabVisible(Tabs::HOME, enabled && conf()->get(Config::showTabHome).toBool());
+    ui->tabWidget->setTabVisible(Tabs::CALC, enabled && conf()->get(Config::showTabCalc).toBool());
+    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && conf()->get(Config::showTabExchange).toBool());
 
     m_historyWidget->setWebsocketEnabled(enabled);
     m_sendWidget->setWebsocketEnabled(enabled);
@@ -626,7 +601,7 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
 void MainWindow::onProxySettingsChanged() {
     m_nodes->connectToNode();
 
-    int proxy = config()->get(Config::proxy).toInt();
+    int proxy = conf()->get(Config::proxy).toInt();
 
     if (proxy == Config::Proxy::Tor) {
         this->onTorConnectionStateChanged(torManager()->torConnected);
@@ -688,7 +663,7 @@ void MainWindow::onConnectionStatusChanged(int status)
     // Update connection info in status bar.
 
     QIcon icon;
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         icon = icons()->icon("status_offline.svg");
         this->setStatusText("Offline");
     } else {
@@ -720,41 +695,123 @@ void MainWindow::onConnectionStatusChanged(int status)
     m_statusBtnConnectionStatusIndicator->setIcon(icon);
 }
 
-void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address) {
-    QString err{"Can't create transaction: "};
+void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address) {
+    // Clean up some UI
+    m_constructingTransaction = false;
+    m_txTimer.stop();
+    this->setStatusText(m_statusText);
+
+    if (m_wallet->isHwBacked()) {
+        m_splashDialog->hide();
+    }
+
     if (tx->status() != PendingTransaction::Status_Ok) {
-        QString tx_err = tx->errorString();
-        qCritical() << tx_err;
+        QString errMsg = tx->errorString();
 
-        if (m_wallet->connectionStatus() == Wallet::ConnectionStatus_WrongVersion)
-            err = QString("%1 Wrong node version: %2").arg(err, tx_err);
-        else
-            err = QString("%1 %2").arg(err, tx_err);
+        Utils::Message message{this, Utils::ERROR, "Failed to construct transaction", errMsg};
 
-        if (tx_err.contains("Node response did not include the requested real output")) {
-            QString currentNode = m_nodes->connection().toAddress();
+        if (tx->getException()) {
+            try
+            {
+                std::rethrow_exception(tx->getException());
+            }
+            catch (const tools::error::daemon_busy &e) {
+                message.description = QString("Node was unable to respond. Failed request: %1").arg(QString::fromStdString(e.request()));
+                message.helpItems = {"Try sending the transaction again.", "If this keeps happening, connect to a different node."};
+            }
+            catch (const tools::error::no_connection_to_daemon &e) {
+                message.description = QString("Connection to node lost. Failed request: %1").arg(QString::fromStdString(e.request()));
+                message.helpItems = {"Try sending the transaction again.", "If this keeps happening, connect to a different node."};
+            }
+            catch (const tools::error::wallet_rpc_error &e) {
+                message.description = QString("RPC error: %1").arg(QString::fromStdString(e.to_string()));
+                message.helpItems = {"Try sending the transaction again.", "If this keeps happening, connect to a different node."};
+            }
+            catch (const tools::error::get_outs_error &e) {
+                message.description = "Failed to get enough decoy outputs from node";
+                message.helpItems = {"Your transaction has too many inputs. Try sending a lower amount."};
+            }
+            catch (const tools::error::not_enough_unlocked_money &e) {
+                message.description = QString("Not enough unlocked balance.\n\nUnlocked balance: %1\nTransaction spends: %2").arg(e.available(), e.tx_amount());
+                message.helpItems = {"Wait for more balance to unlock.", "Click 'Help' to learn more about how balance works."};
+                message.doc = "balance";
+            }
+            catch (const tools::error::not_enough_money &e) {
+                message.description = QString("Not enough money to transfer\n\nTotal balance: %1\nTransaction amount: %2").arg(WalletManager::displayAmount(e.available()), WalletManager::displayAmount(e.tx_amount()));
+                message.helpItems = {"If you are trying to send your entire balance, click 'Max'."};
+                message.doc = "balance";
+            }
+            catch (const tools::error::tx_not_possible &e) {
+                message.description = QString("Not enough money to transfer. Transaction amount + fee exceeds available balance.");
+                message.helpItems = {"If you're trying to send your entire balance, click 'Max'."};
+                message.doc = "balance";
+            }
+            catch (const tools::error::not_enough_outs_to_mix &e) {
+                message.description = "Not enough outputs for specified ring size.";
+            }
+            catch (const tools::error::tx_not_constructed&) {
+                message.description = "Transaction was not constructed";
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const tools::error::tx_rejected &e) {
+                // TODO: provide helptext
+                message.description = QString("Transaction was rejected by node. Reason: %1.").arg(QString::fromStdString(e.status()));
+            }
+            catch (const tools::error::tx_sum_overflow &e) {
+                message.description = "Transaction tries to spend an unrealistic amount of XMR";
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const tools::error::zero_amount&) {
+                message.description = "Destination amount is zero";
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const tools::error::zero_destination&) {
+                message.description = "Transaction has no destination";
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const tools::error::tx_too_big &e) {
+                message.description = "Transaction too big";
+                message.helpItems = {"Try sending a smaller amount."};
+            }
+            catch (const tools::error::transfer_error &e) {
+                message.description = QString("Unknown transfer error: %1").arg(QString::fromStdString(e.what()));
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const tools::error::wallet_internal_error &e) {
+                QString msg = e.what();
+                message.description = QString("Internal error: %1").arg(QString::fromStdString(e.what()));
+                if (msg.contains("Daemon response did not include the requested real output")) {
+                    QString currentNode = m_nodes->connection().toAddress();
+                    message.description += QString("\nYou are currently connected to: %1\n\n"
+                                                   "This node may be acting maliciously. You are strongly recommended to disconnect from this node."
+                                                   "Please report this incident to the developers.").arg(currentNode);
+                    message.doc = "report_an_issue";
+                }
 
-            err += QString("\nYou are currently connected to: %1\n\n"
-                           "This node may be acting maliciously. You are strongly recommended to disconnect from this node."
-                           "Please report this incident to dev@featherwallet.org, #feather on OFTC or /r/FeatherWallet.").arg(currentNode);
+                message.helpItems = {"You have found a bug. Please contact the developers."};
+                message.doc = "report_an_issue";
+            }
+            catch (const std::exception &e) {
+                message.description = QString::fromStdString(e.what());
+            }
         }
 
-        qDebug() << Q_FUNC_INFO << err;
-        this->displayWalletErrorMsg(err);
+        Utils::showMsg(message);
         m_wallet->disposeTransaction(tx);
         return;
     }
     else if (tx->txCount() == 0) {
-        err = QString("%1 %2").arg(err, "No unmixable outputs to sweep.");
-        qDebug() << Q_FUNC_INFO << err;
-        this->displayWalletErrorMsg(err);
+        Utils::showError(this, "Failed to construct transaction", "No transactions were constructed", {"You have found a bug. Please contact the developers."}, "report_an_issue");
         m_wallet->disposeTransaction(tx);
         return;
     }
     else if (tx->txCount() > 1) {
-        err = QString("%1 %2").arg(err, "Split transactions are not supported. Try sending a smaller amount.");
-        qDebug() << Q_FUNC_INFO << err;
-        this->displayWalletErrorMsg(err);
+        Utils::showError(this, "Failed to construct transaction", "Split transactions are not supported", {"Try sending a smaller amount."});
         m_wallet->disposeTransaction(tx);
         return;
     }
@@ -773,9 +830,7 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
         destAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(addr, constants::networkType));
     }
     if (!outputAddresses.contains(destAddresses)) {
-        err = QString("%1 %2").arg(err, "Constructed transaction doesn't appear to send to (all) specified destination address(es). Try creating the transaction again.");
-        qDebug() << Q_FUNC_INFO << err;
-        this->displayWalletErrorMsg(err);
+        Utils::showError(this, "Transaction fails sanity check", "Constructed transaction doesn't appear to send to (all) specified destination address(es). Try creating the transaction again.");
         m_wallet->disposeTransaction(tx);
         return;
     }
@@ -812,40 +867,29 @@ void MainWindow::onCreateTransactionSuccess(PendingTransaction *tx, const QVecto
 }
 
 void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid) {
-    if (success) {
-        QMessageBox msgBox{this};
-        QPushButton *showDetailsButton = msgBox.addButton("Show details", QMessageBox::ActionRole);
-        msgBox.addButton(QMessageBox::Ok);
-        QString body = QString("Successfully sent %1 transaction(s).").arg(txid.count());
-        msgBox.setText(body);
-        msgBox.setWindowTitle("Transaction sent");
-        msgBox.setIcon(QMessageBox::Icon::Information);
-        msgBox.exec();
-        if (msgBox.clickedButton() == showDetailsButton) {
-            this->showHistoryTab();
-            TransactionInfo *txInfo = m_wallet->history()->transaction(txid.first());
-            auto *dialog = new TxInfoDialog(m_wallet, txInfo, this);
-            connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
-            dialog->show();
-            dialog->setAttribute(Qt::WA_DeleteOnClose);
-        }
-
-        m_sendWidget->clearFields();
-    } else {
-        auto err = tx->errorString();
-        QString body = QString("Error committing transaction: %1").arg(err);
-        QMessageBox::warning(this, "Transaction failed", body);
-    }
-}
-
-void MainWindow::onCreateTransactionError(const QString &message) {
-    auto msg = QString("Error while creating transaction: %1").arg(message);
-
-    if (msg.contains("failed to get random outs")) {
-        msg += "\n\nYour transaction has too many inputs. Try sending a lower amount.";
+    if (!success) {
+        Utils::showError(this, "Failed to send transaction", tx->errorString());
+        return;
     }
 
-    QMessageBox::warning(this, "Transaction failed", msg);
+    QMessageBox msgBox{this};
+    QPushButton *showDetailsButton = msgBox.addButton("Show details", QMessageBox::ActionRole);
+    msgBox.addButton(QMessageBox::Ok);
+    QString body = QString("Successfully sent %1 transaction(s).").arg(txid.count());
+    msgBox.setText(body);
+    msgBox.setWindowTitle("Transaction sent");
+    msgBox.setIcon(QMessageBox::Icon::Information);
+    msgBox.exec();
+    if (msgBox.clickedButton() == showDetailsButton) {
+        this->showHistoryTab();
+        TransactionInfo *txInfo = m_wallet->history()->transaction(txid.first());
+        auto *dialog = new TxInfoDialog(m_wallet, txInfo, this);
+        connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
+        dialog->show();
+        dialog->setAttribute(Qt::WA_DeleteOnClose);
+    }
+
+    m_sendWidget->clearFields();
 }
 
 void MainWindow::showWalletInfoDialog() {
@@ -855,17 +899,18 @@ void MainWindow::showWalletInfoDialog() {
 
 void MainWindow::showSeedDialog() {
     if (m_wallet->isHwBacked()) {
-        QMessageBox::information(this, "Information", "Seed unavailable: Wallet keys are stored on hardware device.");
+        Utils::showInfo(this, "Seed unavailable", "Wallet keys are stored on a hardware device", {}, "show_wallet_seed");
         return;
     }
 
     if (m_wallet->viewOnly()) {
-        QMessageBox::information(this, "Information", "Wallet is view-only and has no seed.\n\nTo obtain wallet keys go to Wallet -> View-Only");
+        Utils::showInfo(this, "Seed unavailable", "Wallet is view-only", {"To obtain your private spendkey go to Wallet -> Keys"}, "show_wallet_seed");
         return;
     }
 
     if (!m_wallet->isDeterministic()) {
-        QMessageBox::information(this, "Information", "Wallet is non-deterministic and has no seed.\n\nTo obtain wallet keys go to Wallet -> Keys");
+        Utils::showInfo(this, "Seed unavailable", "Wallet is non-deterministic and has no seed",
+                        {"To obtain wallet keys go to Wallet -> Keys"}, "show_wallet_seed");
         return;
     }
 
@@ -904,7 +949,7 @@ void MainWindow::showViewOnlyDialog() {
 }
 
 void MainWindow::menuHwDeviceClicked() {
-    QMessageBox::information(this, "Hardware Device", QString("This wallet is backed by a %1 hardware device.").arg(this->getHardwareDevice()));
+    Utils::showInfo(this, "Hardware device", QString("This wallet is backed by a %1 hardware device.").arg(this->getHardwareDevice()));
 }
 
 void MainWindow::menuOpenClicked() {
@@ -948,7 +993,7 @@ void MainWindow::menuVerifyTxProof() {
 }
 
 void MainWindow::onShowSettingsPage(int page) {
-    config()->set(Config::lastSettingsPage, page);
+    conf()->set(Config::lastSettingsPage, page);
     this->menuSettingsClicked();
 }
 
@@ -992,7 +1037,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (!this->cleanedUp) {
         this->cleanedUp = true;
 
-        config()->set(Config::homeWidget, ui->tabHomeWidget->currentIndex());
+        conf()->set(Config::homeWidget, ui->tabHomeWidget->currentIndex());
 
         m_historyWidget->resetModel();
 
@@ -1013,7 +1058,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 void MainWindow::changeEvent(QEvent* event)
 {
     if ((event->type() == QEvent::WindowStateChange) && this->isMinimized()) {
-        if (config()->get(Config::lockOnMinimize).toBool()) {
+        if (conf()->get(Config::lockOnMinimize).toBool()) {
             this->lockWallet();
         }
     } else {
@@ -1043,10 +1088,10 @@ void MainWindow::showCalcWindow() {
 void MainWindow::payToMany() {
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
     m_sendWidget->payToMany();
-    QMessageBox::information(this, "Pay to many", "Enter a list of outputs in the 'Pay to' field.\n"
-                                                  "One output per line.\n"
-                                                  "Format: address, amount\n"
-                                                  "A maximum of 16 addresses may be specified.");
+    Utils::showInfo(this, "Pay to many", "Enter a list of outputs in the 'Pay to' field.\n"
+                                         "One output per line.\n"
+                                         "Format: address, amount\n"
+                                         "A maximum of 16 addresses may be specified.");
 }
 
 void MainWindow::showSendScreen(const CCSEntry &entry) { // TODO: rename this function
@@ -1055,14 +1100,14 @@ void MainWindow::showSendScreen(const CCSEntry &entry) { // TODO: rename this fu
 }
 
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
-    QString blockExplorerLink = Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), constants::networkType, txid);
+    QString blockExplorerLink = Utils::blockExplorerLink(conf()->get(Config::blockExplorer).toString(), constants::networkType, txid);
     Utils::externalLinkWarning(this, blockExplorerLink);
 }
 
 void MainWindow::onResendTransaction(const QString &txid) {
     QString txHex = m_wallet->getCacheTransaction(txid);
     if (txHex.isEmpty()) {
-        QMessageBox::warning(this, "Unable to resend transaction", "Transaction was not found in transaction cache. Unable to resend.");
+        Utils::showError(this, "Unable to resend transaction", "Transaction was not found in the transaction cache.");
         return;
     }
 
@@ -1089,17 +1134,17 @@ void MainWindow::importContacts() {
         }
     }
 
-    QMessageBox::information(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
+    Utils::showInfo(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
 }
 
 void MainWindow::saveGeo() {
-    config()->set(Config::geometry, QString(saveGeometry().toBase64()));
-    config()->set(Config::windowState, QString(saveState().toBase64()));
+    conf()->set(Config::geometry, QString(saveGeometry().toBase64()));
+    conf()->set(Config::windowState, QString(saveState().toBase64()));
 }
 
 void MainWindow::restoreGeo() {
-    bool geo = this->restoreGeometry(QByteArray::fromBase64(config()->get(Config::geometry).toByteArray()));
-    bool windowState = this->restoreState(QByteArray::fromBase64(config()->get(Config::windowState).toByteArray()));
+    bool geo = this->restoreGeometry(QByteArray::fromBase64(conf()->get(Config::geometry).toByteArray()));
+    bool windowState = this->restoreState(QByteArray::fromBase64(conf()->get(Config::windowState).toByteArray()));
     qDebug() << "Restored window state: " << geo << " " << windowState;
 }
 
@@ -1129,17 +1174,17 @@ void MainWindow::showAddressChecker() {
     }
 
     if (!WalletManager::addressValid(address, constants::networkType)) {
-        QMessageBox::warning(this, "Address Checker", "Invalid address.");
+        Utils::showInfo(this, "Invalid address", "The address you entered is not a valid XMR address for the current network type.");
         return;
     }
 
     SubaddressIndex index = m_wallet->subaddressIndex(address);
     if (!index.isValid()) {
         // TODO: probably mention lookahead here
-        QMessageBox::warning(this, "Address Checker", "This address does not belong to this wallet.");
+        Utils::showInfo(this, "This address does not belong to this wallet", "");
         return;
     } else {
-        QMessageBox::information(this, "Address Checker", QString("This address belongs to Account #%1").arg(index.major));
+        Utils::showInfo(this, QString("This address belongs to Account #%1").arg(index.major));
     }
 }
 
@@ -1149,9 +1194,9 @@ void MainWindow::exportKeyImages() {
     if (!fn.endsWith("_keyImages")) fn += "_keyImages";
     bool r = m_wallet->exportKeyImages(fn, true);
     if (!r) {
-        QMessageBox::warning(this, "Key image export", QString("Failed to export key images.\nReason: %1").arg(m_wallet->errorString()));
+        Utils::showError(this, "Failed to export key images", m_wallet->errorString());
     } else {
-        QMessageBox::information(this, "Key image export", "Successfully exported key images.");
+        Utils::showInfo(this, "Successfully exported key images");
     }
 }
 
@@ -1160,9 +1205,9 @@ void MainWindow::importKeyImages() {
     if (fn.isEmpty()) return;
     bool r = m_wallet->importKeyImages(fn);
     if (!r) {
-        QMessageBox::warning(this, "Key image import", QString("Failed to import key images.\n\n%1").arg(m_wallet->errorString()));
+        Utils::showError(this, "Failed to import key images", m_wallet->errorString());
     } else {
-        QMessageBox::information(this, "Key image import", "Successfully imported key images");
+        Utils::showInfo(this, "Successfully imported key images");
         m_wallet->refreshModels();
     }
 }
@@ -1173,9 +1218,9 @@ void MainWindow::exportOutputs() {
     if (!fn.endsWith("_outputs")) fn += "_outputs";
     bool r = m_wallet->exportOutputs(fn, true);
     if (!r) {
-        QMessageBox::warning(this, "Outputs export", QString("Failed to export outputs.\nReason: %1").arg(m_wallet->errorString()));
+        Utils::showError(this, "Failed to export outputs", m_wallet->errorString());
     } else {
-        QMessageBox::information(this, "Outputs export", "Successfully exported outputs.");
+        Utils::showInfo(this, "Successfully exported outputs.");
     }
 }
 
@@ -1184,9 +1229,9 @@ void MainWindow::importOutputs() {
     if (fn.isEmpty()) return;
     bool r = m_wallet->importOutputs(fn);
     if (!r) {
-        QMessageBox::warning(this, "Outputs import", QString("Failed to import outputs.\n\n%1").arg(m_wallet->errorString()));
+        Utils::showError(this, "Failed to import outputs", m_wallet->errorString());
     } else {
-        QMessageBox::information(this, "Outputs import", "Successfully imported outputs");
+        Utils::showInfo(this, "Successfully imported outputs");
         m_wallet->refreshModels();
     }
 }
@@ -1197,7 +1242,7 @@ void MainWindow::loadUnsignedTx() {
     UnsignedTransaction *tx = m_wallet->loadTxFile(fn);
     auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Load transaction from file", QString("Failed to load transaction.\n\n%1").arg(err));
+        Utils::showError(this, "Failed to load transaction", err);
         return;
     }
 
@@ -1207,13 +1252,13 @@ void MainWindow::loadUnsignedTx() {
 void MainWindow::loadUnsignedTxFromClipboard() {
     QString unsigned_tx = Utils::copyFromClipboard();
     if (unsigned_tx.isEmpty()) {
-        QMessageBox::warning(this, "Load unsigned transaction from clipboard", "Clipboard is empty");
+        Utils::showError(this, "Unable to load unsigned transaction", "Clipboard is empty");
         return;
     }
     UnsignedTransaction *tx = m_wallet->loadTxFromBase64Str(unsigned_tx);
     auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Load unsigned transaction from clipboard", QString("Failed to load transaction.\n\n%1").arg(err));
+        Utils::showError(this, "Unable to load unsigned transaction", err);
         return;
     }
 
@@ -1226,7 +1271,7 @@ void MainWindow::loadSignedTx() {
     PendingTransaction *tx = m_wallet->loadSignedTxFile(fn);
     auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
-        QMessageBox::warning(this, "Load signed transaction from file", err);
+        Utils::showError(this, "Unable to load signed transaction", err);
         return;
     }
 
@@ -1247,7 +1292,7 @@ void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
 }
 
 void MainWindow::importTransaction() {
-    if (config()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptNode) {
+    if (conf()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptNode) {
         // TODO: don't show if connected to local node
 
         auto result = QMessageBox::warning(this, "Warning", "Using this feature may allow a remote node to associate the transaction with your IP address.\n"
@@ -1365,9 +1410,9 @@ void MainWindow::updateNetStats() {
 
 void MainWindow::rescanSpent() {
     if (!m_wallet->rescanSpent()) {
-        QMessageBox::warning(this, "Rescan spent", m_wallet->errorString());
+        Utils::showError(this, "Failed to rescan spent outputs", m_wallet->errorString());
     } else {
-        QMessageBox::information(this, "Rescan spent", "Successfully rescanned spent outputs.");
+        Utils::showInfo(this, "Successfully rescanned spent outputs");
     }
 }
 
@@ -1417,7 +1462,7 @@ void MainWindow::onHideUpdateNotifications(bool hidden) {
 }
 
 void MainWindow::onTorConnectionStateChanged(bool connected) {
-    if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+    if (conf()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
         return;
     }
 
@@ -1429,7 +1474,7 @@ void MainWindow::onTorConnectionStateChanged(bool connected) {
 
 void MainWindow::showUpdateNotification() {
 #ifdef CHECK_UPDATES
-    if (config()->get(Config::hideUpdateNotifications).toBool()) {
+    if (conf()->get(Config::hideUpdateNotifications).toBool()) {
         return;
     }
 
@@ -1467,21 +1512,10 @@ void MainWindow::onInitiateTransaction() {
     }
 }
 
-void MainWindow::onEndTransaction() {
-    // Todo: endTransaction can fail to fire when the node is switched during tx creation
-    m_constructingTransaction = false;
-    m_txTimer.stop();
-    this->setStatusText(m_statusText);
-
-    if (m_wallet->isHwBacked()) {
-        m_splashDialog->hide();
-    }
-}
-
 void MainWindow::onKeysCorrupted() {
     if (!m_criticalWarningShown) {
         m_criticalWarningShown = true;
-        QMessageBox::warning(this, "Critical error", "WARNING!\n\nThe wallet keys are corrupted.\n\nTo prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\nRestore your wallet from seed.\n\nPlease report this incident to the Feather developers.\n\nWARNING!");
+        Utils::showError(this, "Wallet keys are corrupted", "WARNING!\n\nTo prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\nRestore your wallet from seed.\n\nPlease report this incident to the Feather developers.\n\nWARNING!");
         m_sendWidget->disableSendButton();
     }
 }
@@ -1505,22 +1539,19 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
 }
 
 void MainWindow::onExportHistoryCSV() {
-    if (m_wallet == nullptr)
-        return;
     QString fn = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
     if (fn.isEmpty())
         return;
     if (!fn.endsWith(".csv"))
         fn += ".csv";
     m_wallet->history()->writeCSV(fn);
-    QMessageBox::information(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
+    Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
 }
 
 void MainWindow::onExportContactsCSV() {
-    if (m_wallet == nullptr) return;
     auto *model = m_wallet->addressBookModel();
     if (model->rowCount() <= 0){
-        QMessageBox::warning(this, "Error", "Addressbook empty");
+        Utils::showInfo(this, "Unable to export contacts", "No contacts to export");
         return;
     }
 
@@ -1529,8 +1560,9 @@ void MainWindow::onExportContactsCSV() {
 
     qint64 now = QDateTime::currentMSecsSinceEpoch();
     QString fn = QString("%1/monero-contacts_%2.csv").arg(targetDir, QString::number(now / 1000));
-    if(model->writeCSV(fn))
-        QMessageBox::information(this, "Address book exported", QString("Address book exported to %1").arg(fn));
+    if (model->writeCSV(fn)) {
+        Utils::showInfo(this, "Contacts exported successfully", QString("Exported to: %1").arg(fn));
+    }
 }
 
 void MainWindow::onCreateDesktopEntry() {
@@ -1539,11 +1571,12 @@ void MainWindow::onCreateDesktopEntry() {
 }
 
 void MainWindow::onShowDocumentation() {
-    Utils::externalLinkWarning(this, "https://docs.featherwallet.org");
+    // TODO: welcome page
+    m_windowManager->showDocs(this);
 }
 
 void MainWindow::onReportBug() {
-    Utils::externalLinkWarning(this, "https://docs.featherwallet.org/guides/report-an-issue");
+    m_windowManager->showDocs(this, "report_an_issue");
 }
 
 QString MainWindow::getHardwareDevice() {
@@ -1581,7 +1614,7 @@ void MainWindow::donationNag() {
     if (m_wallet->balanceAll() == 0)
         return;
 
-    auto donationCounter = config()->get(Config::donateBeg).toInt();
+    auto donationCounter = conf()->get(Config::donateBeg).toInt();
     if (donationCounter == -1)
         return;
 
@@ -1594,11 +1627,11 @@ void MainWindow::donationNag() {
             this->donateButtonClicked();
         }
     }
-    config()->set(Config::donateBeg, donationCounter);
+    conf()->set(Config::donateBeg, donationCounter);
 }
 
 void MainWindow::addToRecentlyOpened(QString keysFile) {
-    auto recent = config()->get(Config::recentlyOpenedWallets).toList();
+    auto recent = conf()->get(Config::recentlyOpenedWallets).toList();
 
     if (Utils::isPortableMode()) {
         QDir appPath{Utils::applicationPath()};
@@ -1622,14 +1655,14 @@ void MainWindow::addToRecentlyOpened(QString keysFile) {
         }
     }
 
-    config()->set(Config::recentlyOpenedWallets, recent_);
+    conf()->set(Config::recentlyOpenedWallets, recent_);
 
     this->updateRecentlyOpenedMenu();
 }
 
 void MainWindow::updateRecentlyOpenedMenu() {
     ui->menuRecently_open->clear();
-    const QStringList recentWallets = config()->get(Config::recentlyOpenedWallets).toStringList();
+    const QStringList recentWallets = conf()->get(Config::recentlyOpenedWallets).toStringList();
     for (const auto &walletPath : recentWallets) {
         QFileInfo fileInfo{walletPath};
         ui->menuRecently_open->addAction(fileInfo.fileName(), m_windowManager, std::bind(&WindowManager::tryOpenWallet, m_windowManager, fileInfo.absoluteFilePath(), ""));
@@ -1671,7 +1704,7 @@ void MainWindow::closeQDialogChildren(QObject *object) {
 }
 
 void MainWindow::checkUserActivity() {
-    if (!config()->get(Config::inactivityLockEnabled).toBool()) {
+    if (!conf()->get(Config::inactivityLockEnabled).toBool()) {
         return;
     }
 
@@ -1679,7 +1712,7 @@ void MainWindow::checkUserActivity() {
         return;
     }
 
-    if ((m_userLastActive + (config()->get(Config::inactivityLockTimeout).toInt()*60)) < QDateTime::currentSecsSinceEpoch()) {
+    if ((m_userLastActive + (conf()->get(Config::inactivityLockTimeout).toInt()*60)) < QDateTime::currentSecsSinceEpoch()) {
         qInfo() << "Locking wallet for inactivity";
         this->lockWallet();
     }
@@ -1691,7 +1724,7 @@ void MainWindow::lockWallet() {
     }
 
     if (m_constructingTransaction) {
-        QMessageBox::warning(this, "Lock wallet", "Unable to lock wallet during transaction construction");
+        Utils::showError(this, "Unable to lock wallet", "Can't lock wallet during transaction construction");
         return;
     }
     m_walletUnlockWidget->reset();
@@ -1731,7 +1764,7 @@ void MainWindow::unlockWallet(const QString &password) {
 }
 
 void MainWindow::toggleSearchbar(bool visible) {
-    config()->set(Config::showSearchbar, visible);
+    conf()->set(Config::showSearchbar, visible);
 
     m_historyWidget->setSearchbarVisible(visible);
     m_receiveWidget->setSearchbarVisible(visible);

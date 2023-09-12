@@ -122,7 +122,7 @@ bool PageWalletSeed::validatePage() {
 
     QMessageBox seedWarning(this);
     seedWarning.setWindowTitle("Warning!");
-    seedWarning.setText("• Never disclose your seed\n"
+    seedWarning.setInformativeText("• Never disclose your seed\n"
                         "• Never type it on a website\n"
                         "• Store it safely (offline)\n"
                         "• Do not lose your seed!");

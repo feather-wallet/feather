@@ -41,7 +41,7 @@ void LocalMoneroInfoDialog::setLabelText(QLabel *label, LocalMoneroModel::Column
 
 void LocalMoneroInfoDialog::onGoToOffer() {
     QJsonObject offerData = m_model->getOffer(m_row);
-    QString frontend = config()->get(Config::localMoneroFrontend).toString();
+    QString frontend = conf()->get(Config::localMoneroFrontend).toString();
     QString offerUrl = QString("%1/ad/%2").arg(frontend, offerData["data"].toObject()["ad_id"].toString());
     Utils::externalLinkWarning(this, offerUrl);
 }

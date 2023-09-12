@@ -11,6 +11,8 @@
 #include <QImageCapture>
 #include <QVideoFrame>
 
+#include "Utils.h"
+
 QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
         : QDialog(parent)
         , ui(new Ui::QrCodeScanDialog)
@@ -85,7 +87,7 @@ void QrCodeScanDialog::onDecoded(int type, const QString &data) {
 void QrCodeScanDialog::displayCameraError()
 {
     if (m_camera->error() != QCamera::NoError) {
-        QMessageBox::warning(this, tr("Camera Error"), m_camera->errorString());
+        Utils::showError(this, "Camera error", m_camera->errorString());
     }
 }
 

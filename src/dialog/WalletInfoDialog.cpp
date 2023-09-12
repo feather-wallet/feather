@@ -28,15 +28,15 @@ WalletInfoDialog::WalletInfoDialog(Wallet *wallet, QWidget *parent)
 
     connect(ui->btn_openWalletDir, &QPushButton::clicked, this, &WalletInfoDialog::openWalletDir);
 
-    ui->label_keysFileLabel->setHelpText("The \"keys file\" stores the wallet keys and wallet settings. "
+    ui->label_keysFileLabel->setHelpText("", "The \"keys file\" stores the wallet keys and wallet settings. "
                                          "It is encrypted with the wallet password (if set).\n\n"
                                          "Your funds will be irreversibly lost if you delete this file "
-                                         "without having a backup of your mnemonic seed or private keys.");
+                                         "without having a backup of your mnemonic seed or private keys.", "wallet_files");
 
-    ui->label_cacheFileLabel->setHelpText("The \"cache file\" stores transaction data, contacts, address labels, "
+    ui->label_cacheFileLabel->setHelpText("", "The \"cache file\" stores transaction data, contacts, address labels, "
                                           "block hashes, the 14-word seed (if applicable), and other miscellaneous information. "
                                           "It is encrypted with the wallet password (if set).\n\n"
-                                          "Warning: Transaction keys and the 14-word seed CANNOT be recovered if this file is deleted.");
+                                          "Warning: Transaction keys and the 14-word seed CANNOT be recovered if this file is deleted.", "wallet_files");
 
     this->adjustSize();
 }

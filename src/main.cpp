@@ -42,7 +42,7 @@ void signal_handler(int signum) {
     std::cout << keyStream.str();
 
     // Write stack trace to disk
-    if (config()->get(Config::writeStackTraceToDisk).toBool()) {
+    if (conf()->get(Config::writeStackTraceToDisk).toBool()) {
         QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
         std::ofstream out(crashLogPath.toStdString());
         out << QString("Version: %1-%2\n").arg(FEATHER_VERSION, FEATHER_COMMIT).toStdString();
@@ -165,12 +165,12 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     bool logLevelFromEnv;
     int logLevel = qEnvironmentVariableIntValue("MONERO_LOG_LEVEL", &logLevelFromEnv);
     if (logLevelFromEnv) {
-        config()->set(Config::logLevel, logLevel);
+        conf()->set(Config::logLevel, logLevel);
     } else {
-        logLevel = config()->get(Config::logLevel).toInt();
+        logLevel = conf()->get(Config::logLevel).toInt();
     }
 
-    if (parser.isSet("quiet") || config()->get(Config::disableLogging).toBool()) {
+    if (parser.isSet("quiet") || conf()->get(Config::disableLogging).toBool()) {
         qWarning() << "Logging is disabled";
         WalletManager::instance()->setLogLevel(-1);
     }
@@ -179,23 +179,23 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
 
     // Setup wallet directory
-    QString walletDir = config()->get(Config::walletDirectory).toString();
+    QString walletDir = conf()->get(Config::walletDirectory).toString();
     if (walletDir.isEmpty() || Utils::isPortableMode()) {
         walletDir = Utils::defaultWalletDir();
-        config()->set(Config::walletDirectory, walletDir);
+        conf()->set(Config::walletDirectory, walletDir);
     }
     if (!QDir().mkpath(walletDir))
         qCritical() << "Unable to create dir: " << walletDir;
 
     // Prestium initial config
-    if (config()->get(Config::firstRun).toBool() && Prestium::detect()) {
-        config()->set(Config::proxy, Config::Proxy::i2p);
-        config()->set(Config::socks5Port, Prestium::i2pPort());
-        config()->set(Config::hideUpdateNotifications, true);
+    if (conf()->get(Config::firstRun).toBool() && Prestium::detect()) {
+        conf()->set(Config::proxy, Config::Proxy::i2p);
+        conf()->set(Config::socks5Port, Prestium::i2pPort());
+        conf()->set(Config::hideUpdateNotifications, true);
     }
 
     if (parser.isSet("use-local-tor"))
-        config()->set(Config::useLocalTor, true);
+        conf()->set(Config::useLocalTor, true);
 
     parser.process(app); // Parse again for --help and --version
 
@@ -239,10 +239,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         pool->setMaxThreadCount(8);
     }
 
-    WindowManager windowManager(QCoreApplication::instance(), &filter);
+    auto wm = windowManager();
+    wm->setEventFilter(&filter);
 
-    QObject::connect(&app, &SingleApplication::instanceStarted, [&windowManager]() {
-        windowManager.raise();
+    QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
+        wm->raise();
     });
 
     return QApplication::exec();

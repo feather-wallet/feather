@@ -38,7 +38,7 @@ QNetworkAccessManager* getNetworkClearnet()
 
 QNetworkAccessManager* getNetwork(const QString &address)
 {
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::None) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::None) {
         return getNetworkClearnet();
     }
 

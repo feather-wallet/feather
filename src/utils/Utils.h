@@ -7,15 +7,40 @@
 #include <QRegularExpression>
 #include <QStandardItemModel>
 #include <QTextCharFormat>
+#include <QMessageBox>
 
 #include "libwalletqt/Wallet.h"
 #include "networktype.h"
 
 namespace Utils
 {
+    enum MessageType
+    {
+        INFO = 0,
+        WARNING,
+        ERROR
+    };
+
+    struct Message
+    {
+        QWidget *parent;
+        MessageType type;
+        QString title;
+        QString description;
+        QStringList helpItems;
+        QString doc;
+        QString highlight;
+        QString link;
+
+        QString toString() const {
+            return QString("%1: %2").arg(title, description);
+        }
+    };
+
     bool fileExists(const QString &path);
     QByteArray fileOpen(const QString &path);
     QByteArray fileOpenQRC(const QString &path);
+    QString loadQrc(const QString &qrc);
     bool fileWrite(const QString &path, const QString &data);
     bool pixmapWrite(const QString &path, const QPixmap &pixmap);
     QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
@@ -74,6 +99,14 @@ namespace Utils
     QString QtEnumToString (QEnum value) {
         return QString::fromStdString(std::string(QMetaEnum::fromType<QEnum>().valueToKey(value)));
     }
+
+    void showError(QWidget *parent, const QString &title, const QString &description = "", const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
+    void showInfo(QWidget *parent, const QString &title, const QString &description = "", const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
+    void showWarning(QWidget *parent, const QString &title, const QString &description = "", const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
+    void showMsg(QWidget *parent, QMessageBox::Icon icon, const QString &windowTitle, const QString &title, const QString &description, const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
+    void showMsg(const Message &message);
+
+    QWindow* windowForQObject(QObject* object);
 }
 
 #endif //FEATHER_UTILS_H

@@ -100,6 +100,8 @@ signals:
 
 private slots:
     void onCreateWallet();
+    QString helpPage();
+    void showHelp();
 
 private:
     WalletKeysFilesModel *m_walletKeysFilesModel;

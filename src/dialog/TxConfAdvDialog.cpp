@@ -111,7 +111,7 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
 }
 
 void TxConfAdvDialog::setAmounts(quint64 amount, quint64 fee) {
-    QString preferredCur = config()->get(Config::preferredFiatCurrency).toString();
+    QString preferredCur = conf()->get(Config::preferredFiatCurrency).toString();
 
     auto convert = [preferredCur](double amount){
         return QString::number(appData()->prices.convert("XMR", preferredCur, amount), 'f', 2);
@@ -164,33 +164,54 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
 void TxConfAdvDialog::signTransaction() {
     QString defaultName = QString("%1_signed_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
     QString fn = QFileDialog::getSaveFileName(this, "Save signed transaction to file", QDir::home().filePath(defaultName), "Transaction (*signed_monero_tx)");
-    if(fn.isEmpty()) return;
+    if (fn.isEmpty()) {
+        return;
+    }
 
-    m_utx->sign(fn) ? QMessageBox::information(this, "Sign transaction", "Transaction saved successfully")
-                    : QMessageBox::warning(this, "Sign transaction", "Failed to save transaction to file.");
+    bool success = m_utx->sign(fn);
+
+    if (success) {
+        Utils::showInfo(this, "Transaction saved successfully");
+    } else {
+        Utils::showError(this, "Failed to save transaction to file");
+    }
 }
 
 void TxConfAdvDialog::unsignedSaveFile() {
     QString defaultName = QString("%1_unsigned_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
     QString fn = QFileDialog::getSaveFileName(this, "Save transaction to file", QDir::home().filePath(defaultName), "Transaction (*unsigned_monero_tx)");
-    if(fn.isEmpty()) return;
+    if (fn.isEmpty()) {
+        return;
+    }
 
-    m_tx->saveToFile(fn) ? QMessageBox::information(this, "Transaction saved to file", "Transaction saved successfully")
-                         : QMessageBox::warning(this, "Save transaction", "Failed to save transaction to file.");
+    bool success = m_tx->saveToFile(fn);
+
+    if (success) {
+        Utils::showInfo(this, "Transaction saved successfully");
+    } else {
+        Utils::showError(this, "Failed to save transaction to file");
+    }
 }
 
 void TxConfAdvDialog::signedSaveFile() {
     QString defaultName = QString("%1_signed_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
     QString fn = QFileDialog::getSaveFileName(this, "Save transaction to file", QDir::home().filePath(defaultName), "Transaction (*signed_monero_tx)");
-    if(fn.isEmpty()) return;
+    if (fn.isEmpty()) {
+        return;
+    }
 
-    m_tx->saveToFile(fn) ? QMessageBox::information(this, "Transaction saved to file", "Transaction saved successfully")
-                         : QMessageBox::warning(this, "Save transaction", "Failed to save transaction to file.");
+    bool success = m_tx->saveToFile(fn);
+
+    if (success) {
+        Utils::showInfo(this, "Transaction saved successfully");
+    } else {
+        Utils::showError(this, "Failed to save transaction to file");
+    }
 }
 
 void TxConfAdvDialog::unsignedQrCode() {
     if (m_tx->unsignedTxToBin().size() > 2953) {
-        QMessageBox::warning(this, "Unable to show QR code", "Transaction size exceeds the maximum size for QR codes (2953 bytes).");
+        Utils::showError(this, "Unable to show QR code", "Transaction size exceeds the maximum size for QR codes (2953 bytes)");
         return;
     }
 
@@ -209,7 +230,7 @@ void TxConfAdvDialog::signedCopy() {
 
 void TxConfAdvDialog::txKeyCopy() {
     if (m_wallet->isHwBacked()) {
-        QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
+        Utils::showError(this, "Unable to copy transaction private key", "Function not supported for hardware wallets");
         return;
     }
 

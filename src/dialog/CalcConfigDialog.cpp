@@ -19,8 +19,8 @@ CalcConfigDialog::CalcConfigDialog(QWidget *parent)
     connect(ui->btn_deselectAll, &QPushButton::clicked, this, &CalcConfigDialog::deselectAll);
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, [this]{
-        config()->set(Config::fiatSymbols, this->checkedFiat());
-        config()->set(Config::cryptoSymbols, this->checkedCrypto());
+        conf()->set(Config::fiatSymbols, this->checkedFiat());
+        conf()->set(Config::cryptoSymbols, this->checkedCrypto());
         this->accept();
     });
 
@@ -75,8 +75,8 @@ void CalcConfigDialog::fillListWidgets() {
     QStringList cryptoCurrencies = appData()->prices.markets.keys();
     QStringList fiatCurrencies = appData()->prices.rates.keys();
 
-    QStringList checkedCryptoCurrencies = config()->get(Config::cryptoSymbols).toStringList();
-    QStringList checkedFiatCurrencies = config()->get(Config::fiatSymbols).toStringList();
+    QStringList checkedCryptoCurrencies = conf()->get(Config::cryptoSymbols).toStringList();
+    QStringList checkedFiatCurrencies = conf()->get(Config::fiatSymbols).toStringList();
 
     ui->list_crypto->addItems(cryptoCurrencies);
     ui->list_fiat->addItems(fiatCurrencies);

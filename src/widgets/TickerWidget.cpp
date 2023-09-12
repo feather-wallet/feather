@@ -72,7 +72,7 @@ BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, Wallet *wallet, bool t
 
 void BalanceTickerWidget::updateDisplay() {
     double balance = (m_totalBalance ? m_wallet->balanceAll() : m_wallet->balance()) / constants::cdiv;
-    QString fiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+    QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
     double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance);
     if (balanceFiatAmount < 0)
         return;
@@ -91,7 +91,7 @@ PriceTickerWidget::PriceTickerWidget(QWidget *parent, Wallet *wallet, QString sy
 }
 
 void PriceTickerWidget::updateDisplay() {
-    QString fiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+    QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
     double price = appData()->prices.convert(m_symbol, fiatCurrency, 1.0);
     if (price < 0)
         return;

@@ -116,7 +116,7 @@ void TxInfoDialog::setData(TransactionInfo *tx) {
         ui->label_status->setText("Status: Unconfirmed (in mempool)");
     }
     else {
-        QString dateTimeFormat = QString("%1 %2").arg(config()->get(Config::dateFormat).toString(), config()->get(Config::timeFormat).toString());
+        QString dateTimeFormat = QString("%1 %2").arg(conf()->get(Config::dateFormat).toString(), conf()->get(Config::timeFormat).toString());
         QString date = tx->timestamp().toString(dateTimeFormat);
         QString statusText = QString("Status: Included in block %1 (%2 confirmations) on %3").arg(blockHeight, QString::number(tx->confirmations()), date);
         ui->label_status->setText(statusText);
@@ -160,14 +160,14 @@ void TxInfoDialog::copyTxID() {
 
 void TxInfoDialog::copyTxKey() {
     if (m_wallet->isHwBacked()) {
-        QMessageBox::warning(this, "Unable to get tx private key", "Unable to get tx secret key: wallet is backed by hardware device");
+        Utils::showError(this, "Unable to get transaction secret key", "Function not supported on hardware device");
         return;
     }
 
     m_wallet->getTxKeyAsync(m_txid, [this](QVariantMap map){
         QString txKey = map.value("tx_key").toString();
         if (txKey.isEmpty()) {
-            QMessageBox::warning(this, "Unable to copy transaction key", "Transaction key unknown");
+            Utils::showError(this, "Unable to copy transaction secret key", "Transaction secret key is unknown");
         } else {
             Utils::copyToClipboard(txKey);
             QMessageBox::information(this, "Transaction key copied", "Transaction key copied to clipboard.");
@@ -181,7 +181,7 @@ void TxInfoDialog::createTxProof() {
 }
 
 void TxInfoDialog::viewOnBlockExplorer() {
-    Utils::externalLinkWarning(this, Utils::blockExplorerLink(config()->get(Config::blockExplorer).toString(), constants::networkType, m_txid));
+    Utils::externalLinkWarning(this, Utils::blockExplorerLink(conf()->get(Config::blockExplorer).toString(), constants::networkType, m_txid));
 }
 
 TxInfoDialog::~TxInfoDialog() = default;

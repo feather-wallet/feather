@@ -149,7 +149,6 @@ private slots:
     void onTorConnectionStateChanged(bool connected);
     void showUpdateDialog();
     void onInitiateTransaction();
-    void onEndTransaction();
     void onKeysCorrupted();
     void onSelectedInputsChanged(const QStringList &selectedInputs);
 
@@ -158,8 +157,7 @@ private slots:
     void onSynchronized();
     void onWalletOpened();
     void onConnectionStatusChanged(int status);
-    void onCreateTransactionError(const QString &message);
-    void onCreateTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
+    void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
     void onTransactionCommitted(bool status, PendingTransaction *tx, const QStringList& txid);
 
     // Dialogs
@@ -218,7 +216,6 @@ private:
     void setStatusText(const QString &text, bool override = false, int timeout = 1000);
     void showBalanceDialog();
     QString statusDots();
-    void displayWalletErrorMsg(const QString &err);
     QString getHardwareDevice();
     void updateTitle();
     void donationNag();

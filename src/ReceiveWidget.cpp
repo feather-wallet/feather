@@ -202,7 +202,7 @@ void ReceiveWidget::showOnDevice() {
 void ReceiveWidget::generateSubaddress() {
     bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
     if (!r) {
-        QMessageBox::warning(this, "Warning", QString("Failed to generate subaddress:\n\n%1").arg(m_wallet->subaddress()->errorString()));
+        Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->errorString());
     }
 }
 

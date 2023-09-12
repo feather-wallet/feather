@@ -17,7 +17,7 @@ void Networking::setUserAgent(const QString &userAgent) {
 }
 
 QNetworkReply* Networking::get(QObject *parent, const QString &url) {
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
 
@@ -33,7 +33,7 @@ QNetworkReply* Networking::get(QObject *parent, const QString &url) {
 }
 
 QNetworkReply* Networking::getJson(QObject *parent, const QString &url) {
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
 
@@ -50,7 +50,7 @@ QNetworkReply* Networking::getJson(QObject *parent, const QString &url) {
 }
 
 QNetworkReply* Networking::postJson(QObject *parent, const QString &url, const QJsonObject &data) {
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return nullptr;
     }
 

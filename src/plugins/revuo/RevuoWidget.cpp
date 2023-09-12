@@ -23,6 +23,8 @@ RevuoWidget::RevuoWidget(QWidget *parent)
     m_contextMenu->addAction("Open link", this, &RevuoWidget::onOpenLink);
     m_contextMenu->addAction("Donate to author", this, &RevuoWidget::onDonate);
 
+    ui->splitter->setStretchFactor(1, 5);
+
     connect(ui->listWidget, &QListWidget::currentTextChanged, this, &RevuoWidget::onSelectItem);
     connect(ui->listWidget, &QListWidget::customContextMenuRequested, this, &RevuoWidget::showContextMenu);
 }

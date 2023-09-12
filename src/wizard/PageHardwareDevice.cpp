@@ -7,7 +7,6 @@
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
-#include <QMessageBox>
 #include <QPushButton>
 
 PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)

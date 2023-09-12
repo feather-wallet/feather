@@ -65,7 +65,7 @@ int PageNetwork::nextId() const {
 
 bool PageNetwork::validatePage() {
     int id = ui->btnGroup_network->checkedId();
-    config()->set(Config::nodeSource, id);
+    conf()->set(Config::nodeSource, id);
 
     if (id == Button::CUSTOM) {
         NodeList nodeList;

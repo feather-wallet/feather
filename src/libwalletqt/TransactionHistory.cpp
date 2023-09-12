@@ -176,7 +176,7 @@ bool TransactionHistory::writeCSV(const QString &path) {
 
         // calc historical fiat price
         QString fiatAmount;
-        QString preferredFiatSymbol = config()->get(Config::preferredFiatCurrency).toString();
+        QString preferredFiatSymbol = conf()->get(Config::preferredFiatCurrency).toString();
         const double usd_price = appData()->txFiatHistory->get(timeStamp.toString("yyyyMMdd"));
         double fiat_price = usd_price * amount;
 

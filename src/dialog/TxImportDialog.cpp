@@ -24,20 +24,19 @@ void TxImportDialog::onImport() {
     QString txid = ui->line_txid->text();
 
     if (m_wallet->haveTransaction(txid)) {
-        QMessageBox::warning(this, "Warning", "This transaction already exists in the wallet. "
-                                              "If you can't find it in your history, "
-                                              "check if it belongs to a different account (Wallet -> Account)");
+        Utils::showWarning(this, "Transaction already exists in wallet", "If you can't find it in your history, "
+                                                                       "check if it belongs to a different account (Wallet -> Account)");
         return;
     }
 
     if (m_wallet->importTransaction(txid)) {
         if (!m_wallet->haveTransaction(txid)) {
-            QMessageBox::warning(this, "Import transaction", "This transaction does not belong to this wallet.");
+            Utils::showError(this, "Unable to import transaction", "This transaction does not belong to the wallet");
             return;
         }
-        QMessageBox::information(this, "Import transaction", "Transaction imported successfully.");
+        Utils::showInfo(this, "Transaction imported successfully", "");
     } else {
-        QMessageBox::warning(this, "Import transaction", "Transaction import failed.");
+        Utils::showError(this, "Failed to import transaction", "");
     }
     m_wallet->refreshModels();
 }

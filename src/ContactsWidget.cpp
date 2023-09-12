@@ -127,7 +127,7 @@ void ContactsWidget::newContact(QString address, QString name)
 
     bool addressValid = WalletManager::addressValid(address, m_wallet->nettype());
     if (!addressValid) {
-        QMessageBox::warning(this, "Invalid address", "Invalid address");
+        Utils::showError(this, "Unable to add contact", "Invalid address", {"Use 'Tools -> Address checker' to check if the address is valid."}, "add_contact");
         return;
     }
 
@@ -141,12 +141,12 @@ void ContactsWidget::newContact(QString address, QString name)
         });
 
         if (address == address_entry) {
-            QMessageBox::warning(this, "Unable to add contact", "Duplicate address");
+            Utils::showError(this, "Unable to add contact", "Address already exists in contacts", {}, "add_contact");
             ui->contacts->setCurrentIndex(m_model->index(i,0)); // Highlight duplicate address
             return;
         }
         if (name == name_entry) {
-            QMessageBox::warning(this, "Unable to add contact", "Duplicate label");
+            Utils::showError(this, "Unable to add contact", "Label already exists in contacts", {}, "add_contact");
             this->newContact(address, name);
             return;
         }

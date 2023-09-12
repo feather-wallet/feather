@@ -22,9 +22,6 @@ public:
     bool validatePage() override;
     int nextId() const override;
 
-signals:
-    void showSettings();
-
 private:
     Ui::PageMenu *ui;
     WalletKeysFilesModel *m_walletKeysFilesModel;

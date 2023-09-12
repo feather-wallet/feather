@@ -7,7 +7,6 @@
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QInputDialog>
-#include <QMessageBox>
 #include <QScrollBar>
 #include <QStandardItemModel>
 #include <QTableWidget>
@@ -42,10 +41,10 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
 
     // XMRig executable
     connect(ui->btn_browse, &QPushButton::clicked, this, &XMRigWidget::onBrowseClicked);
-    ui->lineEdit_path->setText(config()->get(Config::xmrigPath).toString());
+    ui->lineEdit_path->setText(conf()->get(Config::xmrigPath).toString());
 
     // Run as admin/root
-    bool elevated = config()->get(Config::xmrigElevated).toBool();
+    bool elevated = conf()->get(Config::xmrigElevated).toBool();
     if (elevated) {
         ui->radio_elevateYes->setChecked(true);
     } else {
@@ -62,7 +61,7 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
     ui->threadSlider->setMinimum(1);
     ui->threadSlider->setMaximum(QThread::idealThreadCount());
 
-    int threads = config()->get(Config::xmrigThreads).toInt();
+    int threads = conf()->get(Config::xmrigThreads).toInt();
     ui->threadSlider->setValue(threads);
     ui->label_threads->setText(QString("CPU threads: %1").arg(threads));
 
@@ -70,14 +69,14 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
 
     // Mining mode
     connect(ui->combo_miningMode, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &XMRigWidget::onMiningModeChanged);
-    ui->combo_miningMode->setCurrentIndex(config()->get(Config::miningMode).toInt());
+    ui->combo_miningMode->setCurrentIndex(conf()->get(Config::miningMode).toInt());
 
     // Pool/node address
     this->updatePools();
     connect(ui->combo_pools, &QComboBox::currentTextChanged, this, &XMRigWidget::onPoolChanged);
 
     connect(ui->btn_poolConfig, &QPushButton::clicked, [this]{
-        QStringList pools = config()->get(Config::pools).toStringList();
+        QStringList pools = conf()->get(Config::pools).toStringList();
         bool ok;
         QString poolStr = QInputDialog::getMultiLineText(this, "Pool addresses", "Set pool addresses (one per line):", pools.join("\n"), &ok);
         if (!ok) {
@@ -86,20 +85,20 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
         QStringList newPools = poolStr.split("\n");
         newPools.removeAll("");
         newPools.removeDuplicates();
-        config()->set(Config::pools, newPools);
+        conf()->set(Config::pools, newPools);
         this->updatePools();
     });
 
-    ui->lineEdit_solo->setText(config()->get(Config::xmrigDaemon).toString());
+    ui->lineEdit_solo->setText(conf()->get(Config::xmrigDaemon).toString());
     connect(ui->lineEdit_solo, &QLineEdit::textChanged, [this](){
-        config()->set(Config::xmrigDaemon, ui->lineEdit_solo->text());
+        conf()->set(Config::xmrigDaemon, ui->lineEdit_solo->text());
     });
 
     // Network settings
     connect(ui->check_tls, &QCheckBox::toggled, this, &XMRigWidget::onNetworkTLSToggled);
     connect(ui->relayTor, &QCheckBox::toggled, this, &XMRigWidget::onNetworkTorToggled);
-    ui->check_tls->setChecked(config()->get(Config::xmrigNetworkTLS).toBool());
-    ui->relayTor->setChecked(config()->get(Config::xmrigNetworkTor).toBool());
+    ui->check_tls->setChecked(conf()->get(Config::xmrigNetworkTLS).toBool());
+    ui->relayTor->setChecked(conf()->get(Config::xmrigNetworkTor).toBool());
 
     // Receiving address
     auto username = m_wallet->getCacheAttribute("feather.xmrig_username");
@@ -144,18 +143,18 @@ void XMRigWidget::onWalletClosed() {
 }
 
 void XMRigWidget::onThreadsValueChanged(int threads) {
-    config()->set(Config::xmrigThreads, threads);
+    conf()->set(Config::xmrigThreads, threads);
     ui->label_threads->setText(QString("CPU threads: %1").arg(threads));
 }
 
 void XMRigWidget::onPoolChanged(const QString &pool) {
     if (!pool.isEmpty()) {
-        config()->set(Config::xmrigPool, pool);
+        conf()->set(Config::xmrigPool, pool);
     }
 }
 
 void XMRigWidget::onXMRigElevationChanged(bool elevated) {
-    config()->set(Config::xmrigElevated, elevated);
+    conf()->set(Config::xmrigElevated, elevated);
 }
 
 void XMRigWidget::onBrowseClicked() {
@@ -163,7 +162,7 @@ void XMRigWidget::onBrowseClicked() {
     if (fileName.isEmpty()) {
         return;
     }
-    config()->set(Config::xmrigPath, fileName);
+    conf()->set(Config::xmrigPath, fileName);
     ui->lineEdit_path->setText(fileName);
 }
 
@@ -176,14 +175,14 @@ void XMRigWidget::onUsePrimaryAddressClicked() {
 }
 
 void XMRigWidget::onStartClicked() {
-    QString xmrigPath = config()->get(Config::xmrigPath).toString();
+    QString xmrigPath = conf()->get(Config::xmrigPath).toString();
     if (!this->checkXMRigPath()) {
         return;
     }
 
     QString address = [this](){
         if (ui->combo_miningMode->currentIndex() == Config::MiningMode::Pool) {
-            return config()->get(Config::xmrigPool).toString();
+            return conf()->get(Config::xmrigPool).toString();
         } else {
             return ui->lineEdit_solo->text().trimmed();
         }
@@ -306,33 +305,33 @@ void XMRigWidget::showContextMenu(const QPoint &pos) {
 }
 
 void XMRigWidget::updatePools() {
-    QStringList pools = config()->get(Config::pools).toStringList();
+    QStringList pools = conf()->get(Config::pools).toStringList();
     if (pools.isEmpty()) {
         pools = m_defaultPools;
-        config()->set(Config::pools, pools);
+        conf()->set(Config::pools, pools);
     }
     ui->combo_pools->clear();
     ui->combo_pools->insertItems(0, pools);
 
-    QString preferredPool = config()->get(Config::xmrigPool).toString();
+    QString preferredPool = conf()->get(Config::xmrigPool).toString();
     if (pools.contains(preferredPool)) {
         ui->combo_pools->setCurrentIndex(pools.indexOf(preferredPool));
     } else {
         preferredPool = pools.at(0);
-        config()->set(Config::xmrigPool, preferredPool);
+        conf()->set(Config::xmrigPool, preferredPool);
     }
 }
 
 void XMRigWidget::printConsoleInfo() {
     ui->console->appendPlainText(QString("Detected %1 CPU threads.").arg(QThread::idealThreadCount()));
     if (this->checkXMRigPath()) {
-        QString path = config()->get(Config::xmrigPath).toString();
+        QString path = conf()->get(Config::xmrigPath).toString();
         ui->console->appendPlainText(QString("XMRig path set to %1").arg(path));
     }
 }
 
 void XMRigWidget::onMiningModeChanged(int mode) {
-    config()->set(Config::miningMode, mode);
+    conf()->set(Config::miningMode, mode);
 
     if (mode == Config::MiningMode::Pool) {
         ui->poolFrame->show();
@@ -348,11 +347,11 @@ void XMRigWidget::onMiningModeChanged(int mode) {
 }
 
 void XMRigWidget::onNetworkTLSToggled(bool checked) {
-    config()->set(Config::xmrigNetworkTLS, checked);
+    conf()->set(Config::xmrigNetworkTLS, checked);
 }
 
 void XMRigWidget::onNetworkTorToggled(bool checked) {
-    config()->set(Config::xmrigNetworkTor, checked);
+    conf()->set(Config::xmrigNetworkTor, checked);
 }
 
 void XMRigWidget::onXMRigStateChanged(QProcess::ProcessState state) {
@@ -385,7 +384,7 @@ void XMRigWidget::setMiningStarted() {
 }
 
 bool XMRigWidget::checkXMRigPath() {
-    QString path = config()->get(Config::xmrigPath).toString();
+    QString path = conf()->get(Config::xmrigPath).toString();
 
     if (path.isEmpty()) {
         ui->console->appendPlainText("No XMRig executable is set. Please configure on the Settings tab.");
