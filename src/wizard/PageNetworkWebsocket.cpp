@@ -21,7 +21,7 @@ int PageNetworkWebsocket::nextId() const {
 
 bool PageNetworkWebsocket::validatePage() {
     bool disabled = ui->btn_disable->isChecked();
-    config()->set(Config::disableWebsocket, disabled);
+    conf()->set(Config::disableWebsocket, disabled);
 
     emit initialNetworkConfigured();
 

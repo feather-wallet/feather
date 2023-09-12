@@ -61,13 +61,13 @@ void DebugInfoDialog::updateInfo() {
     ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_wallet->connectionStatus()));
     QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient->webSocket->state()).remove("State");
-    if (config()->get(Config::disableWebsocket).toBool()) {
+    if (conf()->get(Config::disableWebsocket).toBool()) {
         websocketStatus = "Disabled";
     }
     ui->label_websocketStatus->setText(websocketStatus);
 
     QString proxy = [](){
-        int proxy = config()->get(Config::proxy).toInt();
+        int proxy = conf()->get(Config::proxy).toInt();
         switch (proxy) {
             case 0:
                 return "None";
@@ -84,7 +84,7 @@ void DebugInfoDialog::updateInfo() {
 
     ui->label_proxy->setText(proxy);
     ui->label_torStatus->setText(torStatus);
-    ui->label_torLevel->setText(config()->get(Config::torPrivacyLevel).toString());
+    ui->label_torLevel->setText(conf()->get(Config::torPrivacyLevel).toString());
 
     QString seedType = [this](){
         if (m_wallet->isHwBacked())
@@ -107,7 +107,7 @@ void DebugInfoDialog::updateInfo() {
     }();
 
     QString networkType = Utils::QtEnumToString(m_wallet->nettype());
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         networkType += " (offline)";
     }
     ui->label_netType->setText(networkType);

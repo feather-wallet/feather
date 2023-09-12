@@ -25,7 +25,7 @@ NodeWidget::NodeWidget(QWidget *parent)
         bool custom = (id == 0);
         ui->stackedWidget->setCurrentIndex(custom);
         ui->frame_addCustomNodes->setVisible(custom);
-        config()->set(Config::nodeSource, custom);
+        conf()->set(Config::nodeSource, custom);
         emit nodeSourceChanged(static_cast<NodeSource>(custom));
     });
 
@@ -47,8 +47,8 @@ NodeWidget::NodeWidget(QWidget *parent)
     connect(ui->treeView_websocket, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
     connect(ui->treeView_custom, &QTreeView::doubleClicked, this, &NodeWidget::onContextConnect);
 
-    int index = config()->get(Config::nodeSource).toInt();
-    ui->stackedWidget->setCurrentIndex(config()->get(Config::nodeSource).toInt());
+    int index = conf()->get(Config::nodeSource).toInt();
+    ui->stackedWidget->setCurrentIndex(conf()->get(Config::nodeSource).toInt());
     ui->frame_addCustomNodes->setVisible(index);
 
     this->onWebsocketStatusChanged();
@@ -71,7 +71,7 @@ void NodeWidget::onShowCustomContextMenu(const QPoint &pos) {
 }
 
 void NodeWidget::onWebsocketStatusChanged() {
-    bool disabled = config()->get(Config::disableWebsocket).toBool() || config()->get(Config::offlineMode).toBool();
+    bool disabled = conf()->get(Config::disableWebsocket).toBool() || conf()->get(Config::offlineMode).toBool();
     ui->treeView_websocket->setColumnHidden(1, disabled);
 }
 

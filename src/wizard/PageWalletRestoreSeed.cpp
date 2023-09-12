@@ -9,7 +9,6 @@
 #include <QDialogButtonBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
-#include <QMessageBox>
 
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
 #include "utils/Seed.h"
@@ -152,17 +151,17 @@ bool PageWalletRestoreSeed::validatePage() {
     Seed _seed = Seed(m_fields->seedType, seedSplit, constants::networkType);
 
     if (_seed.encrypted) {
-        QMessageBox::warning(this, "Encrypted seed", QString("This seed is encrypted. Encrypted seeds are not supported"));
+        Utils::showError(this, "Encrypted seed", "This seed is encrypted. Encrypted seeds are not supported");
         return false;
     }
 
     if (!_seed.errorString.isEmpty()) {
-        QMessageBox::warning(this, "Invalid seed", QString("Invalid seed:\n\n%1").arg(_seed.errorString));
+        Utils::showError(this, "Invalid seed", _seed.errorString);
         ui->seedEdit->setStyleSheet(errStyle);
         return false;
     }
     if (!_seed.correction.isEmpty()) {
-        QMessageBox::information(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
+        Utils::showInfo(this, "Corrected erasure", QString("xxxx -> %1").arg(_seed.correction));
     }
 
     m_fields->seed = _seed;

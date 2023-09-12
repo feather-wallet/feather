@@ -145,6 +145,7 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
+include(GenerateDocs)
 include(TorQrcGenerator)
 
 # To build Feather with embedded (and static) Tor, pass CMake -DTOR_DIR=/path/to/tor/

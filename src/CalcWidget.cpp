@@ -101,7 +101,7 @@ void CalcWidget::initComboBox() {
     QList<QString> cryptoKeys = appData()->prices.markets.keys();
     QList<QString> fiatKeys = appData()->prices.rates.keys();
 
-    QStringList enabledCrypto = config()->get(Config::cryptoSymbols).toStringList();
+    QStringList enabledCrypto = conf()->get(Config::cryptoSymbols).toStringList();
     QStringList filteredCryptoKeys;
     for (const auto& symbol : cryptoKeys) {
         if (enabledCrypto.contains(symbol)) {
@@ -109,11 +109,11 @@ void CalcWidget::initComboBox() {
         }
     }
 
-    QStringList enabledFiat = config()->get(Config::fiatSymbols).toStringList();
-    auto preferredFiat = config()->get(Config::preferredFiatCurrency).toString();
+    QStringList enabledFiat = conf()->get(Config::fiatSymbols).toStringList();
+    auto preferredFiat = conf()->get(Config::preferredFiatCurrency).toString();
     if (!enabledFiat.contains(preferredFiat) && fiatKeys.contains(preferredFiat)) {
         enabledFiat.append(preferredFiat);
-        config()->set(Config::fiatSymbols, enabledFiat);
+        conf()->set(Config::fiatSymbols, enabledFiat);
     }
     QStringList filteredFiatKeys;
     for (const auto &symbol : fiatKeys) {

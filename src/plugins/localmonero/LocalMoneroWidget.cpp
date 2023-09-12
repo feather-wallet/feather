@@ -22,7 +22,7 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, Wallet *wallet)
     QPixmap logo(":/assets/images/localMonero_logo.png");
     ui->logo->setPixmap(logo.scaled(100, 100, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-    ui->combo_currency->addItem(config()->get(Config::preferredFiatCurrency).toString());
+    ui->combo_currency->addItem(conf()->get(Config::preferredFiatCurrency).toString());
 
     m_network = new Networking(this);
     m_api = new LocalMoneroApi(this, m_network);
@@ -74,7 +74,7 @@ void LocalMoneroWidget::onSearchClicked() {
 }
 
 void LocalMoneroWidget::onSignUpClicked() {
-    QString signupUrl = QString("%1/signup").arg(config()->get(Config::localMoneroFrontend).toString());
+    QString signupUrl = QString("%1/signup").arg(conf()->get(Config::localMoneroFrontend).toString());
     Utils::externalLinkWarning(this, signupUrl);
 }
 
@@ -82,7 +82,7 @@ void LocalMoneroWidget::onApiResponse(const LocalMoneroApi::LocalMoneroResponse 
     ui->btn_search->setEnabled(true);
 
     if (!resp.ok) {
-        QMessageBox::warning(this, "LocalMonero error", QString("Request failed:\n\n%1").arg(resp.message));
+        Utils::showError(this, "LocalMonero request failed", resp.message);
         return;
     }
 
@@ -162,7 +162,7 @@ void LocalMoneroWidget::openOfferUrl() {
     }
 
     QJsonObject offerData = m_model->getOffer(index.row());
-    QString frontend = config()->get(Config::localMoneroFrontend).toString();
+    QString frontend = conf()->get(Config::localMoneroFrontend).toString();
 
     QString offerUrl = QString("%1/ad/%2").arg(frontend, offerData["data"].toObject()["ad_id"].toString());
 

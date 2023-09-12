@@ -171,7 +171,7 @@ private:
     QHash<QString, QVariant> m_defaults;
 };
 
-inline Config* config()
+inline Config* conf()
 {
     return Config::instance();
 }

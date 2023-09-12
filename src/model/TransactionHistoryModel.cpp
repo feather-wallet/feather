@@ -148,8 +148,8 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (role == Qt::UserRole) {
                 return row;
             }
-            return tInfo.timestamp().toString(QString("%1 %2 ").arg(config()->get(Config::dateFormat).toString(),
-                                                                    config()->get(Config::timeFormat).toString()));
+            return tInfo.timestamp().toString(QString("%1 %2 ").arg(conf()->get(Config::dateFormat).toString(),
+                                                                    conf()->get(Config::timeFormat).toString()));
         }
         case Column::Description:
             return tInfo.description();
@@ -174,7 +174,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
 
             double usd_amount = usd_price * (tInfo.balanceDelta() / constants::cdiv);
 
-            QString preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+            QString preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
             if (preferredFiatCurrency != "USD") {
                 usd_amount = appData()->prices.convert("USD", preferredFiatCurrency, usd_amount);
             }
@@ -201,7 +201,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
 }
 
 QString TransactionHistoryModel::formatAmount(quint64 amount) const {
-    return QString::number(amount / constants::cdiv, 'f', config()->get(Config::amountPrecision).toInt());
+    return QString::number(amount / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
 }
 
 QVariant TransactionHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const {

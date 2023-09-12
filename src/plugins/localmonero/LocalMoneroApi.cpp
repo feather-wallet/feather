@@ -107,11 +107,11 @@ QString LocalMoneroApi::getBuySellUrl(bool buy, const QString &currencyCode, con
 }
 
 QString LocalMoneroApi::getBaseUrl() {
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
         return "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion/api/v1";
     }
 
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
         return "http://yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p/api/v1";
     }
 

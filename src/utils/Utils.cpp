@@ -16,6 +16,7 @@
 #include "utils/config.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
+#include "WindowManager.h"
 
 namespace Utils {
 bool fileExists(const QString &path) {
@@ -44,6 +45,17 @@ QByteArray fileOpenQRC(const QString &path) {
     QByteArray data = file.readAll();
     file.close();
     return data;
+}
+
+QString loadQrc(const QString &qrc) {
+    QFile file(qrc);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "Failed to open resource:" << qrc;
+        return QString();
+    }
+
+    QTextStream in(&file);
+    return in.readAll();
 }
 
 bool fileWrite(const QString &path, const QString &data) {
@@ -292,7 +304,7 @@ bool xdgDesktopEntryRegister() {
 }
 
 bool portOpen(const QString &hostname, quint16 port) { // TODO: this call should be async
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return false;
     }
 
@@ -469,16 +481,15 @@ QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettyp
 }
 
 void externalLinkWarning(QWidget *parent, const QString &url){
-    if (!config()->get(Config::warnOnExternalLink).toBool()) {
+    if (!conf()->get(Config::warnOnExternalLink).toBool()) {
         QDesktopServices::openUrl(QUrl(url));
         return;
     }
 
-    QString body = QString("You are about to open the following link:\n\n%1").arg(url);
-
     QMessageBox linkWarning(parent);
     linkWarning.setWindowTitle("External link warning");
-    linkWarning.setText(body);
+    linkWarning.setText("You are about to open the following link:");
+    linkWarning.setInformativeText(url);
     QPushButton *copy = linkWarning.addButton("Copy link", QMessageBox::HelpRole);
     linkWarning.addButton(QMessageBox::Cancel);
     linkWarning.addButton(QMessageBox::Ok);
@@ -573,5 +584,69 @@ QFont relativeFont(int delta) {
 bool isLocalUrl(const QUrl &url) {
     QRegularExpression localNetwork(R"((^127\.)|(^10\.)|(^172\.1[6-9]\.)|(^172\.2[0-9]\.)|(^172\.3[0-1]\.)|(^192\.168\.))");
     return (localNetwork.match(url.host()).hasMatch() || url.host() == "localhost");
+}
+
+void showError(QWidget *parent, const QString &title, const QString &description, const QStringList &helpItems, const QString &doc, const QString &highlight, const QString &link) {
+    showMsg(parent, QMessageBox::Warning, "Error", title, description, helpItems, doc, highlight, link);
+}
+
+void showInfo(QWidget *parent, const QString &title, const QString &description, const QStringList &helpItems, const QString &doc, const QString &highlight, const QString &link) {
+    showMsg(parent, QMessageBox::Information,"Info", title, description, helpItems, doc, highlight, link);
+}
+
+void showWarning(QWidget *parent, const QString &title, const QString &description, const QStringList &helpItems, const QString &doc, const QString &highlight, const QString &link) {
+    showMsg(parent, QMessageBox::Warning, "Warning", title, description, helpItems, doc, highlight, link);
+}
+
+void showMsg(QWidget *parent, QMessageBox::Icon icon, const QString &windowTitle, const QString &title, const QString &description, const QStringList &helpItems, const QString &doc, const QString &highlight, const QString &link) {
+    QString informativeText = description;
+    if (!helpItems.isEmpty()) {
+        informativeText += "\n";
+    }
+    for (const auto &item : helpItems) {
+        informativeText += QString("\n• %1").arg(item);
+    }
+
+    auto *msgBox = new QMessageBox(parent);
+    msgBox->setText(title);
+    msgBox->setInformativeText(informativeText);
+    msgBox->setIcon(icon);
+    msgBox->setWindowTitle(windowTitle);
+    msgBox->setStandardButtons(doc.isEmpty() ? QMessageBox::Ok : (QMessageBox::Ok | QMessageBox::Help));
+    msgBox->setDefaultButton(QMessageBox::Ok);
+
+    QPushButton *openLinkButton = nullptr;
+    if (!link.isEmpty()) {
+        openLinkButton = msgBox->addButton("Open link", QMessageBox::ActionRole);
+    }
+
+    msgBox->exec();
+
+    if (openLinkButton && msgBox->clickedButton() == openLinkButton) {
+        Utils::externalLinkWarning(parent, link);
+    }
+
+    if (msgBox->result() == QMessageBox::Help) {
+        windowManager()->showDocs(parent, doc);
+        windowManager()->setDocsHighlight(highlight);
+    }
+
+    msgBox->deleteLater();
+}
+
+void showMsg(const Message &m) {
+    showMsg(m.parent, QMessageBox::Warning, "Error", m.title, m.description, m.helpItems, m.doc, m.highlight);
+}
+
+QWindow *windowForQObject(QObject* object) {
+    while (object) {
+        if (auto widget = qobject_cast<QWidget*>(object)) {
+            if (widget->windowHandle()) {
+                return widget->windowHandle();
+            }
+        }
+        object = object->parent();
+    }
+    return nullptr;
 }
 }

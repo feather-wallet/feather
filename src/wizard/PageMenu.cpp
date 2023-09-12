@@ -7,6 +7,8 @@
 
 #include <QFileDialog>
 
+#include "config-feather.h"
+
 PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageMenu)
@@ -16,9 +18,9 @@ PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget 
     ui->setupUi(this);
     this->setButtonText(QWizard::FinishButton, "Open recent wallet");
 
-    QString settingsSkin = config()->get(Config::skin).toString();
+    ui->label_version->setText(QString("Feather %1 — by dsc & tobtoht").arg(FEATHER_VERSION));
 
-    connect(ui->btn_openSettings, &QPushButton::clicked, this, &PageMenu::showSettings);
+    QString settingsSkin = conf()->get(Config::skin).toString();
 }
 
 void PageMenu::initializePage() {

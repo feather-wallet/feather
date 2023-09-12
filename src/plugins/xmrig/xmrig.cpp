@@ -67,8 +67,8 @@ void XmRig::start(const QString &path, int threads, const QString &address, cons
     arguments << "--no-color";
     arguments << "-t" << QString::number(threads);
     if (tor) {
-        QString host = config()->get(Config::socks5Host).toString();
-        QString port = config()->get(Config::socks5Port).toString();
+        QString host = conf()->get(Config::socks5Host).toString();
+        QString port = conf()->get(Config::socks5Port).toString();
         if (!torManager()->isLocalTor()) {
             host = torManager()->featherTorHost;
             port = QString::number(torManager()->featherTorPort);
@@ -123,7 +123,7 @@ void XmRig::handleProcessError(QProcess::ProcessError err) {
     if (err == QProcess::ProcessError::Crashed)
         emit error("XMRig crashed or killed");
     else if (err == QProcess::ProcessError::FailedToStart) {
-        auto path = config()->get(Config::xmrigPath).toString();
+        auto path = conf()->get(Config::xmrigPath).toString();
         emit error(QString("XMRig binary failed to start: %1").arg(path));
     }
 }

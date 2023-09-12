@@ -5,7 +5,6 @@
 #include "ui_PageOpenWallet.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
 
 #include "constants.h"
 #include "WalletWizard.h"
@@ -40,7 +39,7 @@ PageOpenWallet::PageOpenWallet(WalletKeysFilesModel *wallets, QWidget *parent)
     connect(ui->walletTable, &QTreeView::doubleClicked, this, &PageOpenWallet::nextPage);
 
     connect(ui->btnBrowse, &QPushButton::clicked, [this]{
-        QString walletDir = config()->get(Config::walletDirectory).toString();
+        QString walletDir = conf()->get(Config::walletDirectory).toString();
         m_walletFile = QFileDialog::getOpenFileName(this, "Select your wallet file", walletDir, "Wallet file (*.keys)");
         if (m_walletFile.isEmpty())
             return;
@@ -86,19 +85,19 @@ void PageOpenWallet::nextPage() {
 
 bool PageOpenWallet::validatePage() {
     if (m_walletFile.isEmpty()) {
-        QMessageBox::warning(this, "No wallet file selected", "Please select a wallet from the list.");
+        Utils::showError(this, "Can't open wallet", "No wallet file selected");
         return false;
     }
 
     QFileInfo infoPath(m_walletFile);
     if (!infoPath.isReadable()) {
-        QMessageBox::warning(this, "Permission error", "Cannot read wallet file.");
+        Utils::showError(this, "Can't open wallet", "No permission to read wallet file");
         return false;
     }
 
     // Clear autoOpen if openOnStartup is not checked
     auto autoWallet = ui->openOnStartup->isChecked() ? QString("%1%2").arg(constants::networkType).arg(m_walletFile) : "";
-    config()->set(Config::autoOpenWalletPath, autoWallet);
+    conf()->set(Config::autoOpenWalletPath, autoWallet);
 
     emit openWallet(m_walletFile);
     return true;

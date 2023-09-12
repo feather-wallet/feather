@@ -49,8 +49,12 @@ void SignVerifyDialog::signMessage() {
 
 void SignVerifyDialog::verifyMessage() {
     bool verified = m_wallet->verifySignedMessage(ui->message->toPlainText(), ui->address->text(), ui->signature->text());
-    verified ? QMessageBox::information(this, "Information", "Signature is valid")
-             : QMessageBox::warning(this, "Warning", "Signature failed to verify");
+
+    if (verified) {
+        Utils::showInfo(this, "Signature is valid");
+    } else {
+        Utils::showError(this, "Signature is not valid");
+    }
 }
 
 void SignVerifyDialog::copyToClipboard() {

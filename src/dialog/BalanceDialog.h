@@ -22,7 +22,10 @@ public:
     ~BalanceDialog() override;
 
 private:
+    void updateBalance();
+
     QScopedPointer<Ui::BalanceDialog> ui;
+    Wallet *m_wallet;
 };
 
 #endif //FEATHER_BALANCEDIALOG_H

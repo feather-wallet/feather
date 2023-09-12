@@ -300,7 +300,6 @@ public:
     void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
     void sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
 
-    void onCreateTransactionError(const QString &msg);
     void commitTransaction(PendingTransaction *tx, const QString &description="");
     void onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid, const QMap<QString, QString> &txHexMap);
 
@@ -416,9 +415,6 @@ signals:
     void transactionProofVerified(TxProofResult result);
     void spendProofVerified(QPair<bool, bool> result);
 
-    // emitted when transaction is created async
-    void transactionCreated(Monero::PendingTransaction *ptImpl, QVector<QString> address);
-
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;
 
@@ -428,13 +424,12 @@ signals:
     void balanceUpdated(quint64 balance, quint64 spendable);
     void keysCorrupted();
 
-    void endTransaction();
-    void createTransactionSuccess(PendingTransaction *tx, const QVector<QString> &address);
+    void transactionCreated(PendingTransaction *tx, const QVector<QString> &address);
+
     void donationSent();
     void walletRefreshed();
 
     void initiateTransaction();
-    void createTransactionError(QString message);
 
     void selectedInputsChanged(const QStringList &selectedInputs);
 

@@ -211,24 +211,22 @@ void CoinsWidget::onSweepOutputs() {
 
         QString keyImage = coin->keyImage();
         if (!coin->keyImageKnown()) {
-            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output has unknown key image");
+            Utils::showError(this, "Unable to sweep outputs", "Selected output has unknown key image");
             return;
         }
 
         if (coin->spent()) {
-            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output was already spent");
+            Utils::showError(this, "Unable to sweep outputs", "Selected output was already spent");
             return;
         }
 
         if (coin->frozen()) {
-            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output is frozen.\n\n"
-                                                                  "Thaw the selected output(s) before spending.");
+            Utils::showError(this, "Unable to sweep outputs", "Selected output is frozen", {"Thaw the selected output(s) before spending"}, "freeze_thaw_outputs");
             return;
         }
 
         if (!coin->unlocked()) {
-            QMessageBox::warning(this, "Unable to sweep outputs", "Unable to create transaction: selected output is locked.\n\n"
-                                                                  "Wait until the output has reached the required number of confirmation before spending.");
+            Utils::showError(this, "Unable to sweep outputs", "Selected output is locked", {"Wait until the output has reached the required number of confirmation before spending."});
             return;
         }
 

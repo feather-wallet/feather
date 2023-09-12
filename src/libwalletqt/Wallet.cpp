@@ -74,12 +74,10 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
         this->history()->refresh(this->currentSubaddressAccount());
     });
 
-    connect(this, &Wallet::createTransactionError, this, &Wallet::onCreateTransactionError);
     connect(this, &Wallet::refreshed, this, &Wallet::onRefreshed);
     connect(this, &Wallet::newBlock, this, &Wallet::onNewBlock);
     connect(this, &Wallet::updated, this, &Wallet::onUpdated);
     connect(this, &Wallet::heightsRefreshed, this, &Wallet::onHeightsRefreshed);
-    connect(this, &Wallet::transactionCreated, this, &Wallet::onTransactionCreated);
     connect(this, &Wallet::transactionCommitted, this, &Wallet::onTransactionCommitted);
 }
 
@@ -671,21 +669,6 @@ void Wallet::setSelectedInputs(const QStringList &selectedInputs) {
 void Wallet::createTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
     this->tmpTxDescription = description;
 
-    if (!all && amount == 0) {
-        emit createTransactionError("Cannot send nothing");
-        return;
-    }
-
-    quint64 unlocked_balance = this->unlockedBalance();
-    if (!all && amount > unlocked_balance) {
-        emit createTransactionError(QString("Not enough money to spend.\n\n"
-                                            "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
-        return;
-    } else if (unlocked_balance == 0) {
-        emit createTransactionError("No money to spend");
-        return;
-    }
-
     qInfo() << "Creating transaction";
     m_scheduler.run([this, all, address, amount] {
         std::set<uint32_t> subaddr_indices;
@@ -695,7 +678,7 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
                                                                              currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
 
         QVector<QString> addresses{address};
-        emit transactionCreated(ptImpl, addresses);
+        this->onTransactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
@@ -703,16 +686,6 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
 
 void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description) {
     this->tmpTxDescription = description;
-
-    quint64 total_amount = 0;
-    for (auto &amount : amounts) {
-        total_amount += amount;
-    }
-
-    auto unlocked_balance = this->unlockedBalance();
-    if (total_amount > unlocked_balance) {
-        emit createTransactionError("Not enough money to spend");
-    }
 
     qInfo() << "Creating transaction";
     m_scheduler.run([this, addresses, amounts] {
@@ -731,7 +704,7 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
                                                                                      static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
                                                                                      currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
 
-        emit transactionCreated(ptImpl, addresses);
+        this->onTransactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
@@ -751,18 +724,13 @@ void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bo
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis, address.toStdString(), outputs, static_cast<Monero::PendingTransaction::Priority>(this->tx_priority));
 
         QVector<QString> addresses {address};
-        emit transactionCreated(ptImpl, addresses);
+        this->onTransactionCreated(ptImpl, addresses);
     });
 
     emit initiateTransaction();
 }
 
 // Phase 2: Transaction construction completed
-
-void Wallet::onCreateTransactionError(const QString &msg) {
-    this->tmpTxDescription = "";
-    emit endTransaction();
-}
 
 void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector<QString> &address) {
     qDebug() << Q_FUNC_INFO;
@@ -775,11 +743,8 @@ void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector
         }
     }
 
-    // Let UI know that the transaction was constructed
-    emit endTransaction();
-
     // tx created, but not sent yet. ask user to verify first.
-    emit createTransactionSuccess(tx, address);
+    emit transactionCreated(tx, address);
 }
 
 // Phase 3: Commit or dispose
@@ -821,7 +786,7 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
 
     // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
     // To mitigate transactions failing we just send the transaction to every node we know about over Tor
-    if (config()->get(Config::multiBroadcast).toBool()) {
+    if (conf()->get(Config::multiBroadcast).toBool()) {
         // Let MainWindow handle this
         emit multiBroadcast(txHexMap);
     }

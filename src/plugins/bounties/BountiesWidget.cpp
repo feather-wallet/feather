@@ -70,7 +70,7 @@ void BountiesWidget::showContextMenu(const QPoint &pos) {
 }
 
 QString BountiesWidget::getLink(const QString &permaLink) {
-    QString frontend = config()->get(Config::bountiesFrontend).toString();
+    QString frontend = conf()->get(Config::bountiesFrontend).toString();
     return QString("%1/%2").arg(frontend, permaLink);
 }
 

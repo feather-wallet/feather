@@ -27,11 +27,11 @@ public:
         Priority_Medium = Monero::PendingTransaction::Priority_Medium,
         Priority_High   = Monero::PendingTransaction::Priority_High
     };
-    Q_ENUM(Priority)
 
 
     Status status() const;
     QString errorString() const;
+    const std::exception_ptr getException() const;
     bool commit();
     bool saveToFile(const QString &fileName);
     quint64 amount() const;
