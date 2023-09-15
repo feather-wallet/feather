@@ -7,12 +7,18 @@
 #include "WalletWizard.h"
 #include "constants.h"
 
+#include "utils/Icons.h"
+
 PageSetRestoreHeight::PageSetRestoreHeight(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)
         , ui(new Ui::PageSetRestoreHeight)
         , m_fields(fields)
 {
     ui->setupUi(this);
+
+    ui->frame_restoreHeight->setInfo(icons()->icon("unpaid"), "Enter the wallet creation date or set the restore height manually.");
+    ui->frame_walletAgeWarning->setInfo(icons()->icon("info2"), "Wallet is very old. Synchronization may take a long time.");
+    ui->frame_scanWarning->setInfo(icons()->icon("info2"), "Wallet will not scan for transactions before YYYY/MM/DD.");
 
     QRegularExpression yearRe(R"(\d{2,4}-\d{1,2}-\d{1,2})");
     QValidator *yearValidator = new QRegularExpressionValidator(yearRe, this);
@@ -21,13 +27,6 @@ PageSetRestoreHeight::PageSetRestoreHeight(WizardFields *fields, QWidget *parent
     QRegularExpression heightRe(R"(\d{7})");
     QValidator *heightValidator = new QRegularExpressionValidator(heightRe, this);
     ui->line_restoreHeight->setValidator(heightValidator);
-
-    QPixmap pixmap = QPixmap(":/assets/images/unpaid.png");
-    ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
-
-    QPixmap pixmap2 = QPixmap(":/assets/images/info2.svg");
-    ui->warningIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
-    ui->infoIcon->setPixmap(pixmap2.scaledToWidth(32, Qt::SmoothTransformation));
 
     connect(ui->line_creationDate, &QLineEdit::textEdited, [this]{
         this->onCreationDateEdited();
@@ -88,7 +87,7 @@ void PageSetRestoreHeight::onRestoreHeightEdited() {
 
 void PageSetRestoreHeight::showScanWarning(const QDateTime &date) {
     QString dateString = date.toString("MMMM dd, yyyy");
-    ui->label_scanWarning->setText(QString("Wallet will not scan for transactions before %1").arg(dateString));
+    ui->frame_scanWarning->setText(QString("Wallet will not scan for transactions before %1").arg(dateString));
     ui->frame_scanWarning->show();
 }
 

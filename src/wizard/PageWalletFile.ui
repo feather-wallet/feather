@@ -14,10 +14,30 @@
    <string>Create Wallet</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
+   <item row="2" column="0">
+    <widget class="QLineEdit" name="line_walletName"/>
+   </item>
+   <item row="6" column="0">
+    <widget class="QCheckBox" name="check_defaultWalletDirectory">
+     <property name="text">
+      <string>Set as default wallet directory</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Name</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0">
+    <widget class="InfoFrame" name="frame_wallet">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
      </property>
     </widget>
    </item>
@@ -39,65 +59,11 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
-    <widget class="QLineEdit" name="line_walletName"/>
-   </item>
    <item row="3" column="0">
     <widget class="QLabel" name="label_9">
      <property name="text">
       <string>Directory</string>
      </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <widget class="QFrame" name="frame">
-     <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
-     </property>
-     <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
-      <item>
-       <widget class="QLabel" name="lockIcon">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>icon</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeType">
-         <enum>QSizePolicy::Fixed</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>5</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_3">
-        <property name="text">
-         <string>Choose a name and directory for your wallet files.</string>
-        </property>
-        <property name="wordWrap">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-     </layout>
     </widget>
    </item>
    <item row="8" column="0">
@@ -113,20 +79,21 @@
      </property>
     </spacer>
    </item>
-   <item row="6" column="0">
-    <widget class="QCheckBox" name="check_defaultWalletDirectory">
-     <property name="text">
-      <string>Set as default wallet directory</string>
-     </property>
-    </widget>
-   </item>
   </layout>
   <zorder>label_9</zorder>
   <zorder>label</zorder>
   <zorder>line_walletName</zorder>
-  <zorder>frame</zorder>
   <zorder>check_defaultWalletDirectory</zorder>
+  <zorder>frame_wallet</zorder>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InfoFrame</class>
+   <extends>QFrame</extends>
+   <header>components.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>line_walletName</tabstop>
   <tabstop>line_walletDir</tabstop>
