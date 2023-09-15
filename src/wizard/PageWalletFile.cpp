@@ -5,9 +5,10 @@
 #include "PageWalletFile.h"
 #include "ui_PageWalletFile.h"
 
-#include "utils/Utils.h"
-
 #include <QFileDialog>
+
+#include "utils/Icons.h"
+#include "utils/Utils.h"
 
 PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -17,8 +18,7 @@ PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     ui->setupUi(this);
     this->setButtonText(QWizard::FinishButton, "Open wallet");
 
-    QPixmap pixmap = QPixmap(":/assets/images/file.png");
-    ui->lockIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
+    ui->frame_wallet->setInfo(icons()->icon("file"), "Choose a name and directory for your wallet files.");
 
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString currentWalletDir = conf()->get(Config::walletDirectory).toString();

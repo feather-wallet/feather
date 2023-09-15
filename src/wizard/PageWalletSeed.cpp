@@ -4,13 +4,14 @@
 #include "WalletWizard.h"
 #include "PageWalletSeed.h"
 #include "ui_PageWalletSeed.h"
-#include "constants.h"
-#include "Seed.h"
 
 #include <QMessageBox>
-#include <QLineEdit>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+
+#include "constants.h"
+#include "Seed.h"
+#include "Icons.h"
 
 PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -19,15 +20,14 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
 {
     ui->setupUi(this);
 
+    ui->frame_notice->setInfo(icons()->icon("seed"), "The following **16** words can be used to recover access to your wallet.\n\n"
+                                                   "Write them down and store them somewhere safe and secure.\n\n"
+                                                   "Feather uses **Polyseed**. For more information click **Help**.");
+
+    ui->frame_invalidSeed->setInfo(icons()->icon("warning"), "Feather was unable to generate a valid seed.\n"
+                                                             "This should never happen.\n"
+                                                             "Please contact the developers immediately.");
     ui->frame_invalidSeed->hide();
-    QPixmap warningIcon = QPixmap(":/assets/images/warning.png");
-    ui->warningIcon->setPixmap(warningIcon.scaledToWidth(32, Qt::SmoothTransformation));
-
-    QPixmap infoIcon = QPixmap(":/assets/images/info2.svg");
-    ui->newSeedWarningIcon->setPixmap(infoIcon.scaledToWidth(32, Qt::SmoothTransformation));
-
-    QPixmap pixmap = QPixmap(":/assets/images/seed.png");
-    ui->seedIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     connect(ui->btnRoulette, &QPushButton::clicked, [=]{
         this->seedRoulette(0);

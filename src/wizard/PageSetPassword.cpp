@@ -5,6 +5,8 @@
 #include "ui_PageSetPassword.h"
 #include "WalletWizard.h"
 
+#include "utils/Icons.h"
+
 PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
     , ui(new Ui::PageSetPassword)
@@ -13,8 +15,7 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
     ui->setupUi(this);
     this->setFinalPage(true);
 
-    QPixmap pixmap = QPixmap(":/assets/images/lock.svg");
-    ui->icon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
+    ui->frame_password->setInfo(icons()->icon("lock"), "Choose a password to encrypt your wallet keys.");
 
     connect(ui->line_password, &QLineEdit::textChanged, [this]{
         this->completeChanged();
