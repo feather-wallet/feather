@@ -1,8 +1,8 @@
 package=libxcb
-$(package)_version=1.15
+$(package)_version=1.16
 $(package)_download_path=https://xcb.freedesktop.org/dist
 $(package)_file_name=libxcb-$($(package)_version).tar.xz
-$(package)_sha256_hash=cc38744f817cf6814c847e2df37fcb8997357d72fa4bcbc228ae0fe47219a059
+$(package)_sha256_hash=4348566aa0fbf196db5e0a576321c65966189210cb51328ea2bb2be39c711d71
 $(package)_dependencies=xcb_proto libXau
 $(package)_patches = remove_pthread_stubs.patch
 
