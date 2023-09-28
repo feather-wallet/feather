@@ -23,6 +23,8 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
     set(CMAKE_C_FLAGS "@cmake_c_flags@")
     set(CMAKE_CXX_FLAGS "@cmake_cxx_flags@")
+    set(CMAKE_OBJC_FLAGS "@cmake_c_flags@")
+    set(CMAKE_OBJCXX_FLAGS "@cmake_cxx_flags@")
 
     set(CMAKE_INSTALL_NAME_TOOL @target@-install_name_tool)
 endif()

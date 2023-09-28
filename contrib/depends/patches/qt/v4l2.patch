@@ -670,10 +670,10 @@ index 000000000..e34005bbf
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
 new file mode 100644
-index 000000000..c07c0ebc7
+index 000000000..44d81e489
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,123 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -722,8 +722,6 @@ index 000000000..c07c0ebc7
 +
 +QFFmpegMediaIntegration::QFFmpegMediaIntegration()
 +{
-+    m_formatsInfo = new QFFmpegMediaFormatInfo();
-+
 +#if QT_CONFIG(linux_v4l)
 +    m_videoDevices = std::make_unique<QV4L2CameraDevices>(this);
 +#endif
@@ -741,14 +739,9 @@ index 000000000..c07c0ebc7
 +#endif
 +}
 +
-+QFFmpegMediaIntegration::~QFFmpegMediaIntegration()
++QPlatformMediaFormatInfo *QFFmpegMediaIntegration::createFormatInfo()
 +{
-+    delete m_formatsInfo;
-+}
-+
-+QPlatformMediaFormatInfo *QFFmpegMediaIntegration::formatInfo()
-+{
-+    return m_formatsInfo;
++    return new QFFmpegMediaFormatInfo();
 +}
 +
 +QMaybe<QPlatformMediaCaptureSession *> QFFmpegMediaIntegration::createCaptureSession()
@@ -806,10 +799,10 @@ index 000000000..c07c0ebc7
 +#include "qffmpegmediaintegration.moc"
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
 new file mode 100644
-index 000000000..8b44da741
+index 000000000..905c3efd5
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
-@@ -0,0 +1,43 @@
+@@ -0,0 +1,45 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -837,17 +830,19 @@ index 000000000..8b44da741
 +{
 +public:
 +    QFFmpegMediaIntegration();
-+    ~QFFmpegMediaIntegration();
 +
-+    static QFFmpegMediaIntegration *instance() { return static_cast<QFFmpegMediaIntegration *>(QPlatformMediaIntegration::instance()); }
-+    QPlatformMediaFormatInfo *formatInfo() override;
++    static QFFmpegMediaIntegration *instance()
++    {
++        return static_cast<QFFmpegMediaIntegration *>(QPlatformMediaIntegration::instance());
++    }
 +
 +    QMaybe<QPlatformMediaCaptureSession *> createCaptureSession() override;
 +    QMaybe<QPlatformCamera *> createCamera(QCamera *) override;
 +    QMaybe<QPlatformImageCapture *> createImageCapture(QImageCapture *) override;
 +    QMaybe<QPlatformVideoSink *> createVideoSink(QVideoSink *sink) override;
 +
-+    QFFmpegMediaFormatInfo *m_formatsInfo = nullptr;
++protected:
++    QPlatformMediaFormatInfo *createFormatInfo() override;
 +};
 +
 +QT_END_NAMESPACE
@@ -1037,10 +1032,10 @@ index 000000000..cbaa810d7
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qv4l2camera.cpp b/src/plugins/multimedia/v4l2/qv4l2camera.cpp
 new file mode 100644
-index 000000000..0f7a8c91a
+index 000000000..b635a7fce
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qv4l2camera.cpp
-@@ -0,0 +1,940 @@
+@@ -0,0 +1,949 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -1069,28 +1064,38 @@ index 000000000..0f7a8c91a
 +
 +QT_BEGIN_NAMESPACE
 +
-+Q_LOGGING_CATEGORY(qLV4L2Camera, "qt.multimedia.ffmpeg.v4l2camera");
++static Q_LOGGING_CATEGORY(qLV4L2Camera, "qt.multimedia.ffmpeg.v4l2camera");
++
++static bool areCamerasEqual(QList<QCameraDevice> a, QList<QCameraDevice> b) {
++    auto areCamerasDataEqual = [](const QCameraDevice& a, const QCameraDevice& b) {
++        Q_ASSERT(QCameraDevicePrivate::handle(a));
++        Q_ASSERT(QCameraDevicePrivate::handle(b));
++        return *QCameraDevicePrivate::handle(a) == *QCameraDevicePrivate::handle(b);
++    };
++
++    return std::equal(a.cbegin(), a.cend(), b.cbegin(), b.cend(), areCamerasDataEqual);
++}
 +
 +QV4L2CameraDevices::QV4L2CameraDevices(QPlatformMediaIntegration *integration)
 +    : QPlatformVideoDevices(integration)
 +{
-+    deviceWatcher.addPath(QLatin1String("/dev"));
-+    connect(&deviceWatcher, &QFileSystemWatcher::directoryChanged, this, &QV4L2CameraDevices::checkCameras);
++    m_deviceWatcher.addPath(QLatin1String("/dev"));
++    connect(&m_deviceWatcher, &QFileSystemWatcher::directoryChanged, this, &QV4L2CameraDevices::checkCameras);
 +    doCheckCameras();
 +}
 +
 +QList<QCameraDevice> QV4L2CameraDevices::videoDevices() const
 +{
-+    return cameras;
++    return m_cameras;
 +}
 +
 +void QV4L2CameraDevices::checkCameras()
 +{
-+    doCheckCameras();
-+    videoInputsChanged();
++    if (doCheckCameras())
++        emit videoInputsChanged();
 +}
 +
-+const struct {
++static const struct {
 +    QVideoFrameFormat::PixelFormat fmt;
 +    uint32_t v4l2Format;
 +} formatMap[] = {
@@ -1139,9 +1144,9 @@ index 000000000..0f7a8c91a
 +}
 +
 +
-+void QV4L2CameraDevices::doCheckCameras()
++bool QV4L2CameraDevices::doCheckCameras()
 +{
-+    cameras.clear();
++    QList<QCameraDevice> newCameras;
 +
 +    QDir dir(QLatin1String("/dev"));
 +    const auto devices = dir.entryList(QDir::System);
@@ -1154,25 +1159,27 @@ index 000000000..0f7a8c91a
 +            continue;
 +
 +        QByteArray file = QFile::encodeName(dir.filePath(device));
-+        int fd = open(file.constData(), O_RDONLY);
++        const int fd = open(file.constData(), O_RDONLY);
 +        if (fd < 0)
 +            continue;
 +
-+        QCameraDevicePrivate *camera = nullptr;
++        auto fileCloseGuard = qScopeGuard([fd](){ close(fd); });
++
 +        v4l2_fmtdesc formatDesc = {};
 +
 +        struct v4l2_capability cap;
 +        if (ioctl(fd, VIDIOC_QUERYCAP, &cap) < 0)
-+            goto fail;
++            continue;
 +
 +        if (cap.device_caps & V4L2_CAP_META_CAPTURE)
-+            goto fail;
++            continue;
 +        if (!(cap.capabilities & V4L2_CAP_VIDEO_CAPTURE))
-+            goto fail;
++            continue;
 +        if (!(cap.capabilities & V4L2_CAP_STREAMING))
-+            goto fail;
++            continue;
 +
-+        camera = new QCameraDevicePrivate;
++        auto camera = std::make_unique<QCameraDevicePrivate>();
++
 +        camera->id = file;
 +        camera->description = QString::fromUtf8((const char *)cap.card);
 +//        qCDebug(qLV4L2Camera) << "found camera" << camera->id << camera->description;
@@ -1193,6 +1200,7 @@ index 000000000..0f7a8c91a
 +            frameSize.pixel_format = formatDesc.pixelformat;
 +
 +            while (!ioctl(fd, VIDIOC_ENUM_FRAMESIZES, &frameSize)) {
++                ++frameSize.index;
 +                if (frameSize.type != V4L2_FRMSIZE_TYPE_DISCRETE)
 +                    continue;
 +
@@ -1206,9 +1214,9 @@ index 000000000..0f7a8c91a
 +                frameInterval.height = frameSize.discrete.height;
 +
 +                while (!ioctl(fd, VIDIOC_ENUM_FRAMEINTERVALS, &frameInterval)) {
++                    ++frameInterval.index;
 +                    if (frameInterval.type != V4L2_FRMIVAL_TYPE_DISCRETE)
 +                        continue;
-+                    ++frameInterval.index;
 +                    float rate = float(frameInterval.discrete.denominator)/float(frameInterval.discrete.numerator);
 +                    if (rate > max)
 +                        max = rate;
@@ -1217,15 +1225,14 @@ index 000000000..0f7a8c91a
 +                }
 +
 +//                qCDebug(qLV4L2Camera) << "    " << resolution << min << max;
-+                ++frameSize.index;
 +
 +                if (min <= max) {
-+                    QCameraFormatPrivate *fmt = new QCameraFormatPrivate;
++                    auto fmt = std::make_unique<QCameraFormatPrivate>();
 +                    fmt->pixelFormat = pixelFmt;
 +                    fmt->resolution = resolution;
 +                    fmt->minFrameRate = min;
 +                    fmt->maxFrameRate = max;
-+                    camera->videoFormats.append(fmt->create());
++                    camera->videoFormats.append(fmt.release()->create());
 +                    camera->photoResolutions.append(resolution);
 +                }
 +            }
@@ -1234,19 +1241,16 @@ index 000000000..0f7a8c91a
 +        }
 +
 +        // first camera is default
-+        camera->isDefault = first;
-+        first = false;
++        camera->isDefault = std::exchange(first, false);
 +
-+        cameras.append(camera->create());
-+
-+        close(fd);
-+        continue;
-+
-+      fail:
-+        if (camera)
-+              delete camera;
-+        close(fd);
++        newCameras.append(camera.release()->create());
 +    }
++
++    if (areCamerasEqual(m_cameras, newCameras))
++        return false;
++
++    m_cameras = std::move(newCameras);
++    return true;
 +}
 +
 +class QV4L2VideoBuffer : public QAbstractVideoBuffer
@@ -1983,10 +1987,10 @@ index 000000000..0f7a8c91a
 +QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/v4l2/qv4l2camera_p.h b/src/plugins/multimedia/v4l2/qv4l2camera_p.h
 new file mode 100644
-index 000000000..714b4c1db
+index 000000000..f5df691c3
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qv4l2camera_p.h
-@@ -0,0 +1,160 @@
+@@ -0,0 +1,159 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -2014,8 +2018,7 @@ index 000000000..714b4c1db
 +
 +QT_BEGIN_NAMESPACE
 +
-+class QV4L2CameraDevices : public QObject,
-+                           public QPlatformVideoDevices
++class QV4L2CameraDevices : public QPlatformVideoDevices
 +{
 +    Q_OBJECT
 +public:
@@ -2027,10 +2030,10 @@ index 000000000..714b4c1db
 +    void checkCameras();
 +
 +private:
-+    void doCheckCameras();
++    bool doCheckCameras();
 +
-+    QList<QCameraDevice> cameras;
-+    QFileSystemWatcher deviceWatcher;
++    QList<QCameraDevice> m_cameras;
++    QFileSystemWatcher m_deviceWatcher;
 +};
 +
 +struct QV4L2CameraBuffers

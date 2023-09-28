@@ -1,13 +1,12 @@
 package=qt
-$(package)_version=6.5.2
+$(package)_version=6.5.3
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.5/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=3db4c729b4d80a9d8fda8dd77128406353baff4755ca619177eda4cddae71269
+$(package)_sha256_hash=df2f4a230be4ea04f9798f2c19ab1413a3b8ec6a80bef359f50284235307b546
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
-$(package)_patches += dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
 $(package)_patches += guix_cross_lib_path.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
@@ -23,19 +22,19 @@ $(package)_patches += toolchain.cmake
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=551ffb22751d8fd4d88e9ebd55b9131f4ca55341ee497fdbbba4da8d10d94341
+$(package)_qttools_sha256_hash=fc91d32b3f696725bbb48b0df240c25b606bbee3bd22627cfcbee876a6405e37
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=48b4cc1093af2e0ab3bea30f60651bddd877a2335d16e7207879a2e9e81963a3
+$(package)_qtsvg_sha256_hash=fc41c47b69ca1f80473cd4b11996394155781105345392961d064d04f95d5bef
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=204bd7b0dffb54c934abc6cf0eb5e3016f11b3c9721a67b4875a6b21bb8b5c76
+$(package)_qtwebsockets_sha256_hash=04e2ae17594d56cf2930c99dbd2a97eb88ff514b445c17ff7b86e8978fc7a7c3
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=948f00aa679e92839a2a71bd07245a92cc849af486607417ee4c334b2b998975
+$(package)_qtmultimedia_sha256_hash=ed64f3d2bb98c20cd12df19dbf84dc0233d9fcb2078fea812adf42eef9a0ff27
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=ca3fb0db8576c59b9c38bb4b271cc6e10aebeb54e2121f429f4ee80671fc0a3d
+$(package)_qtshadertools_sha256_hash=201b7b3a409f048e78c5defb90a70af423166313ad4386f8e6b83990ae0f3573
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -171,7 +170,6 @@ endef
 
 define $(package)_preprocess_cmds
   cp $($(package)_patch_dir)/root_CMakeLists.txt CMakeLists.txt && \
-  patch -p1 -i $($(package)_patch_dir)/dont_hardcode_pwd.patch && \
   patch -p1 -i $($(package)_patch_dir)/qtbase-moc-ignore-gcc-macro.patch && \
   patch -p1 -i $($(package)_patch_dir)/rcc_hardcode_timestamp.patch && \
   patch -p1 -i $($(package)_patch_dir)/fast_fixed_dtoa_no_optimize.patch && \

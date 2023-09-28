@@ -41,16 +41,16 @@ index 2f4633c34..35a276cb4 100644
  
  set(WMF_LIBRARIES ${WMF_STRMIIDS_LIBRARY} ${WMF_AMSTRMID_LIBRARY} ${WMF_DMOGUIDS_LIBRARY} ${WMF_UUID_LIBRARY}
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
-index 7fdb0af3a..868e91ba4 100644
+index 609806507..40b1b9b36 100644
 --- a/src/multimedia/configure.cmake
 +++ b/src/multimedia/configure.cmake
 @@ -24,7 +24,6 @@ qt_find_package(WrapPulseAudio PROVIDED_TARGETS WrapPulseAudio::WrapPulseAudio M
  qt_find_package(WMF PROVIDED_TARGETS WMF::WMF MODULE_NAME multimedia QMAKE_LIB wmf)
  qt_find_package(EGL)
- 
+
 -qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL AVDEVICE SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::avdevice FFmpeg::swresample  FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg)
- qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VA VAAPI::DRM MODULE_NAME multimedia QMAKE_LIB vaapi)
- 
+ qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
+
  #### Tests
 @@ -76,7 +75,7 @@ qt_feature("ffmpeg" PRIVATE
      LABEL "FFmpeg"

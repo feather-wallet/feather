@@ -1,25 +1,16 @@
-commit 0e953866fc4672486e29e1ba6d83b4207e7b2f0b
-Author: fanquake <fanquake@gmail.com>
-Date:   Tue Aug 18 15:09:06 2020 +0800
-
-    Don't hardcode pwd path
-
-    Let a man use his builtins if he wants to! Also, removes the unnecessary
-    assumption that pwd lives under /bin/pwd.
-
-    See #15581.
-
+diff --git a/qtbase/configure b/qtbase/configure
+index e57707dc..d8f6c934 100755
 --- a/qtbase/configure
 +++ b/qtbase/configure
-@@ -34,9 +34,9 @@
+@@ -9,9 +9,9 @@
  
  # the directory of this script is the "source tree"
- relpath=`dirname $0`
+ relpath=`dirname "$0"`
 -relpath=`(cd "$relpath"; /bin/pwd)`
 +relpath=`(cd "$relpath"; pwd)`
  # the current directory is the "build tree" or "object tree"
 -outpath=`/bin/pwd`
 +outpath=`pwd`
+ outpathPrefix=$outpath
  
  # do this early so we don't store it in config.status
- CFG_TOPLEVEL=
