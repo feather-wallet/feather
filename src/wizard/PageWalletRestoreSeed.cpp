@@ -9,7 +9,9 @@
 #include <QDialogButtonBox>
 #include <QPlainTextEdit>
 #include <QPushButton>
+#include <QShortcut>
 
+#include "dialog/SeedRecoveryDialog.h"
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
 #include "utils/Seed.h"
 #include "constants.h"
@@ -56,6 +58,12 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
 
     ui->seedEdit->setAcceptRichText(false);
     ui->seedEdit->setMaximumHeight(150);
+
+    QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+K"), this);
+    QObject::connect(shortcut, &QShortcut::activated, [&](){
+        SeedRecoveryDialog dialog{this};
+        dialog.exec();
+    });
 
     connect(ui->seedBtnGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &PageWalletRestoreSeed::onSeedTypeToggled);
     connect(ui->combo_seedLanguage, &QComboBox::currentTextChanged, this, &PageWalletRestoreSeed::onSeedLanguageChanged);
