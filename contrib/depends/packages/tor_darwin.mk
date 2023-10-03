@@ -9,6 +9,5 @@ $(package)_extract_cmds=mkdir -p $$($(1)_extract_dir) && \
 	7z x $$($(1)_source)
 
 define $(package)_stage_cmds
-    mv Tor\ Browser.app/Contents/MacOS/Tor/tor.real Tor\ Browser.app/Contents/MacOS/Tor/tor && \
-    cp -a Tor\ Browser.app/Contents/MacOS/Tor $($(package)_staging_prefix_dir)/Tor/
+    cp -a Tor\ Browser/Tor\ Browser.app/Contents/MacOS/Tor $($(package)_staging_prefix_dir)/Tor/
 endef
