@@ -7,6 +7,7 @@
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QWindow>
 
 #include "constants.h"
 #include "dialog/PasswordDialog.h"
@@ -18,9 +19,8 @@
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
-WindowManager::WindowManager(QObject *parent, EventFilter *eventFilter)
+WindowManager::WindowManager(QObject *parent)
     : QObject(parent)
-    , eventFilter(eventFilter)
 {
     m_walletManager = WalletManager::instance();
     m_splashDialog = new SplashDialog();
@@ -45,7 +45,7 @@ WindowManager::WindowManager(QObject *parent, EventFilter *eventFilter)
 
     this->showCrashLogs();
 
-    if (!config()->get(Config::firstRun).toBool() || TailsOS::detect() || WhonixOS::detect()) {
+    if (!conf()->get(Config::firstRun).toBool() || TailsOS::detect() || WhonixOS::detect()) {
         this->onInitialNetworkConfigured();
     }
 
@@ -54,6 +54,12 @@ WindowManager::WindowManager(QObject *parent, EventFilter *eventFilter)
     if (!this->autoOpenWallet()) {
         this->initWizard();
     }
+}
+
+QPointer<WindowManager> WindowManager::m_instance(nullptr);
+
+void WindowManager::setEventFilter(EventFilter *ef) {
+    eventFilter = ef;
 }
 
 WindowManager::~WindowManager() {
@@ -82,6 +88,7 @@ void WindowManager::close() {
     m_wizard->deleteLater();
     m_splashDialog->deleteLater();
     m_tray->deleteLater();
+    m_docsDialog->deleteLater();
 
     torManager()->stop();
 
@@ -109,13 +116,13 @@ void WindowManager::startupWarning() {
     // Stagenet / Testnet
     auto worthlessWarning = QString("Feather wallet is currently running in %1 mode. This is meant "
                                     "for developers only. Your coins are WORTHLESS.");
-    if (constants::networkType == NetworkType::STAGENET && config()->get(Config::warnOnStagenet).toBool()) {
+    if (constants::networkType == NetworkType::STAGENET && conf()->get(Config::warnOnStagenet).toBool()) {
         this->showWarningMessageBox("Warning", worthlessWarning.arg("stagenet"));
-        config()->set(Config::warnOnStagenet, false);
+        conf()->set(Config::warnOnStagenet, false);
     }
-    else if (constants::networkType == NetworkType::TESTNET && config()->get(Config::warnOnTestnet).toBool()){
+    else if (constants::networkType == NetworkType::TESTNET && conf()->get(Config::warnOnTestnet).toBool()){
         this->showWarningMessageBox("Warning", worthlessWarning.arg("testnet"));
-        config()->set(Config::warnOnTestnet, false);
+        conf()->set(Config::warnOnTestnet, false);
     }
 }
 
@@ -173,6 +180,43 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
     settings.exec();
 }
 
+// ######################## DOCS ########################
+
+void WindowManager::showDocs(QObject *parent, const QString &doc, bool modal) {
+    if (!m_docsDialog) {
+        m_docsDialog = new DocsDialog();
+    }
+
+    m_docsDialog->setModal(modal);
+
+    m_docsDialog->show();
+    if (m_docsDialog->isMinimized()) {
+        m_docsDialog->showNormal();
+    }
+    m_docsDialog->raise();
+    m_docsDialog->activateWindow();
+
+    QWindow *window = Utils::windowForQObject(parent);
+    if (window != nullptr) {
+        QPoint centerOfParent = window->frameGeometry().center();
+        m_docsDialog->move(centerOfParent.x() - m_docsDialog->width() / 2, centerOfParent.y() - m_docsDialog->height() / 2);
+    } else {
+        qDebug() << "Unable to center docs window";
+    }
+
+    if (!doc.isEmpty()) {
+        m_docsDialog->showDoc(doc);
+    }
+}
+
+void WindowManager::setDocsHighlight(const QString &highlight) {
+    if (!m_docsDialog) {
+        return;
+    }
+
+    m_docsDialog->updateHighlights(highlight);
+}
+
 // ######################## WALLET OPEN ########################
 
 void WindowManager::tryOpenWallet(const QString &path, const QString &password) {
@@ -192,7 +236,7 @@ void WindowManager::tryOpenWallet(const QString &path, const QString &password) 
     }
 
     if (!Utils::fileExists(path)) {
-        this->handleWalletError(QString("Wallet not found: %1").arg(path));
+        this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", QString("Wallet not found: %1").arg(path)});
         return;
     }
 
@@ -202,30 +246,27 @@ void WindowManager::tryOpenWallet(const QString &path, const QString &password) 
 
 void WindowManager::onWalletOpened(Wallet *wallet) {
     if (!wallet) {
-        QString err{"Unable to open wallet"};
-        this->handleWalletError(err);
+        this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", "This should never happen. If you encounter this error, please report it to the developers.", {}, "report_an_issue"});
         return;
     }
 
     auto status = wallet->status();
     if (status != Wallet::Status_Ok) {
         QString errMsg = wallet->errorString();
-        QString keysPath = wallet->keysPath();
-        QString cachePath = wallet->cachePath();
         wallet->deleteLater();
         if (status == Wallet::Status_BadPassword) {
             // Don't show incorrect password when we try with empty password for the first time
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
-            this->onWalletOpenPasswordRequired(showIncorrectPassword, keysPath);
+            this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
             qCritical() << errMsg;
-            WalletManager::clearWalletCache(cachePath);
+            WalletManager::clearWalletCache(wallet->cachePath());
             errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
-            this->handleWalletError(errMsg);
+            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg});
         } else {
-            this->handleWalletError(errMsg);
+            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg});
         }
         return;
     }
@@ -273,7 +314,7 @@ void WindowManager::onWalletOpenPasswordRequired(bool invalidPassword, const QSt
 }
 
 bool WindowManager::autoOpenWallet() {
-    QString autoPath = config()->get(Config::autoOpenWalletPath).toString();
+    QString autoPath = conf()->get(Config::autoOpenWalletPath).toString();
     if (!autoPath.isEmpty() && autoPath.startsWith(QString::number(constants::networkType))) {
         autoPath.remove(0, 1);
     }
@@ -288,14 +329,13 @@ bool WindowManager::autoOpenWallet() {
 
 void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage,
                                     const QString &seedOffset, const QString &subaddressLookahead, bool newWallet) {
-    if(Utils::fileExists(path)) {
-        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
-        this->handleWalletError(err);
+    if (Utils::fileExists(path)) {
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", QString("File already exists: %1").arg(path)});
         return;
     }
 
     if (seed.mnemonic.isEmpty()) {
-        this->handleWalletError("Mnemonic seed error. Failed to write wallet.");
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Mnemonic seed is emopty"});
         return;
     }
 
@@ -308,7 +348,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     }
 
     if (!wallet) {
-        this->handleWalletError("Failed to write wallet");
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet"});
         return;
     }
 
@@ -325,8 +365,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
 void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead)
 {
     if (Utils::fileExists(path)) {
-        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
-        this->handleWalletError(err);
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet from device", QString("File already exists: %1").arg(path)});
         return;
     }
 
@@ -337,8 +376,7 @@ void WindowManager::tryCreateWalletFromDevice(const QString &path, const QString
 void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address,
                                             const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString &subaddressLookahead) {
     if (Utils::fileExists(path)) {
-        auto err = QString("Failed to write wallet to path: \"%1\"; file already exists.").arg(path);
-        this->handleWalletError(err);
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", QString("File already exists: %1").arg(path)});
         return;
     }
 
@@ -348,20 +386,17 @@ void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &
     }
     else {
         if (!spendkey.isEmpty() && !WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
-            auto err = QString("Failed to create wallet. Invalid spendkey provided.").arg(path);
-            this->handleWalletError(err);
+            this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Invalid spendkey provided"});
             return;
         }
 
         if (!WalletManager::addressValid(address, constants::networkType)) {
-            auto err = QString("Failed to create wallet. Invalid address provided.").arg(path);
-            this->handleWalletError(err);
+            this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Invalid address provided"});
             return;
         }
 
         if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
-            auto err = QString("Failed to create wallet. Invalid viewkey provided.").arg(path);
-            this->handleWalletError(err);
+            this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Invalid viewkey provided"});
             return;
         }
 
@@ -376,10 +411,59 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
     // Currently only called when a wallet is created from device.
     auto state = wallet->status();
     if (state != Wallet::Status_Ok) {
-        qDebug() << Q_FUNC_INFO << QString("Wallet open error: %1").arg(wallet->errorString());
-        this->displayWalletErrorMessage(wallet->errorString());
-        m_splashDialog->hide();
+        QString error = wallet->errorString();
+        QStringList helpItems;
+        QString link;
+        QString doc;
+
+        // Ledger
+        if (error.contains("No device found")) {
+            error = "No Ledger device found.";
+            helpItems = {"Make sure the Monero app is open on the device.", "If the problem persists, try restarting Feather."};
+            doc = "create_wallet_hardware_device";
+        }
+        else if (error.contains("Unable to open device")) {
+            error = "Unable to open device.";
+            helpItems = {"The device might be in use by a different application."};
+#if defined(Q_OS_LINUX)
+            helpItems.append("On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
+                             "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues");
+            link = "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
+#endif
+        }
+
+        // Trezor
+        else if (error.contains("Unable to claim libusb device")) {
+            error = "Unable to claim Trezor device";
+            helpItems = {"Please make sure the device is not used by another program and try again."};
+        }
+        else if (error.contains("Cannot get a device address")) {
+            error = "Cannot get a device address";
+            helpItems = {"Restart the Trezor device and try again"};
+        }
+        else if (error.contains("Could not connect to the device Trezor") || error.contains("Device connect failed")) {
+            error = "Could not connect to the Trezor device";
+            helpItems = {"Make sure the device is connected to your computer and unlocked."};
+#if defined(Q_OS_LINUX)
+            helpItems.append("On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
+                  "https://wiki.trezor.io/Udev_rules");
+            link = "https://wiki.trezor.io/Udev_rules";
+#endif
+        }
+        if (error.contains("SW_CLIENT_NOT_SUPPORTED")) {
+            helpItems = {"Upgrade your Ledger device firmware to the latest version using Ledger Live.\n"
+                         "Then upgrade the Monero app for the Ledger device to the latest version."};
+        }
+        else if (error.contains("Wrong Device Status")) {
+            helpItems = {"The device may need to be unlocked."};
+        }
+        else if (error.contains("Wrong Channel")) {
+            helpItems = {"Restart the hardware device and try again."};
+        }
+
         this->showWizard(WalletWizard::Page_Menu);
+        Utils::showMsg({m_wizard, Utils::ERROR, "Failed to create wallet from device", error, helpItems, doc, "", link});
+        m_splashDialog->hide();
         m_openingWallet = false;
         return;
     }
@@ -389,74 +473,9 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
 
 // ######################## ERROR HANDLING ########################
 
-void WindowManager::handleWalletError(const QString &message) {
-    qCritical() << message;
-    this->displayWalletErrorMessage(message);
+void WindowManager::handleWalletError(const Utils::Message &message) {
+    Utils::showMsg(message);
     this->initWizard();
-}
-
-void WindowManager::displayWalletErrorMessage(const QString &message) {
-    QString errMsg = QString("Error: %1").arg(message);
-    QString link;
-
-    // Ledger
-    if (message.contains("No device found")) {
-        errMsg += "\n\nThis wallet is backed by a Ledger hardware device. Make sure the Monero app is opened on the device.\n"
-                  "You may need to restart Feather before the device can get detected.";
-    }
-    if (message.contains("Unable to open device")) {
-        errMsg += "\n\nThe device might be in use by a different application.";
-#if defined(Q_OS_LINUX)
-        errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
-                  "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
-        link = "https://support.ledger.com/hc/en-us/articles/115005165269-Fix-connection-issues";
-#endif
-    }
-
-    // TREZOR
-    if (message.contains("Unable to claim libusb device")) {
-        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Feather was unable to access the device. "
-                  "Please make sure it is not opened by another program and try again.";
-    }
-    if (message.contains("Cannot get a device address")) {
-        errMsg += "\n\nRestart the Trezor hardware device and try again.";
-    }
-
-    if (message.contains("Could not connect to the device Trezor") || message.contains("Device connect failed")) {
-        errMsg += "\n\nThis wallet is backed by a Trezor hardware device. Make sure the device is connected to your computer and unlocked.";
-#if defined(Q_OS_LINUX)
-        errMsg += "\n\nNote: On Linux you may need to follow the instructions in the link below before the device can be opened:\n"
-                  "https://wiki.trezor.io/Udev_rules";
-        link = "https://wiki.trezor.io/Udev_rules";
-#endif
-    }
-
-    if (message.contains("SW_CLIENT_NOT_SUPPORTED")) {
-        errMsg += "\n\nIncompatible version: upgrade your Ledger device firmware to the latest version using Ledger Live.\n"
-                  "Then upgrade the Monero app for the Ledger device to the latest version.";
-    }
-    else if (message.contains("Wrong Device Status")) {
-        errMsg += "\n\nThe device may need to be unlocked.";
-    }
-    else if (message.contains("Wrong Channel")) {
-        errMsg += "\n\nRestart the hardware device and try again.";
-    }
-
-    QMessageBox msgBox;
-    msgBox.setWindowIcon(icons()->icon("appicons/64x64.png"));
-    msgBox.setIcon(QMessageBox::Warning);
-    msgBox.setText(errMsg);
-    msgBox.setWindowTitle("Wallet error");
-    msgBox.setStandardButtons(QMessageBox::Ok);
-    msgBox.setDefaultButton(QMessageBox::Ok);
-    QPushButton *openLinkButton = nullptr;
-    if (!link.isEmpty()) {
-        openLinkButton = msgBox.addButton("Open link", QMessageBox::ActionRole);
-    }
-    msgBox.exec();
-    if (openLinkButton && msgBox.clickedButton() == openLinkButton) {
-        Utils::externalLinkWarning(nullptr, link);
-    }
 }
 
 void WindowManager::showCrashLogs() {
@@ -586,7 +605,7 @@ void WindowManager::notify(const QString &title, const QString &message, int dur
         return;
     }
 
-    if (config()->get(Config::hideNotifications).toBool()) {
+    if (conf()->get(Config::hideNotifications).toBool()) {
         return;
     }
 
@@ -614,11 +633,11 @@ void WindowManager::onProxySettingsChanged() {
     torManager()->start();
 
     QNetworkProxy proxy{QNetworkProxy::NoProxy};
-    if (config()->get(Config::proxy).toInt() != Config::Proxy::None) {
-        QString host = config()->get(Config::socks5Host).toString();
-        quint16 port = config()->get(Config::socks5Port).toString().toUShort();
+    if (conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        QString host = conf()->get(Config::socks5Host).toString();
+        quint16 port = conf()->get(Config::socks5Port).toString().toUShort();
 
-        if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
+        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
             host = torManager()->featherTorHost;
             port = torManager()->featherTorPort;
         }
@@ -659,7 +678,7 @@ WalletWizard* WindowManager::createWizard(WalletWizard::Page startPage) {
 
 void WindowManager::initWizard() {
     auto startPage = WalletWizard::Page_Menu;
-    if (config()->get(Config::firstRun).toBool() && !(TailsOS::detect() || WhonixOS::detect())) {
+    if (conf()->get(Config::firstRun).toBool() && !(TailsOS::detect() || WhonixOS::detect())) {
         startPage = WalletWizard::Page_Network;
     }
 
@@ -699,7 +718,7 @@ void WindowManager::initSkins() {
     if (!breeze_light.isEmpty())
         m_skins.insert("Breeze/Light", breeze_light);
 
-    QString skin = config()->get(Config::skin).toString();
+    QString skin = conf()->get(Config::skin).toString();
     qApp->setStyleSheet(m_skins[skin]);
 }
 
@@ -725,7 +744,7 @@ void WindowManager::onChangeTheme(const QString &skinName) {
         return;
     }
 
-    config()->set(Config::skin, skinName);
+    conf()->set(Config::skin, skinName);
 
     qApp->setStyleSheet(m_skins[skinName]);
     qDebug() << QString("Skin changed to %1").arg(skinName);
@@ -747,4 +766,13 @@ void WindowManager::patchMacStylesheet() {
 
     qApp->setStyleSheet(styleSheet);
 #endif
+}
+
+WindowManager* WindowManager::instance()
+{
+    if (!m_instance) {
+        m_instance = new WindowManager(QCoreApplication::instance());
+    }
+
+    return m_instance;
 }

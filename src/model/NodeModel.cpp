@@ -60,7 +60,7 @@ QVariant NodeModel::data(const QModelIndex &index, int role) const {
     else if (role == Qt::DecorationRole) {
         switch (index.column()) {
             case NodeModel::URL: {
-                if (m_nodeSource == NodeSource::websocket && !config()->get(Config::offlineMode).toBool()) {
+                if (m_nodeSource == NodeSource::websocket && !conf()->get(Config::offlineMode).toBool()) {
                     return QVariant(node.online ? m_online : m_offline);
                 }
                 return QVariant();

@@ -42,9 +42,8 @@ class HelpLabel : public QLabel
     Q_OBJECT
 
 public:
-    QString help_text;
     QFont font;
-    void setHelpText(const QString &text);
+    void setHelpText(const QString &text, const QString &informativeText, const QString &doc = "");
 
     explicit HelpLabel(QWidget * parent);
 
@@ -56,6 +55,11 @@ protected:
     void enterEvent(QEnterEvent *event) override;
 #endif
     void leaveEvent(QEvent *event) override;
+
+private:
+    QString m_text;
+    QString m_informativeText;
+    QString m_doc;
 };
 
 class ClickableLabel : public QLabel {

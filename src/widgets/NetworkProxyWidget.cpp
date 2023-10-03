@@ -18,7 +18,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->comboBox_proxy->setCurrentIndex(config()->get(Config::proxy).toInt());
+    ui->comboBox_proxy->setCurrentIndex(conf()->get(Config::proxy).toInt());
     connect(ui->comboBox_proxy, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
         this->onProxySettingsChanged();
         ui->frame_proxy->setVisible(index != Config::Proxy::None);
@@ -27,19 +27,19 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
         this->updatePort();
     });
 
-    int proxy = config()->get(Config::proxy).toInt();
+    int proxy = conf()->get(Config::proxy).toInt();
     ui->frame_proxy->setVisible(proxy != Config::Proxy::None);
     ui->frame_tor->setVisible(proxy == Config::Proxy::Tor);
     ui->groupBox_proxySettings->setTitle(QString("%1 settings").arg(ui->comboBox_proxy->currentText()));
 
     // [Host]
-    ui->line_host->setText(config()->get(Config::socks5Host).toString());
+    ui->line_host->setText(conf()->get(Config::socks5Host).toString());
     connect(ui->line_host, &QLineEdit::textChanged, this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Port]
     auto *portValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]")};
     ui->line_port->setValidator(portValidator);
-    ui->line_port->setText(config()->get(Config::socks5Port).toString());
+    ui->line_port->setText(conf()->get(Config::socks5Port).toString());
     connect(ui->line_port, &QLineEdit::textChanged, this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Tor settings]
@@ -49,7 +49,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
     ui->checkBox_torManaged->setEnabled(false);
     ui->checkBox_torManaged->setToolTip("Feather was bundled without Tor");
 #else
-    ui->checkBox_torManaged->setChecked(!config()->get(Config::useLocalTor).toBool());
+    ui->checkBox_torManaged->setChecked(!conf()->get(Config::useLocalTor).toBool());
     connect(ui->checkBox_torManaged, &QCheckBox::toggled, [this](bool toggled){
         this->updatePort();
         this->onProxySettingsChanged();
@@ -60,15 +60,15 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
 #endif
 
     // [Only allow connections to onion services]
-    ui->checkBox_torOnlyAllowOnion->setChecked(config()->get(Config::torOnlyAllowOnion).toBool());
+    ui->checkBox_torOnlyAllowOnion->setChecked(conf()->get(Config::torOnlyAllowOnion).toBool());
     connect(ui->checkBox_torOnlyAllowOnion, &QCheckBox::toggled, this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Node traffic]
-    ui->comboBox_torNodeTraffic->setCurrentIndex(config()->get(Config::torPrivacyLevel).toInt());
+    ui->comboBox_torNodeTraffic->setCurrentIndex(conf()->get(Config::torPrivacyLevel).toInt());
     connect(ui->comboBox_torNodeTraffic, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Show Tor logs]
-    ui->frame_torShowLogs->setVisible(!config()->get(Config::useLocalTor).toBool());
+    ui->frame_torShowLogs->setVisible(!conf()->get(Config::useLocalTor).toBool());
 #if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
     ui->frame_torShowLogs->setVisible(false);
 #endif
@@ -110,12 +110,12 @@ void NetworkProxyWidget::updatePort() {
 }
 
 void NetworkProxyWidget::setProxySettings() {
-    config()->set(Config::proxy, ui->comboBox_proxy->currentIndex());
-    config()->set(Config::socks5Host, ui->line_host->text());
-    config()->set(Config::socks5Port, ui->line_port->text());
-    config()->set(Config::useLocalTor, !ui->checkBox_torManaged->isChecked());
-    config()->set(Config::torOnlyAllowOnion, ui->checkBox_torOnlyAllowOnion->isChecked());
-    config()->set(Config::torPrivacyLevel, ui->comboBox_torNodeTraffic->currentIndex());
+    conf()->set(Config::proxy, ui->comboBox_proxy->currentIndex());
+    conf()->set(Config::socks5Host, ui->line_host->text());
+    conf()->set(Config::socks5Port, ui->line_port->text());
+    conf()->set(Config::useLocalTor, !ui->checkBox_torManaged->isChecked());
+    conf()->set(Config::torOnlyAllowOnion, ui->checkBox_torOnlyAllowOnion->isChecked());
+    conf()->set(Config::torPrivacyLevel, ui->comboBox_torNodeTraffic->currentIndex());
     m_proxySettingsChanged = false;
 }
 

@@ -31,6 +31,7 @@ private:
         seedType()
         {
             completer.setModel(&completerModel);
+            completer.setCompletionMode(QCompleter::UnfilteredPopupCompletion);
             completer.setModelSorting(QCompleter::CaseSensitivelySortedModel);
             completer.setCaseSensitivity(Qt::CaseSensitive);
             completer.setWrapAround(false);

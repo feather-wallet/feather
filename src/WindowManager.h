@@ -6,20 +6,24 @@
 
 #include <QObject>
 
+#include "dialog/DocsDialog.h"
 #include "dialog/TorInfoDialog.h"
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "MainWindow.h"
 #include "utils/nodes.h"
 #include "wizard/WalletWizard.h"
+#include "Utils.h"
 
 class MainWindow;
 class WindowManager : public QObject {
 Q_OBJECT
 
 public:
-    explicit WindowManager(QObject *parent, EventFilter *eventFilter);
+    explicit WindowManager(QObject *parent);
     ~WindowManager() override;
+
+    void setEventFilter(EventFilter *eventFilter);
 
     void wizardOpenWallet();
     void close();
@@ -30,9 +34,14 @@ public:
 
     void showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab = false);
 
+    void showDocs(QObject *parent, const QString &doc = "", bool modal = false);
+    void setDocsHighlight(const QString &highlight);
+
     void notify(const QString &title, const QString &message, int duration);
 
     EventFilter *eventFilter;
+
+    static WindowManager* instance();
 
 signals:
     void proxySettingsChanged();
@@ -66,7 +75,7 @@ private:
     void initWizard();
     WalletWizard* createWizard(WalletWizard::Page startPage);
 
-    void handleWalletError(const QString &message);
+    void handleWalletError(const Utils::Message &message);
     void displayWalletErrorMessage(const QString &message);
 
     void initSkins();
@@ -80,11 +89,14 @@ private:
 
     void quitAfterLastWindow();
 
+    static QPointer<WindowManager> m_instance;
+
     QVector<MainWindow*> m_windows;
 
     WalletManager *m_walletManager;
     WalletWizard *m_wizard = nullptr;
     SplashDialog *m_splashDialog = nullptr;
+    DocsDialog *m_docsDialog = nullptr;
 
     QSystemTrayIcon *m_tray;
 
@@ -97,5 +109,9 @@ private:
     QThread *m_cleanupThread;
 };
 
+inline WindowManager* windowManager()
+{
+    return WindowManager::instance();
+}
 
 #endif //FEATHER_WINDOWMANAGER_H

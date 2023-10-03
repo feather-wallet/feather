@@ -342,7 +342,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QTabWidget" name="tabWidget_2">
+          <widget class="QTabWidget" name="tabWidget_storage">
            <property name="currentIndex">
             <number>0</number>
            </property>
@@ -920,6 +920,9 @@
                 </property>
                 <property name="text">
                  <string>?</string>
+                </property>
+                <property name="flat">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

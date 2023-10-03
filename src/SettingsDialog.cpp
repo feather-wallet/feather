@@ -14,6 +14,7 @@
 #include "utils/Icons.h"
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
+#include "WindowManager.h"
 
 Settings::Settings(Nodes *nodes, QWidget *parent)
         : QDialog(parent)
@@ -36,7 +37,7 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
 
     ui->selector->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->selector->setSelectionBehavior(QAbstractItemView::SelectRows);
-//    ui->selector->setCurrentRow(config()->get(Config::lastSettingsPage).toInt());
+//    ui->selector->setCurrentRow(conf()->get(Config::lastSettingsPage).toInt());
 
     new QListWidgetItem(icons()->icon("interface_32px.png"), "Appearance", ui->selector, Pages::APPEARANCE);
     new QListWidgetItem(icons()->icon("nw_32px.png"), "Network", ui->selector, Pages::NETWORK);
@@ -61,11 +62,11 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
             emit proxySettingsChanged();
         }
 
-        config()->set(Config::lastSettingsPage, ui->selector->currentRow());
+        conf()->set(Config::lastSettingsPage, ui->selector->currentRow());
         this->close();
     });
 
-    this->setSelection(config()->get(Config::lastSettingsPage).toInt());
+    this->setSelection(conf()->get(Config::lastSettingsPage).toInt());
 
     this->adjustSize();
 }
@@ -73,7 +74,7 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
 void Settings::setupAppearanceTab() {
     // [Theme]
     this->setupThemeComboBox();
-    auto settingsTheme = config()->get(Config::skin).toString();
+    auto settingsTheme = conf()->get(Config::skin).toString();
     if (m_themes.contains(settingsTheme)) {
         ui->comboBox_theme->setCurrentIndex(m_themes.indexOf(settingsTheme));
     }
@@ -85,10 +86,10 @@ void Settings::setupAppearanceTab() {
     for (int i = 0; i <= 12; i++) {
         ui->comboBox_amountPrecision->addItem(QString::number(i));
     }
-    ui->comboBox_amountPrecision->setCurrentIndex(config()->get(Config::amountPrecision).toInt());
+    ui->comboBox_amountPrecision->setCurrentIndex(conf()->get(Config::amountPrecision).toInt());
 
     connect(ui->comboBox_amountPrecision, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int pos){
-        config()->set(Config::amountPrecision, pos);
+        conf()->set(Config::amountPrecision, pos);
         emit updateBalance();
     });
 
@@ -97,33 +98,33 @@ void Settings::setupAppearanceTab() {
     for (const auto & format : m_dateFormats) {
         ui->comboBox_dateFormat->addItem(now.toString(format));
     }
-    QString dateFormatSetting = config()->get(Config::dateFormat).toString();
+    QString dateFormatSetting = conf()->get(Config::dateFormat).toString();
     if (m_dateFormats.contains(dateFormatSetting)) {
         ui->comboBox_dateFormat->setCurrentIndex(m_dateFormats.indexOf(dateFormatSetting));
     }
 
     connect(ui->comboBox_dateFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int pos){
-        config()->set(Config::dateFormat, m_dateFormats.at(pos));
+        conf()->set(Config::dateFormat, m_dateFormats.at(pos));
     });
 
     // [Time format]
     for (const auto & format : m_timeFormats) {
         ui->comboBox_timeFormat->addItem(now.toString(format));
     }
-    QString timeFormatSetting = config()->get(Config::timeFormat).toString();
+    QString timeFormatSetting = conf()->get(Config::timeFormat).toString();
     if (m_timeFormats.contains(timeFormatSetting)) {
         ui->comboBox_timeFormat->setCurrentIndex(m_timeFormats.indexOf(timeFormatSetting));
     }
 
     connect(ui->comboBox_timeFormat, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int pos){
-        config()->set(Config::timeFormat, m_timeFormats.at(pos));
+        conf()->set(Config::timeFormat, m_timeFormats.at(pos));
     });
 
 
     // [Balance display]
-    ui->comboBox_balanceDisplay->setCurrentIndex(config()->get(Config::balanceDisplay).toInt());
+    ui->comboBox_balanceDisplay->setCurrentIndex(conf()->get(Config::balanceDisplay).toInt());
     connect(ui->comboBox_balanceDisplay, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int pos){
-        config()->set(Config::balanceDisplay, pos);
+        conf()->set(Config::balanceDisplay, pos);
         emit updateBalance();
     });
 
@@ -138,14 +139,14 @@ void Settings::setupAppearanceTab() {
         fiatCurrencies << ui->comboBox_fiatCurrency->itemText(index);
     }
 
-    auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+    auto preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
     if (!preferredFiatCurrency.isEmpty() && fiatCurrencies.contains(preferredFiatCurrency)) {
         ui->comboBox_fiatCurrency->setCurrentText(preferredFiatCurrency);
     }
 
     connect(ui->comboBox_fiatCurrency, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index){
         QString selection = ui->comboBox_fiatCurrency->itemText(index);
-        config()->set(Config::preferredFiatCurrency, selection);
+        conf()->set(Config::preferredFiatCurrency, selection);
         emit preferredFiatCurrencyChanged(selection);
     });
 }
@@ -167,16 +168,16 @@ void Settings::setupNetworkTab() {
 
     // Websocket
     // [Obtain third-party data]
-    ui->checkBox_enableWebsocket->setChecked(!config()->get(Config::disableWebsocket).toBool());
+    ui->checkBox_enableWebsocket->setChecked(!conf()->get(Config::disableWebsocket).toBool());
     connect(ui->checkBox_enableWebsocket, &QCheckBox::toggled, [this](bool checked){
-        config()->set(Config::disableWebsocket, !checked);
+        conf()->set(Config::disableWebsocket, !checked);
         this->enableWebsocket(checked);
     });
 
     // Overview
-    ui->checkBox_offlineMode->setChecked(config()->get(Config::offlineMode).toBool());
+    ui->checkBox_offlineMode->setChecked(conf()->get(Config::offlineMode).toBool());
     connect(ui->checkBox_offlineMode, &QCheckBox::toggled, [this](bool checked){
-        config()->set(Config::offlineMode, checked);
+        conf()->set(Config::offlineMode, checked);
         emit offlineMode(checked);
         this->enableWebsocket(!checked);
     });
@@ -184,7 +185,7 @@ void Settings::setupNetworkTab() {
 
 void Settings::setupStorageTab() {
     // Paths
-    ui->lineEdit_defaultWalletDir->setText(config()->get(Config::walletDirectory).toString());
+    ui->lineEdit_defaultWalletDir->setText(conf()->get(Config::walletDirectory).toString());
     ui->lineEdit_configDir->setText(Config::defaultConfigDir().path());
     ui->lineEdit_applicationDir->setText(Utils::applicationPath());
 
@@ -195,16 +196,16 @@ void Settings::setupStorageTab() {
     }
 
     connect(ui->btn_browseDefaultWalletDir, &QPushButton::clicked, [this]{
-        QString walletDirOld = config()->get(Config::walletDirectory).toString();
+        QString walletDirOld = conf()->get(Config::walletDirectory).toString();
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", walletDirOld, QFileDialog::ShowDirsOnly);
         if (walletDir.isEmpty())
             return;
-        config()->set(Config::walletDirectory, walletDir);
+        conf()->set(Config::walletDirectory, walletDir);
         ui->lineEdit_defaultWalletDir->setText(walletDir);
     });
 
     connect(ui->btn_openWalletDir, &QPushButton::clicked, []{
-        QDesktopServices::openUrl(QUrl::fromLocalFile(config()->get(Config::walletDirectory).toString()));
+        QDesktopServices::openUrl(QUrl::fromLocalFile(conf()->get(Config::walletDirectory).toString()));
     });
 
     connect(ui->btn_openConfigDir, &QPushButton::clicked, []{
@@ -215,25 +216,25 @@ void Settings::setupStorageTab() {
 
     // Logging
     // [Write log files to disk]
-    ui->checkBox_enableLogging->setChecked(!config()->get(Config::disableLogging).toBool());
+    ui->checkBox_enableLogging->setChecked(!conf()->get(Config::disableLogging).toBool());
     connect(ui->checkBox_enableLogging, &QCheckBox::toggled, [](bool toggled){
-        config()->set(Config::disableLogging, !toggled);
-        WalletManager::instance()->setLogLevel(toggled ? config()->get(Config::logLevel).toInt() : -1);
+        conf()->set(Config::disableLogging, !toggled);
+        WalletManager::instance()->setLogLevel(toggled ? conf()->get(Config::logLevel).toInt() : -1);
     });
 
     // [Log level]
-    ui->comboBox_logLevel->setCurrentIndex(config()->get(Config::logLevel).toInt());
+    ui->comboBox_logLevel->setCurrentIndex(conf()->get(Config::logLevel).toInt());
     connect(ui->comboBox_logLevel, QOverload<int>::of(&QComboBox::currentIndexChanged), [](int index){
-       config()->set(Config::logLevel, index);
-       if (!config()->get(Config::disableLogging).toBool()) {
+       conf()->set(Config::logLevel, index);
+       if (!conf()->get(Config::disableLogging).toBool()) {
            WalletManager::instance()->setLogLevel(index);
        }
     });
 
     // [Write stack trace to disk on crash]
-    ui->checkBox_writeStackTraceToDisk->setChecked(config()->get(Config::writeStackTraceToDisk).toBool());
+    ui->checkBox_writeStackTraceToDisk->setChecked(conf()->get(Config::writeStackTraceToDisk).toBool());
     connect(ui->checkBox_writeStackTraceToDisk, &QCheckBox::toggled, [](bool toggled){
-       config()->set(Config::writeStackTraceToDisk, toggled);
+       conf()->set(Config::writeStackTraceToDisk, toggled);
     });
 
     // [Open log file]
@@ -243,57 +244,57 @@ void Settings::setupStorageTab() {
 
     // Misc
     // [Save recently opened wallet to config file]
-    ui->checkBox_writeRecentlyOpened->setChecked(config()->get(Config::writeRecentlyOpenedWallets).toBool());
+    ui->checkBox_writeRecentlyOpened->setChecked(conf()->get(Config::writeRecentlyOpenedWallets).toBool());
     connect(ui->checkBox_writeRecentlyOpened, &QCheckBox::toggled, [](bool toggled){
-       config()->set(Config::writeRecentlyOpenedWallets, toggled);
+       conf()->set(Config::writeRecentlyOpenedWallets, toggled);
        if (!toggled) {
-           config()->set(Config::recentlyOpenedWallets, {});
+           conf()->set(Config::recentlyOpenedWallets, {});
        }
     });
 }
 
 void Settings::setupDisplayTab() {
     // [Hide balance]
-    ui->checkBox_hideBalance->setChecked(config()->get(Config::hideBalance).toBool());
+    ui->checkBox_hideBalance->setChecked(conf()->get(Config::hideBalance).toBool());
     connect(ui->checkBox_hideBalance, &QCheckBox::toggled, [this](bool toggled){
-        config()->set(Config::hideBalance, toggled);
+        conf()->set(Config::hideBalance, toggled);
         emit updateBalance();
     });
 
     // [Hide update notifications]
-    ui->checkBox_hideUpdateNotifications->setChecked(config()->get(Config::hideUpdateNotifications).toBool());
+    ui->checkBox_hideUpdateNotifications->setChecked(conf()->get(Config::hideUpdateNotifications).toBool());
     connect(ui->checkBox_hideUpdateNotifications, &QCheckBox::toggled, [this](bool toggled){
-        config()->set(Config::hideUpdateNotifications, toggled);
+        conf()->set(Config::hideUpdateNotifications, toggled);
         emit hideUpdateNotifications(toggled);
     });
 
     // [Hide transaction notifications]
-    ui->checkBox_hideTransactionNotifications->setChecked(config()->get(Config::hideNotifications).toBool());
+    ui->checkBox_hideTransactionNotifications->setChecked(conf()->get(Config::hideNotifications).toBool());
     connect(ui->checkBox_hideTransactionNotifications, &QCheckBox::toggled, [](bool toggled){
-        config()->set(Config::hideNotifications, toggled);
+        conf()->set(Config::hideNotifications, toggled);
     });
 
     // [Warn before opening external link]
-    ui->checkBox_warnOnExternalLink->setChecked(config()->get(Config::warnOnExternalLink).toBool());
+    ui->checkBox_warnOnExternalLink->setChecked(conf()->get(Config::warnOnExternalLink).toBool());
     connect(ui->checkBox_warnOnExternalLink, &QCheckBox::clicked, this, [this]{
         bool state = ui->checkBox_warnOnExternalLink->isChecked();
-        config()->set(Config::warnOnExternalLink, state);
+        conf()->set(Config::warnOnExternalLink, state);
     });
 
     // [Lock wallet on inactivity]
-    ui->checkBox_lockOnInactivity->setChecked(config()->get(Config::inactivityLockEnabled).toBool());
-    ui->spinBox_lockOnInactivity->setValue(config()->get(Config::inactivityLockTimeout).toInt());
+    ui->checkBox_lockOnInactivity->setChecked(conf()->get(Config::inactivityLockEnabled).toBool());
+    ui->spinBox_lockOnInactivity->setValue(conf()->get(Config::inactivityLockTimeout).toInt());
     connect(ui->checkBox_lockOnInactivity, &QCheckBox::toggled, [](bool toggled){
-        config()->set(Config::inactivityLockEnabled, toggled);
+        conf()->set(Config::inactivityLockEnabled, toggled);
     });
     connect(ui->spinBox_lockOnInactivity, QOverload<int>::of(&QSpinBox::valueChanged), [](int value){
-        config()->set(Config::inactivityLockTimeout, value);
+        conf()->set(Config::inactivityLockTimeout, value);
     });
 
     // [Lock wallet on minimize]
-    ui->checkBox_lockOnMinimize->setChecked(config()->get(Config::lockOnMinimize).toBool());
+    ui->checkBox_lockOnMinimize->setChecked(conf()->get(Config::lockOnMinimize).toBool());
     connect(ui->checkBox_lockOnMinimize, &QCheckBox::toggled, [](bool toggled){
-        config()->set(Config::lockOnMinimize, toggled);
+        conf()->set(Config::lockOnMinimize, toggled);
     });
 }
 
@@ -303,12 +304,12 @@ void Settings::setupMemoryTab() {
 
 void Settings::setupTransactionsTab() {
     // [Multibroadcast outgoing transactions]
-    ui->checkBox_multibroadcast->setChecked(config()->get(Config::multiBroadcast).toBool());
+    ui->checkBox_multibroadcast->setChecked(conf()->get(Config::multiBroadcast).toBool());
     connect(ui->checkBox_multibroadcast, &QCheckBox::toggled, [](bool toggled){
-        config()->set(Config::multiBroadcast, toggled);
+        conf()->set(Config::multiBroadcast, toggled);
     });
     connect(ui->btn_multibroadcast, &QPushButton::clicked, [this]{
-        QMessageBox::information(this, "Multibroadcasting", "Multibroadcasting relays outgoing transactions to all nodes in your selected node list. This may improve transaction relay speed and reduces the chance of your transaction failing.");
+        Utils::showInfo(this, "Multibroadcasting", "Multibroadcasting relays outgoing transactions to all nodes in your node list. This may improve transaction relay speed and reduces the chance of your transaction failing.");
     });
 
     // Hide unimplemented settings
@@ -318,18 +319,18 @@ void Settings::setupTransactionsTab() {
 
 void Settings::setupMiscTab() {
     // [Block explorer]
-    ui->comboBox_blockExplorer->setCurrentIndex(ui->comboBox_blockExplorer->findText(config()->get(Config::blockExplorer).toString()));
+    ui->comboBox_blockExplorer->setCurrentIndex(ui->comboBox_blockExplorer->findText(conf()->get(Config::blockExplorer).toString()));
     connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
         QString blockExplorer = ui->comboBox_blockExplorer->currentText();
-        config()->set(Config::blockExplorer, blockExplorer);
+        conf()->set(Config::blockExplorer, blockExplorer);
         emit blockExplorerChanged(blockExplorer);
     });
 
     // [Reddit frontend]
-    ui->comboBox_redditFrontend->setCurrentIndex(ui->comboBox_redditFrontend->findText(config()->get(Config::redditFrontend).toString()));
+    ui->comboBox_redditFrontend->setCurrentIndex(ui->comboBox_redditFrontend->findText(conf()->get(Config::redditFrontend).toString()));
     connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
         QString redditFrontend = ui->comboBox_redditFrontend->currentText();
-        config()->set(Config::redditFrontend, redditFrontend);
+        conf()->set(Config::redditFrontend, redditFrontend);
     });
 
     // [LocalMonero frontend]
@@ -339,10 +340,10 @@ void Settings::setupMiscTab() {
                                               "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion");
     ui->comboBox_localMoneroFrontend->addItem("yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p",
                                               "http://yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p");
-    ui->comboBox_localMoneroFrontend->setCurrentIndex(ui->comboBox_localMoneroFrontend->findData(config()->get(Config::localMoneroFrontend).toString()));
+    ui->comboBox_localMoneroFrontend->setCurrentIndex(ui->comboBox_localMoneroFrontend->findData(conf()->get(Config::localMoneroFrontend).toString()));
     connect(ui->comboBox_localMoneroFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
         QString localMoneroFrontend = ui->comboBox_localMoneroFrontend->currentData().toString();
-        config()->set(Config::localMoneroFrontend, localMoneroFrontend);
+        conf()->set(Config::localMoneroFrontend, localMoneroFrontend);
     });
 }
 
@@ -376,7 +377,7 @@ void Settings::setSelection(int index) {
 }
 
 void Settings::enableWebsocket(bool enabled) {
-    if (enabled && !config()->get(Config::offlineMode).toBool() && !config()->get(Config::disableWebsocket).toBool()) {
+    if (enabled && !conf()->get(Config::offlineMode).toBool() && !conf()->get(Config::disableWebsocket).toBool()) {
         websocketNotifier()->websocketClient->restart();
     } else {
         websocketNotifier()->websocketClient->stop();

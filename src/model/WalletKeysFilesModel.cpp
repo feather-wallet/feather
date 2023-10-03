@@ -62,7 +62,7 @@ void WalletKeysFilesModel::updateDirectories() {
     m_walletDirectories << walletDirRoot;
     m_walletDirectories << QDir::homePath();
 
-    QString walletDirectory = config()->get(Config::walletDirectory).toString();
+    QString walletDirectory = conf()->get(Config::walletDirectory).toString();
     if (!walletDirectory.isEmpty())
         m_walletDirectories << walletDirectory;
 

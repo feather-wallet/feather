@@ -45,14 +45,13 @@ void TxBroadcastDialog::onApiResponse(const DaemonRpc::DaemonResponse &resp) {
     }
 
     if (!resp.ok) {
-        QMessageBox::warning(this, "Transaction broadcast", resp.status);
+        Utils::showError(this, "Failed to broadcast transaction", resp.status);
         return;
     }
 
     this->accept();
 
-    QMessageBox::information(this, "Transaction broadcast", "Transaction submitted successfully.\n\n"
-                                                            "If the transaction belongs to this wallet it may take several minutes before it shows up in the history tab.");
+    Utils::showInfo(this, "Transaction submitted successfully", "If the transaction belongs to this wallet it may take several minutes before it shows up in the history tab.");
 }
 
 TxBroadcastDialog::~TxBroadcastDialog() = default;

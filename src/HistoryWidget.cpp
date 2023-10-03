@@ -45,17 +45,17 @@ HistoryWidget::HistoryWidget(Wallet *wallet, QWidget *parent)
 
     connect(ui->btn_moreInfo, &QPushButton::clicked, this, &HistoryWidget::showSyncNoticeMsg);
     connect(ui->btn_close, &QPushButton::clicked, [this]{
-        config()->set(Config::showHistorySyncNotice, false);
+        conf()->set(Config::showHistorySyncNotice, false);
         ui->syncNotice->hide();
     });
 
     connect(m_wallet, &Wallet::walletRefreshed, this, &HistoryWidget::onWalletRefreshed);
 
-    ui->syncNotice->setVisible(config()->get(Config::showHistorySyncNotice).toBool());
+    ui->syncNotice->setVisible(conf()->get(Config::showHistorySyncNotice).toBool());
     ui->history->setHistoryModel(m_model);
 
     // Load view state
-    QByteArray historyViewState = QByteArray::fromBase64(config()->get(Config::GUI_HistoryViewState).toByteArray());
+    QByteArray historyViewState = QByteArray::fromBase64(conf()->get(Config::GUI_HistoryViewState).toByteArray());
     if (!historyViewState.isEmpty()) {
         ui->history->setViewState(historyViewState);
     }
@@ -109,8 +109,8 @@ void HistoryWidget::onResendTransaction() {
 void HistoryWidget::resetModel()
 {
     // Save view state
-    config()->set(Config::GUI_HistoryViewState, ui->history->viewState().toBase64());
-    config()->sync();
+    conf()->set(Config::GUI_HistoryViewState, ui->history->viewState().toBase64());
+    conf()->sync();
 
     ui->history->setModel(nullptr);
 }
@@ -164,8 +164,8 @@ void HistoryWidget::copy(copyField field) {
             case copyField::Description:
                 return tx->description();
             case copyField::Date:
-                return tx->timestamp().toString(QString("%1 %2").arg(config()->get(Config::dateFormat).toString(),
-                                                                     config()->get(Config::timeFormat).toString()));
+                return tx->timestamp().toString(QString("%1 %2").arg(conf()->get(Config::dateFormat).toString(),
+                                                                     conf()->get(Config::timeFormat).toString()));
             case copyField::Amount:
                 return WalletManager::displayAmount(tx->balanceDelta());
             default:

@@ -43,8 +43,8 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
         ui->frameRestoreHeight->setVisible(toggled);
     });
 
-    ui->label_restoreHeightHelp->setHelpText("Should you restore your wallet in the future, "
-                                             "specifying this block number will recover your wallet quicker.");
+    ui->label_restoreHeightHelp->setHelpText("", "Should you restore your wallet in the future, "
+                                             "specifying this block number will recover your wallet quicker.", "restore_height");
 
     this->adjustSize();
 }

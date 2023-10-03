@@ -71,7 +71,7 @@ void RedditWidget::showContextMenu(const QPoint &pos) {
 }
 
 QString RedditWidget::getLink(const QString &permaLink) {
-    QString redditFrontend = config()->get(Config::redditFrontend).toString();
+    QString redditFrontend = conf()->get(Config::redditFrontend).toString();
     return QString("https://%1%2").arg(redditFrontend, permaLink);
 }
 

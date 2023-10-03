@@ -156,7 +156,7 @@ void TxProofDialog::getFormattedProof() {
     TxProof proof = this->getProof();
 
     if (!proof.error.isEmpty()) {
-        QMessageBox::warning(this, "Get formatted proof", QString("Failed to get proof signature: %1").arg(proof.error));
+        Utils::showError(this, "Failed to get formatted proof", proof.error);
         return;
     }
 
@@ -216,7 +216,7 @@ void TxProofDialog::getSignature() {
     TxProof proof = this->getProof();
 
     if (!proof.error.isEmpty()) {
-        QMessageBox::warning(this, "Get proof signature", QString("Failed to get proof signature: %1").arg(proof.error));
+        Utils::showError(this, "Failed to get transaction proof", proof.error);
         return;
     }
 

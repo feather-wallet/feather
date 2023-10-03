@@ -46,7 +46,7 @@ void TorManager::init() {
         m_started = false;
     }
 
-    featherTorPort = config()->get(Config::torManagedPort).toString().toUShort();
+    featherTorPort = conf()->get(Config::torManagedPort).toString().toUShort();
 }
 
 void TorManager::stop() {
@@ -118,13 +118,13 @@ void TorManager::checkConnection() {
         this->setConnectionState(code == 0);
     }
 
-    else if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+    else if (conf()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
         this->setConnectionState(false);
     }
 
     else if (m_localTor) {
-        QString host = config()->get(Config::socks5Host).toString();
-        quint16 port = config()->get(Config::socks5Port).toString().toUShort();
+        QString host = conf()->get(Config::socks5Host).toString();
+        quint16 port = conf()->get(Config::socks5Port).toString().toUShort();
         this->setConnectionState(Utils::portOpen(host, port));
     }
 
@@ -237,8 +237,8 @@ bool TorManager::isStarted() {
 }
 
 bool TorManager::shouldStartTorDaemon() {
-    QString torHost = config()->get(Config::socks5Host).toString();
-    quint16 torPort = config()->get(Config::socks5Port).toString().toUShort();
+    QString torHost = conf()->get(Config::socks5Host).toString();
+    quint16 torPort = conf()->get(Config::socks5Port).toString().toUShort();
     QString torHostPort = QString("%1:%2").arg(torHost, QString::number(torPort));
 
     // Don't start a Tor daemon if Feather is run with Torsocks
@@ -258,12 +258,12 @@ bool TorManager::shouldStartTorDaemon() {
 #endif
 
     // Don't start a Tor daemon if our proxy config isn't set to Tor
-    if (config()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
+    if (conf()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
         return false;
     }
 
     // Don't start a Tor daemon if --use-local-tor is specified
-    if (config()->get(Config::useLocalTor).toBool()) {
+    if (conf()->get(Config::useLocalTor).toBool()) {
         return false;
     }
 

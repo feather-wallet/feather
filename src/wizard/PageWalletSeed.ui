@@ -122,7 +122,7 @@
         <item>
          <widget class="QLabel" name="label_14">
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather uses &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;. For more information visit: docs.featherwallet.org/guides/seed-scheme&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Feather uses &lt;span style=&quot; font-weight:600;&quot;&gt;Polyseed&lt;/span&gt;. For more information click &lt;span style=&quot; font-weight:700;&quot;&gt;Help&lt;/span&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="wordWrap">
            <bool>true</bool>
@@ -222,7 +222,7 @@
    <item>
     <widget class="QFrame" name="frame_seedDisplay">
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>

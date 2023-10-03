@@ -45,11 +45,11 @@ void WebsocketClient::start() {
         return;
     }
 
-    if (config()->get(Config::offlineMode).toBool()) {
+    if (conf()->get(Config::offlineMode).toBool()) {
         return;
     }
 
-    if (config()->get(Config::disableWebsocket).toBool()) {
+    if (conf()->get(Config::disableWebsocket).toBool()) {
         return;
     }
 
@@ -107,11 +107,11 @@ void WebsocketClient::nextWebsocketUrl() {
 }
 
 Config::Proxy WebsocketClient::networkType() {
-    if (config()->get(Config::proxy).toInt() == Config::Proxy::Tor && config()->get(Config::torOnlyAllowOnion).toBool()) {
+    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
         // Websocket performance with onion services is abysmal, connect to clearnet server unless instructed otherwise
         return Config::Proxy::Tor;
     }
-    else if (config()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
+    else if (conf()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
         return Config::Proxy::i2p;
     }
     else {

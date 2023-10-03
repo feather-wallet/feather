@@ -15,6 +15,10 @@ QString PendingTransaction::errorString() const
     return QString::fromStdString(m_pimpl->errorString());
 }
 
+const std::exception_ptr PendingTransaction::getException() const {
+    return m_pimpl->getException();
+}
+
 bool PendingTransaction::commit()
 {
     return m_pimpl->commit();

@@ -7,3 +7,6 @@
 [submodule "src/third-party/polyseed"]
 	path = src/third-party/polyseed
 	url = https://github.com/tevador/polyseed.git
+[submodule "external/feather-docs"]
+	path = external/feather-docs
+	url = https://github.com/feather-wallet/feather-docs.git

@@ -35,7 +35,7 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     ui->lineAmount->setValidator(validator);
 
     connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::onInitiateTransaction);
-    connect(m_wallet, &Wallet::endTransaction, this, &SendWidget::onEndTransaction);
+    connect(m_wallet, &Wallet::transactionCreated, this, &SendWidget::onEndTransaction);
 
     connect(WalletManager::instance(), &WalletManager::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
 
@@ -52,15 +52,17 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
 
-    ui->label_PayTo->setHelpText("Recipient of the funds.\n\n"
-                                 "You may enter a Monero address, or an alias (email-like address that forwards to a Monero address)");
-    ui->label_Description->setHelpText("Description of the transaction (optional).\n\n"
+    ui->label_PayTo->setHelpText("Recipient of the funds",
+                                 "You may enter a Monero address, or an alias (email-like address that forwards to a Monero address)",
+                                 "send_transaction");
+    ui->label_Description->setHelpText("Description of the transaction (optional)",
                                        "The description is not sent to the recipient of the funds. It is stored in your wallet cache, "
-                                       "and displayed in the 'History' tab.");
-    ui->label_Amount->setHelpText("Amount to be sent.\n\nThis is the exact amount the recipient will receive. "
+                                       "and displayed in the 'History' tab.",
+                                       "send_transaction");
+    ui->label_Amount->setHelpText("Amount to be sent","This is the exact amount the recipient will receive. "
                                   "In addition to this amount a transaction fee will be subtracted from your balance. "
                                   "You will be able to review the transaction fee before the transaction is broadcast.\n\n"
-                                  "To send all your balance, click the Max button to the right.");
+                                  "To send all your balance, click the Max button to the right.","send_transaction");
 
     ui->lineAddress->setNetType(constants::networkType);
     this->setupComboBox();
@@ -124,7 +126,7 @@ void SendWidget::scanClicked() {
 #if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     auto cameras = QCameraInfo::availableCameras();
     if (cameras.count() < 1) {
-        QMessageBox::warning(this, "QR code scanner", "No available cameras found.");
+        Utils::showError(this, "Can't open QR scanner", "No available cameras found");
         return;
     }
 
@@ -135,7 +137,7 @@ void SendWidget::scanClicked() {
 #elif defined(WITH_SCANNER)
     auto cameras = QMediaDevices::videoInputs();
     if (cameras.empty()) {
-        QMessageBox::warning(this, "QR code scanner", "No available cameras found.");
+        Utils::showError(this, "Can't open QR scanner", "No available cameras found");
         return;
     }
 
@@ -144,27 +146,26 @@ void SendWidget::scanClicked() {
     ui->lineAddress->setText(dialog->decodedString);
     dialog->deleteLater();
 #else
-    QMessageBox::warning(this, "QR scanner", "Feather was built without webcam QR scanner support.");
+    Utils::showError(this, "Can't open QR scanner", "Feather was built without webcam QR scanner support");
 #endif
 }
 
 void SendWidget::sendClicked() {
     if (!m_wallet->isConnected()) {
-        QMessageBox::warning(this, "Error", "Unable to create transaction:\n\n"
-                                            "Wallet is not connected to a node.\n"
-                                            "Go to File -> Settings -> Node to manually connect to a node.");
+        Utils::showError(this, "Unable to create transaction", "Wallet is not connected to a node.",
+                         {"Wait for the wallet to automatically connect to a node.", "Go to File -> Settings -> Network -> Node to manually connect to a node."},
+                         "nodes");
         return;
     }
 
     if (!m_wallet->isSynchronized()) {
-        QMessageBox::warning(this, "Error", "Wallet is not synchronized, unable to create transaction.\n\n"
-                                            "Wait for synchronization to complete.");
+        Utils::showError(this, "Unable to create transaction", "Wallet is not synchronized", {"Wait for wallet synchronization to complete"}, "synchronization");
         return;
     }
 
     QString recipient = ui->lineAddress->text().simplified().remove(' ');
     if (recipient.isEmpty()) {
-        QMessageBox::warning(this, "Error", "No destination address was entered.");
+        Utils::showError(this, "Unable to create transaction", "No address was entered", {"Enter an address in the 'Pay to' field."}, "send_transaction");
         return;
     }
 
@@ -176,7 +177,7 @@ void SendWidget::sendClicked() {
             errorText += QString("Line #%1:\n%2\n").arg(QString::number(error.idx + 1), error.error);
         }
 
-        QMessageBox::warning(this, "Error", QString("Invalid lines found:\n\n%1").arg(errorText));
+        Utils::showError(this, "Unable to create transaction", QString("Invalid address lines found:\n\n%1").arg(errorText), {}, "pay_to_many");
         return;
     }
 
@@ -184,7 +185,7 @@ void SendWidget::sendClicked() {
 
     if (!outputs.empty()) { // multi destination transaction
         if (outputs.size() > 16) {
-            QMessageBox::warning(this, "Error", "Maximum number of outputs (16) exceeded.");
+            Utils::showError(this, "Unable to create transaction", "Maximum number of outputs (16) exceeded.", {}, "pay_to_many");
             return;
         }
 
@@ -204,7 +205,7 @@ void SendWidget::sendClicked() {
     quint64 amount = this->amount();
 
     if (amount == 0 && !sendAll) {
-        QMessageBox::warning(this, "Error", "No amount was entered.");
+        Utils::showError(this, "Unable to create transaction", "No amount was entered", {}, "send_transaction", "Amount field");
         return;
     }
 
@@ -213,6 +214,18 @@ void SendWidget::sendClicked() {
         amount = WalletManager::amountFromDouble(this->conversionAmount());
     }
 
+    quint64 unlocked_balance = m_wallet->unlockedBalance();
+    quint64 total_balance = m_wallet->balance();
+    if (total_balance == 0) {
+        Utils::showError(this, "Unable to create transaction", "No money to spend");
+        return;
+    }
+
+    if (!sendAll && amount > unlocked_balance) {
+        Utils::showError(this, "Unable to create transaction", QString("Not enough money to spend.\n\n"
+                                                                       "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
+        return;
+    }
     m_wallet->createTransaction(recipient, amount, description, sendAll);
 }
 
@@ -242,7 +255,7 @@ void SendWidget::updateConversionLabel() {
         return;
     }
 
-    if (config()->get(Config::disableWebsocket).toBool()) {
+    if (conf()->get(Config::disableWebsocket).toBool()) {
         return;
     }
 
@@ -252,7 +265,7 @@ void SendWidget::updateConversionLabel() {
             return QString("~%1 XMR").arg(QString::number(this->conversionAmount(), 'f'));
 
         } else {
-            auto preferredFiatCurrency = config()->get(Config::preferredFiatCurrency).toString();
+            auto preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
             double conversionAmount = appData()->prices.convert("XMR", preferredFiatCurrency, this->amountDouble());
             return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
         }
@@ -291,28 +304,23 @@ void SendWidget::onOpenAliasResolved(const QString &openAlias, const QString &ad
     ui->btn_openAlias->setEnabled(true);
 
     if (address.isEmpty()) {
-        this->onOpenAliasResolveError("Could not resolve OpenAlias.");
+        Utils::showError(this, "Unable to resolve OpenAlias", "Address empty.");
         return;
     }
 
     if (!dnssecValid) {
-        this->onOpenAliasResolveError("Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed.");
+        Utils::showError(this, "Unable to resolve OpenAlias", "Address found, but the DNSSEC signatures could not be verified, so this address may be spoofed.");
         return;
     }
 
     bool valid = WalletManager::addressValid(address, constants::networkType);
     if (!valid) {
-        this->onOpenAliasResolveError(QString("Address validation error. Perhaps it is of the wrong network type.\n\n"
-                                              "OpenAlias: %1\nAddress: %2").arg(openAlias, address));
+        Utils::showError(this, "Unable to resolve OpenAlias", QString("Address validation failed.\n\nOpenAlias: %1\nAddress: %2").arg(openAlias, address));
         return;
     }
 
     this->fill(address, openAlias);
     ui->btn_openAlias->hide();
-}
-
-void SendWidget::onOpenAliasResolveError(const QString &msg) {
-    QMessageBox::warning(this, "OpenAlias error", msg);
 }
 
 void SendWidget::clearFields() {
@@ -363,7 +371,7 @@ void SendWidget::onDataPasted(const QString &data) {
         }
     }
     else {
-        QMessageBox::warning(this, "Error", "No Qr Code found.");
+        Utils::showError(this, "Unable to decode QR code", "No QR code found.");
     }
 }
 
@@ -371,7 +379,7 @@ void SendWidget::setupComboBox() {
     ui->comboCurrencySelection->clear();
 
     QStringList defaultCurrencies = {"XMR", "USD", "EUR", "CNY", "JPY", "GBP"};
-    QString preferredCurrency = config()->get(Config::preferredFiatCurrency).toString();
+    QString preferredCurrency = conf()->get(Config::preferredFiatCurrency).toString();
 
     if (defaultCurrencies.contains(preferredCurrency)) {
         defaultCurrencies.removeOne(preferredCurrency);

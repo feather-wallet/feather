@@ -19,6 +19,7 @@
 #include "PageNetworkProxy.h"
 #include "PageNetworkWebsocket.h"
 #include "constants.h"
+#include "WindowManager.h"
 
 #include <QLineEdit>
 #include <QVBoxLayout>
@@ -64,18 +65,42 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPixmap(QWizard::WatermarkPixmap, QPixmap(":/assets/images/banners/3.png"));
     setWizardStyle(WizardStyle::ModernStyle);
     setOption(QWizard::NoBackButtonOnStartPage);
+    setOption(QWizard::HaveHelpButton, true);
+    setOption(QWizard::HaveCustomButton1, true);
+
+    // Set up a custom button layout
+    QList<QWizard::WizardButton> layout;
+    layout << QWizard::HelpButton;
+    layout << QWizard::CustomButton1;
+    layout << QWizard::Stretch;
+    layout << QWizard::BackButton;
+    layout << QWizard::NextButton;
+    layout << QWizard::FinishButton;
+    this->setButtonLayout(layout);
+
+    auto *settingsButton = new QPushButton("Settings", this);
+    this->setButton(QWizard::CustomButton1, settingsButton);
+
+    settingsButton->setVisible(false);
+    connect(this, &QWizard::currentIdChanged, [this, settingsButton](int currentId){
+        settingsButton->setVisible(currentId == Page_Menu);
+
+        auto helpButton = this->button(QWizard::HelpButton);
+        helpButton->setVisible(!this->helpPage().isEmpty());
+    });
+    connect(settingsButton, &QPushButton::clicked, this, &WalletWizard::showSettings);
 
     connect(networkWebsocketPage, &PageNetworkWebsocket::initialNetworkConfigured, [this](){
         emit initialNetworkConfigured();
     });
-
-    connect(menuPage, &PageMenu::showSettings, this, &WalletWizard::showSettings);
 
     connect(walletSetPasswordPage, &PageSetPassword::createWallet, this, &WalletWizard::onCreateWallet);
 
     connect(openWalletPage, &PageOpenWallet::openWallet, [=](const QString &path){
         emit openWallet(path, "");
     });
+
+    connect(this, &QWizard::helpRequested, this, &WalletWizard::showHelp);
 }
 
 void WalletWizard::resetFields() {
@@ -133,4 +158,39 @@ void WalletWizard::onCreateWallet() {
     bool newWallet = m_wizardFields.mode == WizardMode::CreateWallet;
 
     emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead, newWallet);
+}
+
+QString WalletWizard::helpPage() {
+    QString doc;
+    switch (this->currentId()) {
+        case Page_Menu: {
+            doc = "about";
+            break;
+        }
+        case Page_CreateWalletSeed: {
+            doc = "seed_scheme";
+            break;
+        }
+        case Page_WalletFile: {
+            doc = "wallet_files";
+            break;
+        }
+        case Page_HardwareDevice: {
+            doc = "create_wallet_hardware_device";
+            break;
+        }
+        case Page_SetRestoreHeight: {
+            doc = "restore_height";
+            break;
+        }
+    }
+    return doc;
+}
+
+void WalletWizard::showHelp() {
+    QString doc = this->helpPage();
+
+    if (!doc.isEmpty()) {
+        windowManager()->showDocs(this, doc);
+    }
 }

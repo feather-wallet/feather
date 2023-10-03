@@ -5,6 +5,8 @@
 
 #include <QtWidgets>
 
+#include "Utils.h"
+
 DoublePixmapLabel::DoublePixmapLabel(QWidget *parent)
         : QLabel(parent)
 {}
@@ -32,21 +34,22 @@ StatusBarButton::StatusBarButton(const QIcon &icon, const QString &tooltip, QWid
     setCursor(QCursor(Qt::PointingHandCursor));
 }
 
-void HelpLabel::setHelpText(const QString &text)
+void HelpLabel::setHelpText(const QString &text, const QString &informativeText, const QString &doc)
 {
-    this->help_text = text;
+    m_text = text;
+    m_informativeText = informativeText;
+    m_doc = doc;
 }
 
 HelpLabel::HelpLabel(QWidget *parent) : QLabel(parent)
 {
-    this->help_text = "help_text";
     this->font = QFont();
 }
 
 void HelpLabel::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
-    QMessageBox::information(this, "Help", this->help_text);
+    Utils::showInfo(this, m_text, m_informativeText, {}, m_doc);
 }
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)

@@ -4,8 +4,6 @@
 #include "TxConfDialog.h"
 #include "ui_TxConfDialog.h"
 
-#include <QMessageBox>
-
 #include "constants.h"
 #include "TxConfAdvDialog.h"
 #include "utils/AppData.h"
@@ -26,7 +24,7 @@ TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString
     ui->label_warning->setText("You are about to send a transaction.\nVerify the information below.");
     ui->label_note->hide();
 
-    QString preferredCur = config()->get(Config::preferredFiatCurrency).toString();
+    QString preferredCur = conf()->get(Config::preferredFiatCurrency).toString();
 
     auto convert = [preferredCur](double amount){
         return QString::number(appData()->prices.convert("XMR", preferredCur, amount), 'f', 2);

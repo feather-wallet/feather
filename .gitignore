@@ -13,9 +13,12 @@ feather_autogen/
 feather.cbp
 src/config-feather.h
 src/assets_tor.qrc
+src/assets_docs.qrc
 feather.AppDir/*
 src/assets/tor/*
+src/assets/docs/*
 !src/assets/tor/.gitkeep
+!src/assets/docs/.gitkeep
 contrib/installers/windows/setup.nsi
 githash.txt
 guix/guix-build-*

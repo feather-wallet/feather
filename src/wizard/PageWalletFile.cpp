@@ -8,7 +8,6 @@
 #include "utils/Utils.h"
 
 #include <QFileDialog>
-#include <QMessageBox>
 
 PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -22,7 +21,7 @@ PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
     ui->lockIcon->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
     connect(ui->btnChange, &QPushButton::clicked, [=] {
-        QString currentWalletDir = config()->get(Config::walletDirectory).toString();
+        QString currentWalletDir = conf()->get(Config::walletDirectory).toString();
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", currentWalletDir, QFileDialog::ShowDirsOnly);
         if (walletDir.isEmpty()) {
             return;
@@ -39,7 +38,7 @@ PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
 
 void PageWalletFile::initializePage() {
     this->setTitle(m_fields->modeText);
-    ui->line_walletDir->setText(config()->get(Config::walletDirectory).toString());
+    ui->line_walletDir->setText(conf()->get(Config::walletDirectory).toString());
     ui->line_walletName->setText(this->defaultWalletName());
     ui->check_defaultWalletDirectory->setVisible(false);
     ui->check_defaultWalletDirectory->setChecked(false);
@@ -91,9 +90,9 @@ bool PageWalletFile::validatePage() {
     m_fields->walletDir = ui->line_walletDir->text();
 
     QString walletDir = ui->line_walletDir->text();
-    bool dirChanged = config()->get(Config::walletDirectory).toString() != walletDir;
+    bool dirChanged = conf()->get(Config::walletDirectory).toString() != walletDir;
     if (dirChanged && ui->check_defaultWalletDirectory->isChecked()) {
-        config()->set(Config::walletDirectory, walletDir);
+        conf()->set(Config::walletDirectory, walletDir);
     }
 
     return true;

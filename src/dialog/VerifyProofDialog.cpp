@@ -179,8 +179,12 @@ void VerifyProofDialog::proofStatus(bool success, const QString &message) {
     }
     else {
         ui->btn_verify->setEnabled(true);
-        success ? QMessageBox::information(this, "Information", message)
-                : QMessageBox::warning(this, "Warning", message);
+
+        if (success) {
+            Utils::showInfo(this, message);
+        } else {
+            Utils::showError(this, message);
+        }
     }
 }
 
