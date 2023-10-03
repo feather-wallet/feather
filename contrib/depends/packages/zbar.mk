@@ -1,29 +1,30 @@
 package=zbar
-$(package)_version=0.23.92
+$(package)_version=0.23.90
 $(package)_download_path=https://github.com/mchehab/zbar/archive/refs/tags/
-$(package)_file_name=$($(package)_version).tar.gz
-$(package)_sha256_hash=dffc16695cb6e42fa318a4946fd42866c0f5ab735f7eaf450b108d1c3a19b4ba
+$(package)_download_file=$($(package)_version).tar.gz
+$(package)_file_name=$(package)-$($(package)_version).tar.gz
+$(package)_sha256_hash=25fdd6726d5c4c6f95c95d37591bfbb2dde63d13d0b10cb1350923ea8b11963b
 $(package)_dependencies=libiconv
 
 define $(package)_set_vars
-  $(package)_build_opts=CFLAGS="-fPIE"
-  $(package)_build_opts+=CXXFLAGS="-fPIE"
+  $(package)_cflags+=-fPIE
+  $(package)_cxxflags+=-fPIE
 endef
 
 define $(package)_preprocess_cmds
-    autoreconf -vfi
+  autoreconf -vfi
 endef
 
 define $(package)_set_vars
-    $(package)_config_opts=--prefix=$(host_prefix) --disable-shared --without-imagemagick --disable-video --without-xv --with-gtk=no --with-python=no --enable-doc=no --host=$(host)
+  $(package)_config_opts=--prefix=$(host_prefix) --disable-shared --without-imagemagick --disable-video --without-xv --with-gtk=no --with-python=no --enable-doc=no --host=$(host)
 endef
 
 define $(package)_config_cmds
-    CFLAGS="-fPIE" CXXFLAGS="-fPIE" $($(package)_autoconf) $($(package)_config_opts)
+  $($(package)_autoconf) $($(package)_config_opts)
 endef
 
 define $(package)_build_cmds
-    CFLAGS="-fPIE" CXXFLAGS="-fPIE" $(MAKE) $($(package)_build_opts)
+  $(MAKE) $($(package)_build_opts)
 endef
 
 define $(package)_stage_cmds
