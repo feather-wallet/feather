@@ -67,7 +67,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
 
     bool found = m_transactionHistory->transaction(index.row(), [this, &index, &result, &role](const TransactionInfo &tInfo) {
         if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
-            result = parseTransactionInfo(tInfo, index.row(), index.column(), role);
+            result = parseTransactionInfo(tInfo, index.column(), role);
         }
         else if (role == Qt::TextAlignmentRole) {
             switch (index.column()) {
@@ -139,14 +139,14 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tInfo, int row, int column, int role) const
+QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const
 {
     switch (column)
     {
         case Column::Date:
         {
             if (role == Qt::UserRole) {
-                return row;
+                return tInfo.timestamp();
             }
             return tInfo.timestamp().toString(QString("%1 %2 ").arg(conf()->get(Config::dateFormat).toString(),
                                                                     conf()->get(Config::timeFormat).toString()));
@@ -158,7 +158,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             if (role == Qt::UserRole) {
                 return tInfo.balanceDelta();
             }
-            auto amount = this->formatAmount(tInfo.balanceDelta());
+            QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
             amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
@@ -188,20 +188,12 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
             double fiat_rounded = ceil(Utils::roundSignificant(usd_amount, 3) * 100.0) / 100.0;
             return QString("%1").arg(Utils::amountToCurrencyString(fiat_rounded, preferredFiatCurrency));
         }
-        case Column::Balance:
-        {
-            return this->formatAmount(tInfo.balance());
-        }
         default:
         {
             qCritical() << "Unimplemented role";
             return {};
         }
     }
-}
-
-QString TransactionHistoryModel::formatAmount(quint64 amount) const {
-    return QString::number(amount / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
 }
 
 QVariant TransactionHistoryModel::headerData(int section, Qt::Orientation orientation, int role) const {
@@ -221,8 +213,6 @@ QVariant TransactionHistoryModel::headerData(int section, Qt::Orientation orient
                 return QString("Txid");
             case Column::FiatAmount:
                 return QString("Fiat");
-            case Column::Balance:
-                return QString("Balance");
             default:
                 return QVariant();
         }

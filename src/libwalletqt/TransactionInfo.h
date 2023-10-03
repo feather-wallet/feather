@@ -53,7 +53,6 @@ public:
     bool isFailed() const;
     bool isCoinbase() const;
     quint64 balanceDelta() const;
-    quint64 balance() const;
     double amount() const;
     quint64 atomicAmount() const;
     QString displayAmount() const;
@@ -81,7 +80,7 @@ public:
     QString rings_formatted() const;
 
 private:
-    explicit TransactionInfo(const Monero::TransactionInfo *pimpl, quint64 balance, QObject *parent = nullptr);
+    explicit TransactionInfo(const Monero::TransactionInfo *pimpl, QObject *parent = nullptr);
 private:
     friend class TransactionHistory;
     mutable QList<Transfer*> m_transfers;
@@ -103,7 +102,6 @@ private:
     QDateTime m_timestamp;
     quint64 m_unlockTime;
     bool m_coinbase;
-    quint64 m_balance;
 };
 
 #endif // TRANSACTIONINFO_H

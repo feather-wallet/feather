@@ -37,11 +37,6 @@ quint64 TransactionInfo::balanceDelta() const
     return m_amount;
 }
 
-quint64 TransactionInfo::balance() const
-{
-    return m_balance;
-}
-
 double TransactionInfo::amount() const
 {
     // there's no unsigned uint64 for JS, so better use double
@@ -172,7 +167,7 @@ QString TransactionInfo::rings_formatted() const
     return rings;
 }
 
-TransactionInfo::TransactionInfo(const Monero::TransactionInfo *pimpl, quint64 balance, QObject *parent)
+TransactionInfo::TransactionInfo(const Monero::TransactionInfo *pimpl, QObject *parent)
     : QObject(parent)
     , m_amount(pimpl->amount())
     , m_blockHeight(pimpl->blockHeight())
@@ -189,7 +184,6 @@ TransactionInfo::TransactionInfo(const Monero::TransactionInfo *pimpl, quint64 b
     , m_timestamp(QDateTime::fromSecsSinceEpoch(pimpl->timestamp()))
     , m_unlockTime(pimpl->unlockTime())
     , m_coinbase(pimpl->isCoinbase())
-    , m_balance(balance)
 {
     for (auto const &t: pimpl->transfers())
     {

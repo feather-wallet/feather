@@ -27,7 +27,6 @@ public:
         Description,
         Amount,
         FiatAmount,
-        Balance,
         COUNT
     };
 
@@ -48,8 +47,7 @@ signals:
     void transactionHistoryChanged();
 
 private:
-    QVariant parseTransactionInfo(const TransactionInfo &tInfo, int row, int column, int role) const;
-    QString formatAmount(quint64 amount) const;
+    QVariant parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const;
 
     TransactionHistory * m_transactionHistory;
 };
