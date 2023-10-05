@@ -79,7 +79,6 @@ SovereignStreetArt
 spoontechtips
 stickyf00t
 strace
-rottenwheel
 tevador
 thrmo
 tinkerwithtor
