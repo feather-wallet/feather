@@ -4,6 +4,7 @@ $(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/$
 $(package)_file_name=$(package)_$(subst .,_,$($(package)_version)).tar.bz2
 $(package)_sha256_hash=6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e
 $(package)_dependencies=libiconv
+$(package)_patches=disable_addr2line.patch
 
 define $(package)_set_vars
 $(package)_config_opts=variant=release
@@ -27,6 +28,7 @@ $(package)_cxxflags_freebsd=-fPIC
 endef
 
 define $(package)_preprocess_cmds
+  patch -p1 -i $($(package)_patch_dir)/disable_addr2line.patch && \
   echo "using $(boost_toolset_$(host_os)) : : $($(package)_cxx) : <cxxflags>\"$($(package)_cxxflags) $($(package)_cppflags)\" <linkflags>\"$($(package)_ldflags)\" <archiver>\"$(boost_archiver_$(host_os))\" <arflags>\"$($(package)_arflags)\" <striper>\"$(host_STRIP)\"  <ranlib>\"$(host_RANLIB)\" <rc>\"$(host_WINDRES)\" : ;" > user-config.jam
 endef
 
