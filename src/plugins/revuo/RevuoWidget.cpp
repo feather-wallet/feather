@@ -38,7 +38,8 @@ void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
         for (const auto &newsbyte : item->newsbytes) {
             text += "<p> • " + newsbyte + "</p>\n";
         }
-        text += "<br>\nEnjoy Revuo? Consider a <a href=\"feather://donate-revuo\">donation</a> to the author.";
+        text += QString("<br>\n<a href=\"%1\">Read the whole issue in your browser</a>").arg(item->url);
+        text += "<br><br>\nEnjoy Revuo? Consider a <a href=\"feather://donate-revuo\">donation</a> to the author.";
 
         m_items[item->title] = text;
         m_links[item->title] = item->url;
