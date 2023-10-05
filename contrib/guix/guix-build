@@ -467,7 +467,6 @@ EOF
                                          -- env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
                                                 VERSION="$VERSION" \
                                          bash -c "cd /feather && \
-                                                  bash contrib/debian/make_deb.sh && \
                                                   bash contrib/flatpak/make_flatpak.sh"
                 ;;
         esac
