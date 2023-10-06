@@ -7,8 +7,10 @@ get_store_path() {
     find gnu/store -maxdepth 1 -type d -name "*$1*" | sort | head -n 1
 }
 
-mkdir -p /output/flatpak
-cd /output/flatpak
+mkdir /tmp-output
+
+mkdir -p /tmp-output/flatpak
+cd /tmp-output/flatpak
 
 # Create build dir
 mkdir build
@@ -82,3 +84,19 @@ ln -s "/${GUIX_PROFILE}/share/xml" share/xml
 ln -s "/${GUIX_PROFILE}" profile
 
 chmod -R 555 .
+
+cd /tmp-output
+
+find . -print0 \
+    | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+find . \
+    | sort \
+    | zip -X@ "${DISTNAME}-flatpak.zip" \
+    || ( rm -f "${DISTNAME}-flatpak.zip" && exit 1 )
+
+mv "${DISTNAME}-flatpak.zip" /output
+
+cd /output
+rm feather
+
+sha256sum "${DISTNAME}-flatpak.zip" > SHA256SUMS.part

@@ -458,7 +458,7 @@ mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
     cd /outdir-base
     {
         echo "$GIT_ARCHIVE"
-        find "$ACTUAL_OUTDIR" -type f
+        find "$ACTUAL_OUTDIR" -type f -not -name "*.txt"
     } | xargs realpath --relative-base="$PWD" \
       | xargs sha256sum \
       | sort -k2 \

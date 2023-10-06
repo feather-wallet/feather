@@ -54,6 +54,30 @@ worktree to save disk space:
 ./contrib/guix/guix-clean
 ```
 
+
+## Attesting to build outputs
+
+After you've cloned the `feather-sigs` repository, to attest to the current
+worktree's commit/tag:
+
+```
+env GUIX_SIGS_REPO=<path/to/feather-sigs> SIGNER=<gpg-key-name> ./contrib/guix/guix-attest
+```
+
+See `./contrib/guix/guix-attest --help` for more information on the various ways
+`guix-attest` can be invoked.
+
+## Verifying build output attestations
+
+After at least one other signer has uploaded their signatures to the `feather-sigs`
+repository:
+
+```
+git -C <path/to/feather-sigs> pull
+env GUIX_SIGS_REPO=<path/to/feather-sigs> ./contrib/guix/guix-verify
+```
+
+
 ## Common `guix-build` invocation patterns and examples
 
 ### Keeping caches outside of the worktree

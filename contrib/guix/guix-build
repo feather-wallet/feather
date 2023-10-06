@@ -451,7 +451,7 @@ EOF
                 export VERSION=${VERSION}
                 time-machine pack -S /profile=. --manifest="${PWD}/contrib/guix/pack.scm"
                 PACK=$(time-machine pack --manifest="${PWD}/contrib/guix/pack.scm")
-                time-machine environment --ad-hoc unzip tar gzip findutils grep patchelf coreutils-minimal bash binutils sed \
+                time-machine environment --ad-hoc zip unzip tar gzip findutils grep patchelf coreutils-minimal bash binutils sed \
                                          --container \
                                          --pure \
                                          --no-cwd \
@@ -464,7 +464,8 @@ EOF
                                          --user="user" \
                                          ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                          ${ADDITIONAL_GUIX_COMMON_FLAGS} ${ADDITIONAL_GUIX_ENVIRONMENT_FLAGS} \
-                                         -- env SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
+                                         -- env DISTNAME="$DISTNAME" \
+                                                SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
                                                 VERSION="$VERSION" \
                                          bash -c "cd /feather && \
                                                   bash contrib/flatpak/make_flatpak.sh"
