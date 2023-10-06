@@ -56,26 +56,6 @@ FILE-NAME found in ./patches relative to the current file."
       ((%patch-path (list (string-append (dirname (current-filename)) "/patches"))))
     (list (search-patch file-name) ...)))
 
-(define-public mingw-w64-x86_64-winpthreads-10.0.0
-  (package (inherit mingw-w64-x86_64-winpthreads)
-    (name "mingw-w64-x86_64-winpthreads-10.0.0")
-    (version "10.0.0")
-    (source
-      (origin
-        (method url-fetch)
-        (uri (string-append
-              "mirror://sourceforge/mingw-w64/mingw-w64/"
-              "mingw-w64-release/mingw-w64-v" version ".tar.bz2"))
-        (sha256
-        (base32 "15089y4rlj6g1m2m3cm3awndw3rbzhznl7skd0vkmikjxl546sxs"))
-        (patches
-          (search-patches "mingw-w64-6.0.0-gcc.patch"
-                          "mingw-w64-dlltool-temp-prefix.patch"
-                          "mingw-w64-reproducible-gendef.patch"))))
-    (arguments
-      (substitute-keyword-arguments (package-arguments mingw-w64-x86_64-winpthreads)
-               ((#:parallel-build? _ #f) #f)))))
-
 (define building-on (string-append "--build=" (list-ref (string-split (%current-system) #\-) 0) "-guix-linux-gnu"))
 
 (define (make-cross-toolchain target
@@ -154,7 +134,7 @@ desirable for building Feather Wallet release binaries."
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
   (let* ((xbinutils (cross-binutils target))
-         (pthreads-xlibc mingw-w64-x86_64-winpthreads-10.0.0)
+         (pthreads-xlibc mingw-w64-x86_64-winpthreads)
          (pthreads-xgcc (cross-gcc target
                                     #:xgcc (gcc-mingw-patches mingw-w64-base-gcc)
                                     #:xbinutils xbinutils
