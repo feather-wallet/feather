@@ -1,8 +1,8 @@
 package=eudev
-$(package)_version=3.2.12
+$(package)_version=3.2.14
 $(package)_download_path=https://github.com/eudev-project/eudev/releases/download/v$($(package)_version)/
 $(package)_file_name=eudev-$($(package)_version).tar.gz
-$(package)_sha256_hash=ccdd64ec3c381d3c3ed0e99d2e70d1f62988c7763de89ca7bdffafa5eacb9ad8
+$(package)_sha256_hash=8da4319102f24abbf7fff5ce9c416af848df163b29590e666d334cc1927f006f
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-gudev --disable-introspection --disable-hwdb --disable-manpages --disable-shared
