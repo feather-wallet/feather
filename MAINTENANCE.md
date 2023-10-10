@@ -19,6 +19,8 @@ This document is written for developers and users interested in learning how Fea
 Goals:
 
 - Set up a bug bounty program for issues that affect privacy or security
+- Set up a status page with information about project health
+- Set up a feed for security bulletins
 
 Security issues that affect Feather always warrant a new release as soon as possible.
 
@@ -27,10 +29,6 @@ Security issues that affect Feather always warrant a new release as soon as poss
 - Improve and maintain tools to check for reproducibility defects
 - Ensure releases are reproducible and stay that way
 - Upload source archives to the fallback mirror
-
-Goals:
-- Update Guix to benefit from the [full-source bootstrap](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/)
-- Implement a system for verified reproduction
 
 To learn more about Feather's build system, see: `contrib/guix/README.md`
 
@@ -72,13 +70,11 @@ Improving features that are closer to this end should have priority.
 
 ### 7. Packaging
 
-- Package Feather for more distributions
 - Add support for more architectures and operating systems
 - Drop support for End-of-Life distributions
 
 Goals:
 
-- Bootstrappable Flatpaks
 - Debian and Guix packages
 - Create a document with guidelines for packagers
 
