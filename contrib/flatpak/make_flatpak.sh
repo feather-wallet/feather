@@ -91,7 +91,7 @@ find . -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
 find . \
     | sort \
-    | zip -X@ "${DISTNAME}-flatpak.zip" \
+    | zip -y -X@ "${DISTNAME}-flatpak.zip" \
     || ( rm -f "${DISTNAME}-flatpak.zip" && exit 1 )
 
 mv "${DISTNAME}-flatpak.zip" /output
