@@ -2,70 +2,27 @@
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "QrScanThread.h"
-#include <QtGlobal>
 #include <QDebug>
+
+#include <ZXing/ReadBarcode.h>
 
 QrScanThread::QrScanThread(QObject *parent)
     : QThread(parent)
     , m_running(true)
 {
-    m_scanner.set_handler(*this);
-}
-
-void QrScanThread::image_callback(zbar::Image &image)
-{
-    qDebug() << "image_callback :  Found Code ! " ;
-    for (zbar::Image::SymbolIterator sym = image.symbol_begin(); sym != image.symbol_end(); ++sym) {
-        if (!sym->get_count()) {
-            QString data = QString::fromStdString(sym->get_data());
-            emit decoded(sym->get_type(), data);
-        }
-    }
-}
-
-void QrScanThread::processZImage(zbar::Image &image)
-{
-    m_scanner.recycle_image(image);
-    zbar::Image tmp = image.convert(zbar_fourcc('Y', '8', '0', '0'));
-    m_scanner.scan(tmp);
-    image.set_symbols(tmp.get_symbols());
-}
-
-bool QrScanThread::zimageFromQImage(const QImage &qimg, zbar::Image &dst)
-{
-    switch (qimg.format()) {
-        case QImage::Format_RGB32 :
-        case QImage::Format_ARGB32 :
-        case QImage::Format_ARGB32_Premultiplied :
-            break;
-        default :
-            qDebug() << "Format: " << qimg.format();
-            emit notifyError(QString("Invalid QImage Format !"));
-            return false;
-    }
-    unsigned int bpl( qimg.bytesPerLine() ), width( bpl / 4), height( qimg.height());
-    dst.set_size(width, height);
-    dst.set_format("BGR4");
-    unsigned long datalen = qimg.sizeInBytes();
-    dst.set_data(qimg.bits(), datalen);
-    if((width * 4 != bpl) || (width * height * 4 > datalen)){
-        emit notifyError(QString("QImage to Zbar::Image failed !"));
-        return false;
-    }
-    return true;
 }
 
 void QrScanThread::processQImage(const QImage &qimg)
 {
-    try {
-        m_image = QSharedPointer<zbar::Image>(new zbar::Image());
-        if (!zimageFromQImage(qimg, *m_image))
-            return;
-        processZImage(*m_image);
-    }
-    catch(std::exception &e) {
-        qDebug() << "ERROR: " << e.what();
-        emit notifyError(e.what());
+    const auto hints = ZXing::DecodeHints()
+            .setFormats(ZXing::BarcodeFormat::QRCode | ZXing::BarcodeFormat::DataMatrix)
+            .setTryHarder(true)
+            .setBinarizer(ZXing::Binarizer::FixedThreshold);
+
+    const auto result = QrCodeUtils::ReadBarcode(qimg, hints);
+
+    if (result.isValid()) {
+        emit decoded(result.text());
     }
 }
 

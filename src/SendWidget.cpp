@@ -13,11 +13,8 @@
 #include "Icons.h"
 #include "libwalletqt/WalletManager.h"
 
-#if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#if defined(WITH_SCANNER)
 #include "qrcode/scanner/QrCodeScanDialog.h"
-#include <QtMultimedia/QCameraInfo>
-#elif defined(WITH_SCANNER)
-#include "qrcode/scanner_qt6//QrCodeScanDialog.h"
 #include <QMediaDevices>
 #endif
 

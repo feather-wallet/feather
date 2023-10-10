@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>490</width>
+    <height>422</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,7 +15,7 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QCameraViewfinder" name="viewfinder" native="true">
+    <widget class="QVideoWidget" name="viewfinder" native="true">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
        <horstretch>0</horstretch>
@@ -32,7 +32,7 @@
      <property name="frameShadow">
       <enum>QFrame::Raised</enum>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
       <item>
        <widget class="QLabel" name="icon_warning">
         <property name="sizePolicy">
@@ -56,14 +56,14 @@
         </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>10</width>
+          <width>55</width>
           <height>0</height>
          </size>
         </property>
        </spacer>
       </item>
       <item>
-       <widget class="QLabel" name="label">
+       <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Lost connection to camera. Please restart scan dialog.</string>
         </property>
@@ -99,9 +99,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QCameraViewfinder</class>
+   <class>QVideoWidget</class>
    <extends>QWidget</extends>
-   <header>qcameraviewfinder.h</header>
+   <header>qvideowidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

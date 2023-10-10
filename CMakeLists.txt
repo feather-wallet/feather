@@ -92,11 +92,9 @@ if(Polyseed_SUBMODULE)
     add_subdirectory(src/third-party/polyseed EXCLUDE_FROM_ALL)
 endif()
 
-# ZBAR
+# ZXing
 if(WITH_SCANNER)
-    find_package(ZBAR REQUIRED)
-    message(STATUS "libzbar: include dir at ${ZBAR_INCLUDE_DIR}")
-    message(STATUS "libzbar: libraries at ${ZBAR_LIBRARIES}")
+    find_package(ZXing REQUIRED)
 endif()
 
 # libzip

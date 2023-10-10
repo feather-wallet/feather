@@ -6,9 +6,10 @@
 
 #include <QDialog>
 #include <QCamera>
-#include <QCameraImageCapture>
+#include <QScopedPointer>
+#include <QMediaCaptureSession>
 #include <QTimer>
-#include <QVideoFrame>
+#include <QVideoSink>
 
 #include "QrScanThread.h"
 
@@ -28,23 +29,19 @@ public:
 
 private slots:
     void onCameraSwitched(int index);
-    void onDecoded(int type, const QString &data);
-    void notifyError(const QString &msg);
+    void onDecoded(const QString &data);
 
 private:
-    void processAvailableImage(int id, const QVideoFrame &frame);
-    void displayCaptureError(int, QCameraImageCapture::Error, const QString &errorString);
-    void displayCameraError();
-    void takeImage();
+    QImage videoFrameToImage(const QVideoFrame &videoFrame);
+    void handleFrameCaptured(const QVideoFrame &videoFrame);
 
     QScopedPointer<Ui::QrCodeScanDialog> ui;
 
-    QScopedPointer<QCamera> m_camera;
-    QScopedPointer<QCameraImageCapture> m_imageCapture;
-
     QrScanThread *m_thread;
-    QTimer m_imageTimer;
-    QList<QCameraInfo> m_cameras;
+    QScopedPointer<QCamera> m_camera;
+    QMediaCaptureSession m_captureSession;
+    QVideoSink m_sink;
 };
+
 
 #endif //FEATHER_QRCODESCANDIALOG_H

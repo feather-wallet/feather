@@ -4,31 +4,34 @@
 #include "QrCodeScanDialog.h"
 #include "ui_QrCodeScanDialog.h"
 
+#include <QCamera>
+#include <QMediaDevices>
+#include <QCameraDevice>
 #include <QMessageBox>
-#include <QtMultimedia/QCamera>
-#include <QtMultimedia/QCameraInfo>
+#include <QImageCapture>
+#include <QVideoFrame>
+
+#include "Utils.h"
 
 QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
-    : QDialog(parent)
-    , ui(new Ui::QrCodeScanDialog)
+        : QDialog(parent)
+        , ui(new Ui::QrCodeScanDialog)
+        , m_sink(new QVideoSink(this))
 {
     ui->setupUi(this);
-    this->setWindowTitle("Scan QR Code");
+    this->setWindowTitle("Scan QR code");
 
     QPixmap pixmap = QPixmap(":/assets/images/warning.png");
     ui->icon_warning->setPixmap(pixmap.scaledToWidth(32, Qt::SmoothTransformation));
 
-    m_cameras = QCameraInfo::availableCameras();
-
-    for (const auto &camera : m_cameras) {
-#ifdef Q_OS_WIN
+    const QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+    for (const auto &camera : cameras) {
         ui->combo_camera->addItem(camera.description());
-#else
-        ui->combo_camera->addItem(camera.deviceName());
-#endif
     }
-
+    
     connect(ui->combo_camera, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &QrCodeScanDialog::onCameraSwitched);
+
+    connect(ui->viewfinder->videoSink(), &QVideoSink::videoFrameChanged, this, &QrCodeScanDialog::handleFrameCaptured);
 
     this->onCameraSwitched(0);
 
@@ -36,78 +39,57 @@ QrCodeScanDialog::QrCodeScanDialog(QWidget *parent)
     m_thread->start();
 
     connect(m_thread, &QrScanThread::decoded, this, &QrCodeScanDialog::onDecoded);
-    connect(m_thread, &QrScanThread::notifyError, this, &QrCodeScanDialog::notifyError);
-
-    connect(&m_imageTimer, &QTimer::timeout, this, &QrCodeScanDialog::takeImage);
-    m_imageTimer.start(500);
 }
 
-void QrCodeScanDialog::onCameraSwitched(int index) {
-    if (index >= m_cameras.size()) {
-        return;
-    }
-
-    m_camera.reset(new QCamera(m_cameras.at(index)));
-
-    auto captureMode = QCamera::CaptureStillImage;
-    if (m_camera->isCaptureModeSupported(captureMode)) {
-        m_camera->setCaptureMode(captureMode);
-    }
-
-    connect(m_camera.data(), QOverload<QCamera::Error>::of(&QCamera::error), this, &QrCodeScanDialog::displayCameraError);
-    connect(m_camera.data(), &QCamera::statusChanged, [this](QCamera::Status status){
-        bool unloaded = (status == QCamera::Status::UnloadedStatus);
-        ui->frame_unavailable->setVisible(unloaded);
-    });
-
-    m_imageCapture.reset(new QCameraImageCapture(m_camera.data()));
-    if (!m_imageCapture->isCaptureDestinationSupported(QCameraImageCapture::CaptureToBuffer)) {
-        qDebug()  << "Capture to buffer is NOT supported";
-    }
-
-    m_imageCapture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-
-    connect(m_imageCapture.data(), &QCameraImageCapture::imageAvailable, this, &QrCodeScanDialog::processAvailableImage);
-    connect(m_imageCapture.data(), QOverload<int, QCameraImageCapture::Error, const QString &>::of(&QCameraImageCapture::error),
-            this, &QrCodeScanDialog::displayCaptureError);
-
-    m_camera->setViewfinder(ui->viewfinder);
-    m_camera->start();
-}
-
-void QrCodeScanDialog::displayCaptureError(int id, const QCameraImageCapture::Error error, const QString &errorString)
-{
-    Q_UNUSED(id);
-    Q_UNUSED(error);
-    QMessageBox::warning(this, "Image Capture Error", errorString);
-}
-
-void QrCodeScanDialog::displayCameraError()
-{
-    QMessageBox::warning(this, "Camera Error", m_camera->errorString());
-}
-
-void QrCodeScanDialog::processAvailableImage(int id, const QVideoFrame &frame) {
-    Q_UNUSED(id);
-    QImage img = frame.image();
-    img.convertTo(QImage::Format_RGB32);
+void QrCodeScanDialog::handleFrameCaptured(const QVideoFrame &frame) {
+    QImage img = this->videoFrameToImage(frame);
     m_thread->addImage(img);
 }
 
-void QrCodeScanDialog::takeImage()
+QImage QrCodeScanDialog::videoFrameToImage(const QVideoFrame &videoFrame)
 {
-    if (m_imageCapture->isReadyForCapture()) {
-        m_imageCapture->capture();
+    auto handleType = videoFrame.handleType();
+
+    if (handleType == QVideoFrame::NoHandle) {
+
+        QImage image = videoFrame.toImage();
+
+        if (image.isNull()) {
+            return {};
+        }
+
+        if (image.format() != QImage::Format_ARGB32) {
+            image = image.convertToFormat(QImage::Format_ARGB32);
+        }
+        
+        return image.copy();
     }
+    
+    return {};
 }
 
-void QrCodeScanDialog::onDecoded(int type, const QString &data) {
+
+void QrCodeScanDialog::onCameraSwitched(int index) {
+    const QList<QCameraDevice> cameras = QMediaDevices::videoInputs();
+
+    if (index >= cameras.size()) {
+        return;
+    }
+
+    m_camera.reset(new QCamera(cameras.at(index)));
+    m_captureSession.setCamera(m_camera.data());
+    m_captureSession.setVideoOutput(ui->viewfinder);
+
+    connect(m_camera.data(), &QCamera::activeChanged, [this](bool active){
+        ui->frame_unavailable->setVisible(!active);
+    });
+
+    m_camera->start();
+}
+
+void QrCodeScanDialog::onDecoded(const QString &data) {
     decodedString = data;
     this->accept();
-}
-
-void QrCodeScanDialog::notifyError(const QString &msg) {
-    qDebug() << "QrScanner error: " << msg;
 }
 
 QrCodeScanDialog::~QrCodeScanDialog()

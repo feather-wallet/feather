@@ -2,52 +2,46 @@
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "QrCodeUtils.h"
-#include <QDebug>
 
-bool QrCodeUtils::zimageFromQImage(const QImage &qImg, zbar::Image &dst) {
-    qDebug() << qImg.format();
-    switch (qImg.format()) {
-        case QImage::Format_RGB32 :
-        case QImage::Format_ARGB32 :
-        case QImage::Format_ARGB32_Premultiplied :
-            break;
-        default :
-            return false;
-    }
+Result QrCodeUtils::ReadBarcode(const QImage& img, const ZXing::DecodeHints& hints)
+{
+    auto ImgFmtFromQImg = [](const QImage& img){
+        switch (img.format()) {
+            case QImage::Format_ARGB32:
+            case QImage::Format_RGB32:
+#if Q_BYTE_ORDER == Q_LITTLE_ENDIAN
+                return ZXing::ImageFormat::BGRX;
 
-    unsigned int bpl(qImg.bytesPerLine());
-    unsigned int width(bpl / 4);
-    unsigned int height(qImg.height());
+#else
+                return ZXing::ImageFormat::XRGB;
 
-    dst.set_size(width, height);
-    dst.set_format("BGR4");
-    unsigned long datalen = qImg.sizeInBytes();
-    dst.set_data(qImg.bits(), datalen);
-    if ((width * 4 != bpl) || (width * height * 4 > datalen)) {
-        return false;
-    }
-    return true;
+#endif
+            case QImage::Format_RGB888: return ZXing::ImageFormat::RGB;
+
+            case QImage::Format_RGBX8888:
+            case QImage::Format_RGBA8888: return ZXing::ImageFormat::RGBX;
+
+            case QImage::Format_Grayscale8: return ZXing::ImageFormat::Lum;
+
+            default: return ZXing::ImageFormat::None;
+        }
+    };
+
+    auto exec = [&](const QImage& img){
+        return Result(ZXing::ReadBarcode({ img.bits(), img.width(), img.height(), ImgFmtFromQImg(img) }, hints));
+    };
+
+    return ImgFmtFromQImg(img) == ZXing::ImageFormat::None ? exec(img.convertToFormat(QImage::Format_RGBX8888)) : exec(img);
 }
 
+
 QString QrCodeUtils::scanImage(const QImage &img) {
-    zbar::ImageScanner scanner;
-    scanner.set_config(zbar::ZBAR_NONE, zbar::ZBAR_CFG_ENABLE, 1);
+    const auto hints = ZXing::DecodeHints()
+            .setFormats(ZXing::BarcodeFormat::QRCode | ZXing::BarcodeFormat::DataMatrix)
+            .setTryHarder(true)
+            .setBinarizer(ZXing::Binarizer::FixedThreshold);
 
-    zbar::Image zImg;
-    int r = zimageFromQImage(img, zImg);
-    if (!r) {
-        qWarning() << "Unable to convert QImage into zbar::Image";
-        return "";
-    }
+    const auto result = ReadBarcode(img, hints);
 
-    zbar::Image scanImg = zImg.convert(zbar_fourcc('Y', '8', '0', '0'));
-    scanner.scan(scanImg);
-
-    QString result;
-    for (zbar::Image::SymbolIterator sym = scanImg.symbol_begin(); sym != scanImg.symbol_end(); ++sym) {
-        if (!sym->get_count()) {
-            result = QString::fromStdString(sym->get_data());
-        }
-    }
-    return result;
+    return result.text();
 }

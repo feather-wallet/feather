@@ -85,16 +85,10 @@ if (WITH_SCANNER)
             "qrcode/utils/*.cpp")
 endif()
 
-if (WITH_SCANNER AND NOT Qt6_FOUND)
+if (WITH_SCANNER AND Qt6_FOUND)
     file(GLOB SCANNER_FILES
             "qrcode/scanner/*.h"
             "qrcode/scanner/*.cpp")
-endif()
-
-if (WITH_SCANNER AND Qt6_FOUND)
-    file(GLOB SCANNER_FILES
-            "qrcode/scanner_qt6/*.h"
-            "qrcode/scanner_qt6/*.cpp")
 endif()
 
 list(APPEND SOURCE_FILES
@@ -161,9 +155,9 @@ target_include_directories(feather PUBLIC
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
-            ${ZBAR_INCLUDE_DIR}
             ${QtMultimedia_INCLUDE_DIRS}
             ${QtMultimediaWidgets_INCLUDE_DIRS}
+            ${ZXING_INCLUDE_DIRS}
     )
 endif()
 
@@ -191,7 +185,7 @@ if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
-if(WITH_SCANNER)
+if(WITH_SCANNER AND Qt6_FOUND)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
@@ -281,9 +275,9 @@ endif()
 
 if (WITH_SCANNER)
     target_link_libraries(feather
-            ${ZBAR_LIBRARIES}
             Qt::Multimedia
             Qt::MultimediaWidgets
+            ${ZXING_LIBRARIES}
     )
 endif()
 
