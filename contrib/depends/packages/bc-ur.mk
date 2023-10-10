@@ -1,7 +1,8 @@
 package=bc-ur
 $(package)_version=0.3.0
-$(package)_download_path=https://github.com/BlockchainCommons/bc-ur/archive/refs/tags/
-$(package)_file_name=$($(package)_version).tar.gz
+$(package)_download_path=https://github.com/BlockchainCommons/$(package)/archive/refs/tags/
+$(package)_download_file=$($(package)_version).tar.gz
+$(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=2b9455766ce84ae9f7013c9a72d749034dddefb3f515145d585c732f17e7fa94
 $(package)_patches=build-fix.patch
 
