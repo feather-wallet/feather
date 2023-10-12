@@ -9,6 +9,7 @@ set(QT_COMPONENTS
         Network
         Svg
         WebSockets
+        SvgWidgets
 )
 
 if (WITH_SCANNER)
@@ -17,10 +18,7 @@ if (WITH_SCANNER)
             MultimediaWidgets)
 endif()
 
-find_package(Qt6 COMPONENTS ${QT_COMPONENTS} SvgWidgets)
-if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS ${QT_COMPONENTS})
-endif()
+find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(third-party/singleapplication)
@@ -85,7 +83,7 @@ if (WITH_SCANNER)
             "qrcode/utils/*.cpp")
 endif()
 
-if (WITH_SCANNER AND Qt6_FOUND)
+if (WITH_SCANNER)
     file(GLOB SCANNER_FILES
             "qrcode/scanner/*.h"
             "qrcode/scanner/*.cpp")
@@ -185,7 +183,7 @@ if(XMRIG)
     target_compile_definitions(feather PRIVATE HAS_XMRIG=1)
 endif()
 
-if(WITH_SCANNER AND Qt6_FOUND)
+if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
@@ -248,6 +246,7 @@ target_link_libraries(feather
         Qt::Network
         Qt::Svg
         Qt::WebSockets
+        Qt::SvgWidgets
         Threads::Threads
         ${QRENCODE_LIBRARY}
         ${POLYSEED_LIBRARY}
@@ -265,10 +264,6 @@ if(DEPENDS)
     target_link_libraries(feather ${ICONV_LIBRARIES})
 endif()
 
-if(Qt6_FOUND)
-    target_link_libraries(feather Qt::SvgWidgets)
-endif()
-
 if(DEVICE_TREZOR_READY)
     target_link_libraries(feather ${TREZOR_DEP_LIBS})
 endif()
@@ -281,15 +276,7 @@ if (WITH_SCANNER)
     )
 endif()
 
-if(UNIX AND NOT APPLE AND STATIC AND NOT Qt6_FOUND)
-    target_link_libraries(feather
-            Qt5::QSvgIconPlugin
-            Qt5::QSvgPlugin
-            Qt5::QXcbIntegrationPlugin
-    )
-endif()
-
-if(STATIC AND UNIX AND NOT APPLE AND Qt6_FOUND)
+if(STATIC AND UNIX AND NOT APPLE)
     target_link_libraries(feather Qt6::QComposePlatformInputContextPlugin)
 endif()
 

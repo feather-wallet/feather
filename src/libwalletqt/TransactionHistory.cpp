@@ -45,11 +45,7 @@ TransactionInfo* TransactionHistory::transaction(int index)
 
 void TransactionHistory::refresh(quint32 accountIndex)
 {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
     QDateTime firstDateTime = QDate(2014, 4, 18).startOfDay();
-#else
-    QDateTime firstDateTime = QDateTime(QDate(2014, 4, 18)); // the genesis block
-#endif
     QDateTime lastDateTime  = QDateTime::currentDateTime().addDays(1); // tomorrow (guard against jitter and timezones)
 
     emit refreshStarted();

@@ -125,10 +125,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         constants::networkType = NetworkType::MAINNET;
 
     // Setup QApplication
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication::setAttribute(Qt::AA_DisableWindowContextHelpButton);
-#endif
     QApplication::setDesktopSettingsAware(true); // use system font
     QApplication::setApplicationVersion(FEATHER_VERSION);
 

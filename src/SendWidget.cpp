@@ -120,18 +120,7 @@ void SendWidget::fillAddress(const QString &address) {
 }
 
 void SendWidget::scanClicked() {
-#if defined(WITH_SCANNER) && QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    auto cameras = QCameraInfo::availableCameras();
-    if (cameras.count() < 1) {
-        Utils::showError(this, "Can't open QR scanner", "No available cameras found");
-        return;
-    }
-
-    auto *dialog = new QrCodeScanDialog(this);
-    dialog->exec();
-    ui->lineAddress->setText(dialog->decodedString);
-    dialog->deleteLater();
-#elif defined(WITH_SCANNER)
+#if defined(WITH_SCANNER)
     auto cameras = QMediaDevices::videoInputs();
     if (cameras.empty()) {
         Utils::showError(this, "Can't open QR scanner", "No available cameras found");
