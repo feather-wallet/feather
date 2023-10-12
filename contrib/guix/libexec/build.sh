@@ -234,7 +234,11 @@ GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 if [ ! -e "$GIT_ARCHIVE" ]; then
     mkdir -p "$(dirname "$GIT_ARCHIVE")"
     git rev-parse --short=12 HEAD > githash.txt
-    ( git ls-files --recurse-submodules ; echo "githash.txt" ) | cat | tar --transform "s,^,${DISTNAME}/," -caf ${GIT_ARCHIVE} -T-
+    ( git ls-files --recurse-submodules ; echo "githash.txt" ) \
+    | cat \
+    | sort \
+    | tar --create --transform "s,^,${DISTNAME}/," --mode='u+rw,go+r-w,a+X' --files-from=- \
+    | gzip -9n > ${GIT_ARCHIVE}
     sha256sum "$GIT_ARCHIVE"
 fi
 

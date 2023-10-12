@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-set -ex
+export LC_ALL=C
+set -ex -o pipefail
+export TZ=UTC
 
 APP_ID="org.featherwallet.Feather"
 
@@ -17,7 +19,7 @@ mkdir build
 cd build
 
 mkdir export
-cp -a /feather/contrib/flatpak/share export
+cp -r /feather/contrib/flatpak/share export
 rm -rf export/share/app-info
 
 # Copy the metadata file
@@ -33,7 +35,7 @@ cp /feather/contrib/depends/x86_64-linux-gnu/bin/startup .
 cp /feather-bin feather
 
 # Copy metadata
-cp -a /feather/contrib/flatpak/share .
+cp -r /feather/contrib/flatpak/share .
 touch --no-dereference --date="@${SOURCE_DATE_EPOCH}" share/metainfo/${APP_ID}.metainfo.xml
 gzip -c share/metainfo/${APP_ID}.metainfo.xml > share/app-info/xmls/${APP_ID}.xml.gz
 
@@ -83,9 +85,9 @@ ln -s "/${GUIX_PROFILE}/share/xml" share/xml
 # Setup profile symlink
 ln -s "/${GUIX_PROFILE}" profile
 
-chmod -R 555 .
-
 cd /tmp-output
+
+chmod -R 755 .
 
 find . -print0 \
     | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
