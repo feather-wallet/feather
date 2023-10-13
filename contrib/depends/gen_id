@@ -40,7 +40,7 @@
 
     # LINES=\|COLUMNS=\|\|HOSTTYPE=\|OSTYPE=\|MACHTYPE=\|HOSTNAME=
     echo "BEGIN environment"
-    bash -c "printenv | sort | grep -v '^\(BASE_CACHE=\|DISTNAME=\|DISTSRC=\|OUTDIR=\|SOURCES_PATH=\|JOBS=\)'"
+    bash -c "printenv | sort | grep -v '^\(BASE_CACHE=\|DISTNAME=\|DISTSRC=\|OUTDIR=\|SOURCES_PATH=\|JOBS=\|OPTIONS=\)'"
     echo "END environment"
 
     echo "END ALL"
