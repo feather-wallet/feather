@@ -7,31 +7,31 @@ currently supported.
 
 ### Dependencies
 
-Note: Feather uses Qt 5.15.* or Qt 6.2+. Make sure your distro's package manager provides these versions. 
+Note: Feather requires Qt 6.3 or later. Make sure your distro's package manager provides this version. 
 If not, it is recommended that you install Qt manually using the online installer, which can be found here:
 https://www.qt.io/download (under open-source).
 
 #### Arch Linux
 
 ```bash
-pacman -S git cmake base-devel ccache unbound boost qrencode zbar qt6-base qt6-svg qt6-websockets qt6-multimedia libzip hidapi protobuf
+pacman -S git cmake base-devel ccache unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-multimedia libzip hidapi protobuf zxing-cpp
 ```
 
 #### Ubuntu 22.04
 
 ```bash
 apt update
-apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev libqrencode-dev libzbar-dev \
+apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev libqrencode-dev  \
     qt6-base-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev libzip-dev libsodium-dev libgcrypt-dev \
-    libx11-xcb-dev libprotobuf-dev libhidapi-dev
+    libx11-xcb-dev libprotobuf-dev libhidapi-dev libzxing-dev
 ```
 
 #### Void Linux
 
 ```bash
-xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodium-devel libzbar-devel zlib-devel qt6-base-devel \
+xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodium-devel zlib-devel qt6-base-devel \
                 qt6-svg-devel qt6-websockets-devel qt6-multimedia-devel libgcrypt-devel libzip-devel hidapi-devel protobuf \
-                protobuf-devel qrencode-devel
+                protobuf-devel qrencode-devel zxing-cpp-devel
 ```
 
 #### macOS
@@ -39,8 +39,10 @@ xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodi
 For macOS it's easiest to leverage [brew](https://brew.sh) to install the required dependencies.
 
 ```bash
-brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig zbar
+brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig
 ```
+
+Build [zxing-cpp](https://github.com/zxing-cpp/zxing-cpp) from source or compile Feather with `-DWITH_SCANNER=Off`.
 
 ### Tor daemon
 
