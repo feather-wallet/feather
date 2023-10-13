@@ -7,6 +7,7 @@ export LC_ALL=C
 set -e -o pipefail
 export TZ=UTC
 export DEBUG_GENID=1
+export HOSTNAME=host
 
 # shellcheck source=contrib/shell/git-utils.bash
 source contrib/shell/git-utils.bash

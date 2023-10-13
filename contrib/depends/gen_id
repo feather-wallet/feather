@@ -34,37 +34,14 @@
     echo "$@"
     echo "END ID SALT"
 
-    # GCC only prints COLLECT_LTO_WRAPPER when invoked with just "-v", but we want
-    # the information from "-v -E -" as well, so just include both.
-    echo "BEGIN CC"
-    bash -c "${CC} -v"
-    bash -c "${CC} -v -E -xc -o /dev/null - < /dev/null"
-    bash -c "${CC} -v -E -xobjective-c -o /dev/null - < /dev/null"
-    echo "C_STANDARD=${C_STANDARD}"
-    echo "END CC"
+    echo "BEGIN /gnu/store"
+    bash -c "ls -1 /gnu/store | sort"
+    echo "END /gnu/store"
 
-    echo "BEGIN CXX"
-    bash -c "${CXX} -v"
-    bash -c "${CXX} -v -E -xc++ -o /dev/null - < /dev/null"
-    bash -c "${CXX} -v -E -xobjective-c++ -o /dev/null - < /dev/null"
-    echo "CXX_STANDARD=${CXX_STANDARD}"
-    echo "END CXX"
-
-    echo "BEGIN AR"
-    bash -c "${AR} --version"
-    env | grep '^AR_'
-    echo "ZERO_AR_DATE=${ZERO_AR_DATE}"
-    echo "END AR"
-
-    echo "BEGIN RANLIB"
-    bash -c "${RANLIB} --version"
-    env | grep '^RANLIB_'
-    echo "END RANLIB"
-
-    echo "BEGIN STRIP"
-    bash -c "${STRIP} --version"
-    env | grep '^STRIP_'
-    echo "END STRIP"
+    # LINES=\|COLUMNS=\|\|HOSTTYPE=\|OSTYPE=\|MACHTYPE=\|HOSTNAME=
+    echo "BEGIN environment"
+    bash -c "printenv | sort | grep -v '^\(BASE_CACHE=\|DISTNAME=\|DISTSRC=\|OUTDIR=\|SOURCES_PATH=\|JOBS=\)'"
+    echo "END environment"
 
     echo "END ALL"
 ) | if [ -n "$DEBUG_GENID" ] && command -v tee > /dev/null 2>&1; then
