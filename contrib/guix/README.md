@@ -61,11 +61,14 @@ After you've cloned the `feather-sigs` repository, to attest to the current
 worktree's commit/tag:
 
 ```
-env GUIX_SIGS_REPO=<path/to/feather-sigs> SIGNER=<gpg-key-name> ./contrib/guix/guix-attest
+env GUIX_SIGS_REPO=<path/to/feather-sigs> SIGNER=<gpg-key-fingerprint>=<gh_username> ./contrib/guix/guix-attest
 ```
 
 See `./contrib/guix/guix-attest --help` for more information on the various ways
 `guix-attest` can be invoked.
+
+For a step-by-step walkthrough, see: https://paste.debian.net/plainh/2457c02c. Make sure to replace the version number
+with the version you want to build.
 
 ## Verifying build output attestations
 
@@ -169,9 +172,8 @@ details.
   Override the space-separated list of platform triples for which to perform a
   bootstrappable build.
 
-  _(defaults to "x86\_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu
-  riscv64-linux-gnu powerpc64-linux-gnu powerpc64le-linux-gnu
-  x86\_64-w64-mingw32 x86\_64-apple-darwin arm64-apple-darwin")_
+  _(defaults to "x86\_64-linux-gnu aarch64-linux-gnu arm-linux-gnueabihf x86\_64-linux-gnu.no-tor-bundle 
+ x86\_64-linux-gnu.pack riscv64-linux-gnu x86\_64-w64-mingw32 x86\_64-w64-mingw32.installer x86\_64-apple-darwin arm64-apple-darwin")_
 
 * _**SOURCES_PATH**_
 
@@ -204,13 +206,6 @@ details.
   more details.
 
   _(defaults to the value of `nproc` outside the container)_
-
-* _**SOURCE_DATE_EPOCH**_
-
-  Override the reference UNIX timestamp used for bit-for-bit reproducibility,
-  the variable name conforms to [standard][r12e/source-date-epoch].
-
-  _(defaults to the output of `$(git log --format=%at -1)`)_
 
 * _**V**_
 
