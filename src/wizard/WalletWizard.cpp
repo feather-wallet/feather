@@ -76,6 +76,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     layout << QWizard::BackButton;
     layout << QWizard::NextButton;
     layout << QWizard::FinishButton;
+    layout << QWizard::CommitButton;
     this->setButtonLayout(layout);
 
     auto *settingsButton = new QPushButton("Settings", this);
