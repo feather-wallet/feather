@@ -166,6 +166,11 @@ void DocsDialog::filterIndex(const QString &text) {
 }
 
 void DocsDialog::showDoc(const QString &doc, const QString &highlight) {
+    ColorScheme::updateFromWidget(this);
+    QPalette p = qApp->palette();
+    p.setBrush(QPalette::Link, ColorScheme::darkScheme ? ColorScheme::BLUE.asColor() : QColor("blue"));
+    qApp->setPalette(p);
+
     QString resource = doc;
 
     if (!resource.startsWith("qrc")) {
