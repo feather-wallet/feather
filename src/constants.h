@@ -23,6 +23,7 @@ namespace constants
 
     // donation constants
     const QString donationAddress = "47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f";
+    const QString donationDescription = "Donation to the Feather development team";
     const int donationBoundary = 25;
 }
 

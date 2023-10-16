@@ -90,6 +90,11 @@ void SendWidget::addressEdited() {
     }
 
     ui->btn_openAlias->setVisible(ui->lineAddress->isOpenAlias());
+
+    // Clear donation description if address no longer matches
+    if (ui->lineDescription->text() == constants::donationDescription && ui->lineAddress->text() != constants::donationAddress) {
+        ui->lineDescription->clear();
+    }
 }
 
 void SendWidget::amountEdited(const QString &text) {

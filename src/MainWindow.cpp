@@ -1067,7 +1067,7 @@ void MainWindow::changeEvent(QEvent* event)
 }
 
 void MainWindow::donateButtonClicked() {
-    m_sendWidget->fill(constants::donationAddress, "Donation to the Feather development team");
+    m_sendWidget->fill(constants::donationAddress, constants::donationDescription);
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
