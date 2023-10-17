@@ -40,18 +40,20 @@ jobs:
           path: |
             gnu/store
             guix_db.sqlite
+            guix
           key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
       - name: move guix store
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           if [[ -e "guix_db.sqlite" ]]; then
-              sudo mkdir -p /var/guix/db
+              sudo mkdir -p /var/guix/db /root/.cache/
               sudo mv gnu /gnu
+              sudo mv guix /root/.cache
               sudo cp guix_db.sqlite /var/guix/db/db.sqlite
 
               sudo chmod 1775 /gnu/store
               sudo chown 0644 /var/guix/db/db.sqlite
-              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
+              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite /root/.cache/guix
           fi
       - name: depends sources cache
         if: steps.cache.outputs.cache-hit != 'true'
@@ -74,6 +76,7 @@ jobs:
           sudo systemctl stop guix-daemon
           sudo mv /gnu gnu
           sudo mv /var/guix/db/db.sqlite guix_db.sqlite
+          sudo mv /root/.cache/guix guix
 
   build-guix:
     runs-on: ubuntu-latest
@@ -114,17 +117,19 @@ jobs:
           path: |
             gnu/store
             guix_db.sqlite
+            guix
           key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
       - name: move guix store
         run: |
           if [[ -e "guix_db.sqlite" ]]; then
-              sudo mkdir -p /var/guix/db
+              sudo mkdir -p /var/guix/db /root/.cache/
               sudo mv gnu /gnu
+              sudo mv guix /root/.cache
               sudo cp guix_db.sqlite /var/guix/db/db.sqlite
           
               sudo chmod 1775 /gnu/store
               sudo chown 0644 /var/guix/db/db.sqlite
-              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
+              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite /root/.cache/guix
           fi
       - name: depends cache
         uses: actions/cache@v3
