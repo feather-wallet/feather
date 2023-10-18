@@ -34,7 +34,7 @@ To learn more about Feather's build system, see: `contrib/guix/README.md`
 
 [Bootstrappable builds](https://bootstrappable.org/) are a requirement for all release builds since version 2.2.2. 
 Our Guix time-machine is currently pinned at a commit which implements the 
-[reduced binary seed bootstrap](https://guix.gnu.org/manual/en/html_node/Reduced-Binary-Seed-Bootstrap.html).
+[Full-Source Bootstrap](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/).
 
 ### 3. Bugs
 
