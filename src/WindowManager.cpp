@@ -301,6 +301,7 @@ void WindowManager::onWalletOpenPasswordRequired(bool invalidPassword, const QSt
         case QDialog::Rejected:
         {
             m_openWalletTriedOnce = false;
+            m_openingWallet = false;
             if (m_wizard) {
                 m_wizard->show();
             } else {
