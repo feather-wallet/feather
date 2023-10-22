@@ -21,6 +21,7 @@ $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
 $(package)_patches += xkb-1.6.0.patch
 $(package)_patches += CVE-2023-45872-qtsvg-6.6.0.diff
+$(package)_patches += fix_alternating_row_icons_windows.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -190,6 +191,7 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/xcb-util-image-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/xkb-1.6.0.patch && \
+  patch -p1 -i $($(package)_patch_dir)/fix_alternating_row_icons_windows.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
