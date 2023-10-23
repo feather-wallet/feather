@@ -608,7 +608,7 @@ void showMsg(QWidget *parent, QMessageBox::Icon icon, const QString &windowTitle
     }
 
     auto *msgBox = new QMessageBox(parent);
-    msgBox->setText(title);
+    msgBox->setText(QString("<b>%1</b>").arg(title));
     msgBox->setInformativeText(informativeText);
     msgBox->setIcon(icon);
     msgBox->setWindowTitle(windowTitle);
