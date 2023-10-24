@@ -1,8 +1,8 @@
 package=openssl
-$(package)_version=3.1.3
+$(package)_version=3.1.4
 $(package)_download_path=https://www.openssl.org/source
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=f0316a2ebd89e7f2352976445458689f80302093788c466692fb2a188b2eacf6
+$(package)_sha256_hash=840af5366ab9b522bde525826be3ef0fb0af81c6a9ebd84caa600fea1731eee3
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
