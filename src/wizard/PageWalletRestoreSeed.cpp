@@ -65,6 +65,17 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
         dialog.exec();
     });
 
+    ui->seedObscured->hide();
+    connect(ui->check_obscureSeed, &QPushButton::clicked, [this](bool checked){
+        ui->seedEdit->setVisible(!checked);
+        ui->seedObscured->setVisible(checked);
+        if (checked) {
+            ui->seedObscured->setText(ui->seedEdit->toPlainText());
+        } else {
+            ui->seedEdit->setText(ui->seedObscured->text());
+        }
+    });
+
     connect(ui->seedBtnGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &PageWalletRestoreSeed::onSeedTypeToggled);
     connect(ui->combo_seedLanguage, &QComboBox::currentTextChanged, this, &PageWalletRestoreSeed::onSeedLanguageChanged);
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreSeed::onOptionsClicked);
@@ -119,6 +130,7 @@ int PageWalletRestoreSeed::nextId() const {
 
 void PageWalletRestoreSeed::initializePage() {
     this->setTitle(m_fields->modeText);
+    ui->seedObscured->setText("");
     ui->seedEdit->setText("");
     ui->seedEdit->setStyleSheet("");
     ui->label_errorString->hide();
@@ -130,8 +142,17 @@ bool PageWalletRestoreSeed::validatePage() {
     ui->label_errorString->hide();
     ui->seedEdit->setStyleSheet("");
 
+    QString seed = [this]{
+        if (ui->check_obscureSeed->isChecked()) {
+            return ui->seedObscured->text();
+        } else {
+            return ui->seedEdit->toPlainText();
+        }
+    }();
+
+    seed = seed.replace("\n", " ").replace("\r", "").trimmed();
+
     auto errStyle = "QTextEdit{border: 1px solid red;}";
-    auto seed = ui->seedEdit->toPlainText().replace("\n", " ").replace("\r", "").trimmed();
     QStringList seedSplit = seed.split(" ", Qt::SkipEmptyParts);
 
     if (seedSplit.length() != m_mode->length) {
