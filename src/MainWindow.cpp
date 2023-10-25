@@ -732,7 +732,14 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                 message.helpItems = {"Your transaction has too many inputs. Try sending a lower amount."};
             }
             catch (const tools::error::not_enough_unlocked_money &e) {
-                message.description = QString("Not enough unlocked balance.\n\nUnlocked balance: %1\nTransaction spends: %2").arg(e.available(), e.tx_amount());
+                QString error;
+                if (e.fee() > e.available()) {
+                    error = QString("Transaction fee exceeds spendable balance.\n\nSpendable balance: %1\nTransaction fee: %2").arg(WalletManager::displayAmount(e.available()), WalletManager::displayAmount(e.fee()));
+                }
+                else {
+                    error = QString("Spendable balance insufficient to pay for transaction.\n\nSpendable balance: %1\nTransaction needs: %2").arg(WalletManager::displayAmount(e.available()), WalletManager::displayAmount(e.tx_amount() + e.fee()));
+                }
+                message.description = error;
                 message.helpItems = {"Wait for more balance to unlock.", "Click 'Help' to learn more about how balance works."};
                 message.doc = "balance";
             }

@@ -212,6 +212,11 @@ void SendWidget::sendClicked() {
         return;
     }
 
+    if (unlocked_balance == 0) {
+        Utils::showError(this, "Unable to create transaction", QString("No spendable balance.\n\n%1 XMR becomes spendable within 10 blocks (~20 minutes).").arg(WalletManager::displayAmount(total_balance - unlocked_balance)), {"Wait for more balance to unlock.", "Click 'Help' to learn more about how balance works."}, "balance");
+        return;
+    }
+
     if (!sendAll && amount > unlocked_balance) {
         Utils::showError(this, "Unable to create transaction", QString("Not enough money to spend.\n\n"
                                                                        "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
