@@ -790,8 +790,10 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                 message.doc = "report_an_issue";
             }
             catch (const tools::error::wallet_internal_error &e) {
+                bool bug = true;
                 QString msg = e.what();
                 message.description = QString("Internal error: %1").arg(QString::fromStdString(e.what()));
+
                 if (msg.contains("Daemon response did not include the requested real output")) {
                     QString currentNode = m_nodes->connection().toAddress();
                     message.description += QString("\nYou are currently connected to: %1\n\n"
@@ -799,9 +801,16 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                                                    "Please report this incident to the developers.").arg(currentNode);
                     message.doc = "report_an_issue";
                 }
+                if (msg.startsWith("No unlocked balance")) {
+                    // TODO: We're sending ALL, but fractional outputs got ignored
+                    message.description = "Spendable balance insufficient to pay for transaction fee.";
+                    bug = false;
+                }
 
-                message.helpItems = {"You have found a bug. Please contact the developers."};
-                message.doc = "report_an_issue";
+                if (bug) {
+                    message.helpItems = {"You have found a bug. Please contact the developers."};
+                    message.doc = "report_an_issue";
+                }
             }
             catch (const std::exception &e) {
                 message.description = QString::fromStdString(e.what());
