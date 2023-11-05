@@ -35,12 +35,7 @@ private:
     void closeDialog();
     void setAmounts(quint64 amount, quint64 fee);
 
-    void unsignedCopy();
-    void unsignedQrCode();
-    void unsignedSaveFile();
-
     void signedCopy();
-    void signedQrCode();
     void signedSaveFile();
 
     void txKeyCopy();
@@ -49,7 +44,6 @@ private:
     Wallet *m_wallet;
     PendingTransaction *m_tx = nullptr;
     UnsignedTransaction *m_utx = nullptr;
-    QMenu *m_exportUnsignedMenu;
     QMenu *m_exportSignedMenu;
     QMenu *m_exportTxKeyMenu;
     QString m_txid;

@@ -32,6 +32,14 @@ void QrScanThread::stop()
     m_waitCondition.wakeOne();
 }
 
+void QrScanThread::start() 
+{
+    m_queue.clear();
+    m_running = true;
+    m_waitCondition.wakeOne();
+    QThread::start();
+}
+
 void QrScanThread::addImage(const QImage &img)
 {
     QMutexLocker locker(&m_mutex);

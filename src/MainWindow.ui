@@ -479,7 +479,7 @@
      <x>0</x>
      <y>0</y>
      <width>977</width>
-     <height>27</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -521,28 +521,11 @@
      <property name="title">
       <string>Advanced</string>
      </property>
-     <widget class="QMenu" name="menuExport">
-      <property name="title">
-       <string>Export</string>
-      </property>
-      <addaction name="actionExportOutputs"/>
-      <addaction name="actionExportKeyImages"/>
-     </widget>
-     <widget class="QMenu" name="menuImport">
-      <property name="title">
-       <string>Import</string>
-      </property>
-      <addaction name="actionImportOutputs"/>
-      <addaction name="actionImportKeyImages"/>
-     </widget>
      <addaction name="actionStore_wallet"/>
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
      <addaction name="actionRescan_spent"/>
      <addaction name="actionWallet_cache_debug"/>
-     <addaction name="separator"/>
-     <addaction name="menuExport"/>
-     <addaction name="menuImport"/>
     </widget>
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
@@ -560,13 +543,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuLoad_transaction">
-     <property name="title">
-      <string>Load unsigned transaction</string>
-     </property>
-     <addaction name="actionLoadUnsignedTxFromFile"/>
-     <addaction name="actionLoadUnsignedTxFromClipboard"/>
-    </widget>
     <widget class="QMenu" name="menuLoad_signed_transaction">
      <property name="title">
       <string>Broadcast transaction</string>
@@ -577,7 +553,7 @@
     <addaction name="actionSignVerify"/>
     <addaction name="actionVerifyTxProof"/>
     <addaction name="separator"/>
-    <addaction name="menuLoad_transaction"/>
+    <addaction name="actionKeyImageSync"/>
     <addaction name="menuLoad_signed_transaction"/>
     <addaction name="actionImport_transaction"/>
     <addaction name="separator"/>
@@ -946,6 +922,11 @@
   <action name="actionCheckForUpdates">
    <property name="text">
     <string>Check for updates</string>
+   </property>
+  </action>
+  <action name="actionKeyImageSync">
+   <property name="text">
+    <string>Offline transaction signing</string>
    </property>
   </action>
  </widget>

@@ -29,6 +29,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::geometry, {QS("geometry"), {}}},
         {Config::windowState, {QS("windowState"), {}}},
         {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
+        {Config::geometryOTSWizard, {QS("geometryOTSWizard"), {}}},
 
         // Wallets
         {Config::walletDirectory,{QS("walletDirectory"), ""}},
@@ -74,6 +75,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::offlineMode, {QS("offlineMode"), false}},
 
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
+        {Config::offlineTxSigningMethod, {QS("offlineTxSigningMethod"), Config::OTSMethod::UnifiedResources}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
         {Config::hideNotifications, {QS("hideNotifications"), false}},

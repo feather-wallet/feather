@@ -53,6 +53,8 @@ file(GLOB SOURCE_FILES
         "widgets/*.cpp"
         "wizard/*.h"
         "wizard/*.cpp"
+        "wizard/offline_tx_signing/*.h"
+        "wizard/offline_tx_signing/*.cpp"
         "wallet/*.h"
         "wallet/*.cpp"
         "qrcode/*.h"
@@ -149,6 +151,7 @@ target_include_directories(feather PUBLIC
         ${LIBZIP_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${POLYSEED_INCLUDE_DIR}
+        /feather/contrib/depends/x86_64-linux-gnu/include
 )
 
 if(WITH_SCANNER)
@@ -254,6 +257,7 @@ target_link_libraries(feather
         ${ICU_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZLIB_LIBRARIES}
+        ${BCUR_LIBRARY}
 )
 
 if(CHECK_UPDATES)

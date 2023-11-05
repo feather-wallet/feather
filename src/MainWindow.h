@@ -137,12 +137,6 @@ private slots:
     void onShowSettingsPage(int page);
 
     // offline tx signing
-    void exportKeyImages();
-    void importKeyImages();
-    void exportOutputs();
-    void importOutputs();
-    void loadUnsignedTx();
-    void loadUnsignedTxFromClipboard();
     void loadSignedTx();
     void loadSignedTxFromText();
 
@@ -166,10 +160,11 @@ private slots:
     void showPasswordDialog();
     void showKeysDialog();
     void showViewOnlyDialog();
+    void showKeyImageSyncWizard();
     void showWalletCacheDebugDialog();
     void showAccountSwitcherDialog();
     void showAddressChecker();
-
+    
     void donateButtonClicked();
     void showCalcWindow();
     void payToMany();
@@ -209,7 +204,6 @@ private:
     void saveGeo();
     void restoreGeo();
     void showDebugInfo();
-    void createUnsignedTxDialog(UnsignedTransaction *tx);
     void updatePasswordIcon();
     void updateNetStats();
     void rescanSpent();

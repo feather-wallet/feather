@@ -11,6 +11,7 @@
 #include "constants.h"
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/TorInfoDialog.h"
 #include "dialog/TxBroadcastDialog.h"
@@ -271,6 +272,7 @@ void MainWindow::initMenu() {
     connect(ui->actionSeed,         &QAction::triggered, this, &MainWindow::showSeedDialog);
     connect(ui->actionKeys,         &QAction::triggered, this, &MainWindow::showKeysDialog);
     connect(ui->actionViewOnly,     &QAction::triggered, this, &MainWindow::showViewOnlyDialog);
+    connect(ui->actionKeyImageSync, &QAction::triggered, this, &MainWindow::showKeyImageSyncWizard);
 
     // [Wallet] -> [Advanced]
     connect(ui->actionStore_wallet,          &QAction::triggered, this, &MainWindow::tryStoreWallet);
@@ -278,14 +280,6 @@ void MainWindow::initMenu() {
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_wallet->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
-
-    // [Wallet] -> [Advanced] -> [Export]
-    connect(ui->actionExportOutputs,   &QAction::triggered, this, &MainWindow::exportOutputs);
-    connect(ui->actionExportKeyImages, &QAction::triggered, this, &MainWindow::exportKeyImages);
-
-    // [Wallet] -> [Advanced] -> [Import]
-    connect(ui->actionImportOutputs,   &QAction::triggered, this, &MainWindow::importOutputs);
-    connect(ui->actionImportKeyImages, &QAction::triggered, this, &MainWindow::importKeyImages);
 
     // [Wallet] -> [History]
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
@@ -344,8 +338,6 @@ void MainWindow::initMenu() {
     // [Tools]
     connect(ui->actionSignVerify,                  &QAction::triggered, this, &MainWindow::menuSignVerifyClicked);
     connect(ui->actionVerifyTxProof,               &QAction::triggered, this, &MainWindow::menuVerifyTxProof);
-    connect(ui->actionLoadUnsignedTxFromFile,      &QAction::triggered, this, &MainWindow::loadUnsignedTx);
-    connect(ui->actionLoadUnsignedTxFromClipboard, &QAction::triggered, this, &MainWindow::loadUnsignedTxFromClipboard);
     connect(ui->actionLoadSignedTxFromFile,        &QAction::triggered, this, &MainWindow::loadSignedTx);
     connect(ui->actionLoadSignedTxFromText,        &QAction::triggered, this, &MainWindow::loadSignedTxFromText);
     connect(ui->actionImport_transaction,          &QAction::triggered, this, &MainWindow::importTransaction);
@@ -853,8 +845,20 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 
     m_wallet->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
+    // Offline transaction signing
+    if (m_wallet->viewOnly()) {
+        OfflineTxSigningWizard wizard(this, m_wallet, tx);
+        wizard.exec();
+        
+        if (!wizard.readyToCommit()) {
+            return;
+        } else {
+            tx = wizard.signedTx();
+        }
+    }
+    
     // Show advanced dialog on multi-destination transactions
-    if (address.size() > 1 || m_wallet->viewOnly()) {
+    if (address.size() > 1) {
         TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
         dialog_adv.setTransaction(tx, !m_wallet->viewOnly());
         dialog_adv.exec();
@@ -962,6 +966,11 @@ void MainWindow::showKeysDialog() {
 void MainWindow::showViewOnlyDialog() {
     ViewOnlyDialog dialog{m_wallet, this};
     dialog.exec();
+}
+
+void MainWindow::showKeyImageSyncWizard() {
+    OfflineTxSigningWizard wizard{this, m_wallet};
+    wizard.exec();
 }
 
 void MainWindow::menuHwDeviceClicked() {
@@ -1204,83 +1213,6 @@ void MainWindow::showAddressChecker() {
     }
 }
 
-void MainWindow::exportKeyImages() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
-    if (fn.isEmpty()) return;
-    if (!fn.endsWith("_keyImages")) fn += "_keyImages";
-    bool r = m_wallet->exportKeyImages(fn, true);
-    if (!r) {
-        Utils::showError(this, "Failed to export key images", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully exported key images");
-    }
-}
-
-void MainWindow::importKeyImages() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages);;All Files (*)");
-    if (fn.isEmpty()) return;
-    bool r = m_wallet->importKeyImages(fn);
-    if (!r) {
-        Utils::showError(this, "Failed to import key images", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully imported key images");
-        m_wallet->refreshModels();
-    }
-}
-
-void MainWindow::exportOutputs() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
-    if (fn.isEmpty()) return;
-    if (!fn.endsWith("_outputs")) fn += "_outputs";
-    bool r = m_wallet->exportOutputs(fn, true);
-    if (!r) {
-        Utils::showError(this, "Failed to export outputs", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully exported outputs.");
-    }
-}
-
-void MainWindow::importOutputs() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs);;All Files (*)");
-    if (fn.isEmpty()) return;
-    bool r = m_wallet->importOutputs(fn);
-    if (!r) {
-        Utils::showError(this, "Failed to import outputs", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully imported outputs");
-        m_wallet->refreshModels();
-    }
-}
-
-void MainWindow::loadUnsignedTx() {
-    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx);;All Files (*)");
-    if (fn.isEmpty()) return;
-    UnsignedTransaction *tx = m_wallet->loadTxFile(fn);
-    auto err = m_wallet->errorString();
-    if (!err.isEmpty()) {
-        Utils::showError(this, "Failed to load transaction", err);
-        return;
-    }
-
-    this->createUnsignedTxDialog(tx);
-}
-
-void MainWindow::loadUnsignedTxFromClipboard() {
-    QString unsigned_tx = Utils::copyFromClipboard();
-    if (unsigned_tx.isEmpty()) {
-        Utils::showError(this, "Unable to load unsigned transaction", "Clipboard is empty");
-        return;
-    }
-    UnsignedTransaction *tx = m_wallet->loadTxFromBase64Str(unsigned_tx);
-    auto err = m_wallet->errorString();
-    if (!err.isEmpty()) {
-        Utils::showError(this, "Unable to load unsigned transaction", err);
-        return;
-    }
-
-    this->createUnsignedTxDialog(tx);
-}
-
 void MainWindow::loadSignedTx() {
     QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*signed_monero_tx);;All Files (*)");
     if (fn.isEmpty()) return;
@@ -1298,12 +1230,6 @@ void MainWindow::loadSignedTx() {
 
 void MainWindow::loadSignedTxFromText() {
     TxBroadcastDialog dialog{this, m_nodes};
-    dialog.exec();
-}
-
-void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
-    TxConfAdvDialog dialog{m_wallet, "", this};
-    dialog.setUnsignedTransaction(tx);
     dialog.exec();
 }
 

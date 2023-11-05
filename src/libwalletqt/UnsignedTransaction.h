@@ -12,13 +12,6 @@
 class UnsignedTransaction : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Status status READ status)
-    Q_PROPERTY(QString errorString READ errorString)
-    Q_PROPERTY(quint64 txCount READ txCount)
-    Q_PROPERTY(QString confirmationMessage READ confirmationMessage)
-    Q_PROPERTY(QStringList recipientAddress READ recipientAddress)
-    Q_PROPERTY(QStringList paymentId READ paymentId)
-    Q_PROPERTY(quint64 minMixinCount READ minMixinCount)
 
 public:
     enum Status {
@@ -30,16 +23,18 @@ public:
 
     Status status() const;
     QString errorString() const;
-    Q_INVOKABLE quint64 amount(size_t index) const;
-    Q_INVOKABLE quint64 fee(size_t index) const;
-    Q_INVOKABLE quint64 mixin(size_t index) const;
+    quint64 amount(size_t index) const;
+    quint64 fee(size_t index) const;
+    quint64 mixin(size_t index) const;
     QStringList recipientAddress() const;
     QStringList paymentId() const;
     quint64 txCount() const;
     QString confirmationMessage() const;
     quint64 minMixinCount() const;
-    Q_INVOKABLE bool sign(const QString &fileName) const;
-    Q_INVOKABLE void setFilename(const QString &fileName);
+    bool sign(const QString &fileName) const;
+    bool signToStr(std::string &data) const;
+    
+    void setFilename(const QString &fileName);
     void refresh();
 
     ConstructionInfo * constructionInfo(int index) const;

@@ -32,6 +32,7 @@ public:
         geometry,
         windowState,
         GUI_HistoryViewState,
+        geometryOTSWizard,
 
         // Wallets
         walletDirectory, // Directory where wallet files are stored
@@ -110,6 +111,7 @@ public:
 
         // Transactions
         multiBroadcast,
+        offlineTxSigningMethod,
 
         // Misc
         blockExplorer,
@@ -145,6 +147,11 @@ public:
         socks5
     };
 
+    enum OTSMethod {
+        UnifiedResources = 0,
+        FileTransfer
+    };
+    
     ~Config() override;
     QVariant get(ConfigKey key);
     QString getFileName();

@@ -21,16 +21,10 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
     : WindowModalDialog(parent)
     , ui(new Ui::TxConfAdvDialog)
     , m_wallet(wallet)
-    , m_exportUnsignedMenu(new QMenu(this))
     , m_exportSignedMenu(new QMenu(this))
     , m_exportTxKeyMenu(new QMenu(this))
 {
     ui->setupUi(this);
-
-    m_exportUnsignedMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::unsignedCopy);
-    m_exportUnsignedMenu->addAction("Show as QR code", this, &TxConfAdvDialog::unsignedQrCode);
-    m_exportUnsignedMenu->addAction("Save to file", this, &TxConfAdvDialog::unsignedSaveFile);
-    ui->btn_exportUnsigned->setMenu(m_exportUnsignedMenu);
 
     m_exportSignedMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::signedCopy);
     m_exportSignedMenu->addAction("Save to file", this, &TxConfAdvDialog::signedSaveFile);
@@ -77,17 +71,6 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
 
     this->setAmounts(tx->amount(), tx->fee());
 
-    auto size_str = [this, isSigned]{
-        if (isSigned) {
-            auto size = m_tx->signedTxToHex(0).size() / 2;
-            return QString("Size: %1 bytes (%2 bytes unsigned)").arg(QString::number(size), QString::number(m_tx->unsignedTxToBin().size()));
-        } else {
-
-            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
-        }
-    }();
-    ui->label_size->setText(size_str);
-
     this->setupConstructionData(ptx);
 }
 
@@ -95,14 +78,12 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
     m_utx = utx;
     m_utx->refresh();
 
-    ui->btn_exportUnsigned->hide();
     ui->btn_exportSigned->hide();
     ui->btn_exportTxKey->hide();
     ui->btn_sign->show();
     ui->btn_send->hide();
 
     ui->txid->setText("n/a");
-    ui->label_size->setText("Size: n/a");
 
     this->setAmounts(utx->amount(0), utx->fee(0));
 
@@ -157,40 +138,10 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
         cursor.insertBlock();
     }
     ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(outputs.size())));
-
-    ui->label_ringSize->setText(QString("Ring size: %1").arg(QString::number(ci->minMixinCount() + 1)));
 }
 
 void TxConfAdvDialog::signTransaction() {
-    QString defaultName = QString("%1_signed_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
-    QString fn = QFileDialog::getSaveFileName(this, "Save signed transaction to file", QDir::home().filePath(defaultName), "Transaction (*signed_monero_tx)");
-    if (fn.isEmpty()) {
-        return;
-    }
-
-    bool success = m_utx->sign(fn);
-
-    if (success) {
-        Utils::showInfo(this, "Transaction saved successfully");
-    } else {
-        Utils::showError(this, "Failed to save transaction to file");
-    }
-}
-
-void TxConfAdvDialog::unsignedSaveFile() {
-    QString defaultName = QString("%1_unsigned_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
-    QString fn = QFileDialog::getSaveFileName(this, "Save transaction to file", QDir::home().filePath(defaultName), "Transaction (*unsigned_monero_tx)");
-    if (fn.isEmpty()) {
-        return;
-    }
-
-    bool success = m_tx->saveToFile(fn);
-
-    if (success) {
-        Utils::showInfo(this, "Transaction saved successfully");
-    } else {
-        Utils::showError(this, "Failed to save transaction to file");
-    }
+    this->accept();
 }
 
 void TxConfAdvDialog::signedSaveFile() {
@@ -209,21 +160,6 @@ void TxConfAdvDialog::signedSaveFile() {
     }
 }
 
-void TxConfAdvDialog::unsignedQrCode() {
-    if (m_tx->unsignedTxToBin().size() > 2953) {
-        Utils::showError(this, "Unable to show QR code", "Transaction size exceeds the maximum size for QR codes (2953 bytes)");
-        return;
-    }
-
-    QrCode qr(m_tx->unsignedTxToBin(), QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::LOW);
-    QrCodeDialog dialog{this, &qr, "Unsigned Transaction"};
-    dialog.exec();
-}
-
-void TxConfAdvDialog::unsignedCopy() {
-    Utils::copyToClipboard(m_tx->unsignedTxToBase64());
-}
-
 void TxConfAdvDialog::signedCopy() {
     Utils::copyToClipboard(m_tx->signedTxToHex(0));
 }
@@ -235,9 +171,6 @@ void TxConfAdvDialog::txKeyCopy() {
     }
 
     Utils::copyToClipboard(m_tx->transaction(0)->txKey());
-}
-
-void TxConfAdvDialog::signedQrCode() {
 }
 
 void TxConfAdvDialog::broadcastTransaction() {

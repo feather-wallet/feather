@@ -11,6 +11,8 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
+
 CoinsWidget::CoinsWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::CoinsWidget)
@@ -186,7 +188,14 @@ void CoinsWidget::spendSelected() {
 
     QStringList keyimages;
     for (QModelIndex index: list) {
-        keyimages << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
+        QString keyImage = m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
+
+        if (keyImage == "0100000000000000000000000000000000000000000000000000000000000000") {
+            Utils::showError(this, "Unable to select output to spend", "Selected output has unknown key image");
+            return;
+        }
+        
+        keyimages << keyImage;
     }
 
     m_wallet->setSelectedInputs(keyimages);
@@ -237,6 +246,13 @@ void CoinsWidget::onSweepOutputs() {
     OutputSweepDialog dialog{this, totalAmount};
     int ret = dialog.exec();
     if (!ret) return;
+
+    OfflineTxSigningWizard wizard(this, m_wallet);
+    auto r = wizard.exec();
+
+    if (r == QDialog::Rejected) {
+        return;
+    }
 
     m_wallet->sweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
 }

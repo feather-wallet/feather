@@ -86,6 +86,10 @@ message(STATUS "libsodium: libraries at ${SODIUM_LIBRARY}")
 # QrEncode
 find_package(QREncode REQUIRED)
 
+# bc-ur
+find_library(BCUR_LIBRARY bcur)
+message(STATUS "bcur: libraries at ${BCUR_LIBRARY}")
+
 # Polyseed
 find_package(Polyseed REQUIRED)
 if(Polyseed_SUBMODULE)

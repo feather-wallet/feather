@@ -13,6 +13,8 @@
 #include "Icons.h"
 #include "libwalletqt/WalletManager.h"
 
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
+
 #if defined(WITH_SCANNER)
 #include "qrcode/scanner/QrCodeScanDialog.h"
 #include <QMediaDevices>
@@ -132,9 +134,9 @@ void SendWidget::scanClicked() {
         return;
     }
 
-    auto dialog = new QrCodeScanDialog(this);
+    auto dialog = new QrCodeScanDialog(this, false);
     dialog->exec();
-    ui->lineAddress->setText(dialog->decodedString);
+    ui->lineAddress->setText(dialog->decodedString());
     dialog->deleteLater();
 #else
     Utils::showError(this, "Can't open QR scanner", "Feather was built without webcam QR scanner support");
@@ -222,7 +224,30 @@ void SendWidget::sendClicked() {
                                                                        "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
         return;
     }
+
+    if (keyImageSync(sendAll, amount)) {
+        OfflineTxSigningWizard wizard(this, m_wallet);
+        auto r = wizard.exec();
+
+        if (r == QDialog::Rejected) {
+            return;
+        }
+    }
+
     m_wallet->createTransaction(recipient, amount, description, sendAll);
+}
+
+bool SendWidget::keyImageSync(bool sendAll, quint64 amount) {
+    if (!m_wallet->viewOnly()) {
+        return false;
+    }
+
+    if (sendAll) {
+        return m_wallet->hasUnknownKeyImages();
+    }
+
+    // 0.001 XMR to account for tx fee
+    return ((amount + WalletManager::amountFromDouble(0.001)) > m_wallet->viewOnlyBalance(m_wallet->currentSubaddressAccount()));
 }
 
 void SendWidget::aliasClicked() {
