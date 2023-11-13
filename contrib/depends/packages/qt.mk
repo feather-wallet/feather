@@ -122,6 +122,7 @@ $(package)_config_opts_mingw32 += -DQT_QMAKE_TARGET_MKSPEC=win32-g++
 $(package)_config_opts_mingw32 += -DINPUT_opengl=no
 $(package)_config_opts_mingw32 += -DINPUT_dbus=no
 $(package)_config_opts_mingw32 += -DINPUT_freetype=no
+$(package)_config_opts_mingw32 += -DINPUT_ffmpeg=no
 $(package)_config_opts_mingw32 += -DINPUT_wmf=yes
 $(package)_config_opts_mingw32 += -DBUILD_WITH_PCH=ON
 
