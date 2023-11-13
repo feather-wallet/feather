@@ -11,6 +11,7 @@ define $(package)_set_vars
     $(package)_config_opts+=--with-libevent-dir=$(host_prefix) --with-openssl-dir=$(host_prefix)
     $(package)_config_opts+=--with-zlib-dir=$(host_prefix) --disable-tool-name-check --enable-fatal-warnings
     $(package)_config_opts+=--prefix=$(host_prefix)
+    $(package)_config_opts_x86_64+=--enable-static-tor
     $(package)_cflags+=-O2
     $(package)_cxxflags+=-O2
     $(package)_ldflags+=$(guix_ldflags)
