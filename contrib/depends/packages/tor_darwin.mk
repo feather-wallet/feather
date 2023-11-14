@@ -1,8 +1,8 @@
 package=tor_darwin
-$(package)_version=0.4.7.15
-$(package)_download_path=https://dist.torproject.org/torbrowser/12.5.6/
-$(package)_file_name=TorBrowser-12.5.6-macos_ALL.dmg
-$(package)_sha256_hash=8ba5b760e9ad959b74a056d614a9f618e3c783af30a6587b5a8194ec0baa4cea
+$(package)_version=0.4.8.7
+$(package)_download_path=https://dist.torproject.org/torbrowser/13.0.1/
+$(package)_file_name=tor-browser-macos-13.0.1.dmg
+$(package)_sha256_hash=3000b97ab595d6ce3cfd7554079c14c7fe41e5c3aef791c65c6a94aeafe526f4
 $(package)_extract_cmds=mkdir -p $$($(1)_extract_dir) && \
 	echo "$$($(1)_sha256_hash)  $$($(1)_source)" > $$($(1)_extract_dir)/.$$($(1)_file_name).hash && \
 	$(build_SHA256SUM) -c $$($(1)_extract_dir)/.$$($(1)_file_name).hash && \
