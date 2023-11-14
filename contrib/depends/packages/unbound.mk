@@ -1,8 +1,8 @@
 package=unbound
-$(package)_version=1.18.0
+$(package)_version=1.19.0
 $(package)_download_path=https://www.nlnetlabs.nl/downloads/$(package)/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=3da95490a85cff6420f26fae0b84a49f5112df1bf1b7fc34f8724f02082cb712
+$(package)_sha256_hash=a97532468854c61c2de48ca4170de854fd3bc95c8043bb0cfb0fe26605966624
 $(package)_dependencies=openssl expat
 $(package)_patches=disable-glibc-reallocarray.patch
 
