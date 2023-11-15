@@ -1,18 +1,16 @@
 package=libgcrypt
-$(package)_version=1.10.2
+$(package)_version=1.10.3
 $(package)_download_path=https://www.gnupg.org/ftp/gcrypt/libgcrypt/
 $(package)_file_name=libgcrypt-$($(package)_version).tar.bz2
-$(package)_sha256_hash=3b9c02a004b68c256add99701de00b383accccf37177e0d6c58289664cce0c03
+$(package)_sha256_hash=8b0870897ac5ac67ded568dcfadf45969cfa8a6beb0fd60af2a9eadc2a3272aa
 $(package)_dependencies=libgpg-error
-$(package)_patches=fix_getrandom_darwin.patch
 
 define $(package)_set_vars
    $(package)_build_opts=CFLAGS="-fPIE"
 endef
 
 define $(package)_preprocess_cmds
-    cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux && \
-    patch -p1 < $($(package)_patch_dir)/fix_getrandom_darwin.patch
+    cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux
 endef
 
 # TODO: building on linux with $($(package)_autoconf) fails for mysterious reasons
