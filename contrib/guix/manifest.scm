@@ -110,7 +110,7 @@ chain for " target " development."))
       (license (package-license xgcc)))))
 
 (define base-gcc gcc-10)
-(define base-linux-kernel-headers linux-libre-headers-5.15)
+(define base-linux-kernel-headers linux-libre-headers-6.1)
 
 (define* (make-bitcoin-cross-toolchain target
                                        #:key
