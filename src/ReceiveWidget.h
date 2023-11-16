@@ -13,6 +13,7 @@
 #include "model/SubaddressProxyModel.h"
 #include "model/SubaddressModel.h"
 #include "qrcode/QrCode.h"
+#include "utils/config.h"
 
 namespace Ui {
     class ReceiveWidget;
@@ -34,10 +35,6 @@ public slots:
     void copyLabel();
     void editLabel();
     void showContextMenu(const QPoint& point);
-    void setShowFullAddresses(bool show);
-    void setShowChangeAddresses(bool show);
-    void setShowUsedAddresses(bool show);
-    void setShowHiddenAddresses(bool show);
     void setSearchFilter(const QString &filter);
     void onShowTransactions();
     void createPaymentRequest();
@@ -47,8 +44,6 @@ signals:
 
 private slots:
     void showHeaderMenu(const QPoint& position);
-    void hideAddress();
-    void showAddress();
     void showOnDevice();
     void generateSubaddress();
 
@@ -56,18 +51,14 @@ private:
     QScopedPointer<Ui::ReceiveWidget> ui;
     Wallet *m_wallet;
     QMenu *m_headerMenu;
-    QAction *m_showFullAddressesAction;
     QAction *m_showTransactionsAction;
-    QAction *m_showChangeAddressesAction;
     SubaddressModel *m_model;
     SubaddressProxyModel *m_proxyModel;
 
+    void addOption(QMenu *menu, const QString &text, Config::ConfigKey key, const std::function<void(bool show)>& func);
     void updateQrCode();
     void showQrCodeDialog();
-    QStringList getHiddenAddresses();
-    void addHiddenAddress(const QString& address);
-    void removeHiddenAddress(const QString& address);
-    Monero::SubaddressRow* currentEntry();
+    SubaddressRow* currentEntry();
 };
 
 #endif //FEATHER_RECEIVEWIDGET_H

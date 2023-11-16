@@ -48,6 +48,14 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::showTabCalc,{QS("showTabCalc"), true}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
+        // Receive
+        {Config::showUsedAddresses,{QS("showUsedAddresses"), false}},
+        {Config::showHiddenAddresses,{QS("showHiddenAddresses"), false}},
+        {Config::showFullAddresses, {QS("showFullAddresses"), false}},
+        {Config::showChangeAddresses,{QS("showChangeAddresses"), false}},
+        {Config::showAddressIndex,{QS("showAddressIndex"), true}},
+        {Config::showAddressLabels,{QS("showAddressLabels"), true}},
+        
         // Mining
         {Config::miningMode,{QS("miningMode"), Config::MiningMode::Pool}},
         {Config::xmrigPath,{QS("xmrigPath"), ""}},

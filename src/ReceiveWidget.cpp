@@ -9,6 +9,7 @@
 
 #include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"
+#include "utils/config.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
@@ -22,7 +23,6 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     m_model = m_wallet->subaddressModel();
     m_proxyModel = new SubaddressProxyModel(this, m_wallet->subaddress());
     m_proxyModel->setSourceModel(m_model);
-    m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
 
     ui->addresses->setModel(m_proxyModel);
     ui->addresses->setColumnHidden(SubaddressModel::isUsed, true);
@@ -42,11 +42,32 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     // header context menu
     ui->addresses->header()->setContextMenuPolicy(Qt::CustomContextMenu);
     m_headerMenu = new QMenu(this);
-    m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ReceiveWidget::setShowFullAddresses);
-    m_showFullAddressesAction->setCheckable(true);
-    m_showChangeAddressesAction = m_headerMenu->addAction("Show change addresses", this, &ReceiveWidget::setShowChangeAddresses);
-    m_showChangeAddressesAction->setCheckable(true);
+    auto subMenu = new QMenu(this);
+    subMenu->setTitle("Columns");
+    
+    this->addOption(m_headerMenu, "Show used addresses", Config::showUsedAddresses, [this](bool show){
+        m_proxyModel->invalidate();
+    });
+    this->addOption(m_headerMenu, "Show hidden addresses", Config::showHiddenAddresses, [this](bool show){
+        m_proxyModel->invalidate();
+    });
+    this->addOption(m_headerMenu, "Show full addresses", Config::showFullAddresses, [this](bool show){
+        m_proxyModel->invalidate();
+    });
+    this->addOption(m_headerMenu, "Show change address", Config::showChangeAddresses, [this](bool show){
+        m_proxyModel->invalidate();
+    });
+    
+    m_headerMenu->addMenu(subMenu);
+    this->addOption(subMenu, "Show index", Config::showAddressIndex, [this](bool show){
+        ui->addresses->setColumnHidden(0, !show);
+    });
+    this->addOption(subMenu, "Show labels", Config::showAddressLabels, [this](bool show){
+        ui->addresses->setColumnHidden(2, !show);
+    });
+
     connect(ui->addresses->header(), &QHeaderView::customContextMenuRequested, this, &ReceiveWidget::showHeaderMenu);
+    ui->toolBtn_options->setMenu(m_headerMenu);
 
     // context menu
     ui->addresses->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -59,14 +80,23 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     connect(ui->qrCode, &ClickableLabel::clicked, this, &ReceiveWidget::showQrCodeDialog);
     connect(ui->search, &QLineEdit::textChanged, this, &ReceiveWidget::setSearchFilter);
 
-    connect(ui->check_showUsed, &QCheckBox::clicked, this, &ReceiveWidget::setShowUsedAddresses);
-    connect(ui->check_showHidden, &QCheckBox::clicked, this, &ReceiveWidget::setShowHiddenAddresses);
-
     connect(ui->btn_createPaymentRequest, &QPushButton::clicked, this, &ReceiveWidget::createPaymentRequest);
 }
 
+void ReceiveWidget::addOption(QMenu *menu, const QString &text, Config::ConfigKey key, const std::function<void(bool show)>& func) {
+    // QMenu takes ownership of the returned QAction.
+    QAction *action = menu->addAction(text, func);
+    action->setCheckable(true);
+    bool toggled = conf()->get(key).toBool();
+    action->setChecked(toggled);
+    func(toggled);
+    connect(action, &QAction::toggled, [key](bool toggled){
+        conf()->set(key, toggled);
+    });
+}
+
 void ReceiveWidget::setSearchbarVisible(bool visible) {
-    ui->search->setVisible(visible);
+    ui->frame_search->setVisible(visible);
 }
 
 void ReceiveWidget::focusSearchbar() {
@@ -91,11 +121,8 @@ void ReceiveWidget::editLabel() {
 }
 
 void ReceiveWidget::showContextMenu(const QPoint &point) {
-    Monero::SubaddressRow* row = this->currentEntry();
+    SubaddressRow* row = this->currentEntry();
     if (!row) return;
-
-    QString address = QString::fromStdString(row->getAddress());
-    bool isUsed = row->isUsed();
 
     auto *menu = new QMenu(ui->addresses);
 
@@ -103,16 +130,31 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
     menu->addAction("Copy label", this, &ReceiveWidget::copyLabel);
     menu->addAction("Edit label", this, &ReceiveWidget::editLabel);
 
-    if (isUsed) {
+    if (row->isUsed()) {
         menu->addAction(m_showTransactionsAction);
     }
 
-    QStringList hiddenAddresses = this->getHiddenAddresses();
-    if (hiddenAddresses.contains(address)) {
-        menu->addAction("Unhide address", this, &ReceiveWidget::showAddress);
-    } else {
-        menu->addAction("Hide address", this, &ReceiveWidget::hideAddress);
-    }
+    QAction *actionPin = menu->addAction("Pin address", [this](bool toggled){
+        SubaddressRow* row = this->currentEntry();
+        if (!row) return;
+        
+        QString address = row->getAddress();
+        m_wallet->subaddress()->setPinned(address, toggled);
+        m_proxyModel->invalidate();
+    });
+    actionPin->setCheckable(true);
+    actionPin->setChecked(row->isPinned());
+
+    QAction *actionHide = menu->addAction("Hide address", [this](bool toggled){
+        SubaddressRow* row = this->currentEntry();
+        if (!row) return;
+        
+        QString address = row->getAddress();
+        m_wallet->subaddress()->setHidden(address, toggled);
+        m_proxyModel->invalidate();
+    });
+    actionHide->setCheckable(true);
+    actionHide->setChecked(row->isHidden());
 
     if (m_wallet->isHwBacked()) {
         menu->addAction("Show on device", this, &ReceiveWidget::showOnDevice);
@@ -143,66 +185,26 @@ void ReceiveWidget::onShowTransactions() {
     emit showTransactions(address);
 }
 
-void ReceiveWidget::setShowChangeAddresses(bool show) {
-    if (!m_proxyModel) return;
-    m_proxyModel->setShowChangeAddresses(show);
-}
-
-void ReceiveWidget::setShowFullAddresses(bool show) {
-    if (!m_model) return;
-    m_model->setShowFullAddresses(show);
-}
-
-void ReceiveWidget::setShowUsedAddresses(bool show) {
-    if (!m_proxyModel) return;
-    m_proxyModel->setShowUsed(show);
-}
-
-void ReceiveWidget::setShowHiddenAddresses(bool show) {
-    if (!m_proxyModel) return;
-    m_proxyModel->setShowHidden(show);
-}
-
 void ReceiveWidget::setSearchFilter(const QString &filter) {
-    if (!m_proxyModel) return;
     m_proxyModel->setSearchFilter(filter);
 }
 
 void ReceiveWidget::showHeaderMenu(const QPoint& position)
 {
-    Q_UNUSED(position);
-    m_showFullAddressesAction->setChecked(m_model->isShowFullAddresses());
+    Q_UNUSED(position)
     m_headerMenu->exec(QCursor::pos());
 }
 
-void ReceiveWidget::hideAddress()
-{
-    Monero::SubaddressRow* row = this->currentEntry();
-    if (!row) return;
-    QString address = QString::fromStdString(row->getAddress());
-    this->addHiddenAddress(address);
-    m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
-}
-
-void ReceiveWidget::showAddress()
-{
-    Monero::SubaddressRow* row = this->currentEntry();
-    if (!row) return;
-    QString address = QString::fromStdString(row->getAddress());
-    this->removeHiddenAddress(address);
-    m_proxyModel->setHiddenAddresses(this->getHiddenAddresses());
-}
-
 void ReceiveWidget::showOnDevice() {
-    Monero::SubaddressRow* row = this->currentEntry();
+    SubaddressRow* row = this->currentEntry();
     if (!row) return;
-    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRowId(), "");
+    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRow(), "");
 }
 
 void ReceiveWidget::generateSubaddress() {
     bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
     if (!r) {
-        Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->errorString());
+        Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->getError());
     }
 }
 
@@ -235,28 +237,7 @@ void ReceiveWidget::showQrCodeDialog() {
     dialog.exec();
 }
 
-QStringList ReceiveWidget::getHiddenAddresses() {
-    QString data = m_wallet->getCacheAttribute("feather.hiddenaddresses");
-    return data.split(",");
-}
-
-void ReceiveWidget::addHiddenAddress(const QString& address) {
-    QStringList hiddenAddresses = this->getHiddenAddresses();
-    if (!hiddenAddresses.contains(address)) {
-        hiddenAddresses.append(address);
-    }
-    QString data = hiddenAddresses.join(",");
-    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
-}
-
-void ReceiveWidget::removeHiddenAddress(const QString &address) {
-    QStringList hiddenAddresses = this->getHiddenAddresses();
-    hiddenAddresses.removeAll(address);
-    QString data = hiddenAddresses.join(",");
-    m_wallet->setCacheAttribute("feather.hiddenaddresses", data);
-}
-
-Monero::SubaddressRow* ReceiveWidget::currentEntry() {
+SubaddressRow* ReceiveWidget::currentEntry() {
     QModelIndexList list = ui->addresses->selectionModel()->selectedRows();
     if (list.size() == 1) {
         return m_model->entryFromIndex(m_proxyModel->mapToSource(list.first()));

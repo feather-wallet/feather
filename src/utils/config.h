@@ -50,6 +50,14 @@ public:
         showTabCalc,
         showTabXMRig,
         showSearchbar,
+        
+        // Receive
+        showUsedAddresses,
+        showHiddenAddresses,
+        showFullAddresses,
+        showChangeAddresses,
+        showAddressIndex,
+        showAddressLabels,
 
         // Mining
         miningMode,

@@ -4,46 +4,20 @@
 #include "Subaddress.h"
 #include <QDebug>
 
-Subaddress::Subaddress(Monero::Subaddress *subaddressImpl, QObject *parent)
+Subaddress::Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
     : QObject(parent)
-    , m_subaddressImpl(subaddressImpl)
-    , m_unusedLookahead(0)
+    , m_wallet(wallet)
+    , m_wallet2(wallet2)
 {
-    getAll();
+    QString pinned = m_wallet->getCacheAttribute("feather.pinnedaddresses");
+    m_pinned = pinned.split(",");
+
+    QString hidden = m_wallet->getCacheAttribute("feather.hiddenaddresses");
+    m_hidden = hidden.split(",");
 }
 
-QString Subaddress::errorString() const
+bool Subaddress::getRow(int index, std::function<void (SubaddressRow &row)> callback) const
 {
-    return QString::fromStdString(m_subaddressImpl->errorString());
-}
-
-void Subaddress::getAll() const
-{
-    emit refreshStarted();
-
-    {
-        QWriteLocker locker(&m_lock);
-
-        m_unusedLookahead = 0;
-
-        m_rows.clear();
-        for (auto &row: m_subaddressImpl->getAll()) {
-            m_rows.append(row);
-
-            if (row->isUsed())
-                m_unusedLookahead = 0;
-            else
-                m_unusedLookahead += 1;
-        }
-    }
-
-    emit refreshFinished();
-}
-
-bool Subaddress::getRow(int index, std::function<void (Monero::SubaddressRow &row)> callback) const
-{
-    QReadLocker locker(&m_lock);
-
     if (index < 0 || index >= m_rows.size())
     {
         return false;
@@ -53,48 +27,140 @@ bool Subaddress::getRow(int index, std::function<void (Monero::SubaddressRow &ro
     return true;
 }
 
-bool Subaddress::addRow(quint32 accountIndex, const QString &label) const
+bool Subaddress::addRow(quint32 accountIndex, const QString &label)
 {
-    bool r = m_subaddressImpl->addRow(accountIndex, label.toStdString());
-
-    if (r)
-        getAll();
-
-    return r;
-}
-
-bool Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const
-{
-    bool r = m_subaddressImpl->setLabel(accountIndex, addressIndex, label.toStdString());
-    if (r) {
-        getAll();
-        emit labelChanged();
+    // This can fail if hardware device is unplugged during operating, catch here to prevent crash
+    // Todo: Notify GUI that it was a device error
+    try
+    {
+        m_wallet2->add_subaddress(accountIndex, label.toStdString());
+        refresh(accountIndex);
     }
+    catch (const std::exception& e)
+    {
+        if (m_wallet2->key_on_device()) {
+        }
+        m_errorString = QString::fromStdString(e.what());
+        return false;
+    }
+
+    return true;
+}
+
+bool Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label)
+{
+    try {
+        m_wallet2->set_subaddress_label({accountIndex, addressIndex}, label.toStdString());
+        refresh(accountIndex);
+    }
+    catch (const std::exception& e)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool Subaddress::setHidden(const QString &address, bool hidden) 
+{
+    if (hidden) {
+        if (m_hidden.contains(address)) {
+            return false;
+        }
+        m_hidden.append(address);
+    }
+    else {
+        if (!m_hidden.contains(address)) {
+            return false;
+        }
+        m_hidden.removeAll(address);
+    }
+    
+    bool r = m_wallet->setCacheAttribute("feather.hiddenaddresses", m_hidden.join(","));
+    
+    refresh(m_wallet->currentSubaddressAccount());
     return r;
 }
 
-bool Subaddress::refresh(quint32 accountIndex) const
+bool Subaddress::isHidden(const QString &address) 
 {
-    bool r = m_subaddressImpl->refresh(accountIndex);
-    getAll();
+    return m_hidden.contains(address);
+};
+
+bool Subaddress::setPinned(const QString &address, bool pinned) 
+{
+    if (pinned) {
+        if (m_pinned.contains(address)) {
+            return false;
+        }
+        m_pinned.append(address);
+    }
+    else {
+        if (!m_pinned.contains(address)) {
+            return false;
+        }
+        m_pinned.removeAll(address);
+    }
+    
+    bool r = m_wallet->setCacheAttribute("feather.pinnedaddresses", m_pinned.join(","));
+
+    refresh(m_wallet->currentSubaddressAccount());
     return r;
 }
 
-quint64 Subaddress::unusedLookahead() const
+bool Subaddress::isPinned(const QString &address)
 {
-    QReadLocker locker(&m_lock);
-
-    return m_unusedLookahead;
+    return m_pinned.contains(address);
 }
 
-quint64 Subaddress::count() const
+bool Subaddress::refresh(quint32 accountIndex)
 {
-    QReadLocker locker(&m_lock);
+    emit refreshStarted();
+    
+    this->clearRows();
+    for (qsizetype i = 0; i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
+    {
+        QString address = QString::fromStdString(m_wallet2->get_subaddress_as_str({accountIndex, (uint32_t)i}));
+        
+        auto* row = new SubaddressRow{this,
+                                      i,
+                                      address,
+                                      QString::fromStdString(m_wallet2->get_subaddress_label({accountIndex, (uint32_t)i})),
+                                      m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i}),
+                                      this->isHidden(address),
+                                      this->isPinned(address)
+        };
+        
+        m_rows.append(row);
+    }
 
-    return m_rows.size();
+    // Make sure keys are intact. We NEVER want to display incorrect addresses in case of memory corruption.
+    bool keysCorrupt = m_wallet2->get_device_type() == hw::device::SOFTWARE && !m_wallet2->verify_keys();
+
+    if (keysCorrupt) {
+        clearRows();
+        LOG_ERROR("KEY INCONSISTENCY DETECTED, WALLET IS IN CORRUPT STATE.");
+    }
+
+    emit refreshFinished();
+
+    return !keysCorrupt;
 }
 
-Monero::SubaddressRow* Subaddress::row(int index) const
+qsizetype Subaddress::count() const
 {
+    return m_rows.length();
+}
+
+void Subaddress::clearRows() {
+    qDeleteAll(m_rows);
+    m_rows.clear();
+}
+
+SubaddressRow* Subaddress::row(int index) const {
     return m_rows.value(index);
-}
+};
+
+QString Subaddress::getError() const {
+    return m_errorString;
+};

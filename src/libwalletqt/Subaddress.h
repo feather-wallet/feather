@@ -12,34 +12,52 @@
 #include <QList>
 #include <QDateTime>
 
+#include <wallet/wallet2.h>
+
+#include "Wallet.h"
+#include "rows/SubaddressRow.h"
+
 class Subaddress : public QObject
 {
     Q_OBJECT
+
 public:
-    void getAll() const;
-    bool getRow(int index, std::function<void (Monero::SubaddressRow &row)> callback) const;
-    bool addRow(quint32 accountIndex, const QString &label) const;
-    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) const;
-    bool refresh(quint32 accountIndex) const;
-    quint64 unusedLookahead() const;
-    quint64 count() const;
-    QString errorString() const;
-    Monero::SubaddressRow* row(int index) const;
+    bool getRow(int index, std::function<void (SubaddressRow &row)> callback) const;
+    bool addRow(quint32 accountIndex, const QString &label);
+    
+    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
+
+    bool setHidden(const QString& address, bool hidden);
+    bool isHidden(const QString& address);
+    
+    bool setPinned(const QString& address, bool pinned);
+    bool isPinned(const QString& address);
+    
+    bool refresh(quint32 accountIndex);
+    
+    [[nodiscard]] qsizetype count() const;
+    void clearRows();
+
+    [[nodiscard]] SubaddressRow* row(int index) const;
+
+    QString getError() const;
 
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
-    void labelChanged() const;
-
-public slots:
 
 private:
-    explicit Subaddress(Monero::Subaddress * subaddressImpl, QObject *parent);
+    explicit Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
-    mutable QReadWriteLock m_lock;
-    Monero::Subaddress * m_subaddressImpl;
-    mutable QList<Monero::SubaddressRow*> m_rows;
-    mutable quint64 m_unusedLookahead;
+
+    Wallet* m_wallet;
+    tools::wallet2 *m_wallet2;
+    QList<SubaddressRow*> m_rows;
+    
+    QStringList m_pinned;
+    QStringList m_hidden;
+
+    QString m_errorString;
 };
 
 #endif // SUBADDRESS_H

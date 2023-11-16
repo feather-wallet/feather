@@ -41,6 +41,8 @@ file(GLOB SOURCE_FILES
         "utils/os/*.cpp"
         "libwalletqt/*.h"
         "libwalletqt/*.cpp"
+        "libwalletqt/rows/*.h"
+        "libwalletqt/rows/*.cpp"
         "daemon/*.h"
         "daemon/*.cpp"
         "model/*.h"
@@ -129,6 +131,7 @@ target_include_directories(feather PUBLIC
         ${CMAKE_BINARY_DIR}/src/feather_autogen/include
         ${CMAKE_SOURCE_DIR}/monero/include
         ${CMAKE_SOURCE_DIR}/monero/src
+        ${CMAKE_SOURCE_DIR}/monero/external
         ${CMAKE_SOURCE_DIR}/monero/external/easylogging++
         ${CMAKE_SOURCE_DIR}/monero/contrib/epee/include
         ${CMAKE_SOURCE_DIR}/src

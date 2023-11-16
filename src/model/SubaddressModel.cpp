@@ -8,13 +8,14 @@
 #include <QColor>
 #include <QBrush>
 
+#include "utils/config.h"
 #include "utils/ColorScheme.h"
+#include "utils/Icons.h"
 #include "utils/Utils.h"
 
 SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
     : QAbstractTableModel(parent)
     , m_subaddress(subaddress)
-    , m_showFullAddresses(false)
 {
     connect(m_subaddress, &Subaddress::refreshStarted, this, &SubaddressModel::startReset);
     connect(m_subaddress, &Subaddress::refreshFinished, this, &SubaddressModel::endReset);
@@ -51,10 +52,19 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
         return QVariant();
 
     QVariant result;
-
-    bool found = m_subaddress->getRow(index.row(), [this, &index, &role, &result](const Monero::SubaddressRow &subaddress) {
+    
+    bool found = m_subaddress->getRow(index.row(), [this, &index, &role, &result](const SubaddressRow &subaddress) {
         if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole){
             result = parseSubaddressRow(subaddress, index, role);
+        }
+        
+        else if (role == Qt::DecorationRole) {
+            if (subaddress.isPinned() && index.column() == ModelColumn::Index) {
+                result = QVariant(icons()->icon("pin.png"));
+            }
+            else if (subaddress.isHidden() && index.column() == ModelColumn::Index) {
+                result = QVariant(icons()->icon("eye_blind.png"));
+            }
         }
         else if (role == Qt::BackgroundRole) {
             switch(index.column()) {
@@ -94,17 +104,25 @@ QVariant SubaddressModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subaddress, const QModelIndex &index, int role) const
+QVariant SubaddressModel::parseSubaddressRow(const SubaddressRow &subaddress, const QModelIndex &index, int role) const
 {
+    bool showFull = conf()->get(Config::showFullAddresses).toBool();
     switch (index.column()) {
         case Index:
         {
-            return "#" + QString::number(subaddress.getRowId()) + " ";
+            if (role == Qt::UserRole) {
+                if (subaddress.isPinned()) {
+                    return -1;
+                } else {
+                    return subaddress.getRow();
+                }
+            }
+            return "#" + QString::number(subaddress.getRow()) + " ";
         }
         case Address:
         {
-            QString address = QString::fromStdString(subaddress.getAddress());
-            if (!m_showFullAddresses && role != Qt::UserRole) {
+            QString address = subaddress.getAddress();
+            if (!showFull && role != Qt::UserRole) {
                 address = Utils::displayAddress(address);
             }
             return address;
@@ -117,7 +135,7 @@ QVariant SubaddressModel::parseSubaddressRow(const Monero::SubaddressRow &subadd
             else if (index.row() == 0) {
                 return "Change";
             }
-            return QString::fromStdString(subaddress.getLabel());
+            return subaddress.getLabel();
         }
         case isUsed:
             return subaddress.isUsed();
@@ -170,12 +188,6 @@ bool SubaddressModel::setData(const QModelIndex &index, const QVariant &value, i
     return false;
 }
 
-void SubaddressModel::setShowFullAddresses(bool show)
-{
-    m_showFullAddresses = show;
-    emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
-}
-
 Qt::ItemFlags SubaddressModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
@@ -187,19 +199,11 @@ Qt::ItemFlags SubaddressModel::flags(const QModelIndex &index) const
     return QAbstractTableModel::flags(index);
 }
 
-bool SubaddressModel::isShowFullAddresses() const {
-    return m_showFullAddresses;
-}
-
-int SubaddressModel::unusedLookahead() const {
-    return m_subaddress->unusedLookahead();
-}
-
 void SubaddressModel::setCurrentSubaddressAccount(quint32 accountIndex) {
     m_currentSubaddressAccount = accountIndex;
 }
 
-Monero::SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {
+SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_subaddress->count());
     return m_subaddress->row(index.row());
 }

@@ -10,6 +10,8 @@
 #include <QSortFilterProxyModel>
 #include <QDebug>
 
+#include "rows/SubaddressRow.h"
+
 class Subaddress;
 
 class SubaddressModel : public QAbstractTableModel
@@ -36,13 +38,9 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    bool isShowFullAddresses() const;
-    void setShowFullAddresses(bool show);
-
-    Monero::SubaddressRow* entryFromIndex(const QModelIndex &index) const;
+    SubaddressRow* entryFromIndex(const QModelIndex &index) const;
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
-    int unusedLookahead() const;
 
 public slots:
     void startReset();
@@ -50,9 +48,8 @@ public slots:
 
 private:
     Subaddress *m_subaddress;
-    QVariant parseSubaddressRow(const Monero::SubaddressRow &subaddress, const QModelIndex &index, int role) const;
+    QVariant parseSubaddressRow(const SubaddressRow &subaddress, const QModelIndex &index, int role) const;
 
-    bool m_showFullAddresses;
     quint32 m_currentSubaddressAccount;
 };
 
