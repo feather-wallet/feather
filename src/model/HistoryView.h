@@ -18,7 +18,7 @@ class HistoryView : public QTreeView
 public:
     explicit HistoryView(QWidget* parent = nullptr);
     void setHistoryModel(TransactionHistoryProxyModel *model);
-    TransactionInfo* currentEntry();
+    TransactionRow* currentEntry();
 
     void setSearchMode(bool mode);
     QByteArray viewState() const;

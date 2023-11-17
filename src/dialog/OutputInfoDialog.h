@@ -8,7 +8,7 @@
 
 #include "components.h"
 #include "libwalletqt/Coins.h"
-#include "libwalletqt/CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 
 namespace Ui {
     class OutputInfoDialog;

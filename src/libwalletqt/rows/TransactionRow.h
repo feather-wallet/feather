@@ -1,48 +1,24 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
-#ifndef TRANSACTIONINFO_H
-#define TRANSACTIONINFO_H
-
-#include <wallet/api/wallet2_api.h>
-#include <QObject>
-#include <QDateTime>
-#include <QSet>
+#ifndef FEATHER_TRANSACTIONROW_H
+#define FEATHER_TRANSACTIONROW_H
 
 class Transfer;
 class Ring;
 
-class TransactionInfo : public QObject
+#include <QObject>
+#include <QSet>
+#include <QDateTime>
+
+class TransactionRow : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Direction direction READ direction)
-    Q_PROPERTY(bool isPending READ isPending)
-    Q_PROPERTY(bool isFailed READ isFailed)
-    Q_PROPERTY(bool isCoinbase READ isCoinbase)
-    Q_PROPERTY(double amount READ amount)
-    Q_PROPERTY(quint64 atomicAmount READ atomicAmount)
-    Q_PROPERTY(QString displayAmount READ displayAmount)
-    Q_PROPERTY(QString fee READ fee)
-    Q_PROPERTY(quint64 blockHeight READ blockHeight)
-    Q_PROPERTY(QString description READ description)
-    Q_PROPERTY(QSet<quint32> subaddrIndex READ subaddrIndex)
-    Q_PROPERTY(quint32 subaddrAccount READ subaddrAccount)
-    Q_PROPERTY(QString label READ label)
-    Q_PROPERTY(quint64 confirmations READ confirmations)
-    Q_PROPERTY(quint64 confirmationsRequired READ confirmationsRequired)
-    Q_PROPERTY(quint64 unlockTime READ unlockTime)
-    Q_PROPERTY(QString hash READ hash)
-    Q_PROPERTY(QDateTime timestamp READ timestamp)
-    Q_PROPERTY(QString date READ date)
-    Q_PROPERTY(QString time READ time)
-    Q_PROPERTY(QString paymentId READ paymentId)
-    Q_PROPERTY(QString destinations_formatted READ destinations_formatted)
-    Q_PROPERTY(QString rings_formatted READ rings_formatted)
 
 public:
     enum Direction {
-        Direction_In  =  Monero::TransactionInfo::Direction_In,
-        Direction_Out =  Monero::TransactionInfo::Direction_Out,
+        Direction_In  =  0,
+        Direction_Out =  1,
         Direction_Both // invalid direction value, used for filtering
     };
 
@@ -80,7 +56,10 @@ public:
     QString rings_formatted() const;
 
 private:
-    explicit TransactionInfo(const Monero::TransactionInfo *pimpl, QObject *parent = nullptr);
+    explicit TransactionRow();
+
+//    TransactionRow(const Monero::TransactionInfo *pimpl, QObject *parent = nullptr);
+
 private:
     friend class TransactionHistory;
     mutable QList<Transfer*> m_transfers;
@@ -104,4 +83,5 @@ private:
     bool m_coinbase;
 };
 
-#endif // TRANSACTIONINFO_H
+
+#endif //FEATHER_TRANSACTIONROW_H

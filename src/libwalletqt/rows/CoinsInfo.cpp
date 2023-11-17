@@ -74,7 +74,15 @@ QString CoinsInfo::address() const {
 
 QString CoinsInfo::addressLabel() const {
     if (m_subaddrIndex == 0) {
-        return m_coinbase ? "Coinbase" : "Change";
+        if (m_coinbase) {
+            return "Coinbase";
+        }
+        if (m_change) {
+            return "Change";
+        }
+        if (m_addressLabel == "Primary account") {
+            return "Primary address";
+        }
     }
 
     return m_addressLabel;
@@ -108,29 +116,28 @@ QString CoinsInfo::description() const {
     return m_description;
 }
 
-CoinsInfo::CoinsInfo(const Monero::CoinsInfo *pimpl, QObject *parent)
+bool CoinsInfo::change() const {
+    return m_change;
+}
+
+CoinsInfo::CoinsInfo(QObject *parent)
         : QObject(parent)
-        , m_blockHeight(pimpl->blockHeight())
-        , m_hash(QString::fromStdString(pimpl->hash()))
-        , m_internalOutputIndex(pimpl->internalOutputIndex())
-        , m_globalOutputIndex(pimpl->globalOutputIndex())
-        , m_spent(pimpl->spent())
-        , m_frozen(pimpl->frozen())
-        , m_spentHeight(pimpl->spentHeight())
-        , m_amount(pimpl->amount())
-        , m_rct(pimpl->rct())
-        , m_keyImageKnown(pimpl->keyImageKnown())
-        , m_pkIndex(pimpl->pkIndex())
-        , m_subaddrIndex(pimpl->subaddrIndex())
-        , m_subaddrAccount(pimpl->subaddrAccount())
-        , m_address(QString::fromStdString(pimpl->address()))
-        , m_addressLabel(QString::fromStdString(pimpl->addressLabel()))
-        , m_keyImage(QString::fromStdString(pimpl->keyImage()))
-        , m_unlockTime(pimpl->unlockTime())
-        , m_unlocked(pimpl->unlocked())
-        , m_pubKey(QString::fromStdString(pimpl->pubKey()))
-        , m_coinbase(pimpl->coinbase())
-        , m_description(QString::fromStdString(pimpl->description()))
+        , m_blockHeight(0)
+        , m_internalOutputIndex(0)
+        , m_globalOutputIndex(0)
+        , m_spent(false)
+        , m_frozen(false)
+        , m_spentHeight(0)
+        , m_amount(0)
+        , m_rct(false)
+        , m_keyImageKnown(false)
+        , m_pkIndex(0)
+        , m_subaddrIndex(0)
+        , m_subaddrAccount(0)
+        , m_unlockTime(0)
+        , m_unlocked(false)
+        , m_coinbase(false)
+        , m_change(false)
 {
 
 }

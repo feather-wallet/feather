@@ -64,7 +64,7 @@ void AccountSwitcherDialog::switchAccount() {
         return;
     }
 
-    m_wallet->switchSubaddressAccount(row->getRowId());
+    m_wallet->switchSubaddressAccount(row->getRow());
 }
 
 void AccountSwitcherDialog::copyLabel() {
@@ -73,7 +73,7 @@ void AccountSwitcherDialog::copyLabel() {
         return;
     }
 
-    Utils::copyToClipboard(QString::fromStdString(row->getLabel()));
+    Utils::copyToClipboard(row->getLabel());
 }
 
 void AccountSwitcherDialog::copyBalance() {
@@ -82,7 +82,7 @@ void AccountSwitcherDialog::copyBalance() {
         return;
     }
 
-    Utils::copyToClipboard(QString::fromStdString(row->getBalance()));
+    Utils::copyToClipboard(row->getBalance());
 }
 
 void AccountSwitcherDialog::editLabel() {
@@ -93,6 +93,9 @@ void AccountSwitcherDialog::editLabel() {
 
 void AccountSwitcherDialog::updateSelection() {
     QModelIndex index = m_model->index(m_wallet->currentSubaddressAccount(), 0);
+    if (!index.isValid()) {
+        return;
+    }
     ui->accounts->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
 }
 
@@ -111,7 +114,7 @@ void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
     menu->popup(ui->accounts->viewport()->mapToGlobal(point));
 }
 
-Monero::SubaddressAccountRow* AccountSwitcherDialog::currentEntry() {
+AccountRow* AccountSwitcherDialog::currentEntry() {
     QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
     return m_wallet->subaddressAccountModel()->entryFromIndex(index);
 }

@@ -22,7 +22,7 @@
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
 #include "libwalletqt/AddressBook.h"
-#include "libwalletqt/CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/Transfer.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
@@ -502,20 +502,20 @@ void MainWindow::onWalletOpened() {
     m_wallet->subaddressModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
 
     // history page
-    m_wallet->history()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->history()->refresh();
 
     // coins page
-    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->coins()->refresh();
     m_coinsWidget->setModel(m_wallet->coinsModel(), m_wallet->coins());
     m_wallet->coinsModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
 
     // Coin labeling uses set_tx_note, so we need to refresh history too
     connect(m_wallet->coins(), &Coins::descriptionChanged, [this] {
-        m_wallet->history()->refresh(m_wallet->currentSubaddressAccount());
+        m_wallet->history()->refresh();
     });
     // Vice versa
     connect(m_wallet->history(), &TransactionHistory::txNoteChanged, [this] {
-        m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+        m_wallet->coins()->refresh();
     });
 
     this->updatePasswordIcon();
@@ -898,7 +898,7 @@ void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, co
     msgBox.exec();
     if (msgBox.clickedButton() == showDetailsButton) {
         this->showHistoryTab();
-        TransactionInfo *txInfo = m_wallet->history()->transaction(txid.first());
+        TransactionRow *txInfo = m_wallet->history()->transaction(txid.first());
         auto *dialog = new TxInfoDialog(m_wallet, txInfo, this);
         connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
         dialog->show();
@@ -1145,7 +1145,7 @@ void MainWindow::importContacts() {
         i.next();
         bool addressValid = WalletManager::addressValid(i.value(), m_wallet->nettype());
         if(addressValid) {
-            m_wallet->addressBook()->addRow(i.value(), "", i.key());
+            m_wallet->addressBook()->addRow(i.value(), i.key());
             inserts++;
         }
     }

@@ -10,6 +10,7 @@
 #include <QSvgWidget>
 
 #include "dialog/TxProofDialog.h"
+#include "libwalletqt/rows/TransactionRow.h"
 
 namespace Ui {
     class TxInfoDialog;
@@ -20,7 +21,7 @@ class TxInfoDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent = nullptr);
+    explicit TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *parent = nullptr);
     ~TxInfoDialog() override;
 
 signals:
@@ -30,14 +31,14 @@ private:
     void copyTxID();
     void copyTxKey();
     void createTxProof();
-    void setData(TransactionInfo *tx);
+    void setData(TransactionRow *tx);
     void updateData();
     void adjustHeight(QTextEdit *textEdit, qreal docHeight);
     void viewOnBlockExplorer();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
     Wallet *m_wallet;
-    TransactionInfo *m_txInfo;
+    TransactionRow *m_txInfo;
     TxProofDialog *m_txProofDialog;
     QString m_txid;
 };

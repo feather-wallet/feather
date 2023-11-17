@@ -3,13 +3,13 @@
 
 #include "TransactionHistoryModel.h"
 #include "TransactionHistory.h"
-#include "TransactionInfo.h"
 #include "constants.h"
 #include "utils/config.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 #include "utils/AppData.h"
 #include "utils/Utils.h"
+#include "libwalletqt/rows/TransactionRow.h"
 
 TransactionHistoryModel::TransactionHistoryModel(QObject *parent)
     : QAbstractTableModel(parent),
@@ -34,7 +34,7 @@ TransactionHistory *TransactionHistoryModel::transactionHistory() const {
     return m_transactionHistory;
 }
 
-TransactionInfo* TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
+TransactionRow* TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_transactionHistory->count());
     return m_transactionHistory->transaction(index.row());
 }
@@ -65,7 +65,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
 
     QVariant result;
 
-    bool found = m_transactionHistory->transaction(index.row(), [this, &index, &result, &role](const TransactionInfo &tInfo) {
+    bool found = m_transactionHistory->transaction(index.row(), [this, &index, &result, &role](const TransactionRow &tInfo) {
         if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseTransactionInfo(tInfo, index.column(), role);
         }
@@ -117,7 +117,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                 case Column::FiatAmount:
                 case Column::Amount:
                 {
-                    if (tInfo.direction() == TransactionInfo::Direction_Out) {
+                    if (tInfo.direction() == TransactionRow::Direction_Out) {
                         result = QVariant(QColor("#BC1E1E"));
                     }
                 }
@@ -139,7 +139,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const
+QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tInfo, int column, int role) const
 {
     switch (column)
     {
@@ -159,7 +159,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionInfo &tI
                 return tInfo.balanceDelta();
             }
             QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
-            amount = (tInfo.direction() == TransactionInfo::Direction_Out) ? "-" + amount : "+" + amount;
+            amount = (tInfo.direction() == TransactionRow::Direction_Out) ? "-" + amount : "+" + amount;
             return amount;
         }
         case Column::TxID: {
@@ -227,7 +227,7 @@ bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &
         switch (index.column()) {
             case Column::Description:
             {
-                m_transactionHistory->transaction(index.row(), [this, &hash, &value](const TransactionInfo &tInfo){
+                m_transactionHistory->transaction(index.row(), [this, &hash, &value](const TransactionRow &tInfo){
                     hash = tInfo.hash();
                 });
                 m_transactionHistory->setTxNote(hash, value.toString());

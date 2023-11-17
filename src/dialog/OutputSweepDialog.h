@@ -7,7 +7,7 @@
 #include <QDialog>
 
 #include "components.h"
-#include "libwalletqt/CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 
 namespace Ui {
     class OutputSweepDialog;

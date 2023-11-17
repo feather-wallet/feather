@@ -12,7 +12,7 @@ class Transfer : public QObject
 {
     Q_OBJECT
 
-private:
+public:
     explicit Transfer(uint64_t _amount, QString _address,  QObject *parent = 0)
             : QObject(parent), m_amount(_amount), m_address(std::move(_address)) {};
 private:

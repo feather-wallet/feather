@@ -4,31 +4,15 @@
 #include "SubaddressAccount.h"
 #include <QDebug>
 
-SubaddressAccount::SubaddressAccount(Monero::SubaddressAccount *subaddressAccountImpl, QObject *parent)
-  : QObject(parent), m_subaddressAccountImpl(subaddressAccountImpl)
+SubaddressAccount::SubaddressAccount(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
+    : QObject(parent)
+    , m_wallet(wallet)
+    , m_wallet2(wallet2)
 {
-    getAll();
 }
 
-void SubaddressAccount::getAll() const
+bool SubaddressAccount::getRow(int index, std::function<void (AccountRow &row)> callback) const
 {
-    emit refreshStarted();
-
-    {
-        QWriteLocker locker(&m_lock);
-        m_rows.clear();
-        for (auto &row: m_subaddressAccountImpl->getAll()) {
-            m_rows.append(row);
-        }
-    }
-
-    emit refreshFinished();
-}
-
-bool SubaddressAccount::getRow(int index, std::function<void (Monero::SubaddressAccountRow &)> callback) const
-{
-    QReadLocker locker(&m_lock);
-
     if (index < 0 || index >= m_rows.size())
     {
         return false;
@@ -38,32 +22,50 @@ bool SubaddressAccount::getRow(int index, std::function<void (Monero::Subaddress
     return true;
 }
 
-void SubaddressAccount::addRow(const QString &label) const
+void SubaddressAccount::addRow(const QString &label)
 {
-    m_subaddressAccountImpl->addRow(label.toStdString());
-    getAll();
+    m_wallet2->add_subaddress_account(label.toStdString());
+    refresh();
 }
 
-void SubaddressAccount::setLabel(quint32 accountIndex, const QString &label) const
+void SubaddressAccount::setLabel(quint32 accountIndex, const QString &label)
 {
-    m_subaddressAccountImpl->setLabel(accountIndex, label.toStdString());
-    getAll();
+    m_wallet2->set_subaddress_label({accountIndex, 0}, label.toStdString());
+    refresh();
 }
 
-void SubaddressAccount::refresh() const
+void SubaddressAccount::refresh()
 {
-    m_subaddressAccountImpl->refresh();
-    getAll();
+    emit refreshStarted();
+
+    this->clearRows();
+    for (uint32_t i = 0; i < m_wallet2->get_num_subaddress_accounts(); ++i)
+    {
+        auto *row = new AccountRow{this,
+                                   i,
+                                   QString::fromStdString(m_wallet2->get_subaddress_as_str({i,0})),
+                                   QString::fromStdString(m_wallet2->get_subaddress_label({i,0})),
+                                   m_wallet2->balance(i, false),
+                                   m_wallet2->unlocked_balance(i, false)};
+
+        m_rows.append(row);
+    }
+
+    emit refreshFinished();
 }
 
-quint64 SubaddressAccount::count() const
+qsizetype SubaddressAccount::count() const
 {
-    QReadLocker locker(&m_lock);
-
-    return m_rows.size();
+    return m_rows.length();
 }
 
-Monero::SubaddressAccountRow* SubaddressAccount::row(int index) const
+void SubaddressAccount::clearRows()
+{
+    qDeleteAll(m_rows);
+    m_rows.clear();
+}
+
+AccountRow* SubaddressAccount::row(int index) const
 {
     return m_rows.value(index);
 }

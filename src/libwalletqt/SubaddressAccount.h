@@ -12,30 +12,40 @@
 #include <QList>
 #include <QDateTime>
 
+#include <wallet/wallet2.h>
+
+#include "Wallet.h"
+#include "rows/AccountRow.h"
+
 class SubaddressAccount : public QObject
 {
     Q_OBJECT
+
 public:
-    Q_INVOKABLE void getAll() const;
-    Q_INVOKABLE bool getRow(int index, std::function<void (Monero::SubaddressAccountRow &)> callback) const;
-    Q_INVOKABLE void addRow(const QString &label) const;
-    Q_INVOKABLE void setLabel(quint32 accountIndex, const QString &label) const;
-    Q_INVOKABLE void refresh() const;
-    quint64 count() const;
-    Monero::SubaddressAccountRow* row(int index) const;
+    void getAll() const;
+    bool getRow(int index, std::function<void (AccountRow &row)> callback) const;
+    void addRow(const QString &label);
+
+    void setLabel(quint32 accountIndex, const QString &label);
+
+    void refresh();
+
+    qsizetype count() const;
+    void clearRows();
+
+    AccountRow* row(int index) const;
 
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
 
-public slots:
-
 private:
-    explicit SubaddressAccount(Monero::SubaddressAccount * subaddressAccountImpl, QObject *parent);
+    explicit SubaddressAccount(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
-    mutable QReadWriteLock m_lock;
-    Monero::SubaddressAccount * m_subaddressAccountImpl;
-    mutable QList<Monero::SubaddressAccountRow*> m_rows;
+
+    Wallet *m_wallet;
+    tools::wallet2 *m_wallet2;
+    QList<AccountRow*> m_rows;
 };
 
 #endif // SUBADDRESSACCOUNT_H

@@ -8,6 +8,7 @@
 #include "utils/Utils.h"
 
 #include "libwalletqt/WalletManager.h"
+#include "rows/AccountRow.h"
 
 SubaddressAccountModel::SubaddressAccountModel(QObject *parent, SubaddressAccount *subaddressAccount)
     : QAbstractTableModel(parent)
@@ -49,7 +50,7 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
 
     QVariant result;
 
-    bool found = m_subaddressAccount->getRow(index.row(), [this, &index, &result, &role](const Monero::SubaddressAccountRow &row) {
+    bool found = m_subaddressAccount->getRow(index.row(), [this, &index, &result, &role](const AccountRow &row) {
         if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             result = parseSubaddressAccountRow(row, index, role);
         }
@@ -72,7 +73,7 @@ QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-QVariant SubaddressAccountModel::parseSubaddressAccountRow(const Monero::SubaddressAccountRow &row,
+QVariant SubaddressAccountModel::parseSubaddressAccountRow(const AccountRow &row,
                                                            const QModelIndex &index, int role) const
 {
     switch (index.column()) {
@@ -82,19 +83,19 @@ QVariant SubaddressAccountModel::parseSubaddressAccountRow(const Monero::Subaddr
             }
             return QString("#%1").arg(QString::number(index.row()));
         case Address:
-            return QString::fromStdString(row.getAddress());
+            return row.getAddress();
         case Label:
-            return QString::fromStdString(row.getLabel());
+            return row.getLabel();
         case Balance:
             if (role == Qt::UserRole) {
-                return WalletManager::amountFromString(QString::fromStdString(row.getBalance()));
+                return WalletManager::amountFromString(row.getBalance());
             }
-            return QString::fromStdString(row.getBalance());
+            return row.getBalance();
         case UnlockedBalance:
             if (role == Qt::UserRole) {
-                return WalletManager::amountFromString(QString::fromStdString(row.getUnlockedBalance()));
+                return WalletManager::amountFromString(row.getUnlockedBalance());
             }
-            return QString::fromStdString(row.getUnlockedBalance());
+            return row.getUnlockedBalance();
         default:
             return QVariant();
     }
@@ -154,8 +155,7 @@ Qt::ItemFlags SubaddressAccountModel::flags(const QModelIndex &index) const
     return QAbstractTableModel::flags(index);
 }
 
-Monero::SubaddressAccountRow* SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
-    Q_ASSERT(index.isValid() && index.row() < m_subaddressAccount->count());
+AccountRow* SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
     return m_subaddressAccount->row(index.row());
 }
 

@@ -10,7 +10,7 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
-TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionInfo *txInfo)
+TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionRow *txInfo)
     : WindowModalDialog(parent)
     , ui(new Ui::TxProofDialog)
     , m_wallet(wallet)
@@ -70,7 +70,7 @@ void TxProofDialog::selectSpendProof() {
     m_mode = Mode::SpendProof;
     this->resetFrames();
 
-    if (m_direction == TransactionInfo::Direction_In) {
+    if (m_direction == TransactionRow::Direction_In) {
         this->showWarning("Your wallet did not construct this transaction. Creating a SpendProof is not possible.");
         return;
     }
@@ -107,7 +107,7 @@ void TxProofDialog::selectInProof() {
     m_mode = Mode::InProof;
     this->resetFrames();
 
-    if (m_direction == TransactionInfo::Direction_Out) {
+    if (m_direction == TransactionRow::Direction_Out) {
         this->showWarning("Can't create InProofs for outgoing transactions.");
         return;
     }

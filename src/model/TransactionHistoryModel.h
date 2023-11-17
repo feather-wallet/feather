@@ -8,7 +8,7 @@
 #include <QIcon>
 
 class TransactionHistory;
-class TransactionInfo;
+class TransactionRow;
 
 /**
  * @brief The TransactionHistoryModel class - read-only table model for Transaction History
@@ -33,7 +33,7 @@ public:
     explicit TransactionHistoryModel(QObject * parent = nullptr);
     void setTransactionHistory(TransactionHistory * th);
     TransactionHistory * transactionHistory() const;
-    TransactionInfo* entryFromIndex(const QModelIndex& index) const;
+    TransactionRow* entryFromIndex(const QModelIndex& index) const;
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
@@ -47,7 +47,7 @@ signals:
     void transactionHistoryChanged();
 
 private:
-    QVariant parseTransactionInfo(const TransactionInfo &tInfo, int column, int role) const;
+    QVariant parseTransactionInfo(const TransactionRow &tInfo, int column, int role) const;
 
     TransactionHistory * m_transactionHistory;
 };

@@ -135,9 +135,9 @@ void ContactsWidget::newContact(QString address, QString name)
     QString address_entry;
     QString name_entry;
     for (int i=0; i<num_addresses; i++) {
-        m_wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const AddressBookInfo &entry){
-            address_entry = entry.address();
-            name_entry = entry.description();
+        m_wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const ContactRow &entry){
+            address_entry = entry.getAddress();
+            name_entry = entry.getLabel();
         });
 
         if (address == address_entry) {
@@ -152,7 +152,7 @@ void ContactsWidget::newContact(QString address, QString name)
         }
     }
 
-    m_wallet->addressBook()->addRow(address, "", name);
+    m_wallet->addressBook()->addRow(address, name);
 }
 
 void ContactsWidget::deleteContact()

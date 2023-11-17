@@ -5,43 +5,44 @@
 #define ADDRESSBOOK_H
 
 #include <wallet/api/wallet2_api.h>
-#include "AddressBookInfo.h"
 #include <QMap>
 #include <QObject>
 #include <QReadWriteLock>
 #include <QList>
 #include <QDateTime>
 
+#include "rows/ContactRow.h"
+#include "Wallet.h"
+#include "wallet/wallet2.h"
+
 namespace Monero {
 struct AddressBook;
 }
-class AddressBookRow;
 
 class AddressBook : public QObject
 {
     Q_OBJECT
-public:
-    Q_INVOKABLE bool getRow(int index, std::function<void (AddressBookInfo &)> callback) const;
-    Q_INVOKABLE bool addRow(const QString &address, const QString &payment_id, const QString &description);
-    Q_INVOKABLE bool deleteRow(int rowId);
-    Q_INVOKABLE void setDescription(int index, const QString &label);
-    quint64 count() const;
-    Q_INVOKABLE QString errorString() const;
-    Q_INVOKABLE int errorCode() const;
-    Q_INVOKABLE QString getDescription(const QString &address) const;
-    Q_INVOKABLE QString getAddress(const QString &description) const;
 
+public:
     enum ErrorCode {
         Status_Ok,
         General_Error,
         Invalid_Address,
         Invalid_Payment_Id
     };
-
     Q_ENUM(ErrorCode);
 
-private:
-    void getAll();
+    bool getRow(int index, std::function<void (ContactRow &)> callback) const;
+    bool addRow(const QString &address, const QString &description);
+    bool deleteRow(int rowId);
+    bool setDescription(int index, const QString &label);
+    qsizetype count() const;
+    QString errorString() const;
+    ErrorCode errorCode() const;
+
+    void refresh();
+    void clearRows();
+
 
 signals:
     void refreshStarted() const;
@@ -49,12 +50,15 @@ signals:
     void descriptionChanged() const;
 
 private:
-    explicit AddressBook(Monero::AddressBook * abImpl, QObject *parent);
+    explicit AddressBook(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
-    Monero::AddressBook * m_addressBookImpl;
-    mutable QReadWriteLock m_lock;
-    QList<AddressBookInfo*> m_rows;
-    QMap<QString, size_t> m_addresses;
+
+    Wallet *m_wallet;
+    tools::wallet2 *m_wallet2;
+    QList<ContactRow*> m_rows;
+
+    QString m_errorString;
+    ErrorCode m_errorCode;
 };
 
 #endif // ADDRESSBOOK_H

@@ -10,14 +10,14 @@
 #include "config.h"
 #include "constants.h"
 #include "libwalletqt/Coins.h"
-#include "libwalletqt/CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/TransactionHistory.h"
 #include "libwalletqt/Transfer.h"
 #include "libwalletqt/WalletManager.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
-TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *parent)
+TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::TxInfoDialog)
     , m_wallet(wallet)
@@ -41,7 +41,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *par
 
     this->setData(txInfo);
 
-    if ((txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionInfo::Direction_In) {
+    if ((txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionRow::Direction_In) {
         connect(ui->btn_rebroadcastTx, &QPushButton::pressed, [this]{
             emit resendTranscation(m_txid);
         });
@@ -49,7 +49,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionInfo *txInfo, QWidget *par
         ui->btn_rebroadcastTx->hide();
     }
 
-    if (txInfo->direction() == TransactionInfo::Direction_In) {
+    if (txInfo->direction() == TransactionRow::Direction_In) {
         ui->btn_CopyTxKey->setDisabled(true);
         ui->btn_CopyTxKey->setToolTip("No tx secret key available for incoming transactions.");
     }
@@ -106,7 +106,7 @@ void TxInfoDialog::adjustHeight(QTextEdit *textEdit, qreal docHeight) {
     textEdit->verticalScrollBar()->hide();
 }
 
-void TxInfoDialog::setData(TransactionInfo *tx) {
+void TxInfoDialog::setData(TransactionRow *tx) {
     QString blockHeight = QString::number(tx->blockHeight());
 
     if (tx->isFailed()) {
@@ -131,13 +131,13 @@ void TxInfoDialog::setData(TransactionInfo *tx) {
         ui->label_lock->setText("Lock: Outputs are spendable");
     }
 
-    QString direction = tx->direction() == TransactionInfo::Direction_In ? "received" : "sent";
+    QString direction = tx->direction() == TransactionRow::Direction_In ? "received" : "sent";
     ui->label_amount->setText(QString("Amount %1: %2 XMR").arg(direction, tx->displayAmount()));
 
     QString fee;
     if (tx->isCoinbase())
         fee = "Not applicable";
-    else if (tx->direction() == TransactionInfo::Direction_In)
+    else if (tx->direction() == TransactionRow::Direction_In)
         fee = "Paid by sender";
     else if (tx->fee().isEmpty())
         fee = "N/A";
@@ -149,7 +149,7 @@ void TxInfoDialog::setData(TransactionInfo *tx) {
 }
 
 void TxInfoDialog::updateData() {
-    TransactionInfo *tx = m_wallet->history()->transaction(m_txid);
+    TransactionRow *tx = m_wallet->history()->transaction(m_txid);
     if (!tx) return;
     this->setData(tx);
 }

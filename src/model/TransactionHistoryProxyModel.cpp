@@ -4,7 +4,7 @@
 #include "TransactionHistoryProxyModel.h"
 #include "TransactionHistoryModel.h"
 
-#include "libwalletqt/TransactionInfo.h"
+#include "libwalletqt/rows/TransactionRow.h"
 
 TransactionHistoryProxyModel::TransactionHistoryProxyModel(Wallet *wallet, QObject *parent)
         : QSortFilterProxyModel(parent)
@@ -25,7 +25,7 @@ bool TransactionHistoryProxyModel::filterAcceptsRow(int sourceRow, const QModelI
     quint32 subaddrAccount;
     QSet<quint32> subaddrIndex;
 
-    m_history->transaction(sourceRow, [&description, &txid, &subaddrlabel, &subaddrAccount, &subaddrIndex](TransactionInfo &tInfo){
+    m_history->transaction(sourceRow, [&description, &txid, &subaddrlabel, &subaddrAccount, &subaddrIndex](TransactionRow &tInfo){
         description = tInfo.description();
         txid = tInfo.hash();
         subaddrlabel = tInfo.label();

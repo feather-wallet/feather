@@ -3,7 +3,7 @@
 
 #include "CoinsProxyModel.h"
 #include "CoinsModel.h"
-#include "libwalletqt/CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 
 CoinsProxyModel::CoinsProxyModel(QObject *parent, Coins *coins)
         : QSortFilterProxyModel(parent)

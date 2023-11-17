@@ -12,6 +12,9 @@
 #include <QDateTime>
 #include <wallet/api/wallet2_api.h>
 
+#include "Wallet.h"
+#include "wallet/wallet2.h"
+
 namespace Monero {
     struct TransactionHistory;
 }
@@ -25,15 +28,16 @@ Q_OBJECT
 public:
     bool coin(int index, std::function<void (CoinsInfo &)> callback);
     CoinsInfo * coin(int index);
-    void refresh(quint32 accountIndex);
+    void refresh();
     void refreshUnlocked();
-    void freeze(QString &publicKey) const;
-    void thaw(QString &publicKey) const;
+    void freeze(QString &publicKey);
+    void thaw(QString &publicKey);
     QVector<CoinsInfo*> coins_from_txid(const QString &txid);
     QVector<CoinsInfo*> coinsFromKeyImage(const QStringList &keyimages);
     void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
 
     quint64 count() const;
+    void clearRows();
 
 signals:
     void refreshStarted() const;
@@ -43,13 +47,16 @@ signals:
     void descriptionChanged() const;
 
 private:
-    explicit Coins(Monero::Coins * pimpl, QObject *parent = nullptr);
+    explicit Coins(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent = nullptr);
 
 private:
     friend class Wallet;
+
+    Wallet *m_wallet;
+    tools::wallet2 *m_wallet2;
+    QList<CoinsInfo*> m_rows;
+
     mutable QReadWriteLock m_lock;
-    Monero::Coins * m_pimpl;
-    mutable QList<CoinsInfo*> m_tinfo;
 };
 
 #endif //FEATHER_COINS_H

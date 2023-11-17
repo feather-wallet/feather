@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "CoinsModel.h"
-#include "CoinsInfo.h"
+#include "libwalletqt/rows/CoinsInfo.h"
 #include "Coins.h"
 #include "constants.h"
 #include "utils/ColorScheme.h"

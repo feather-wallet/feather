@@ -299,7 +299,7 @@ void CoinsWidget::freezeCoins(QStringList &pubkeys) {
     for (auto &pubkey : pubkeys) {
         m_wallet->coins()->freeze(pubkey);
     }
-    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->coins()->refresh();
     m_wallet->updateBalance();
 }
 
@@ -307,7 +307,7 @@ void CoinsWidget::thawCoins(QStringList &pubkeys) {
     for (auto &pubkey : pubkeys) {
         m_wallet->coins()->thaw(pubkey);
     }
-    m_wallet->coins()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->coins()->refresh();
     m_wallet->updateBalance();
 }
 

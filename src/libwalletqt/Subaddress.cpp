@@ -159,8 +159,8 @@ void Subaddress::clearRows() {
 
 SubaddressRow* Subaddress::row(int index) const {
     return m_rows.value(index);
-};
+}
 
 QString Subaddress::getError() const {
     return m_errorString;
-};
+}

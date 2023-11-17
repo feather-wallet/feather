@@ -4,48 +4,54 @@
 #include "AddressBook.h"
 #include <QDebug>
 
-AddressBook::AddressBook(Monero::AddressBook *abImpl, QObject *parent)
-  : QObject(parent), m_addressBookImpl(abImpl)
+AddressBook::AddressBook(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
+     : QObject(parent)
+     , m_wallet(wallet)
+     , m_wallet2(wallet2)
 {
-    getAll();
+    this->refresh();
 }
 
 QString AddressBook::errorString() const
 {
-    return QString::fromStdString(m_addressBookImpl->errorString());
+    return m_errorString;
 }
 
-int AddressBook::errorCode() const
+AddressBook::ErrorCode AddressBook::errorCode() const
 {
-    return m_addressBookImpl->errorCode();
+    return m_errorCode;
 }
 
-void AddressBook::getAll()
+void AddressBook::refresh()
 {
     emit refreshStarted();
 
-    {
-        QWriteLocker locker(&m_lock);
+    clearRows();
 
-        qDeleteAll(m_rows);
+    // Fetch from Wallet2 and create vector of AddressBookRow objects
+    std::vector<tools::wallet2::address_book_row> rows = m_wallet2->get_address_book();
+    for (qsizetype i = 0; i < rows.size(); ++i) {
+        tools::wallet2::address_book_row *row = &rows.at(i);
 
-        m_addresses.clear();
-        m_rows.clear();
+        std::string address;
+        if (row->m_has_payment_id)
+            address = cryptonote::get_account_integrated_address_as_str(m_wallet2->nettype(), row->m_address, row->m_payment_id);
+        else
+            address = get_account_address_as_str(m_wallet2->nettype(), row->m_is_subaddress, row->m_address);
 
-        for (auto &abr: m_addressBookImpl->getAll()) {
-            m_addresses.insert(QString::fromStdString(abr->getAddress()), m_rows.size());
-
-            m_rows.append(new AddressBookInfo(abr, this));
-        }
+        auto* abr = new ContactRow{this,
+                                   i,
+                                   QString::fromStdString(address),
+                                   QString::fromStdString(row->m_description)};
+        m_rows.push_back(abr);
     }
+
 
     emit refreshFinished();
 }
 
-bool AddressBook::getRow(int index, std::function<void (AddressBookInfo &)> callback) const
+bool AddressBook::getRow(int index, std::function<void (ContactRow &)> callback) const
 {
-    QReadLocker locker(&m_lock);
-
     if (index < 0 || index >= m_rows.size())
     {
         return false;
@@ -55,88 +61,58 @@ bool AddressBook::getRow(int index, std::function<void (AddressBookInfo &)> call
     return true;
 }
 
-bool AddressBook::addRow(const QString &address, const QString &payment_id, const QString &description)
+bool AddressBook::addRow(const QString &address, const QString &description)
 {
-    //  virtual bool addRow(const std::string &dst_addr , const std::string &payment_id, const std::string &description) = 0;
-    bool result;
+    m_errorString = "";
 
-    {
-        QWriteLocker locker(&m_lock);
-
-        result = m_addressBookImpl->addRow(address.toStdString(), payment_id.toStdString(), description.toStdString());
+    cryptonote::address_parse_info info;
+    if (!cryptonote::get_account_address_from_str(info, m_wallet2->nettype(), address.toStdString())) {
+        m_errorString = tr("Invalid destination address");
+        m_errorCode = Invalid_Address;
+        return false;
     }
 
-    if (result)
-    {
-        getAll();
-    }
-
-    return result;
+    bool r =  m_wallet2->add_address_book_row(info.address, info.has_payment_id ? &info.payment_id : nullptr, description.toStdString(), info.is_subaddress);
+    if (r)
+        refresh();
+    else
+        m_errorCode = General_Error;
+    return r;
 }
 
-void AddressBook::setDescription(int index, const QString &description) {
-    bool result;
+bool AddressBook::setDescription(int index, const QString &description) {
+    m_errorString = "";
 
-    {
-        QWriteLocker locker(&m_lock);
-
-        result = m_addressBookImpl->setDescription(index, description.toStdString());
+    const auto ab = m_wallet2->get_address_book();
+    if (index >= ab.size()){
+        return false;
     }
 
-    if (result)
-    {
-        getAll();
-        emit descriptionChanged();
-    }
+    tools::wallet2::address_book_row entry = ab[index];
+    entry.m_description = description.toStdString();
+    bool r =  m_wallet2->set_address_book_row(index, entry.m_address, entry.m_has_payment_id ? &entry.m_payment_id : nullptr, entry.m_description, entry.m_is_subaddress);
+    if (r)
+        refresh();
+    else
+        m_errorCode = General_Error;
+    return r;
 }
 
 bool AddressBook::deleteRow(int rowId)
 {
-    bool result;
-
-    {
-        QWriteLocker locker(&m_lock);
-
-        result = m_addressBookImpl->deleteRow(rowId);
-    }
-
-    // Fetch new data from wallet2.
-    if (result)
-    {
-        getAll();
-    }
-
-    return result;
+    bool r = m_wallet2->delete_address_book_row(rowId);
+    if (r)
+        refresh();
+    return r;
 }
 
-quint64 AddressBook::count() const
+qsizetype AddressBook::count() const
 {
-    QReadLocker locker(&m_lock);
-
-    return m_rows.size();
+    return m_rows.length();
 }
 
-QString AddressBook::getDescription(const QString &address) const
+void AddressBook::clearRows()
 {
-    QReadLocker locker(&m_lock);
-
-    const QMap<QString, size_t>::const_iterator it = m_addresses.find(address);
-    if (it == m_addresses.end())
-    {
-        return {};
-    }
-    return m_rows.value(*it)->description();
-}
-
-QString AddressBook::getAddress(const QString &description) const
-{
-    QReadLocker locker(&m_lock);
-
-    for (const auto &row : m_rows) {
-        if (row->description() == description) {
-            return row->address();
-        }
-    }
-
-    return QString();
+    qDeleteAll(m_rows);
+    m_rows.clear();
 }

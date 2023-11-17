@@ -86,7 +86,7 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
     if (!tx) return;
 
     bool unconfirmed = tx->isFailed() || tx->isPending();
-    if (unconfirmed && tx->direction() != TransactionInfo::Direction_In) {
+    if (unconfirmed && tx->direction() != TransactionRow::Direction_In) {
         menu.addAction("Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 

@@ -70,12 +70,12 @@ QVariant AddressBookModel::data(const QModelIndex &index, int role) const
 {
     QVariant result;
 
-    bool found = m_addressBook->getRow(index.row(), [this, &result, &role, &index](const AddressBookInfo &row) {
+    bool found = m_addressBook->getRow(index.row(), [this, &result, &role, &index](const ContactRow &row) {
         if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
             switch (index.column()) {
                 case Address:
                 {
-                    QString address = row.address();
+                    QString address = row.getAddress();
                     if (!m_showFullAddresses && role != Qt::UserRole) {
                         address = Utils::displayAddress(address);
                     }
@@ -83,7 +83,7 @@ QVariant AddressBookModel::data(const QModelIndex &index, int role) const
                     break;
                 }
                 case Description:
-                    result = row.description();
+                    result = row.getLabel();
                     break;
                 default:
                     qCritical() << "Invalid column" << index.column();

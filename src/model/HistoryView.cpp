@@ -4,7 +4,6 @@
 #include "HistoryView.h"
 
 #include "TransactionHistoryProxyModel.h"
-#include "libwalletqt/TransactionInfo.h"
 #include "utils/Utils.h"
 
 #include <QHeaderView>
@@ -71,7 +70,7 @@ TransactionHistoryModel* HistoryView::sourceModel()
     return dynamic_cast<TransactionHistoryModel *>(m_model->sourceModel());
 }
 
-TransactionInfo* HistoryView::currentEntry()
+TransactionRow* HistoryView::currentEntry()
 {
     QModelIndexList list = selectionModel()->selectedRows();
     if (list.size() == 1) {
@@ -199,7 +198,7 @@ void HistoryView::resetViewToDefaults()
 }
 
 void HistoryView::keyPressEvent(QKeyEvent *event) {
-    TransactionInfo* tx = this->currentEntry();
+    TransactionRow* tx = this->currentEntry();
 
     if (event->matches(QKeySequence::Copy) && tx) {
         Utils::copyToClipboard(tx->hash());

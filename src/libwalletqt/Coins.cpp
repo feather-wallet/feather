@@ -2,50 +2,80 @@
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "Coins.h"
+#include "rows/CoinsInfo.h"
 
-#include <QDebug>
+Coins::Coins(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
+        : QObject(parent)
+        , m_wallet(wallet)
+        , m_wallet2(wallet2)
+{
 
-#include "CoinsInfo.h"
-
-#include <QFile>
-
+}
 
 bool Coins::coin(int index, std::function<void (CoinsInfo &)> callback)
 {
     QReadLocker locker(&m_lock);
 
-    if (index < 0 || index >= m_tinfo.size()) {
+    if (index < 0 || index >= m_rows.size()) {
         qCritical("%s: no transaction info for index %d", __FUNCTION__, index);
-        qCritical("%s: there's %d transactions in backend", __FUNCTION__, m_pimpl->count());
+        qCritical("%s: there's %lld transactions in backend", __FUNCTION__, m_rows.count());
         return false;
     }
 
-    callback(*m_tinfo.value(index));
+    callback(*m_rows.value(index));
     return true;
 }
 
 CoinsInfo* Coins::coin(int index)
 {
-    return m_tinfo.value(index);
+    return m_rows.value(index);
 }
 
-void Coins::refresh(quint32 accountIndex)
+void Coins::refresh()
 {
     emit refreshStarted();
+
+    boost::shared_lock<boost::shared_mutex> transfers_lock(m_wallet2->m_transfers_mutex);
 
     {
         QWriteLocker locker(&m_lock);
 
-        qDeleteAll(m_tinfo);
-        m_tinfo.clear();
+        clearRows();
+        uint32_t account = m_wallet->currentSubaddressAccount();
 
-        m_pimpl->refresh();
-        for (const auto i : m_pimpl->getAll()) {
-            if (i->subaddrAccount() != accountIndex) {
+        for (size_t i = 0; i < m_wallet2->get_num_transfer_details(); ++i)
+        {
+            const tools::wallet2::transfer_details &td = m_wallet2->get_transfer_details(i);
+
+            if (td.m_subaddr_index.major != account) {
                 continue;
             }
 
-            m_tinfo.append(new CoinsInfo(i, this));
+            auto ci = new CoinsInfo(this);
+            ci->m_blockHeight = td.m_block_height;
+            ci->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_txid));
+            ci->m_internalOutputIndex = td.m_internal_output_index;
+            ci->m_globalOutputIndex = td.m_global_output_index;
+            ci->m_spent = td.m_spent;
+            ci->m_frozen = td.m_frozen;
+            ci->m_spentHeight = td.m_spent_height;
+            ci->m_amount = td.m_amount;
+            ci->m_rct = td.m_rct;
+            ci->m_keyImageKnown = td.m_key_image_known;
+            ci->m_pkIndex = td.m_pk_index;
+            ci->m_subaddrIndex = td.m_subaddr_index.minor;
+            ci->m_subaddrAccount = td.m_subaddr_index.major;
+            ci->m_address = QString::fromStdString(m_wallet2->get_subaddress_as_str(td.m_subaddr_index)); // todo: this is expensive, cache maybe?
+            ci->m_addressLabel = QString::fromStdString(m_wallet2->get_subaddress_label(td.m_subaddr_index));
+            ci->m_keyImage = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_key_image));
+            ci->m_unlockTime = td.m_tx.unlock_time;
+            ci->m_unlocked = m_wallet2->is_transfer_unlocked(td);
+            ci->m_pubKey = QString::fromStdString(epee::string_tools::pod_to_hex(td.get_public_key()));
+            ci->m_coinbase = td.m_tx.vin.size() == 1 && td.m_tx.vin[0].type() == typeid(cryptonote::txin_gen);
+            ci->m_description = m_wallet->getCacheAttribute(QString("coin.description:%1").arg(ci->m_pubKey));
+            ci->m_change = m_wallet2->is_change(td);
+
+            m_rows.push_back(ci);
         }
     }
 
@@ -56,9 +86,9 @@ void Coins::refreshUnlocked()
 {
     QWriteLocker locker(&m_lock);
 
-    for (CoinsInfo* c : m_tinfo) {
+    for (CoinsInfo* c : m_rows) {
         if (!c->unlocked()) {
-            bool unlocked = m_pimpl->isTransferUnlocked(c->unlockTime(), c->blockHeight());
+            bool unlocked = m_wallet2->is_transfer_unlocked(c->unlockTime(), c->blockHeight());
             c->setUnlocked(unlocked);
         }
     }
@@ -68,18 +98,50 @@ quint64 Coins::count() const
 {
     QReadLocker locker(&m_lock);
 
-    return m_tinfo.count();
+    return m_rows.length();
 }
 
-void Coins::freeze(QString &publicKey) const
+void Coins::freeze(QString &publicKey)
 {
-    m_pimpl->setFrozen(publicKey.toStdString());
+    crypto::public_key pk;
+    if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
+    {
+        qWarning() << "Invalid public key: " << publicKey;
+        return;
+    }
+
+    try
+    {
+        m_wallet2->freeze(pk);
+        refresh();
+    }
+    catch (const std::exception& e)
+    {
+        qWarning() << "freeze: " << e.what();
+    }
+
     emit coinFrozen();
 }
 
-void Coins::thaw(QString &publicKey) const
+void Coins::thaw(QString &publicKey)
 {
-    m_pimpl->thaw(publicKey.toStdString());
+    crypto::public_key pk;
+    if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
+    {
+        qWarning() << "Invalid public key: " << publicKey;
+        return;
+    }
+
+    try
+    {
+        m_wallet2->thaw(pk);
+        refresh();
+    }
+    catch (const std::exception& e)
+    {
+        qWarning() << "thaw: " << e.what();
+    }
+
     emit coinThawed();
 }
 
@@ -111,14 +173,12 @@ QVector<CoinsInfo*> Coins::coinsFromKeyImage(const QStringList &keyimages) {
 
 void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const QString &description)
 {
-    m_pimpl->setDescription(publicKey.toStdString(), description.toStdString());
-    this->refresh(accountIndex);
+    m_wallet->setCacheAttribute(QString("coin.description:%1").arg(publicKey), description);
+    this->refresh();
     emit descriptionChanged();
 }
 
-Coins::Coins(Monero::Coins *pimpl, QObject *parent)
-        : QObject(parent)
-        , m_pimpl(pimpl)
-{
-
+void Coins::clearRows() {
+    qDeleteAll(m_rows);
+    m_rows.clear();
 }

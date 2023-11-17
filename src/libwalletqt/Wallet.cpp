@@ -32,21 +32,21 @@ namespace {
 Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
         : QObject(parent)
         , m_walletImpl(wallet)
-        , m_history(new TransactionHistory(m_walletImpl->history(), this))
+        , m_history(new TransactionHistory(this, wallet->getWallet(), this))
         , m_historyModel(nullptr)
-        , m_addressBook(new AddressBook(m_walletImpl->addressBook(), this))
+        , m_addressBook(new AddressBook(this, wallet->getWallet(), this))
         , m_addressBookModel(nullptr)
         , m_daemonBlockChainHeight(0)
         , m_daemonBlockChainTargetHeight(0)
         , m_connectionStatus(Wallet::ConnectionStatus_Disconnected)
         , m_currentSubaddressAccount(0)
         , m_subaddress(new Subaddress(this, wallet->getWallet(), this))
-        , m_subaddressAccount(new SubaddressAccount(m_walletImpl->subaddressAccount(), this))
+        , m_subaddressAccount(new SubaddressAccount(this, wallet->getWallet(), this))
         , m_refreshNow(false)
         , m_refreshEnabled(false)
         , m_scheduler(this)
         , m_useSSL(true)
-        , m_coins(new Coins(m_walletImpl->coins(), this))
+        , m_coins(new Coins(this, wallet->getWallet(), this))
         , m_storeTimer(new QTimer(this))
 {
     m_walletListener = new WalletListenerImpl(this);
@@ -71,7 +71,7 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     }
 
     connect(this->history(), &TransactionHistory::txNoteChanged, [this]{
-        this->history()->refresh(this->currentSubaddressAccount());
+        this->history()->refresh();
     });
 
     connect(this, &Wallet::refreshed, this, &Wallet::onRefreshed);
@@ -185,8 +185,8 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex) {
             qWarning() << "failed to set " << ATTRIBUTE_SUBADDRESS_ACCOUNT << " cache attribute";
         }
         m_subaddress->refresh(m_currentSubaddressAccount);
-        m_history->refresh(m_currentSubaddressAccount);
-        m_coins->refresh(m_currentSubaddressAccount);
+        m_history->refresh();
+        m_coins->refresh();
         this->subaddressModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->coinsModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->updateBalance();
@@ -453,8 +453,8 @@ void Wallet::onRefreshed(bool success, const QString &message) {
 }
 
 void Wallet::refreshModels() {
-    m_history->refresh(this->currentSubaddressAccount());
-    m_coins->refresh(this->currentSubaddressAccount());
+    m_history->refresh();
+    m_coins->refresh();
     bool r = this->subaddress()->refresh(this->currentSubaddressAccount());
 
     if (!r) {
@@ -776,8 +776,8 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
     // Store wallet immediately, so we don't risk losing tx key if wallet crashes
     this->storeSafer();
 
-    this->history()->refresh(this->currentSubaddressAccount());
-    this->coins()->refresh(this->currentSubaddressAccount());
+    this->history()->refresh();
+    this->coins()->refresh();
     this->updateBalance();
 
     if (!success) {

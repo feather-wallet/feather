@@ -8,6 +8,8 @@
 #include <QAbstractTableModel>
 #include <QSortFilterProxyModel>
 
+#include "rows/AccountRow.h"
+
 class SubaddressAccount;
 
 class SubaddressAccountModel : public QAbstractTableModel
@@ -34,14 +36,14 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    Monero::SubaddressAccountRow* entryFromIndex(const QModelIndex &index) const;
+    AccountRow* entryFromIndex(const QModelIndex &index) const;
 
 public slots:
     void startReset();
     void endReset();
 
 private:
-    QVariant parseSubaddressAccountRow(const Monero::SubaddressAccountRow &row, const QModelIndex &index, int role) const;
+    QVariant parseSubaddressAccountRow(const AccountRow &row, const QModelIndex &index, int role) const;
 
     SubaddressAccount *m_subaddressAccount;
 };

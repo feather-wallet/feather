@@ -34,7 +34,7 @@ private:
     void copyBalance();
     void editLabel();
 
-    Monero::SubaddressAccountRow* currentEntry();
+    AccountRow* currentEntry();
 
     QScopedPointer<Ui::AccountSwitcherDialog> ui;
     Wallet *m_wallet;
