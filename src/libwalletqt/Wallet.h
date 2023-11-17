@@ -454,6 +454,7 @@ private:
     friend class WalletListenerImpl;
 
     Monero::Wallet *m_walletImpl;
+    tools::wallet2 *m_wallet2;
 
     TransactionHistory *m_history;
     TransactionHistoryModel *m_historyModel;

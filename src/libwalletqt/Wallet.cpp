@@ -32,6 +32,7 @@ namespace {
 Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
         : QObject(parent)
         , m_walletImpl(wallet)
+        , m_wallet2(wallet->getWallet())
         , m_history(new TransactionHistory(this, wallet->getWallet(), this))
         , m_historyModel(nullptr)
         , m_addressBook(new AddressBook(this, wallet->getWallet(), this))
@@ -118,11 +119,11 @@ NetworkType::Type Wallet::nettype() const {
 }
 
 bool Wallet::viewOnly() const {
-    return m_walletImpl->watchOnly();
+    return m_wallet2->watch_only();
 }
 
 bool Wallet::isDeterministic() const {
-    return m_walletImpl->isDeterministic();
+    return m_wallet2->is_deterministic();
 }
 
 // #################### Balance ####################
@@ -132,11 +133,14 @@ quint64 Wallet::balance() const {
 }
 
 quint64 Wallet::balance(quint32 accountIndex) const {
-    return m_walletImpl->balance(accountIndex);
+    return m_wallet2->balance(accountIndex, false);
 }
 
 quint64 Wallet::balanceAll() const {
-    return m_walletImpl->balanceAll();
+    uint64_t result = 0;
+    for (uint32_t i = 0; i < numSubaddressAccounts(); ++i)
+        result += balance(i);
+    return result;
 }
 
 quint64 Wallet::unlockedBalance() const {
@@ -144,11 +148,14 @@ quint64 Wallet::unlockedBalance() const {
 }
 
 quint64 Wallet::unlockedBalance(quint32 accountIndex) const {
-    return m_walletImpl->unlockedBalance(accountIndex);
+    return m_wallet2->unlocked_balance(accountIndex, false);
 }
 
 quint64 Wallet::unlockedBalanceAll() const {
-    return m_walletImpl->unlockedBalanceAll();
+    uint64_t result = 0;
+    for (uint32_t i = 0; i < numSubaddressAccounts(); ++i)
+        result += unlockedBalance(i);
+    return result;
 }
 
 void Wallet::updateBalance() {
@@ -161,7 +168,7 @@ void Wallet::updateBalance() {
 // #################### Subaddresses and Accounts ####################
 
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const {
-    return QString::fromStdString(m_walletImpl->address(accountIndex, addressIndex));
+    return QString::fromStdString(m_wallet2->get_subaddress_as_str({accountIndex, addressIndex}));
 }
 
 SubaddressIndex Wallet::subaddressIndex(const QString &address) const {
@@ -194,20 +201,20 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex) {
     }
 }
 void Wallet::addSubaddressAccount(const QString& label) {
-    m_walletImpl->addSubaddressAccount(label.toStdString());
+    m_wallet2->add_subaddress_account(label.toStdString());
     switchSubaddressAccount(numSubaddressAccounts() - 1);
 }
 
 quint32 Wallet::numSubaddressAccounts() const {
-    return m_walletImpl->numSubaddressAccounts();
+    return m_wallet2->get_num_subaddress_accounts();
 }
 
 quint32 Wallet::numSubaddresses(quint32 accountIndex) const {
-    return m_walletImpl->numSubaddresses(accountIndex);
+    return m_wallet2->get_num_subaddresses(accountIndex);
 }
 
 void Wallet::addSubaddress(const QString& label) {
-    m_walletImpl->addSubaddress(currentSubaddressAccount(), label.toStdString());
+    m_wallet2->add_subaddress(currentSubaddressAccount(), label.toStdString());
 }
 
 QString Wallet::getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const {
@@ -226,15 +233,16 @@ void Wallet::deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, 
 }
 
 QString Wallet::getSubaddressLookahead() const {
-    auto lookahead = m_walletImpl->getSubaddressLookahead();
-
+    auto lookahead = m_wallet2->get_subaddress_lookahead();
     return QString("%1:%2").arg(QString::number(lookahead.first), QString::number(lookahead.second));
 }
 
 // #################### Seed ####################
 
 QString Wallet::getSeed(const QString &seedOffset) const {
-    return QString::fromStdString(m_walletImpl->seed(seedOffset.toStdString()));
+    epee::wipeable_string seed;
+    m_wallet2->get_seed(seed, seedOffset.toStdString());
+    return QString::fromStdString(std::string(seed.data(), seed.size()));
 }
 
 qsizetype Wallet::seedLength() const {
@@ -244,22 +252,22 @@ qsizetype Wallet::seedLength() const {
 
 QString Wallet::getSeedLanguage() const
 {
-    return QString::fromStdString(m_walletImpl->getSeedLanguage());
+    return QString::fromStdString(m_wallet2->get_seed_language());
 }
 
 void Wallet::setSeedLanguage(const QString &lang)
 {
-    m_walletImpl->setSeedLanguage(lang.toStdString());
+    m_wallet2->set_seed_language(lang.toStdString());
 }
 
 // #################### Node connection ####################
 
 void Wallet::setOffline(bool offline) const {
-    return m_walletImpl->setOffline(offline);
+    m_wallet2->set_offline(offline);
 }
 
 void Wallet::setTrustedDaemon(bool arg) {
-    m_walletImpl->setTrustedDaemon(arg);
+    m_wallet2->set_trusted_daemon(arg);
 }
 
 void Wallet::setUseSSL(bool ssl) {
@@ -391,7 +399,7 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
 
 quint64 Wallet::blockChainHeight() const {
     // Can not block UI
-    return m_walletImpl->blockChainHeight();
+    return m_wallet2->get_blockchain_current_height();
 }
 
 quint64 Wallet::daemonBlockChainHeight() const {
@@ -468,19 +476,19 @@ void Wallet::refreshModels() {
 // #################### Hardware wallet ####################
 
 bool Wallet::isHwBacked() const {
-    return m_walletImpl->getDeviceType() != Monero::Wallet::Device_Software;
+    return static_cast<Monero::Wallet::Device>(m_wallet2->get_device_type()) != Monero::Wallet::Device_Software;
 }
 
 bool Wallet::isLedger() const {
-    return m_walletImpl->getDeviceType() == Monero::Wallet::Device_Ledger;
+    return static_cast<Monero::Wallet::Device>(m_wallet2->get_device_type()) == Monero::Wallet::Device_Ledger;
 }
 
 bool Wallet::isTrezor() const {
-    return m_walletImpl->getDeviceType() == Monero::Wallet::Device_Trezor;
+    return static_cast<Monero::Wallet::Device>(m_wallet2->get_device_type()) == Monero::Wallet::Device_Trezor;
 }
 
 bool Wallet::isDeviceConnected() const {
-    return m_walletImpl->isDeviceConnected();
+    return m_wallet2->device_connected();
 }
 
 bool Wallet::reconnectDevice() {
@@ -537,11 +545,11 @@ void Wallet::storeSafer() {
 }
 
 QString Wallet::cachePath() const {
-    return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->filename()));
+    return QDir::toNativeSeparators(QString::fromStdString(m_wallet2->get_wallet_file()));
 }
 
 QString Wallet::keysPath() const {
-    return QDir::toNativeSeparators(QString::fromStdString(m_walletImpl->keysFilename()));;
+    return QDir::toNativeSeparators(QString::fromStdString(m_wallet2->get_keys_file()));;
 }
 
 bool Wallet::setPassword(const QString &oldPassword, const QString &newPassword) {
@@ -549,19 +557,23 @@ bool Wallet::setPassword(const QString &oldPassword, const QString &newPassword)
 }
 
 bool Wallet::verifyPassword(const QString &password) {
-    return m_walletImpl->verifyPassword(password.toStdString());
+    return m_wallet2->verify_password(password.toStdString());
 }
 
 bool Wallet::cacheAttributeExists(const QString &key) {
-    return m_walletImpl->cacheAttributeExists(key.toStdString());
+    std::string value;
+    return m_wallet2->get_attribute(key.toStdString(), value);
 }
 
 bool Wallet::setCacheAttribute(const QString &key, const QString &val) {
-    return m_walletImpl->setCacheAttribute(key.toStdString(), val.toStdString());
+    m_wallet2->set_attribute(key.toStdString(), val.toStdString());
+    return true;
 }
 
 QString Wallet::getCacheAttribute(const QString &key) const {
-    return QString::fromStdString(m_walletImpl->getCacheAttribute(key.toStdString()));
+    std::string value;
+    m_wallet2->get_attribute(key.toStdString(), value);
+    return QString::fromStdString(value);
 }
 
 void Wallet::addCacheTransaction(const QString &txid, const QString &txHex) {
@@ -573,79 +585,90 @@ QString Wallet::getCacheTransaction(const QString &txid) const {
 }
 
 bool Wallet::setUserNote(const QString &txid, const QString &note) {
-    return m_walletImpl->setUserNote(txid.toStdString(), note.toStdString());
+    cryptonote::blobdata txid_data;
+    if(!epee::string_tools::parse_hexstr_to_binbuff(txid.toStdString(), txid_data) || txid_data.size() != sizeof(crypto::hash))
+        return false;
+    const crypto::hash htxid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
+
+    m_wallet2->set_tx_note(htxid, note.toStdString());
+    return true;
 }
 
 QString Wallet::getUserNote(const QString &txid) const {
-    return QString::fromStdString(m_walletImpl->getUserNote(txid.toStdString()));
+    cryptonote::blobdata txid_data;
+    if(!epee::string_tools::parse_hexstr_to_binbuff(txid.toStdString(), txid_data) || txid_data.size() != sizeof(crypto::hash))
+        return "";
+    const crypto::hash htxid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
+
+    return QString::fromStdString(m_wallet2->get_tx_note(htxid));
 }
 
 QString Wallet::printBlockchain() {
-    return QString::fromStdString(m_walletImpl->printBlockchain());
+    return QString::fromStdString(m_wallet2->printBlockchain());
 }
 
 QString Wallet::printTransfers() {
-    return QString::fromStdString(m_walletImpl->printTransfers());
+    return QString::fromStdString(m_wallet2->printTransfers());
 }
 
 QString Wallet::printPayments() {
-    return QString::fromStdString(m_walletImpl->printPayments());
+    return QString::fromStdString(m_wallet2->printPayments());
 }
 
 QString Wallet::printUnconfirmedPayments() {
-    return QString::fromStdString(m_walletImpl->printUnconfirmedPayments());
+    return QString::fromStdString(m_wallet2->printUnconfirmedPayments());
 }
 
 QString Wallet::printConfirmedTransferDetails() {
-    return QString::fromStdString(m_walletImpl->printConfirmedTransferDetails());
+    return QString::fromStdString(m_wallet2->printConfirmedTransferDetails());
 }
 
 QString Wallet::printUnconfirmedTransferDetails() {
-    return QString::fromStdString(m_walletImpl->printUnconfirmedTransferDetails());
+    return QString::fromStdString(m_wallet2->printUnconfirmedTransferDetails());
 }
 
 QString Wallet::printPubKeys() {
-    return QString::fromStdString(m_walletImpl->printPubKeys());
+    return QString::fromStdString(m_wallet2->printPubKeys());
 }
 
 QString Wallet::printTxNotes() {
-    return QString::fromStdString(m_walletImpl->printTxNotes());
+    return QString::fromStdString(m_wallet2->printTxNotes());
 }
 
 QString Wallet::printSubaddresses() {
-    return QString::fromStdString(m_walletImpl->printSubaddresses());
+    return QString::fromStdString(m_wallet2->printSubaddresses());
 }
 
 QString Wallet::printSubaddressLabels() {
-    return QString::fromStdString(m_walletImpl->printSubaddressLabels());
+    return QString::fromStdString(m_wallet2->printSubaddressLabels());
 }
 
 QString Wallet::printAdditionalTxKeys() {
-    return QString::fromStdString(m_walletImpl->printAdditionalTxKeys());
+    return QString::fromStdString(m_wallet2->printAdditionalTxKeys());
 }
 
 QString Wallet::printAttributes() {
-    return QString::fromStdString(m_walletImpl->printAttributes());
+    return QString::fromStdString(m_wallet2->printAttributes());
 }
 
 QString Wallet::printKeyImages() {
-    return QString::fromStdString(m_walletImpl->printKeyImages());
+    return QString::fromStdString(m_wallet2->printKeyImages());
 }
 
 QString Wallet::printAccountTags() {
-    return QString::fromStdString(m_walletImpl->printAccountTags());
+    return QString::fromStdString(m_wallet2->printAccountTags());
 }
 
 QString Wallet::printTxKeys() {
-    return QString::fromStdString(m_walletImpl->printTxKeys());
+    return QString::fromStdString(m_wallet2->printTxKeys());
 }
 
 QString Wallet::printAddressBook() {
-    return QString::fromStdString(m_walletImpl->printAddressBook());
+    return QString::fromStdString(m_wallet2->printAddressBook());
 }
 
 QString Wallet::printScannedPoolTxs() {
-    return QString::fromStdString(m_walletImpl->printScannedPoolTxs());
+    return QString::fromStdString(m_wallet2->printScannedPoolTxs());
 }
 
 // #################### Transactions ####################
@@ -1092,7 +1115,7 @@ QString Wallet::make_uri(const QString &address, quint64 &amount, const QString 
 quint64 Wallet::getBytesReceived() const {
     // TODO: this can segfault. Unclear why.
     try {
-        return m_walletImpl->getBytesReceived();
+        return m_wallet2->get_bytes_received();
     }
     catch (...) {
         return 0;
@@ -1100,11 +1123,11 @@ quint64 Wallet::getBytesReceived() const {
 }
 
 quint64 Wallet::getBytesSent() const {
-    return m_walletImpl->getBytesSent();
+    return m_wallet2->get_bytes_sent();
 }
 
 QString Wallet::getDaemonLogPath() const {
-    return QString::fromStdString(m_walletImpl->getDefaultDataDir()) + "/bitmonero.log";
+    return QString::fromStdString(tools::get_default_data_dir()) + "/bitmonero.log";
 }
 
 bool Wallet::setRingDatabase(const QString &path) {
@@ -1112,7 +1135,7 @@ bool Wallet::setRingDatabase(const QString &path) {
 }
 
 void Wallet::setWalletCreationHeight(quint64 height) {
-    m_walletImpl->setRefreshFromBlockHeight(height);
+    m_wallet2->set_refresh_from_block_height(height);
 }
 
 //! create a view only wallet
