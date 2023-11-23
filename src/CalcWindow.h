@@ -18,14 +18,9 @@ public:
     explicit CalcWindow(QWidget *parent = nullptr);
     ~CalcWindow() override;
 
-signals:
-    void closed();
-
-private:
-    void closeEvent(QCloseEvent *bar) override;
-
 private:
     QScopedPointer<Ui::CalcWindow> ui;
 };
 
 #endif // FEATHER_CALCWINDOW_H
+

@@ -18,8 +18,4 @@ CalcWindow::CalcWindow(QWidget *parent)
     this->setWindowIcon(icons()->icon("gnome-calc.png"));
 }
 
-void CalcWindow::closeEvent(QCloseEvent *foo) {
-    emit closed();
-}
-
 CalcWindow::~CalcWindow() = default;

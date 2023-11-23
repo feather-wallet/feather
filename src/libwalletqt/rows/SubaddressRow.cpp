@@ -3,18 +3,6 @@
 
 #include "SubaddressRow.h"
 
-bool SubaddressRow::setHidden(bool hidden) {
-    m_hidden = hidden;
-}
-
-bool SubaddressRow::setUsed(bool used) {
-    m_used = used;
-}
-
-bool SubaddressRow::setPinned(bool pinned) {
-    m_used = pinned;
-}
-
 qsizetype SubaddressRow::getRow() const {
     return m_row;
 }

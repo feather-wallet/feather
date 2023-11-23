@@ -145,17 +145,6 @@ QString TransactionRow::paymentId() const
     return m_paymentId;
 }
 
-QString TransactionRow::destinations_formatted() const
-{
-    QString destinations;
-    for (auto const& t: m_transfers) {
-        if (!destinations.isEmpty())
-            destinations += "<br> ";
-        destinations += WalletManager::displayAmount(t->amount()) + ": " + t->address();
-    }
-    return destinations;
-}
-
 QList<QString> TransactionRow::destinations() const
 {
     QList<QString> dests;

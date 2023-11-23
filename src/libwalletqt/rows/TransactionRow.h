@@ -42,23 +42,17 @@ public:
     quint64 confirmations() const;
     quint64 confirmationsRequired() const;
     quint64 unlockTime() const;
-    //! transaction_id
     QString hash() const;
     QDateTime timestamp() const;
     QString date() const;
     QString time() const;
     QString paymentId() const;
-    //! only applicable for output transactions
-    //! used in tx details popup
     QList<QString> destinations() const;
-    QString destinations_formatted() const;
     QList<Transfer*> transfers() const;
     QString rings_formatted() const;
 
 private:
     explicit TransactionRow();
-
-//    TransactionRow(const Monero::TransactionInfo *pimpl, QObject *parent = nullptr);
 
 private:
     friend class TransactionHistory;

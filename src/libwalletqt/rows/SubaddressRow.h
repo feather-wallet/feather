@@ -19,10 +19,6 @@ public:
         , m_used(used) 
         , m_hidden(hidden)
         , m_pinned(pinned) {}
-        
-    bool setUsed(bool used);
-    bool setHidden(bool hidden);
-    bool setPinned(bool pinned);
     
     qsizetype getRow() const;
     const QString& getAddress() const;

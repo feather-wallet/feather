@@ -17,16 +17,8 @@ SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
     : QAbstractTableModel(parent)
     , m_subaddress(subaddress)
 {
-    connect(m_subaddress, &Subaddress::refreshStarted, this, &SubaddressModel::startReset);
-    connect(m_subaddress, &Subaddress::refreshFinished, this, &SubaddressModel::endReset);
-}
-
-void SubaddressModel::startReset(){
-    beginResetModel();
-}
-
-void SubaddressModel::endReset(){
-    endResetModel();
+    connect(m_subaddress, &Subaddress::refreshStarted, this, &SubaddressModel::beginResetModel);
+    connect(m_subaddress, &Subaddress::refreshFinished, this, &SubaddressModel::endResetModel);
 }
 
 int SubaddressModel::rowCount(const QModelIndex &parent) const

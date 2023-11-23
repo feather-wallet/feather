@@ -11,17 +11,9 @@ AddressBookModel::AddressBookModel(QObject *parent, AddressBook *addressBook)
     , m_addressBook(addressBook)
     , m_showFullAddresses(false)
 {
-    connect(m_addressBook, &AddressBook::refreshStarted, this, &AddressBookModel::startReset);
-    connect(m_addressBook, &AddressBook::refreshFinished, this, &AddressBookModel::endReset);
+    connect(m_addressBook, &AddressBook::refreshStarted, this, &AddressBookModel::beginResetModel);
+    connect(m_addressBook, &AddressBook::refreshFinished, this, &AddressBookModel::endResetModel);
     m_contactIcon = icons()->icon("person.svg");
-}
-
-void AddressBookModel::startReset(){
-    beginResetModel();
-}
-
-void AddressBookModel::endReset(){
-    endResetModel();
 }
 
 int AddressBookModel::rowCount(const QModelIndex &) const

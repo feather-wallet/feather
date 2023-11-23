@@ -42,10 +42,6 @@ public:
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
 
-public slots:
-    void startReset();
-    void endReset();
-
 private:
     Subaddress *m_subaddress;
     QVariant parseSubaddressRow(const SubaddressRow &subaddress, const QModelIndex &index, int role) const;

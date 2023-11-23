@@ -30,16 +30,12 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    Q_INVOKABLE bool deleteRow(int row);
+    bool deleteRow(int row);
 
     bool isShowFullAddresses() const;
     void setShowFullAddresses(bool show);
     bool writeCSV(const QString &path);
     QMap<QString, QString> readCSV(const QString &path);
-
-public slots:
-    void startReset();
-    void endReset();
 
 private:
     AddressBook * m_addressBook;
