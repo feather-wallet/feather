@@ -17,7 +17,7 @@ PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
     ui->setupUi(this);
 
     ui->combo_deviceType->addItem("Ledger Nano S (PLUS) / X", DeviceType::LEDGER);
-    ui->combo_deviceType->addItem("Trezor Model T", DeviceType::TREZOR);
+    ui->combo_deviceType->addItem("Trezor Model T / Safe 3", DeviceType::TREZOR);
 
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageHardwareDevice::onOptionsClicked);
 }
