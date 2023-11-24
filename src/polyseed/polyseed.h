@@ -61,6 +61,7 @@ namespace polyseed {
         }
 
         void create(feature_type features);
+        void create_from_secret(feature_type features, const char* secret);
 
         void load(polyseed_storage storage);
 

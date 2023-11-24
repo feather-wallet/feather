@@ -13,6 +13,8 @@
 
 #include <QString>
 
+#define POLYSEED_RANDBYTES 19
+
 namespace polyseed {
 
     static std::locale locale;
@@ -39,6 +41,18 @@ namespace polyseed {
         return size;
     }
 
+    static char seed[POLYSEED_RANDBYTES]{};
+
+    static void randombytes(void* const buf, const size_t size) {
+        assert(size <= POLYSEED_RANDBYTES);
+        if (std::all_of(seed, seed + size, [](char c) { return c == '\0'; })) {
+            randombytes_buf(buf, size);
+        } else {
+            memcpy(buf, seed, size);
+            sodium_memzero(seed, POLYSEED_RANDBYTES);
+        }
+    }
+
     struct dependency {
         dependency();
         std::vector<language> languages;
@@ -55,8 +69,10 @@ namespace polyseed {
         gen.locale_cache_enabled(true);
         locale = gen("");
 
+        sodium_memzero(seed, POLYSEED_RANDBYTES);
+
         polyseed_dependency pd;
-        pd.randbytes = &randombytes_buf;
+        pd.randbytes = &randombytes;
         pd.pbkdf2_sha256 = &crypto_pbkdf2_sha256;
         pd.memzero = &sodium_memzero;
         pd.u8_nfc = &utf8_nfc;
@@ -115,6 +131,15 @@ namespace polyseed {
 
     void data::create(feature_type features) {
         check_init();
+        auto status = polyseed_create(features, &m_data);
+        if (status != POLYSEED_OK) {
+            throw get_error(status);
+        }
+    }
+
+    void data::create_from_secret(feature_type features, const char* secret) {
+        check_init();
+        memcpy(seed, secret, POLYSEED_RANDBYTES);
         auto status = polyseed_create(features, &m_data);
         if (status != POLYSEED_OK) {
             throw get_error(status);

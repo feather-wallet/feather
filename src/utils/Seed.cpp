@@ -4,8 +4,10 @@
 #include <iomanip>
 #include "Seed.h"
 
-Seed::Seed(Type type, NetworkType::Type networkType, QString language)
-    : type(type), networkType(networkType), language(std::move(language))
+Seed::Seed(Type type, NetworkType::Type networkType, QString language, const char* secret)
+    : type(type)
+    , networkType(networkType)
+    , language(std::move(language))
 {
     // We only support the creation of Polyseeds
     if (this->type != Type::POLYSEED) {
@@ -23,7 +25,12 @@ Seed::Seed(Type type, NetworkType::Type networkType, QString language)
 
     try {
         polyseed::data seed(POLYSEED_MONERO);
-        seed.create(0);
+
+        if (secret) {
+            seed.create_from_secret(0, secret);
+        } else {
+            seed.create(0);
+        }
 
         uint8_t key[32];
         seed.keygen(&key, sizeof(key));
@@ -129,7 +136,6 @@ void Seed::setRestoreHeight(int height) {
 void Seed::setRestoreHeight() {
     // Ignore the embedded restore date, new wallets should sync from the current block height.
     this->restoreHeight = appData()->restoreHeights[networkType]->dateToHeight(this->time);
-    int a = 0;
 }
 
 Seed::Seed() = default;

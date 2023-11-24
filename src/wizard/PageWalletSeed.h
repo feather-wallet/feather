@@ -30,7 +30,7 @@ public slots:
 
 private:
     void seedRoulette(int count);
-    void generateSeed();
+    void generateSeed(const char* secret = nullptr);
     void onOptionsClicked();
 
 signals:

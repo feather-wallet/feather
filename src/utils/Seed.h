@@ -41,7 +41,7 @@ struct Seed {
     bool encrypted = false;
 
     explicit Seed();
-    explicit Seed(Type type, NetworkType::Type networkType = NetworkType::MAINNET, QString language = "English");
+    explicit Seed(Type type, NetworkType::Type networkType = NetworkType::MAINNET, QString language = "English", const char* secret = nullptr);
     explicit Seed(Type type, QStringList mnemonic, NetworkType::Type networkType = NetworkType::MAINNET);
     void setRestoreHeight(int height);
 

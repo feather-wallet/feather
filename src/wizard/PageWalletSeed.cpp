@@ -8,10 +8,13 @@
 #include <QMessageBox>
 #include <QCheckBox>
 #include <QDialogButtonBox>
+#include <QPushButton>
+#include <QShortcut>
 
 #include "constants.h"
 #include "Seed.h"
 #include "Icons.h"
+#include "dialog/SeedDiceDialog.h"
 
 PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -28,6 +31,15 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
                                                              "This should never happen.\n"
                                                              "Please contact the developers immediately.");
     ui->frame_invalidSeed->hide();
+
+    QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+K"), this);
+    QObject::connect(shortcut, &QShortcut::activated, [&](){
+        SeedDiceDialog dialog{this};
+        int r = dialog.exec();
+        if (r == QDialog::Accepted) {
+            this->generateSeed(dialog.getSecret());
+        }
+    });
 
     connect(ui->btnRoulette, &QPushButton::clicked, [=]{
         this->seedRoulette(0);
@@ -55,10 +67,10 @@ void PageWalletSeed::seedRoulette(int count) {
     });
 }
 
-void PageWalletSeed::generateSeed() {
+void PageWalletSeed::generateSeed(const char* secret) {
     QString mnemonic;
 
-    m_seed = Seed(Seed::Type::POLYSEED, constants::networkType);
+    m_seed = Seed(Seed::Type::POLYSEED, constants::networkType, "English", secret);
     mnemonic = m_seed.mnemonic.join(" ");
     m_restoreHeight = m_seed.restoreHeight;
 
@@ -99,6 +111,7 @@ void PageWalletSeed::onOptionsClicked() {
     QCheckBox checkbox("Extend this seed with a passphrase");
     checkbox.setChecked(m_fields->showSetSeedPassphrasePage);
     layout.addWidget(&checkbox);
+
     QDialogButtonBox buttons(QDialogButtonBox::Ok);
     layout.addWidget(&buttons);
     dialog.setLayout(&layout);
@@ -117,12 +130,16 @@ int PageWalletSeed::nextId() const {
 }
 
 bool PageWalletSeed::validatePage() {
-    if (m_seed.mnemonic.isEmpty()) return false;
-    if (!m_restoreHeight) return false;
+    if (m_seed.mnemonic.isEmpty()) {
+        return false;
+    }
+    if (!m_restoreHeight) {
+        return false;
+    }
 
     QMessageBox seedWarning(this);
     seedWarning.setWindowTitle("Warning!");
-    seedWarning.setInformativeText("• Never disclose your seed\n"
+    seedWarning.setText("• Never disclose your seed\n"
                         "• Never type it on a website\n"
                         "• Store it safely (offline)\n"
                         "• Do not lose your seed!");
