@@ -230,7 +230,7 @@ void Nodes::connectToNode(const FeatherNode &node) {
 
     QString proxyAddress;
     if (useSocks5Proxy(node)) {
-        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
+        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && (!torManager()->isLocalTor() || torManager()->isAlreadyRunning())) {
             proxyAddress = QString("%1:%2").arg(torManager()->featherTorHost, QString::number(torManager()->featherTorPort));
         } else {
             proxyAddress = QString("%1:%2").arg(conf()->get(Config::socks5Host).toString(),

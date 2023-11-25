@@ -25,6 +25,7 @@ public:
     bool unpackBins();
     bool isLocalTor();
     bool isStarted();
+    bool isAlreadyRunning();
     SemanticVersion getVersion(const QString &fileName);
 
     static TorManager* instance();
@@ -62,9 +63,10 @@ private:
     QProcess *m_process;
     int m_restarts = 0;
     bool m_stopRetries = false;
-    bool m_localTor;
+    bool m_localTor = false;
     bool m_started = false;
     bool m_unpacked = false;
+    bool m_alreadyRunning = false;
     QTimer *m_checkConnectionTimer;
 };
 

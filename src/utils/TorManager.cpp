@@ -3,9 +3,7 @@
 
 #include "utils/TorManager.h"
 
-#include <QScreen>
 #include <QDesktopServices>
-#include <QRegularExpression>
 
 #include "utils/config.h"
 #include "utils/Utils.h"
@@ -122,7 +120,7 @@ void TorManager::checkConnection() {
         this->setConnectionState(false);
     }
 
-    else if (m_localTor) {
+    else if (m_localTor && !m_alreadyRunning) {
         QString host = conf()->get(Config::socks5Host).toString();
         quint16 port = conf()->get(Config::socks5Port).toString().toUShort();
         this->setConnectionState(Utils::portOpen(host, port));
@@ -236,10 +234,15 @@ bool TorManager::isStarted() {
     return m_started;
 }
 
+bool TorManager::isAlreadyRunning() {
+    return m_alreadyRunning;
+}
+
 bool TorManager::shouldStartTorDaemon() {
     QString torHost = conf()->get(Config::socks5Host).toString();
     quint16 torPort = conf()->get(Config::socks5Port).toString().toUShort();
     QString torHostPort = QString("%1:%2").arg(torHost, QString::number(torPort));
+    m_alreadyRunning = false;
 
     // Don't start a Tor daemon if Feather is run with Torsocks
     if (Utils::isTorsocks()) {
@@ -287,6 +290,7 @@ bool TorManager::shouldStartTorDaemon() {
     // Tor daemon (or other service) is already running on our port (19450)
 
     if (Utils::portOpen(featherTorHost, featherTorPort)) {
+        m_alreadyRunning = true;
         return false;
     }
 

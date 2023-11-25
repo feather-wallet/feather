@@ -638,7 +638,7 @@ void WindowManager::onProxySettingsChanged() {
         QString host = conf()->get(Config::socks5Host).toString();
         quint16 port = conf()->get(Config::socks5Port).toString().toUShort();
 
-        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && !torManager()->isLocalTor()) {
+        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && (!torManager()->isLocalTor() || torManager()->isAlreadyRunning())) {
             host = torManager()->featherTorHost;
             port = torManager()->featherTorPort;
         }
