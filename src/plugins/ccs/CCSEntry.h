@@ -9,12 +9,14 @@
 struct CCSEntry {
     CCSEntry()= default;;
 
-    QString title = "";
-    QString date = "";
-    QString address = "";
-    QString author = "";
-    QString state = "";
-    QString url = "";
+    QString title;
+    QString date;
+    QString address;
+    QString author;
+    QString state;
+    QString url;
+    QString organizer;
+    QString currency;
     double target_amount = 0;
     double raised_amount = 0;
     double percentage_funded = 0;

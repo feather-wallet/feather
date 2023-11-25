@@ -18,16 +18,17 @@ CCSWidget::CCSWidget(QWidget *parent)
         , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
-    ui->tableView->setModel(m_model);
-    this->setupTable();
+    ui->treeView->setModel(m_model);
 
     m_contextMenu->addAction("View proposal", this, &CCSWidget::linkClicked);
     m_contextMenu->addAction("Donate", this, &CCSWidget::donateClicked);
-    connect(ui->tableView, &QHeaderView::customContextMenuRequested, this, &CCSWidget::showContextMenu);
 
-    connect(ui->tableView, &QTableView::doubleClicked, this, &CCSWidget::linkClicked);
+    connect(ui->treeView, &QHeaderView::customContextMenuRequested, this, &CCSWidget::showContextMenu);
+    connect(ui->treeView, &QTreeView::doubleClicked, this, &CCSWidget::linkClicked);
 
-    ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeView->setSelectionBehavior(QAbstractItemView::SelectRows);
+    ui->treeView->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeView->header()->setSectionResizeMode(CCSModel::Title, QHeaderView::Stretch);
 }
 
 CCSModel* CCSWidget::model() {
@@ -35,7 +36,7 @@ CCSModel* CCSWidget::model() {
 }
 
 void CCSWidget::linkClicked() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = ui->treeView->currentIndex();
     auto entry = m_model->entry(index.row());
 
     if (entry) {
@@ -44,28 +45,20 @@ void CCSWidget::linkClicked() {
 }
 
 void CCSWidget::donateClicked() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = ui->treeView->currentIndex();
     auto entry = m_model->entry(index.row());
 
     if (entry)
         emit selected(*entry);
 }
 
-void CCSWidget::setupTable() {
-    ui->tableView->verticalHeader()->setVisible(false);
-    ui->tableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    ui->tableView->horizontalHeader()->setSectionResizeMode(0, QHeaderView::Stretch);
-    ui->tableView->setColumnWidth(2, 160);
-}
-
 void CCSWidget::showContextMenu(const QPoint &pos) {
-    QModelIndex index = ui->tableView->indexAt(pos);
+    QModelIndex index = ui->treeView->indexAt(pos);
         if (!index.isValid()) {
         return;
     }
 
-    m_contextMenu->exec(ui->tableView->viewport()->mapToGlobal(pos));
+    m_contextMenu->exec(ui->treeView->viewport()->mapToGlobal(pos));
 }
 
 CCSWidget::~CCSWidget() = default;

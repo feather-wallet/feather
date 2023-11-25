@@ -36,7 +36,6 @@ private slots:
     void linkClicked();
 
 private:
-    void setupTable();
     void showContextMenu(const QPoint &pos);
 
     QScopedPointer<Ui::CSSWidget> ui;

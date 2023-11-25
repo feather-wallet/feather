@@ -54,10 +54,12 @@ QVariant CCSModel::data(const QModelIndex &index, int role) const
         switch(index.column()) {
             case Title:
                 return entry->title;
+            case Organizer:
+                return entry->organizer;
             case Author:
-                return entry->author;
+                return QString("%1 ").arg(entry->author);
             case Progress:
-                return QString("%1/%2 XMR").arg(entry->raised_amount).arg(entry->target_amount);
+                return QString("%1/%2 %3").arg(QString::number(entry->raised_amount), QString::number(entry->target_amount), entry->currency);
             default:
                 return QVariant();
         }
@@ -74,7 +76,9 @@ QVariant CCSModel::headerData(int section, Qt::Orientation orientation, int role
     {
         switch(section) {
             case Title:
-                return QString("Community Crowdfunding Proposal");
+                return QString("Proposal");
+            case Organizer:
+                return QString("Organizer");
             case Author:
                 return QString("Author");
             case Progress:

@@ -156,7 +156,7 @@ void WebsocketNotifier::onWSReddit(const QJsonArray& reddit_data) {
 void WebsocketNotifier::onWSCCS(const QJsonArray &ccs_data) {
     QList<QSharedPointer<CCSEntry>> l;
 
-    for (auto &&entry: ccs_data) {
+    for (const auto& entry: ccs_data) {
         auto obj = entry.toObject();
         auto c = QSharedPointer<CCSEntry>(new CCSEntry());
 
@@ -168,11 +168,24 @@ void WebsocketNotifier::onWSCCS(const QJsonArray &ccs_data) {
         c->author = obj.value("author").toString();
         c->date = obj.value("date").toString();
         c->title = obj.value("title").toString();
-        c->url = obj.value("url").toString();
         c->target_amount = obj.value("target_amount").toDouble();
         c->raised_amount = obj.value("raised_amount").toDouble();
         c->percentage_funded = obj.value("percentage_funded").toDouble();
         c->contributions = obj.value("contributions").toInt();
+        c->organizer = obj.value("organizer").toString();
+        c->currency = obj.value("currency").toString();
+
+        QString urlpath = obj.value("urlpath").toString();
+        if (c->organizer == "CCS") {
+            c->url = QString("https://ccs.getmonero.org/%1").arg(urlpath);
+        }
+        else if (c->organizer == "MAGIC") {
+            c->url = QString("https://monerofund.org/%1").arg(urlpath);
+        }
+        else {
+            continue;
+        }
+
         l.append(c);
     }
 

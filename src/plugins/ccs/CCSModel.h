@@ -17,6 +17,7 @@ public:
     enum ModelColumn
     {
         Title = 0,
+        Organizer,
         Author,
         Progress,
         COUNT

@@ -1111,7 +1111,7 @@ void MainWindow::payToMany() {
 }
 
 void MainWindow::showSendScreen(const CCSEntry &entry) { // TODO: rename this function
-    m_sendWidget->fill(entry.address, QString("CCS: %1").arg(entry.title));
+    m_sendWidget->fill(entry.address, QString("Donation to %1: %2").arg(entry.organizer, entry.title));
     ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
