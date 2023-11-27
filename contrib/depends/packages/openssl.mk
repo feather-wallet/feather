@@ -1,8 +1,8 @@
 package=openssl
-$(package)_version=3.1.4
+$(package)_version=3.2.0
 $(package)_download_path=https://www.openssl.org/source
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=840af5366ab9b522bde525826be3ef0fb0af81c6a9ebd84caa600fea1731eee3
+$(package)_sha256_hash=14c826f07c7e433706fb5c69fa9e25dab95684844b4c962a2cf1bf183eb4690e
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
@@ -25,6 +25,7 @@ $(package)_config_opts+=no-ssl3
 $(package)_config_opts+=no-tests
 $(package)_config_opts+=no-unit-test
 $(package)_config_opts+=no-weak-ssl-ciphers
+$(package)_config_opts+=no-winstore
 $(package)_config_opts+=no-zlib
 $(package)_config_opts+=no-zlib-dynamic
 $(package)_config_opts+=-pipe
