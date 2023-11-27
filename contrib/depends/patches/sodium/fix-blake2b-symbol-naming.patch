@@ -1,0 +1,39 @@
+From 86d419f9989613a0f046ca1613b005efac942095 Mon Sep 17 00:00:00 2001
+From: tobtoht <tob@featherwallet.org>
+Date: Tue, 28 Nov 2023 01:00:38 +0100
+Subject: [PATCH] fix blake2b symbol naming
+
+---
+ .../crypto_generichash/blake2b/ref/blake2.h      | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/libsodium/crypto_generichash/blake2b/ref/blake2.h b/src/libsodium/crypto_generichash/blake2b/ref/blake2.h
+index edfc99a2..eff55b4d 100644
+--- a/src/libsodium/crypto_generichash/blake2b/ref/blake2.h
++++ b/src/libsodium/crypto_generichash/blake2b/ref/blake2.h
+@@ -23,6 +23,22 @@
+ #include "crypto_generichash_blake2b.h"
+ #include "export.h"
+ 
++#define blake2b _sodium_blake2b
++#define blake2b_compress_avx2 _sodium_blake2b_compress_avx2
++#define blake2b_compress_ref _sodium_blake2b_compress_ref
++#define blake2b_compress_sse41 _sodium_blake2b_compress_sse41
++#define blake2b_compress_ssse3 _sodium_blake2b_compress_ssse3
++#define blake2b_final _sodium_blake2b_final
++#define blake2b_init _sodium_blake2b_init
++#define blake2b_init_key _sodium_blake2b_init_key
++#define blake2b_init_key_salt_personal _sodium_blake2b_init_key_salt_personal
++#define blake2b_init_param _sodium_blake2b_init_param
++#define blake2b_init_salt_personal _sodium_blake2b_init_salt_personal
++#define blake2b_long _sodium_blake2b_long
++#define blake2b_pick_best_implementation _sodium_blake2b_pick_best_implementation
++#define blake2b_salt_personal _sodium_blake2b_salt_personal
++#define blake2b_update _sodium_blake2b_update
++
+ enum blake2b_constant {
+     BLAKE2B_BLOCKBYTES    = 128,
+     BLAKE2B_OUTBYTES      = 64,
+-- 
+2.43.0
+
