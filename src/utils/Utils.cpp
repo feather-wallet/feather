@@ -265,16 +265,14 @@ void copyColumn(QModelIndex *index, int column) {
 QString xdgDesktopEntry(){
     return QString(
             "[Desktop Entry]\n"
-            "Name=Feather\n"
-            "GenericName=Feather\n"
-            "X-GNOME-FullName=Feather\n"
-            "Comment=a free, open source Monero desktop wallet\n"
+            "Name=Feather Wallet\n"
+            "Comment=A free Monero desktop wallet\n"
             "Keywords=Monero;\n"
-            "Exec=\"%1\" %u\n"
+            "Exec=\"%1\"\n"
             "Terminal=false\n"
             "Type=Application\n"
             "Icon=feather\n"
-            "Categories=Network;GNOME;Qt;\n"
+            "Categories=Network;\n"
             "StartupNotify=false\n"
     ).arg(applicationFilePath());
 }
