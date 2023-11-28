@@ -202,6 +202,15 @@ QString applicationPath() {
     return applicationPath;
 }
 
+QString applicationFilePath() {
+    QString appimagePath = qgetenv("APPIMAGE");
+    if (!appimagePath.isEmpty()) {
+        return appimagePath;
+    }
+
+    return QApplication::applicationFilePath();
+}
+
 bool validateJSON(const QByteArray &blob) {
     QJsonDocument doc = QJsonDocument::fromJson(blob);
     QString jsonString = doc.toJson(QJsonDocument::Indented);
@@ -267,7 +276,7 @@ QString xdgDesktopEntry(){
             "Icon=feather\n"
             "Categories=Network;GNOME;Qt;\n"
             "StartupNotify=false\n"
-    ).arg(QApplication::applicationFilePath());
+    ).arg(applicationFilePath());
 }
 
 bool xdgDesktopEntryWrite(const QString &path){
