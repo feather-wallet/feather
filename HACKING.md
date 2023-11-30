@@ -123,10 +123,9 @@ On platforms without `execinfo.h` use `cmake -DSTACK_TRACE:BOOL=OFF ..` instead 
 
 There are some CMake options that you may pass to control how Feather is built:
 
-- `-DLOCALMONERO=OFF` - disable LocalMonero feature
-- `-DXMRIG=OFF` - disable XMRig feature
 - `-DCHECK_UPDATES=ON` - enable checking for updates, only for standalone binaries
 - `-DDONATE_BEG=OFF` - disable the dreaded donate requests
 - `-DUSE_DEVICE_TREZOR=OFF` - disable Trezor hardware wallet support
 - `-DWITH_SCANNER=ON` - enable the webcam QR code scanner
 - `-DTOR_DIR=/path/to/tor/` - embed a Tor binary in Feather, argument should be a directory containing the binary
+- `-DWITH_PLUGIN_<NAME>=OFF` - disable a plugin

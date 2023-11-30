@@ -50,15 +50,23 @@ QVariant BountiesModel::data(const QModelIndex &index, int role) const
 
     QSharedPointer<BountyEntry> post = m_bounties.at(index.row());
 
-    if(role == Qt::DisplayRole) {
+    if(role == Qt::DisplayRole || role == Qt::UserRole) {
         switch(index.column()) {
-            case Votes:
+            case Votes: {
+                if (role == Qt::UserRole) {
+                    return post->votes;
+                }
                 return QString::number(post->votes);
+            }
             case Title:
                 return post->title;
             case Status:
                 return post->status;
             case Bounty: {
+                if (role == Qt::UserRole) {
+                    return post->bountyAmount;
+                }
+
                 if (post->bountyAmount > 0) {
                     return QString("%1 XMR").arg(QString::number(post->bountyAmount, 'f', 5));
                 }
@@ -90,7 +98,7 @@ QVariant BountiesModel::headerData(int section, Qt::Orientation orientation, int
     {
         switch(section) {
             case Votes:
-                return QString(" 🡅 ");
+                return QString("Score ");
             case Title:
                 return QString("Title");
             case Status:

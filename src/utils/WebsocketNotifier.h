@@ -11,10 +11,6 @@
 #include "networktype.h"
 #include "nodes.h"
 #include "prices.h"
-#include "plugins/bounties/Bounty.h"
-#include "plugins/reddit/RedditPost.h"
-#include "plugins/ccs/CCSEntry.h"
-#include "plugins/revuo/RevuoItem.h"
 #include "TxFiatHistory.h"
 
 class WebsocketNotifier : public QObject {
@@ -36,31 +32,25 @@ signals:
     void NodesReceived(QList<FeatherNode> &L);
     void CryptoRatesReceived(const QJsonArray &data);
     void FiatRatesReceived(const QJsonObject &fiat_rates);
-    void RedditReceived(QList<QSharedPointer<RedditPost>> L);
-    void CCSReceived(QList<QSharedPointer<CCSEntry>> L);
-    void BountyReceived(QList<QSharedPointer<BountyEntry>> L);
-    void RevuoReceived(QList<QSharedPointer<RevuoItem>> L);
     void TxFiatHistoryReceived(const QJsonObject &data);
     void UpdatesReceived(const QJsonObject &updates);
     void XMRigDownloadsReceived(const QJsonObject &downloads);
     void LocalMoneroCountriesReceived(const QJsonArray &countries);
     void LocalMoneroCurrenciesReceived(const QJsonArray &currencies);
     void LocalMoneroPaymentMethodsReceived(const QJsonObject &payment_methods);
+    void dataReceived(const QString &type, const QJsonValue &json);
 
 private slots:
     void onWSMessage(const QJsonObject &msg);
 
     void onWSNodes(const QJsonArray &nodes);
-    void onWSReddit(const QJsonArray &reddit_data);
-    void onWSCCS(const QJsonArray &ccs_data);
-    void onWSBounties(const QJsonArray &bounties_data);
-    void onWSRevuo(const QJsonArray &revuo_data);
     void onWSUpdates(const QJsonObject &updates);
     void onWSXMRigDownloads(const QJsonObject &downloads);
 
 private:
     static QPointer<WebsocketNotifier> m_instance;
 
+    QStringList m_pluginSubscriptions;
     QHash<QString, QJsonObject> m_cache;
     QDateTime m_lastMessageReceived;
 };

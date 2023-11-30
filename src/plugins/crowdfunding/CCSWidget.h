@@ -24,10 +24,9 @@ Q_OBJECT
 public:
     explicit CCSWidget(QWidget *parent = nullptr);
     ~CCSWidget();
-    CCSModel *model();
 
 signals:
-    void selected(CCSEntry entry);
+    void fillSendTab(const QString &address, const QString &description);
 
 public slots:
     void donateClicked();

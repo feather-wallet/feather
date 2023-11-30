@@ -83,7 +83,8 @@ public:
         Page_SetRestoreHeight,
         Page_HardwareDevice,
         Page_NetworkProxy,
-        Page_NetworkWebsocket
+        Page_NetworkWebsocket,
+        Page_Plugins
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);

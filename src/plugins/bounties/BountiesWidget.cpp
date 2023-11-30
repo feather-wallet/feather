@@ -4,13 +4,12 @@
 #include "BountiesWidget.h"
 #include "ui_BountiesWidget.h"
 
-#include <QDesktopServices>
-#include <QStandardItemModel>
 #include <QTableWidget>
 
 #include "BountiesModel.h"
 #include "utils/Utils.h"
 #include "utils/config.h"
+#include "utils/WebsocketNotifier.h"
 
 BountiesWidget::BountiesWidget(QWidget *parent)
         : QWidget(parent)
@@ -19,7 +18,13 @@ BountiesWidget::BountiesWidget(QWidget *parent)
         , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
-    ui->tableView->setModel(m_model);
+
+    m_proxyModel = new BountiesProxyModel(this);
+    m_proxyModel->setSourceModel(m_model);
+
+    ui->tableView->setModel(m_proxyModel);
+    ui->tableView->setSortingEnabled(true);
+    ui->tableView->sortByColumn(3, Qt::DescendingOrder);
     this->setupTable();
 
     m_contextMenu->addAction("View Bounty", this, &BountiesWidget::linkClicked);
@@ -28,15 +33,32 @@ BountiesWidget::BountiesWidget(QWidget *parent)
 
     connect(ui->tableView, &QTableView::doubleClicked, this, &BountiesWidget::linkClicked);
 
+    connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString &type, const QJsonValue &json) {
+        if (type == "bounties") {
+            QJsonArray bounties_data = json.toArray();
+            QList<QSharedPointer<BountyEntry>> l;
+
+            for (const auto& entry : bounties_data) {
+                QJsonObject obj = entry.toObject();
+                auto bounty = new BountyEntry(obj.value("votes").toInt(),
+                                              obj.value("title").toString(),
+                                              obj.value("amount").toDouble(),
+                                              obj.value("link").toString(),
+                                              obj.value("address").toString(),
+                                              obj.value("status").toString());
+                QSharedPointer<BountyEntry> b = QSharedPointer<BountyEntry>(bounty);
+                l.append(b);
+            }
+
+            m_model->updateBounties(l);
+        }
+    });
+
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 }
 
-BountiesModel * BountiesWidget::model() {
-    return m_model;
-}
-
 void BountiesWidget::linkClicked() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = m_proxyModel->mapToSource(ui->tableView->currentIndex());
     auto post = m_model->post(index.row());
 
     if (post)
@@ -44,7 +66,7 @@ void BountiesWidget::linkClicked() {
 }
 
 void BountiesWidget::donateClicked() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = m_proxyModel->mapToSource(ui->tableView->currentIndex());
     auto bounty = m_model->post(index.row());
 
     if (bounty) {

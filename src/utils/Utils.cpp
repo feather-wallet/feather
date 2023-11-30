@@ -445,7 +445,7 @@ QString amountToCurrencyString(double amount, const QString &currencyCode) {
     if (currencyCode == "USD")
         return locale.toCurrencyString(amount, "$").remove("\xC2\xA0");
 
-    return locale.toCurrencyString(amount).remove("\xC2\xA0");
+    return QString("%1%2").arg(locale.currencySymbol(), QString::number(amount, 'f', 2));
 }
 
 QStandardItem *qStandardItem(const QString& text) {
@@ -692,5 +692,20 @@ QWindow *windowForQObject(QObject* object) {
         object = object->parent();
     }
     return nullptr;
+}
+
+void clearLayout(QLayout* layout, bool deleteWidgets)
+{
+    while (QLayoutItem *item = layout->takeAt(0)) {
+        if (deleteWidgets) {
+            if (QWidget *widget = item->widget()) {
+                widget->deleteLater();
+            }
+        }
+        if (QLayout *childLayout = item->layout()) {
+            clearLayout(childLayout, deleteWidgets);
+        }
+        delete item;
+    }
 }
 }

@@ -50,14 +50,18 @@ QVariant RedditModel::data(const QModelIndex &index, int role) const
 
     QSharedPointer<RedditPost> post = m_posts.at(index.row());
 
-    if(role == Qt::DisplayRole) {
+    if(role == Qt::DisplayRole || role == Qt::UserRole) {
         switch(index.column()) {
             case Title:
                 return post->title;
             case Author:
                 return post->author;
-            case Comments:
+            case Comments: {
+                if (role == Qt::UserRole) {
+                    return post->comments;
+                }
                 return QString::number(post->comments);
+            }
             default:
                 return QVariant();
         }

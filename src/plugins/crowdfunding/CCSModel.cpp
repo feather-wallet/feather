@@ -78,7 +78,7 @@ QVariant CCSModel::headerData(int section, Qt::Orientation orientation, int role
             case Title:
                 return QString("Proposal");
             case Organizer:
-                return QString("Organizer");
+                return QString("Organizer ");
             case Author:
                 return QString("Author");
             case Progress:

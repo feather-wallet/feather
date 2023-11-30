@@ -4,7 +4,7 @@
 #include "CalcConfigDialog.h"
 #include "ui_CalcConfigDialog.h"
 
-#include "AppData.h"
+#include "utils/AppData.h"
 #include "utils/config.h"
 
 CalcConfigDialog::CalcConfigDialog(QWidget *parent)

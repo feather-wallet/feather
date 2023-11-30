@@ -6,6 +6,7 @@
 
 #include "utils/ColorScheme.h"
 #include "Utils.h"
+#include "utils/WebsocketNotifier.h"
 
 RevuoWidget::RevuoWidget(QWidget *parent)
         : QWidget(parent)
@@ -27,6 +28,32 @@ RevuoWidget::RevuoWidget(QWidget *parent)
 
     connect(ui->listWidget, &QListWidget::currentTextChanged, this, &RevuoWidget::onSelectItem);
     connect(ui->listWidget, &QListWidget::customContextMenuRequested, this, &RevuoWidget::showContextMenu);
+
+    connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString& type, const QJsonValue& json) {
+        if (type == "revuo") {
+            QJsonArray revuo_data = json.toArray();
+            QList<QSharedPointer<RevuoItem>> l;
+
+            for (const auto &entry: revuo_data) {
+                auto obj = entry.toObject();
+
+                QStringList newsbytes;
+                for (const auto &n : obj.value("newsbytes").toArray()) {
+                    newsbytes.append(n.toString());
+                }
+
+                auto revuoItem = new RevuoItem(
+                        obj.value("title").toString(),
+                        obj.value("url").toString(),
+                        newsbytes);
+
+                QSharedPointer<RevuoItem> r = QSharedPointer<RevuoItem>(revuoItem);
+                l.append(r);
+            }
+
+            this->updateItems(l);
+        }
+    });
 }
 
 void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
@@ -48,6 +75,7 @@ void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
     ui->listWidget->clear();
     ui->listWidget->addItems(titles);
     ui->listWidget->setCurrentRow(0);
+    ui->listWidget->setMinimumWidth(ui->listWidget->sizeHintForColumn(0) + 10);
 }
 
 void RevuoWidget::onSelectItem(const QString &item) {

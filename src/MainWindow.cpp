@@ -14,7 +14,6 @@
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
 #include "dialog/PasswordDialog.h"
-#include "dialog/TorInfoDialog.h"
 #include "dialog/TxBroadcastDialog.h"
 #include "dialog/TxConfAdvDialog.h"
 #include "dialog/TxConfDialog.h"
@@ -26,6 +25,7 @@
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/Transfer.h"
+#include "plugins/PluginRegistry.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
@@ -44,7 +44,6 @@
 #ifdef CHECK_UPDATES
 #include "utils/updater/UpdateDialog.h"
 #endif
-//#include "misc_log_ex.h"
 
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
     : QMainWindow(parent)
@@ -56,12 +55,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 {
     ui->setupUi(this);
 
-//    MCWARNING("feather", "Platform tag: " << this->getPlatformTag().toStdString());
-
     // Ensure the destructor is called after closeEvent()
     setAttribute(Qt::WA_DeleteOnClose);
 
-    m_windowCalc = new CalcWindow(this);
     m_splashDialog = new SplashDialog(this);
     m_accountSwitcherDialog = new AccountSwitcherDialog(m_wallet, this);
 
@@ -72,25 +68,21 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     this->restoreGeo();
 
     this->initStatusBar();
+    this->initPlugins();
     this->initWidgets();
     this->initMenu();
-    this->initHome();
     this->initOffline();
     this->initWalletContext();
+    emit uiSetup();
 
     this->onOfflineMode(conf()->get(Config::offlineMode).toBool());
+    conf()->set(Config::restartRequired, false);
     
     // Websocket notifier
-    connect(websocketNotifier(), &WebsocketNotifier::CCSReceived, ui->ccsWidget->model(), &CCSModel::updateEntries);
-    connect(websocketNotifier(), &WebsocketNotifier::BountyReceived, ui->bountiesWidget->model(), &BountiesModel::updateBounties);
-    connect(websocketNotifier(), &WebsocketNotifier::RedditReceived, ui->redditWidget->model(), &RedditModel::updatePosts);
-    connect(websocketNotifier(), &WebsocketNotifier::RevuoReceived, ui->revuoWidget, &RevuoWidget::updateItems);
 #ifdef CHECK_UPDATES
     connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, m_updater.data(), &Updater::wsUpdatesReceived);
 #endif
-#ifdef HAS_XMRIG
-    connect(websocketNotifier(), &WebsocketNotifier::XMRigDownloadsReceived, m_xmrig, &XMRigWidget::onDownloads);
-#endif
+
     websocketNotifier()->emitCache(); // Get cached data
 
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
@@ -194,10 +186,33 @@ void MainWindow::initStatusBar() {
     m_statusBtnHwDevice->hide();
 }
 
-void MainWindow::initWidgets() {
-    int homeWidget = conf()->get(Config::homeWidget).toInt();
-    ui->tabHomeWidget->setCurrentIndex(TabsHome(homeWidget));
+void MainWindow::initPlugins() {
+    const QStringList enabledPlugins = conf()->get(Config::enabledPlugins).toStringList();
 
+    for (const auto& plugin_creator : PluginRegistry::getPluginCreators()) {
+        Plugin* plugin = plugin_creator();
+
+        if (!PluginRegistry::getInstance().isPluginEnabled(plugin->id())) {
+            continue;
+        }
+
+        qDebug() << "Initializing plugin: " << plugin->id();
+        plugin->initialize(m_wallet, this);
+        connect(plugin, &Plugin::setStatusText, this, &MainWindow::setStatusText);
+        connect(plugin, &Plugin::fillSendTab, this, &MainWindow::fillSendTab);
+        connect(this, &MainWindow::updateIcons, plugin, &Plugin::skinChanged);
+        connect(this, &MainWindow::aboutToQuit, plugin, &Plugin::aboutToQuit);
+        connect(this, &MainWindow::uiSetup, plugin, &Plugin::uiSetup);
+
+        m_plugins.append(plugin);
+    }
+
+    std::sort(m_plugins.begin(), m_plugins.end(), [](Plugin *a, Plugin *b) {
+        return a->idx() < b->idx();
+    });
+}
+
+void MainWindow::initWidgets() {
     // [History]
     m_historyWidget = new HistoryWidget(m_wallet, this);
     ui->historyWidgetLayout->addWidget(m_historyWidget);
@@ -216,7 +231,7 @@ void MainWindow::initWidgets() {
     ui->receiveWidgetLayout->addWidget(m_receiveWidget);
     connect(m_receiveWidget, &ReceiveWidget::showTransactions, [this](const QString &text) {
         m_historyWidget->setSearchText(text);
-        ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
+        ui->tabWidget->setCurrentIndex(this->findTab("History"));
     });
     connect(m_contactsWidget, &ContactsWidget::fillAddress, m_sendWidget, &SendWidget::fillAddress);
 
@@ -224,26 +239,24 @@ void MainWindow::initWidgets() {
     m_coinsWidget = new CoinsWidget(m_wallet, this);
     ui->coinsWidgetLayout->addWidget(m_coinsWidget);
 
-#ifdef HAS_LOCALMONERO
-    m_localMoneroWidget = new LocalMoneroWidget(this, m_wallet);
-    ui->localMoneroLayout->addWidget(m_localMoneroWidget);
-#else
-    ui->tabWidgetExchanges->setTabVisible(0, false);
-#endif
+    // [Plugins..]
+    for (auto* plugin : m_plugins) {
+        if (!plugin->hasParent()) {
+            qDebug() << "Adding tab: " << plugin->displayName();
 
-#ifdef HAS_XMRIG
-    m_xmrig = new XMRigWidget(m_wallet, this);
-    ui->xmrRigLayout->addWidget(m_xmrig);
+            if (plugin->insertFirst()) {
+                ui->tabWidget->insertTab(0, plugin->tab(), icons()->icon(plugin->icon()), plugin->displayName());
+            } else {
+                ui->tabWidget->addTab(plugin->tab(), icons()->icon(plugin->icon()), plugin->displayName());
+            }
 
-    connect(m_xmrig, &XMRigWidget::miningStarted, [this]{ this->updateTitle(); });
-    connect(m_xmrig, &XMRigWidget::miningEnded, [this]{ this->updateTitle(); });
-#else
-    ui->tabWidget->setTabVisible(Tabs::XMRIG, false);
-#endif
-
-#if defined(Q_OS_MACOS)
-    ui->line->hide();
-#endif
+            for (auto* child : m_plugins) {
+                if (child->hasParent() && child->parent() == plugin->id()) {
+                    plugin->addSubPlugin(child);
+                }
+            }
+        }
+    }
 
     ui->frame_coinControl->setVisible(false);
     connect(ui->btn_resetCoinControl, &QPushButton::clicked, [this]{
@@ -257,6 +270,7 @@ void MainWindow::initWidgets() {
     connect(m_walletUnlockWidget, &WalletUnlockWidget::closeWallet, this, &MainWindow::close);
     connect(m_walletUnlockWidget, &WalletUnlockWidget::unlockWallet, this, &MainWindow::unlockWallet);
 
+    ui->tabWidget->setCurrentIndex(0);
     ui->stackedWidget->setCurrentIndex(0);
 }
 
@@ -301,43 +315,31 @@ void MainWindow::initMenu() {
     connect(ui->actionShow_Searchbar, &QAction::toggled, this, &MainWindow::toggleSearchbar);
     ui->actionShow_Searchbar->setChecked(conf()->get(Config::showSearchbar).toBool());
 
-    // Show/Hide Home
-    connect(ui->actionShow_Home, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Home"] = new ToggleTab(ui->tabHome, "Home", "Home", ui->actionShow_Home, Config::showTabHome);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Home, "Home");
-
     // Show/Hide Coins
     connect(ui->actionShow_Coins, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins, Config::showTabCoins);
+    m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Coins, "Coins");
 
-    // Show/Hide Calc
-    connect(ui->actionShow_calc, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Calc"] = new ToggleTab(ui->tabCalc, "Calc", "Calc", ui->actionShow_calc, Config::showTabCalc);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
+    // Show/Hide Plugins..
+    for (const auto &plugin : m_plugins) {
+        if (plugin->parent() != "") {
+            continue;
+        }
 
-    // Show/Hide Exchange
-#if defined(HAS_LOCALMONERO)
-    connect(ui->actionShow_Exchange, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Exchange"] = new ToggleTab(ui->tabExchange, "Exchange", "Exchange", ui->actionShow_Exchange, Config::showTabExchange);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Exchange, "Exchange");
-#else
-    ui->actionShow_Exchange->setVisible(false);
-    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, false);
-#endif
+        auto* pluginAction = new QAction(QString("Show %1").arg(plugin->displayName()), this);
+        ui->menuView->insertAction(plugin->insertFirst() ? ui->actionPlaceholderBegin : ui->actionPlaceholderEnd, pluginAction);
+        connect(pluginAction, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+        m_tabShowHideMapper[plugin->displayName()] = new ToggleTab(plugin->tab(), plugin->displayName(), plugin->displayName(), pluginAction);
+        m_tabShowHideSignalMapper->setMapping(pluginAction, plugin->displayName());
+    }
+    ui->actionPlaceholderBegin->setVisible(false);
+    ui->actionPlaceholderEnd->setVisible(false);
 
-    // Show/Hide Mining
-#if defined(HAS_XMRIG)
-    connect(ui->actionShow_XMRig, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Mining"] = new ToggleTab(ui->tabXmrRig, "Mining", "Mining", ui->actionShow_XMRig, Config::showTabXMRig);
-    m_tabShowHideSignalMapper->setMapping(ui->actionShow_XMRig, "Mining");
-#else
-    ui->actionShow_XMRig->setVisible(false);
-#endif
-
+    QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
     for (const auto &key: m_tabShowHideMapper.keys()) {
         const auto toggleTab = m_tabShowHideMapper.value(key);
-        const bool show = conf()->get(toggleTab->configKey).toBool();
+        bool show = enabledTabs.contains(key);
+
         toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
         ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
     }
@@ -353,7 +355,6 @@ void MainWindow::initMenu() {
     connect(ui->actionTransmitOverUR,              &QAction::triggered, this, &MainWindow::showURDialog);
     connect(ui->actionPay_to_many,                 &QAction::triggered, this, &MainWindow::payToMany);
     connect(ui->actionAddress_checker,             &QAction::triggered, this, &MainWindow::showAddressChecker);
-    connect(ui->actionCalculator,                  &QAction::triggered, this, &MainWindow::showCalcWindow);
     connect(ui->actionCreateDesktopEntry,          &QAction::triggered, this, &MainWindow::onCreateDesktopEntry);
 
     if (m_wallet->viewOnly()) {
@@ -396,27 +397,6 @@ void MainWindow::initMenu() {
     ui->actionUpdate_balance->setShortcut(QKeySequence("Ctrl+U"));
     ui->actionShow_Searchbar->setShortcut(QKeySequence("Ctrl+F"));
     ui->actionDocumentation->setShortcut(QKeySequence("F1"));
-}
-
-void MainWindow::initHome() {
-    // Ticker widgets
-    m_tickerWidgets.append(new PriceTickerWidget(this, m_wallet, "XMR"));
-    m_tickerWidgets.append(new PriceTickerWidget(this, m_wallet, "BTC"));
-    m_tickerWidgets.append(new RatioTickerWidget(this, m_wallet, "XMR", "BTC"));
-    for (const auto &widget : m_tickerWidgets) {
-        ui->tickerLayout->addWidget(widget);
-    }
-
-    m_balanceTickerWidget = new BalanceTickerWidget(this, m_wallet, false);
-    ui->fiatTickerLayout->addWidget(m_balanceTickerWidget);
-
-    connect(ui->ccsWidget, &CCSWidget::selected, this, &MainWindow::showSendScreen);
-    connect(ui->bountiesWidget, &BountiesWidget::donate, this, &MainWindow::fillSendTab);
-    connect(ui->redditWidget, &RedditWidget::setStatusText, this, &MainWindow::setStatusText);
-    connect(ui->revuoWidget, &RevuoWidget::donate, [this](const QString &address, const QString &description){
-        m_sendWidget->fill(address, description);
-        ui->tabWidget->setCurrentIndex(Tabs::SEND);
-    });
 }
 
 void MainWindow::initOffline() {
@@ -502,9 +482,18 @@ void MainWindow::initWalletContext() {
 
 void MainWindow::menuToggleTabVisible(const QString &key){
     const auto toggleTab = m_tabShowHideMapper[key];
-    bool show = conf()->get(toggleTab->configKey).toBool();
+
+    QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
+    bool show = enabledTabs.contains(key);
     show = !show;
-    conf()->set(toggleTab->configKey, show);
+
+    if (show) {
+        enabledTabs.append(key);
+    } else {
+        enabledTabs.removeAll(key);
+    }
+
+    conf()->set(Config::enabledTabs, enabledTabs);
     ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
     toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
 }
@@ -599,7 +588,6 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
 
     m_statusLabelBalance->setToolTip("Click for details");
     m_statusLabelBalance->setText(balance_str);
-    m_balanceTickerWidget->setHidden(hide);
 }
 
 void MainWindow::setStatusText(const QString &text, bool override, int timeout) {
@@ -631,19 +619,22 @@ void MainWindow::tryStoreWallet() {
 
 void MainWindow::onWebsocketStatusChanged(bool enabled) {
     ui->actionShow_Home->setVisible(enabled);
-    ui->actionShow_calc->setVisible(enabled);
-    ui->actionShow_Exchange->setVisible(enabled);
 
-    ui->tabWidget->setTabVisible(Tabs::HOME, enabled && conf()->get(Config::showTabHome).toBool());
-    ui->tabWidget->setTabVisible(Tabs::CALC, enabled && conf()->get(Config::showTabCalc).toBool());
-    ui->tabWidget->setTabVisible(Tabs::EXCHANGES, enabled && conf()->get(Config::showTabExchange).toBool());
+    QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
+
+    for (const auto &plugin : m_plugins) {
+        if (plugin->hasParent()) {
+            continue;
+        }
+
+        if (plugin->requiresWebsocket()) {
+            // TODO: unload plugins
+            ui->tabWidget->setTabVisible(this->findTab(plugin->displayName()), enabled && enabledTabs.contains(plugin->displayName()));
+        }
+    }
 
     m_historyWidget->setWebsocketEnabled(enabled);
     m_sendWidget->setWebsocketEnabled(enabled);
-
-#ifdef HAS_XMRIG
-    m_xmrig->setDownloadsTabEnabled(enabled);
-#endif
 }
 
 void MainWindow::onProxySettingsChanged() {
@@ -1129,11 +1120,7 @@ void MainWindow::skinChanged(const QString &skinName) {
 
 void MainWindow::updateWidgetIcons() {
     m_sendWidget->skinChanged();
-#ifdef HAS_LOCALMONERO
-    m_localMoneroWidget->skinChanged();
-#endif
-    ui->conversionWidget->skinChanged();
-    ui->revuoWidget->skinChanged();
+    emit updateIcons();
 
     m_statusBtnHwDevice->setIcon(this->hardwareDevicePairedIcon());
 }
@@ -1162,7 +1149,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     if (!this->cleanedUp) {
         this->cleanedUp = true;
 
-        conf()->set(Config::homeWidget, ui->tabHomeWidget->currentIndex());
+        emit aboutToQuit();
 
         m_historyWidget->resetModel();
 
@@ -1193,35 +1180,26 @@ void MainWindow::changeEvent(QEvent* event)
 
 void MainWindow::donateButtonClicked() {
     m_sendWidget->fill(constants::donationAddress, constants::donationDescription);
-    ui->tabWidget->setCurrentIndex(Tabs::SEND);
+    ui->tabWidget->setCurrentIndex(this->findTab("Send"));
 }
 
 void MainWindow::showHistoryTab() {
     this->raise();
-    ui->tabWidget->setCurrentIndex(Tabs::HISTORY);
+    ui->tabWidget->setCurrentIndex(this->findTab("History"));
 }
 
 void MainWindow::fillSendTab(const QString &address, const QString &description) {
     m_sendWidget->fill(address, description);
-    ui->tabWidget->setCurrentIndex(Tabs::SEND);
-}
-
-void MainWindow::showCalcWindow() {
-    m_windowCalc->show();
+    ui->tabWidget->setCurrentIndex(this->findTab("Send"));
 }
 
 void MainWindow::payToMany() {
-    ui->tabWidget->setCurrentIndex(Tabs::SEND);
+    ui->tabWidget->setCurrentIndex(this->findTab("Send"));
     m_sendWidget->payToMany();
     Utils::showInfo(this, "Pay to many", "Enter a list of outputs in the 'Pay to' field.\n"
                                          "One output per line.\n"
                                          "Format: address, amount\n"
                                          "A maximum of 16 addresses may be specified.");
-}
-
-void MainWindow::showSendScreen(const CCSEntry &entry) { // TODO: rename this function
-    m_sendWidget->fill(entry.address, QString("Donation to %1: %2").arg(entry.organizer, entry.title));
-    ui->tabWidget->setCurrentIndex(Tabs::SEND);
 }
 
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
@@ -1502,10 +1480,6 @@ void MainWindow::bringToFront() {
 }
 
 void MainWindow::onPreferredFiatCurrencyChanged() {
-    for (const auto &widget : m_tickerWidgets) {
-        widget->updateDisplay();
-    }
-    m_balanceTickerWidget->updateDisplay();
     m_sendWidget->onPreferredFiatCurrencyChanged();
 }
 
@@ -1651,12 +1625,9 @@ QString MainWindow::getHardwareDevice() {
 void MainWindow::updateTitle() {
     QString title = QString("%1 (#%2)").arg(this->walletName(), QString::number(m_wallet->currentSubaddressAccount()));
 
-    if (m_wallet->viewOnly())
+    if (m_wallet->viewOnly()) {
         title += " [view-only]";
-#ifdef HAS_XMRIG
-    if (m_xmrig->isMining())
-        title += " [mining]";
-#endif
+    }
 
     title += " - Feather";
 
@@ -1832,14 +1803,23 @@ void MainWindow::toggleSearchbar(bool visible) {
     m_coinsWidget->setSearchbarVisible(visible);
 
     int currentTab = ui->tabWidget->currentIndex();
-    if (currentTab == Tabs::HISTORY)
+    if (currentTab == this->findTab("History"))
         m_historyWidget->focusSearchbar();
-    else if (currentTab == Tabs::SEND)
+    else if (currentTab == this->findTab("Send"))
         m_contactsWidget->focusSearchbar();
-    else if (currentTab == Tabs::RECEIVE)
+    else if (currentTab == this->findTab("Receive"))
         m_receiveWidget->focusSearchbar();
-    else if (currentTab == Tabs::COINS)
+    else if (currentTab == this->findTab("Coins"))
         m_coinsWidget->focusSearchbar();
+}
+
+int MainWindow::findTab(const QString &title) {
+    for (int i = 0; i < ui->tabWidget->count(); i++) {
+        if (ui->tabWidget->tabText(i) == title) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 MainWindow::~MainWindow() {

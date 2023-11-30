@@ -161,6 +161,7 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
         for (const auto &window : m_windows) {
             window->onPreferredFiatCurrencyChanged();
         }
+        emit preferredFiatCurrencyChanged();
     });
     connect(&settings, &Settings::skinChanged, this, &WindowManager::onChangeTheme);
     connect(&settings, &Settings::updateBalance, this, &WindowManager::updateBalance);
@@ -171,6 +172,9 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
         for (const auto &window : m_windows) {
             window->onHideUpdateNotifications(hidden);
         }
+    });
+    connect(&settings, &Settings::pluginConfigured, [this](const QString &id) {
+        emit pluginConfigured(id);
     });
 
     if (showProxyTab) {

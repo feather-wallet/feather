@@ -11,8 +11,10 @@
 #include <QStandardItemModel>
 #include <QTableWidget>
 
+#include "WebsocketNotifier.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
+#include "WindowManager.h"
 
 XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
@@ -128,6 +130,14 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
     ui->label_status->hide();
 
     this->printConsoleInfo();
+
+    connect(windowManager(), &WindowManager::websocketStatusChanged, this, &XMRigWidget::setDownloadsTabEnabled);
+    connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString &type, const QJsonValue &json) {
+        if (type == "xmrig") {
+            QJsonObject xmrig_data = json.toObject();
+            this->onDownloads(xmrig_data);
+        }
+    });
 }
 
 bool XMRigWidget::isMining() {

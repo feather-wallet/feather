@@ -6,10 +6,8 @@
 
 #include <QMainWindow>
 #include <QSystemTrayIcon>
-#include <QMenu>
 
 #include "components.h"
-#include "CalcWindow.h"
 #include "SettingsDialog.h"
 
 #include "dialog/AboutDialog.h"
@@ -31,8 +29,6 @@
 #include "utils/config.h"
 #include "utils/daemonrpc.h"
 #include "utils/EventFilter.h"
-#include "plugins/ccs/CCSWidget.h"
-#include "plugins/reddit/RedditWidget.h"
 #include "widgets/TickerWidget.h"
 #include "widgets/WalletUnlockWidget.h"
 #include "wizard/WalletWizard.h"
@@ -44,17 +40,10 @@
 #include "CoinsWidget.h"
 
 #include "WindowManager.h"
+#include "plugins/Plugin.h"
 
 #ifdef CHECK_UPDATES
 #include "utils/updater/Updater.h"
-#endif
-
-#ifdef HAS_LOCALMONERO
-#include "plugins/localmonero/LocalMoneroWidget.h"
-#endif
-
-#ifdef HAS_XMRIG
-#include "plugins/xmrig/XMRigWidget.h"
 #endif
 
 namespace Ui {
@@ -62,13 +51,12 @@ namespace Ui {
 }
 
 struct ToggleTab {
-    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction, Config::ConfigKey configKey) :
-            tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction), configKey(configKey){}
+    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction) :
+            tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction) {}
     QWidget *tab;
     QString key;
     QString name;
     QAction *menuAction;
-    Config::ConfigKey configKey;
 };
 
 class WindowManager;
@@ -84,24 +72,6 @@ public:
     QString walletCachePath();
     QString walletKeysPath();
 
-    enum Tabs {
-        HOME = 0,
-        HISTORY,
-        SEND,
-        RECEIVE,
-        COINS,
-        CALC,
-        EXCHANGES,
-        XMRIG
-    };
-
-    enum TabsHome {
-        CCS = 0,
-        BOUNTIES,
-        REDDIT,
-        REVUO
-    };
-
     enum Stack {
         WALLET = 0,
         LOCKED,
@@ -116,7 +86,10 @@ public slots:
     void onHideUpdateNotifications(bool hidden);
 
 signals:
+    void updateIcons();
     void closed();
+    void uiSetup();
+    void aboutToQuit();
 
 protected:
     void changeEvent(QEvent* event) override;
@@ -173,10 +146,8 @@ private slots:
     void showURDialog();
     
     void donateButtonClicked();
-    void showCalcWindow();
     void payToMany();
     void showHistoryTab();
-    void showSendScreen(const CCSEntry &entry);
     void skinChanged(const QString &skinName);
     void onBlockchainSync(int height, int target);
     void onRefreshSync(int height, int target);
@@ -201,9 +172,9 @@ private:
     friend WindowManager;
 
     void initStatusBar();
+    void initPlugins();
     void initWidgets();
     void initMenu();
-    void initHome();
     void initOffline();
     void initWalletContext();
 
@@ -231,6 +202,7 @@ private:
     void lockWallet();
     void unlockWallet(const QString &password);
     void closeQDialogChildren(QObject *object);
+    int findTab(const QString &title);
 
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();
@@ -241,25 +213,15 @@ private:
     Nodes *m_nodes;
     DaemonRpc *m_rpc;
 
-    CalcWindow *m_windowCalc = nullptr;
     SplashDialog *m_splashDialog = nullptr;
     AccountSwitcherDialog *m_accountSwitcherDialog = nullptr;
 
     WalletUnlockWidget *m_walletUnlockWidget = nullptr;
-#ifdef HAS_XMRIG
-    XMRigWidget *m_xmrig = nullptr;
-#endif
     ContactsWidget *m_contactsWidget = nullptr;
     HistoryWidget *m_historyWidget = nullptr;
     SendWidget *m_sendWidget = nullptr;
     ReceiveWidget *m_receiveWidget = nullptr;
     CoinsWidget *m_coinsWidget = nullptr;
-#ifdef HAS_LOCALMONERO
-    LocalMoneroWidget *m_localMoneroWidget = nullptr;
-#endif
-
-    QList<TickerWidgetBase*> m_tickerWidgets;
-    BalanceTickerWidget *m_balanceTickerWidget;
 
     QPointer<QAction> m_clearRecentlyOpenAction;
 
@@ -281,6 +243,8 @@ private:
 
     QTimer m_updateBytes;
     QTimer m_checkUserActivity;
+
+    QList<Plugin*> m_plugins;
 
     QString m_statusText;
     int m_statusDots;

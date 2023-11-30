@@ -193,6 +193,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     if (parser.isSet("use-local-tor"))
         conf()->set(Config::useLocalTor, true);
 
+    conf()->set(Config::restartRequired, false);
+
     parser.process(app); // Parse again for --help and --version
 
     if (!quiet) {

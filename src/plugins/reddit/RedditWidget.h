@@ -9,6 +9,7 @@
 #include <QWidget>
 
 #include "RedditModel.h"
+#include "RedditProxyModel.h"
 
 namespace Ui {
     class RedditWidget;
@@ -21,7 +22,6 @@ class RedditWidget : public QWidget
 public:
     explicit RedditWidget(QWidget *parent = nullptr);
     ~RedditWidget();
-    RedditModel* model();
 
 public slots:
     void linkClicked();
@@ -37,6 +37,7 @@ private:
 
     QScopedPointer<Ui::RedditWidget> ui;
     RedditModel* const m_model;
+    RedditProxyModel* m_proxyModel;
     QMenu *m_contextMenu;
 };
 

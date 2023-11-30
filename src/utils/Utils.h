@@ -113,6 +113,7 @@ namespace Utils
     void openDir(QWidget *parent, const QString &message, const QString& dir);
 
     QWindow* windowForQObject(QObject* object);
+    void clearLayout(QLayout *layout, bool deleteWidgets = true);
 }
 
 #endif //FEATHER_UTILS_H
