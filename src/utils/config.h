@@ -122,11 +122,13 @@ public:
         // Misc
         blockExplorer,
         redditFrontend,
+        trocadorAppFrontend,
         localMoneroFrontend,
         bountiesFrontend, // unused
 
         fiatSymbols,
         cryptoSymbols,
+        trocadorAppCryptoSymbols
     };
 
     enum PrivacyLevel {

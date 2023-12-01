@@ -18,6 +18,7 @@ set(COPYRIGHT_HOLDERS "The Monero Project")
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
+option(TROCADORAPP "Include TrocadorApp module" ON)
 option(LOCALMONERO "Include LocalMonero module" ON)
 option(XMRIG "Include XMRig module" ON)
 option(TOR_DIR "Directory containing Tor binaries to embed inside Feather" OFF)

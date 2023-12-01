@@ -214,6 +214,11 @@ void MainWindow::initWidgets() {
     m_coinsWidget = new CoinsWidget(m_wallet, this);
     ui->coinsWidgetLayout->addWidget(m_coinsWidget);
 
+#ifdef HAS_TROCADORAPP
+    m_trocadorAppWidget = new TrocadorAppWidget(this, m_wallet);
+    ui->trocadorAppLayout->addWidget(m_trocadorAppWidget);
+#endif
+
 #ifdef HAS_LOCALMONERO
     m_localMoneroWidget = new LocalMoneroWidget(this, m_wallet);
     ui->localMoneroLayout->addWidget(m_localMoneroWidget);
@@ -315,7 +320,7 @@ void MainWindow::initMenu() {
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_calc, "Calc");
 
     // Show/Hide Exchange
-#if defined(HAS_LOCALMONERO)
+#if (defined(HAS_LOCALMONERO) || defined(HAS_TROCADORAPP))
     connect(ui->actionShow_Exchange, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Exchange"] = new ToggleTab(ui->tabExchange, "Exchange", "Exchange", ui->actionShow_Exchange, Config::showTabExchange);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Exchange, "Exchange");
