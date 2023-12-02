@@ -28,9 +28,9 @@ public:
     bool isPending() const;
     bool isFailed() const;
     bool isCoinbase() const;
-    quint64 balanceDelta() const;
+    qint64 balanceDelta() const;
     double amount() const;
-    quint64 atomicAmount() const;
+    qint64 atomicAmount() const;
     QString displayAmount() const;
     QString fee() const;
     quint64 atomicFee() const;
@@ -58,7 +58,8 @@ private:
     friend class TransactionHistory;
     mutable QList<Transfer*> m_transfers;
     mutable QList<Ring*> m_rings;
-    quint64 m_amount;
+    qint64 m_amount; // Amount that was sent (to destinations) or received, excludes tx fee
+    qint64 m_balanceDelta; // How much the total balance was mutated as a result of this tx (includes tx fee)
     quint64 m_blockHeight;
     QString m_description;
     quint64 m_confirmations;

@@ -68,7 +68,6 @@ WalletWizard::WalletWizard(QWidget *parent)
     setOption(QWizard::HaveHelpButton, true);
     setOption(QWizard::HaveCustomButton1, true);
 
-    // Set up a custom button layout
     QList<QWizard::WizardButton> layout;
     layout << QWizard::HelpButton;
     layout << QWizard::CustomButton1;

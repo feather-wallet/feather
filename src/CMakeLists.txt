@@ -82,7 +82,9 @@ endif()
 if (WITH_SCANNER)
     file(GLOB QRCODE_UTILS_FILES
             "qrcode/utils/*.h"
-            "qrcode/utils/*.cpp")
+            "qrcode/utils/*.cpp"
+            "wizard/offline_tx_signing/*.h"
+            "wizard/offline_tx_signing/*.cpp")
 endif()
 
 if (WITH_SCANNER)
@@ -152,6 +154,7 @@ target_include_directories(feather PUBLIC
         ${LIBZIP_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${POLYSEED_INCLUDE_DIR}
+        ${BCUR_INCLUDE_DIR}
 )
 
 if(WITH_SCANNER)
@@ -257,6 +260,7 @@ target_link_libraries(feather
         ${ICU_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZLIB_LIBRARIES}
+        ${BCUR_LIBRARY}
 )
 
 if(CHECK_UPDATES)

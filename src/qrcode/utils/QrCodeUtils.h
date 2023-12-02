@@ -5,20 +5,23 @@
 #define FEATHER_QRCODEUTILS_H
 
 #include <QImage>
+#include <QString>
 
 #include <ZXing/ReadBarcode.h>
 
-class Result : private ZXing::Result
+class Result
 {
 public:
-    explicit Result(ZXing::Result&& r) :
-            m_result(std::move(r)){ }
-
-    inline QString text() const { return QString::fromStdString(m_result.text()); }
-    bool isValid() const { return m_result.isValid(); }
-
+    explicit Result(const std::string &text, bool isValid)
+        : m_text(QString::fromStdString(text))
+        , m_valid(isValid){}
+    
+    [[nodiscard]] QString text() const { return m_text; }
+    [[nodiscard]] bool isValid() const { return m_valid; }
+    
 private:
-    ZXing::Result m_result;
+    QString m_text = "";
+    bool m_valid = false;
 };
 
 class QrCodeUtils {

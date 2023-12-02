@@ -11,6 +11,10 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
+#ifdef WITH_SCANNER
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
+#endif
+
 CoinsWidget::CoinsWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::CoinsWidget)
@@ -186,7 +190,14 @@ void CoinsWidget::spendSelected() {
 
     QStringList keyimages;
     for (QModelIndex index: list) {
-        keyimages << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
+        QString keyImage = m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
+
+        if (keyImage == "0100000000000000000000000000000000000000000000000000000000000000") {
+            Utils::showError(this, "Unable to select output to spend", "Selected output has unknown key image");
+            return;
+        }
+        
+        keyimages << keyImage;
     }
 
     m_wallet->setSelectedInputs(keyimages);
@@ -237,6 +248,20 @@ void CoinsWidget::onSweepOutputs() {
     OutputSweepDialog dialog{this, totalAmount};
     int ret = dialog.exec();
     if (!ret) return;
+
+    if (m_wallet->keyImageSyncNeeded(totalAmount, false)) {
+#if defined(WITH_SCANNER)
+        OfflineTxSigningWizard wizard(this, m_wallet);
+        auto r = wizard.exec();
+    
+        if (r == QDialog::Rejected) {
+            return;
+        }
+#else
+        Utils::showError(this, "Can't open offline transaction signing wizard", "Feather was built without webcam QR scanner support");
+        return;
+#endif
+    }
 
     m_wallet->sweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
 }

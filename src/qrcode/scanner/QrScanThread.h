@@ -21,8 +21,10 @@ class QrScanThread : public QThread
 public:
     explicit QrScanThread(QObject *parent = nullptr);
     void addImage(const QImage &img);
+    
     virtual void stop();
-
+    virtual void start();
+    
 signals:
     void decoded(const QString &data);
 

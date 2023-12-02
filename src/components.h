@@ -93,4 +93,28 @@ private:
     QLabel *m_infoLabel;
 };
 
+class U32Validator : public QValidator {
+public:
+    U32Validator(QObject *parent = nullptr) : QValidator(parent) {}
+
+    QValidator::State validate(QString &input, int &pos) const override {
+        if (input.isEmpty()) {
+            return QValidator::Intermediate;
+        }
+
+        bool ok;
+        qint64 value = input.toLongLong(&ok);
+
+        if (!ok) {
+            return QValidator::Invalid;
+        }
+
+        if (value < 0 || value > UINT32_MAX) {
+            return QValidator::Invalid;
+        }
+
+        return QValidator::Acceptable;
+    }
+};
+
 #endif //FEATHER_COMPONENTS_H

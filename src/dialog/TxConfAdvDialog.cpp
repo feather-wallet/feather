@@ -6,6 +6,7 @@
 
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QTreeWidgetItem>
 
 #include "constants.h"
 #include "dialog/QrCodeDialog.h"
@@ -14,23 +15,19 @@
 #include "libwalletqt/WalletManager.h"
 #include "qrcode/QrCode.h"
 #include "utils/AppData.h"
+#include "utils/ColorScheme.h"
 #include "utils/config.h"
 #include "utils/Utils.h"
 
-TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWidget *parent)
+TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWidget *parent, bool offline)
     : WindowModalDialog(parent)
     , ui(new Ui::TxConfAdvDialog)
     , m_wallet(wallet)
-    , m_exportUnsignedMenu(new QMenu(this))
     , m_exportSignedMenu(new QMenu(this))
     , m_exportTxKeyMenu(new QMenu(this))
+    , m_offline(offline)
 {
     ui->setupUi(this);
-
-    m_exportUnsignedMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::unsignedCopy);
-    m_exportUnsignedMenu->addAction("Show as QR code", this, &TxConfAdvDialog::unsignedQrCode);
-    m_exportUnsignedMenu->addAction("Save to file", this, &TxConfAdvDialog::unsignedSaveFile);
-    ui->btn_exportUnsigned->setMenu(m_exportUnsignedMenu);
 
     m_exportSignedMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::signedCopy);
     m_exportSignedMenu->addAction("Save to file", this, &TxConfAdvDialog::signedSaveFile);
@@ -38,8 +35,6 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
 
     m_exportTxKeyMenu->addAction("Copy to clipboard", this, &TxConfAdvDialog::txKeyCopy);
     ui->btn_exportTxKey->setMenu(m_exportTxKeyMenu);
-
-    ui->line_description->setText(description);
 
     connect(ui->btn_sign, &QPushButton::clicked, this, &TxConfAdvDialog::signTransaction);
     connect(ui->btn_send, &QPushButton::clicked, this, &TxConfAdvDialog::broadcastTransaction);
@@ -49,9 +44,11 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
     ui->fee->setFont(Utils::getMonospaceFont());
     ui->total->setFont(Utils::getMonospaceFont());
 
-    ui->inputs->setFont(Utils::getMonospaceFont());
-    ui->outputs->setFont(Utils::getMonospaceFont());
-
+    if (m_offline) {
+        ui->txid->hide();
+        ui->label_txid->hide();
+    }
+    
     this->adjustSize();
 }
 
@@ -77,17 +74,6 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
 
     this->setAmounts(tx->amount(), tx->fee());
 
-    auto size_str = [this, isSigned]{
-        if (isSigned) {
-            auto size = m_tx->signedTxToHex(0).size() / 2;
-            return QString("Size: %1 bytes (%2 bytes unsigned)").arg(QString::number(size), QString::number(m_tx->unsignedTxToBin().size()));
-        } else {
-
-            return QString("Size: %1 bytes (unsigned)").arg(QString::number(m_tx->unsignedTxToBin().size()));
-        }
-    }();
-    ui->label_size->setText(size_str);
-
     this->setupConstructionData(ptx);
 }
 
@@ -95,14 +81,12 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
     m_utx = utx;
     m_utx->refresh();
 
-    ui->btn_exportUnsigned->hide();
     ui->btn_exportSigned->hide();
     ui->btn_exportTxKey->hide();
     ui->btn_sign->show();
     ui->btn_send->hide();
 
     ui->txid->setText("n/a");
-    ui->label_size->setText("Size: n/a");
 
     this->setAmounts(utx->amount(0), utx->fee(0));
 
@@ -131,66 +115,63 @@ void TxConfAdvDialog::setAmounts(quint64 amount, quint64 fee) {
     int maxLengthFiat = Utils::maxLength(amounts_fiat);
     std::for_each(amounts_fiat.begin(), amounts_fiat.end(), [maxLengthFiat](QString& amount){amount = amount.rightJustified(maxLengthFiat, ' ');});
 
-    ui->amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
-    ui->fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
-    ui->total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));
+    if (m_offline) {
+        ui->amount->setText(amount_str);
+        ui->fee->setText(fee_str);
+        ui->total->setText(total);
+    } else {
+        ui->amount->setText(QString("%1 (%2 %3)").arg(amounts[0], amounts_fiat[0], preferredCur));
+        ui->fee->setText(QString("%1 (%2 %3)").arg(amounts[1], amounts_fiat[1], preferredCur));
+        ui->total->setText(QString("%1 (%2 %3)").arg(amounts[2], amounts_fiat[2], preferredCur));   
+    }
 }
 
 void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
-    QString inputs_str;
-    auto inputs = ci->inputs();
-    for (const auto& i: inputs) {
-        inputs_str += QString("%1 %2\n").arg(i->pubKey(), WalletManager::displayAmount(i->amount()));
+    for (const auto &in: ci->inputs()) {
+        auto *item = new QTreeWidgetItem(ui->treeInputs);
+        item->setText(0, in->pubKey());
+        item->setFont(0, Utils::getMonospaceFont());
+        item->setText(1, WalletManager::displayAmount(in->amount()));
     }
-    ui->inputs->setText(inputs_str);
-    ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(inputs.size())));
+    ui->treeInputs->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeInputs->resizeColumnToContents(1);
+    ui->treeInputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    auto outputs = ci->outputs();
+    ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(ci->inputs().size())));
 
-    QTextCursor cursor = ui->outputs->textCursor();
-    for (const auto& o: outputs) {
-        auto address = o->address();
-        auto amount = WalletManager::displayAmount(o->amount());
-        auto index = m_wallet->subaddressIndex(address);
-        cursor.insertText(address, Utils::addressTextFormat(index, o->amount()));
-        cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
-        cursor.insertBlock();
+    for (const auto &out: ci->outputs()) {
+        auto *item = new QTreeWidgetItem(ui->treeOutputs);
+        item->setText(0, out->address());
+        item->setText(1, WalletManager::displayAmount(out->amount()));
+        item->setFont(0, Utils::getMonospaceFont());
+        auto index = m_wallet->subaddressIndex(out->address());
+        QBrush brush;
+        if (index.isChange()) {
+            brush = QBrush(ColorScheme::YELLOW.asColor(true));
+            item->setToolTip(0, "Wallet change/primary address");
+            // item->setHidden(true);
+        }
+        else if (index.isValid()) {
+            brush = QBrush(ColorScheme::GREEN.asColor(true));
+            item->setToolTip(0, "Wallet receive address");
+        }
+        else if (out->amount() == 0) {
+            brush = QBrush(ColorScheme::GRAY.asColor(true));
+            item->setToolTip(0, "Dummy output (Min. 2 outs consensus rule)");
+        }
+        item->setBackground(0, brush);
     }
-    ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(outputs.size())));
+    ui->treeOutputs->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->treeOutputs->resizeColumnToContents(1);
+    ui->treeOutputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    ui->label_ringSize->setText(QString("Ring size: %1").arg(QString::number(ci->minMixinCount() + 1)));
+    ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(ci->outputs().size())));
+
+    this->adjustSize();
 }
 
 void TxConfAdvDialog::signTransaction() {
-    QString defaultName = QString("%1_signed_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
-    QString fn = QFileDialog::getSaveFileName(this, "Save signed transaction to file", QDir::home().filePath(defaultName), "Transaction (*signed_monero_tx)");
-    if (fn.isEmpty()) {
-        return;
-    }
-
-    bool success = m_utx->sign(fn);
-
-    if (success) {
-        Utils::showInfo(this, "Transaction saved successfully");
-    } else {
-        Utils::showError(this, "Failed to save transaction to file");
-    }
-}
-
-void TxConfAdvDialog::unsignedSaveFile() {
-    QString defaultName = QString("%1_unsigned_monero_tx").arg(QString::number(QDateTime::currentSecsSinceEpoch()));
-    QString fn = QFileDialog::getSaveFileName(this, "Save transaction to file", QDir::home().filePath(defaultName), "Transaction (*unsigned_monero_tx)");
-    if (fn.isEmpty()) {
-        return;
-    }
-
-    bool success = m_tx->saveToFile(fn);
-
-    if (success) {
-        Utils::showInfo(this, "Transaction saved successfully");
-    } else {
-        Utils::showError(this, "Failed to save transaction to file");
-    }
+    this->accept();
 }
 
 void TxConfAdvDialog::signedSaveFile() {
@@ -209,21 +190,6 @@ void TxConfAdvDialog::signedSaveFile() {
     }
 }
 
-void TxConfAdvDialog::unsignedQrCode() {
-    if (m_tx->unsignedTxToBin().size() > 2953) {
-        Utils::showError(this, "Unable to show QR code", "Transaction size exceeds the maximum size for QR codes (2953 bytes)");
-        return;
-    }
-
-    QrCode qr(m_tx->unsignedTxToBin(), QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::LOW);
-    QrCodeDialog dialog{this, &qr, "Unsigned Transaction"};
-    dialog.exec();
-}
-
-void TxConfAdvDialog::unsignedCopy() {
-    Utils::copyToClipboard(m_tx->unsignedTxToBase64());
-}
-
 void TxConfAdvDialog::signedCopy() {
     Utils::copyToClipboard(m_tx->signedTxToHex(0));
 }
@@ -237,12 +203,9 @@ void TxConfAdvDialog::txKeyCopy() {
     Utils::copyToClipboard(m_tx->transaction(0)->txKey());
 }
 
-void TxConfAdvDialog::signedQrCode() {
-}
-
 void TxConfAdvDialog::broadcastTransaction() {
     if (m_tx == nullptr) return;
-    m_wallet->commitTransaction(m_tx, ui->line_description->text());
+    m_wallet->commitTransaction(m_tx);
     QDialog::accept();
 }
 

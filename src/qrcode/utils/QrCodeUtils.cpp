@@ -16,22 +16,36 @@ Result QrCodeUtils::ReadBarcode(const QImage& img, const ZXing::DecodeHints& hin
                 return ZXing::ImageFormat::XRGB;
 
 #endif
-            case QImage::Format_RGB888: return ZXing::ImageFormat::RGB;
+            case QImage::Format_RGB888: 
+                return ZXing::ImageFormat::RGB;
 
             case QImage::Format_RGBX8888:
-            case QImage::Format_RGBA8888: return ZXing::ImageFormat::RGBX;
+            case QImage::Format_RGBA8888: 
+                return ZXing::ImageFormat::RGBX;
 
-            case QImage::Format_Grayscale8: return ZXing::ImageFormat::Lum;
+            case QImage::Format_Grayscale8: 
+                return ZXing::ImageFormat::Lum;
 
-            default: return ZXing::ImageFormat::None;
+            default: 
+                return ZXing::ImageFormat::None;
         }
     };
 
     auto exec = [&](const QImage& img){
-        return Result(ZXing::ReadBarcode({ img.bits(), img.width(), img.height(), ImgFmtFromQImg(img) }, hints));
+        auto res = ZXing::ReadBarcode({ img.bits(), img.width(), img.height(), ImgFmtFromQImg(img) }, hints);
+        return Result(res.text(), res.isValid());
     };
 
-    return ImgFmtFromQImg(img) == ZXing::ImageFormat::None ? exec(img.convertToFormat(QImage::Format_RGBX8888)) : exec(img);
+    try {
+        if (ImgFmtFromQImg(img) == ZXing::ImageFormat::None) {
+            return exec(img.convertToFormat(QImage::Format_RGBX8888));
+        } else {
+            return exec(img);
+        }
+    }
+    catch (...) {
+        return Result("", false);
+    }
 }
 
 

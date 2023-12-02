@@ -1,0 +1,28 @@
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2023 The Monero Project
+
+#ifndef FEATHER_URDIALOG_H
+#define FEATHER_URDIALOG_H
+
+#include <QDialog>
+
+#include "components.h"
+
+namespace Ui {
+    class URDialog;
+}
+
+class URDialog : public WindowModalDialog
+{
+    Q_OBJECT
+
+public:
+    explicit URDialog(QWidget *parent = nullptr);
+    ~URDialog() override;
+
+private:
+    QScopedPointer<Ui::URDialog> ui;
+};
+
+
+#endif //FEATHER_URDIALOG_H

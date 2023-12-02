@@ -102,6 +102,12 @@ public:
         REVUO
     };
 
+    enum Stack {
+        WALLET = 0,
+        LOCKED,
+        OFFLINE
+    };
+
     void showOrHide();
     void bringToFront();
 
@@ -137,12 +143,6 @@ private slots:
     void onShowSettingsPage(int page);
 
     // offline tx signing
-    void exportKeyImages();
-    void importKeyImages();
-    void exportOutputs();
-    void importOutputs();
-    void loadUnsignedTx();
-    void loadUnsignedTxFromClipboard();
     void loadSignedTx();
     void loadSignedTxFromText();
 
@@ -166,10 +166,12 @@ private slots:
     void showPasswordDialog();
     void showKeysDialog();
     void showViewOnlyDialog();
+    void showKeyImageSyncWizard();
     void showWalletCacheDebugDialog();
     void showAccountSwitcherDialog();
     void showAddressChecker();
-
+    void showURDialog();
+    
     void donateButtonClicked();
     void showCalcWindow();
     void payToMany();
@@ -202,6 +204,7 @@ private:
     void initWidgets();
     void initMenu();
     void initHome();
+    void initOffline();
     void initWalletContext();
 
     void closeEvent(QCloseEvent *event) override;
@@ -209,7 +212,6 @@ private:
     void saveGeo();
     void restoreGeo();
     void showDebugInfo();
-    void createUnsignedTxDialog(UnsignedTransaction *tx);
     void updatePasswordIcon();
     void updateNetStats();
     void rescanSpent();

@@ -126,6 +126,10 @@ bool Wallet::isDeterministic() const {
     return m_wallet2->is_deterministic();
 }
 
+QString Wallet::walletName() const {
+    return QFileInfo(this->cachePath()).fileName();
+}
+
 // #################### Balance ####################
 
 quint64 Wallet::balance() const {
@@ -156,6 +160,14 @@ quint64 Wallet::unlockedBalanceAll() const {
     for (uint32_t i = 0; i < numSubaddressAccounts(); ++i)
         result += unlockedBalance(i);
     return result;
+}
+
+quint64 Wallet::viewOnlyBalance(quint32 accountIndex) const {
+    std::vector<std::string> kis;
+    for (const auto & ki : m_selectedInputs) {
+        kis.push_back(ki);
+    }
+    return m_walletImpl->viewOnlyBalance(accountIndex, kis);
 }
 
 void Wallet::updateBalance() {
@@ -507,20 +519,69 @@ void Wallet::onWalletPassphraseNeeded(bool on_device) {
 
 // #################### Import / Export ####################
 
+void Wallet::setForceKeyImageSync(bool enabled) {
+    m_forceKeyImageSync = enabled;
+}
+
+bool Wallet::hasUnknownKeyImages() const {
+    return m_walletImpl->hasUnknownKeyImages();
+}
+
+bool Wallet::keyImageSyncNeeded(quint64 amount, bool sendAll) const {
+    if (m_forceKeyImageSync) {
+        return true;
+    }
+
+    if (!this->viewOnly()) {
+        return false;
+    }
+    
+    if (sendAll) {
+        return this->hasUnknownKeyImages();
+    }
+
+    // 0.001 XMR to account for tx fee
+    return ((amount + WalletManager::amountFromDouble(0.001)) > this->viewOnlyBalance(this->currentSubaddressAccount()));
+}
+
 bool Wallet::exportKeyImages(const QString& path, bool all) {
     return m_walletImpl->exportKeyImages(path.toStdString(), all);
 }
 
+bool Wallet::exportKeyImagesToStr(std::string &keyImages, bool all) {
+    return m_walletImpl->exportKeyImagesToStr(keyImages, all);
+}
+
+bool Wallet::exportKeyImagesForOutputsFromStr(const std::string &outputs, std::string &keyImages) {
+    return m_walletImpl->exportKeyImagesForOutputsFromStr(outputs, keyImages);
+}
+
 bool Wallet::importKeyImages(const QString& path) {
-    return m_walletImpl->importKeyImages(path.toStdString());
+    bool r = m_walletImpl->importKeyImages(path.toStdString());
+    this->coins()->refresh();
+    return r;
+}
+
+bool Wallet::importKeyImagesFromStr(const std::string &keyImages) {
+    bool r = m_walletImpl->importKeyImagesFromStr(keyImages);
+    this->coins()->refresh();
+    return r;
 }
 
 bool Wallet::exportOutputs(const QString& path, bool all) {
     return m_walletImpl->exportOutputs(path.toStdString(), all);
 }
 
+bool Wallet::exportOutputsToStr(std::string& outputs, bool all) {
+    return m_walletImpl->exportOutputsToStr(outputs, all);
+}
+
 bool Wallet::importOutputs(const QString& path) {
     return m_walletImpl->importOutputs(path.toStdString());
+}
+
+bool Wallet::importOutputsFromStr(const std::string &outputs) {
+    return m_walletImpl->importOutputsFromStr(outputs);
 }
 
 bool Wallet::importTransaction(const QString& txid) {
@@ -845,6 +906,12 @@ UnsignedTransaction * Wallet::loadTxFile(const QString &fileName)
     return result;
 }
 
+UnsignedTransaction * Wallet::loadUnsignedTransactionFromStr(const std::string &data) {
+    Monero::UnsignedTransaction *ptImpl = m_walletImpl->loadUnsignedTxFromStr(data);
+    UnsignedTransaction *result = new UnsignedTransaction(ptImpl, m_walletImpl, this);
+    return result;
+}
+
 UnsignedTransaction * Wallet::loadTxFromBase64Str(const QString &unsigned_tx)
 {
     Monero::UnsignedTransaction *ptImpl = m_walletImpl->loadUnsignedTxFromBase64Str(unsigned_tx.toStdString());
@@ -856,6 +923,13 @@ PendingTransaction * Wallet::loadSignedTxFile(const QString &fileName)
 {
     qDebug() << "Tying to load " << fileName;
     Monero::PendingTransaction *ptImpl = m_walletImpl->loadSignedTx(fileName.toStdString());
+    PendingTransaction *result = new PendingTransaction(ptImpl, this);
+    return result;
+}
+
+PendingTransaction * Wallet::loadSignedTxFromStr(const std::string &data)
+{
+    Monero::PendingTransaction *ptImpl = m_walletImpl->loadSignedTxFromStr(data);
     PendingTransaction *result = new PendingTransaction(ptImpl, this);
     return result;
 }
@@ -1149,7 +1223,9 @@ bool Wallet::createViewOnly(const QString &path, const QString &password) const 
 bool Wallet::rescanSpent() {
     QMutexLocker locker(&m_asyncMutex);
 
-    return m_walletImpl->rescanSpent();
+    bool r = m_walletImpl->rescanSpent();
+    m_coins->refresh();
+    return r;
 }
 
 void Wallet::setNewWallet() {

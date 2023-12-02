@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QFontDatabase>
 #include <QTcpSocket>
+#include <QFileDialog>
 
 #include "constants.h"
 #include "networktype.h"
@@ -109,6 +110,28 @@ QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, 
         }
     }
     return rtn;
+}
+
+QString getSaveFileName(QWidget* parent, const QString &caption, const QString &filename, const QString &filter) {
+    QDir lastPath{conf()->get(Config::lastPath).toString()};
+    QString fn = QFileDialog::getSaveFileName(parent, caption, lastPath.filePath(filename), filter);
+    if (fn.isEmpty()) {
+        return {};
+    }
+    QFileInfo fileInfo(fn);
+    conf()->set(Config::lastPath, fileInfo.absolutePath());
+    return fn;
+}
+
+QString getOpenFileName(QWidget* parent, const QString& caption, const QString& filter) {
+    QString lastPath = conf()->get(Config::lastPath).toString();
+    QString fn = QFileDialog::getOpenFileName(parent, caption, lastPath, filter);
+    if (fn.isEmpty()) {
+        return {};
+    }
+    QFileInfo fileInfo(fn);
+    conf()->set(Config::lastPath, fileInfo.absolutePath());
+    return fn;
 }
 
 bool dirExists(const QString &path) {
@@ -643,6 +666,20 @@ void showMsg(QWidget *parent, QMessageBox::Icon icon, const QString &windowTitle
 
 void showMsg(const Message &m) {
     showMsg(m.parent, QMessageBox::Warning, "Error", m.title, m.description, m.helpItems, m.doc, m.highlight);
+}
+
+void openDir(QWidget *parent, const QString &message, const QString &dir) {
+    QMessageBox openDir{parent};
+    openDir.setWindowTitle("Info");
+    openDir.setText(message);
+    QPushButton *copy = openDir.addButton("Open directory", QMessageBox::HelpRole);
+    openDir.addButton(QMessageBox::Ok);
+    openDir.setDefaultButton(QMessageBox::Ok);
+    openDir.exec();
+
+    if (openDir.clickedButton() == copy) {
+        QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
+    }
 }
 
 QWindow *windowForQObject(QObject* object) {

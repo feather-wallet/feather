@@ -20,6 +20,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::firstRun, {QS("firstRun"), true}},
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
+        {Config::warnOnKiImport,{QS("warnOnKiImport"), true}},
         {Config::logLevel,{QS("logLevel"), 0}},
 
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},
@@ -29,6 +30,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::geometry, {QS("geometry"), {}}},
         {Config::windowState, {QS("windowState"), {}}},
         {Config::GUI_HistoryViewState, {QS("GUI_HistoryViewState"), {}}},
+        {Config::geometryOTSWizard, {QS("geometryOTSWizard"), {}}},
 
         // Wallets
         {Config::walletDirectory,{QS("walletDirectory"), ""}},
@@ -82,6 +84,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::offlineMode, {QS("offlineMode"), false}},
 
         {Config::multiBroadcast, {QS("multiBroadcast"), true}},
+        {Config::offlineTxSigningMethod, {QS("offlineTxSigningMethod"), Config::OTSMethod::UnifiedResources}},
+        {Config::offlineTxSigningForceKISync, {QS("offlineTxSigningForceKISync"), false}},
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},
         {Config::hideNotifications, {QS("hideNotifications"), false}},
@@ -94,6 +98,14 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::localMoneroFrontend, {QS("localMoneroFrontend"), "https://localmonero.co"}},
         {Config::bountiesFrontend, {QS("bountiesFrontend"), "https://bounties.monero.social"}},
+        {Config::lastPath, {QS("lastPath"), QDir::homePath()}},
+
+        {Config::URmsPerFragment, {QS("URmsPerFragment"), 80}},
+        {Config::URfragmentLength, {QS("URfragmentLength"), 150}},
+        {Config::URfountainCode, {QS("URfountainCode"), false}},
+
+        {Config::cameraManualExposure, {QS("cameraManualExposure"), false}},
+        {Config::cameraExposureTime, {QS("cameraExposureTime"), 10}},
 
         {Config::fiatSymbols, {QS("fiatSymbols"), QStringList{"USD", "EUR", "GBP", "CAD", "AUD", "RUB"}}},
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
