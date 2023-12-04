@@ -12,6 +12,7 @@ TransactionRow::TransactionRow()
         , m_failed(false)
         , m_coinbase(false)
         , m_amount(0)
+        , m_balanceDelta(0)
         , m_fee(0)
         , m_blockHeight(0)
         , m_subaddrAccount(0)
@@ -41,15 +42,9 @@ bool TransactionRow::isCoinbase() const
     return m_coinbase;
 }
 
-quint64 TransactionRow::balanceDelta() const
+qint64 TransactionRow::balanceDelta() const
 {
-    if (m_direction == Direction_In) {
-        return m_amount;
-    }
-    else if (m_direction == Direction_Out) {
-        return m_amount + m_fee;
-    }
-    return m_amount;
+    return m_balanceDelta;
 }
 
 double TransactionRow::amount() const
@@ -58,7 +53,7 @@ double TransactionRow::amount() const
     return displayAmount().toDouble();
 }
 
-quint64 TransactionRow::atomicAmount() const
+qint64 TransactionRow::atomicAmount() const
 {
     return m_amount;
 }

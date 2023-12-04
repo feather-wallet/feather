@@ -24,6 +24,7 @@ public:
         firstRun,
         warnOnStagenet,
         warnOnTestnet,
+        warnOnKiImport,
 
         homeWidget,
         donateBeg,
@@ -32,6 +33,7 @@ public:
         geometry,
         windowState,
         GUI_HistoryViewState,
+        geometryOTSWizard,
 
         // Wallets
         walletDirectory, // Directory where wallet files are stored
@@ -118,12 +120,24 @@ public:
 
         // Transactions
         multiBroadcast,
+        offlineTxSigningMethod,
+        offlineTxSigningForceKISync,
 
         // Misc
         blockExplorer,
         redditFrontend,
         localMoneroFrontend,
         bountiesFrontend, // unused
+        lastPath,
+        
+        // UR
+        URmsPerFragment,
+        URfragmentLength,
+        URfountainCode,
+
+        // Camera
+        cameraManualExposure,
+        cameraExposureTime,
 
         fiatSymbols,
         cryptoSymbols,
@@ -153,6 +167,11 @@ public:
         socks5
     };
 
+    enum OTSMethod {
+        UnifiedResources = 0,
+        FileTransfer
+    };
+    
     ~Config() override;
     QVariant get(ConfigKey key);
     QString getFileName();

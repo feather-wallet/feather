@@ -117,7 +117,7 @@ QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const
                 case Column::FiatAmount:
                 case Column::Amount:
                 {
-                    if (tInfo.direction() == TransactionRow::Direction_Out) {
+                    if (tInfo.balanceDelta() < 0) {
                         result = QVariant(QColor("#BC1E1E"));
                     }
                 }
@@ -159,7 +159,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tIn
                 return tInfo.balanceDelta();
             }
             QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
-            amount = (tInfo.direction() == TransactionRow::Direction_Out) ? "-" + amount : "+" + amount;
+            amount = (tInfo.balanceDelta() < 0) ? amount : "+" + amount;
             return amount;
         }
         case Column::TxID: {
@@ -172,7 +172,7 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tIn
                 return QString("?");
             }
 
-            double usd_amount = usd_price * (tInfo.balanceDelta() / constants::cdiv);
+            double usd_amount = usd_price * (abs(tInfo.balanceDelta()) / constants::cdiv);
 
             QString preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
             if (preferredFiatCurrency != "USD") {

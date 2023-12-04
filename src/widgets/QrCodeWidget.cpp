@@ -12,6 +12,10 @@ QrCodeWidget::QrCodeWidget(QWidget *parent) : QWidget(parent)
 }
 
 void QrCodeWidget::setQrCode(QrCode *qrCode) {
+    if (m_qrcode) {
+        delete m_qrcode;
+    }
+
     m_qrcode = qrCode;
 
     int k = m_qrcode->width();

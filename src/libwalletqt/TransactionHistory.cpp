@@ -91,6 +91,7 @@ void TransactionHistory::refresh()
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_coinbase = pd.m_coinbase;
             t->m_amount = pd.m_amount;
+            t->m_balanceDelta = pd.m_amount;
             t->m_fee = pd.m_fee;
             t->m_direction = TransactionRow::Direction_In;
             t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
@@ -129,16 +130,17 @@ void TransactionHistory::refresh()
             uint64_t change = pd.m_change == (uint64_t)-1 ? 0 : pd.m_change; // change may not be known
             uint64_t fee = pd.m_amount_in - pd.m_amount_out;
 
-
             std::string payment_id = epee::string_tools::pod_to_hex(i->second.m_payment_id);
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-
             auto* t = new TransactionRow();
             t->m_paymentId = QString::fromStdString(payment_id);
-            t->m_amount = pd.m_amount_in - change - fee;
+
+            t->m_amount = pd.m_amount_out - change;
+            t->m_balanceDelta = change - pd.m_amount_in;
             t->m_fee = fee;
+
             t->m_direction = TransactionRow::Direction_Out;
             t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(hash));
             t->m_blockHeight = pd.m_block_height;
@@ -180,6 +182,7 @@ void TransactionHistory::refresh()
             const crypto::hash &hash = i->first;
             uint64_t amount = pd.m_amount_in;
             uint64_t fee = amount - pd.m_amount_out;
+            uint64_t change = pd.m_change == (uint64_t)-1 ? 0 : pd.m_change;
             std::string payment_id = epee::string_tools::pod_to_hex(i->second.m_payment_id);
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
@@ -187,8 +190,11 @@ void TransactionHistory::refresh()
 
             auto *t = new TransactionRow();
             t->m_paymentId = QString::fromStdString(payment_id);
-            t->m_amount = amount - pd.m_change - fee;
+
+            t->m_amount = pd.m_amount_out - change;
+            t->m_balanceDelta = change - pd.m_amount_in;
             t->m_fee = fee;
+
             t->m_direction = TransactionRow::Direction_Out;
             t->m_failed = is_failed;
             t->m_pending = true;
@@ -233,6 +239,7 @@ void TransactionHistory::refresh()
             auto *t = new TransactionRow();
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_amount = pd.m_amount;
+            t->m_balanceDelta = pd.m_amount;
             t->m_direction = TransactionRow::Direction_In;
             t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
             t->m_blockHeight = pd.m_block_height;

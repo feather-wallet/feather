@@ -24,7 +24,7 @@
     <normaloff>:/assets/images/appicons/64x64.png</normaloff>:/assets/images/appicons/64x64.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout">
+   <layout class="QVBoxLayout" name="verticalLayout_14">
     <property name="leftMargin">
      <number>0</number>
     </property>
@@ -37,13 +37,10 @@
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <property name="horizontalSpacing">
-     <number>12</number>
-    </property>
-    <item row="0" column="0">
+    <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="page_wallet">
        <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -468,6 +465,235 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="page_offline">
+       <layout class="QVBoxLayout" name="verticalLayout_13">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
+        <item>
+         <widget class="QTabWidget" name="tabWidget_2">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="tab_5">
+           <attribute name="icon">
+            <iconset resource="assets.qrc">
+             <normaloff>:/assets/images/network.png</normaloff>:/assets/images/network.png</iconset>
+           </attribute>
+           <attribute name="title">
+            <string>Airgapped signing</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_16">
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>Feather supports two airgapped transaction signing methods:</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QGroupBox" name="groupBox">
+              <property name="title">
+               <string/>
+              </property>
+              <layout class="QVBoxLayout" name="verticalLayout_15">
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_5">
+                 <item>
+                  <widget class="QRadioButton" name="radio_airgapUR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                   <property name="checked">
+                    <bool>true</bool>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="ClickableLabel" name="label_airgapUR">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use a webcam to scan &lt;span style=&quot; font-weight:700;&quot;&gt;animated QR codes&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_6">
+                 <item>
+                  <widget class="QRadioButton" name="radio_airgapFiles">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string/>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="ClickableLabel" name="label_airgapFiles">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="text">
+                    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Transfer &lt;span style=&quot; font-weight:700;&quot;&gt;files&lt;/span&gt; between computers (using a flash drive)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_3">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_5">
+              <property name="text">
+               <string>To initiate an airgapped transaction, try to send a transaction using your online/view-only wallet. Then click 'Sign a transaction..' below to begin the signing process.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Follow through the steps in the wizard. You may need to transfer/scan multiple files/QR codes.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Fixed</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>10</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_4">
+              <item>
+               <widget class="QPushButton" name="btn_help">
+                <property name="text">
+                 <string>Help</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <spacer name="horizontalSpacer_2">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>40</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_checkAddress">
+                <property name="text">
+                 <string>Show address</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="btn_signTransaction">
+                <property name="text">
+                 <string>Sign a transaction..</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <spacer name="verticalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>0</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QLabel" name="label">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+              <property name="text">
+               <string>If you're unsure what this is, disable 'Offline mode' by going to Settings → Network → Offline.</string>
+              </property>
+              <property name="wordWrap">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -521,28 +747,11 @@
      <property name="title">
       <string>Advanced</string>
      </property>
-     <widget class="QMenu" name="menuExport">
-      <property name="title">
-       <string>Export</string>
-      </property>
-      <addaction name="actionExportOutputs"/>
-      <addaction name="actionExportKeyImages"/>
-     </widget>
-     <widget class="QMenu" name="menuImport">
-      <property name="title">
-       <string>Import</string>
-      </property>
-      <addaction name="actionImportOutputs"/>
-      <addaction name="actionImportKeyImages"/>
-     </widget>
      <addaction name="actionStore_wallet"/>
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
      <addaction name="actionRescan_spent"/>
      <addaction name="actionWallet_cache_debug"/>
-     <addaction name="separator"/>
-     <addaction name="menuExport"/>
-     <addaction name="menuImport"/>
     </widget>
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
@@ -560,13 +769,6 @@
     <property name="title">
      <string>Tools</string>
     </property>
-    <widget class="QMenu" name="menuLoad_transaction">
-     <property name="title">
-      <string>Load unsigned transaction</string>
-     </property>
-     <addaction name="actionLoadUnsignedTxFromFile"/>
-     <addaction name="actionLoadUnsignedTxFromClipboard"/>
-    </widget>
     <widget class="QMenu" name="menuLoad_signed_transaction">
      <property name="title">
       <string>Broadcast transaction</string>
@@ -577,9 +779,11 @@
     <addaction name="actionSignVerify"/>
     <addaction name="actionVerifyTxProof"/>
     <addaction name="separator"/>
-    <addaction name="menuLoad_transaction"/>
+    <addaction name="actionKeyImageSync"/>
     <addaction name="menuLoad_signed_transaction"/>
     <addaction name="actionImport_transaction"/>
+    <addaction name="separator"/>
+    <addaction name="actionTransmitOverUR"/>
     <addaction name="separator"/>
     <addaction name="actionPay_to_many"/>
     <addaction name="actionAddress_checker"/>
@@ -948,6 +1152,16 @@
     <string>Check for updates</string>
    </property>
   </action>
+  <action name="actionKeyImageSync">
+   <property name="text">
+    <string>Offline transaction signing</string>
+   </property>
+  </action>
+  <action name="actionTransmitOverUR">
+   <property name="text">
+    <string>Transmit over UR</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -980,6 +1194,11 @@
    <extends>QWidget</extends>
    <header>plugins/bounties/BountiesWidget.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>ClickableLabel</class>
+   <extends>QLabel</extends>
+   <header>components.h</header>
   </customwidget>
  </customwidgets>
  <resources>

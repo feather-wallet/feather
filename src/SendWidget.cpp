@@ -14,6 +14,7 @@
 #include "libwalletqt/WalletManager.h"
 
 #if defined(WITH_SCANNER)
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
 #include "qrcode/scanner/QrCodeScanDialog.h"
 #include <QMediaDevices>
 #endif
@@ -132,9 +133,9 @@ void SendWidget::scanClicked() {
         return;
     }
 
-    auto dialog = new QrCodeScanDialog(this);
+    auto dialog = new QrCodeScanDialog(this, false);
     dialog->exec();
-    ui->lineAddress->setText(dialog->decodedString);
+    ui->lineAddress->setText(dialog->decodedString());
     dialog->deleteLater();
 #else
     Utils::showError(this, "Can't open QR scanner", "Feather was built without webcam QR scanner support");
@@ -222,6 +223,24 @@ void SendWidget::sendClicked() {
                                                                        "Spendable balance: %1").arg(WalletManager::displayAmount(unlocked_balance)));
         return;
     }
+
+    // TODO: allow using file-only airgapped signing without scanner
+
+    if (m_wallet->keyImageSyncNeeded(amount, sendAll)) {
+        #if defined(WITH_SCANNER)
+        OfflineTxSigningWizard wizard(this, m_wallet);
+        auto r = wizard.exec();
+        m_wallet->setForceKeyImageSync(false);
+
+        if (r == QDialog::Rejected) {
+            return;
+        }
+        #else
+        Utils::showError(this, "Can't open offline transaction signing wizard", "Feather was built without webcam QR scanner support");
+        return;
+        #endif
+    }
+
     m_wallet->createTransaction(recipient, amount, description, sendAll);
 }
 

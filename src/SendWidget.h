@@ -50,6 +50,7 @@ private slots:
 private:
     void setupComboBox();
     double amountDouble();
+    bool keyImageSync(bool sendAll, quint64 amount);
 
     quint64 amount();
     double conversionAmount();

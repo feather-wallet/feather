@@ -13,6 +13,8 @@
 
 #include "QrScanThread.h"
 
+#include <bcur/ur-decoder.hpp>
+
 namespace Ui {
     class QrCodeScanDialog;
 }
@@ -22,25 +24,13 @@ class QrCodeScanDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit QrCodeScanDialog(QWidget *parent);
+    explicit QrCodeScanDialog(QWidget *parent, bool scan_ur = false);
     ~QrCodeScanDialog() override;
 
-    QString decodedString = "";
-
-private slots:
-    void onCameraSwitched(int index);
-    void onDecoded(const QString &data);
+    QString decodedString();
 
 private:
-    QImage videoFrameToImage(const QVideoFrame &videoFrame);
-    void handleFrameCaptured(const QVideoFrame &videoFrame);
-
     QScopedPointer<Ui::QrCodeScanDialog> ui;
-
-    QrScanThread *m_thread;
-    QScopedPointer<QCamera> m_camera;
-    QMediaCaptureSession m_captureSession;
-    QVideoSink m_sink;
 };
 
 

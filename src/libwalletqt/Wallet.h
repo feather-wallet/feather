@@ -53,6 +53,10 @@ struct SubaddressIndex {
         return major == 0 && minor == 0;
     }
 
+    bool isChange() const {
+        return minor == 0;
+    }
+
     int major;
     int minor;
 };
@@ -133,6 +137,8 @@ public:
     //! return true if deterministic keys
     bool isDeterministic() const;
 
+    QString walletName() const;
+    
     // ##### Balance #####
     //! returns balance
     quint64 balance() const;
@@ -143,6 +149,8 @@ public:
     quint64 unlockedBalance() const;
     quint64 unlockedBalance(quint32 accountIndex) const;
     quint64 unlockedBalanceAll() const;
+    
+    quint64 viewOnlyBalance(quint32 accountIndex) const;
 
     void updateBalance();
 
@@ -235,13 +243,24 @@ public:
     void onWalletPassphraseNeeded(bool on_device) override;
 
     // ##### Import / Export #####
+    void setForceKeyImageSync(bool enabled);
+    bool hasUnknownKeyImages() const;
+    bool keyImageSyncNeeded(quint64 amount, bool sendAll) const;
+    
     //! export/import key images
     bool exportKeyImages(const QString& path, bool all = false);
+    bool exportKeyImagesToStr(std::string &keyImages, bool all = false);
+    bool exportKeyImagesForOutputsFromStr(const std::string &outputs, std::string &keyImages);
+    
     bool importKeyImages(const QString& path);
+    bool importKeyImagesFromStr(const std::string &keyImages);
 
     //! export/import outputs
     bool exportOutputs(const QString& path, bool all = false);
+    bool exportOutputsToStr(std::string& outputs, bool all);
+    
     bool importOutputs(const QString& path);
+    bool importOutputsFromStr(const std::string &outputs);
 
     //! import a transaction
     bool importTransaction(const QString& txid);
@@ -315,12 +334,14 @@ public:
 
     //! Sign a transfer from file
     UnsignedTransaction * loadTxFile(const QString &fileName);
-
+    UnsignedTransaction * loadUnsignedTransactionFromStr(const std::string &data);
+    
     //! Load an unsigned transaction from a base64 encoded string
     UnsignedTransaction * loadTxFromBase64Str(const QString &unsigned_tx);
 
     //! Load a signed transaction from file
     PendingTransaction * loadSignedTxFile(const QString &fileName);
+    PendingTransaction * loadSignedTxFromStr(const std::string &data);
 
     //! Submit a transfer from file
     bool submitTxFile(const QString &fileName) const;
@@ -490,6 +511,7 @@ private:
     bool m_useSSL;
     bool donationSending = false;
     bool m_newWallet = false;
+    bool m_forceKeyImageSync = false;
 
     QTimer *m_storeTimer = nullptr;
     std::set<std::string> m_selectedInputs;

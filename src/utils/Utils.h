@@ -45,6 +45,9 @@ namespace Utils
     bool pixmapWrite(const QString &path, const QPixmap &pixmap);
     QStringList fileFind(const QRegularExpression &pattern, const QString &baseDir, int level, int depth, int maxPerDir);
 
+    QString getSaveFileName(QWidget *parent, const QString &caption, const QString &filename, const QString &filter);
+    QString getOpenFileName(QWidget *parent, const QString &caption, const QString &filter);
+
     QString portablePath();
     bool isPortableMode();
     bool portableFileExists(const QString &dir);
@@ -106,6 +109,8 @@ namespace Utils
     void showWarning(QWidget *parent, const QString &title, const QString &description = "", const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
     void showMsg(QWidget *parent, QMessageBox::Icon icon, const QString &windowTitle, const QString &title, const QString &description, const QStringList &helpItems = {}, const QString &doc = "", const QString &highlight = "", const QString &link = "");
     void showMsg(const Message &message);
+
+    void openDir(QWidget *parent, const QString &message, const QString& dir);
 
     QWindow* windowForQObject(QObject* object);
 }

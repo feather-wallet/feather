@@ -69,8 +69,8 @@ QList<QVariant> PendingTransaction::subaddrIndices() const
     return result;
 }
 
-QByteArray PendingTransaction::unsignedTxToBin() const {
-    return QByteArray::fromStdString(m_pimpl->unsignedTxToBin());
+std::string PendingTransaction::unsignedTxToBin() const {
+    return m_pimpl->unsignedTxToBin();
 }
 
 QString PendingTransaction::unsignedTxToBase64() const

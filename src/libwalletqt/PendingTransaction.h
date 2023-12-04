@@ -40,7 +40,7 @@ public:
     QStringList txid() const;
     quint64 txCount() const;
     QList<QVariant> subaddrIndices() const;
-    QByteArray unsignedTxToBin() const;
+    std::string unsignedTxToBin() const;
     QString unsignedTxToBase64() const;
     QString signedTxToHex(int index) const;
     void refresh();

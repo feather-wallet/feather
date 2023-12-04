@@ -7,8 +7,10 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QCheckBox>
 
 #include "constants.h"
+#include "dialog/AddressCheckerIndexDialog.h"
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
 #include "dialog/PasswordDialog.h"
@@ -33,6 +35,11 @@
 #include "utils/WebsocketNotifier.h"
 
 #include "wallet/wallet_errors.h"
+
+#ifdef WITH_SCANNER
+#include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
+#include "dialog/URDialog.h"
+#endif
 
 #ifdef CHECK_UPDATES
 #include "utils/updater/UpdateDialog.h"
@@ -68,8 +75,11 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     this->initWidgets();
     this->initMenu();
     this->initHome();
+    this->initOffline();
     this->initWalletContext();
 
+    this->onOfflineMode(conf()->get(Config::offlineMode).toBool());
+    
     // Websocket notifier
     connect(websocketNotifier(), &WebsocketNotifier::CCSReceived, ui->ccsWidget->model(), &CCSModel::updateEntries);
     connect(websocketNotifier(), &WebsocketNotifier::BountyReceived, ui->bountiesWidget->model(), &BountiesModel::updateBounties);
@@ -279,14 +289,6 @@ void MainWindow::initMenu() {
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
 
-    // [Wallet] -> [Advanced] -> [Export]
-    connect(ui->actionExportOutputs,   &QAction::triggered, this, &MainWindow::exportOutputs);
-    connect(ui->actionExportKeyImages, &QAction::triggered, this, &MainWindow::exportKeyImages);
-
-    // [Wallet] -> [Advanced] -> [Import]
-    connect(ui->actionImportOutputs,   &QAction::triggered, this, &MainWindow::importOutputs);
-    connect(ui->actionImportKeyImages, &QAction::triggered, this, &MainWindow::importKeyImages);
-
     // [Wallet] -> [History]
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
 
@@ -344,15 +346,19 @@ void MainWindow::initMenu() {
     // [Tools]
     connect(ui->actionSignVerify,                  &QAction::triggered, this, &MainWindow::menuSignVerifyClicked);
     connect(ui->actionVerifyTxProof,               &QAction::triggered, this, &MainWindow::menuVerifyTxProof);
-    connect(ui->actionLoadUnsignedTxFromFile,      &QAction::triggered, this, &MainWindow::loadUnsignedTx);
-    connect(ui->actionLoadUnsignedTxFromClipboard, &QAction::triggered, this, &MainWindow::loadUnsignedTxFromClipboard);
+    connect(ui->actionKeyImageSync,                &QAction::triggered, this, &MainWindow::showKeyImageSyncWizard);
     connect(ui->actionLoadSignedTxFromFile,        &QAction::triggered, this, &MainWindow::loadSignedTx);
     connect(ui->actionLoadSignedTxFromText,        &QAction::triggered, this, &MainWindow::loadSignedTxFromText);
     connect(ui->actionImport_transaction,          &QAction::triggered, this, &MainWindow::importTransaction);
+    connect(ui->actionTransmitOverUR,              &QAction::triggered, this, &MainWindow::showURDialog);
     connect(ui->actionPay_to_many,                 &QAction::triggered, this, &MainWindow::payToMany);
     connect(ui->actionAddress_checker,             &QAction::triggered, this, &MainWindow::showAddressChecker);
     connect(ui->actionCalculator,                  &QAction::triggered, this, &MainWindow::showCalcWindow);
     connect(ui->actionCreateDesktopEntry,          &QAction::triggered, this, &MainWindow::onCreateDesktopEntry);
+
+    if (m_wallet->viewOnly()) {
+        ui->actionKeyImageSync->setText("Key image sync");
+    }
 
     // TODO: Allow creating desktop entry on Windows and Mac
 #if defined(Q_OS_WIN) || defined(Q_OS_MACOS)
@@ -410,6 +416,48 @@ void MainWindow::initHome() {
     connect(ui->revuoWidget, &RevuoWidget::donate, [this](const QString &address, const QString &description){
         m_sendWidget->fill(address, description);
         ui->tabWidget->setCurrentIndex(Tabs::SEND);
+    });
+}
+
+void MainWindow::initOffline() {
+    // TODO: check if we have any cameras available
+
+    connect(ui->btn_help, &QPushButton::clicked, [this] {
+        windowManager()->showDocs(this, "offline_tx_signing");
+    });
+    connect(ui->btn_checkAddress, &QPushButton::clicked, [this]{
+        AddressCheckerIndexDialog dialog{m_wallet, this};
+        dialog.exec();
+    });
+    connect(ui->btn_signTransaction, &QPushButton::clicked, [this] {
+        this->showKeyImageSyncWizard();
+    });
+
+    switch (conf()->get(Config::offlineTxSigningMethod).toInt()) {
+        case OfflineTxSigningWizard::Method::FILES:
+            ui->radio_airgapFiles->setChecked(true);
+            break;
+        default:
+            ui->radio_airgapUR->setChecked(true);
+    }
+
+    // We can't use rich text for radio buttons
+    connect(ui->label_airgapUR, &ClickableLabel::clicked, [this] {
+        ui->radio_airgapUR->setChecked(true);
+    });
+    connect(ui->label_airgapFiles, &ClickableLabel::clicked, [this] {
+        ui->radio_airgapFiles->setChecked(true);
+    });
+
+    connect(ui->radio_airgapFiles, &QCheckBox::toggled, [this] (bool checked){
+        if (checked) {
+            conf()->set(Config::offlineTxSigningMethod, OfflineTxSigningWizard::Method::FILES);
+        }
+    });
+    connect(ui->radio_airgapUR, &QCheckBox::toggled, [this](bool checked) {
+        if (checked) {
+            conf()->set(Config::offlineTxSigningMethod, OfflineTxSigningWizard::Method::UR);
+        }
     });
 }
 
@@ -619,11 +667,22 @@ void MainWindow::onProxySettingsChanged() {
 }
 
 void MainWindow::onOfflineMode(bool offline) {
-    if (!m_wallet) {
+    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
+    m_wallet->setOffline(offline);
+
+    if (m_wallet->viewOnly()) {
         return;
     }
-    m_wallet->setOffline(offline);
-    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
+
+    if (ui->stackedWidget->currentIndex() != Stack::LOCKED) {
+        ui->stackedWidget->setCurrentIndex(offline ? Stack::OFFLINE: Stack::WALLET);
+    }
+
+    ui->actionPay_to_many->setVisible(!offline);
+    ui->menuView->setDisabled(offline);
+
+    m_statusLabelBalance->setVisible(!offline);
+    m_statusBtnProxySettings->setVisible(!offline);
 }
 
 void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
@@ -665,7 +724,7 @@ void MainWindow::onConnectionStatusChanged(int status)
     QIcon icon;
     if (conf()->get(Config::offlineMode).toBool()) {
         icon = icons()->icon("status_offline.svg");
-        this->setStatusText("Offline");
+        this->setStatusText("Offline mode");
     } else {
         switch(status){
             case Wallet::ConnectionStatus_Disconnected:
@@ -853,8 +912,31 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 
     m_wallet->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
+    // Offline transaction signing
+    if (m_wallet->viewOnly()) {
+#ifdef WITH_SCANNER
+        OfflineTxSigningWizard wizard(this, m_wallet, tx);
+        wizard.exec();
+        
+        if (!wizard.readyToCommit()) {
+            return;
+        } else {
+            tx = wizard.signedTx();
+        }
+
+        if (tx->txCount() == 0) {
+            Utils::showError(this, "Failed to load transaction", "No transactions were found", {"You have found a bug. Please contact the developers."}, "report_an_issue");
+            m_wallet->disposeTransaction(tx);
+            return;
+        }
+#else
+        Utils::showError(this, "Can't open offline transaction signing wizard", "Feather was built without webcam QR scanner support");
+        return;
+#endif
+    }
+
     // Show advanced dialog on multi-destination transactions
-    if (address.size() > 1 || m_wallet->viewOnly()) {
+    if (address.size() > 1) {
         TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
         dialog_adv.setTransaction(tx, !m_wallet->viewOnly());
         dialog_adv.exec();
@@ -884,7 +966,11 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
 
 void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid) {
     if (!success) {
-        Utils::showError(this, "Failed to send transaction", tx->errorString());
+        QString error = tx->errorString();
+        if (m_wallet->viewOnly() && error.contains("double spend")) {
+            m_wallet->setForceKeyImageSync(true);
+        }
+        Utils::showError(this, "Failed to send transaction", error);
         return;
     }
 
@@ -962,6 +1048,29 @@ void MainWindow::showKeysDialog() {
 void MainWindow::showViewOnlyDialog() {
     ViewOnlyDialog dialog{m_wallet, this};
     dialog.exec();
+}
+
+void MainWindow::showKeyImageSyncWizard() {
+#ifdef WITH_SCANNER
+    OfflineTxSigningWizard wizard{this, m_wallet};
+    wizard.exec();
+    
+    if (wizard.readyToSign()) {
+        TxConfAdvDialog dialog{m_wallet, "", this, true};
+        dialog.setUnsignedTransaction(wizard.unsignedTransaction());
+        auto r = dialog.exec();
+
+        if (r != QDialog::Accepted) {
+            return;
+        }
+
+        wizard.setStartId(OfflineTxSigningWizard::Page_ExportSignedTx);
+        wizard.restart();
+        wizard.exec();
+    }
+#else
+    Utils::showError(this, "Can't open offline transaction signing wizard", "Feather was built without webcam QR scanner support");
+#endif
 }
 
 void MainWindow::menuHwDeviceClicked() {
@@ -1204,81 +1313,9 @@ void MainWindow::showAddressChecker() {
     }
 }
 
-void MainWindow::exportKeyImages() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save key images to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Key Images (*_keyImages)");
-    if (fn.isEmpty()) return;
-    if (!fn.endsWith("_keyImages")) fn += "_keyImages";
-    bool r = m_wallet->exportKeyImages(fn, true);
-    if (!r) {
-        Utils::showError(this, "Failed to export key images", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully exported key images");
-    }
-}
-
-void MainWindow::importKeyImages() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import key image file", QDir::homePath(), "Key Images (*_keyImages);;All Files (*)");
-    if (fn.isEmpty()) return;
-    bool r = m_wallet->importKeyImages(fn);
-    if (!r) {
-        Utils::showError(this, "Failed to import key images", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully imported key images");
-        m_wallet->refreshModels();
-    }
-}
-
-void MainWindow::exportOutputs() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save outputs to file", QString("%1/%2_%3").arg(QDir::homePath(), this->walletName(), QString::number(QDateTime::currentSecsSinceEpoch())), "Outputs (*_outputs)");
-    if (fn.isEmpty()) return;
-    if (!fn.endsWith("_outputs")) fn += "_outputs";
-    bool r = m_wallet->exportOutputs(fn, true);
-    if (!r) {
-        Utils::showError(this, "Failed to export outputs", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully exported outputs.");
-    }
-}
-
-void MainWindow::importOutputs() {
-    QString fn = QFileDialog::getOpenFileName(this, "Import outputs file", QDir::homePath(), "Outputs (*_outputs);;All Files (*)");
-    if (fn.isEmpty()) return;
-    bool r = m_wallet->importOutputs(fn);
-    if (!r) {
-        Utils::showError(this, "Failed to import outputs", m_wallet->errorString());
-    } else {
-        Utils::showInfo(this, "Successfully imported outputs");
-        m_wallet->refreshModels();
-    }
-}
-
-void MainWindow::loadUnsignedTx() {
-    QString fn = QFileDialog::getOpenFileName(this, "Select transaction to load", QDir::homePath(), "Transaction (*unsigned_monero_tx);;All Files (*)");
-    if (fn.isEmpty()) return;
-    UnsignedTransaction *tx = m_wallet->loadTxFile(fn);
-    auto err = m_wallet->errorString();
-    if (!err.isEmpty()) {
-        Utils::showError(this, "Failed to load transaction", err);
-        return;
-    }
-
-    this->createUnsignedTxDialog(tx);
-}
-
-void MainWindow::loadUnsignedTxFromClipboard() {
-    QString unsigned_tx = Utils::copyFromClipboard();
-    if (unsigned_tx.isEmpty()) {
-        Utils::showError(this, "Unable to load unsigned transaction", "Clipboard is empty");
-        return;
-    }
-    UnsignedTransaction *tx = m_wallet->loadTxFromBase64Str(unsigned_tx);
-    auto err = m_wallet->errorString();
-    if (!err.isEmpty()) {
-        Utils::showError(this, "Unable to load unsigned transaction", err);
-        return;
-    }
-
-    this->createUnsignedTxDialog(tx);
+void MainWindow::showURDialog() {
+    URDialog dialog{this};
+    dialog.exec();
 }
 
 void MainWindow::loadSignedTx() {
@@ -1291,19 +1328,13 @@ void MainWindow::loadSignedTx() {
         return;
     }
 
-    TxConfAdvDialog dialog{m_wallet, "", this};
+    TxConfAdvDialog dialog{m_wallet, "", this, true};
     dialog.setTransaction(tx);
     dialog.exec();
 }
 
 void MainWindow::loadSignedTxFromText() {
     TxBroadcastDialog dialog{this, m_nodes};
-    dialog.exec();
-}
-
-void MainWindow::createUnsignedTxDialog(UnsignedTransaction *tx) {
-    TxConfAdvDialog dialog{m_wallet, "", this};
-    dialog.setUnsignedTransaction(tx);
     dialog.exec();
 }
 
@@ -1425,6 +1456,18 @@ void MainWindow::updateNetStats() {
 }
 
 void MainWindow::rescanSpent() {
+    QMessageBox warning{this};
+    warning.setWindowTitle("Warning");
+    warning.setText("Rescanning spent outputs reveals which outputs you own to the node. "
+                    "Make sure you are connected to a trusted node.\n\n"
+                    "Do you want to proceed?");
+    warning.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    
+    auto r = warning.exec();
+    if (r == QMessageBox::No) {
+        return;
+    }
+    
     if (!m_wallet->rescanSpent()) {
         Utils::showError(this, "Failed to rescan spent outputs", m_wallet->errorString());
     } else {
@@ -1773,6 +1816,7 @@ void MainWindow::unlockWallet(const QString &password) {
     this->statusBar()->show();
     this->menuBar()->show();
     ui->stackedWidget->setCurrentIndex(0);
+    this->onOfflineMode(conf()->get(Config::offlineMode).toBool());
 
     m_checkUserActivity.start();
 

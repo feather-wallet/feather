@@ -73,8 +73,11 @@ bool UnsignedTransaction::sign(const QString &fileName) const
 {
     if(!m_pimpl->sign(fileName.toStdString()))
         return false;
-    // export key images
-    return m_walletImpl->exportKeyImages(fileName.toStdString() + "_keyImages");
+    return true;
+}
+
+bool UnsignedTransaction::signToStr(std::string &data) const {
+    return m_pimpl->signToStr(data);
 }
 
 void UnsignedTransaction::setFilename(const QString &fileName)
