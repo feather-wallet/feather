@@ -973,6 +973,36 @@
          </item>
         </layout>
        </widget>
+       <widget class="QWidget" name="page_plugins">
+        <layout class="QVBoxLayout" name="verticalLayout_21">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="label_20">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:700;&quot;&gt;Plugins&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="PluginWidget" name="pluginWidget" native="true">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
        <widget class="QWidget" name="page_misc">
         <layout class="QVBoxLayout" name="verticalLayout_18">
          <property name="leftMargin">
@@ -1163,6 +1193,12 @@
    <class>NetworkProxyWidget</class>
    <extends>QWidget</extends>
    <header>widgets/NetworkProxyWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>PluginWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/PluginWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

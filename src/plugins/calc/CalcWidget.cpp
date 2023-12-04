@@ -6,7 +6,7 @@
 
 #include <QList>
 
-#include "dialog/CalcConfigDialog.h"
+#include "CalcConfigDialog.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"

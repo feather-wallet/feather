@@ -46,11 +46,7 @@ public:
         useOnionNodes,
 
         // Tabs
-        showTabHome,
-        showTabCoins,
-        showTabExchange,
-        showTabCalc,
-        showTabXMRig,
+        enabledTabs,
         showSearchbar,
         
         // Receive
@@ -141,6 +137,13 @@ public:
 
         fiatSymbols,
         cryptoSymbols,
+
+        enabledPlugins,
+        restartRequired,
+
+        // Tickers
+        tickers,
+        tickersShowFiatBalance,
     };
 
     enum PrivacyLevel {

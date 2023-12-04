@@ -43,11 +43,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
 
         // Tabs
-        {Config::showTabHome,{QS("showTabHome"), true}},
-        {Config::showTabCoins,{QS("showTabCoins"), false}},
-        {Config::showTabExchange, {QS("showTabExchange"), false}},
-        {Config::showTabXMRig,{QS("showTabXMRig"), false}},
-        {Config::showTabCalc,{QS("showTabCalc"), true}},
+        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc"}}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // Receive
@@ -120,7 +116,13 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
         {Config::torManagedPort, {QS("torManagedPort"), "19450"}},
         {Config::useLocalTor, {QS("useLocalTor"), false}},
-        {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}}
+        {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
+
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "reddit", "revuo", "localmonero", "calc", "xmrig"}}},
+        {Config::restartRequired, {QS("restartRequired"), false}},
+
+        {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
+        {Config::tickersShowFiatBalance, {QS("tickersShowFiatBalance"), true}},
 };
 
 

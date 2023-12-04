@@ -47,7 +47,9 @@ signals:
     void proxySettingsChanged();
     void websocketStatusChanged(bool enabled);
     void updateBalance();
+    void preferredFiatCurrencyChanged();
     void offlineMode(bool offline);
+    void pluginConfigured(const QString &id);
 
 public slots:
     void onProxySettingsChanged();

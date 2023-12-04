@@ -40,7 +40,7 @@
     <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="currentIndex">
-       <number>2</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page_wallet">
        <layout class="QVBoxLayout" name="verticalLayout_11">
@@ -67,148 +67,6 @@
             <height>16</height>
            </size>
           </property>
-          <widget class="QWidget" name="tabHome">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/tab_home.png</normaloff>:/assets/images/tab_home.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>Home</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_3">
-            <property name="bottomMargin">
-             <number>5</number>
-            </property>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <item>
-               <layout class="QHBoxLayout" name="tickerLayout"/>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="fiatTickerLayout"/>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QTabWidget" name="tabHomeWidget">
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <property name="documentMode">
-               <bool>true</bool>
-              </property>
-              <widget class="QWidget" name="tab">
-               <attribute name="title">
-                <string>Crowdfunding</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_6">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="CCSWidget" name="ccsWidget" native="true"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="tab_4">
-               <attribute name="title">
-                <string>Bounties</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_10">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="BountiesWidget" name="bountiesWidget" native="true"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="tab_2">
-               <attribute name="title">
-                <string>/r/Monero</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_7">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="RedditWidget" name="redditWidget" native="true"/>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="tab_3">
-               <attribute name="title">
-                <string>Revuo</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_9">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <widget class="RevuoWidget" name="revuoWidget" native="true"/>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-           </layout>
-          </widget>
           <widget class="QWidget" name="tabHistory">
            <attribute name="icon">
             <iconset resource="assets.qrc">
@@ -297,107 +155,6 @@
            <layout class="QVBoxLayout" name="verticalLayout_2">
             <item>
              <layout class="QVBoxLayout" name="coinsWidgetLayout"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tabCalc">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/gnome-calc.png</normaloff>:/assets/images/gnome-calc.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>Calc</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="CalcWidget" name="conversionWidget" native="true"/>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>40</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tabExchange">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/update.png</normaloff>:/assets/images/update.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>Exchange</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_8">
-            <property name="leftMargin">
-             <number>0</number>
-            </property>
-            <property name="topMargin">
-             <number>0</number>
-            </property>
-            <property name="rightMargin">
-             <number>0</number>
-            </property>
-            <property name="bottomMargin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QTabWidget" name="tabWidgetExchanges">
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="tabLocalMonero">
-               <attribute name="icon">
-                <iconset resource="assets.qrc">
-                 <normaloff>:/assets/images/localMonero_logo.png</normaloff>:/assets/images/localMonero_logo.png</iconset>
-               </attribute>
-               <attribute name="title">
-                <string>LocalMonero</string>
-               </attribute>
-               <layout class="QVBoxLayout" name="verticalLayout_4">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>0</number>
-                </property>
-                <item>
-                 <layout class="QVBoxLayout" name="localMoneroLayout"/>
-                </item>
-               </layout>
-              </widget>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tabXmrRig">
-           <attribute name="icon">
-            <iconset resource="assets.qrc">
-             <normaloff>:/assets/images/mining.png</normaloff>:/assets/images/mining.png</iconset>
-           </attribute>
-           <attribute name="title">
-            <string>Mining</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <layout class="QGridLayout" name="xmrRigLayout"/>
             </item>
            </layout>
           </widget>
@@ -787,7 +544,6 @@
     <addaction name="separator"/>
     <addaction name="actionPay_to_many"/>
     <addaction name="actionAddress_checker"/>
-    <addaction name="actionCalculator"/>
     <addaction name="actionCreateDesktopEntry"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
@@ -808,11 +564,9 @@
     <property name="title">
      <string>View</string>
     </property>
-    <addaction name="actionShow_Home"/>
+    <addaction name="actionPlaceholderBegin"/>
     <addaction name="actionShow_Coins"/>
-    <addaction name="actionShow_calc"/>
-    <addaction name="actionShow_Exchange"/>
-    <addaction name="actionShow_XMRig"/>
+    <addaction name="actionPlaceholderEnd"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Searchbar"/>
    </widget>
@@ -1162,39 +916,19 @@
     <string>Transmit over UR</string>
    </property>
   </action>
+  <action name="actionPlaceholderEnd">
+   <property name="text">
+    <string>Placeholder</string>
+   </property>
+  </action>
+  <action name="actionPlaceholderBegin">
+   <property name="text">
+    <string>PlaceholderBegin</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
-  <customwidget>
-   <class>CalcWidget</class>
-   <extends>QWidget</extends>
-   <header>CalcWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>CCSWidget</class>
-   <extends>QWidget</extends>
-   <header>plugins/ccs/CCSWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>RedditWidget</class>
-   <extends>QWidget</extends>
-   <header>plugins/reddit/RedditWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>RevuoWidget</class>
-   <extends>QWidget</extends>
-   <header>plugins/revuo/RevuoWidget.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>BountiesWidget</class>
-   <extends>QWidget</extends>
-   <header>plugins/bounties/BountiesWidget.h</header>
-   <container>1</container>
-  </customwidget>
   <customwidget>
    <class>ClickableLabel</class>
    <extends>QLabel</extends>

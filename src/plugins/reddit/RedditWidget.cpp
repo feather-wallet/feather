@@ -4,13 +4,12 @@
 #include "RedditWidget.h"
 #include "ui_RedditWidget.h"
 
-#include <QDesktopServices>
-#include <QStandardItemModel>
 #include <QTableWidget>
 
 #include "RedditModel.h"
 #include "utils/Utils.h"
 #include "utils/config.h"
+#include "utils/WebsocketNotifier.h"
 
 RedditWidget::RedditWidget(QWidget *parent)
         : QWidget(parent)
@@ -19,7 +18,13 @@ RedditWidget::RedditWidget(QWidget *parent)
         , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
-    ui->tableView->setModel(m_model);
+
+    m_proxyModel = new RedditProxyModel(this);
+    m_proxyModel->setSourceModel(m_model);
+
+    ui->tableView->setModel(m_proxyModel);
+    ui->tableView->setSortingEnabled(true);
+    ui->tableView->sortByColumn(2, Qt::DescendingOrder);
     this->setupTable();
 
     m_contextMenu->addAction("View thread", this, &RedditWidget::linkClicked);
@@ -29,14 +34,30 @@ RedditWidget::RedditWidget(QWidget *parent)
     connect(ui->tableView, &QTableView::doubleClicked, this, &RedditWidget::linkClicked);
 
     ui->tableView->verticalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-}
 
-RedditModel* RedditWidget::model() {
-    return m_model;
+    connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString& type, const QJsonValue& json) {
+        if (type == "reddit") {
+            QJsonArray reddit_data = json.toArray();
+            QList<QSharedPointer<RedditPost>> l;
+
+            for (auto &&entry: reddit_data) {
+                auto obj = entry.toObject();
+                auto redditPost = new RedditPost(
+                        obj.value("title").toString(),
+                        obj.value("author").toString(),
+                        obj.value("permalink").toString(),
+                        obj.value("comments").toInt());
+                QSharedPointer<RedditPost> r = QSharedPointer<RedditPost>(redditPost);
+                l.append(r);
+            }
+
+            m_model->updatePosts(l);
+        }
+    });
 }
 
 void RedditWidget::linkClicked() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = m_proxyModel->mapToSource(ui->tableView->currentIndex());
     auto post = m_model->post(index.row());
 
     if (post)
@@ -44,7 +65,7 @@ void RedditWidget::linkClicked() {
 }
 
 void RedditWidget::copyUrl() {
-    QModelIndex index = ui->tableView->currentIndex();
+    QModelIndex index = m_proxyModel->mapToSource(ui->tableView->currentIndex());
     auto post = m_model->post(index.row());
 
     if (post) {

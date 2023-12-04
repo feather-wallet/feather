@@ -15,6 +15,8 @@
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
 #include "WindowManager.h"
+#include "plugins/PluginRegistry.h"
+#include "utils/ColorScheme.h"
 
 Settings::Settings(Nodes *nodes, QWidget *parent)
         : QDialog(parent)
@@ -29,6 +31,7 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
     this->setupDisplayTab();
     this->setupMemoryTab();
     this->setupTransactionsTab();
+    this->setupPluginsTab();
     this->setupMiscTab();
 
     connect(ui->selector, &QListWidget::currentItemChanged, [this](QListWidgetItem *current, QListWidgetItem *previous){
@@ -37,7 +40,6 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
 
     ui->selector->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->selector->setSelectionBehavior(QAbstractItemView::SelectRows);
-//    ui->selector->setCurrentRow(conf()->get(Config::lastSettingsPage).toInt());
 
     new QListWidgetItem(icons()->icon("interface_32px.png"), "Appearance", ui->selector, Pages::APPEARANCE);
     new QListWidgetItem(icons()->icon("nw_32px.png"), "Network", ui->selector, Pages::NETWORK);
@@ -45,6 +47,8 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
     new QListWidgetItem(icons()->icon("vrdp_32px.png"), "Display", ui->selector, Pages::DISPLAY);
 //  new QListWidgetItem(icons()->icon("chipset_32px.png"), "Memory", ui->selector, Pages::MEMORY);
     new QListWidgetItem(icons()->icon("file_manager_32px.png"), "Transactions", ui->selector, Pages::TRANSACTIONS);
+    QString connectIcon = ColorScheme::darkScheme ? "connect_white.svg" : "connect.svg";;
+    new QListWidgetItem(icons()->icon(connectIcon), "Plugins", ui->selector, Pages::PLUGINS);
     new QListWidgetItem(icons()->icon("settings_disabled_32px.png"), "Misc", ui->selector, Pages::MISC);
 
     ui->selector->setFixedWidth(ui->selector->sizeHintForColumn(0) + ui->selector->frameWidth() + 5);
@@ -315,6 +319,12 @@ void Settings::setupTransactionsTab() {
     // Hide unimplemented settings
     ui->checkBox_alwaysOpenAdvancedTxDialog->hide();
     ui->checkBox_requirePasswordToSpend->hide();
+}
+
+void Settings::setupPluginsTab() {
+    connect(ui->pluginWidget, &PluginWidget::pluginConfigured, [this](const QString &id) {
+       emit pluginConfigured(id);
+    });
 }
 
 void Settings::setupMiscTab() {

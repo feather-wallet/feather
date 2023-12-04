@@ -32,6 +32,7 @@ public:
         DISPLAY,
         MEMORY,
         TRANSACTIONS,
+        PLUGINS,
         MISC
     };
 
@@ -44,6 +45,7 @@ signals:
     void proxySettingsChanged();
     void updateBalance();
     void offlineMode(bool offline);
+    void pluginConfigured(const QString &id);
 
 public slots:
 //    void checkboxExternalLinkWarn();
@@ -59,6 +61,7 @@ private:
     void setupDisplayTab();
     void setupMemoryTab();
     void setupTransactionsTab();
+    void setupPluginsTab();
     void setupMiscTab();
 
     void setupThemeComboBox();

@@ -9,6 +9,7 @@
 #include <QWidget>
 
 #include "BountiesModel.h"
+#include "BountiesProxyModel.h"
 
 namespace Ui {
     class BountiesWidget;
@@ -21,7 +22,6 @@ class BountiesWidget : public QWidget
 public:
     explicit BountiesWidget(QWidget *parent = nullptr);
     ~BountiesWidget() override;
-    BountiesModel* model();
 
 public slots:
     void linkClicked();
@@ -38,6 +38,7 @@ private:
 
     QScopedPointer<Ui::BountiesWidget> ui;
     BountiesModel *m_model;
+    BountiesProxyModel *m_proxyModel;
     QMenu *m_contextMenu;
 };
 
