@@ -404,6 +404,13 @@
                </spacer>
               </item>
               <item>
+               <widget class="QPushButton" name="btn_viewOnlyDetails">
+                <property name="text">
+                 <string>View-only details</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <widget class="QPushButton" name="btn_checkAddress">
                 <property name="text">
                  <string>Show address</string>

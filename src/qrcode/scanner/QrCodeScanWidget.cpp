@@ -233,6 +233,14 @@ std::string QrCodeScanWidget::getURData() {
     return data;
 }
 
+std::string QrCodeScanWidget::getURType() {
+    if (!m_decoder.is_success()) {
+        return "";
+    }
+
+    return m_decoder.expected_type().value_or("");
+}
+
 QString QrCodeScanWidget::getURError() {
     if (!m_decoder.is_failure()) {
         return {};

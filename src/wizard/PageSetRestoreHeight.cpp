@@ -50,6 +50,12 @@ void PageSetRestoreHeight::initializePage() {
         ui->line_creationDate->setText(creationDate.toString("yyyy-MM-dd"));
         this->onCreationDateEdited();
     }
+
+    if (m_fields->restoreHeight > 0) {
+        ui->line_restoreHeight->setText(QString::number(m_fields->restoreHeight));
+        this->onRestoreHeightEdited();
+        this->completeChanged();
+    }
 }
 
 void PageSetRestoreHeight::onCreationDateEdited() {

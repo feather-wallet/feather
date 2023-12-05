@@ -11,6 +11,7 @@
 
 #include "WalletWizard.h"
 #include "constants.h"
+#include "dialog/URDialog.h"
 #include "libwalletqt/WalletManager.h"
 
 PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *parent)
@@ -41,6 +42,17 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
 
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreKeys::onOptionsClicked);
     connect(ui->combo_walletType, &QComboBox::currentTextChanged, this, &PageWalletRestoreKeys::showInputLines);
+    connect(ui->btn_scanUR, &QPushButton::clicked, [this] {
+        URDialog dialog{this, "", true};
+        dialog.exec();
+        ViewOnlyDetails details = dialog.getViewOnlyDetails();
+        ui->line_address->setText(details.address);
+        ui->line_address->setCursorPosition(0);
+        ui->line_viewkey->setText(details.key);
+        ui->line_viewkey->setCursorPosition(0);
+        m_fields->restoreHeight = details.restoreHeight;
+        m_fields->walletName = details.walletName;
+    });
 }
 
 void PageWalletRestoreKeys::initializePage() {

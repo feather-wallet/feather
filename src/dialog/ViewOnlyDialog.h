@@ -25,6 +25,7 @@ private slots:
     void onWriteViewOnlyWallet();
 
 private:
+    QString toString();
     void copyToClipboard();
 
     QScopedPointer<Ui::ViewOnlyDialog> ui;

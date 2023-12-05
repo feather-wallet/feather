@@ -29,6 +29,7 @@ public:
 
     QString decodedString = "";
     std::string getURData();
+    std::string getURType();
     QString getURError();
     
     void startCapture(bool scan_ur = false);

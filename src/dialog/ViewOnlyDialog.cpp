@@ -8,6 +8,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 
+#include "URDialog.h"
 #include "utils/Utils.h"
 
 ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
@@ -23,6 +24,10 @@ ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
 
     connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboard);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
+    connect(ui->btn_transmitOverUR, &QPushButton::clicked, [this] {
+        URDialog dialog{this, this->toString()};
+        dialog.exec();
+    });
 
     if (m_wallet->viewOnly()) {
         ui->btn_Save->setEnabled(false);
@@ -52,12 +57,17 @@ void ViewOnlyDialog::onWriteViewOnlyWallet(){
     QMessageBox::information(this, "Information", "View-only wallet successfully written to disk.");
 }
 
-void ViewOnlyDialog::copyToClipboard() {
-    QString text = "";
-    text += QString("Address: %1\n").arg(ui->label_primaryAddress->text());
+QString ViewOnlyDialog::toString() {
+    QString text;
     text += QString("Secret view key: %1\n").arg(ui->label_secretViewKey->text());
+    text += QString("Address: %1\n").arg(ui->label_primaryAddress->text());
     text += QString("Restore height: %1\n").arg(ui->label_restoreHeight->text());
-    Utils::copyToClipboard(text);
+    text += QString("Wallet name: %1\n").arg(m_wallet->walletName());
+    return text;
+}
+
+void ViewOnlyDialog::copyToClipboard() {
+    Utils::copyToClipboard(this->toString());
 }
 
 ViewOnlyDialog::~ViewOnlyDialog() = default;

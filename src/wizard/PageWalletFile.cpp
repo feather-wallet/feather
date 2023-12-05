@@ -42,6 +42,10 @@ void PageWalletFile::initializePage() {
     ui->line_walletName->setText(this->defaultWalletName());
     ui->check_defaultWalletDirectory->setVisible(false);
     ui->check_defaultWalletDirectory->setChecked(false);
+
+    if (!m_fields->walletName.isEmpty()) {
+        ui->line_walletName->setText(m_fields->walletName);
+    }
 }
 
 bool PageWalletFile::validateWidgets(){

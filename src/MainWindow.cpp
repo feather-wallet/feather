@@ -405,6 +405,9 @@ void MainWindow::initOffline() {
     connect(ui->btn_help, &QPushButton::clicked, [this] {
         windowManager()->showDocs(this, "offline_tx_signing");
     });
+    connect(ui->btn_viewOnlyDetails, &QPushButton::clicked, [this] {
+         this->showViewOnlyDialog();
+    });
     connect(ui->btn_checkAddress, &QPushButton::clicked, [this]{
         AddressCheckerIndexDialog dialog{m_wallet, this};
         dialog.exec();
