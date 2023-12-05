@@ -131,6 +131,7 @@ namespace polyseed {
 
     void data::create(feature_type features) {
         check_init();
+        sodium_memzero(seed, POLYSEED_RANDBYTES);
         auto status = polyseed_create(features, &m_data);
         if (status != POLYSEED_OK) {
             throw get_error(status);
