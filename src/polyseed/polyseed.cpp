@@ -13,8 +13,6 @@
 
 #include <QString>
 
-#define POLYSEED_RANDBYTES 19
-
 namespace polyseed {
 
     static std::locale locale;

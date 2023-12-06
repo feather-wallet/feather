@@ -6,6 +6,10 @@
 
 #include <cmath>
 #include <algorithm>
+#include <sodium/core.h>
+#include <sodium/utils.h>
+#include <sodium/randombytes.h>
+#include "polyseed/polyseed.h"
 
 #include <QPasswordDigestor>
 
@@ -16,6 +20,10 @@ SeedDiceDialog::SeedDiceDialog(QWidget *parent)
         , ui(new Ui::SeedDiceDialog)
 {
     ui->setupUi(this);
+
+    if (sodium_init() == -1) {
+        throw std::runtime_error("sodium_init failed");
+    }
 
     ui->frame_dice->hide();
     ui->frame_coinflip->hide();
@@ -77,12 +85,27 @@ SeedDiceDialog::SeedDiceDialog(QWidget *parent)
     });
 
     connect(ui->btn_createPolyseed, &QPushButton::clicked, [this]{
-        QByteArray salt = "POLYSEED";
-        QByteArray data = m_rolls.join(" ").toUtf8();
+        qsizetype rolls_length = 0;
+        for (const auto& roll : m_rolls) {
+            rolls_length += roll.length() + 1;
+        }
 
-        // We already have enough entropy assuming unbiased throws, but a few extra rounds can't hurt
+        QByteArray data;
+        data.reserve(rolls_length + POLYSEED_RANDBYTES);
+        data = m_rolls.join(" ").toUtf8();
+
+        // Get 19 bytes of entropy from the system
+        char random[POLYSEED_RANDBYTES] = {};
+        randombytes_buf(&random, POLYSEED_RANDBYTES);
+
+        data.append(random, POLYSEED_RANDBYTES);
+
         // Polyseed requests 19 bytes of random data and discards two bits (for a total of 150 bits)
+        QByteArray salt = "POLYSEED";
         m_key = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Sha256, data, salt, 2048, 19);
+
+        sodium_memzero(data.data(), data.size());
+        sodium_memzero(&random, POLYSEED_RANDBYTES);
 
         this->accept();
     });
@@ -146,7 +169,7 @@ bool SeedDiceDialog::updateEntropy() {
     double entropy = entropyPerRoll() * m_rolls.length();
     ui->label_entropy->setText(QString("%1 / %2 bits").arg(QString::number(entropy, 'f', 2), QString::number(entropyNeeded)));
 
-    return entropy > entropyNeeded;
+    return entropy >= entropyNeeded;
 }
 
 void SeedDiceDialog::updateRolls() {
@@ -172,12 +195,16 @@ void SeedDiceDialog::setEnableMethodSelection(bool enabled) {
     ui->spin_sides->setEnabled(enabled);
 }
 
+bool SeedDiceDialog::finished() {
+    return updateEntropy();
+}
+
 const char* SeedDiceDialog::getSecret() {
     return m_key.data();
 }
 
-const QString& SeedDiceDialog::getMnemonic() {
-    return m_mnemonic;
+void SeedDiceDialog::wipeSecret() {
+    sodium_memzero(m_key.data(), m_key.length());
 }
 
 SeedDiceDialog::~SeedDiceDialog() = default;

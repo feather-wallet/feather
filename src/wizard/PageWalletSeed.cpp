@@ -30,14 +30,21 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
     ui->frame_invalidSeed->setInfo(icons()->icon("warning"), "Feather was unable to generate a valid seed.\n"
                                                              "This should never happen.\n"
                                                              "Please contact the developers immediately.");
-    ui->frame_invalidSeed->hide();
 
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+K"), this);
     QObject::connect(shortcut, &QShortcut::activated, [&](){
         SeedDiceDialog dialog{this};
         int r = dialog.exec();
         if (r == QDialog::Accepted) {
+            if (!dialog.finished()) {
+                this->onError();
+                Utils::showError(this, "Unable to create polyseed using additional entropy", "Not enough entropy was collected", {"You have found a bug. Please contact the developers."});
+                return;
+            }
+
             this->generateSeed(dialog.getSecret());
+            dialog.wipeSecret();
+            Utils::showInfo(this, "Polyseed created successfully using additional entropy");
         }
     });
 
@@ -51,6 +58,9 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
 }
 
 void PageWalletSeed::initializePage() {
+    ui->frame_invalidSeed->hide();
+    ui->frame_seedDisplay->show();
+
     this->generateSeed();
     this->setTitle(m_fields->modeText);
 }
@@ -77,9 +87,7 @@ void PageWalletSeed::generateSeed(const char* secret) {
     this->displaySeed(mnemonic);
 
     if (!m_seed.errorString.isEmpty()) {
-        ui->frame_invalidSeed->show();
-        ui->frame_seedDisplay->hide();
-        m_seedError = true;
+        this->onError();
     }
 }
 
@@ -120,6 +128,13 @@ void PageWalletSeed::onOptionsClicked() {
     });
     dialog.exec();
     m_fields->showSetSeedPassphrasePage = checkbox.isChecked();
+}
+
+void PageWalletSeed::onError() {
+    ui->frame_invalidSeed->show();
+    ui->frame_seedDisplay->hide();
+    m_seedError = true;
+    this->completeChanged();
 }
 
 int PageWalletSeed::nextId() const {

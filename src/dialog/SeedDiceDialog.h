@@ -20,9 +20,9 @@ public:
     explicit SeedDiceDialog(QWidget *parent);
     ~SeedDiceDialog() override;
 
+    bool finished();
     const char* getSecret();
-
-    const QString& getMnemonic();
+    void wipeSecret();
 
 private:
     void addFlip(bool heads);
@@ -40,7 +40,6 @@ private:
     QStringList m_rolls;
     QByteArray m_key;
     int entropyNeeded = 152; // Polyseed requests 19 bytes of random data
-    QString m_mnemonic;
 };
 
 

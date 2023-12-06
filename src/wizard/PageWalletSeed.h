@@ -32,6 +32,7 @@ private:
     void seedRoulette(int count);
     void generateSeed(const char* secret = nullptr);
     void onOptionsClicked();
+    void onError();
 
 signals:
     void createWallet();

@@ -1,10 +1,15 @@
 // SPDX-License-Identifier: BSD-2-Clause
 // SPDX-FileCopyrightText: Copyright 2021 tevador <tevador@gmail.com>
 
+#ifndef FEATHER_POLYSEED_H
+#define FEATHER_POLYSEED_H
+
 #include <polyseed.h>
 #include <vector>
 #include <stdexcept>
 #include <string>
+
+#define POLYSEED_RANDBYTES 19
 
 namespace polyseed {
 
@@ -123,3 +128,5 @@ namespace polyseed {
         polyseed_coin m_coin;
     };
 }
+
+#endif // FEATHER_POLYSEED_H
