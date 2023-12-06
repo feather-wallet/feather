@@ -15,7 +15,7 @@ WebsocketClient::WebsocketClient(QObject *parent)
     connect(webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
     connect(webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
     connect(webSocket, &QWebSocket::disconnected, this, &WebsocketClient::onDisconnected);
-    connect(webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::error), this, &WebsocketClient::onError);
+    connect(webSocket, QOverload<QAbstractSocket::SocketError>::of(&QWebSocket::errorOccured), this, &WebsocketClient::onError);
 
     connect(webSocket, &QWebSocket::binaryMessageReceived, this, &WebsocketClient::onbinaryMessageReceived);
 
