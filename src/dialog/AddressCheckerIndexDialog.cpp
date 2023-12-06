@@ -6,6 +6,7 @@
 
 #include "utils/Utils.h"
 #include "components.h"
+#include "dialog/QrCodeDialog.h"
 
 AddressCheckerIndexDialog::AddressCheckerIndexDialog(Wallet *wallet, QWidget *parent)
         : WindowModalDialog(parent)
@@ -14,20 +15,30 @@ AddressCheckerIndexDialog::AddressCheckerIndexDialog(Wallet *wallet, QWidget *pa
 {
     ui->setupUi(this);
 
-    connect(ui->btn_showAddress, &QPushButton::clicked, [this] {
-        this->showAddress(ui->line_index->text().toUInt());
+    connect(ui->btn_showQRcode, &QPushButton::clicked, [this]{
+        QString address = this->address();
+        QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
+        QrCodeDialog dialog{this, &qr, "Address"};
+        dialog.exec();
+    });
+
+    connect(ui->line_index, &QLineEdit::textChanged, [this]{
+        ui->address->setText(this->address());
     });
 
     auto indexValidator = new U32Validator(this);
     ui->line_index->setValidator(indexValidator);
     ui->line_index->setText("0");
 
-    this->showAddress(0);
     this->adjustSize();
 }
 
-void AddressCheckerIndexDialog::showAddress(uint32_t index) {
-    ui->address->setText(m_wallet->address(m_wallet->currentSubaddressAccount(), index));
+uint32_t AddressCheckerIndexDialog::index() {
+    return ui->line_index->text().toUInt();
+}
+
+QString AddressCheckerIndexDialog::address() {
+    return m_wallet->address(m_wallet->currentSubaddressAccount(), this->index());
 }
 
 AddressCheckerIndexDialog::~AddressCheckerIndexDialog() = default;

@@ -20,7 +20,8 @@ class AddressCheckerIndexDialog : public WindowModalDialog
     ~AddressCheckerIndexDialog() override;
 
 private:
-    void showAddress(uint32_t index);
+    uint32_t index();
+    QString address();
 
     QScopedPointer<Ui::AddressCheckerIndexDialog> ui;
     Wallet *m_wallet;

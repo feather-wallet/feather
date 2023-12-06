@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>712</width>
-    <height>127</height>
+    <width>458</width>
+    <height>99</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -34,9 +34,9 @@
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btn_showAddress">
+      <widget class="QPushButton" name="btn_showQRcode">
        <property name="text">
-        <string>Show address</string>
+        <string>Show QR code</string>
        </property>
       </widget>
      </item>
