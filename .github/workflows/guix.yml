@@ -1,7 +1,6 @@
 name: ci/gh-actions/guix
 
-on:
-  push:
+on: [push, pull_request]
 
 env:
   APT_SET_CONF: |
