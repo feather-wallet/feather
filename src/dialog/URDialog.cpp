@@ -5,16 +5,18 @@
 #include "ui_URDialog.h"
 
 #include <QFileDialog>
+#include <QInputDialog>
 
 #include "utils/Utils.h"
+#include "WalletManager.h"
 
-URDialog::URDialog(QWidget *parent, const QString &data, bool scanOnly)
+URDialog::URDialog(QWidget *parent, const std::string &data, bool scanOnly)
         : WindowModalDialog(parent)
         , ui(new Ui::URDialog)
 {
     ui->setupUi(this);
 
-    if (!data.isEmpty()) {
+    if (!data.empty()) {
         ui->btn_loadFile->setVisible(false);
         ui->btn_loadClipboard->setVisible(false);
         ui->tabWidget->setTabVisible(1, false);
@@ -26,8 +28,7 @@ URDialog::URDialog(QWidget *parent, const QString &data, bool scanOnly)
         int availableHeight = currentScreen->availableGeometry().height() - 200;
         this->resize(availableHeight, availableHeight);
 
-        std::string d = data.toStdString();
-        ui->widgetUR->setData("xmr-viewonly", d);
+        ui->widgetUR->setData("xmr-viewonly", data);
         return;
     }
 
@@ -75,23 +76,38 @@ URDialog::URDialog(QWidget *parent, const QString &data, bool scanOnly)
         }
 
         if (ui->widgetScanner->getURType() == "xmr-viewonly") {
-            QRegularExpression viewOnlyDetails(
-                "Secret view key: (?<key>[0-9a-f]{64})\nAddress: (?<address>\\w+)\nRestore height: (?<restoreheight>\\d+)\nWallet name: (?<walletname>\\w+)\n",
-                QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
-            QString data = QString::fromStdString(ui->widgetScanner->getURData());
-            QRegularExpressionMatch match = viewOnlyDetails.match(data);
+            std::string urData = ui->widgetScanner->getURData();
+            while (true) {
+                bool ok;
+                QString password = QInputDialog::getText(this, "Encrypt view-only details", "Enter one-time password to decrypt view-only details with", QLineEdit::Password, "", &ok);
+                if (!ok) {
+                    break;
+                }
 
-            if (!match.hasMatch()) {
-                Utils::showError(this, "Unable to load view-only details", "Unexpected data");
+                QString data = WalletManager::decryptWithPassword(urData, password);
+                if (!data.startsWith("Secret view key")) {
+                    Utils::showError(this, "Unable to load view-only details", "Invalid password");
+                    continue;
+                }
+
+                QRegularExpression viewOnlyDetails(
+                        "Secret view key: (?<key>[0-9a-f]{64})\nAddress: (?<address>\\w+)\nRestore height: (?<restoreheight>\\d+)\nWallet name: (?<walletname>\\w+)\n",
+                        QRegularExpression::CaseInsensitiveOption | QRegularExpression::DotMatchesEverythingOption);
+                QRegularExpressionMatch match = viewOnlyDetails.match(data);
+
+                if (!match.hasMatch()) {
+                    Utils::showError(this, "Unable to load view-only details", "Unexpected data");
+                    continue;
+                }
+
+                m_viewOnlyDetails.address = match.captured("address");
+                m_viewOnlyDetails.key = match.captured("key").toLower();
+                m_viewOnlyDetails.restoreHeight = match.captured("restoreheight").toInt();
+                m_viewOnlyDetails.walletName = QString("%1_view_only").arg(match.captured("walletname"));
+
+                this->accept();
                 return;
             }
-
-            m_viewOnlyDetails.address = match.captured("address");
-            m_viewOnlyDetails.key = match.captured("key").toLower();
-            m_viewOnlyDetails.restoreHeight = match.captured("restoreheight").toInt();
-            m_viewOnlyDetails.walletName = QString("%1_view_only").arg(match.captured("walletname"));
-
-            this->accept();
         }
 
         if (ui->radio_clipboard->isChecked()) {

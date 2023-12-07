@@ -10,6 +10,7 @@
 
 #include "URDialog.h"
 #include "utils/Utils.h"
+#include "WalletManager.h"
 
 ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
@@ -25,7 +26,14 @@ ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
     connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboard);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
     connect(ui->btn_transmitOverUR, &QPushButton::clicked, [this] {
-        URDialog dialog{this, this->toString()};
+        bool ok;
+        QString password = QInputDialog::getText(this, "Encrypt view-only details", "Enter one-time password to encrypt view-only details with", QLineEdit::Password, "", &ok);
+        if (!ok) {
+            return;
+        }
+
+        std::string encrypted = WalletManager::encryptWithPassword(this->toString(), password);
+        URDialog dialog{this, encrypted};
         dialog.exec();
     });
 

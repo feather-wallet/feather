@@ -5,6 +5,7 @@
 #include "Wallet.h"
 
 #include "utils/ScopeGuard.h"
+#include "serialization/binary_utils.h"
 
 class WalletPassphraseListenerImpl : public Monero::WalletListener, public PassphraseReceiver
 {
@@ -327,4 +328,46 @@ void WalletManager::onPassphraseEntered(const QString &passphrase, bool enter_on
     {
         m_passphraseReceiver->onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
+}
+
+std::string WalletManager::encryptWithPassword(const QString &q_plain, const QString &q_password) {
+    std::string plain = q_plain.toStdString();
+    std::string password = q_password.toStdString();
+
+    crypto::chacha_key key;
+    crypto::generate_chacha_key(password.data(), password.size(), key, 1);
+
+    std::string cipher;
+    cipher.resize(plain.size());
+
+    // Repurposing this struct
+    tools::wallet2::keys_file_data s_data = {};
+    s_data.iv = crypto::rand<crypto::chacha_iv>();
+
+    crypto::chacha20(plain.data(), plain.size(), key, s_data.iv, &cipher[0]);
+    s_data.account_data = cipher;
+
+    std::string buf;
+    ::serialization::dump_binary(s_data, buf);
+
+    return buf;
+}
+
+QString WalletManager::decryptWithPassword(const std::string &cipher, const QString &q_password) {
+    std::string password = q_password.toStdString();
+
+    tools::wallet2::keys_file_data s_data;
+    bool r = ::serialization::parse_binary(cipher, s_data);
+    if (!r) {
+        return {};
+    }
+
+    crypto::chacha_key key;
+    crypto::generate_chacha_key(password.data(), password.size(), key, 1);
+
+    std::string plaintext;
+    plaintext.resize(s_data.account_data.size());
+    crypto::chacha20(s_data.account_data.data(), s_data.account_data.size(), key, s_data.iv, &plaintext[0]);
+
+    return QString::fromStdString(plaintext);
 }

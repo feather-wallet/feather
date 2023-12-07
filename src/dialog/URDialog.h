@@ -24,7 +24,7 @@ class URDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit URDialog(QWidget *parent, const QString &data = "", bool scanOnly = false);
+    explicit URDialog(QWidget *parent, const std::string &data = "", bool scanOnly = false);
     ~URDialog() override;
 
     ViewOnlyDetails getViewOnlyDetails();
