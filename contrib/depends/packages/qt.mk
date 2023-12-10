@@ -20,6 +20,7 @@ $(package)_patches += xcb-util-image-fix.patch
 $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
+$(package)_patches += no-resonance-audio.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -93,6 +94,7 @@ $(package)_config_opts += -DINPUT_printpreviewdialog=no
 $(package)_config_opts += -DINPUT_printpreviewwidget=no
 $(package)_config_opts += -DINPUT_printsupport=no
 $(package)_config_opts += -DINPUT_sessionmanager=no
+$(package)_config_opts += -DINPUT_spatialaudio=no
 $(package)_config_opts += -DINPUT_sql=no
 $(package)_config_opts += -DINPUT_syntaxhighlighter=no
 $(package)_config_opts += -DINPUT_textmarkdownwriter=no
@@ -192,7 +194,8 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
-  patch -p1 -i $($(package)_patch_dir)/v4l2.patch
+  patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
+  patch -p1 -i $($(package)_patch_dir)/no-resonance-audio.patch
 endef
 
 define $(package)_config_cmds
