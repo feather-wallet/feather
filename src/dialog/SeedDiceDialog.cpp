@@ -100,8 +100,10 @@ SeedDiceDialog::SeedDiceDialog(QWidget *parent)
 
         data.append(random, POLYSEED_RANDBYTES);
 
+        int sides = ui->radio_coinflip->isChecked() ? 2 : ui->spin_sides->value();
+        QByteArray salt = "POLYSEED-" + QString::number(sides).toUtf8(); // domain separate by number of sides
+
         // Polyseed requests 19 bytes of random data and discards two bits (for a total of 150 bits)
-        QByteArray salt = "POLYSEED";
         m_key = QPasswordDigestor::deriveKeyPbkdf2(QCryptographicHash::Sha256, data, salt, 2048, 19);
 
         sodium_memzero(data.data(), data.size());
