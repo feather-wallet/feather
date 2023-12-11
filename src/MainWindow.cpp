@@ -1040,6 +1040,10 @@ void MainWindow::showKeysDialog() {
 }
 
 void MainWindow::showViewOnlyDialog() {
+    if (!this->verifyPassword()) {
+        return;
+    }
+
     ViewOnlyDialog dialog{m_wallet, this};
     dialog.exec();
 }

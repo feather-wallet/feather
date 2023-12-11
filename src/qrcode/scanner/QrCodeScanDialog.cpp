@@ -21,6 +21,10 @@ QrCodeScanDialog::QrCodeScanDialog(QWidget *parent, bool scan_ur)
     this->setWindowTitle("Scan QR code");
     
     ui->widget_scanner->startCapture(scan_ur);
+
+    connect(ui->widget_scanner, &QrCodeScanWidget::finished, [this]{
+        this->accept();
+    });
 }
 
 QString QrCodeScanDialog::decodedString() {

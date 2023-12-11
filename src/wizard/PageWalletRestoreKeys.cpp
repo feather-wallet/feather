@@ -13,6 +13,7 @@
 #include "constants.h"
 #include "dialog/URDialog.h"
 #include "libwalletqt/WalletManager.h"
+#include "scanner/QrCodeScanDialog.h"
 
 PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -43,15 +44,27 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreKeys::onOptionsClicked);
     connect(ui->combo_walletType, &QComboBox::currentTextChanged, this, &PageWalletRestoreKeys::showInputLines);
     connect(ui->btn_scanUR, &QPushButton::clicked, [this] {
-        URDialog dialog{this, "", true};
+        QrCodeScanDialog dialog{this, false};
         dialog.exec();
-        ViewOnlyDetails details = dialog.getViewOnlyDetails();
-        ui->line_address->setText(details.address);
+
+        QString json = dialog.decodedString();
+        if (json.isEmpty()) {
+            return;
+        }
+
+        QJsonParseError error;
+        auto doc = QJsonDocument::fromJson(json.toUtf8(), &error);
+        if (error.error != QJsonParseError::NoError) {
+            Utils::showError(this, "Unable to load view-only details", QString("Can't parse JSON: %1").arg(error.errorString()));
+            return;
+        }
+
+        ui->line_address->setText(doc["primaryAddress"].toString());
         ui->line_address->setCursorPosition(0);
-        ui->line_viewkey->setText(details.key);
+        ui->line_viewkey->setText(doc["privateViewKey"].toString());
         ui->line_viewkey->setCursorPosition(0);
-        m_fields->restoreHeight = details.restoreHeight;
-        m_fields->walletName = details.walletName;
+        m_fields->restoreHeight = doc["restoreHeight"].toInt();
+        m_fields->walletName = doc["walletName"].toString() + "_view_only";
     });
 }
 

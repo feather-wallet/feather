@@ -12,26 +12,16 @@ namespace Ui {
     class URDialog;
 }
 
-struct ViewOnlyDetails {
-    QString address;
-    QString key;
-    int restoreHeight = 0;
-    QString walletName;
-};
-
 class URDialog : public WindowModalDialog
 {
     Q_OBJECT
 
 public:
-    explicit URDialog(QWidget *parent, const std::string &data = "", bool scanOnly = false);
+    explicit URDialog(QWidget *parent);
     ~URDialog() override;
-
-    ViewOnlyDetails getViewOnlyDetails();
 
 private:
     QScopedPointer<Ui::URDialog> ui;
-    ViewOnlyDetails m_viewOnlyDetails;
 };
 
 

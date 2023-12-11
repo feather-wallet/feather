@@ -90,7 +90,7 @@
      <item>
       <widget class="QPushButton" name="btn_transmitOverUR">
        <property name="text">
-        <string>Transmit over UR</string>
+        <string>Show QR</string>
        </property>
       </widget>
      </item>

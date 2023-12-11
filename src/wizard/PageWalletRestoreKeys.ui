@@ -218,7 +218,7 @@
      <item>
       <widget class="QPushButton" name="btn_scanUR">
        <property name="text">
-        <string>Scan UR</string>
+        <string>Scan QR</string>
        </property>
       </widget>
      </item>

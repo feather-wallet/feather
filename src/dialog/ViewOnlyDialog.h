@@ -26,6 +26,7 @@ private slots:
 
 private:
     QString toString();
+    QString toJsonString();
     void copyToClipboard();
 
     QScopedPointer<Ui::ViewOnlyDialog> ui;

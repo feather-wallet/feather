@@ -11,6 +11,8 @@
 #include "URDialog.h"
 #include "utils/Utils.h"
 #include "WalletManager.h"
+#include "qrcode/QrCode.h"
+#include "dialog/QrCodeDialog.h"
 
 ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
     : WindowModalDialog(parent)
@@ -26,14 +28,8 @@ ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
     connect(ui->btn_Copy, &QPushButton::clicked, this, &ViewOnlyDialog::copyToClipboard);
     connect(ui->btn_Save, &QPushButton::clicked, this, &ViewOnlyDialog::onWriteViewOnlyWallet);
     connect(ui->btn_transmitOverUR, &QPushButton::clicked, [this] {
-        bool ok;
-        QString password = QInputDialog::getText(this, "Encrypt view-only details", "Enter one-time password to encrypt view-only details with", QLineEdit::Password, "", &ok);
-        if (!ok) {
-            return;
-        }
-
-        std::string encrypted = WalletManager::encryptWithPassword(this->toString(), password);
-        URDialog dialog{this, encrypted};
+        QrCode qr(this->toJsonString(), QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
+        QrCodeDialog dialog{this, &qr, "View-Only details"};
         dialog.exec();
     });
 
@@ -72,6 +68,18 @@ QString ViewOnlyDialog::toString() {
     text += QString("Restore height: %1\n").arg(ui->label_restoreHeight->text());
     text += QString("Wallet name: %1\n").arg(m_wallet->walletName());
     return text;
+}
+
+QString ViewOnlyDialog::toJsonString() {
+    QVariantMap data;
+    data["version"] = 0,
+    data["primaryAddress"] = m_wallet->address(0, 0);
+    data["privateViewKey"] = m_wallet->getSecretViewKey();
+    data["restoreHeight"] = m_wallet->getWalletCreationHeight();
+    data["walletName"] = m_wallet->walletName();
+
+    auto obj = QJsonDocument::fromVariant(data);
+    return obj.toJson(QJsonDocument::Compact);
 }
 
 void ViewOnlyDialog::copyToClipboard() {
