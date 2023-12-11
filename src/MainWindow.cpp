@@ -402,6 +402,12 @@ void MainWindow::initMenu() {
 void MainWindow::initOffline() {
     // TODO: check if we have any cameras available
 
+    ui->btn_help->setFocusPolicy(Qt::NoFocus);
+    ui->btn_viewOnlyDetails->setFocusPolicy(Qt::NoFocus);
+    ui->btn_checkAddress->setFocusPolicy(Qt::NoFocus);
+    ui->btn_signTransaction->setFocusPolicy(Qt::StrongFocus);
+    ui->btn_signTransaction->setFocus();
+
     connect(ui->btn_help, &QPushButton::clicked, [this] {
         windowManager()->showDocs(this, "offline_tx_signing");
     });
