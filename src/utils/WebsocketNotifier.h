@@ -34,10 +34,6 @@ signals:
     void FiatRatesReceived(const QJsonObject &fiat_rates);
     void TxFiatHistoryReceived(const QJsonObject &data);
     void UpdatesReceived(const QJsonObject &updates);
-    void XMRigDownloadsReceived(const QJsonObject &downloads);
-    void LocalMoneroCountriesReceived(const QJsonArray &countries);
-    void LocalMoneroCurrenciesReceived(const QJsonArray &currencies);
-    void LocalMoneroPaymentMethodsReceived(const QJsonObject &payment_methods);
     void dataReceived(const QString &type, const QJsonValue &json);
 
 private slots:
@@ -45,7 +41,6 @@ private slots:
 
     void onWSNodes(const QJsonArray &nodes);
     void onWSUpdates(const QJsonObject &updates);
-    void onWSXMRigDownloads(const QJsonObject &downloads);
 
 private:
     static QPointer<WebsocketNotifier> m_instance;

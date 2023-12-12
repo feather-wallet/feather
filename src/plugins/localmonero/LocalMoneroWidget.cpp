@@ -42,9 +42,17 @@ LocalMoneroWidget::LocalMoneroWidget(QWidget *parent, Wallet *wallet)
     connect(m_api, &LocalMoneroApi::ApiResponse, this, &LocalMoneroWidget::onApiResponse);
     connect(ui->btn_loadMore, &QPushButton::clicked, this, &LocalMoneroWidget::onLoadMore);
 
-    connect(websocketNotifier(), &WebsocketNotifier::LocalMoneroCountriesReceived, this, &LocalMoneroWidget::onWsCountriesReceived);
-    connect(websocketNotifier(), &WebsocketNotifier::LocalMoneroCurrenciesReceived, this, &LocalMoneroWidget::onWsCurrenciesReceived);
-    connect(websocketNotifier(), &WebsocketNotifier::LocalMoneroPaymentMethodsReceived, this, &LocalMoneroWidget::onWsPaymentMethodsReceived);
+    connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString& type, const QJsonValue& json) {
+        if (type == "localmonero_countries") {
+            this->onWsCountriesReceived(json.toArray());
+        }
+        else if (type == "localmonero_currencies") {
+            this->onWsCurrenciesReceived(json.toArray());
+        }
+        else if (type == "localmonero_payment_methods") {
+            this->onWsPaymentMethodsReceived(json.toObject());
+        }
+    });
 
     connect(ui->combo_currency, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &LocalMoneroWidget::updatePaymentMethods);
 

@@ -109,10 +109,6 @@ void WebsocketNotifier::onWSUpdates(const QJsonObject &updates) {
     emit UpdatesReceived(updates);
 }
 
-void WebsocketNotifier::onWSXMRigDownloads(const QJsonObject &downloads) {
-    emit XMRigDownloadsReceived(downloads);
-}
-
 WebsocketNotifier* WebsocketNotifier::instance()
 {
     if (!m_instance) {
