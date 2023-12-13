@@ -765,6 +765,14 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
     }
 
     if (tx->status() != PendingTransaction::Status_Ok) {
+        if (m_showDeviceError) {
+            // The hardware devices has disconnected during tx construction.
+            // Due to a macOS-specific Qt bug, we have to prevent it from stacking two QMessageBoxes, otherwise
+            // the UI becomes unresponsive. The reconnect dialog should take priority.
+            m_wallet->disposeTransaction(tx);
+            return;
+        }
+
         QString errMsg = tx->errorString();
 
         Utils::Message message{this, Utils::ERROR, "Failed to construct transaction", errMsg};
