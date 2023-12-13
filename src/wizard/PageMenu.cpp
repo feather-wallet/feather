@@ -29,6 +29,9 @@ void PageMenu::initializePage() {
     } else {
         ui->radioCreate->setChecked(true);
     }
+
+    // Don't show setup wizard again
+    conf()->set(Config::firstRun, false);
 }
 
 int PageMenu::nextId() const {
