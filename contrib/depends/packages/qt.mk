@@ -127,6 +127,8 @@ $(package)_config_opts_mingw32 += -DINPUT_wmf=yes
 $(package)_config_opts_mingw32 += -DBUILD_WITH_PCH=ON
 
 $(package)_config_opts_darwin += -DQT_QMAKE_TARGET_MKSPEC=macx-clang
+# see #138
+$(package)_config_opts_darwin += -DINPUT_accessibility=no
 $(package)_config_opts_darwin += -DINPUT_dbus=no
 $(package)_config_opts_darwin += -DINPUT_freetype=no
 $(package)_config_opts_darwin += -DINPUT_ffmpeg=no
