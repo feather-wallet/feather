@@ -978,6 +978,13 @@ void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, co
         if (m_wallet->viewOnly() && error.contains("double spend")) {
             m_wallet->setForceKeyImageSync(true);
         }
+        if (error.contains("no connection to daemon")) {
+            auto button = QMessageBox::question(this, "Unable to send transaction", "No connection to node. Retry sending transaction?");
+            if (button == QMessageBox::Yes) {
+                m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
+            }
+            return;
+        }
         Utils::showError(this, "Failed to send transaction", error);
         return;
     }
