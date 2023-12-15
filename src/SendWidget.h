@@ -38,11 +38,12 @@ public slots:
     void updateConversionLabel();
     void onOpenAliasResolved(const QString &openAlias, const QString &address, bool dnssecValid);
     void onPreferredFiatCurrencyChanged();
-    void disableSendButton();
     void setWebsocketEnabled(bool enabled);
 
-    void onInitiateTransaction();
-    void onEndTransaction();
+    void disableSendButton();
+    void enableSendButton();
+
+    void disallowSending();
 
 private slots:
     void onDataPasted(const QString &data);
@@ -57,7 +58,7 @@ private:
 
     QScopedPointer<Ui::SendWidget> ui;
     Wallet *m_wallet;
-    bool m_sendDisabled = false;
+    bool m_disallowSending = false;
 };
 
 #endif // FEATHER_SENDWIDGET_H

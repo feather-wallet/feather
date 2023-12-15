@@ -32,8 +32,10 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->lineAmount->setValidator(validator);
 
-    connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::onInitiateTransaction);
-    connect(m_wallet, &Wallet::transactionCreated, this, &SendWidget::onEndTransaction);
+    connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::disableSendButton);
+    connect(m_wallet, &Wallet::transactionCreated, this, &SendWidget::enableSendButton);
+    connect(m_wallet, &Wallet::beginCommitTransaction, this, &SendWidget::disableSendButton);
+    connect(m_wallet, &Wallet::transactionCommitted, this, &SendWidget::enableSendButton);
 
     connect(WalletManager::instance(), &WalletManager::openAliasResolved, this, &SendWidget::onOpenAliasResolved);
 
@@ -349,18 +351,19 @@ void SendWidget::payToMany() {
     ui->lineAddress->payToMany();
 }
 
-void SendWidget::onInitiateTransaction() {
+void SendWidget::disableSendButton() {
     ui->btnSend->setEnabled(false);
 }
 
-void SendWidget::onEndTransaction() {
-    if (!m_sendDisabled) {
-        ui->btnSend->setEnabled(true);
+void SendWidget::enableSendButton() {
+    if (m_disallowSending) {
+        return;
     }
+    ui->btnSend->setEnabled(true);
 }
 
-void SendWidget::disableSendButton() {
-    m_sendDisabled = true;
+void SendWidget::disallowSending() {
+    m_disallowSending = true;
     ui->btnSend->setEnabled(false);
 }
 

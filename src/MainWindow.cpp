@@ -1577,7 +1577,7 @@ void MainWindow::onKeysCorrupted() {
     if (!m_criticalWarningShown) {
         m_criticalWarningShown = true;
         Utils::showError(this, "Wallet keys are corrupted", "WARNING!\n\nTo prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\nRestore your wallet from seed.\n\nPlease report this incident to the Feather developers.\n\nWARNING!");
-        m_sendWidget->disableSendButton();
+        m_sendWidget->disallowSending();
     }
 }
 

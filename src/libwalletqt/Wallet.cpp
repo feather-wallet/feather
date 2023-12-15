@@ -834,6 +834,8 @@ void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector
 // Phase 3: Commit or dispose
 
 void Wallet::commitTransaction(PendingTransaction *tx, const QString &description) {
+    emit beginCommitTransaction();
+
     // Clear list of selected transfers
     this->setSelectedInputs({});
 

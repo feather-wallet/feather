@@ -431,6 +431,7 @@ signals:
     void deviceButtonPressed();
     void deviceError(const QString &message);
     void walletPassphraseNeeded(bool onDevice);
+    void beginCommitTransaction();
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid, const QMap<QString, QString> &txHexMap);
     void deviceShowAddressShowed();
     void transactionProofVerified(TxProofResult result);
