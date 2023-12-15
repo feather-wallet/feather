@@ -49,7 +49,6 @@ OfflineTxSigningWizard::OfflineTxSigningWizard(QWidget *parent, Wallet *wallet, 
 
     QList<QWizard::WizardButton> layout;
     layout << QWizard::CancelButton;
-    layout << QWizard::HelpButton;
     layout << QWizard::Stretch;
     layout << QWizard::BackButton;
     layout << QWizard::NextButton;
@@ -57,7 +56,6 @@ OfflineTxSigningWizard::OfflineTxSigningWizard(QWidget *parent, Wallet *wallet, 
     layout << QWizard::CommitButton;
     this->setButtonLayout(layout);
 
-    setOption(QWizard::HaveHelpButton);
     // setOption(QWizard::HaveCustomButton1, true);
     setOption(QWizard::NoBackButtonOnStartPage);
     setWizardStyle(WizardStyle::ModernStyle);
