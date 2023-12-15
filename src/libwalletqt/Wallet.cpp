@@ -428,7 +428,7 @@ void Wallet::syncStatusUpdated(quint64 height, quint64 target) {
     }
     else {
         this->updateBalance();
-        emit synchronized();
+        emit synchronized(height, target);
     }
 }
 

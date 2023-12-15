@@ -442,7 +442,7 @@ signals:
 
     void refreshSync(int height, int target);
     void blockchainSync(int height, int target);
-    void synchronized();
+    void synchronized(int height, int target);
     void balanceUpdated(quint64 balance, quint64 spendable);
     void keysCorrupted();
 

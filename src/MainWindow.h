@@ -127,7 +127,7 @@ private slots:
 
     // libwalletqt
     void onBalanceUpdated(quint64 balance, quint64 spendable);
-    void onSynchronized();
+    void onSynchronized(int height, int target);
     void onWalletOpened();
     void onConnectionStatusChanged(int status);
     void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
