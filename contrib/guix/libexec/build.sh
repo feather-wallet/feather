@@ -323,6 +323,9 @@ mkdir -p "$DISTSRC"
 
     LINUX_ARCH=""
     case "$HOST" in
+        i686-linux*)
+            LINUX_ARCH="-x86"
+            ;;
         aarch64-linux*)
             LINUX_ARCH="-arm64"
             ;;
