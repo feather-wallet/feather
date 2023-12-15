@@ -93,6 +93,8 @@ jobs:
             host: "arm-linux-gnueabihf"
           - name: "riscv64-linux-gnu"
             host: "riscv64-linux-gnu"
+          - name: "i686-linux-gnu"
+            host: "i686-linux-gnu"
           - name: "x86_64-w64-mingw32"
             host: "x86_64-w64-mingw32"
           - name: "x86_64-w64-mingw32.installer"
