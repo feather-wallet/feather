@@ -13,6 +13,13 @@ if(Python3_Interpreter_FOUND)
         list(APPEND QRC_LIST "        <file alias=\"${FILE_REL}\">${FILE}</file>")
     endforeach()
 
+    FILE(GLOB IMAGES LIST_DIRECTORIES false "external/feather-docs/static/files/compressed/*.png")
+
+    foreach(FILE ${IMAGES})
+        cmake_path(GET FILE FILENAME FILE_REL)
+        list(APPEND QRC_LIST "        <file alias=\"/static/files/${FILE_REL}\">${FILE}</file>")
+    endforeach()
+
     list(JOIN QRC_LIST "\n" QRC_DATA)
     configure_file("cmake/assets_docs.qrc" "${CMAKE_CURRENT_SOURCE_DIR}/src/assets_docs.qrc")
 else()
