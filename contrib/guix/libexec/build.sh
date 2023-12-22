@@ -376,9 +376,18 @@ mkdir -p "$DISTSRC"
         *darwin*)
             make -C build install/strip ${V:+V=1}
             ;;
-        *)
-            make -C build install ${V:+V=1}
+        *.installer)
+
             ;;
+        *)
+            case "$OPTIONS" in
+                installer)
+                    # do nothing, we don't want feather.exe in the final .zip
+                    ;;
+                *)
+                    make -C build install ${V:+V=1}
+                    ;;
+            esac
     esac
 
     (
