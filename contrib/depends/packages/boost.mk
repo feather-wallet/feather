@@ -1,8 +1,8 @@
 package=boost
-$(package)_version=1.83.0
+$(package)_version=1.84.0
 $(package)_download_path=https://downloads.sourceforge.net/project/boost/boost/$($(package)_version)/
 $(package)_file_name=$(package)_$(subst .,_,$($(package)_version)).tar.bz2
-$(package)_sha256_hash=6478edfe2f3305127cffe8caf73ea0176c53769f4bf1585be237eb30798c3b8e
+$(package)_sha256_hash=cc4b893acf645c9d4b698e9a0f08ca8846aa5d6c68275c14c3e7949c24109454
 $(package)_dependencies=libiconv
 $(package)_patches=disable_addr2line.patch
 
