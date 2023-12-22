@@ -3,6 +3,7 @@
 
 #include "Coins.h"
 #include "rows/CoinsInfo.h"
+#include <wallet/wallet2.h>
 
 Coins::Coins(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
         : QObject(parent)

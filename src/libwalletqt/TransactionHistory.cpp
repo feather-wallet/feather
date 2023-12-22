@@ -9,6 +9,7 @@
 #include "WalletManager.h"
 #include "Transfer.h"
 #include "Ring.h"
+#include "wallet/wallet2.h"
 
 bool TransactionHistory::transaction(int index, std::function<void (TransactionRow &)> callback)
 {

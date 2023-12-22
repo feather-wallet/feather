@@ -10,13 +10,15 @@
 #include <QList>
 #include <QReadWriteLock>
 #include <QDateTime>
-#include <wallet/api/wallet2_api.h>
 
 #include "Wallet.h"
-#include "wallet/wallet2.h"
 
 namespace Monero {
     struct TransactionHistory;
+}
+
+namespace tools {
+    class wallet2;
 }
 
 class CoinsInfo;

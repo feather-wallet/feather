@@ -13,7 +13,10 @@
 
 #include "rows/TransactionRow.h"
 #include "Wallet.h"
-#include "wallet/wallet2.h"
+
+namespace tools {
+    class wallet2;
+}
 
 namespace Monero {
 struct TransactionHistory;

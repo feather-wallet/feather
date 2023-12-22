@@ -6,16 +6,17 @@
 
 #include <functional>
 
-#include <wallet/api/wallet2_api.h>
 #include <QObject>
 #include <QReadWriteLock>
 #include <QList>
 #include <QDateTime>
 
-#include <wallet/wallet2.h>
-
 #include "Wallet.h"
 #include "rows/AccountRow.h"
+
+namespace tools {
+    class wallet2;
+}
 
 class SubaddressAccount : public QObject
 {

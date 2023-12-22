@@ -12,10 +12,12 @@
 #include <QList>
 #include <QDateTime>
 
-#include <wallet/wallet2.h>
-
 #include "Wallet.h"
 #include "rows/SubaddressRow.h"
+
+namespace tools {
+    class wallet2;
+}
 
 class Subaddress : public QObject
 {

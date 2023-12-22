@@ -13,10 +13,13 @@
 
 #include "rows/ContactRow.h"
 #include "Wallet.h"
-#include "wallet/wallet2.h"
 
 namespace Monero {
 struct AddressBook;
+}
+
+namespace tools{
+    class wallet2;
 }
 
 class AddressBook : public QObject

@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2023 The Monero Project
 
 #include "SubaddressAccount.h"
-#include <QDebug>
+#include <wallet/wallet2.h>
 
 SubaddressAccount::SubaddressAccount(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
     : QObject(parent)
