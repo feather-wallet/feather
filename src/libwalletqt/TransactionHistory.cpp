@@ -97,13 +97,17 @@ void TransactionHistory::refresh()
             t->m_direction = TransactionRow::Direction_In;
             t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
             t->m_blockHeight = pd.m_block_height;
-            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(pd.m_tx_hash));
             t->m_subaddrIndex = { pd.m_subaddr_index.minor };
             t->m_subaddrAccount = pd.m_subaddr_index.major;
             t->m_label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
             t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
             t->m_confirmations = (wallet_height > pd.m_block_height) ? wallet_height - pd.m_block_height : 0;
             t->m_unlockTime = pd.m_unlock_time;
+
+            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(pd.m_tx_hash));
+            if (t->m_description.isEmpty()) {
+                t->m_description = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
+            }
 
             m_rows.append(t);
         }
@@ -244,13 +248,17 @@ void TransactionHistory::refresh()
             t->m_direction = TransactionRow::Direction_In;
             t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
             t->m_blockHeight = pd.m_block_height;
-            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(pd.m_tx_hash));
             t->m_pending = true;
             t->m_subaddrIndex = { pd.m_subaddr_index.minor };
             t->m_subaddrAccount = pd.m_subaddr_index.major;
             t->m_label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
             t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
             t->m_confirmations = 0;
+
+            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(pd.m_tx_hash));
+            if (t->m_description.isEmpty()) {
+                t->m_description = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
+            }
 
             m_rows.append(t);
 
