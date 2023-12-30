@@ -667,7 +667,6 @@ void MainWindow::onProxySettingsChanged() {
 }
 
 void MainWindow::onOfflineMode(bool offline) {
-    this->onConnectionStatusChanged(Wallet::ConnectionStatus_Disconnected);
     m_wallet->setOffline(offline);
 
     if (m_wallet->viewOnly()) {
@@ -717,6 +716,9 @@ void MainWindow::onRefreshSync(int height, int target) {
 
 void MainWindow::onConnectionStatusChanged(int status)
 {
+    // Note: Wallet does not emit this signal unless status is changed, so calling this function from MainWindow may
+    // result in the wrong connection status being displayed.
+
     qDebug() << "Wallet connection status changed " << Utils::QtEnumToString(static_cast<Wallet::ConnectionStatus>(status));
 
     // Update connection info in status bar.

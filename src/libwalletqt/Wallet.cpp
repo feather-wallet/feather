@@ -274,8 +274,11 @@ void Wallet::setSeedLanguage(const QString &lang)
 
 // #################### Node connection ####################
 
-void Wallet::setOffline(bool offline) const {
+void Wallet::setOffline(bool offline) {
     m_wallet2->set_offline(offline);
+    if (offline) {
+        setConnectionStatus(Wallet::ConnectionStatus_Disconnected);
+    }
 }
 
 void Wallet::setTrustedDaemon(bool arg) {

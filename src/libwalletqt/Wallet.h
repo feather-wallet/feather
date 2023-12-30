@@ -193,7 +193,7 @@ public:
 
     // ##### Node connection #####
 
-    void setOffline(bool offline) const;
+    void setOffline(bool offline);
 
     //! indicates if daemon is trusted
     void setTrustedDaemon(bool arg);
