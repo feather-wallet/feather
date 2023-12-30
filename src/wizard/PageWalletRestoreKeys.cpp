@@ -11,9 +11,11 @@
 
 #include "WalletWizard.h"
 #include "constants.h"
-#include "dialog/URDialog.h"
 #include "libwalletqt/WalletManager.h"
+
+#ifdef WITH_SCANNER
 #include "scanner/QrCodeScanDialog.h"
+#endif
 
 PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *parent)
     : QWizardPage(parent)
@@ -43,6 +45,8 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
 
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletRestoreKeys::onOptionsClicked);
     connect(ui->combo_walletType, &QComboBox::currentTextChanged, this, &PageWalletRestoreKeys::showInputLines);
+
+#ifdef WITH_SCANNER
     connect(ui->btn_scanUR, &QPushButton::clicked, [this] {
         QrCodeScanDialog dialog{this, false};
         dialog.exec();
@@ -66,6 +70,10 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
         m_fields->restoreHeight = doc["restoreHeight"].toInt();
         m_fields->walletName = doc["walletName"].toString() + "_view_only";
     });
+#else
+    ui->btn_scanUR->setEnabled(false);
+    ui->btn_scanUR->setToolTip("Can't scan QR code: Feather was built without webcam scanner support.");
+#endif
 }
 
 void PageWalletRestoreKeys::initializePage() {

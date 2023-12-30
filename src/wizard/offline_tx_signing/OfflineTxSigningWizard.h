@@ -37,11 +37,6 @@ public:
         Page_ImportOffline
     };
 
-    enum Method {
-        UR = 0,
-        FILES,
-    };
-    
     explicit OfflineTxSigningWizard(QWidget *parent, Wallet *wallet, PendingTransaction *tx = nullptr);
     ~OfflineTxSigningWizard() override;
 

@@ -114,7 +114,7 @@
   <customwidget>
    <class>URWidget</class>
    <extends>QWidget</extends>
-   <header>widgets/URWidget.h</header>
+   <header>qrcode/scanner/URWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

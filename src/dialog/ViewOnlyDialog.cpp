@@ -5,10 +5,8 @@
 #include "ui_ViewOnlyDialog.h"
 
 #include <QFileDialog>
-#include <QInputDialog>
 #include <QMessageBox>
 
-#include "URDialog.h"
 #include "utils/Utils.h"
 #include "WalletManager.h"
 #include "qrcode/QrCode.h"

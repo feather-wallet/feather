@@ -4,9 +4,6 @@
 #include "URWidget.h"
 #include "ui_URWidget.h"
 
-#include <QDesktopServices>
-#include <QMenu>
-
 #include "dialog/URSettingsDialog.h"
 #include "utils/config.h"
 

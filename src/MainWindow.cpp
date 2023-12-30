@@ -38,7 +38,7 @@
 
 #ifdef WITH_SCANNER
 #include "wizard/offline_tx_signing/OfflineTxSigningWizard.h"
-#include "dialog/URDialog.h"
+#include "qrcode/scanner/URDialog.h"
 #endif
 
 #ifdef CHECK_UPDATES
@@ -423,7 +423,7 @@ void MainWindow::initOffline() {
     });
 
     switch (conf()->get(Config::offlineTxSigningMethod).toInt()) {
-        case OfflineTxSigningWizard::Method::FILES:
+        case Config::OTSMethod::FileTransfer:
             ui->radio_airgapFiles->setChecked(true);
             break;
         default:
@@ -440,12 +440,12 @@ void MainWindow::initOffline() {
 
     connect(ui->radio_airgapFiles, &QCheckBox::toggled, [this] (bool checked){
         if (checked) {
-            conf()->set(Config::offlineTxSigningMethod, OfflineTxSigningWizard::Method::FILES);
+            conf()->set(Config::offlineTxSigningMethod, Config::OTSMethod::FileTransfer);
         }
     });
     connect(ui->radio_airgapUR, &QCheckBox::toggled, [this](bool checked) {
         if (checked) {
-            conf()->set(Config::offlineTxSigningMethod, OfflineTxSigningWizard::Method::UR);
+            conf()->set(Config::offlineTxSigningMethod, Config::OTSMethod::UnifiedResources);
         }
     });
 }
@@ -1310,8 +1310,12 @@ void MainWindow::showAddressChecker() {
 }
 
 void MainWindow::showURDialog() {
+#ifdef WITH_SCANNER
     URDialog dialog{this};
     dialog.exec();
+#else
+    Utils::showError(this, "Unable to open UR dialog", "Feather was built without webcam scanner support");
+#endif
 }
 
 void MainWindow::loadSignedTx() {
