@@ -9,7 +9,6 @@
 
 #include "utils/config.h"
 #include "utils/Icons.h"
-#include <bcur/bc-ur.hpp>
 
 QrCodeScanWidget::QrCodeScanWidget(QWidget *parent)
         : QWidget(parent)

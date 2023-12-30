@@ -13,8 +13,6 @@
 
 #include "QrScanThread.h"
 
-#include <bcur/ur-decoder.hpp>
-
 namespace Ui {
     class QrCodeScanDialog;
 }

@@ -98,9 +98,10 @@ find_package(QREncode REQUIRED)
 
 # bc-ur
 if(WITH_SCANNER)
-    find_path(BCUR_INCLUDE_DIR "bcur/bc-ur.hpp")
-    find_library(BCUR_LIBRARY bcur)
-    message(STATUS "bcur: libraries at ${BCUR_INCLUDE_DIR}")
+    find_package(BCUR REQUIRED)
+    if(BCUR_VENDORED)
+        add_subdirectory(src/third-party/bcur EXCLUDE_FROM_ALL)
+    endif()
 endif()
 
 # Polyseed
