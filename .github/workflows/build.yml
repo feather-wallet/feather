@@ -1,0 +1,24 @@
+name: ci/gh-actions/build
+
+on: [push, pull_request]
+
+jobs:
+  build-ubuntu-without-scanner:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - name: update apt
+        run: sudo apt update
+      - name: install dependencies
+        run: sudo apt -y install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev
+                                 libqrencode-dev qt6-base-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev
+                                 qt6-multimedia-dev libzip-dev libsodium-dev libgcrypt-dev libx11-xcb-dev
+                                 libprotobuf-dev libhidapi-dev libzxingcore-dev
+      - name: build
+        run: |
+          mkdir build
+          cd build
+          cmake -DWITH_SCANNER=OFF ..
+          cmake --build . -j $(nproc)
