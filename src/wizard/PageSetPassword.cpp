@@ -17,10 +17,7 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
 
     ui->frame_password->setInfo(icons()->icon("lock"), "Choose a password to encrypt your wallet keys.");
 
-    connect(ui->line_password, &QLineEdit::textChanged, [this]{
-        this->completeChanged();
-    });
-    connect(ui->line_confirmPassword, &QLineEdit::textChanged, [this]{
+    connect(ui->widget_password, &PasswordSetWidget::passwordEntryChanged, [this]{
         this->completeChanged();
     });
 
@@ -29,12 +26,11 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
 
 void PageSetPassword::initializePage() {
     this->setTitle(m_fields->modeText);
-    ui->line_password->setText("");
-    ui->line_confirmPassword->setText("");
+    ui->widget_password->resetFields();
 }
 
 bool PageSetPassword::validatePage() {
-    m_fields->password = ui->line_password->text();
+    m_fields->password = ui->widget_password->password();
     emit createWallet();
     return true;
 }
@@ -44,5 +40,5 @@ int PageSetPassword::nextId() const {
 }
 
 bool PageSetPassword::isComplete() const {
-    return ui->line_password->text() == ui->line_confirmPassword->text();
+    return ui->widget_password->passwordsMatch();
 }

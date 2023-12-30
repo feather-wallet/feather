@@ -12,6 +12,7 @@
 #include "utils/Utils.h"
 #include "WalletManager.h"
 #include "qrcode/QrCode.h"
+#include "dialog/PasswordSetDialog.h"
 #include "dialog/QrCodeDialog.h"
 
 ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
@@ -43,20 +44,18 @@ ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
 
 void ViewOnlyDialog::onWriteViewOnlyWallet(){
     QString fn = QFileDialog::getSaveFileName(this, "Save .keys wallet file", Utils::defaultWalletDir(), "Monero wallet (*.keys)");
-    if(fn.isEmpty()) return;
-    if(!fn.endsWith(".keys")) fn += ".keys";
+    if (fn.isEmpty()) {
+        return;
+    }
+    if (!fn.endsWith(".keys")) {
+        fn += ".keys";
+    }
 
-    QString passwd;
-    QInputDialog passwordDialog(this);
-    passwordDialog.setInputMode(QInputDialog::TextInput);
-    passwordDialog.setTextEchoMode(QLineEdit::Password);
-    passwordDialog.setWindowTitle("View-Only wallet password");
-    passwordDialog.setLabelText("Protect this view-only wallet with a password?");
-    passwordDialog.resize(300, 100);
-    if((bool)passwordDialog.exec())
-        passwd = passwordDialog.textValue();
+    PasswordSetDialog dialog("Set a password for the view-only wallet", this);
+    dialog.exec();
+    QString password = dialog.password();
 
-    m_wallet->createViewOnly(fn, passwd);
+    m_wallet->createViewOnly(fn, password);
 
     QMessageBox::information(this, "Information", "View-only wallet successfully written to disk.");
 }
