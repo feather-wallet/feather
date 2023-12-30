@@ -7,9 +7,12 @@
 #include <QKeyEvent>
 #include <QPushButton>
 
-WalletUnlockWidget::WalletUnlockWidget(QWidget *parent)
+#include "utils/Utils.h"
+
+WalletUnlockWidget::WalletUnlockWidget(QWidget *parent, Wallet *wallet)
         : QWidget(parent)
         , ui(new Ui::WalletUnlockWidget)
+        , m_wallet(wallet)
 {
     ui->setupUi(this);
     this->reset();
@@ -18,6 +21,14 @@ WalletUnlockWidget::WalletUnlockWidget(QWidget *parent)
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, this, &WalletUnlockWidget::tryUnlock);
     connect(ui->buttonBox, &QDialogButtonBox::rejected, this, &WalletUnlockWidget::closeWallet);
+
+    ui->frame_sync->hide();
+    if (m_wallet) {
+        connect(m_wallet, &Wallet::syncStatus, [this](quint64 height, quint64 target, bool daemonSync){
+            ui->frame_sync->show();
+            ui->label_sync->setText(Utils::formatSyncStatus(height, target, daemonSync));
+        });
+    }
 }
 
 void WalletUnlockWidget::setWalletName(const QString &walletName) {

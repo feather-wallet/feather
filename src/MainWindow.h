@@ -127,7 +127,7 @@ private slots:
 
     // libwalletqt
     void onBalanceUpdated(quint64 balance, quint64 spendable);
-    void onSynchronized();
+    void onSyncStatus(quint64 height, quint64 target, bool daemonSync);
     void onWalletOpened();
     void onConnectionStatusChanged(int status);
     void onTransactionCreated(PendingTransaction *tx, const QVector<QString> &address);
@@ -149,8 +149,6 @@ private slots:
     void payToMany();
     void showHistoryTab();
     void skinChanged(const QString &skinName);
-    void onBlockchainSync(int height, int target);
-    void onRefreshSync(int height, int target);
     void onViewOnBlockExplorer(const QString &txid);
     void onResendTransaction(const QString &txid);
     void importContacts();

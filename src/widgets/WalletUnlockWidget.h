@@ -7,6 +7,8 @@
 #include <QWidget>
 #include <QMenu>
 
+#include "Wallet.h"
+
 namespace Ui {
     class WalletUnlockWidget;
 }
@@ -16,7 +18,7 @@ class WalletUnlockWidget : public QWidget
 Q_OBJECT
 
 public:
-    explicit WalletUnlockWidget(QWidget *parent = nullptr);
+    explicit WalletUnlockWidget(QWidget *parent, Wallet *wallet = nullptr);
     ~WalletUnlockWidget();
 
     void setWalletName(const QString &walletName);
@@ -35,6 +37,7 @@ protected:
 
 private:
     QScopedPointer<Ui::WalletUnlockWidget> ui;
+    Wallet *m_wallet;
 };
 
 #endif //FEATHER_WALLETUNLOCKWIDGET_H

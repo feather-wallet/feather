@@ -263,7 +263,7 @@ void MainWindow::initWidgets() {
        m_wallet->setSelectedInputs({});
     });
 
-    m_walletUnlockWidget = new WalletUnlockWidget(this);
+    m_walletUnlockWidget = new WalletUnlockWidget(this, m_wallet);
     m_walletUnlockWidget->setWalletName(this->walletName());
     ui->walletUnlockLayout->addWidget(m_walletUnlockWidget);
 
@@ -452,9 +452,7 @@ void MainWindow::initOffline() {
 
 void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::balanceUpdated,           this, &MainWindow::onBalanceUpdated);
-    connect(m_wallet, &Wallet::synchronized,             this, &MainWindow::onSynchronized); //TODO
-    connect(m_wallet, &Wallet::blockchainSync,           this, &MainWindow::onBlockchainSync);
-    connect(m_wallet, &Wallet::refreshSync,              this, &MainWindow::onRefreshSync);
+    connect(m_wallet, &Wallet::syncStatus,               this, &MainWindow::onSyncStatus);
     connect(m_wallet, &Wallet::transactionCreated,       this, &MainWindow::onTransactionCreated);
     connect(m_wallet, &Wallet::transactionCommitted,     this, &MainWindow::onTransactionCommitted);
     connect(m_wallet, &Wallet::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
@@ -697,21 +695,11 @@ void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
     }
 }
 
-void MainWindow::onSynchronized() {
-    this->updateNetStats();
-    this->setStatusText("Synchronized");
-}
-
-void MainWindow::onBlockchainSync(int height, int target) {
-    QString blocks = (target >= height) ? QString::number(target - height) : "?";
-    QString heightText = QString("Blockchain sync: %1 blocks remaining").arg(blocks);
-    this->setStatusText(heightText);
-}
-
-void MainWindow::onRefreshSync(int height, int target) {
-    QString blocks = (target >= height) ? QString::number(target - height) : "?";
-    QString heightText = QString("Wallet sync: %1 blocks remaining").arg(blocks);
-    this->setStatusText(heightText);
+void MainWindow::onSyncStatus(quint64 height, quint64 target, bool daemonSync) {
+    if (height >= (target - 1)) {
+        this->updateNetStats();
+    }
+    this->setStatusText(Utils::formatSyncStatus(height, target, daemonSync));
 }
 
 void MainWindow::onConnectionStatusChanged(int status)

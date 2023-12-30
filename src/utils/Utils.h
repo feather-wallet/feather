@@ -114,6 +114,8 @@ namespace Utils
 
     QWindow* windowForQObject(QObject* object);
     void clearLayout(QLayout *layout, bool deleteWidgets = true);
+
+    QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync = false);
 }
 
 #endif //FEATHER_UTILS_H

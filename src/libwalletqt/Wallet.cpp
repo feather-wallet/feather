@@ -396,7 +396,7 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
         quint64 walletHeight = blockChainHeight();
 
         if (daemonHeight < targetHeight) {
-            emit blockchainSync(daemonHeight, targetHeight);
+            emit syncStatus(daemonHeight, targetHeight, true);
         }
         else {
             this->syncStatusUpdated(walletHeight, daemonHeight);
@@ -426,13 +426,12 @@ quint64 Wallet::daemonBlockChainTargetHeight() const {
 }
 
 void Wallet::syncStatusUpdated(quint64 height, quint64 target) {
-    if (height < (target - 1)) {
-        emit refreshSync(height, target);
-    }
-    else {
+    if (height >= (target - 1)) {
+        // TODO: is this needed?
         this->updateBalance();
-        emit synchronized();
     }
+
+    emit syncStatus(height, target, false);
 }
 
 void Wallet::onNewBlock(uint64_t walletHeight) {

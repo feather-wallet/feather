@@ -708,4 +708,14 @@ void clearLayout(QLayout* layout, bool deleteWidgets)
         delete item;
     }
 }
+
+QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync) {
+    if (height < (target - 1)) {
+        QString blocks = (target >= height) ? QString::number(target - height) : "?";
+        QString type = daemonSync ? "Blockchain" : "Wallet";
+        return QString("%1 sync: %2 blocks remaining").arg(type, blocks);
+    }
+
+    return "Synchronized";
+}
 }
