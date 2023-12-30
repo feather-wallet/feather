@@ -126,9 +126,21 @@ void ContactsWidget::newContact(QString address, QString name)
     name = dialog.getName();
 
     bool addressValid = WalletManager::addressValid(address, m_wallet->nettype());
-    if (!addressValid) {
+    bool nameIsAddress = WalletManager::addressValid(name, m_wallet->nettype());
+
+    if (addressValid && nameIsAddress) {
+        Utils::showError(this, "Unable to add contact", "Name can not be an address", {}, "add_contact");
+        return;
+    }
+
+    if (!addressValid && !nameIsAddress) {
         Utils::showError(this, "Unable to add contact", "Invalid address", {"Use 'Tools -> Address checker' to check if the address is valid."}, "add_contact");
         return;
+    }
+
+    if (!addressValid && nameIsAddress) {
+        // User accidentally swapped name and address, allow it
+        std::swap(address, name);
     }
 
     int num_addresses = m_wallet->addressBook()->count();
