@@ -163,6 +163,9 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tIn
             return amount;
         }
         case Column::TxID: {
+            if (conf()->get(Config::historyShowFullTxid).toBool()) {
+                return tInfo.hash();
+            }
             return Utils::displayAddress(tInfo.hash(), 1);
         }
         case Column::FiatAmount:

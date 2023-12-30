@@ -48,7 +48,10 @@ public:
         // Tabs
         enabledTabs,
         showSearchbar,
-        
+
+        // History
+        historyShowFullTxid,
+
         // Receive
         showUsedAddresses,
         showHiddenAddresses,

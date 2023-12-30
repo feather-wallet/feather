@@ -5,6 +5,7 @@
 
 #include "TransactionHistoryProxyModel.h"
 #include "utils/Utils.h"
+#include "utils/config.h"
 
 #include <QHeaderView>
 #include <QMenu>
@@ -56,6 +57,10 @@ void HistoryView::setHistoryModel(TransactionHistoryProxyModel *model) {
     }
     connect(m_columnActions, &QActionGroup::triggered, this, &HistoryView::toggleColumnVisibility);
 
+    m_headerMenu->addSeparator();
+    auto action = m_headerMenu->addAction("Show full txid", this, &HistoryView::showFullTxid);
+    action->setCheckable(true);
+    action->setChecked(conf()->get(Config::historyShowFullTxid).toBool());
     m_headerMenu->addSeparator();
     m_headerMenu->addAction(tr("Fit to window"), this, &HistoryView::fitColumnsToWindow);
     m_headerMenu->addAction(tr("Fit to contents"), this, &HistoryView::fitColumnsToContents);
@@ -152,6 +157,16 @@ void HistoryView::toggleColumnVisibility(QAction* action)
         return;
     }
     action->setChecked(true);
+}
+
+void HistoryView::showFullTxid(bool enabled) {
+    conf()->set(Config::historyShowFullTxid, enabled);
+    this->reset();
+
+
+    if (!enabled) {
+        this->resizeColumnToContents(TransactionHistoryModel::TxID);
+    }
 }
 
 void HistoryView::fitColumnsToWindow()

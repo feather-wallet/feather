@@ -46,6 +46,9 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc"}}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
+        // History
+        {Config::historyShowFullTxid, {QS("historyShowFullTxid"), false}},
+
         // Receive
         {Config::showUsedAddresses,{QS("showUsedAddresses"), false}},
         {Config::showHiddenAddresses,{QS("showHiddenAddresses"), false}},

@@ -27,6 +27,7 @@ public:
 private slots:
     void showHeaderMenu(const QPoint& position);
     void toggleColumnVisibility(QAction* action);
+    void showFullTxid(bool enabled);
     void fitColumnsToWindow();
     void fitColumnsToContents();
     void resetViewToDefaults();
