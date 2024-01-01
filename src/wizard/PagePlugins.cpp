@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2023 The Monero Project
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "PagePlugins.h"
 #include "ui_PagePlugins.h"

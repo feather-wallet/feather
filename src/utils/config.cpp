@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2011 Felix Geyer <debfx@fobos.de>
 // SPDX-FileCopyrightText: 2020 KeePassXC Team <team@keepassxc.org>
-// SPDX-FileCopyrightText: 2020-2023 The Monero Project
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "config.h"
 #include "utils/Utils.h"

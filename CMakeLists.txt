@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(PACKAGE_NAME ${PROJECT_NAME})
 set(PACKAGE_BUGREPORT "https://github.com/feather-wallet/feather/issues")
 set(PACKAGE_URL "https://featherwallet.org/")
-set(COPYRIGHT_YEAR "2023")
+set(COPYRIGHT_YEAR "2024")
 set(COPYRIGHT_HOLDERS "The Monero Project")
 
 # Configurable options
