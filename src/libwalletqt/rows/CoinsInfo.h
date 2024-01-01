@@ -39,6 +39,7 @@ public:
     bool coinbase() const;
     QString description() const;
     bool change() const;
+    QString txNote() const;
 
     void setUnlocked(bool unlocked);
 
@@ -70,6 +71,7 @@ private:
     bool m_coinbase;
     QString m_description;
     bool m_change;
+    QString m_txNote;
 };
 
 #endif //FEATHER_COINSINFO_H

@@ -228,6 +228,8 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case Label: {
             if (!cInfo.description().isEmpty())
                 return cInfo.description();
+            if (!cInfo.txNote().isEmpty())
+                return cInfo.txNote();
             return cInfo.addressLabel();
         }
         case Spent:

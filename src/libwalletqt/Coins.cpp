@@ -68,6 +68,7 @@ void Coins::refresh()
             ci->m_subaddrAccount = td.m_subaddr_index.major;
             ci->m_address = QString::fromStdString(m_wallet2->get_subaddress_as_str(td.m_subaddr_index)); // todo: this is expensive, cache maybe?
             ci->m_addressLabel = QString::fromStdString(m_wallet2->get_subaddress_label(td.m_subaddr_index));
+            ci->m_txNote = QString::fromStdString(m_wallet2->get_tx_note(td.m_txid));
             ci->m_keyImage = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_key_image));
             ci->m_unlockTime = td.m_tx.unlock_time;
             ci->m_unlocked = m_wallet2->is_transfer_unlocked(td);

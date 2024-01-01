@@ -120,6 +120,10 @@ bool CoinsInfo::change() const {
     return m_change;
 }
 
+QString CoinsInfo::txNote() const {
+    return m_txNote;
+}
+
 CoinsInfo::CoinsInfo(QObject *parent)
         : QObject(parent)
         , m_blockHeight(0)
