@@ -270,7 +270,12 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
             this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg});
         } else {
-            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg});
+            QStringList helpItems = {};
+            if (errMsg == "Failed to acquire device") {
+                helpItems.append("Try closing Trezor suite");
+            }
+
+            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg, helpItems});
         }
         return;
     }
@@ -340,7 +345,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     }
 
     if (seed.mnemonic.isEmpty()) {
-        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Mnemonic seed is emopty"});
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Mnemonic seed is empty"});
         return;
     }
 
@@ -454,6 +459,9 @@ void WindowManager::onWalletCreated(Wallet *wallet) {
                   "https://wiki.trezor.io/Udev_rules");
             link = "https://wiki.trezor.io/Udev_rules";
 #endif
+        }
+        else if (error.contains("Failed to acquire device")) {
+            helpItems = {"Try closing Trezor suite"};
         }
         if (error.contains("SW_CLIENT_NOT_SUPPORTED")) {
             helpItems = {"Upgrade your Ledger device firmware to the latest version using Ledger Live.\n"
