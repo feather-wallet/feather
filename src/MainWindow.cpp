@@ -969,8 +969,24 @@ void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, co
             m_wallet->setForceKeyImageSync(true);
         }
         if (error.contains("no connection to daemon")) {
-            auto button = QMessageBox::question(this, "Unable to send transaction", "No connection to node. Retry sending transaction?");
-            if (button == QMessageBox::Yes) {
+            QMessageBox box(this);
+            box.setWindowTitle("Question");
+            box.setText("Unable to send transaction");
+            box.setInformativeText("No connection to node. Retry sending transaction?");
+            QPushButton *manual = box.addButton("Broadcast manually", QMessageBox::HelpRole);
+            box.addButton(QMessageBox::No);
+            box.addButton(QMessageBox::Yes);
+
+            box.exec();
+
+            if (box.clickedButton() == manual) {
+                if (txid.empty()) {
+                    Utils::showError(this, "Unable to open tx broadcaster", "Cached transaction not found");
+                    return;
+                }
+                this->onResendTransaction(txid[0]);
+            }
+            else if (box.result() == QMessageBox::Yes) {
                 m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
             }
             return;
