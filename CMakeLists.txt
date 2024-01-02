@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(feather
-  VERSION "2.6.1"
+  VERSION "2.6.2"
   DESCRIPTION "A free Monero desktop wallet"
   LANGUAGES CXX C ASM
 )
