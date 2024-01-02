@@ -49,6 +49,7 @@ private:
     void refreshCameraList();
     QImage videoFrameToImage(const QVideoFrame &videoFrame);
     void handleFrameCaptured(const QVideoFrame &videoFrame);
+    bool getPermission();
 
     QScopedPointer<Ui::QrCodeScanWidget> ui;
 

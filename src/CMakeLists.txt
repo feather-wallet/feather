@@ -299,6 +299,10 @@ if (WITH_SCANNER)
     )
 endif()
 
+if(STATIC AND APPLE)
+    target_link_libraries(feather Qt6::QDarwinCameraPermissionPlugin)
+endif()
+
 if(STATIC AND UNIX AND NOT APPLE)
     target_link_libraries(feather Qt6::QComposePlatformInputContextPlugin)
 endif()

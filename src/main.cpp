@@ -34,6 +34,10 @@ Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
 Q_IMPORT_PLUGIN(QComposePlatformInputContextPlugin) // Needed for dead keys on Linux
 #endif
 
+#if defined(Q_OS_MAC) && defined(STATIC)
+Q_IMPORT_PLUGIN(QDarwinCameraPermissionPlugin)
+#endif
+
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
 void signal_handler(int signum) {
     ::signal(signum, SIG_DFL);

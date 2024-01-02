@@ -68,6 +68,7 @@ $(package)_config_opts += -DINPUT_libudev=no
 $(package)_config_opts += -DINPUT_mtdev=no
 $(package)_config_opts += -DINPUT_openssl=linked
 $(package)_config_opts += -DINPUT_openvg=no
+$(package)_config_opts += -DINPUT_permissions=yes
 $(package)_config_opts += -DINPUT_reduce_relocations=no
 $(package)_config_opts += -DINPUT_schannel=no
 $(package)_config_opts += -DINPUT_sctp=no
