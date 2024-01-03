@@ -21,6 +21,8 @@ PasswordDialog::PasswordDialog(const QString &walletName, bool incorrectPassword
         password = ui->line_password->text();
     });
 
+    ui->line_password->setFocus();
+
     this->adjustSize();
 }
 
