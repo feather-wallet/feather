@@ -48,7 +48,16 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
         ui->txid->hide();
         ui->label_txid->hide();
     }
-    
+
+    ui->treeInputs->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->treeOutputs->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->treeInputs, &QTreeView::customContextMenuRequested, [this](const QPoint &point){
+        this->setupContextMenu(point, ui->treeInputs);
+    });
+    connect(ui->treeOutputs, &QTreeView::customContextMenuRequested, [this](const QPoint &point){
+        this->setupContextMenu(point, ui->treeOutputs);
+    });
+
     this->adjustSize();
 }
 
@@ -215,6 +224,37 @@ void TxConfAdvDialog::closeDialog() {
     if (m_utx != nullptr)
         m_wallet->disposeTransaction(m_utx);
     QDialog::reject();
+}
+
+void TxConfAdvDialog::setupContextMenu(const QPoint &point, QTreeWidget *tree) {
+    if (!tree) {
+        return;
+    }
+
+    QTreeWidgetItem *header = tree->headerItem();
+    if (!header) {
+        return;
+    }
+
+    auto* menu = new QMenu(this);
+    for (int column = 0; column < tree->columnCount(); column++)
+    {
+        menu->addAction(QString("Copy %1").arg(header->text(column)), this, [this, column, point, tree]{
+            this->copyFromTree(point, column, tree);
+        });
+    }
+
+    menu->popup(tree->viewport()->mapToGlobal(point));
+}
+
+void TxConfAdvDialog::copyFromTree(const QPoint &point, int column, QTreeWidget *tree) {
+    QModelIndex index = tree->indexAt(point);
+    if (!index.isValid()) {
+        return;
+    }
+
+    QModelIndex dataIndex = index.sibling(index.row(), column);
+    Utils::copyToClipboard(dataIndex.data().toString());
 }
 
 TxConfAdvDialog::~TxConfAdvDialog() = default;

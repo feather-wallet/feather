@@ -8,6 +8,7 @@
 #include <QMenu>
 #include <QStandardItemModel>
 #include <QTextCharFormat>
+#include <QTreeWidget>
 
 #include "components.h"
 #include "libwalletqt/PendingTransaction.h"
@@ -34,6 +35,8 @@ private:
     void broadcastTransaction();
     void closeDialog();
     void setAmounts(quint64 amount, quint64 fee);
+    void setupContextMenu(const QPoint &point, QTreeWidget *tree);
+    void copyFromTree(const QPoint &point, int column, QTreeWidget *tree);
 
     void signedCopy();
     void signedSaveFile();
