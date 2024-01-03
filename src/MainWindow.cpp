@@ -469,7 +469,7 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::walletPassphraseNeeded, this, &MainWindow::onWalletPassphraseNeeded);
 
     connect(m_wallet, &Wallet::unconfirmedMoneyReceived, this, [this](const QString &txId, uint64_t amount){
-       if (m_wallet->isSynchronized()) {
+       if (m_wallet->isSynchronized() && !m_locked) {
            auto notify = QString("%1 XMR (pending)").arg(WalletManager::displayAmount(amount, false));
            m_windowManager->notify("Payment received", notify, 5000);
        }
