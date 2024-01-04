@@ -251,7 +251,7 @@ if (DEPENDS)
     target_link_directories(feather PRIVATE "${LIB_DIR}")
 endif()
 
-target_link_libraries(feather
+target_link_libraries(feather PRIVATE
         wallet_merged
         ${LMDB_LIBRARY}
         epee
@@ -280,19 +280,19 @@ target_link_libraries(feather
 )
 
 if(CHECK_UPDATES)
-    target_link_libraries(feather openpgp)
+    target_link_libraries(feather PRIVATE openpgp)
 endif()
 
 if(DEPENDS)
-    target_link_libraries(feather ${ICONV_LIBRARIES})
+    target_link_libraries(feather PRIVATE ${ICONV_LIBRARIES})
 endif()
 
 if(DEVICE_TREZOR_READY)
-    target_link_libraries(feather ${TREZOR_DEP_LIBS})
+    target_link_libraries(feather PRIVATE ${TREZOR_DEP_LIBS})
 endif()
 
 if (WITH_SCANNER)
-    target_link_libraries(feather
+    target_link_libraries(feather PRIVATE
             Qt::Multimedia
             Qt::MultimediaWidgets
             ${ZXING_LIBRARIES}
@@ -300,16 +300,16 @@ if (WITH_SCANNER)
 endif()
 
 if(STATIC AND APPLE)
-    target_link_libraries(feather Qt6::QDarwinCameraPermissionPlugin)
+    target_link_libraries(feather PRIVATE Qt6::QDarwinCameraPermissionPlugin)
 endif()
 
 if(STATIC AND UNIX AND NOT APPLE)
-    target_link_libraries(feather Qt6::QComposePlatformInputContextPlugin)
+    target_link_libraries(feather PRIVATE Qt6::QComposePlatformInputContextPlugin)
 endif()
 
 if(DEPENDS AND APPLE)
     # TODO: Needed for ___isOSVersionAtLeast
-    target_link_libraries(feather
+    target_link_libraries(feather PRIVATE
             ${CMAKE_OSX_SYSROOT}/lib/darwin/libclang_rt.osx.a)
 endif()
 
@@ -335,3 +335,18 @@ else()
         install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/assets/images/appicons/256x256.png DESTINATION ${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/256x256/apps RENAME "feather.png")
     endif()
 endif()
+
+if(APPLE)
+    configure_file(${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist.in ${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist @ONLY)
+
+    set_target_properties(feather PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+            MACOSX_BUNDLE TRUE
+            MACOSX_BUNDLE_INFO_PLIST "${CMAKE_SOURCE_DIR}/contrib/macdeploy/Info.plist"
+            LINK_FLAGS_RELEASE -s
+    )
+
+    file(COPY "${CMAKE_SOURCE_DIR}/src/assets/images/appicons/appicon.icns" DESTINATION "${CMAKE_SOURCE_DIR}/installed/feather.app/Contents/Resources/" )
+endif()
+
+qt_finalize_executable(feather)

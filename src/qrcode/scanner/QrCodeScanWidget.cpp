@@ -70,10 +70,21 @@ void QrCodeScanWidget::startCapture(bool scan_ur) {
     ui->progressBar_UR->setVisible(m_scan_ur);
     ui->progressBar_UR->setFormat("Progress: %v%");
 
-    if (!getPermission()) {
-        ui->frame_error->setText("No permission to start camera.");
-        ui->frame_error->show();
-        return;
+    QCameraPermission cameraPermission;
+    switch (qApp->checkPermission(cameraPermission)) {
+        case Qt::PermissionStatus::Undetermined:
+            qDebug() << "Camera permission undetermined";
+            qApp->requestPermission(cameraPermission, [this] {
+                startCapture(m_scan_ur);
+            });
+            return;
+        case Qt::PermissionStatus::Denied:
+            ui->frame_error->setText("No permission to start camera.");
+            ui->frame_error->show();
+            return;
+        case Qt::PermissionStatus::Granted:
+            qDebug() << "Camera permission granted";
+            break;
     }
 
     if (ui->combo_camera->count() < 1) {
@@ -86,20 +97,6 @@ void QrCodeScanWidget::startCapture(bool scan_ur) {
     
     if (!m_thread->isRunning()) {
         m_thread->start();
-    }
-}
-
-bool QrCodeScanWidget::getPermission() {
-    QCameraPermission cameraPermission;
-    switch (qApp->checkPermission(cameraPermission)) {
-        case Qt::PermissionStatus::Undetermined:
-            qApp->requestPermission(cameraPermission, this,
-                                    &QrCodeScanWidget::getPermission);
-            return false;
-        case Qt::PermissionStatus::Denied:
-            return false;
-        case Qt::PermissionStatus::Granted:
-            return true;
     }
 }
 
