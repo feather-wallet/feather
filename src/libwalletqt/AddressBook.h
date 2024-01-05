@@ -4,7 +4,6 @@
 #ifndef ADDRESSBOOK_H
 #define ADDRESSBOOK_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QMap>
 #include <QObject>
 #include <QReadWriteLock>

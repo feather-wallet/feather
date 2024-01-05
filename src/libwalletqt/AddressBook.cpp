@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "AddressBook.h"
-#include <QDebug>
+
 #include <wallet/wallet2.h>
 
 AddressBook::AddressBook(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)

@@ -6,7 +6,6 @@
 
 #include <QObject>
 
-#include <wallet/api/wallet2_api.h>
 #include "libwalletqt/PendingTransactionInfo.h"
 
 class UnsignedTransaction : public QObject

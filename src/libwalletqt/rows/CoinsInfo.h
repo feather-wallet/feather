@@ -4,7 +4,6 @@
 #ifndef FEATHER_COINSINFO_H
 #define FEATHER_COINSINFO_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QObject>
 #include <QDateTime>
 #include <QSet>

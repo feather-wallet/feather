@@ -25,6 +25,8 @@
 
 #include "utils/ScopeGuard.h"
 
+#include "wallet/wallet2.h"
+
 namespace {
     constexpr char ATTRIBUTE_SUBADDRESS_ACCOUNT[] = "feather.subaddress_account";
 }

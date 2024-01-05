@@ -6,7 +6,6 @@
 
 #include <functional>
 
-#include <wallet/api/wallet2_api.h>
 #include <QReadWriteLock>
 #include <QObject>
 #include <QList>

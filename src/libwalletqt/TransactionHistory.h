@@ -51,7 +51,6 @@ signals:
 
 private:
     explicit TransactionHistory(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent = nullptr);
-    QString description(const tools::wallet2::payment_details &pd);
 
 private:
     friend class Wallet;

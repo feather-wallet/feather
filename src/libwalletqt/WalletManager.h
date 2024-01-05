@@ -117,9 +117,6 @@ public:
     void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort=false);
     virtual void onWalletPassphraseNeeded(bool on_device) override;
 
-    static std::string encryptWithPassword(const QString &plain, const QString &password);
-    static QString decryptWithPassword(const std::string &cipher, const QString &password);
-
 signals:
     void walletOpened(Wallet *wallet);
     void walletCreated(Wallet *wallet);

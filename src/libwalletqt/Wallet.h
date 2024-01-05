@@ -10,7 +10,6 @@
 #include <QList>
 #include <QtConcurrent/QtConcurrent>
 
-#include "wallet/api/wallet2_api.h"
 #include "utils/scheduler.h"
 #include "PendingTransaction.h"
 #include "UnsignedTransaction.h"

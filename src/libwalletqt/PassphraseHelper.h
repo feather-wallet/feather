@@ -4,7 +4,6 @@
 #ifndef MONERO_GUI_PASSPHRASEHELPER_H
 #define MONERO_GUI_PASSPHRASEHELPER_H
 
-#include <QtGlobal>
 #include <wallet/api/wallet2_api.h>
 #include <QMutex>
 #include <QPointer>

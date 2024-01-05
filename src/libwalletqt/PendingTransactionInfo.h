@@ -4,7 +4,6 @@
 #ifndef FEATHER_PENDINGTRANSACTIONINFO_H
 #define FEATHER_PENDINGTRANSACTIONINFO_H
 
-#include <wallet/api/wallet2_api.h>
 #include "ConstructionInfo.h"
 #include <QObject>
 #include <QSet>
