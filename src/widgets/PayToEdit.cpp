@@ -80,22 +80,31 @@ bool PayToEdit::isOpenAlias() {
 
 void PayToEdit::keyPressEvent(QKeyEvent *event) {
     if (event->matches(QKeySequence::Paste)) {
-        this->pasteEvent(QApplication::clipboard()->mimeData());
-        event->accept();
+        bool uri = this->pasteEvent(QApplication::clipboard()->mimeData());
+        if (uri) {
+            event->ignore();
+            return;
+        }
     }
 
     QPlainTextEdit::keyPressEvent(event);
 }
 
-void PayToEdit::pasteEvent(const QMimeData *mimeData) {
+bool PayToEdit::pasteEvent(const QMimeData *mimeData) {
+    if (mimeData->hasText() && mimeData->text().startsWith("monero:")) {
+        dataPasted(mimeData->text());
+        return true;
+    }
+
     QImage image;
     if (mimeData->hasImage()) {
         image = qvariant_cast<QImage>(mimeData->imageData());
     }
     else if (mimeData->hasUrls()) {
+        // Path to image file
         QList<QUrl> urlList = mimeData->urls();
         if (urlList.count() > 1) {
-            return;
+            return false;
         }
         QFileInfo file(urlList.at(0).toLocalFile());
         if (file.exists()) {
@@ -103,12 +112,12 @@ void PayToEdit::pasteEvent(const QMimeData *mimeData) {
         }
     }
     else {
-        return;
+        return false;
     }
 
     if (image.isNull()) {
         qDebug() << "Invalid image";
-        return;
+        return false;
     }
 
 #if defined(WITH_SCANNER)
@@ -116,7 +125,10 @@ void PayToEdit::pasteEvent(const QMimeData *mimeData) {
     QString result = QrCodeUtils::scanImage(image);
 
     dataPasted(result);
+    return true;
 #endif
+
+    return false;
 }
 
 void PayToEdit::checkText() {

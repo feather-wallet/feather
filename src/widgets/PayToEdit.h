@@ -58,7 +58,7 @@ private:
     void checkText();
     void updateSize();
 
-    void pasteEvent(const QMimeData *mimeData);
+    bool pasteEvent(const QMimeData *mimeData);
 
     PartialTxOutput parseAddressAndAmount(const QString &line);
     quint64 parseAmount(QString amount);
