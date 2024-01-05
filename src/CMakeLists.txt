@@ -318,7 +318,7 @@ if(DEPENDS AND UNIX AND NOT APPLE)
 endif()
 
 if(STACK_TRACE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")
-    target_link_libraries(feather -rdynamic)
+    target_link_libraries(feather PRIVATE -rdynamic)
 endif()
 
 if(DEPENDS)
