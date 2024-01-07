@@ -39,7 +39,6 @@ public:
 signals:
     void preferredFiatCurrencyChanged(QString currency);
     void skinChanged(QString skinName);
-    void blockExplorerChanged(QString blockExplorer);
     void hideUpdateNotifications(bool hidden);
     void websocketStatusChanged(bool enabled);
     void proxySettingsChanged();

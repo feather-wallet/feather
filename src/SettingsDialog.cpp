@@ -329,12 +329,7 @@ void Settings::setupPluginsTab() {
 
 void Settings::setupMiscTab() {
     // [Block explorer]
-    ui->comboBox_blockExplorer->setCurrentIndex(ui->comboBox_blockExplorer->findText(conf()->get(Config::blockExplorer).toString()));
-    connect(ui->comboBox_blockExplorer, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
-        QString blockExplorer = ui->comboBox_blockExplorer->currentText();
-        conf()->set(Config::blockExplorer, blockExplorer);
-        emit blockExplorerChanged(blockExplorer);
-    });
+    ui->blockExplorerConfigureWidget->setup("Block explorers", Config::blockExplorers, Config::blockExplorer, {"%txid%"});
 
     // [Reddit frontend]
     ui->comboBox_redditFrontend->setCurrentIndex(ui->comboBox_redditFrontend->findText(conf()->get(Config::redditFrontend).toString()));

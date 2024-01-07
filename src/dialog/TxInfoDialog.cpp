@@ -181,7 +181,14 @@ void TxInfoDialog::createTxProof() {
 }
 
 void TxInfoDialog::viewOnBlockExplorer() {
-    Utils::externalLinkWarning(this, Utils::blockExplorerLink(conf()->get(Config::blockExplorer).toString(), constants::networkType, m_txid));
+    QString link = Utils::blockExplorerLink(m_txid);
+
+    if (link.isEmpty()) {
+        Utils::showError(this, "Unable to open block explorer", "No block explorer configured", {"Go to Settings -> Misc -> Block explorer"});
+        return;
+    }
+
+    Utils::externalLinkWarning(this, link);
 }
 
 TxInfoDialog::~TxInfoDialog() = default;

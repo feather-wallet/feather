@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>841</width>
+    <width>908</width>
     <height>454</height>
    </rect>
   </property>
@@ -32,7 +32,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>1</number>
+        <number>7</number>
        </property>
        <widget class="QWidget" name="page_appearance">
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1051,43 +1051,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QComboBox" name="comboBox_blockExplorer">
-               <item>
-                <property name="text">
-                 <string>exploremonero.com</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>xmrchain.net</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>melo.tools</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>moneroblocks.info</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>blockchair.info</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>127.0.0.1:31312</string>
-                </property>
-               </item>
-              </widget>
+              <widget class="UrlListConfigureWidget" name="blockExplorerConfigureWidget" native="true"/>
              </item>
              <item>
               <widget class="QLabel" name="label_18">
@@ -1199,6 +1163,12 @@
    <class>PluginWidget</class>
    <extends>QWidget</extends>
    <header>widgets/PluginWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>UrlListConfigureWidget</class>
+   <extends>QWidget</extends>
+   <header>widgets/UrlListConfigureWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

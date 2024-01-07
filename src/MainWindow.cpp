@@ -1237,7 +1237,11 @@ void MainWindow::payToMany() {
 }
 
 void MainWindow::onViewOnBlockExplorer(const QString &txid) {
-    QString blockExplorerLink = Utils::blockExplorerLink(conf()->get(Config::blockExplorer).toString(), constants::networkType, txid);
+    QString blockExplorerLink = Utils::blockExplorerLink(txid);
+    if (blockExplorerLink.isEmpty()) {
+        Utils::showError(this, "Unable to open block explorer", "No block explorer configured", {"Go to Settings -> Misc -> Block explorer"});
+        return;
+    }
     Utils::externalLinkWarning(this, blockExplorerLink);
 }
 

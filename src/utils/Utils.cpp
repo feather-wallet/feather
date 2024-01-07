@@ -461,53 +461,19 @@ QStandardItem *qStandardItem(const QString& text, QFont &font) {
     return item;
 }
 
-QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid) {
-    if (blockExplorer == "exploremonero.com") {
-        if (nettype == NetworkType::MAINNET) {
-            return QString("https://exploremonero.com/transaction/%1").arg(txid);
-        }
-    }
-    else if (blockExplorer == "moneroblocks.info") {
-        if (nettype == NetworkType::MAINNET) {
-            return QString("https://moneroblocks.info/tx/%1").arg(txid);
-        }
-    }
-    else if (blockExplorer == "blockchair.com") {
-        if (nettype == NetworkType::MAINNET) {
-            return QString("https://blockchair.com/monero/transaction/%1").arg(txid);
-        }
-    }
-    else if (blockExplorer == "melo.tools") {
-        switch (nettype) {
-            case NetworkType::MAINNET:
-                return QString("https://melo.tools/explorer/mainnet/tx/%1").arg(txid);
-            case NetworkType::STAGENET:
-                return QString("https://melo.tools/explorer/stagenet/tx/%1").arg(txid);
-            case NetworkType::TESTNET:
-                return QString("https://melo.tools/explorer/testnet/tx/%1").arg(txid);
-        }
-    }
-    else if (blockExplorer == "blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion") {
-        if (nettype == NetworkType::MAINNET) {
-            return QString("http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%1").arg(txid);
-        }
-    }
-    else if (blockExplorer == "127.0.0.1:31312") {
-        if (nettype == NetworkType::MAINNET) {
-            return QString("http://127.0.0.1:31312/tx?id=%1").arg(txid);
-        }
-    }
-    
-    switch (nettype) {
-        case NetworkType::MAINNET:
-            return QString("https://xmrchain.net/tx/%1").arg(txid);
-        case NetworkType::STAGENET:
-            return QString("https://stagenet.xmrchain.net/tx/%1").arg(txid);
-        case NetworkType::TESTNET:
-            return QString("https://testnet.xmrchain.net/tx/%1").arg(txid);
+QString blockExplorerLink(const QString &txid) {
+    QString link = conf()->get(Config::blockExplorer).toString();
+
+    QUrl url(link);
+    if (url.scheme() != "http" && url.scheme() != "https") {
+        return {};
     }
 
-    return {};
+    if (!link.contains("%txid%")) {
+        return {};
+    }
+
+    return link.replace("%txid%", txid);
 }
 
 void externalLinkWarning(QWidget *parent, const QString &url){

@@ -85,7 +85,7 @@ namespace Utils
     QStandardItem *qStandardItem(const QString &text);
     QStandardItem *qStandardItem(const QString &text, QFont &font);
 
-    QString blockExplorerLink(const QString &blockExplorer, NetworkType::Type nettype, const QString &txid);
+    QString blockExplorerLink(const QString &txid);
     void externalLinkWarning(QWidget *parent, const QString &url);
 
     QString displayAddress(const QString& address, int sections = 3, const QString & sep = " ");

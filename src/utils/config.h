@@ -123,6 +123,7 @@ public:
         offlineTxSigningForceKISync,
 
         // Misc
+        blockExplorers,
         blockExplorer,
         redditFrontend,
         localMoneroFrontend,
