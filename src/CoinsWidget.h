@@ -86,6 +86,7 @@ private:
     CoinsInfo* currentEntry();
     QVector<CoinsInfo*> currentEntries();
     QStringList selectedPubkeys();
+    bool isCoinSpendable(CoinsInfo* coin);
 };
 
 

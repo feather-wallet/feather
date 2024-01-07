@@ -186,17 +186,16 @@ void CoinsWidget::thawAllSelected() {
 }
 
 void CoinsWidget::spendSelected() {
-    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
-
+    QVector<CoinsInfo*> selectedCoins = this->currentEntries();
     QStringList keyimages;
-    for (QModelIndex index: list) {
-        QString keyImage = m_model->entryFromIndex(m_proxyModel->mapToSource(index))->keyImage();
 
-        if (keyImage == "0100000000000000000000000000000000000000000000000000000000000000") {
-            Utils::showError(this, "Unable to select output to spend", "Selected output has unknown key image");
-            return;
-        }
-        
+    for (const auto coin : selectedCoins) {
+        if (!coin) return;
+
+        bool spendable = this->isCoinSpendable(coin);
+        if (!spendable) return;
+
+        QString keyImage = coin->keyImage();
         keyimages << keyImage;
     }
 
@@ -220,27 +219,10 @@ void CoinsWidget::onSweepOutputs() {
     for (const auto coin : selectedCoins) {
         if (!coin) return;
 
+        bool spendable = this->isCoinSpendable(coin);
+        if (!spendable) return;
+
         QString keyImage = coin->keyImage();
-        if (!coin->keyImageKnown()) {
-            Utils::showError(this, "Unable to sweep outputs", "Selected output has unknown key image");
-            return;
-        }
-
-        if (coin->spent()) {
-            Utils::showError(this, "Unable to sweep outputs", "Selected output was already spent");
-            return;
-        }
-
-        if (coin->frozen()) {
-            Utils::showError(this, "Unable to sweep outputs", "Selected output is frozen", {"Thaw the selected output(s) before spending"}, "freeze_thaw_outputs");
-            return;
-        }
-
-        if (!coin->unlocked()) {
-            Utils::showError(this, "Unable to sweep outputs", "Selected output is locked", {"Wait until the output has reached the required number of confirmation before spending."});
-            return;
-        }
-
         keyImages.push_back(keyImage);
         totalAmount += coin->amount();
     }
@@ -345,6 +327,30 @@ void CoinsWidget::editLabel() {
     QModelIndex index = ui->coins->currentIndex().siblingAtColumn(m_model->ModelColumn::Label);
     ui->coins->setCurrentIndex(index);
     ui->coins->edit(index);
+}
+
+bool CoinsWidget::isCoinSpendable(CoinsInfo *coin) {
+    if (!coin->keyImageKnown()) {
+        Utils::showError(this, "Unable to spend outputs", "Selected output has unknown key image");
+        return false;
+    }
+
+    if (coin->spent()) {
+        Utils::showError(this, "Unable to spend outputs", "Selected output was already spent");
+        return false;
+    }
+
+    if (coin->frozen()) {
+        Utils::showError(this, "Unable to spend outputs", "Selected output is frozen", {"Thaw the selected output(s) before spending"}, "freeze_thaw_outputs");
+        return false;
+    }
+
+    if (!coin->unlocked()) {
+        Utils::showError(this, "Unable to spend outputs", "Selected output is locked", {"Wait until the output has reached the required number of confirmation before spending."});
+        return false;
+    }
+
+    return true;
 }
 
 CoinsWidget::~CoinsWidget() = default;
