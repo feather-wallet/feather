@@ -700,6 +700,7 @@ void MainWindow::onSyncStatus(quint64 height, quint64 target, bool daemonSync) {
         this->updateNetStats();
     }
     this->setStatusText(Utils::formatSyncStatus(height, target, daemonSync));
+    m_statusLabelStatus->setToolTip(QString("Wallet height: %1").arg(QString::number(height)));
 }
 
 void MainWindow::onConnectionStatusChanged(int status)
