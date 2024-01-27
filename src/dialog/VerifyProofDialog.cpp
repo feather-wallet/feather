@@ -103,7 +103,7 @@ void VerifyProofDialog::checkTxKey() {
     ui->btn_verify->setEnabled(false);
     TxKeyResult res = m_wallet->checkTxKey(ui->line_keyTxID->text(), ui->line_keyTxKey->text(), ui->line_keyAddress->text());
 
-    if (!res.succes) {
+    if (!res.success) {
         this->proofStatus(false, QString("Error: %1").arg(res.errorString));
         return;
     }
