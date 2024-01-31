@@ -15,6 +15,7 @@
              ((gnu packages gettext) #:select (gettext-minimal))
              (gnu packages gperf)
              ((gnu packages installers) #:select (nsis-x86_64))
+             ((gnu packages libusb) #:select (libplist))
              ((gnu packages linux) #:select (linux-libre-headers-6.1 util-linux))
              (gnu packages llvm)
              (gnu packages mingw)
