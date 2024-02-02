@@ -30,7 +30,7 @@ struct TxProof {
 };
 
 struct TxKeyResult {
-    bool succes = false;
+    bool success = false;
     bool good = false;
     QString amount;
     bool inPool;
