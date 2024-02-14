@@ -672,10 +672,10 @@ index 000000000..e34005bbf
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
 new file mode 100644
-index 000000000..57a332696
+index 000000000..2dad447c9
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
-@@ -0,0 +1,124 @@
+@@ -0,0 +1,130 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -725,15 +725,6 @@ index 000000000..57a332696
 +
 +QFFmpegMediaIntegration::QFFmpegMediaIntegration()
 +{
-+#if QT_CONFIG(linux_v4l)
-+    m_videoDevices = std::make_unique<QV4L2CameraDevices>(this);
-+#endif
-+#ifdef Q_OS_DARWIN
-+    m_videoDevices = std::make_unique<QAVFVideoDevices>(this);
-+#elif defined(Q_OS_WINDOWS)
-+    m_videoDevices = std::make_unique<QWindowsVideoDevices>(this);
-+#endif
-+
 +#ifndef QT_NO_DEBUG
 +    qDebug() << "Available HW decoding frameworks:";
 +    AVHWDeviceType type = AV_HWDEVICE_TYPE_NONE;
@@ -745,6 +736,21 @@ index 000000000..57a332696
 +QPlatformMediaFormatInfo *QFFmpegMediaIntegration::createFormatInfo()
 +{
 +    return new QFFmpegMediaFormatInfo();
++}
++
++QPlatformVideoDevices *QFFmpegMediaIntegration::createVideoDevices()
++{
++#if defined(Q_OS_ANDROID)
++    return new QAndroidVideoDevices(this);
++#elif QT_CONFIG(linux_v4l)
++    return new QV4L2CameraDevices(this);
++#elif defined Q_OS_DARWIN
++    return new QAVFVideoDevices(this);
++#elif defined(Q_OS_WINDOWS)
++    return new QWindowsVideoDevices(this);
++#else
++    return nullptr;
++#endif
 +}
 +
 +QMaybe<QPlatformMediaCaptureSession *> QFFmpegMediaIntegration::createCaptureSession()
@@ -802,10 +808,10 @@ index 000000000..57a332696
 +#include "qffmpegmediaintegration.moc"
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
 new file mode 100644
-index 000000000..905c3efd5
+index 000000000..13b81ecc2
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
-@@ -0,0 +1,45 @@
+@@ -0,0 +1,47 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -846,6 +852,8 @@ index 000000000..905c3efd5
 +
 +protected:
 +    QPlatformMediaFormatInfo *createFormatInfo() override;
++
++    QPlatformVideoDevices *createVideoDevices() override;
 +};
 +
 +QT_END_NAMESPACE
