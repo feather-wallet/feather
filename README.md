@@ -12,8 +12,8 @@ Copyright (c) 2020-2024, The Monero Project.
 * Reddit: [/r/FeatherWallet](https://old.reddit.com/r/FeatherWallet)
 * Lemmy: [monero.town/c/featherwallet](https://monero.town/c/featherwallet)
 * Mail: dev@featherwallet.org
-* IRC: `#feather` on OFTC
-* Matrix: `#feather:monero.social`
+* IRC: `#feather` on [OFTC](https://www.oftc.net/)
+* Matrix: [matrix.to/#/#feather:monero.social](https://matrix.to/#/#feather:monero.social)
 
 **Download** the latest release [here](https://featherwallet.org/download).
 
@@ -33,6 +33,6 @@ See [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/mast
 
 If you are looking to set up a development environment for Feather, see [HACKING.md](https://github.com/feather-wallet/feather/blob/master/HACKING.md).
 
-It is highly recommended that you join the `#feather` IRC channel on OFTC or `#feather:monero.social` on Matrix if you 
+It is highly recommended that you join the `#feather` IRC channel on [OFTC](https://www.oftc.net/) or [`#feather:monero.social`](https://matrix.to/#/#feather:monero.social) on Matrix if you 
 are hacking on Feather. Due to the nature of this open source software project, idling in this channel is the best 
 way to stay updated on best practices and new developments.
