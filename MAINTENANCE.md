@@ -30,7 +30,7 @@ Security issues that affect Feather always warrant a new release as soon as poss
 - Ensure releases are reproducible and stay that way
 - Upload source archives to the fallback mirror
 
-To learn more about Feather's build system, see: `contrib/guix/README.md`
+To learn more about Feather's build system, see: [`contrib/guix/README.md`](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md)
 
 [Bootstrappable builds](https://bootstrappable.org/) are a requirement for all release builds since version 2.2.2. 
 Our Guix time-machine is currently pinned at a commit which implements the 
