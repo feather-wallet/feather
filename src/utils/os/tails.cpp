@@ -23,7 +23,9 @@ bool TailsOS::detect()
     QByteArray data = Utils::fileOpen("/etc/os-release");
     QRegularExpression re("TAILS_PRODUCT_NAME=\"Tails\"");
     QRegularExpressionMatch os_match = re.match(data);
-    bool matched = os_match.hasMatch();
+
+    QRegularExpression re_6("NAME=\"Tails\"");
+    bool matched = os_match.hasMatch() || re_6.match(data).hasMatch();
 
     if (matched)
         qDebug() << "Tails OS detected";
