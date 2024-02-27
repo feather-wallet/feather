@@ -79,7 +79,7 @@ set(PLUGIN_PREFIX "WITH_PLUGIN_")
 foreach (_var ${_vars})
     string(REGEX MATCH "^${PLUGIN_PREFIX}" _isPlugin ${_var})
 
-    if (NOT _var)
+    if (NOT ${_var})
         continue()
     endif()
 
