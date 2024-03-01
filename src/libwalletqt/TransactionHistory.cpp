@@ -344,7 +344,7 @@ bool TransactionHistory::writeCSV(const QString &path) {
 
     auto transactions = m_rows;
 
-    std::sort(m_rows.begin(), m_rows.end(), [](const TransactionRow *info1, const TransactionRow *info2){
+    std::sort(transactions.begin(), transactions.end(), [](const TransactionRow *info1, const TransactionRow *info2){
         return info1->blockHeight() < info2->blockHeight();
     });
 
