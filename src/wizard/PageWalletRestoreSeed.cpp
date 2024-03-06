@@ -12,6 +12,7 @@
 #include <QShortcut>
 
 #include "dialog/SeedRecoveryDialog.h"
+#include "dialog/LegacySeedRecovery.h"
 #include <monero_seed/wordlist.hpp>  // tevador 14 word
 #include "utils/Seed.h"
 #include "constants.h"
@@ -61,8 +62,14 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
 
     QShortcut *shortcut = new QShortcut(QKeySequence("Ctrl+K"), this);
     QObject::connect(shortcut, &QShortcut::activated, [&](){
-        SeedRecoveryDialog dialog{this};
-        dialog.exec();
+        if (ui->radio16->isChecked()) {
+            SeedRecoveryDialog dialog{this};
+            dialog.exec();
+        }
+        if (ui->radio25->isChecked()) {
+            LegacySeedRecovery dialog{this};
+            dialog.exec();
+        }
     });
 
     ui->seedObscured->hide();
