@@ -405,8 +405,6 @@ public:
     //! create a view only wallet
     bool createViewOnly(const QString &path, const QString &password) const;
 
-    PendingTransaction::Priority tx_priority = PendingTransaction::Priority::Priority_Low;
-
     QString tmpTxDescription; // TODO: remove the need for this var
     bool refreshedOnce = false;
 

@@ -22,13 +22,6 @@ public:
     };
     Q_ENUM(Status)
 
-    enum Priority {
-        Priority_Low    = Monero::PendingTransaction::Priority_Low,
-        Priority_Medium = Monero::PendingTransaction::Priority_Medium,
-        Priority_High   = Monero::PendingTransaction::Priority_High
-    };
-
-
     Status status() const;
     QString errorString() const;
     const std::exception_ptr getException() const;

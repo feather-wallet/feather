@@ -838,7 +838,7 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
         std::set<uint32_t> subaddr_indices;
 
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? Monero::optional<uint64_t>() : Monero::optional<uint64_t>(amount), constants::mixin,
-                                                                             static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
+                                                                             Monero::PendingTransaction::Priority_Default,
                                                                              currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
 
         QVector<QString> addresses{address};
@@ -865,7 +865,7 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
 
         std::set<uint32_t> subaddr_indices;
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amount, constants::mixin,
-                                                                                     static_cast<Monero::PendingTransaction::Priority>(this->tx_priority),
+                                                                                     Monero::PendingTransaction::Priority_Default,
                                                                                      currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
 
         this->onTransactionCreated(ptImpl, addresses);
@@ -885,7 +885,10 @@ void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bo
         for (const auto &key_image : keyImages) {
             kis.push_back(key_image.toStdString());
         }
-        Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis, address.toStdString(), outputs, static_cast<Monero::PendingTransaction::Priority>(this->tx_priority));
+        Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis,
+                                                                                     address.toStdString(),
+                                                                                     outputs,
+                                                                                     Monero::PendingTransaction::Priority_Default);
 
         QVector<QString> addresses {address};
         this->onTransactionCreated(ptImpl, addresses);
