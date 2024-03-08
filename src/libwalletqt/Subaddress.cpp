@@ -120,33 +120,53 @@ bool Subaddress::refresh(quint32 accountIndex)
     emit refreshStarted();
     
     this->clearRows();
-    for (qsizetype i = 0; i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
+
+    bool potentialWalletFileCorruption = false;
+
+    for (quint32 i = 0; i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
     {
-        QString address = QString::fromStdString(m_wallet2->get_subaddress_as_str({accountIndex, (uint32_t)i}));
-        
+        cryptonote::subaddress_index index = {accountIndex, i};
+        cryptonote::account_public_address address = m_wallet2->get_subaddress(index);
+
+        // Make sure we have previously generated Di
+        auto idx =  m_wallet2->get_subaddress_index(address);
+        if (!idx) {
+            potentialWalletFileCorruption = true;
+            break;
+        }
+
+        // Verify mapping
+        if (idx != index) {
+            potentialWalletFileCorruption = true;
+            break;
+        }
+
+        QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
+
         auto* row = new SubaddressRow{this,
                                       i,
-                                      address,
-                                      QString::fromStdString(m_wallet2->get_subaddress_label({accountIndex, (uint32_t)i})),
+                                      addressStr,
+                                      QString::fromStdString(m_wallet2->get_subaddress_label(index)),
                                       m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i}),
-                                      this->isHidden(address),
-                                      this->isPinned(address)
+                                      this->isHidden(addressStr),
+                                      this->isPinned(addressStr)
         };
         
         m_rows.append(row);
     }
 
     // Make sure keys are intact. We NEVER want to display incorrect addresses in case of memory corruption.
-    bool keysCorrupt = m_wallet2->get_device_type() == hw::device::SOFTWARE && !m_wallet2->verify_keys();
+    potentialWalletFileCorruption = potentialWalletFileCorruption || (m_wallet2->get_device_type() == hw::device::SOFTWARE && !m_wallet2->verify_keys());
 
-    if (keysCorrupt) {
-        clearRows();
+    if (potentialWalletFileCorruption) {
         LOG_ERROR("KEY INCONSISTENCY DETECTED, WALLET IS IN CORRUPT STATE.");
+        clearRows();
+        emit corrupted();
     }
 
     emit refreshFinished();
 
-    return !keysCorrupt;
+    return !potentialWalletFileCorruption;
 }
 
 qsizetype Subaddress::count() const

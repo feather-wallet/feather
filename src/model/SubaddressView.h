@@ -10,9 +10,13 @@
 
 class SubaddressView : public QTreeView
 {
+Q_OBJECT
 
 public:
     SubaddressView(QWidget* parent = nullptr);
+
+signals:
+    void copyAddress();
 
 protected:
     void keyPressEvent(QKeyEvent *event);

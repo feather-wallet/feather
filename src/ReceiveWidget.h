@@ -31,6 +31,7 @@ public:
     void focusSearchbar();
 
 public slots:
+    QString getAddress(quint32 minorIndex);
     void copyAddress();
     void copyLabel();
     void editLabel();

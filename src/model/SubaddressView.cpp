@@ -4,6 +4,7 @@
 #include "SubaddressView.h"
 
 #include "utils/Utils.h"
+#include "SubaddressModel.h"
 
 SubaddressView::SubaddressView(QWidget *parent) : QTreeView(parent) {
 
@@ -15,7 +16,11 @@ void SubaddressView::keyPressEvent(QKeyEvent *event){
     if(!selectedIndexes().isEmpty()){
         if(event->matches(QKeySequence::Copy)){
             QModelIndex index = this->currentIndex();
-            Utils::copyColumn(&index, index.column());
+            if (index.column() == SubaddressModel::ModelColumn::Address) {
+                emit copyAddress();
+            } else {
+                Utils::copyColumn(&index, index.column());
+            }
         }
         else
             QTreeView::keyPressEvent(event);

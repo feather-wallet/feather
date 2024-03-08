@@ -3,7 +3,7 @@
 
 #include "SubaddressRow.h"
 
-qsizetype SubaddressRow::getRow() const {
+quint32 SubaddressRow::getRow() const {
     return m_row;
 }
 

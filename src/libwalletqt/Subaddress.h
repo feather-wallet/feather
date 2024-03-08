@@ -46,6 +46,7 @@ public:
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
+    void corrupted() const;
 
 private:
     explicit Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);

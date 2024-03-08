@@ -30,7 +30,7 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     ui->addresses->header()->setSectionResizeMode(SubaddressModel::Address, QHeaderView::ResizeToContents);
     ui->addresses->header()->setSectionResizeMode(SubaddressModel::Label, QHeaderView::Stretch);
 
-    connect(ui->addresses->selectionModel(), &QItemSelectionModel::currentChanged, [=](QModelIndex current, QModelIndex prev){
+    connect(ui->addresses->selectionModel(), &QItemSelectionModel::selectionChanged, [=](const QItemSelection &selected, const QItemSelection &deselected){
         this->updateQrCode();
     });
     connect(m_model, &SubaddressModel::modelReset, [this](){
@@ -74,12 +74,12 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
     m_showTransactionsAction = new QAction("Show transactions");
     connect(m_showTransactionsAction, &QAction::triggered, this, &ReceiveWidget::onShowTransactions);
     connect(ui->addresses, &QTreeView::customContextMenuRequested, this, &ReceiveWidget::showContextMenu);
-
-    connect(ui->btn_generateSubaddress, &QPushButton::clicked, this, &ReceiveWidget::generateSubaddress);
+    connect(ui->addresses, &SubaddressView::copyAddress, this, &ReceiveWidget::copyAddress);
 
     connect(ui->qrCode, &ClickableLabel::clicked, this, &ReceiveWidget::showQrCodeDialog);
     connect(ui->search, &QLineEdit::textChanged, this, &ReceiveWidget::setSearchFilter);
 
+    connect(ui->btn_generateSubaddress, &QPushButton::clicked, this, &ReceiveWidget::generateSubaddress);
     connect(ui->btn_createPaymentRequest, &QPushButton::clicked, this, &ReceiveWidget::createPaymentRequest);
 }
 
@@ -104,9 +104,32 @@ void ReceiveWidget::focusSearchbar() {
     ui->search->setFocus();
 }
 
+QString ReceiveWidget::getAddress(quint32 minorIndex) {
+    bool ok;
+    QString reason;
+    QString address = m_wallet->getAddressSafe(m_wallet->currentSubaddressAccount(), minorIndex, ok, reason);
+
+    if (!ok) {
+        Utils::showError(this, "Unable to get address",
+                         QString("Reason: %1\n\n"
+                                 "WARNING!\n\n"
+                                 "Potential wallet file corruption detected.\n\n"
+                                 "To prevent LOSS OF FUNDS do NOT continue to use this wallet file.\n\n"
+                                 "Restore your wallet from seed, keys, or device.\n\n"
+                                 "Please report this incident to the Feather developers.\n\n"
+                                 "WARNING!").arg(reason), {}, "report_an_issue");
+        return {};
+    }
+
+    return address;
+}
+
 void ReceiveWidget::copyAddress() {
-    QModelIndex index = ui->addresses->currentIndex();
-    Utils::copyColumn(&index, SubaddressModel::Address);
+    SubaddressRow* row = this->currentEntry();
+    if (!row) return;
+
+    QString address = this->getAddress(row->getRow());
+    Utils::copyToClipboard(address);
 }
 
 void ReceiveWidget::copyLabel() {
@@ -115,7 +138,7 @@ void ReceiveWidget::copyLabel() {
 }
 
 void ReceiveWidget::editLabel() {
-    QModelIndex index = ui->addresses->currentIndex().siblingAtColumn(m_model->ModelColumn::Label);
+    QModelIndex index = ui->addresses->currentIndex().siblingAtColumn(SubaddressModel::ModelColumn::Label);
     ui->addresses->setCurrentIndex(index);
     ui->addresses->edit(index);
 }
@@ -164,24 +187,20 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 }
 
 void ReceiveWidget::createPaymentRequest() {
-    QModelIndex index = ui->addresses->currentIndex();
-    if (!index.isValid()) {
-        return;
-    }
+    SubaddressRow* row = this->currentEntry();
+    if (!row) return;
 
-    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+    QString address = this->getAddress(row->getRow());
 
     PaymentRequestDialog dialog{this, m_wallet, address};
     dialog.exec();
 }
 
 void ReceiveWidget::onShowTransactions() {
-    QModelIndex index = ui->addresses->currentIndex();
-    if (!index.isValid()) {
-        return;
-    }
+    SubaddressRow* row = this->currentEntry();
+    if (!row) return;
 
-    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+    QString address = this->getAddress(row->getRow());
     emit showTransactions(address);
 }
 
@@ -209,14 +228,14 @@ void ReceiveWidget::generateSubaddress() {
 }
 
 void ReceiveWidget::updateQrCode(){
-    QModelIndex index = ui->addresses->currentIndex();
-    if (!index.isValid()) {
+    SubaddressRow* row = this->currentEntry();
+    if (!row) {
         ui->qrCode->clear();
         ui->btn_createPaymentRequest->hide();
         return;
     }
 
-    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+    QString address = this->getAddress(row->getRow());
     const QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::MEDIUM);
 
     int width = ui->qrCode->width() - 4;
@@ -227,11 +246,10 @@ void ReceiveWidget::updateQrCode(){
 }
 
 void ReceiveWidget::showQrCodeDialog() {
-    QModelIndex index = ui->addresses->currentIndex();
-    if (!index.isValid()) {
-        return;
-    }
-    QString address = index.model()->data(index.siblingAtColumn(SubaddressModel::Address), Qt::UserRole).toString();
+    SubaddressRow* row = this->currentEntry();
+    if (!row) return;
+
+    QString address = this->getAddress(row->getRow());
     QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
     QrCodeDialog dialog{this, &qr, "Address"};
     dialog.exec();

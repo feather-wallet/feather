@@ -82,6 +82,10 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     connect(this, &Wallet::updated, this, &Wallet::onUpdated);
     connect(this, &Wallet::heightsRefreshed, this, &Wallet::onHeightsRefreshed);
     connect(this, &Wallet::transactionCommitted, this, &Wallet::onTransactionCommitted);
+
+    connect(m_subaddress, &Subaddress::corrupted, [this]{
+       emit keysCorrupted();
+    });
 }
 
 // #################### Status ####################
@@ -183,6 +187,85 @@ void Wallet::updateBalance() {
 
 QString Wallet::address(quint32 accountIndex, quint32 addressIndex) const {
     return QString::fromStdString(m_wallet2->get_subaddress_as_str({accountIndex, addressIndex}));
+}
+
+QString Wallet::getAddressSafe(quint32 accountIndex, quint32 addressIndex, bool &ok, QString &reason) const {
+    ok = false;
+
+    // If we copy an address to clipboard or create a QR code, there must not be a spark of doubt that
+    // the address belongs to our wallet.
+
+    // This function does a number of sanity checks, some seemingly unnecessary or redundant to ensure
+    // that, yes, we own this address. It provides basic protection against memory corruption errors.
+
+    if (accountIndex >= this->numSubaddressAccounts()) {
+        reason = "Account index exceeds number of pre-computed subaddress accounts";
+        return {};
+    }
+
+    if (addressIndex >= this->numSubaddresses(accountIndex)) {
+        reason = "Address index exceeds number of pre-computed subaddresses";
+        return {};
+    }
+
+    // Realistically, nobody will have more than 1M subaddresses or accounts in their wallet.
+    if (accountIndex >= 1000000) {
+        reason = "Account index exceeds safety limit";
+        return {};
+    }
+
+    if (addressIndex >= 1000000) {
+        reason = "Address index exceeds safety limit";
+        return {};
+    }
+
+    // subaddress public spendkey (Di) = Hs(secret viewkey || subaddress index)G + primary address public spendkey (B)
+    // subaddress public viewkey  (Ci) = D * secret viewkey (a)
+
+    if (!m_wallet2->verify_keys()) {
+        reason = "Unable to verify viewkey";
+        return {};
+    }
+
+    cryptonote::subaddress_index index = {accountIndex, addressIndex};
+    cryptonote::account_public_address address = m_wallet2->get_subaddress(index);
+
+    // Make sure we have previously generated Di
+    auto idx =  m_wallet2->get_subaddress_index(address);
+    if (!idx) {
+        reason = "No mapping found for this subaddress public spendkey";
+        return {};
+    }
+
+    // Verify mapping
+    if (idx != index) {
+        reason = "Invalid subaddress public spendkey mapping";
+        return {};
+    }
+
+    // Recompute address
+    cryptonote::account_public_address address2 = m_wallet2->get_subaddress(idx.value());
+    if (address != address2) {
+        reason = "Recomputed address does not match original address";
+        return {};
+    }
+
+    std::string address_str = m_wallet2->get_subaddress_as_str(index);
+
+    // Make sure address is parseable
+    cryptonote::address_parse_info info;
+    if (!cryptonote::get_account_address_from_str(info, m_wallet2->nettype(), address_str)) {
+        reason = "Unable to parse address";
+        return {};
+    }
+
+    if (info.address != address) {
+        reason = "Parsed address does not match original address";
+        return {};
+    }
+
+    ok = true;
+    return QString::fromStdString(address_str);
 }
 
 SubaddressIndex Wallet::subaddressIndex(const QString &address) const {
@@ -479,14 +562,7 @@ void Wallet::onRefreshed(bool success, const QString &message) {
 void Wallet::refreshModels() {
     m_history->refresh();
     m_coins->refresh();
-    bool r = this->subaddress()->refresh(this->currentSubaddressAccount());
-
-    if (!r) {
-        // This should only happen if wallet keys got corrupted or were tampered with
-        // The list of subaddresses is wiped to prevent loss of funds
-        // Notify MainWindow to display an error message
-        emit keysCorrupted();
-    }
+    this->subaddress()->refresh(this->currentSubaddressAccount());
 }
 
 // #################### Hardware wallet ####################

@@ -11,7 +11,7 @@ class SubaddressRow : public QObject
     Q_OBJECT
     
 public:
-    SubaddressRow(QObject *parent, qsizetype row, const QString& address, const QString &label, bool used, bool hidden, bool pinned)
+    SubaddressRow(QObject *parent, quint32 row, const QString& address, const QString &label, bool used, bool hidden, bool pinned)
         : QObject(parent)
         , m_row(row)
         , m_address(address)
@@ -20,7 +20,7 @@ public:
         , m_hidden(hidden)
         , m_pinned(pinned) {}
     
-    qsizetype getRow() const;
+    [[nodiscard]] quint32 getRow() const;
     const QString& getAddress() const;
     const QString& getLabel() const;
     bool isUsed() const;
@@ -28,7 +28,7 @@ public:
     bool isPinned() const;
     
 private:
-    qsizetype m_row;
+    quint32 m_row;
     QString m_address;
     QString m_label;
     bool m_used = false;

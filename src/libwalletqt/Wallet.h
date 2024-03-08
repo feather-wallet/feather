@@ -154,8 +154,8 @@ public:
     void updateBalance();
 
     // ##### Subaddresses and Accounts #####
-    //! returns wallet's public address
     QString address(quint32 accountIndex, quint32 addressIndex) const;
+    QString getAddressSafe(quint32 accountIndex, quint32 addressIndex, bool &ok, QString &reason) const;
 
     //! returns the subaddress index of the address
     SubaddressIndex subaddressIndex(const QString &address) const;
