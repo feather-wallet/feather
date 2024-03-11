@@ -15,13 +15,13 @@ define $(package)_config_cmds
 endef
 
 define $(package)_build_cmds
-  $(MAKE) -C src
+  $(MAKE) -C src protoc
 endef
 
 define $(package)_stage_cmds
-  $(MAKE) DESTDIR=$($(package)_staging_dir) -C src install
+  $(MAKE) DESTDIR=$($(package)_staging_dir) -C src install-binPROGRAMS install-nobase_dist_protoDATA
 endef
 
 define $(package)_postprocess_cmds
-  rm lib/libprotoc.a
+  rm -rf lib/
 endef
