@@ -21,6 +21,7 @@ $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
+$(package)_patches += fix_static_qt_darwin_camera_permissions.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -196,6 +197,7 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/xcb-util-image-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
+  patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
