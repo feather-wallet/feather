@@ -832,6 +832,7 @@ void Wallet::setSelectedInputs(const QStringList &selectedInputs) {
 
 void Wallet::createTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
     this->tmpTxDescription = description;
+    pauseRefresh();
 
     qInfo() << "Creating transaction";
     m_scheduler.run([this, all, address, amount] {
@@ -850,6 +851,7 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
 
 void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description) {
     this->tmpTxDescription = description;
+    pauseRefresh();
 
     qInfo() << "Creating transaction";
     m_scheduler.run([this, addresses, amounts] {
@@ -875,6 +877,7 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
 }
 
 void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs) {
+    pauseRefresh();
     if (churn) {
         address = this->address(0, 0);
     }
@@ -901,6 +904,7 @@ void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bo
 
 void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector<QString> &address) {
     qDebug() << Q_FUNC_INFO;
+    startRefresh();
 
     PendingTransaction *tx = new PendingTransaction(mtx, this);
 
