@@ -199,7 +199,7 @@ host_to_commonname() {
     esac
 }
 
-SOURCE_DATE_EPOCH="1701896000"
+COMMIT_TIMESTAMP="$(git -c log.showSignature=false log --format=%at -1)"
 
 # Precious directories are those which should not be cleaned between successive
 # guix builds
@@ -322,7 +322,7 @@ for host in $HOSTS; do
         # shellcheck disable=SC2030
 cat << EOF
 INFO: Building ${VERSION:?not set} for platform triple ${HOST:?not set}:
-      ...using reference timestamp: ${SOURCE_DATE_EPOCH:?not set}
+      ...using commit timestamp: ${COMMIT_TIMESTAMP:?not set}
       ...running at most ${JOBS:?not set} jobs
       ...from worktree directory: '${PWD}'
           ...bind-mounted in container to: '/feather'
@@ -434,7 +434,7 @@ EOF
                                  -- env HOST="$HOST" \
                                         DISTNAME="$DISTNAME" \
                                         JOBS="$JOBS" \
-                                        SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
+                                        COMMIT_TIMESTAMP="${COMMIT_TIMESTAMP:?unable to determine value}" \
                                         ${V:+V=1} \
                                         ${SOURCES_PATH:+SOURCES_PATH="$SOURCES_PATH"} \
                                         ${BASE_CACHE:+BASE_CACHE="$BASE_CACHE"} \
@@ -465,7 +465,7 @@ EOF
                                          ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                          ${ADDITIONAL_GUIX_COMMON_FLAGS} ${ADDITIONAL_GUIX_ENVIRONMENT_FLAGS} \
                                          -- env DISTNAME="$DISTNAME" \
-                                                SOURCE_DATE_EPOCH="${SOURCE_DATE_EPOCH:?unable to determine value}" \
+                                                SOURCE_DATE_EPOCH="${COMMIT_TIMESTAMP:?unable to determine value}" \
                                                 VERSION="$VERSION" \
                                          bash -c "cd /feather && \
                                                   bash contrib/flatpak/make_flatpak.sh"

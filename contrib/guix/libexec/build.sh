@@ -36,7 +36,7 @@ Required environment variables as seen inside the container:
     DIST_ARCHIVE_BASE: ${DIST_ARCHIVE_BASE:?not set}
     DISTNAME: ${DISTNAME:?not set}
     HOST: ${HOST:?not set}
-    SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH:?not set}
+    COMMIT_TIMESTAMP: ${COMMIT_TIMESTAMP:?not set}
     JOBS: ${JOBS:?not set}
     DISTSRC: ${DISTSRC:?not set}
     OUTDIR: ${OUTDIR:?not set}
@@ -45,6 +45,9 @@ EOF
 
 ACTUAL_OUTDIR="${OUTDIR}"
 OUTDIR="${DISTSRC}/output"
+
+# Use a fixed timestamp for depends builds so hashes match across commits that don't make changes to the build system
+export SOURCE_DATE_EPOCH=1397818193
 
 #####################
 # Environment Setup #
@@ -229,6 +232,10 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
 ###########################
 # Source Tarball Building #
 ###########################
+
+# Use COMMIT_TIMESTAMP for the source and release binary archives
+export SOURCE_DATE_EPOCH=${COMMIT_TIMESTAMP}
+export TAR_OPTIONS="--owner=0 --group=0 --numeric-owner --mtime='@${SOURCE_DATE_EPOCH}' --sort=name"
 
 GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 
