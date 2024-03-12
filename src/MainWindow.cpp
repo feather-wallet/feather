@@ -864,6 +864,11 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                     message.description = "Spendable balance insufficient to pay for transaction fee.";
                     bug = false;
                 }
+                if (msg.contains("Failed to get height") || msg.contains("Failed to get earliest fork height")) {
+                    message.description = QString("RPC error: %1").arg(QString::fromStdString(e.to_string()));
+                    message.helpItems = {"Try sending the transaction again.", "If this keeps happening, connect to a different node."};
+                    bug = false;
+                }
 
                 if (bug) {
                     message.helpItems = {"You have found a bug. Please contact the developers."};
