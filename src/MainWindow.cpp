@@ -909,8 +909,6 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
         return;
     }
 
-    m_wallet->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
-
     // Offline transaction signing
     if (m_wallet->viewOnly()) {
 #ifdef WITH_SCANNER
@@ -933,6 +931,8 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
         return;
 #endif
     }
+
+    m_wallet->addCacheTransaction(tx->txid()[0], tx->signedTxToHex(0));
 
     // Show advanced dialog on multi-destination transactions
     if (address.size() > 1) {
