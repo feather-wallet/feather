@@ -76,6 +76,8 @@ DISTSRC_BASE="${DISTSRC_BASE:-${VERSION_BASE}}"
 
 OUTDIR_BASE="${OUTDIR_BASE:-${VERSION_BASE}/output}"
 
+LOGDIR_BASE="${LOGDIR_BASE:-${VERSION_BASE}/logs}"
+
 var_base_basename="var"
 VAR_BASE="${VAR_BASE:-${VERSION_BASE}/${var_base_basename}}"
 

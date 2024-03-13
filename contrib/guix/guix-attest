@@ -107,10 +107,10 @@ fi
 # We should be able to find at least one output
 ################
 
-echo "Looking for build output SHA256SUMS fragments in ${OUTDIR_BASE}"
+echo "Looking for build output SHA256SUMS fragments in ${LOGDIR_BASE}"
 
 shopt -s nullglob
-sha256sum_fragments=( "$OUTDIR_BASE"/*/SHA256SUMS.part ) # This expands to an array of directories...
+sha256sum_fragments=( "$LOGDIR_BASE"/*/SHA256SUMS.part ) # This expands to an array of directories...
 shopt -u nullglob
 
 noncodesigned_fragments=()
@@ -118,20 +118,20 @@ codesigned_fragments=()
 
 if (( ${#sha256sum_fragments[@]} )); then
     echo "Found build output SHA256SUMS fragments:"
-    for outdir in "${sha256sum_fragments[@]}"; do
-        echo "    '$outdir'"
-        case "$outdir" in
-            "$OUTDIR_BASE"/*-codesigned/SHA256SUMS.part)
-                codesigned_fragments+=("$outdir")
+    for logdir in "${sha256sum_fragments[@]}"; do
+        echo "    '$logdir'"
+        case "$logdir" in
+            "$LOGDIR_BASE"/*-codesigned/SHA256SUMS.part)
+                codesigned_fragments+=("$logdir")
                 ;;
             *)
-                noncodesigned_fragments+=("$outdir")
+                noncodesigned_fragments+=("$logdir")
                 ;;
         esac
     done
     echo
 else
-    echo "ERR: Could not find any build output SHA256SUMS fragments in ${OUTDIR_BASE}"
+    echo "ERR: Could not find any build output SHA256SUMS fragments in ${LOGDIR_BASE}"
     exit 1
 fi
 
@@ -139,7 +139,7 @@ fi
 ##  Attest  ##
 ##############
 
-# Usage: out_name $outdir
+# Usage: out_name $logdir
 #
 #   HOST: The output directory being attested
 #

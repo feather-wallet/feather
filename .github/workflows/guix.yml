@@ -2,77 +2,22 @@ name: ci/gh-actions/guix
 
 on: [push, pull_request]
 
-env:
-  APT_SET_CONF: |
-    echo "Acquire::Retries \"3\";"         | sudo tee -a /etc/apt/apt.conf.d/80-custom
-    echo "Acquire::http::Timeout \"120\";" | sudo tee -a /etc/apt/apt.conf.d/80-custom
-    echo "Acquire::ftp::Timeout \"120\";"  | sudo tee -a /etc/apt/apt.conf.d/80-custom
-
 jobs:
   cache-sources:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: depends sources cache
         id: cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: download depends sources
         if: steps.cache.outputs.cache-hit != 'true'
         run: make -C contrib/depends download
-
-  cache-guix:
-    runs-on: ubuntu-latest
-    needs: [cache-sources]
-    steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-      - name: guix cache
-        id: cache
-        uses: actions/cache@v3
-        with:
-          path: |
-            gnu/store
-            guix_db.sqlite
-          key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
-      - name: move guix store
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          if [[ -e "guix_db.sqlite" ]]; then
-              sudo mkdir -p /var/guix/db
-              sudo mv gnu /gnu
-              sudo cp guix_db.sqlite /var/guix/db/db.sqlite
-
-              sudo chmod 1775 /gnu/store
-              sudo chown 0644 /var/guix/db/db.sqlite
-              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
-          fi
-      - name: depends sources cache
-        if: steps.cache.outputs.cache-hit != 'true'
-        uses: actions/cache/restore@v3
-        with:
-          path: contrib/depends/sources
-          key: sources-${{ hashFiles('contrib/depends/packages/*') }}
-      - name: set apt conf
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: ${{env.APT_SET_CONF}}
-      - name: install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: sudo apt update; sudo apt -y install guix git ca-certificates
-      - name: dry run
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: DRY_RUN=1 SUBSTITUTE_URLS='http://ci.guix.gnu.org' JOBS=2 ./contrib/guix/guix-build
-      - name: prepare guix store for caching
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: |
-          sudo systemctl stop guix-daemon
-          sudo mv /gnu gnu
-          sudo mv /var/guix/db/db.sqlite guix_db.sqlite
 
   build-guix:
     runs-on: ubuntu-latest
@@ -81,70 +26,50 @@ jobs:
       fail-fast: false
       matrix:
         toolchain:
-          - name: "x86_64-linux-gnu"
-            host: "x86_64-linux-gnu"
-          - name: "x86_64-linux-gnu.no-tor-bundle"
-            host: "x86_64-linux-gnu.no-tor-bundle"
-          - name: "x86_64-linux-gnu.pack"
-            host: "x86_64-linux-gnu.pack"
-          - name: "aarch64-linux-gnu"
-            host: "aarch64-linux-gnu"
-          - name: "arm-linux-gnueabihf"
-            host: "arm-linux-gnueabihf"
-          - name: "riscv64-linux-gnu"
-            host: "riscv64-linux-gnu"
-          - name: "i686-linux-gnu"
-            host: "i686-linux-gnu"
-          - name: "x86_64-w64-mingw32"
-            host: "x86_64-w64-mingw32"
-          - name: "x86_64-w64-mingw32.installer"
-            host: "x86_64-w64-mingw32.installer"
-          - name: "x86_64-apple-darwin"
-            host: "x86_64-apple-darwin"
-          - name: "arm64-apple-darwin"
-            host: "arm64-apple-darwin"
-    name: ${{ matrix.toolchain.name }}
+          - target: "x86_64-linux-gnu"
+          - target: "x86_64-linux-gnu.no-tor-bundle"
+          - target: "x86_64-linux-gnu.pack"
+          - target: "aarch64-linux-gnu"
+          - target: "arm-linux-gnueabihf"
+          - target: "riscv64-linux-gnu"
+          - target: "i686-linux-gnu"
+          - target: "x86_64-w64-mingw32"
+          - target: "x86_64-w64-mingw32.installer"
+          - target: "x86_64-apple-darwin"
+          - target: "arm64-apple-darwin"
+
+    name: ${{ matrix.toolchain.target }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           submodules: recursive
-      - name: guix cache
-        uses: actions/cache/restore@v3
-        with:
-          path: |
-            gnu/store
-            guix_db.sqlite
-          key: guix-${{ hashFiles('contrib/guix/manifest.scm') }}
-      - name: move guix store
-        run: |
-          if [[ -e "guix_db.sqlite" ]]; then
-              sudo mkdir -p /var/guix/db
-              sudo mv gnu /gnu
-              sudo cp guix_db.sqlite /var/guix/db/db.sqlite
-          
-              sudo chmod 1775 /gnu/store
-              sudo chown 0644 /var/guix/db/db.sqlite
-              sudo chown -R root:root /gnu/store /var/guix/db/db.sqlite
-          fi
-      - name: depends cache
-        uses: actions/cache@v3
-        with:
-          path: contrib/depends/built
-          key: depends-${{ matrix.toolchain.host }}-${{ hashFiles('contrib/depends/packages/*') }}
+      - name: remove bundled packages
+        run: sudo rm -rf /usr/local
       - name: depends sources cache
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
-      - name: set apt conf
-        run: ${{env.APT_SET_CONF}}
       - name: install dependencies
         run: sudo apt update; sudo apt -y install guix git ca-certificates
       - name: build
-        run: SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.host }}" JOBS=2 ./contrib/guix/guix-build
-      - uses: actions/upload-artifact@v3
+        run: SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+      - uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.toolchain.name }}
+          name: ${{ matrix.toolchain.target }}
           path: |
-            guix/guix-build-*/output/${{ matrix.toolchain.host }}/*
+            guix/guix-build-*/output/${{ matrix.toolchain.target }}/*
+            guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
+
+  bundle-logs:
+    runs-on: ubuntu-latest
+    needs: [build-guix]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: "logs"
+          path: '**/logs/**'

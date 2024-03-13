@@ -40,6 +40,7 @@ Required environment variables as seen inside the container:
     JOBS: ${JOBS:?not set}
     DISTSRC: ${DISTSRC:?not set}
     OUTDIR: ${OUTDIR:?not set}
+    LOGDIR: ${LOGDIR:?not set}
     OPTIONS: ${OPTIONS}
 EOF
 
@@ -52,6 +53,11 @@ export SOURCE_DATE_EPOCH=1397818193
 #####################
 # Environment Setup #
 #####################
+
+# Collect some information about the build environment to help debug potential reproducibility issues
+mkdir -p "${LOGDIR}"
+ls -1 /gnu/store | sort > ${LOGDIR}/guix-hashes.txt
+printenv | sort | grep -v '^\(BASE_CACHE=\|DISTNAME=\|DISTSRC=\|OUTDIR=\|LOGDIR=\|SOURCES_PATH=\|JOBS=\|OPTIONS=\|DEPENDS_ONLY=\)' > ${LOGDIR}/guix-env.txt
 
 # The depends folder also serves as a base-prefix for depends packages for
 # $HOSTs after successfully building.
@@ -213,6 +219,9 @@ esac
 
 mkdir -p "$OUTDIR"
 
+# Log the depends build ids
+make -C contrib/depends --no-print-directory HOST="$HOST" print-final_build_id_long | tr ':' '\n' > ${LOGDIR}/depends-hashes.txt
+
 # Build the depends tree, overriding variables that assume multilib gcc
 make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    ${V:+V=1} \
@@ -220,6 +229,7 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    ${BASE_CACHE+BASE_CACHE="$BASE_CACHE"} \
                                    ${SDK_PATH+SDK_PATH="$SDK_PATH"} \
                                    OUTDIR="$OUTDIR" \
+                                   LOGDIR="$LOGDIR" \
                                    x86_64_linux_CC=x86_64-linux-gnu-gcc \
                                    x86_64_linux_CXX=x86_64-linux-gnu-g++ \
                                    x86_64_linux_AR=x86_64-linux-gnu-gcc-ar \
@@ -228,6 +238,15 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    x86_64_linux_STRIP=x86_64-linux-gnu-strip \
                                    guix_ldflags="$HOST_LDFLAGS"
 
+# Log the depends package hashes
+DEPENDS_PACKAGES="$(make -C contrib/depends --no-print-directory HOST="$HOST" print-all_packages)"
+DEPENDS_CACHE="$(make -C contrib/depends --no-print-directory ${BASE_CACHE+BASE_CACHE="$BASE_CACHE"} print-BASE_CACHE)"
+
+{
+    for package in ${DEPENDS_PACKAGES}; do
+        cat "${DEPENDS_CACHE}/${HOST}/${package}"/*.hash
+    done
+} | sort -k2 > "${LOGDIR}/depends-packages.txt"
 
 ###########################
 # Source Tarball Building #
@@ -256,7 +275,7 @@ fi
 ###########################
 
 # CFLAGS
-HOST_CFLAGS="-O2 -g"
+HOST_CFLAGS="-O2"
 HOST_CFLAGS+=$(find /gnu/store -maxdepth 1 -mindepth 1 -type d -exec echo -n " -ffile-prefix-map={}=/usr" \;)
 case "$HOST" in
     *linux*)  HOST_CFLAGS+=" -ffile-prefix-map=${PWD}=." ;;
@@ -487,5 +506,5 @@ mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
     } | xargs realpath --relative-base="$PWD" \
       | xargs sha256sum \
       | sort -k2 \
-      | sponge "$ACTUAL_OUTDIR"/SHA256SUMS.part
+      | sponge "$LOGDIR"/SHA256SUMS.part
 )

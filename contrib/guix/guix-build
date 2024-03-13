@@ -91,7 +91,7 @@ export HOSTS="${HOSTS:-i686-linux-gnu x86_64-linux-gnu aarch64-linux-gnu arm-lin
 #   HOST: The current platform triple we're building for
 #
 distsrc_for_host() {
-    echo "${DISTSRC_BASE}/distsrc-${VERSION}-${1}"
+    echo "${DISTSRC_BASE}/build/distsrc-${VERSION}-${1}"
 }
 
 # Accumulate a list of build directories that already exist...
@@ -204,7 +204,7 @@ COMMIT_TIMESTAMP="$(git -c log.showSignature=false log --format=%at -1)"
 # Precious directories are those which should not be cleaned between successive
 # guix builds
 depends_precious_dir_names='SOURCES_PATH BASE_CACHE'
-precious_dir_names="${depends_precious_dir_names} OUTDIR_BASE PROFILES_BASE"
+precious_dir_names="${depends_precious_dir_names} OUTDIR_BASE LOGDIR_BASE PROFILES_BASE"
 
 # Usage: contains IFS-SEPARATED-LIST ITEM
 contains() {
@@ -241,9 +241,10 @@ mkdir -p "$VAR_BASE"
 # shellcheck disable=SC2046,SC2086
 {
     # Get depends precious dir definitions from depends
-    make -C "${PWD}/contrib/depends" \
-         --no-print-directory \
-         -- $(printf "print-%s\n" $depends_precious_dir_names)
+    for precious_dir_name in $depends_precious_dir_names; do
+        precious_dir_path="$(make -C "${PWD}/contrib/depends" --no-print-directory print-${precious_dir_name})"
+        echo "${precious_dir_name}=${precious_dir_path}"
+    done
 
     # Get remaining precious dir definitions from the environment
     for precious_dir_name in $precious_dir_names; do
@@ -254,9 +255,11 @@ mkdir -p "$VAR_BASE"
     done
 } > "${VAR_BASE}/precious_dirs"
 
-# Make sure an output directory exists for our builds
+# Make sure an output and logs directory exists for our builds
 OUTDIR_BASE="${OUTDIR_BASE:-${VERSION_BASE}/output}"
 mkdir -p "$OUTDIR_BASE"
+LOGDIR_BASE="${LOGDIR_BASE:-${VERSION_BASE}/logs}"
+mkdir -p "$LOGDIR_BASE"
 
 # Download the depends sources now as we won't have internet access in the build
 # container
@@ -273,6 +276,15 @@ outdir_for_host() {
     echo "${OUTDIR_BASE}/${1}${2:+-${2}}"
 }
 
+# Usage: logdir_for_host HOST SUFFIX
+#
+#   HOST: The current platform triple we're building for
+#
+logdir_for_host() {
+    echo "${LOGDIR_BASE}/${1}${2:+-${2}}"
+}
+
+
 # Usage: profiledir_for_host HOST SUFFIX
 #
 #   HOST: The current platform triple we're building for
@@ -280,7 +292,6 @@ outdir_for_host() {
 profiledir_for_host() {
     echo "${PROFILES_BASE}/${1}${2:+-${2}}"
 }
-
 
 #########
 # BUILD #
@@ -340,7 +351,7 @@ EOF
                                  --pure \
                                  --no-cwd \
                                  ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
-                                 -- env HOST="$HOST"
+                                 -- echo "$HOST"
 
         if [[ -v DRY_RUN ]]; then
             echo "Dry run, exiting.."
@@ -420,6 +431,7 @@ EOF
                                  --share="$PWD"=/feather \
                                  --share="$DISTSRC_BASE"=/distsrc-base \
                                  --share="$OUTDIR_BASE"=/outdir-base \
+                                 --share="$LOGDIR_BASE"=/logdir-base \
                                  --expose="$(git rev-parse --git-common-dir)" \
                                  ${SOURCES_PATH:+--share="$SOURCES_PATH"} \
                                  ${BASE_CACHE:+--share="$BASE_CACHE"} \
@@ -440,6 +452,7 @@ EOF
                                         ${BASE_CACHE:+BASE_CACHE="$BASE_CACHE"} \
                                         DISTSRC="$(DISTSRC_BASE=/distsrc-base && distsrc_for_host "$host")" \
                                         OUTDIR="$(OUTDIR_BASE=/outdir-base && outdir_for_host "$host")" \
+                                        LOGDIR="$(LOGDIR_BASE=/logdir-base && logdir_for_host "$host")" \
                                         DIST_ARCHIVE_BASE=/outdir-base/dist-archive \
                                         OPTIONS="${host_split[1]}" \
                                       bash -c "cd /feather && bash contrib/guix/libexec/build.sh"

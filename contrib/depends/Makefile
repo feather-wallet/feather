@@ -2,7 +2,7 @@
 
 # Pattern rule to print variables, e.g. make print-top_srcdir
 print-%: FORCE
-	@echo '$*'='$($*)'
+	@echo '$($*)'
 
 # When invoking a sub-make, keep only the command line variable definitions
 # matching the pattern in the filter function.
@@ -127,34 +127,8 @@ include builders/$(build_os).mk
 include builders/default.mk
 include packages/packages.mk
 
-# Previously, we directly invoked the well-known programs using $(shell ...)
-# to construct build_id_string. However, that was problematic because:
-#
-# 1. When invoking a shell, GNU Make special-cases exit code 127 (command not
-#    found) by not capturing the output but instead passing it through. This is
-#    not done for any other exit code.
-#
-# 2. Characters like '#' (from these programs' output) would end up in make
-#    variables like build_id_string, which would be wrongly interpreted by make
-#    when these variables were used.
-#
-# Therefore, we should avoid having arbitrary strings in make variables where
-# possible. The gen_id script used here hashes the output to construct a
-# "make-safe" id.
-#
-# Also note that these lines need to be:
-#
-#     1. After including {hosts,builders}/*.mk, since they rely on the tool
-#        variables (e.g. build_CC, host_STRIP, etc.) to be set.
-#
-#     2. Before including packages/*.mk (excluding packages/packages.mk), since
-#        they rely on the build_id variables
-#
-build_id:=$(shell env SHA256SUM='$(build_SHA256SUM)' DEBUG='$(DEBUG)' ./gen_id '$(BUILD_ID_SALT)' 'GUIX_ENVIRONMENT=$(realpath $(GUIX_ENVIRONMENT))')
-$(host_arch)_$(host_os)_id:=$(shell env SHA256SUM='$(build_SHA256SUM)' DEBUG='$(DEBUG)' ./gen_id '$(HOST_ID_SALT)' 'GUIX_ENVIRONMENT=$(realpath $(GUIX_ENVIRONMENT))')
-ifneq ($(OUTDIR),)
-    $(file >> $(OUTDIR)/build-hashes.txt,$(host_arch)_$(host_os)_id=$($(host_arch)_$(host_os)_id))
-endif
+build_id_string:=$(realpath $(GUIX_ENVIRONMENT))
+$(host_arch)_$(host_os)_id_string:=$(realpath $(GUIX_ENVIRONMENT))
 
 qt_packages_$(NO_QT) = $(qt_packages) $(qt_$(host_os)_packages) $(qt_$(host_arch)_$(host_os)_packages) $(qrencode_packages_)
 tor_packages_$(NO_TOR) = $(tor_packages) $(tor_$(host_os)_packages)
@@ -181,7 +155,7 @@ build-only-$(1)_$(3): CMAKE_SHARED_BOOL = $(if $(findstring shared,$(3)),ON,OFF)
 
 
 toolchain_path=$($($(host_arch)_$(host_os)_native_toolchain)_prefixbin)
-final_build_id_long+=$(shell $(build_SHA256SUM) toolchain.cmake.in)
+final_build_id_long+=:[sha256sum]:$(shell $(build_SHA256SUM) toolchain.cmake.in)
 final_build_id+=$(shell echo -n "$(final_build_id_long)" | $(build_SHA256SUM) | cut -c-$(HASH_LENGTH))
 $(host_prefix)/.stamp_$(final_build_id): $(native_packages) $(packages)
 	rm -rf $(@D)
