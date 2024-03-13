@@ -10,7 +10,7 @@
     - Run `feather-utils/depends/vulns.py` to check
   - Rebase on top of latest Monero version
 - Update `src/assets/ack.txt`
-- Update `SOURCE_DATE_EPOCH` in `contrib/guix/guix-build`
+- Update documentation (`feather-wallet/feather-docs`) and `external/feather-docs` submodule
 - Update the version number in `CMakeLists.txt`
   - A hardfork-ready release must bump major version
 - Create an annotated tag (`git tag x.x.x -a`)
@@ -27,14 +27,12 @@
     ./contrib/guix/guix-build
     ```
   - Alternatively, run `feather-utils/guix/run-build.sh`
-  - Use at least two machines to verify that the builds are reproducible:
-    - In absence of a system for verified reproduction, at least one machine should be air-gapped.
-    - Use the `feather-utils/guix/compare-builds.sh` script to compare two build directories and identify any reproducibility defects.
-    - If builds are not reproducible: fix any reproducibility defects and bump patch version. Do not sign or release non-reproducible builds.
+- Attest the builds (`contrib/guix/guix-attest`) and PR to `feather/feather-sigs`.
+  - Wait until at least one other person has independently verified reproducibility
+  - If builds are not reproducible: fix any reproducibility defects and bump patch version. Do not sign or release non-reproducible builds.
 - Sign release artifacts and hashlists.
   - Transfer files in `guix-build-x.x.x/output` to release signing machine
   - Run `feather-utils/release/make-release.sh`
-- Update documentation (`feather-wallet/feather-docs`)
 - Update the site (`feather-wallet/feather-site`)
   - Run the `feather-utils/site/bump-version.py` script to create a template commit.
   - Edit the changelog in `content/changelog`
@@ -44,6 +42,6 @@
     - Follow the directory structure defined in `MainWindow::onShowUpdateCheck`.
   - Make `depends` source files [available](https://featherwallet.org/files/sources/):
     - `make -C contrib/depends download`
-- Announce release on social media (Reddit, Twitter, irc/Matrix)
+- Announce release on social media (irc/Matrix, Twitter, Lemmy)
 - Update websocket servers to notify clients of new release
   - Wait up to 7 days to allow for bug reports before major rollout
