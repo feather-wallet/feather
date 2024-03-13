@@ -21,7 +21,7 @@ jobs:
 
   build-guix:
     runs-on: ubuntu-latest
-    needs: [cache-guix]
+    needs: [cache-sources]
     strategy:
       fail-fast: false
       matrix:
