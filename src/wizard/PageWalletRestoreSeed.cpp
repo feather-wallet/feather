@@ -43,6 +43,7 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     for (int i = 0; i != 2048; i++)
         bip39English << QString::fromStdString(wordlist::english.get_word(i));
 
+    m_polyseed.type = Seed::Type::POLYSEED;
     m_polyseed.length = 16;
     m_polyseed.setWords(bip39English);
 
@@ -50,9 +51,11 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     // (illegible word with a known location). This can be tested by replacing a word with xxxx
     bip39English << "xxxx";
 
+    m_tevador.type = Seed::Type::TEVADOR;
     m_tevador.length = 14;
     m_tevador.setWords(bip39English);
 
+    m_legacy.type = Seed::Type::MONERO;
     m_legacy.length = 25;
     m_legacy.setWords(m_wordlists["English"]);
     ui->combo_seedLanguage->setCurrentText("English");
@@ -163,10 +166,12 @@ bool PageWalletRestoreSeed::validatePage() {
     QStringList seedSplit = seed.split(" ", Qt::SkipEmptyParts);
 
     if (seedSplit.length() != m_mode->length) {
-        ui->label_errorString->show();
-        ui->label_errorString->setText(QString("The mnemonic seed should be %1 words.").arg(m_mode->length));
-        ui->seedEdit->setStyleSheet(errStyle);
-        return false;
+        if (!(m_mode->type == Seed::Type::MONERO && seedSplit.length() == 24)) {
+            ui->label_errorString->show();
+            ui->label_errorString->setText(QString("The mnemonic seed should be %1 words.").arg(m_mode->length));
+            ui->seedEdit->setStyleSheet(errStyle);
+            return false;
+        }
     }
 
     // libwallet will accept e.g. "brötchen" or "BRÖTCHEN" instead of "Brötchen"

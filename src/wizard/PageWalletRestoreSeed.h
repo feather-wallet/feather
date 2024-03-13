@@ -46,6 +46,7 @@ private:
         QStringList words;
         QStringListModel completerModel;
         QCompleter completer;
+        Seed::Type type;
     };
 
     void onSeedTypeToggled();

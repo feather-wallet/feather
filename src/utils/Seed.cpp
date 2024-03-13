@@ -64,8 +64,13 @@ Seed::Seed(Type type, QStringList mnemonic, NetworkType::Type networkType)
     : type(type), mnemonic(std::move(mnemonic)), networkType(networkType)
 {
     if (m_seedLength[this->type] != this->mnemonic.length()) {
-        this->errorString = "Invalid seed length";
-        return;
+        if (this->type == Seed::Type::MONERO && this->mnemonic.length() == 24) {
+            qDebug() << "Loaded legacy seed without checksum";
+        }
+        else {
+            this->errorString = "Invalid seed length";
+            return;
+        }
     }
 
     if (this->type == Type::POLYSEED) {
