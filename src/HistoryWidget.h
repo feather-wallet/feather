@@ -42,6 +42,7 @@ private slots:
     void onViewOnBlockExplorer();
     void setSearchFilter(const QString &filter);
     void onResendTransaction();
+    void onRemoveFromHistory();
     void createTxProof();
 
 private:

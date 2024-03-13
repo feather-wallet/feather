@@ -1032,6 +1032,20 @@ bool Wallet::submitTxFile(const QString &fileName) const
     return m_walletImpl->importKeyImages(fileName.toStdString() + "_keyImages");
 }
 
+bool Wallet::removeFailedTx(const QString &txid)
+{
+    crypto::hash txid_;
+    if(!epee::string_tools::hex_to_pod(txid.toStdString(), txid_))
+    {
+        return false;
+    }
+
+    bool r = m_wallet2->remove_failed_tx(txid_);
+    m_history->refresh();
+
+    return r;
+}
+
 // #################### Models ####################
 
 TransactionHistory *Wallet::history() const {

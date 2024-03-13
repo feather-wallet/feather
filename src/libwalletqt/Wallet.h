@@ -345,6 +345,8 @@ public:
     //! Submit a transfer from file
     bool submitTxFile(const QString &fileName) const;
 
+    bool removeFailedTx(const QString &txid);
+
     // ##### Models #####
     TransactionHistory* history() const;
     TransactionHistoryProxyModel* historyModel();

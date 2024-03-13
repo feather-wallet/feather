@@ -90,6 +90,10 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
         menu.addAction("Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
+    if (tx->isFailed()) {
+        menu.addAction("Remove from history", this, &HistoryWidget::onRemoveFromHistory);
+    }
+
     menu.addMenu(m_copyMenu);
     menu.addAction("Show details", this, &HistoryWidget::showTxDetails);
     menu.addAction("View on block explorer", this, &HistoryWidget::onViewOnBlockExplorer);
@@ -103,6 +107,16 @@ void HistoryWidget::onResendTransaction() {
     if (tx) {
         QString txid = tx->hash();
         emit resendTransaction(txid);
+    }
+}
+
+void HistoryWidget::onRemoveFromHistory() {
+    auto *tx = ui->history->currentEntry();
+    if (!tx) return;
+
+    auto result = QMessageBox::question(this, "Remove transaction from history", "Are you sure you want to remove this transaction from the history?");
+    if (result == QMessageBox::Yes) {
+        m_wallet->removeFailedTx(tx->hash());
     }
 }
 
