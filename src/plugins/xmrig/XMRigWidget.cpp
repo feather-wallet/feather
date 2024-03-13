@@ -211,11 +211,6 @@ void XMRigWidget::onStartClicked() {
         return;
     }
 
-    if (address.contains("cryptonote.social") && !username.contains(".")) {
-        // cryptonote social requires <addr>.<username>, we'll just grab a few chars from primary addy
-        username = QString("%1.%2").arg(username, m_wallet->address(0, 0).mid(0, 6));
-    }
-
     int threads = ui->threadSlider->value();
     bool solo = (ui->combo_miningMode->currentIndex() == Config::MiningMode::Solo);
     QStringList extraOptions = ui->lineEdit_extraOptions->text().split(" ");

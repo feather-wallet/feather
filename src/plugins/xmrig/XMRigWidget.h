@@ -71,7 +71,7 @@ private:
 
     bool m_isMining = false;
     QStringList m_urls;
-    QStringList m_defaultPools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433","monerohash.com:9999", "cryptonote.social:5555", "cryptonote.social:5556"};
+    QStringList m_defaultPools{"pool.xmr.pt:9000", "pool.supportxmr.com:9000", "mine.xmrpool.net:443", "xmrpool.eu:9999", "xmr-eu1.nanopool.org:14433","monerohash.com:9999"};
 };
 
 #endif // FEATHER_XMRWIDGET_H
