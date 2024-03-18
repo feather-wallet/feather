@@ -97,7 +97,7 @@ chain for " target " development."))
       (home-page (package-home-page xgcc))
       (license (package-license xgcc)))))
 
-(define base-gcc gcc-10)
+(define base-gcc gcc-12)
 (define base-linux-kernel-headers linux-libre-headers-6.1)
 
 (define* (make-bitcoin-cross-toolchain target
@@ -291,9 +291,6 @@ chain for " target " development."))
         meson
         ninja
         zig
-        ;; Native GCC 10 toolchain
-        gcc-toolchain-10
-        (list gcc-toolchain-10 "static")
         ;; Scripting
         perl
         python-minimal
@@ -310,10 +307,21 @@ chain for " target " development."))
   (let ((target (getenv "HOST")))
     (cond ((string-suffix? "-mingw32" target)
            ;; Windows
-           (list (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
-                 nsis-x86_64))
+           (list
+             gcc-toolchain-12
+             (list gcc-toolchain-12 "static")
+             (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
+             nsis-x86_64))
           ((string-contains target "-linux-")
-           (list (make-bitcoin-cross-toolchain target)))
+           (list
+             gcc-toolchain-12
+             (list gcc-toolchain-12 "static")
+             (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
-           (list clang-toolchain-10 binutils ldid))
+           (list
+             gcc-toolchain-10
+             (list gcc-toolchain-10 "static")
+             binutils
+             clang-toolchain-10
+             ldid))
           (else '())))))
