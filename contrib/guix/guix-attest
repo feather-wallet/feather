@@ -121,8 +121,6 @@ if (( ${#sha256sum_fragments[@]} )); then
     for logdir in "${sha256sum_fragments[@]}"; do
         echo "    '$logdir'"
         case "$logdir" in
-            "$LOGDIR_BASE"/*.pack/SHA256SUMS.part)
-                ;;
             "$LOGDIR_BASE"/*-codesigned/SHA256SUMS.part)
                 codesigned_fragments+=("$logdir")
                 ;;
@@ -136,8 +134,6 @@ else
     echo "ERR: Could not find any build output SHA256SUMS fragments in ${LOGDIR_BASE}"
     exit 1
 fi
-
-noncodesigned_fragments+=("$OUTDIR_BASE/x86_64-linux-gnu.pack/SHA256SUMS.part")
 
 ##############
 ##  Attest  ##

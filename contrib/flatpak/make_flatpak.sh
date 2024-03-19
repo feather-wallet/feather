@@ -101,4 +101,4 @@ mv "${DISTNAME}-flatpak.zip" /output
 cd /output
 rm feather
 
-sha256sum "${DISTNAME}-flatpak.zip" > SHA256SUMS.part
+sha256sum "${DISTNAME}-flatpak.zip" > "${LOGDIR}/SHA256SUMS.part"
