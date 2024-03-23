@@ -222,7 +222,7 @@ QString Wallet::getAddressSafe(quint32 accountIndex, quint32 addressIndex, bool 
     // subaddress public spendkey (Di) = Hs(secret viewkey || subaddress index)G + primary address public spendkey (B)
     // subaddress public viewkey  (Ci) = D * secret viewkey (a)
 
-    if (!m_wallet2->verify_keys()) {
+    if (m_wallet2->get_device_type() == hw::device::SOFTWARE && !m_wallet2->verify_keys()) {
         reason = "Unable to verify viewkey";
         return {};
     }
