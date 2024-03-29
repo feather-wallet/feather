@@ -78,6 +78,9 @@ get_directory_property(ARCH_WIDTH DIRECTORY "monero" DEFINITION ARCH_WIDTH)
 get_directory_property(UNBOUND_LIBRARY DIRECTORY "monero" DEFINITION UNBOUND_LIBRARY)
 get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_TREZOR_READY)
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
+get_directory_property(OPENBSD DIRECTORY "monero" DEFINITION OPENBSD)
+get_directory_property(FREEBSD DIRECTORY "monero" DEFINITION FREEBSD)
+get_directory_property(DRAGONFLY DIRECTORY "monero" DEFINITION DRAGONFLY)
 
 # libXau
 # workaround for: undefined reference to `XauGetBestAuthByAddr'
