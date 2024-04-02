@@ -85,10 +85,18 @@ void WindowManager::close() {
         window->close();
     }
 
-    m_wizard->deleteLater();
-    m_splashDialog->deleteLater();
-    m_tray->deleteLater();
-    m_docsDialog->deleteLater();
+    if (m_splashDialog) {
+        m_splashDialog->deleteLater();
+    }
+    if (m_tray) {
+        m_tray->deleteLater();
+    }
+    if (m_wizard) {
+        m_wizard->deleteLater();
+    }
+    if (m_docsDialog) {
+        m_docsDialog->deleteLater();
+    }
 
     torManager()->stop();
 

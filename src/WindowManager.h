@@ -100,7 +100,7 @@ private:
     SplashDialog *m_splashDialog = nullptr;
     DocsDialog *m_docsDialog = nullptr;
 
-    QSystemTrayIcon *m_tray;
+    QSystemTrayIcon *m_tray = nullptr;
 
     QMap<QString, QString> m_skins;
 
