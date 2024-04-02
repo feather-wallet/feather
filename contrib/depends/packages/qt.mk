@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.6.2
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.6/$($(package)_version)/submodules
+$(package)_version=6.7.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=b89b426b9852a17d3e96230ab0871346574d635c7914480a2a27f98ff942677b
+$(package)_sha256_hash=11b2e29e2e52fb0e3b453ea13bbe51a10fdff36e1c192d8868c5a40233b8b254
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
@@ -15,7 +15,6 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
-$(package)_patches += revert_f99ee441.patch
 $(package)_patches += xcb-util-image-fix.patch
 $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
@@ -25,19 +24,19 @@ $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=e6d49e9f52111287f77878ecb8b708cce682f10b03ba2476d9247603bc6c4746
+$(package)_qttools_sha256_hash=c8da6b239e82fe1e23465cbf0936c0da5a334438d3fb433e19c503cbb1abee7b
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=5a231d59ef1b42bfbaa5174d4ff39f8e1b4ba070ef984a70b069b4b2576d8181
+$(package)_qtsvg_sha256_hash=1518f40e08ff5e6153a6e26e5b95b033413ac143b70795dc1317e7f73ebf922d
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=c0e6ea9bc8db4290bb43e683fb3d639055fe91258f357980eb6ef5abab4438f9
+$(package)_qtwebsockets_sha256_hash=5ffc77da6b36cdf18e04c975a0fbf243968806a93a6291bcd2e9cd0b26139736
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=e2942599ba0ae106ab3e4f82d6633e8fc1943f8a35d91f99d1fca46d251804ec
+$(package)_qtmultimedia_sha256_hash=f394bae49e3d4ee6a3b0c9e1e5e31bb870cc04a4b44f4cda3615baf7bd078c70
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=628bead7ff4e7f42cb910f47d2adefbdea0d8c71a0234baef8ca709bf467b92f
+$(package)_qtshadertools_sha256_hash=3e13f967c62f0815c901e754cbc472a2e19170da0c7a505230d559615f7998af
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -138,6 +137,8 @@ $(package)_config_opts_darwin += -DQMAKE_MACOSX_DEPLOYMENT_TARGET=11.0
 $(package)_config_opts_darwin += -DBUILD_WITH_PCH=OFF
 $(package)_config_opts_darwin += '-DQT_QMAKE_DEVICE_OPTIONS=MAC_SDK_PATH=$(host_prefix)/native/SDK;MAC_SDK_VERSION=$(OSX_SDK_VERSION);CROSS_COMPILE=$(host)-;MAC_TARGET=$(host);XCODE_VERSION=$(XCODE_VERSION)'
 $(package)_config_opts_darwin += -DQT_NO_APPLE_SDK_AND_XCODE_CHECK=ON
+# work around a build issue in qfutex_mac_p.h
+$(package)_config_opts_darwin += -DINPUT_appstore_compliant=yes
 
 $(package)_config_opts += -G Ninja
 
@@ -193,7 +194,6 @@ define $(package)_preprocess_cmds
 	     -e 's|@wmf_libs@|$(WMF_LIBS)|' \
       toolchain.cmake && \
   cd qtbase && \
-  patch -p1 -i $($(package)_patch_dir)/revert_f99ee441.patch && \
   patch -p1 -i $($(package)_patch_dir)/xcb-util-image-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
