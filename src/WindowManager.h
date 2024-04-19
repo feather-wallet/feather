@@ -78,6 +78,7 @@ private:
     WalletWizard* createWizard(WalletWizard::Page startPage);
 
     void handleWalletError(const Utils::Message &message);
+    void handleDeviceError(const QString &error, Utils::Message &msg);
     void displayWalletErrorMessage(const QString &message);
 
     void initSkins();
