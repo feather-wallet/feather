@@ -245,7 +245,16 @@ void CoinsWidget::onSweepOutputs() {
 #endif
     }
 
-    m_wallet->sweepOutputs(keyImages, dialog.address(), dialog.churn(), dialog.outputs());
+    QString address = dialog.address();
+    bool churn = dialog.churn();
+    int outputs = dialog.outputs();
+
+    QtFuture::connect(m_wallet, &Wallet::preTransactionChecksComplete)
+            .then([this, keyImages, address, churn, outputs](int feeLevel){
+                m_wallet->sweepOutputs(keyImages, address, churn, outputs, feeLevel);
+            });
+
+    m_wallet->preTransactionChecks(dialog.feeLevel());
 }
 
 void CoinsWidget::copy(copyField field) {

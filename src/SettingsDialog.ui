@@ -32,7 +32,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>7</number>
+        <number>5</number>
        </property>
        <widget class="QWidget" name="page_appearance">
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -952,6 +952,20 @@
              <widget class="QCheckBox" name="checkBox_requirePasswordToSpend">
               <property name="text">
                <string>Require password to spend</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_manualFeeTierSelection">
+              <property name="text">
+               <string>Manual fee-tier selection</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_subtractFeeFromAmount">
+              <property name="text">
+               <string>Subtract fee from outputs</string>
               </property>
              </widget>
             </item>

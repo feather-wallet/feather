@@ -824,37 +824,62 @@ void Wallet::setSelectedInputs(const QStringList &selectedInputs) {
     emit selectedInputsChanged(selectedInputs);
 }
 
+void Wallet::preTransactionChecks(int feeLevel) {
+    pauseRefresh();
+    emit initiateTransaction();
+    this->automaticFeeAdjustment(feeLevel);
+}
+
+void Wallet::automaticFeeAdjustment(int feeLevel) {
+  m_scheduler.run([this, feeLevel]{
+      QVector<quint64> results;
+
+      std::vector<std::pair<uint64_t, uint64_t>> blocks;
+      uint64_t priority = 0;
+      try {
+        priority = m_wallet2->adjust_priority(0, blocks);
+      }
+      catch (const std::exception &e) { }
+
+      for (const auto &block : blocks) {
+        results.append(block.first);
+      }
+
+      emit txPoolBacklog(results, feeLevel, priority);
+  });
+}
+
+void Wallet::confirmPreTransactionChecks(int feeLevel) {
+    emit preTransactionChecksComplete(feeLevel);
+}
+
 // Phase 1: Transaction creation
 // Pick one:
 // - createTransaction
 // - createTransactionMultiDest
 // - sweepOutputs
 
-void Wallet::createTransaction(const QString &address, quint64 amount, const QString &description, bool all) {
+void Wallet::createTransaction(const QString &address, quint64 amount, const QString &description, bool all, int feeLevel, bool subtractFeeFromAmount) {
     this->tmpTxDescription = description;
-    pauseRefresh();
 
     qInfo() << "Creating transaction";
-    m_scheduler.run([this, all, address, amount] {
+    m_scheduler.run([this, all, address, amount, feeLevel, subtractFeeFromAmount] {
         std::set<uint32_t> subaddr_indices;
 
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? Monero::optional<uint64_t>() : Monero::optional<uint64_t>(amount), constants::mixin,
-                                                                             Monero::PendingTransaction::Priority_Default,
-                                                                             currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
+                                                                             static_cast<Monero::PendingTransaction::Priority>(feeLevel),
+                                                                             currentSubaddressAccount(), subaddr_indices, m_selectedInputs, subtractFeeFromAmount);
 
         QVector<QString> addresses{address};
         this->onTransactionCreated(ptImpl, addresses);
     });
-
-    emit initiateTransaction();
 }
 
-void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description) {
+void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description, int feeLevel, bool subtractFeeFromAmount) {
     this->tmpTxDescription = description;
-    pauseRefresh();
 
     qInfo() << "Creating transaction";
-    m_scheduler.run([this, addresses, amounts] {
+    m_scheduler.run([this, addresses, amounts, feeLevel, subtractFeeFromAmount] {
         std::vector<std::string> dests;
         for (auto &addr : addresses) {
             dests.push_back(addr.toStdString());
@@ -867,23 +892,20 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
 
         std::set<uint32_t> subaddr_indices;
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionMultDest(dests, "", amount, constants::mixin,
-                                                                                     Monero::PendingTransaction::Priority_Default,
-                                                                                     currentSubaddressAccount(), subaddr_indices, m_selectedInputs);
+                                                                                     static_cast<Monero::PendingTransaction::Priority>(feeLevel),
+                                                                                     currentSubaddressAccount(), subaddr_indices, m_selectedInputs, subtractFeeFromAmount);
 
         this->onTransactionCreated(ptImpl, addresses);
     });
-
-    emit initiateTransaction();
 }
 
-void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs) {
-    pauseRefresh();
+void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs, int feeLevel) {
     if (churn) {
         address = this->address(0, 0);
     }
 
     qInfo() << "Creating transaction";
-    m_scheduler.run([this, keyImages, address, outputs] {
+    m_scheduler.run([this, keyImages, address, outputs, feeLevel] {
         std::vector<std::string> kis;
         for (const auto &key_image : keyImages) {
             kis.push_back(key_image.toStdString());
@@ -891,13 +913,11 @@ void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bo
         Monero::PendingTransaction *ptImpl = m_walletImpl->createTransactionSelected(kis,
                                                                                      address.toStdString(),
                                                                                      outputs,
-                                                                                     Monero::PendingTransaction::Priority_Default);
+                                                                                     static_cast<Monero::PendingTransaction::Priority>(feeLevel));
 
         QVector<QString> addresses {address};
         this->onTransactionCreated(ptImpl, addresses);
     });
-
-    emit initiateTransaction();
 }
 
 // Phase 2: Transaction construction completed
@@ -1333,6 +1353,80 @@ bool Wallet::rescanSpent() {
 
 void Wallet::setNewWallet() {
     m_newWallet = true;
+}
+
+bool Wallet::getBaseFees(QVector<quint64> &baseFees) {
+    std::vector<uint64_t> base_fees;
+
+    try {
+        base_fees = m_wallet2->get_base_fees();
+    }
+    catch (const std::exception &e) {
+        qWarning() << "Failed to get base fees: " << QString::fromStdString(e.what());
+        return false;
+    }
+
+    for (const auto fee : base_fees) {
+        baseFees.append(fee);
+    }
+
+    return true;
+}
+
+bool Wallet::estimateBacklog(const QVector<quint64> &baseFees, QVector<quint64> &backlog) {
+    std::vector<std::pair<double, double>> fee_levels;
+
+    for (const auto fee : baseFees) {
+        fee_levels.push_back(std::make_pair<double, double>(fee, fee));
+    }
+
+    std::vector<std::pair<uint64_t, uint64_t>> backlog_;
+    try {
+        backlog_ = m_wallet2->estimate_backlog(fee_levels);
+    }
+    catch (const std::exception &e) {
+       qWarning() << "Failed to estimate backlog: " << QString::fromStdString(e.what());
+       return false;
+    }
+
+    for (const auto b : backlog_) {
+        backlog.append(b.first);
+    }
+
+    return true;
+}
+
+bool Wallet::getBlockWeightLimit(quint64 &blockWeightLimit) {
+    try {
+        blockWeightLimit = m_wallet2->get_block_weight_limit();
+    }
+    catch (const std::exception &e) {
+        return false;
+    }
+
+    return true;
+}
+
+void Wallet::getTxPoolStatsAsync() {
+    m_scheduler.run([this] {
+        QVector<TxBacklogEntry> txPoolBacklog;
+
+        quint64 blockWeightLimit = m_wallet2->get_block_weight_limit();
+        std::vector<uint64_t> base_fees = m_wallet2->get_base_fees();
+
+        QVector<quint64> baseFees;
+        for (const auto &fee : base_fees) {
+            baseFees.push_back(fee);
+        }
+
+        auto entries = m_wallet2->get_txpool_backlog();
+        for (const auto &entry : entries) {
+            TxBacklogEntry result{entry.weight, entry.fee, entry.time_in_pool};
+            txPoolBacklog.push_back(result);
+        }
+
+        emit poolStats(txPoolBacklog, baseFees, blockWeightLimit);
+    });
 }
 
 Wallet::~Wallet()

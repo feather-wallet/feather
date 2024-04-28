@@ -121,6 +121,8 @@ public:
         multiBroadcast,
         offlineTxSigningMethod,
         offlineTxSigningForceKISync,
+        manualFeeTierSelection,
+        subtractFeeFromAmount,
 
         // Misc
         blockExplorers,

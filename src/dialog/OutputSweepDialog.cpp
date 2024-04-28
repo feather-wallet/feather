@@ -22,6 +22,7 @@ OutputSweepDialog::OutputSweepDialog(QWidget *parent, quint64 amount)
         m_address = ui->lineEdit_address->text();
         m_churn = ui->checkBox_churn->isChecked();
         m_outputs = ui->spinBox_numOutputs->value();
+        m_feeLevel = ui->combo_feePriority->currentIndex();
     });
 
     connect(ui->spinBox_numOutputs, QOverload<int>::of(&QSpinBox::valueChanged), [this](int value){
@@ -50,6 +51,10 @@ bool OutputSweepDialog::churn() const {
 
 int OutputSweepDialog::outputs() const {
     return m_outputs;
+}
+
+int OutputSweepDialog::feeLevel() const {
+    return m_feeLevel;
 }
 
 OutputSweepDialog::~OutputSweepDialog() = default;

@@ -350,6 +350,7 @@ EOF
                                  --container \
                                  --pure \
                                  --no-cwd \
+                                 --cores="$JOBS" \
                                  ${SUBSTITUTE_URLS:+--substitute-urls="$SUBSTITUTE_URLS"} \
                                  -- echo "$HOST"
 

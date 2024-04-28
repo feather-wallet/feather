@@ -45,6 +45,8 @@ signals:
     void updateBalance();
     void offlineMode(bool offline);
     void pluginConfigured(const QString &id);
+    void manualFeeSelectionEnabled(bool enabled);
+    void subtractFeeFromAmountEnabled(bool enabled);
 
 public slots:
 //    void checkboxExternalLinkWarn();

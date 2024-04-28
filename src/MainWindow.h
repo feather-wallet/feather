@@ -19,6 +19,7 @@
 #include "dialog/KeysDialog.h"
 #include "dialog/AboutDialog.h"
 #include "dialog/SplashDialog.h"
+#include "dialog/TxPoolViewerDialog.h"
 #include "libwalletqt/Wallet.h"
 #include "model/SubaddressModel.h"
 #include "model/SubaddressProxyModel.h"
@@ -124,6 +125,7 @@ private slots:
     void onInitiateTransaction();
     void onKeysCorrupted();
     void onSelectedInputsChanged(const QStringList &selectedInputs);
+    void onTxPoolBacklog(const QVector<quint64> &backlog, quint64 originalFeeLevel, quint64 automaticFeeLevel);
 
     // libwalletqt
     void onBalanceUpdated(quint64 balance, quint64 spendable);
@@ -141,6 +143,7 @@ private slots:
     void showViewOnlyDialog();
     void showKeyImageSyncWizard();
     void showWalletCacheDebugDialog();
+    void showTxPoolViewerDialog();
     void showAccountSwitcherDialog();
     void showAddressChecker();
     void showURDialog();
@@ -162,8 +165,10 @@ private slots:
     void tryStoreWallet();
     void onWebsocketStatusChanged(bool enabled);
     void showUpdateNotification();
-    void onProxySettingsChanged();
+    void onProxySettingsChanged(bool connect = true);
     void onOfflineMode(bool offline);
+    void onManualFeeSelectionEnabled(bool enabled);
+    void onSubtractFeeFromAmountEnabled(bool enabled);
     void onMultiBroadcast(const QMap<QString, QString> &txHexMap);
 
 private:
@@ -213,6 +218,7 @@ private:
 
     SplashDialog *m_splashDialog = nullptr;
     AccountSwitcherDialog *m_accountSwitcherDialog = nullptr;
+    TxPoolViewerDialog *m_txPoolViewerDialog = nullptr;
 
     WalletUnlockWidget *m_walletUnlockWidget = nullptr;
     ContactsWidget *m_contactsWidget = nullptr;

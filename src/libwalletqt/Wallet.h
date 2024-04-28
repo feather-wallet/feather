@@ -16,6 +16,7 @@
 #include "utils/networktype.h"
 #include "PassphraseHelper.h"
 #include "WalletListenerImpl.h"
+#include "rows/TxBacklogEntry.h"
 
 namespace Monero {
     struct Wallet; // forward declaration
@@ -313,10 +314,13 @@ public:
 
     // ##### Transactions #####
     void setSelectedInputs(const QStringList &selected);
+    void preTransactionChecks(int feeLevel);
+    void automaticFeeAdjustment(int feeLevel);
+    void confirmPreTransactionChecks(int feeLevel);
 
-    void createTransaction(const QString &address, quint64 amount, const QString &description, bool all);
-    void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description);
-    void sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs);
+    void createTransaction(const QString &address, quint64 amount, const QString &description, bool all, int feeLevel = 0, bool subtractFeeFromAmount = false);
+    void createTransactionMultiDest(const QVector<QString> &addresses, const QVector<quint64> &amounts, const QString &description, int feeLevel = 0, bool subtractFeeFromAmount = false);
+    void sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs, int feeLevel = 0);
 
     void commitTransaction(PendingTransaction *tx, const QString &description="");
     void onTransactionCommitted(bool success, PendingTransaction *tx, const QStringList& txid, const QMap<QString, QString> &txHexMap);
@@ -412,6 +416,11 @@ public:
 
     void onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targetHeight);
 
+    void getTxPoolStatsAsync();
+    bool getBaseFees(QVector<quint64> &baseFees);
+    bool estimateBacklog(const QVector<quint64> &baseFees, QVector<quint64> &backlog);
+    bool getBlockWeightLimit(quint64 &blockWeightLimit);
+
 signals:
     // emitted on every event happened with wallet
     // (money sent/received, new block)
@@ -435,6 +444,9 @@ signals:
     void deviceShowAddressShowed();
     void transactionProofVerified(TxProofResult result);
     void spendProofVerified(QPair<bool, bool> result);
+    void poolStats(const QVector<TxBacklogEntry> &txPool, const QVector<quint64> &baseFees, quint64 blockWeightLimit);
+    void txPoolBacklog(const QVector<quint64> &backlog, quint64 originalFeeLevel, quint64 adjustedFeeLevel);
+    void preTransactionChecksComplete(int feeLevel);
 
     void connectionStatusChanged(int status) const;
     void currentSubaddressAccountChanged() const;

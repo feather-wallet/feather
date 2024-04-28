@@ -4,9 +4,7 @@
 #ifndef TRANSFER_H
 #define TRANSFER_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QObject>
-#include <utility>
 
 class Transfer : public QObject
 {

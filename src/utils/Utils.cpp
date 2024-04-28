@@ -407,7 +407,7 @@ QString formatBytes(quint64 bytes)
     QVector<QString> sizes = { "B", "KB", "MB", "GB", "TB" };
 
     int i;
-    double _data;
+    double _data = bytes;
     for (i = 0; i < sizes.count() && bytes >= 10000; i++, bytes /= 1000)
         _data = bytes / 1000.0;
 

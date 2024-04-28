@@ -253,6 +253,14 @@ void Nodes::autoConnect(bool forceReconnect) {
         return;
     }
 
+    if (!m_allowConnection) {
+        return;
+    }
+
+    if (conf()->get(Config::offlineMode).toBool()) {
+        return;
+    }
+
     // this function is responsible for automatically connecting to a daemon.
     if (m_wallet == nullptr || !m_enableAutoconnect) {
         return;
@@ -332,6 +340,13 @@ FeatherNode Nodes::pickEligibleNode() {
             // Ignore nodes that say they aren't synchronized
             if (node.target_height > node.height)
                 continue;
+        }
+
+        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
+            if (!node.isOnion() && !node.isLocal()) {
+                // We only want to connect to .onion nodes, but local nodes get an exception.
+                continue;
+            }
         }
 
         // Don't connect to nodes that failed to connect recently

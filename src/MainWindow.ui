@@ -469,7 +469,7 @@
      <x>0</x>
      <y>0</y>
      <width>977</width>
-     <height>24</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -552,6 +552,7 @@
     <addaction name="actionPay_to_many"/>
     <addaction name="actionAddress_checker"/>
     <addaction name="actionCreateDesktopEntry"/>
+    <addaction name="actionTxPoolViewer"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -931,6 +932,11 @@
   <action name="actionPlaceholderBegin">
    <property name="text">
     <string>PlaceholderBegin</string>
+   </property>
+  </action>
+  <action name="actionTxPoolViewer">
+   <property name="text">
+    <string>Tx pool viewer</string>
    </property>
   </action>
  </widget>

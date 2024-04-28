@@ -66,6 +66,9 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
 
     ui->lineAddress->setNetType(constants::networkType);
     this->setupComboBox();
+
+    this->setManualFeeSelectionEnabled(conf()->get(Config::manualFeeTierSelection).toBool());
+    this->setSubtractFeeFromAmountEnabled(conf()->get(Config::subtractFeeFromAmount).toBool());
 }
 
 void SendWidget::currencyComboChanged(int index) {
@@ -175,6 +178,8 @@ void SendWidget::sendClicked() {
         return;
     }
 
+    bool subtractFeeFromAmount = conf()->get(Config::subtractFeeFromAmount).toBool() && ui->check_subtractFeeFromAmount->isChecked();
+
     QString description = ui->lineDescription->text();
 
     if (!outputs.empty()) { // multi destination transaction
@@ -190,7 +195,13 @@ void SendWidget::sendClicked() {
             amounts.push_back(output.amount);
         }
 
-        m_wallet->createTransactionMultiDest(addresses, amounts, description);
+        QtFuture::connect(m_wallet, &Wallet::preTransactionChecksComplete)
+                .then([this, addresses, amounts, description, subtractFeeFromAmount](int feeLevel){
+                    m_wallet->createTransactionMultiDest(addresses, amounts, description, feeLevel, subtractFeeFromAmount);
+                });
+
+        m_wallet->preTransactionChecks(ui->combo_feePriority->currentIndex());
+
         return;
     }
 
@@ -243,7 +254,12 @@ void SendWidget::sendClicked() {
         #endif
     }
 
-    m_wallet->createTransaction(recipient, amount, description, sendAll);
+    QtFuture::connect(m_wallet, &Wallet::preTransactionChecksComplete)
+            .then([this, recipient, amount, description, sendAll, subtractFeeFromAmount](int feeLevel){
+                m_wallet->createTransaction(recipient, amount, description, sendAll, feeLevel, subtractFeeFromAmount);
+            });
+
+    m_wallet->preTransactionChecks(ui->combo_feePriority->currentIndex());
 }
 
 void SendWidget::aliasClicked() {
@@ -375,6 +391,15 @@ void SendWidget::setWebsocketEnabled(bool enabled) {
         ui->comboCurrencySelection->clear();
         ui->comboCurrencySelection->insertItem(0, "XMR");
     }
+}
+
+void SendWidget::setManualFeeSelectionEnabled(bool enabled) {
+    ui->label_feeTarget->setVisible(enabled);
+    ui->combo_feePriority->setVisible(enabled);
+}
+
+void SendWidget::setSubtractFeeFromAmountEnabled(bool enabled) {
+    ui->check_subtractFeeFromAmount->setVisible(enabled);
 }
 
 void SendWidget::onDataPasted(const QString &data) {

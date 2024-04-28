@@ -319,6 +319,28 @@ void Settings::setupTransactionsTab() {
     // Hide unimplemented settings
     ui->checkBox_alwaysOpenAdvancedTxDialog->hide();
     ui->checkBox_requirePasswordToSpend->hide();
+
+    // [Manual fee-tier selection]
+    ui->checkBox_manualFeeTierSelection->setChecked(conf()->get(Config::manualFeeTierSelection).toBool());
+    connect(ui->checkBox_manualFeeTierSelection, &QCheckBox::toggled, [this](bool toggled){
+        if (toggled) {
+            auto result = QMessageBox::question(this, "Privacy warning", "Using a non-automatic fee makes your transactions stick out and harms your privacy.\n\nAre you sure you want to enable manual fee-tier selection?");
+            if (result == QMessageBox::No) {
+                ui->checkBox_manualFeeTierSelection->setChecked(false);
+                return;
+            }
+
+        }
+
+        conf()->set(Config::manualFeeTierSelection, toggled);
+        emit manualFeeSelectionEnabled(toggled);
+    });
+
+    ui->checkBox_subtractFeeFromAmount->setChecked(conf()->get(Config::subtractFeeFromAmount).toBool());
+    connect(ui->checkBox_subtractFeeFromAmount, &QCheckBox::toggled, [this](bool toggled){
+        conf()->set(Config::subtractFeeFromAmount, toggled);
+        emit subtractFeeFromAmountEnabled(toggled);
+    });
 }
 
 void Settings::setupPluginsTab() {

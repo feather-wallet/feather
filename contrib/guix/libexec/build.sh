@@ -222,6 +222,8 @@ mkdir -p "$OUTDIR"
 # Log the depends build ids
 make -C contrib/depends --no-print-directory HOST="$HOST" print-final_build_id_long | tr ':' '\n' > ${LOGDIR}/depends-hashes.txt
 
+export CMAKE_BUILD_PARALLEL_LEVEL=$JOBS
+
 # Build the depends tree, overriding variables that assume multilib gcc
 make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    ${V:+V=1} \

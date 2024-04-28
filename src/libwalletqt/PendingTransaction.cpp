@@ -83,6 +83,11 @@ QString PendingTransaction::signedTxToHex(int index) const
     return QString::fromStdString(m_pimpl->signedTxToHex(index));
 }
 
+quint64 PendingTransaction::weight(int index) const
+{
+    return m_pimpl->weight(index);
+}
+
 PendingTransactionInfo * PendingTransaction::transaction(int index) const {
     return m_pending_tx_info[index];
 }

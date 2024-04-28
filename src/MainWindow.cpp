@@ -19,6 +19,7 @@
 #include "dialog/TxConfDialog.h"
 #include "dialog/TxImportDialog.h"
 #include "dialog/TxInfoDialog.h"
+#include "dialog/TxPoolViewerDialog.h"
 #include "dialog/ViewOnlyDialog.h"
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
@@ -88,9 +89,13 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
     this->onWebsocketStatusChanged(!conf()->get(Config::disableWebsocket).toBool());
 
-    connect(m_windowManager, &WindowManager::proxySettingsChanged, this, &MainWindow::onProxySettingsChanged);
+    connect(m_windowManager, &WindowManager::proxySettingsChanged, [this]{
+        this->onProxySettingsChanged();
+    });
     connect(m_windowManager, &WindowManager::updateBalance, m_wallet, &Wallet::updateBalance);
     connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
+    connect(m_windowManager, &WindowManager::manualFeeSelectionEnabled, this, &MainWindow::onManualFeeSelectionEnabled);
+    connect(m_windowManager, &WindowManager::subtractFeeFromAmountEnabled, this, &MainWindow::onSubtractFeeFromAmountEnabled);
 
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
@@ -178,7 +183,7 @@ void MainWindow::initStatusBar() {
     m_statusBtnProxySettings = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Proxy settings", this);
     connect(m_statusBtnProxySettings, &StatusBarButton::clicked, this, &MainWindow::menuProxySettingsClicked);
     this->statusBar()->addPermanentWidget(m_statusBtnProxySettings);
-    this->onProxySettingsChanged();
+    this->onProxySettingsChanged(false);
 
     m_statusBtnHwDevice = new StatusBarButton(this->hardwareDevicePairedIcon(), this->getHardwareDevice(), this);
     connect(m_statusBtnHwDevice, &StatusBarButton::clicked, this, &MainWindow::menuHwDeviceClicked);
@@ -302,6 +307,7 @@ void MainWindow::initMenu() {
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_wallet->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
+    connect(ui->actionTxPoolViewer,          &QAction::triggered, this, &MainWindow::showTxPoolViewerDialog);
 
     // [Wallet] -> [History]
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
@@ -458,6 +464,7 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::initiateTransaction,      this, &MainWindow::onInitiateTransaction);
     connect(m_wallet, &Wallet::keysCorrupted,            this, &MainWindow::onKeysCorrupted);
     connect(m_wallet, &Wallet::selectedInputsChanged,    this, &MainWindow::onSelectedInputsChanged);
+    connect(m_wallet, &Wallet::txPoolBacklog,            this, &MainWindow::onTxPoolBacklog);
 
     // Wallet
     connect(m_wallet, &Wallet::connectionStatusChanged, [this](int status){
@@ -644,8 +651,10 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     m_sendWidget->setWebsocketEnabled(enabled);
 }
 
-void MainWindow::onProxySettingsChanged() {
-    m_nodes->connectToNode();
+void MainWindow::onProxySettingsChanged(bool connect) {
+    if (connect) {
+        m_nodes->connectToNode();
+    }
 
     int proxy = conf()->get(Config::proxy).toInt();
 
@@ -680,6 +689,14 @@ void MainWindow::onOfflineMode(bool offline) {
 
     m_statusLabelBalance->setVisible(!offline);
     m_statusBtnProxySettings->setVisible(!offline);
+}
+
+void MainWindow::onManualFeeSelectionEnabled(bool enabled) {
+    m_sendWidget->setManualFeeSelectionEnabled(enabled);
+}
+
+void MainWindow::onSubtractFeeFromAmountEnabled(bool enabled) {
+    m_sendWidget->setSubtractFeeFromAmountEnabled(enabled);
 }
 
 void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
@@ -1309,6 +1326,14 @@ void MainWindow::showWalletCacheDebugDialog() {
     dialog.exec();
 }
 
+void MainWindow::showTxPoolViewerDialog() {
+    if (!m_txPoolViewerDialog) {
+        m_txPoolViewerDialog = new TxPoolViewerDialog{this, m_wallet};
+    }
+
+    m_txPoolViewerDialog->show();
+}
+
 void MainWindow::showAccountSwitcherDialog() {
     m_accountSwitcherDialog->show();
     m_accountSwitcherDialog->update();
@@ -1622,6 +1647,36 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
         QString text = QString("Coin control active: %1 selected outputs, %2 XMR").arg(QString::number(numInputs), WalletManager::displayAmount(totalAmount));
         ui->label_coinControl->setText(text);
     }
+}
+
+void MainWindow::onTxPoolBacklog(const QVector<quint64> &backlog, quint64 originalFeeLevel, quint64 automaticFeeLevel) {
+    bool automatic = (originalFeeLevel == 0);
+
+    if (automaticFeeLevel == 0) {
+        qWarning() << "Automatic fee level wasn't adjusted";
+        automaticFeeLevel = 2;
+    }
+
+    quint64 feeLevel = automatic ? automaticFeeLevel : originalFeeLevel;
+
+    for (int i = 0; i < backlog.size(); i++) {
+        qDebug() << QString("Fee level: %1, backlog: %2").arg(QString::number(i), QString::number(backlog[i]));
+    }
+
+    if (automatic) {
+        if (backlog.size() >= 1 && backlog[1] >= 2) {
+            auto button = QMessageBox::question(this, "Transaction Pool Backlog",
+                                                QString("There is a backlog of %1 blocks (≈ %2 minutes) in the transaction pool "
+                                                        "at the maximum automatic fee level.\n\n"
+                                                        "Do you want to increase the fee for this transaction?")
+                                                        .arg(QString::number(backlog[1]), QString::number(backlog[1] * 2)));
+            if (button == QMessageBox::Yes) {
+                feeLevel = 3;
+            }
+        }
+    }
+
+    m_wallet->confirmPreTransactionChecks(feeLevel);
 }
 
 void MainWindow::onExportHistoryCSV() {

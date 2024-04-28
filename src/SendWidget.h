@@ -40,6 +40,9 @@ public slots:
     void onPreferredFiatCurrencyChanged();
     void setWebsocketEnabled(bool enabled);
 
+    void setManualFeeSelectionEnabled(bool enabled);
+    void setSubtractFeeFromAmountEnabled(bool enabled);
+
     void disableSendButton();
     void enableSendButton();
 

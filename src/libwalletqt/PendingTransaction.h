@@ -36,6 +36,7 @@ public:
     std::string unsignedTxToBin() const;
     QString unsignedTxToBase64() const;
     QString signedTxToHex(int index) const;
+    quint64 weight(int index) const;
     void refresh();
 
     PendingTransactionInfo * transaction(int index) const;

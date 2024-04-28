@@ -24,6 +24,7 @@ public:
     QString address();
     bool churn() const;
     int outputs() const;
+    int feeLevel() const;
 
 private:
     QScopedPointer<Ui::OutputSweepDialog> ui;
@@ -31,8 +32,9 @@ private:
     uint64_t m_amount;
 
     QString m_address;
-    bool m_churn;
-    int m_outputs;
+    bool m_churn = false;
+    int m_outputs = 1;
+    int m_feeLevel = 0;
 };
 
 
