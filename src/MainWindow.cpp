@@ -1664,7 +1664,7 @@ void MainWindow::onTxPoolBacklog(const QVector<quint64> &backlog, quint64 origin
     }
 
     if (automatic) {
-        if (backlog.size() >= 1 && backlog[1] >= 2) {
+        if (backlog.size() > 1 && backlog[1] >= 2) {
             auto button = QMessageBox::question(this, "Transaction Pool Backlog",
                                                 QString("There is a backlog of %1 blocks (≈ %2 minutes) in the transaction pool "
                                                         "at the maximum automatic fee level.\n\n"
