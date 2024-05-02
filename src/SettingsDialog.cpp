@@ -378,6 +378,7 @@ void Settings::onProxySettingsChanged() {
     ui->closeButton->addButton(QDialogButtonBox::Apply);
     connect(ui->closeButton->button(QDialogButtonBox::Apply), &QAbstractButton::clicked, [this](){
         ui->proxyWidget->setProxySettings();
+        m_nodes->updateModels();
         emit proxySettingsChanged();
         ui->closeButton->removeButton(ui->closeButton->button(QDialogButtonBox::Apply));
     });

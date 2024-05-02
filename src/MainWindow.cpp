@@ -89,9 +89,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
     this->onWebsocketStatusChanged(!conf()->get(Config::disableWebsocket).toBool());
 
-    connect(m_windowManager, &WindowManager::proxySettingsChanged, [this]{
-        this->onProxySettingsChanged();
-    });
+    connect(m_windowManager, &WindowManager::proxySettingsChanged, this, &MainWindow::onProxySettingsChangedConnect);
     connect(m_windowManager, &WindowManager::updateBalance, m_wallet, &Wallet::updateBalance);
     connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
     connect(m_windowManager, &WindowManager::manualFeeSelectionEnabled, this, &MainWindow::onManualFeeSelectionEnabled);
@@ -183,7 +181,7 @@ void MainWindow::initStatusBar() {
     m_statusBtnProxySettings = new StatusBarButton(icons()->icon("tor_logo_disabled.png"), "Proxy settings", this);
     connect(m_statusBtnProxySettings, &StatusBarButton::clicked, this, &MainWindow::menuProxySettingsClicked);
     this->statusBar()->addPermanentWidget(m_statusBtnProxySettings);
-    this->onProxySettingsChanged(false);
+    this->onProxySettingsChanged();
 
     m_statusBtnHwDevice = new StatusBarButton(this->hardwareDevicePairedIcon(), this->getHardwareDevice(), this);
     connect(m_statusBtnHwDevice, &StatusBarButton::clicked, this, &MainWindow::menuHwDeviceClicked);
@@ -651,11 +649,12 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     m_sendWidget->setWebsocketEnabled(enabled);
 }
 
-void MainWindow::onProxySettingsChanged(bool connect) {
-    if (connect) {
-        m_nodes->connectToNode();
-    }
+void MainWindow::onProxySettingsChangedConnect() {
+    m_nodes->connectToNode();
+    this->onProxySettingsChanged();
+}
 
+void MainWindow::onProxySettingsChanged() {
     int proxy = conf()->get(Config::proxy).toInt();
 
     if (proxy == Config::Proxy::Tor) {

@@ -134,7 +134,6 @@ struct FeatherNode {
     }
 };
 
-class AppContext;
 class Nodes : public QObject {
     Q_OBJECT
 
@@ -144,6 +143,7 @@ public:
 
     void loadConfig();
     void allowConnection();
+    void updateModels();
 
     NodeSource source();
     FeatherNode connection();
@@ -190,7 +190,6 @@ private:
     bool useI2PNodes();
     bool useSocks5Proxy(const FeatherNode &node);
 
-    void updateModels();
     void resetLocalState();
     void exhausted();
     int modeHeight(const QList<FeatherNode> &nodes);

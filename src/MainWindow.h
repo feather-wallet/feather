@@ -165,7 +165,8 @@ private slots:
     void tryStoreWallet();
     void onWebsocketStatusChanged(bool enabled);
     void showUpdateNotification();
-    void onProxySettingsChanged(bool connect = true);
+    void onProxySettingsChangedConnect();
+    void onProxySettingsChanged();
     void onOfflineMode(bool offline);
     void onManualFeeSelectionEnabled(bool enabled);
     void onSubtractFeeFromAmountEnabled(bool enabled);
