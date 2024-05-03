@@ -37,11 +37,7 @@ public:
     bool operator<(const QTreeWidgetItem &other) const override {
         int column = treeWidget()->sortColumn();
 
-        if (column == 2) {
-            return this->text(column).toInt() < other.text(column).toInt();
-        }
-
-        return this->text(column) < other.text(column);
+        return this->data(column, Qt::UserRole).toUInt() < other.data(column, Qt::UserRole).toUInt();
     }
 };
 
@@ -70,13 +66,16 @@ void TxPoolViewerDialog::onTxPoolBacklog(const QVector<TxBacklogEntry> &txPool, 
 
         auto* item = new TxPoolSortItem();
         item->setText(0, QString("%1 B").arg(QString::number(entry.weight)));
+        item->setData(0, Qt::UserRole, entry.weight);
         item->setTextAlignment(0, Qt::AlignRight);
 
         item->setText(1, QString("%1 XMR").arg(WalletManager::displayAmount(entry.fee)));
+        item->setData(1, Qt::UserRole, entry.fee);
         item->setTextAlignment(1, Qt::AlignRight);
 
         quint64 fee_per_byte = entry.fee / entry.weight;
         item->setText(2, QString::number(entry.fee / entry.weight));
+        item->setData(2, Qt::UserRole, entry.fee / entry.weight);
         item->setTextAlignment(2, Qt::AlignRight);
 
         if (fee_per_byte == baseFees[0]) {
