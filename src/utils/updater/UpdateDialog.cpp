@@ -69,6 +69,7 @@ void UpdateDialog::noUpdateAvailable() {
 void UpdateDialog::updateAvailable() {
     m_waitingTimer.stop();
     ui->frame->show();
+    ui->btn_download->setFocus();
     ui->btn_installUpdate->hide();
     ui->btn_restart->hide();
     ui->progressBar->hide();
@@ -134,6 +135,7 @@ void UpdateDialog::onDownloadFinished() {
     this->setStatus("Download finished and verified.", true);
 
     ui->btn_installUpdate->show();
+    ui->btn_installUpdate->setFocus();
     ui->progressBar->hide();
 
     m_updateZipArchive = responseStr;
@@ -246,6 +248,7 @@ void UpdateDialog::onInstallUpdate() {
         this->setStatus("Installation successful. Do you want to restart Feather now?");
     }
     ui->btn_restart->show();
+    ui->btn_restart->setFocus();
 }
 
 void UpdateDialog::installUpdateMac() {
