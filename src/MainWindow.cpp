@@ -823,7 +823,9 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                 message.doc = "balance";
             }
             catch (const tools::error::tx_not_possible &e) {
-                message.description = QString("Not enough money to transfer. Transaction amount + fee exceeds available balance.");
+                message.description = QString("Not enough money to transfer. Transaction amount + fee exceeds available balance.\n\n"
+                                              "Spendable balance: %1\n"
+                                              "Transaction needs: %2").arg(WalletManager::displayAmount(e.available()), WalletManager::displayAmount(e.tx_amount() + e.fee()));
                 message.helpItems = {"If you're trying to send your entire balance, click 'Max'."};
                 message.doc = "balance";
             }

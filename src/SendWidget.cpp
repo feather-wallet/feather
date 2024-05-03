@@ -183,8 +183,8 @@ void SendWidget::sendClicked() {
     QString description = ui->lineDescription->text();
 
     if (!outputs.empty()) { // multi destination transaction
-        if (outputs.size() > 16) {
-            Utils::showError(this, "Unable to create transaction", "Maximum number of outputs (16) exceeded.", {}, "pay_to_many");
+        if (outputs.size() > 15) {
+            Utils::showError(this, "Unable to create transaction", "Maximum number of outputs (15) exceeded.", {}, "pay_to_many");
             return;
         }
 
