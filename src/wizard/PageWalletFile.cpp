@@ -20,6 +20,10 @@ PageWalletFile::PageWalletFile(WizardFields *fields, QWidget *parent)
 
     ui->frame_wallet->setInfo(icons()->icon("file"), "Choose a name and directory for your wallet files.");
 
+    QRegularExpression nameRe(R"([^\/\\:*?"<>|]+)");
+    QValidator *nameValidator = new QRegularExpressionValidator(nameRe, this);
+    ui->line_walletName->setValidator(nameValidator);
+
     connect(ui->btnChange, &QPushButton::clicked, [=] {
         QString currentWalletDir = conf()->get(Config::walletDirectory).toString();
         QString walletDir = QFileDialog::getExistingDirectory(this, "Select wallet directory ", currentWalletDir, QFileDialog::ShowDirsOnly);
