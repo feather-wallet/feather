@@ -487,7 +487,7 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
             this->syncStatusUpdated(walletHeight, daemonHeight);
         }
 
-        if (walletHeight < (daemonHeight - 1)) {
+        if (walletHeight < (targetHeight - 1)) {
             setConnectionStatus(ConnectionStatus_Synchronizing);
         } else {
             setConnectionStatus(ConnectionStatus_Synchronized);
