@@ -82,12 +82,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
-// #TODO: Fix Windows dark mode handling Qt 6.5 beta1
-// darkmode=2 (default) causes some text to become unreadable
-#if defined(Q_OS_WIN)
-    qputenv("QT_QPA_PLATFORM", "windows:darkmode=1");
-#endif
-
     QStringList argv_;
     for(int i = 0; i != argc; i++){
         argv_ << QString::fromStdString(argv[i]);
