@@ -1068,48 +1068,6 @@
               <widget class="UrlListConfigureWidget" name="blockExplorerConfigureWidget" native="true"/>
              </item>
              <item>
-              <widget class="QLabel" name="label_18">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>Reddit frontend:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_redditFrontend">
-               <item>
-                <property name="text">
-                 <string>old.reddit.com</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>old.reddittorjg6rue252oqsxryoxengawnmo46qy4kyii5wtqnwfj4ooad.onion</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reddit.com</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>reddittorjg6rue252oqsxryoxengawnmo46qy4kyii5wtqnwfj4ooad.onion</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>teddit.net</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
               <spacer name="verticalSpacer_7">
                <property name="orientation">
                 <enum>Qt::Vertical</enum>

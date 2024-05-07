@@ -127,7 +127,6 @@ public:
         // Misc
         blockExplorers,
         blockExplorer,
-        redditFrontend,
         bountiesFrontend, // unused
         lastPath,
         

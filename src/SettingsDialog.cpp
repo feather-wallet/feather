@@ -352,13 +352,6 @@ void Settings::setupPluginsTab() {
 void Settings::setupMiscTab() {
     // [Block explorer]
     ui->blockExplorerConfigureWidget->setup("Block explorers", Config::blockExplorers, Config::blockExplorer, {"%txid%"});
-
-    // [Reddit frontend]
-    ui->comboBox_redditFrontend->setCurrentIndex(ui->comboBox_redditFrontend->findText(conf()->get(Config::redditFrontend).toString()));
-    connect(ui->comboBox_redditFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
-        QString redditFrontend = ui->comboBox_redditFrontend->currentText();
-        conf()->set(Config::redditFrontend, redditFrontend);
-    });
 }
 
 void Settings::onProxySettingsChanged() {

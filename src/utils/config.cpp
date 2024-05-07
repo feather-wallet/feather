@@ -104,7 +104,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
                                                                     "http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%txid%",
                                                                     "http://127.0.0.1:31312/tx?id=%txid%"}}},
         {Config::blockExplorer,{QS("blockExplorer"), "https://xmrchain.net/tx/%txid%"}},
-        {Config::redditFrontend, {QS("redditFrontend"), "old.reddit.com"}},
         {Config::bountiesFrontend, {QS("bountiesFrontend"), "https://bounties.monero.social"}},
         {Config::lastPath, {QS("lastPath"), QDir::homePath()}},
 
@@ -130,7 +129,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "reddit", "revuo", "calc", "xmrig"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
