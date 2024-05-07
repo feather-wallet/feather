@@ -274,11 +274,11 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             m_openWalletTriedOnce = true;
             this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
         }
-        else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc")) {
+        else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc") || errMsg == "invalid signature") {
             qCritical() << errMsg;
             WalletManager::clearWalletCache(wallet->cachePath());
-            errMsg = QString("%1\n\nAttempted to clean wallet cache. Please restart Feather.").arg(errMsg);
-            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg});
+            errMsg = QString("%1\n\nWallet cache is unusable, moving it.").arg(errMsg);
+            this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"Try opening this wallet again.", "If this keeps happening, please file a bug report."}, "report_an_issue"});
         } else {
             Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet"};
             this->handleDeviceError(errMsg, message);
@@ -497,6 +497,9 @@ void WindowManager::handleDeviceError(const QString &error, Utils::Message &msg)
     }
     else if (error.contains("Wrong Channel")) {
         msg.helpItems = {"Restart the hardware device and try again."};
+    }
+    else {
+        msg.doc = "report_an_issue";
     }
 }
 
