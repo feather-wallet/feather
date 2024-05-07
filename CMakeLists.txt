@@ -34,8 +34,6 @@ option(WITH_PLUGIN_BOUNTIES "Include Bounties Home plugin" ON)
 option(WITH_PLUGIN_REDDIT "Include Reddit Home plugin" ON)
 option(WITH_PLUGIN_REVUO "Include Revuo Home plugin" ON)
 option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
-option(WITH_PLUGIN_EXCHANGE "Include Exchange tab plugin" ON)
-option(WITH_PLUGIN_LOCALMONERO "Include LocalMonero plugin" ON)
 option(WITH_PLUGIN_XMRIG "Include XMRig plugin" ON)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")

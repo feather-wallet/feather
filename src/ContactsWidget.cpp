@@ -20,7 +20,7 @@ ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
     ui->setupUi(this);
 
     m_btn_addContact = new QPushButton(this);
-    m_btn_addContact->setIcon(icons()->icon("localMonero_register.svg"));
+    m_btn_addContact->setIcon(icons()->icon("register.svg"));
     ui->searchLayout->addWidget(m_btn_addContact, 0, Qt::AlignRight);
     connect(m_btn_addContact, &QPushButton::clicked, [this]{this->newContact();});
 

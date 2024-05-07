@@ -359,19 +359,6 @@ void Settings::setupMiscTab() {
         QString redditFrontend = ui->comboBox_redditFrontend->currentText();
         conf()->set(Config::redditFrontend, redditFrontend);
     });
-
-    // [LocalMonero frontend]
-    ui->comboBox_localMoneroFrontend->addItem("localmonero.co", "https://localmonero.co");
-    ui->comboBox_localMoneroFrontend->addItem("localmonero.co/nojs", "https://localmonero.co/nojs");
-    ui->comboBox_localMoneroFrontend->addItem("nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion",
-                                              "http://nehdddktmhvqklsnkjqcbpmb63htee2iznpcbs5tgzctipxykpj6yrid.onion");
-    ui->comboBox_localMoneroFrontend->addItem("yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p",
-                                              "http://yeyar743vuwmm6fpgf3x6bzmj7fxb5uxhuoxx4ea76wqssdi4f3q.b32.i2p");
-    ui->comboBox_localMoneroFrontend->setCurrentIndex(ui->comboBox_localMoneroFrontend->findData(conf()->get(Config::localMoneroFrontend).toString()));
-    connect(ui->comboBox_localMoneroFrontend, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{
-        QString localMoneroFrontend = ui->comboBox_localMoneroFrontend->currentData().toString();
-        conf()->set(Config::localMoneroFrontend, localMoneroFrontend);
-    });
 }
 
 void Settings::onProxySettingsChanged() {

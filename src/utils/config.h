@@ -128,7 +128,6 @@ public:
         blockExplorers,
         blockExplorer,
         redditFrontend,
-        localMoneroFrontend,
         bountiesFrontend, // unused
         lastPath,
         

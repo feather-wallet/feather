@@ -32,7 +32,7 @@
      <item>
       <widget class="QStackedWidget" name="stackedWidget">
        <property name="currentIndex">
-        <number>5</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="page_appearance">
         <layout class="QVBoxLayout" name="verticalLayout_6">
@@ -1108,22 +1108,6 @@
                 </property>
                </item>
               </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="label_19">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>LocalMonero frontend:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QComboBox" name="comboBox_localMoneroFrontend"/>
              </item>
              <item>
               <spacer name="verticalSpacer_7">

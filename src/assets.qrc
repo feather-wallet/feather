@@ -50,13 +50,6 @@
     <file>assets/images/ledger.png</file>
     <file>assets/images/ledger_unpaired.png</file>
     <file>assets/images/lightning.png</file>
-    <file>assets/images/localMonero_search.svg</file>
-    <file>assets/images/localMonero_buy.svg</file>
-    <file>assets/images/localMonero_buy_white.svg</file>
-    <file>assets/images/localMonero_sell.svg</file>
-    <file>assets/images/localMonero_sell_white.svg</file>
-    <file>assets/images/localMonero_logo.png</file>
-    <file>assets/images/localMonero_register.svg</file>
     <file>assets/images/lock.svg</file>
     <file>assets/images/microphone.png</file>
     <file>assets/images/mining.png</file>
@@ -70,6 +63,7 @@
     <file>assets/images/preferences.svg</file>
     <file>assets/images/qrcode.png</file>
     <file>assets/images/qrcode_white.png</file>
+    <file>assets/images/register.svg</file>
     <file>assets/images/revealer_c.png</file>
     <file>assets/images/revealer.png</file>
     <file>assets/images/seal.png</file>
