@@ -371,6 +371,8 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
 
     wallet->setCacheAttribute("feather.seed", seed.mnemonic.join(" "));
     wallet->setCacheAttribute("feather.seedoffset", seedOffset);
+    // Store attributes now, so we don't lose them on crash / forced exit
+    wallet->store();
 
     if (newWallet) {
         wallet->setNewWallet();
