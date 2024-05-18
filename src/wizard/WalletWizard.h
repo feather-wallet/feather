@@ -84,7 +84,8 @@ public:
         Page_HardwareDevice,
         Page_NetworkProxy,
         Page_NetworkWebsocket,
-        Page_Plugins
+        Page_Plugins,
+        Page_Atomic
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);

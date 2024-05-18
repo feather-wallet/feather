@@ -40,6 +40,8 @@ WalletWizard::WalletWizard(QWidget *parent)
     auto networkWebsocketPage = new PageNetworkWebsocket(this);
     auto menuPage = new PageMenu(&m_wizardFields, m_walletKeysFilesModel, this);
     auto openWalletPage = new PageOpenWallet(m_walletKeysFilesModel, this);
+
+
     auto createWallet = new PageWalletFile(&m_wizardFields , this);
     auto createWalletSeed = new PageWalletSeed(&m_wizardFields, this);
     auto walletSetPasswordPage = new PageSetPassword(&m_wizardFields, this);

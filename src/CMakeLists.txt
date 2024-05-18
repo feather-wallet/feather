@@ -225,7 +225,7 @@ if(STATIC)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(feather PRIVATE QT_NO_DEBUG=1)
+    target_compile_definitions(feather PRIVATE QT_NO_DEBUG=0)
 endif()
 
 target_compile_definitions(feather

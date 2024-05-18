@@ -43,7 +43,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
 
         // Tabs
-        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc"}}},
+        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc", "Atomic"}}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // History
@@ -129,7 +129,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig", "atomic"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},

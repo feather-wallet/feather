@@ -34,6 +34,7 @@ option(WITH_PLUGIN_BOUNTIES "Include Bounties Home plugin" ON)
 option(WITH_PLUGIN_REVUO "Include Revuo Home plugin" ON)
 option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
 option(WITH_PLUGIN_XMRIG "Include XMRig plugin" ON)
+option(WITH_PLUGIN_ATOMIC "Include Atomic plugin" ON)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
