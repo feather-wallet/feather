@@ -36,7 +36,7 @@ QString AtomicPlugin::description() {
 }
 
 QString AtomicPlugin::icon() {
-    return "gnome-calc.png";
+    return "atomic-icon.png";
 }
 
 QStringList AtomicPlugin::socketData() {

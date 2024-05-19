@@ -6,6 +6,7 @@
 
 #include "utils/AppData.h"
 #include "utils/config.h"
+#include "utils/Networking.h"
 
 AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
         : WindowModalDialog(parent)
@@ -15,33 +16,19 @@ AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
 
     this->fillListWidgets();
 
-    connect(ui->btn_selectAll, &QPushButton::clicked, this, &AtomicConfigDialog::selectAll);
-    connect(ui->btn_deselectAll, &QPushButton::clicked, this, &AtomicConfigDialog::deselectAll);
-
+    connect(ui->btn_autoInstall,&QPushButton::clicked, this, &AtomicConfigDialog::downloadBinary);
+    connect(ui->btn_selectFile,&QPushButton::clicked, this, &AtomicConfigDialog::selectBinary);
     connect(ui->buttonBox, &QDialogButtonBox::accepted, [this]{
-        conf()->set(Config::fiatSymbols, this->checkedFiat());
-        conf()->set(Config::cryptoSymbols, this->checkedCrypto());
         this->accept();
     });
 
     this->adjustSize();
 }
 
-QStringList AtomicConfigDialog::checkedFiat() {
-    return this->getChecked(ui->list_fiat);
-}
 
-QStringList AtomicConfigDialog::checkedCrypto() {
-    return this->getChecked(ui->list_crypto);
-}
 
-void AtomicConfigDialog::selectAll() {
-    this->setCheckState(this->getVisibleListWidget(), Qt::Checked);
-}
 
-void AtomicConfigDialog::deselectAll() {
-    this->setCheckState(this->getVisibleListWidget(), Qt::Unchecked);
-}
+
 
 void AtomicConfigDialog::setCheckState(QListWidget *widget, Qt::CheckState checkState) {
     QListWidgetItem *item;
@@ -63,13 +50,7 @@ QStringList AtomicConfigDialog::getChecked(QListWidget *widget) {
     return checked;
 }
 
-QListWidget* AtomicConfigDialog::getVisibleListWidget() {
-    if (ui->tabWidget->currentIndex() == 0) {
-        return ui->list_fiat;
-    } else {
-        return ui->list_crypto;
-    }
-}
+
 
 void AtomicConfigDialog::fillListWidgets() {
     QStringList cryptoCurrencies = appData()->prices.markets.keys();
@@ -78,8 +59,6 @@ void AtomicConfigDialog::fillListWidgets() {
     QStringList checkedCryptoCurrencies = conf()->get(Config::cryptoSymbols).toStringList();
     QStringList checkedFiatCurrencies = conf()->get(Config::fiatSymbols).toStringList();
 
-    ui->list_crypto->addItems(cryptoCurrencies);
-    ui->list_fiat->addItems(fiatCurrencies);
 
     auto setChecked = [](QListWidget *widget, const QStringList &checked){
         QListWidgetItem *item;
@@ -94,8 +73,13 @@ void AtomicConfigDialog::fillListWidgets() {
         }
     };
 
-    setChecked(ui->list_crypto, checkedCryptoCurrencies);
-    setChecked(ui->list_fiat, checkedFiatCurrencies);
 }
 
+void AtomicConfigDialog::downloadBinary() {
+
+};
+
+void AtomicConfigDialog::selectBinary() {
+
+};
 AtomicConfigDialog::~AtomicConfigDialog() = default;

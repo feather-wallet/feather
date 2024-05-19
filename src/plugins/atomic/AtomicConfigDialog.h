@@ -21,18 +21,13 @@ public:
     explicit AtomicConfigDialog(QWidget *parent = nullptr);
     ~AtomicConfigDialog() override;
 
-    QStringList checkedFiat();
-    QStringList checkedCrypto();
-
-private slots:
-    void selectAll();
-    void deselectAll();
 
 private:
     void setCheckState(QListWidget *widget, Qt::CheckState checkState);
     QStringList getChecked(QListWidget *widget);
     void fillListWidgets();
-    QListWidget* getVisibleListWidget();
+    void downloadBinary();
+    void selectBinary();
 
     QScopedPointer<Ui::AtomicConfigDialog> ui;
 };

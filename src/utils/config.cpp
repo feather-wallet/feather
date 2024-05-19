@@ -134,6 +134,14 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
         {Config::tickersShowFiatBalance, {QS("tickersShowFiatBalance"), true}},
+
+        // Atomic
+        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/xmr-btc-asb.coblox.tech/tcp/9939/p2p/12D3KooWCdMKjesXMJz1SiZ7HgotrxuqhQJbP5sgBm2BwP1cqThi",
+                                                            "/dnsaddr/atomic.money/p2p/12D3KooWNfiwKyDpAbW7XSgw5xmoMJzMXsJxR91FbUJiuWU1vBGb",
+                                                            "/dnsaddr/xmr.darkness.su/p2p/12D3KooWLWpQtmuPoQvMJxs6KRGMrc39ohkNbRNaXWJhW3DfQD6e",
+                                                            "/dnsaddr/swapanarchy.cfd/p2p/12D3KooWMgGjeW7ErQxCQzaeHiXxJn42wegCPFepixEXfBJT1PNS",
+                                                            "/onion3/spqfqxirmlrhq7gbiwn4jn35c77gu2kof26i6psoc6bbyduol3zty6qd:9841/p2p/12D3KooWM9ipr33nEtxyCBF7fdbHsMrRzHaSf1bEVYzV8XSBSMet"}}},
+        {Config::swapPath, {QS("swapPath"), ""}},
 };
 
 
