@@ -672,10 +672,10 @@ index 000000000..e34005bbf
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
 new file mode 100644
-index 000000000..2dad447c9
+index 000000000..63a8ff196
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
-@@ -0,0 +1,130 @@
+@@ -0,0 +1,131 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -724,6 +724,7 @@ index 000000000..2dad447c9
 +};
 +
 +QFFmpegMediaIntegration::QFFmpegMediaIntegration()
++    : QPlatformMediaIntegration(QLatin1String("ffmpeg"))
 +{
 +#ifndef QT_NO_DEBUG
 +    qDebug() << "Available HW decoding frameworks:";

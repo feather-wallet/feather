@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.7.0
+$(package)_version=6.7.1
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=11b2e29e2e52fb0e3b453ea13bbe51a10fdff36e1c192d8868c5a40233b8b254
+$(package)_sha256_hash=b7338da1bdccb4d861e714efffaa83f174dfe37e194916bfd7ec82279a6ace19
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
@@ -21,22 +21,23 @@ $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
+$(package)_patches += revert-f67ee7c39.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=c8da6b239e82fe1e23465cbf0936c0da5a334438d3fb433e19c503cbb1abee7b
+$(package)_qttools_sha256_hash=0953cddf6248f3959279a10904892e8a98eb3e463d729a174b6fc47febd99824
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=1518f40e08ff5e6153a6e26e5b95b033413ac143b70795dc1317e7f73ebf922d
+$(package)_qtsvg_sha256_hash=3ed5b80f7228c41dd463b7a57284ed273d224d1c323c0dd78c5209635807cbce
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=5ffc77da6b36cdf18e04c975a0fbf243968806a93a6291bcd2e9cd0b26139736
+$(package)_qtwebsockets_sha256_hash=fe16a6e4d2b819c72a56f671c5c697bae4c7f9fee4df2a4473b14caf7602feeb
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=f394bae49e3d4ee6a3b0c9e1e5e31bb870cc04a4b44f4cda3615baf7bd078c70
+$(package)_qtmultimedia_sha256_hash=656d1543727f5bf1bd39fe2548ac454860109dc8555df77d7940f21e3d65cd3e
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=3e13f967c62f0815c901e754cbc472a2e19170da0c7a505230d559615f7998af
+$(package)_qtshadertools_sha256_hash=e585e3a985b2e2bad8191a84489a04e69c3defc6022a8e746aad22a1f17910c2
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -201,7 +202,8 @@ define $(package)_preprocess_cmds
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-resonance-audio.patch
+  patch -p1 -i $($(package)_patch_dir)/no-resonance-audio.patch && \
+  patch -p1 -i $($(package)_patch_dir)/revert-f67ee7c39.patch
 endef
 
 define $(package)_config_cmds
