@@ -9,10 +9,10 @@
 #include <stdio.h>
 #include <archive.h>
 #include <zip.h>
-#include <zlib.h>
-#include <archive_entry.h>
 
-#include "utils/AppData.h"
+#include <archive_entry.h>
+#include <QFileDialog>
+
 #include "utils/config.h"
 #include "utils/Networking.h"
 
@@ -22,65 +22,33 @@ AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
 {
     ui->setupUi(this);
 
-    this->fillListWidgets();
-
-    connect(ui->btn_autoInstall,&QPushButton::clicked, this, &AtomicConfigDialog::downloadBinary);
-    connect(ui->btn_selectFile,&QPushButton::clicked, this, &AtomicConfigDialog::selectBinary);
+    ui->downloadLabel->setVisible(false);
+    connect(ui->btn_autoInstall,&QPushButton::clicked, this, [this] {
+        /*
+        QMessageBox downloadPopup = QMessageBox(this);
+        qDebug() << "opening popup";
+        downloadPopup.setText("Downloading swap tool, this usually takes about a minute or two, please wait");
+        downloadPopup.setWindowTitle("Swap tool download");
+        downloadPopup.show();
+        qApp->processEvents();
+         */
+        AtomicConfigDialog::downloadBinary();
+    });
+    connect(ui->btn_selectFile,&QPushButton::clicked, this, [this] {
+        QString path = QFileDialog::getOpenFileName(this, "Select swap binary file",
+                                                    Config::defaultConfigDir().absolutePath(),
+                                                    "Binary Executable (*)");
+        Config::instance()->set(Config::swapPath, path);
+        if(path.isEmpty()){
+            return;
+        }
+        close();
+    });
     connect(ui->buttonBox, &QDialogButtonBox::accepted, [this]{
         this->accept();
     });
 
     this->adjustSize();
-}
-
-
-
-
-
-
-void AtomicConfigDialog::setCheckState(QListWidget *widget, Qt::CheckState checkState) {
-    QListWidgetItem *item;
-    for (int i=0; i < widget->count(); i++) {
-        item = widget->item(i);
-        item->setCheckState(checkState);
-    }
-}
-
-QStringList AtomicConfigDialog::getChecked(QListWidget *widget) {
-    QStringList checked;
-    QListWidgetItem *item;
-    for (int i=0; i < widget->count(); i++) {
-        item = widget->item(i);
-        if (item->checkState() == Qt::Checked) {
-            checked.append(item->text());
-        }
-    }
-    return checked;
-}
-
-
-
-void AtomicConfigDialog::fillListWidgets() {
-    QStringList cryptoCurrencies = appData()->prices.markets.keys();
-    QStringList fiatCurrencies = appData()->prices.rates.keys();
-
-    QStringList checkedCryptoCurrencies = conf()->get(Config::cryptoSymbols).toStringList();
-    QStringList checkedFiatCurrencies = conf()->get(Config::fiatSymbols).toStringList();
-
-
-    auto setChecked = [](QListWidget *widget, const QStringList &checked){
-        QListWidgetItem *item;
-        for (int i=0; i < widget->count(); i++) {
-            item = widget->item(i);
-            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-            if (checked.contains(item->text())) {
-                item->setCheckState(Qt::Checked);
-            } else {
-                item->setCheckState(Qt::Unchecked);
-            }
-        }
-    };
-
 }
 
 void AtomicConfigDialog::downloadBinary() {
@@ -98,9 +66,11 @@ void AtomicConfigDialog::downloadBinary() {
     } else {
         url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.12.3/swap_0.12.3_Darwin_x86_64.tar");
     }
+
     archive = network->get(this, url);
+    ui->downloadLabel->setVisible(true);
     QStringList answer;
-    connect(archive,&QNetworkReply::readyRead, this, [&]{
+    connect(archive,&QNetworkReply::readyRead, this, [this]{
         QByteArray data= archive->readAll();
         qDebug() << "received data of size: " << data.size();
         download->write(data.constData(), data.size());
@@ -111,7 +81,7 @@ void AtomicConfigDialog::downloadBinary() {
 
 void AtomicConfigDialog::extract() {
 
-
+    ui->downloadLabel->setText("Download Successful, extracting binary to final destination");
     qDebug() << "extracting";
     download->close();
     archive->deleteLater();
@@ -179,6 +149,8 @@ void AtomicConfigDialog::extract() {
     }
     qDebug() << "Finished";
     binaryFile.close();
+    ui->downloadLabel->setText("Swap tool installation complete, Atomic swaps are ready !");
+
 
 };
 int
@@ -205,7 +177,5 @@ AtomicConfigDialog::copy_data(struct archive *ar, struct archive *aw)
         }
     }
 }
-void AtomicConfigDialog::selectBinary() {
 
-};
 AtomicConfigDialog::~AtomicConfigDialog() = default;

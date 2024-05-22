@@ -28,11 +28,7 @@ public slots:
     void extract();
 
 private:
-    void setCheckState(QListWidget *widget, Qt::CheckState checkState);
-    QStringList getChecked(QListWidget *widget);
-    void fillListWidgets();
     void downloadBinary();
-    void selectBinary();
     int copy_data(struct archive *ar, struct archive *aw);
 
     QScopedPointer<Ui::AtomicConfigDialog> ui;
