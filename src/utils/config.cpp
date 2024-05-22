@@ -8,7 +8,13 @@
 #include "utils/os/tails.h"
 
 #define QS QStringLiteral
-
+#if defined(Q_OS_WIN64)
+#define OS "WINDOWS"
+#elif defined(Q_OS_DARWIN)
+#define OS "MAC"
+#else
+#define OS "LINUX"
+#endif
 struct ConfigDirective
 {
     QString name;
@@ -142,6 +148,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
                                                             "/dnsaddr/swapanarchy.cfd/p2p/12D3KooWMgGjeW7ErQxCQzaeHiXxJn42wegCPFepixEXfBJT1PNS",
                                                             "/onion3/spqfqxirmlrhq7gbiwn4jn35c77gu2kof26i6psoc6bbyduol3zty6qd:9841/p2p/12D3KooWM9ipr33nEtxyCBF7fdbHsMrRzHaSf1bEVYzV8XSBSMet"}}},
         {Config::swapPath, {QS("swapPath"), ""}},
+        {Config::operatingSystem, {QS("operatingSystem"), OS}},
 };
 
 

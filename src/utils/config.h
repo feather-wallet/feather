@@ -11,6 +11,7 @@
 #include <QPointer>
 #include <QDir>
 
+
 class Config : public QObject
 {
     Q_OBJECT
@@ -152,6 +153,7 @@ public:
         // Atomic Settings
         rendezVous,
         swapPath,
+        operatingSystem,
     };
 
     enum PrivacyLevel {

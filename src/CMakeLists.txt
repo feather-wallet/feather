@@ -23,6 +23,8 @@ find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
 add_subdirectory(third-party/singleapplication)
 
+
+
 if (CHECK_UPDATES)
     add_subdirectory(openpgp)
 endif()
@@ -298,6 +300,12 @@ if (WITH_SCANNER)
             ${ZXING_LIBRARIES}
     )
 endif()
+
+
+    FIND_PACKAGE(LibArchive REQUIRED)
+    INCLUDE_DIRECTORIES(${LibArchive_INCLUDE_DIR})
+    target_link_libraries(feather PRIVATE ${LibArchive_LIBRARIES})
+
 
 if(STATIC AND APPLE)
     target_link_libraries(feather PRIVATE Qt6::QDarwinCameraPermissionPlugin)

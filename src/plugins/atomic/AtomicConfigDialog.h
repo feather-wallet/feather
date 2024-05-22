@@ -6,7 +6,10 @@
 
 #include <QDialog>
 #include <QListWidget>
+#include <QNetworkReply>
+#include <QTemporaryFile>
 
+#include <archive.h>
 #include "components.h"
 
 namespace Ui {
@@ -21,6 +24,8 @@ public:
     explicit AtomicConfigDialog(QWidget *parent = nullptr);
     ~AtomicConfigDialog() override;
 
+public slots:
+    void extract();
 
 private:
     void setCheckState(QListWidget *widget, Qt::CheckState checkState);
@@ -28,8 +33,15 @@ private:
     void fillListWidgets();
     void downloadBinary();
     void selectBinary();
+    int copy_data(struct archive *ar, struct archive *aw);
 
     QScopedPointer<Ui::AtomicConfigDialog> ui;
+
+    QNetworkReply* archive;
+    QString tempFile;
+    QTemporaryFile* download;
+
+
 };
 
 
