@@ -301,11 +301,11 @@ if (WITH_SCANNER)
     )
 endif()
 
-
+if (WITH_PLUGIN_ATOMIC)
     FIND_PACKAGE(LibArchive REQUIRED)
     INCLUDE_DIRECTORIES(${LibArchive_INCLUDE_DIR})
     target_link_libraries(feather PRIVATE ${LibArchive_LIBRARIES})
-
+endif()
 
 if(STATIC AND APPLE)
     target_link_libraries(feather PRIVATE Qt6::QDarwinCameraPermissionPlugin)

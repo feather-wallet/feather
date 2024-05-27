@@ -4,8 +4,13 @@ Built in xmr-btc atomic swap
 ## Installation
 
 ## Hacking
-sudo apt install 
-Install KArchive
+sudo apt install libarchive-dev
+
+Functions used to control swap (AtomicPlugin.cpp)
+
+withdraw(btcaddress) - withdraw btc 
+list(rendezvous point) - list sellers at rendezvous
+ 
 ## Usage
 Navigate to the Atomic tab after opening your wallet. Click the configure button.
 

@@ -5,8 +5,10 @@
 #include "ui_AtomicWidget.h"
 
 #include <QList>
+#include <QProcess>
 
 #include "AtomicConfigDialog.h"
+#include "OfferModel.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"
@@ -15,6 +17,8 @@
 AtomicWidget::AtomicWidget(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::AtomicWidget)
+        , o_model(new OfferModel(this))
+        , offerList(new QList<QSharedPointer<OfferEntry>>())
 {
     ui->setupUi(this);
 
@@ -30,7 +34,15 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->lineFrom->setValidator(validator);
     ui->lineTo->setValidator(validator);
+    ui->offerBookTable->setModel(o_model);
+    ui->offerBookTable->setSortingEnabled(true);
+    ui->offerBookTable->sortByColumn(0, Qt::SortOrder::AscendingOrder);
+    ui->offerBookTable->verticalHeader()->setVisible(false);
+    ui->offerBookTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
+    ui->offerBookTable->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+    ui->offerBookTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
+    //ui->offerBookTable->
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &AtomicWidget::onPricesReceived);
     connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &AtomicWidget::onPricesReceived);
 
@@ -41,6 +53,40 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     connect(ui->comboAtomicTo,   QOverload<int>::of(&QComboBox::currentIndexChanged), [this]{this->convert(false);});
 
     connect(ui->btn_configure, &QPushButton::clicked, this, &AtomicWidget::showAtomicConfigureDialog);
+
+    connect(ui->btn_refreshOffer, &QPushButton::clicked, this, [this]{
+        offerList->clear();
+
+        auto m_instance = Config::instance();
+        QStringList pointList = m_instance->get(Config::rendezVous).toStringList();
+        for(QString point :pointList)
+            AtomicWidget::list(point);
+
+        /*
+        QList<QFuture<void>> tempList;
+        for (int i=0; i<pointList.size();i++){
+            tempList.append(QtConcurrent::run([this, pointList, i]{
+                return AtomicWidget::list(pointList[i]);
+            }));
+        }
+
+        sleep(130);
+        for (int i=0; i<pointList.size();i++){
+            qDebug() << "Starting to read offers";
+            auto offers = tempList[i].result();
+            for (auto offer: offers){
+                offerList->append(offer);
+            }
+        }
+        qDebug() << "done";
+
+        /*for(auto offer: AtomicWidget::list(Config::instance()->get(Config::rendezVous).toStringList()[0])){
+            offerList->append(offer);
+        }
+                 o_model->updateOffers(*offerList);
+
+         */
+    });
 
     QTimer::singleShot(1, [this]{
         this->skinChanged();
@@ -165,6 +211,59 @@ void AtomicWidget::updateStatus() {
     else {
         ui->frame_warning->hide();
     }
+}
+
+void AtomicWidget::list(QString rendezvous) {
+    QStringList arguments;
+    QList<QSharedPointer<OfferEntry>> list;
+    auto m_instance = Config::instance();
+    arguments << "--data-base-dir";
+    arguments << Config::defaultConfigDir().absolutePath();
+    // Remove after testing
+    //arguments << "--testnet";
+    arguments << "-j";
+    arguments << "list-sellers";
+    arguments << "--tor-socks5-port";
+    arguments << m_instance->get(Config::socks5Port).toString();
+    arguments << "--rendezvous-point";
+    arguments << rendezvous;
+    auto *swap = new QProcess();
+    swap->setReadChannel(QProcess::StandardOutput);
+    //swap->start(m_instance->get(Config::swapPath).toString(), arguments);
+    connect(swap, &QProcess::finished, this, [this, swap]{
+        QJsonDocument parsedLine;
+        QJsonParseError parseError;
+        QList<QSharedPointer<OfferEntry>> list;
+        qDebug() << "Subprocess has finished";
+        auto output = QString::fromLocal8Bit(swap->readAllStandardError());
+        qDebug() << "Crashes before splitting";
+        auto lines = output.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
+        qDebug() << lines.size();
+        qDebug() << "parsing Output";
+
+
+        for(auto line : lines){
+            qDebug() << line;
+            if(line.contains("status")){
+                qDebug() << "status contained";
+                parsedLine = QJsonDocument::fromJson(line.toLocal8Bit(), &parseError );
+                if (parsedLine["fields"]["status"].toString().contains("Online")){
+                    OfferEntry  entry = {parsedLine["fields"]["price"].toDouble(),parsedLine["fields"]["min_quantity"].toDouble(),parsedLine["fields"]["max_quantity"].toDouble(), parsedLine["fields"]["address"].toString()};
+                    offerList->append(QSharedPointer<OfferEntry>(&entry));
+                    qDebug() << &entry;
+                }
+            }
+            qDebug() << "next line";
+        }
+        qDebug() << "exits fine";
+        swap->close();
+        return list;
+    });
+    swap->start("/home/dev/.config/feather/swap", arguments);
+    //swap->waitForFinished(120000);
+
+
+
 }
 
 AtomicWidget::~AtomicWidget() = default;

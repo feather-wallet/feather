@@ -142,11 +142,10 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::tickersShowFiatBalance, {QS("tickersShowFiatBalance"), true}},
 
         // Atomic
-        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/xmr-btc-asb.coblox.tech/tcp/9939/p2p/12D3KooWCdMKjesXMJz1SiZ7HgotrxuqhQJbP5sgBm2BwP1cqThi",
-                                                            "/dnsaddr/atomic.money/p2p/12D3KooWNfiwKyDpAbW7XSgw5xmoMJzMXsJxR91FbUJiuWU1vBGb",
-                                                            "/dnsaddr/xmr.darkness.su/p2p/12D3KooWLWpQtmuPoQvMJxs6KRGMrc39ohkNbRNaXWJhW3DfQD6e",
-                                                            "/dnsaddr/swapanarchy.cfd/p2p/12D3KooWMgGjeW7ErQxCQzaeHiXxJn42wegCPFepixEXfBJT1PNS",
-                                                            "/onion3/spqfqxirmlrhq7gbiwn4jn35c77gu2kof26i6psoc6bbyduol3zty6qd:9841/p2p/12D3KooWM9ipr33nEtxyCBF7fdbHsMrRzHaSf1bEVYzV8XSBSMet"}}},
+        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/discover.unstoppableswap.net/tcp/8888/p2p/12D3KooWA6cnqJpVnreBVnoro8midDL9Lpzmg8oJPoAGi7YYaamE",
+                                                            "/dns4/eratosthen.es/tcp/7798/p2p/12D3KooWAh7EXXa2ZyegzLGdjvj1W4G3EXrTGrf6trraoT1MEobs",
+                                                            "/dnsaddr/rendezvous.coblox.tech/p2p/12D3KooWQUt9DkNZxEn2R5ymJzWj15MpG6mTW84kyd8vDaRZi46o",
+                                                            "/dns4/swap.sethforprivacy.com/tcp/8888/p2p/12D3KooWCULyZKuV9YEkb6BX8FuwajdvktSzmMg4U5ZX2uYZjHeu"}}},
         {Config::swapPath, {QS("swapPath"), ""}},
         {Config::operatingSystem, {QS("operatingSystem"), OS}},
 };

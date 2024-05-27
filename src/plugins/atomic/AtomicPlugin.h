@@ -6,6 +6,7 @@
 
 #include "plugins/Plugin.h"
 #include "AtomicWidget.h"
+#include "Offer.h"
 
 class AtomicPlugin : public Plugin {
 Q_OBJECT
@@ -26,7 +27,6 @@ public:
     QDialog* configDialog(QWidget *parent) override;
 
     void initialize(Wallet *wallet, QObject *parent) override;
-
     static AtomicPlugin* create() { return new AtomicPlugin(); }
 
 public slots:

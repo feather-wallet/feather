@@ -26,7 +26,7 @@ option(DONATE_BEG "Prompt donation window every once in a while" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
 option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
 
-# Plugins
+#
 option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
 option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)
 option(WITH_PLUGIN_CROWDFUNDING "Include Crowdfunding Home plugin" ON)
@@ -117,7 +117,7 @@ if(WITH_SCANNER)
 endif()
 
 # libzip
-if(CHECK_UPDATES)
+if(CHECK_UPDATES OR WITH_PLUGIN_ATOMIC)
     set(ZLIB_USE_STATIC_LIBS "ON")
     message("libzip inclueded")
     find_package(ZLIB REQUIRED)
