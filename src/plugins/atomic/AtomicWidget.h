@@ -29,13 +29,9 @@ public slots:
     void skinChanged();
 
 private slots:
-    void initComboBox();
     void showAtomicConfigureDialog();
-    void onPricesReceived();
 
 private:
-    void convert(bool reverse);
-    void setupComboBox(QComboBox *comboBox, const QStringList &crypto, const QStringList &fiat);
     void updateStatus();
 
     QScopedPointer<Ui::AtomicWidget> ui;
