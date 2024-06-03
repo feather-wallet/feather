@@ -30,6 +30,7 @@ public slots:
 
 private slots:
     void showAtomicConfigureDialog();
+    void runSwap(QString seller, QString btcChange, QString xmrReceive);
 
 private:
     void updateStatus();

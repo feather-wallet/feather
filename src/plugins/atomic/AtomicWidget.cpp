@@ -53,31 +53,20 @@ AtomicWidget::AtomicWidget(QWidget *parent)
         QStringList pointList = m_instance->get(Config::rendezVous).toStringList();
         for(QString point :pointList)
             AtomicWidget::list(point);
+    });
 
-        /*
-        QList<QFuture<void>> tempList;
-        for (int i=0; i<pointList.size();i++){
-            tempList.append(QtConcurrent::run([this, pointList, i]{
-                return AtomicWidget::list(pointList[i]);
-            }));
+    connect(ui->btn_swap, &QPushButton::clicked, this, [this]{
+        auto rows = ui->offerBookTable->selectionModel()->selectedRows();
+        if (rows.size() < 1){
+            ui->meta_label->setText("You must select an offer to use for swap, refresh if there aren't any");
+        } else {
+            QModelIndex index = rows.at(0);
+            QString seller = index.sibling(index.row(), 3).data().toString();
+            //Add proper error checking on ui input after rest of swap is implemented
+            QString btcChange = ui->change_address->text();
+            QString xmrReceive = ui->xmr_address->text();
+            runSwap(seller,btcChange, xmrReceive);
         }
-
-        sleep(130);
-        for (int i=0; i<pointList.size();i++){
-            qDebug() << "Starting to read offers";
-            auto offers = tempList[i].result();
-            for (auto offer: offers){
-                offerList->append(offer);
-            }
-        }
-        qDebug() << "done";
-
-        /*for(auto offer: AtomicWidget::list(Config::instance()->get(Config::rendezVous).toStringList()[0])){
-            offerList->append(offer);
-        }
-                 o_model->updateOffers(*offerList);
-
-         */
     });
 
     connect(ui->btn_addRendezvous, &QPushButton::clicked, this, [this]{
@@ -116,6 +105,45 @@ void AtomicWidget::updateStatus() {
 
 }
 
+void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive) {
+    qDebug() << "starting swap";
+    QStringList  arguments;
+    auto m_instance = Config::instance();
+    arguments << "--data-base-dir";
+    arguments << Config::defaultConfigDir().absolutePath();
+    // Remove after testing
+    //arguments << "--testnet";
+    arguments << "-j";
+    arguments << "buy-xmr";
+    arguments << "--change-address";
+    arguments << btcChange;
+    arguments << "--receive-address";
+    arguments << xmrReceive;
+    arguments << "--seller";
+    arguments << seller;
+    arguments << "--tor-socks5-port";
+    arguments << m_instance->get(Config::socks5Port).toString();
+
+    auto *swap = new QProcess();
+    swap->setReadChannel(QProcess::StandardError);
+    connect(swap, &QProcess::readyReadStandardError,this, [this, swap] {
+        while(swap->canReadLine()){
+            QJsonParseError err;
+            QJsonDocument line = QJsonDocument::fromJson(swap->readLine(), &err);
+            qDebug() << line;
+            if (line["fields"]["message"].toString().contains("Connected to Alice")){
+                qDebug() << "Succesfully connected";
+            } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
+                qDebug() << "Deposit to btc to segwit address";
+            } else if ()
+            //Insert line conditionals here
+        }
+    });
+    swap->start(m_instance->get(Config::swapPath).toString(),arguments);
+    qDebug() << "process started";
+
+}
+
 void AtomicWidget::list(QString rendezvous) {
     QStringList arguments;
     QList<QSharedPointer<OfferEntry>> list;
@@ -131,7 +159,7 @@ void AtomicWidget::list(QString rendezvous) {
     arguments << "--rendezvous-point";
     arguments << rendezvous;
     auto *swap = new QProcess();
-    swap->setReadChannel(QProcess::StandardOutput);
+    swap->setReadChannel(QProcess::StandardError);
     //swap->start(m_instance->get(Config::swapPath).toString(), arguments);
     connect(swap, &QProcess::finished, this, [this, swap]{
         QJsonDocument parsedLine;
