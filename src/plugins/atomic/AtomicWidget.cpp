@@ -12,14 +12,17 @@
 #include "OfferModel.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
-#include "utils/config.h"
 #include "utils/WebsocketNotifier.h"
+#include "dialog/QrCodeDialog.h"
 
 AtomicWidget::AtomicWidget(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::AtomicWidget)
+        , m_instance(Config::instance())
         , o_model(new OfferModel(this))
         , offerList(new QList<QSharedPointer<OfferEntry>>())
+        , swapDialog(new AtomicSwap(this))
+        , procList(new QList<QSharedPointer<QProcess>>())
 {
     ui->setupUi(this);
 
@@ -49,7 +52,6 @@ AtomicWidget::AtomicWidget(QWidget *parent)
 
         ui->meta_label->setText("Updating offer book this may take a bit, if no offers appear after a while try refreshing again");
 
-        auto m_instance = Config::instance();
         QStringList pointList = m_instance->get(Config::rendezVous).toStringList();
         for(QString point :pointList)
             AtomicWidget::list(point);
@@ -65,6 +67,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
             //Add proper error checking on ui input after rest of swap is implemented
             QString btcChange = ui->change_address->text();
             QString xmrReceive = ui->xmr_address->text();
+            showAtomicSwapDialog();
             runSwap(seller,btcChange, xmrReceive);
         }
     });
@@ -99,6 +102,9 @@ void AtomicWidget::showAtomicConfigureDialog() {
     }
 }
 
+void AtomicWidget::showAtomicSwapDialog() {
+    swapDialog->show();
+}
 
 
 void AtomicWidget::updateStatus() {
@@ -108,7 +114,6 @@ void AtomicWidget::updateStatus() {
 void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive) {
     qDebug() << "starting swap";
     QStringList  arguments;
-    auto m_instance = Config::instance();
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
     // Remove after testing
@@ -125,17 +130,28 @@ void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive
     arguments << m_instance->get(Config::socks5Port).toString();
 
     auto *swap = new QProcess();
+    procList->append(QSharedPointer<QProcess>(swap));
+
     swap->setReadChannel(QProcess::StandardError);
     connect(swap, &QProcess::readyReadStandardError,this, [this, swap] {
         while(swap->canReadLine()){
             QJsonParseError err;
-            QJsonDocument line = QJsonDocument::fromJson(swap->readLine(), &err);
-            qDebug() << line;
+            const QByteArray& rawline = swap->readLine();
+            QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
+            qDebug() << rawline;
             if (line["fields"]["message"].toString().contains("Connected to Alice")){
                 qDebug() << "Succesfully connected";
+                swapDialog->logLine(line["fields"].toString());
             } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
                 qDebug() << "Deposit to btc to segwit address";
-            } else if ()
+                QString address = line["fields"]["deposit_address"].toString();
+                QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
+                swapDialog->updateStatus("Add money to this address\n" + address);
+                QrCodeDialog dialog(this, &qrc,  "Deposit BTC to this address");
+                dialog.show();
+            } else{
+
+            }
             //Insert line conditionals here
         }
     });
@@ -147,7 +163,6 @@ void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive
 void AtomicWidget::list(QString rendezvous) {
     QStringList arguments;
     QList<QSharedPointer<OfferEntry>> list;
-    auto m_instance = Config::instance();
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
     // Remove after testing
@@ -159,6 +174,7 @@ void AtomicWidget::list(QString rendezvous) {
     arguments << "--rendezvous-point";
     arguments << rendezvous;
     auto *swap = new QProcess();
+    procList->append(QSharedPointer<QProcess>(swap));
     swap->setReadChannel(QProcess::StandardError);
     //swap->start(m_instance->get(Config::swapPath).toString(), arguments);
     connect(swap, &QProcess::finished, this, [this, swap]{
@@ -206,4 +222,19 @@ void AtomicWidget::list(QString rendezvous) {
 
 }
 
-AtomicWidget::~AtomicWidget() = default;
+AtomicWidget::~AtomicWidget() {
+    qDebug()<< "EXiting widget!!";
+    delete o_model;
+    delete offerList;
+    for (auto proc : *procList){
+        if(!proc->atEnd())
+            proc->terminate();
+    }
+    if(QString::compare("WINDOWS",m_instance->get(Config::operatingSystem).toString()) != 0) {
+        qDebug() << "Closing monero-wallet-rpc";
+        (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+                                                         "/mainnet/monero/monero-wallet-rpc"});
+    }
+        delete m_instance;
+    delete procList;
+};

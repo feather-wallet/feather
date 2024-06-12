@@ -60,11 +60,11 @@ void AtomicConfigDialog::downloadBinary() {
     auto operatingSystem = Config::instance()->get(Config::operatingSystem).toString().toStdString();
     if(strcmp("WIN",operatingSystem.c_str()) == 0) {
         // HARD CODED DOWNload URL CHANGE IF PROBLEMS
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/tag/0.13.0/swap_0.13.0_Windows_x86_64.zip");
+        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Windows_x86_64.zip");
     } else if (strcmp("LINUX",operatingSystem.c_str())==0){
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/tag/0.13.0/swap_0.13.0_Linux_x86_64.tar");
+        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Linux_x86_64.tar");
     } else {
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/tag/0.13.0/swap_0.13.0_Darwin_x86_64.tar");
+        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Linux_x86_64.tar");
     }
 
     archive = network->get(this, url);

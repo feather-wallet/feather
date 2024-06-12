@@ -11,6 +11,8 @@
 #include <QMutex>
 
 #include "OfferModel.h"
+#include "AtomicSwap.h"
+#include "config.h"
 
 namespace Ui {
     class AtomicWidget;
@@ -40,6 +42,12 @@ private:
     QTimer m_statusTimer;
     OfferModel *o_model;
     QList<QSharedPointer<OfferEntry>> *offerList;
+    AtomicSwap *swapDialog;
+
+    void showAtomicSwapDialog();
+
+    QList<QSharedPointer<QProcess>> *procList;
+    Config *m_instance;
 };
 
 #endif // FEATHER_ATOMICWIDGET_H

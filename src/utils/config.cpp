@@ -142,9 +142,10 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::tickersShowFiatBalance, {QS("tickersShowFiatBalance"), true}},
 
         // Atomic
-        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/discover.unstoppableswap.net/tcp/8888/p2p/12D3KooWA6cnqJpVnreBVnoro8midDL9Lpzmg8oJPoAGi7YYaamE",
-                                                            "/dns4/eratosthen.es/tcp/7798/p2p/12D3KooWAh7EXXa2ZyegzLGdjvj1W4G3EXrTGrf6trraoT1MEobs",
+        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/atomicswaps.majesticbank.at/tcp/8888/p2p/12D3KooWKJUwP45K7fLbwGY1VM5V3U7LseU8EwJiAozUFrq5ihoF",
                                                             "/dnsaddr/rendezvous.coblox.tech/p2p/12D3KooWQUt9DkNZxEn2R5ymJzWj15MpG6mTW84kyd8vDaRZi46o",
+                                                            "/dns4/discover.unstoppableswap.net/tcp/8888/p2p/12D3KooWA6cnqJpVnreBVnoro8midDL9Lpzmg8oJPoAGi7YYaamE",
+                                                            "/dns4/eratosthen.es/tcp/7798/p2p/12D3KooWAh7EXXa2ZyegzLGdjvj1W4G3EXrTGrf6trraoT1MEobs",
                                                             "/dns4/swap.sethforprivacy.com/tcp/8888/p2p/12D3KooWCULyZKuV9YEkb6BX8FuwajdvktSzmMg4U5ZX2uYZjHeu"}}},
         {Config::swapPath, {QS("swapPath"), ""}},
         {Config::operatingSystem, {QS("operatingSystem"), OS}},
