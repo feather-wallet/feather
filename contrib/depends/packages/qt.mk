@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.7.1
+$(package)_version=6.7.2
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=b7338da1bdccb4d861e714efffaa83f174dfe37e194916bfd7ec82279a6ace19
+$(package)_sha256_hash=c5f22a5e10fb162895ded7de0963328e7307611c688487b5d152c9ee64767599
 $(package)_darwin_dependencies=native_cctools native_qt openssl
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
@@ -25,19 +25,19 @@ $(package)_patches += revert-f67ee7c39.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=0953cddf6248f3959279a10904892e8a98eb3e463d729a174b6fc47febd99824
+$(package)_qttools_sha256_hash=58e855ad1b2533094726c8a425766b63a04a0eede2ed85086860e54593aa4b2a
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=3ed5b80f7228c41dd463b7a57284ed273d224d1c323c0dd78c5209635807cbce
+$(package)_qtsvg_sha256_hash=fb0d1286a35be3583fee34aeb5843c94719e07193bdf1d4d8b0dc14009caef01
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=fe16a6e4d2b819c72a56f671c5c697bae4c7f9fee4df2a4473b14caf7602feeb
+$(package)_qtwebsockets_sha256_hash=5bde4af6ec9ce8c8632b782ab77b82d910721be2c714e6d38902521bcd1d215f
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=656d1543727f5bf1bd39fe2548ac454860109dc8555df77d7940f21e3d65cd3e
+$(package)_qtmultimedia_sha256_hash=8ef835115acb9a1d3d2c9f23cfacb43f2c537e3786a8ab822299a2a7765651d3
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=e585e3a985b2e2bad8191a84489a04e69c3defc6022a8e746aad22a1f17910c2
+$(package)_qtshadertools_sha256_hash=edfa34c0ac8c00fcaa949df1d8e7a77d89dadd6386e683ce6c3e3b117e2f7cc1
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)

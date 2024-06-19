@@ -1,15 +1,15 @@
 diff --git a/src/plugins/multimedia/CMakeLists.txt b/src/plugins/multimedia/CMakeLists.txt
-index 978710112..1cb2cc730 100644
+index 5bc39c1f8..c74f2ff4c 100644
 --- a/src/plugins/multimedia/CMakeLists.txt
 +++ b/src/plugins/multimedia/CMakeLists.txt
 @@ -2,7 +2,7 @@
  # SPDX-License-Identifier: BSD-3-Clause
  
- if (QT_FEATURE_ffmpeg)
+ if(QT_FEATURE_ffmpeg)
 -    add_subdirectory(ffmpeg)
 +    add_subdirectory(v4l2)
- endif ()
- if (QT_FEATURE_gstreamer)
+ endif()
+ if(QT_FEATURE_gstreamer)
      add_subdirectory(gstreamer)
 diff --git a/src/plugins/multimedia/v4l2/CMakeLists.txt b/src/plugins/multimedia/v4l2/CMakeLists.txt
 new file mode 100644
@@ -1044,7 +1044,7 @@ index 000000000..cbaa810d7
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qv4l2camera.cpp b/src/plugins/multimedia/v4l2/qv4l2camera.cpp
 new file mode 100644
-index 000000000..2086af10d
+index 000000000..1ba05364d
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qv4l2camera.cpp
 @@ -0,0 +1,707 @@
@@ -1444,7 +1444,7 @@ index 000000000..2086af10d
 +void QV4L2Camera::setCameraBusy()
 +{
 +    m_cameraBusy = true;
-+    emit error(QCamera::CameraError, QLatin1String("Camera is in use"));
++    updateError(QCamera::CameraError, QLatin1String("Camera is in use"));
 +}
 +
 +void QV4L2Camera::initV4L2Controls()
@@ -1462,7 +1462,7 @@ index 000000000..2086af10d
 +        qCWarning(qLcV4L2Camera) << "Unable to open the camera" << deviceName
 +                                 << "for read to query the parameter info:"
 +                                 << qt_error_string(errno);
-+        emit error(QCamera::CameraError, QLatin1String("Cannot open camera"));
++        updateError(QCamera::CameraError, QLatin1String("Cannot open camera"));
 +        return;
 +    }
 +
@@ -1701,7 +1701,7 @@ index 000000000..2086af10d
 +
 +    if (!m_memoryTransfer) {
 +        qCWarning(qLcV4L2Camera) << "Cannot init v4l2 memory transfer," << qt_error_string(errno);
-+        emit error(QCamera::CameraError, QLatin1String("Cannot init V4L2 memory transfer"));
++        updateError(QCamera::CameraError, QLatin1String("Cannot init V4L2 memory transfer"));
 +    }
 +}
 +
