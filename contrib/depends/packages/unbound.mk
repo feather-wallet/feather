@@ -1,10 +1,9 @@
 package=unbound
-$(package)_version=1.19.3
+$(package)_version=1.20.0
 $(package)_download_path=https://www.nlnetlabs.nl/downloads/$(package)/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=3ae322be7dc2f831603e4b0391435533ad5861c2322e34a76006a9fb65eb56b9
+$(package)_sha256_hash=56b4ceed33639522000fd96775576ddf8782bb3617610715d7f1e777c5ec1dbf
 $(package)_dependencies=openssl expat
-$(package)_patches=disable-glibc-reallocarray.patch
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-shared --enable-static --without-pyunbound --prefix=$(host_prefix)
@@ -17,7 +16,8 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 < $($(package)_patch_dir)/disable-glibc-reallocarray.patch &&\
+  rm configure~ doc/IP-BasedActions.pdf doc/ietf67-design-02.odp doc/ietf67-design-02.pdf doc/CNAME-basedRedirectionDesignNotes.pdf &&\
+  rm -rf testdata dnscrypt/testdata &&\
   autoconf
 endef
 
