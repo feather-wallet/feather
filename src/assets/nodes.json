@@ -21,6 +21,15 @@
       "rucknium757bokwv3ss35ftgc3gzb7hgbvvglbg3hisp7tsj2fkd2nyd.onion:18081"
     ],
     "i2p": [
+<<<<<<< HEAD
+=======
+      "ghsdgnq5ge2azab42hryquhuxeaafby64lgxz4odqkuuh4y7ycaa.b32.i2p:18081",
+      "bpdl72ivoc2jxwtx62ypo2szsew4xso643yblkprgde6t65wv3ta.b32.i2p:18081",
+      "3mpt2afz2dm6c4ww4hogvjqzb3qc4zmdajvsh4kn3v2ayg4poy4q.b32.i2p:18089",
+      "monero2p56zvn5jgiap57cawbisokmge4wximkjdu2xbiqd3pcoq.b32.i2p:18089",
+      "monero-node.i2p:18089",
+      "rpcxmrkhptor4duixkkhwcplrgp3u7ucw4mhr2b4zem77o24tlva.b32.i2p:18081",
+>>>>>>> 1a8a242 (nodes: add i2p nodes)
       "ynk3hrwte23asonojqeskoulek2g2cd6tqg4neghnenfyljrvhga.b32.i2p:18081",
       "t7lce3j7mwxt32h755u3njjp3k6og3defgueo3iecgsexxnkoezouobc.b32.i2p:18089",
       "ecnfc7oyzzw3jmwc2omxzccbik33wyyaofxsfow7342z6kjanq6a.b32.i2p:18089",
