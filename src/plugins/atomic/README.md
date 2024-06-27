@@ -6,7 +6,7 @@ Built in xmr-btc atomic swap
 ## Hacking
 sudo apt install libarchive-dev
 
-It may also be helpful to download my fork of the comit network's xmr-btc swap tool as it has tests set to ouput JSON and scripts that allow for easy simulation of running swap (filters to Bob POV & removes wrappers on normal output)
+It may also be helpful to download my fork of the comit network's xmr-btc swap tool as it has everything you need to use btc's testnet4 for swaps. Testnet4 btc is much easier to acquire so it makes testing much more practical. There are scripts to run the electrum server just make sure you have docker-compose installed and build the electrumx testnet4 fork before trying to run the scripts.
 
 [xmr-btc-swap-json-tests](https://github.com/BrandyJSon/xmr-btc-swap-json-tests/tree/master)
 
