@@ -25,7 +25,7 @@ Q_OBJECT
 public:
     explicit AtomicWidget(QWidget *parent = nullptr);
     ~AtomicWidget() override;
-    void list(QString rendezvous);
+    void list(const QString& rendezvous);
 
 public slots:
     void skinChanged();
@@ -33,7 +33,7 @@ public slots:
 
 private slots:
     void showAtomicConfigureDialog();
-    void runSwap(QString seller, QString btcChange, QString xmrReceive);
+    void runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive);
 signals:
     void receivedBTC(float new_amount);
 private:

@@ -31,7 +31,6 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     QString amount_rx = R"(^\d{0,8}[\.]\d{0,12}$)";
     QRegularExpression rx;
     rx.setPattern(amount_rx);
-    QValidator *validator = new QRegularExpressionValidator(rx, this);
     ui->offerBookTable->setModel(o_model);
     ui->offerBookTable->setSortingEnabled(true);
     ui->offerBookTable->sortByColumn(0, Qt::SortOrder::AscendingOrder);
@@ -53,7 +52,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
         ui->meta_label->setText("Updating offer book this may take a bit, if no offers appear after a while try refreshing again");
 
         QStringList pointList = m_instance->get(Config::rendezVous).toStringList();
-        for(QString point :pointList)
+        for(const QString& point :pointList)
             AtomicWidget::list(point);
     });
 
@@ -110,7 +109,7 @@ void AtomicWidget::updateStatus() {
 
 }
 
-void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive) {
+void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive) {
     qDebug() << "starting swap";
     QStringList  arguments;
     arguments << "--data-base-dir";
@@ -151,7 +150,7 @@ void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive
             QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
             qDebug() << rawline;
             if (line["fields"]["message"].toString().contains("Connected to Alice")){
-                qDebug() << "Succesfully connected";
+                qDebug() << "Successfully connected";
                 swapDialog->logLine(line["fields"].toString());
             } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
                 qDebug() << "Deposit to btc to segwit address";
@@ -159,12 +158,12 @@ void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive
                 QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
                 AtomicFundDialog dialog(qobject_cast<QWidget*>(parent()), &qrc,  "Deposit BTC to this address", address);
                 connect(&dialog,&AtomicFundDialog::cleanProcs, this, [this]{clean();});
-                connect(this, &AtomicWidget::receivedBTC,&dialog, [this, &dialog]{
+                connect(this, &AtomicWidget::receivedBTC,&dialog, [ &dialog]{
                     disconnect(&dialog, SIGNAL(cleanProcs()), nullptr, nullptr);
                     dialog.close();});
                 dialog.exec();
             } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
-                emit receivedBTC(line["fields"]["new_balance"].toString().split(" ")[0].toDouble());
+                emit receivedBTC(line["fields"]["new_balance"].toString().split(" ")[0].toFloat());
                 qDebug() << "Spawn atomic swap progress dialog";
                 showAtomicSwapDialog();
             }
@@ -177,9 +176,8 @@ void AtomicWidget::runSwap(QString seller, QString btcChange, QString xmrReceive
 
 }
 
-void AtomicWidget::list(QString rendezvous) {
+void AtomicWidget::list(const QString& rendezvous) {
     QStringList arguments;
-    QList<QSharedPointer<OfferEntry>> list;
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
     arguments << "-j";
@@ -204,7 +202,7 @@ void AtomicWidget::list(QString rendezvous) {
         qDebug() << "parsing Output";
 
 
-        for(auto line : lines){
+        for(const auto& line : lines){
             qDebug() << line;
             if(line.contains("status")){
                 qDebug() << "status contained";
@@ -212,7 +210,7 @@ void AtomicWidget::list(QString rendezvous) {
                 if (parsedLine["fields"]["status"].toString().contains("Online")){
                     bool skip = false;
                     auto  entry = new OfferEntry(parsedLine["fields"]["price"].toString().split( ' ')[0].toDouble(),parsedLine["fields"]["min_quantity"].toString().split(' ')[0].toDouble(),parsedLine["fields"]["max_quantity"].toString().split(' ')[0].toDouble(), parsedLine["fields"]["address"].toString());
-                    for(auto post : *offerList){
+                    for(const auto& post : *offerList){
                         if(std::equal(entry->address.begin(), entry->address.end(),post->address.begin(),post->address.end()))
                             skip = true;
                     }
@@ -237,7 +235,7 @@ void AtomicWidget::list(QString rendezvous) {
 }
 
 AtomicWidget::~AtomicWidget() {
-    qDebug()<< "EXiting widget!!";
+    qDebug()<< "Exiting widget!!";
     delete o_model;
     delete offerList;
     clean();
@@ -246,7 +244,7 @@ AtomicWidget::~AtomicWidget() {
 }
 
 void AtomicWidget::clean() {
-    for (auto proc : *procList){
+    for (const auto& proc : *procList){
         if(!proc->atEnd())
             proc->terminate();
     }
