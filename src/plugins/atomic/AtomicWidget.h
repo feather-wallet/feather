@@ -29,11 +29,13 @@ public:
 
 public slots:
     void skinChanged();
+    void clean();
 
 private slots:
     void showAtomicConfigureDialog();
     void runSwap(QString seller, QString btcChange, QString xmrReceive);
-
+signals:
+    void receivedBTC(float new_amount);
 private:
     void updateStatus();
 

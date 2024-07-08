@@ -7,13 +7,14 @@
 
 #include <QDialog>
 #include <QTime>
+#include "components.h"
 
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AtomicSwap; }
 QT_END_NAMESPACE
 
-class AtomicSwap : public QDialog {
+class AtomicSwap : public WindowModalDialog {
 Q_OBJECT
 
 public:
@@ -21,7 +22,11 @@ public:
     void updateStatus(QString status);
     void logLine(QString line);
     ~AtomicSwap() override;
-
+    void updateBTCConf(int confs);
+    void updateXMRConf(int confs);
+    void setTitle(QString title);
+signals:
+    void cleanProcs();
 private:
     Ui::AtomicSwap *ui;
 
