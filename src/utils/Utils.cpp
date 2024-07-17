@@ -513,6 +513,14 @@ QString displayAddress(const QString& address, int sections, const QString& sep)
     return list.join(sep);
 }
 
+QString chunkAddress(const QString& address) {
+    QStringList list;
+    for (int i = 0; i < 19; i+= 1) {
+        list << address.mid(i*5, 5);
+    }
+    return list.join(" ");
+}
+
 QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount) {
     QTextCharFormat rec;
     if (index.isPrimary()) {
@@ -683,5 +691,14 @@ QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync) {
     }
 
     return "Synchronized";
+}
+
+QString formatRestoreHeight(Wallet *wallet) {
+    if (!wallet) {
+        return "";
+    }
+
+    QDateTime restoreDate = appData()->restoreHeights[constants::networkType]->heightToDate(wallet->getWalletCreationHeight());
+    return QString("%1 (%2)").arg(QString::number(wallet->getWalletCreationHeight()), restoreDate.toString("yyyy-MM-dd"));
 }
 }

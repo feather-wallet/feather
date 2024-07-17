@@ -50,6 +50,7 @@ public:
     QList<QString> destinations() const;
     QList<Transfer*> transfers() const;
     QString rings_formatted() const;
+    QString prefixHash() const;
 
 private:
     explicit TransactionRow();
@@ -76,6 +77,7 @@ private:
     QDateTime m_timestamp;
     quint64 m_unlockTime;
     bool m_coinbase;
+    QString m_prefixHash;
 };
 
 

@@ -28,6 +28,7 @@ public:
 
     void setTransaction(PendingTransaction *tx, bool isSigned = true); // #TODO: have libwallet return a UnsignedTransaction, this is just dumb
     void setUnsignedTransaction(UnsignedTransaction *utx);
+    void setMultisigTransaction(PendingTransaction *tx);
 
 private:
     void setupConstructionData(ConstructionInfo *ci);
@@ -51,6 +52,7 @@ private:
     QMenu *m_exportTxKeyMenu;
     QString m_txid;
     bool m_offline;
+    bool m_multisig = false;
 };
 
 #endif //FEATHER_TXCONFADVDIALOG_H

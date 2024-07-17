@@ -19,17 +19,32 @@
 #include "PageHardwareDevice.h"
 #include "PageNetworkProxy.h"
 #include "PageNetworkWebsocket.h"
+#include "multisig/PageMultisigExperimentalWarning.h"
+#include "multisig/PageMultisigCreateSetupKey.h"
+#include "multisig/PageMultisigParticipants.h"
+#include "multisig/PageMultisigOwnAddress.h"
+#include "multisig/PageMultisigSignerInfo.h"
+#include "multisig/PageMultisigSetupDebug.h"
+#include "multisig/PageMultisigSeed.h"
+#include "multisig/PageMultisigEnterSetupKey.h"
+#include "multisig/PageMultisigEnterChannel.h"
+#include "multisig/PageMultisigSignerConfig.h"
+#include "multisig/PageMultisigSetupKey.h"
+#include "multisig/PageMultisigEnterName.h"
+#include "multisig/PageMultisigSetupWallet.h"
+#include "multisig/PageMultisigVerifyAddress.h"
+#include "multisig/PageMultisigRestoreSeed.h"
+#include "multisig/PageMultisigMMSRecoveryInfo.h"
+#include "multisig/PageMultisigRestoreMMSRecoveryInfo.h"
 #include "constants.h"
 #include "WindowManager.h"
-
-#include <QLineEdit>
-#include <QVBoxLayout>
-#include <QScreen>
+#include "PageRecoverWallet.h"
+#include "PageKeyType.h"
 
 WalletWizard::WalletWizard(QWidget *parent)
     : QWizard(parent)
 {
-    this->setWindowTitle("Welcome to Feather Wallet");
+    this->setWindowTitle("Feather Wizard");
     this->setWindowIcon(QIcon(":/assets/images/appicons/64x64.png"));
 
     m_walletKeysFilesModel = new WalletKeysFilesModel(this);
@@ -45,6 +60,9 @@ WalletWizard::WalletWizard(QWidget *parent)
     auto walletSetPasswordPage = new PageSetPassword(&m_wizardFields, this);
     auto walletSetSeedPassphrasePage = new PageSetSeedPassphrase(&m_wizardFields, this);
     auto walletSetSubaddressLookaheadPage = new PageSetSubaddressLookahead(&m_wizardFields, this);
+    auto multisigSetupDebug = new PageMultisigSetupDebug(&m_wizardFields, this);
+    auto multisigSeed = new PageMultisigSeed(&m_wizardFields, this);
+    auto multisigRecoveryInfo = new PageMultisigMMSRecoveryInfo(&m_wizardFields, this);
     setPage(Page_Menu, menuPage);
     setPage(Page_WalletFile, createWallet);
     setPage(Page_OpenWallet, openWalletPage);
@@ -60,6 +78,25 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_SetSeedPassphrase, walletSetSeedPassphrasePage);
     setPage(Page_SetSubaddressLookahead, walletSetSubaddressLookaheadPage);
     setPage(Page_Plugins, new PagePlugins(this));
+    setPage(Page_MultisigExperimentalWarning, new PageMultisigExperimentalWarning(&m_wizardFields, this));
+    setPage(Page_MultisigCreateSetupKey, new PageMultisigCreateSetupKey(&m_wizardFields, this));
+    setPage(Page_MultisigParticipants, new PageMultisigParticipants(&m_wizardFields, this));
+    setPage(Page_MultisigOwnAddress, new PageMultisigOwnAddress(&m_wizardFields, this));
+    setPage(Page_MultisigSignerInfo, new PageMultisigSignerInfo(&m_wizardFields, this));
+    setPage(Page_MultisigSetupDebug, multisigSetupDebug);
+    setPage(Page_MultisigSeed, multisigSeed);
+    setPage(Page_MultisigEnterSetupKey, new PageMultisigEnterSetupKey(&m_wizardFields, this));
+    setPage(Page_MultisigEnterChannel, new PageMultisigEnterChannel(&m_wizardFields, this));
+    setPage(Page_MultisigSignerConfig, new PageMultisigSignerConfig(&m_wizardFields, this));
+    setPage(Page_MultisigShowSetupKey, new PageMultisigSetupKey(&m_wizardFields, this));
+    setPage(Page_MultisigEnterName, new PageMultisigEnterName(&m_wizardFields, this));
+    setPage(Page_MultisigSetupWallet, new PageMultisigSetupWallet(&m_wizardFields, this));
+    setPage(Page_MultisigVerifyAddress, new PageMultisigVerifyAddress(&m_wizardFields, this));
+    setPage(Page_Recover, new PageRecoverWallet(&m_wizardFields, this));
+    setPage(Page_MultisigRestoreSeed, new PageMultisigRestoreSeed(&m_wizardFields, this));
+    setPage(Page_KeyType, new PageKeyType(&m_wizardFields, this));
+    setPage(Page_MultisigMMSRecoveryInfo, multisigRecoveryInfo);
+    setPage(Page_MultisigRestoreMMSRecoveryInfo, new PageMultisigRestoreMMSRecoveryInfo(&m_wizardFields, this));
 
     setStartId(Page_Menu);
 
@@ -79,6 +116,8 @@ WalletWizard::WalletWizard(QWidget *parent)
     layout << QWizard::FinishButton;
     layout << QWizard::CommitButton;
     this->setButtonLayout(layout);
+
+    this->setButtonText(QWizard::CommitButton, "Next");
 
     auto *settingsButton = new QPushButton("Settings", this);
     this->setButton(QWizard::CustomButton1, settingsButton);
@@ -102,11 +141,20 @@ WalletWizard::WalletWizard(QWidget *parent)
         emit openWallet(path, "");
     });
 
+    connect(multisigRecoveryInfo, &PageMultisigMMSRecoveryInfo::showWallet, [this](Wallet* wallet){
+        m_wizardFields.wallet = nullptr;
+        emit showWallet(wallet);
+    });
+
     connect(this, &QWizard::helpRequested, this, &WalletWizard::showHelp);
 }
 
 void WalletWizard::resetFields() {
     m_wizardFields = {};
+}
+
+void WalletWizard::setWallet(Wallet *wallet) {
+    m_wizardFields.wallet = wallet;
 }
 
 void WalletWizard::onCreateWallet() {
@@ -147,6 +195,21 @@ void WalletWizard::onCreateWallet() {
         return;
     }
 
+    if (m_wizardFields.mode == WizardMode::CreateMultisig) {
+        // We didn't generate a seed, generate one here.
+        m_wizardFields.seed = Seed(Seed::Type::POLYSEED, constants::networkType, "English", nullptr);
+    }
+
+    if (m_wizardFields.mode == WizardMode::RestoreMultisig) {
+        emit restoreMultisigWallet(walletPath,
+                                   m_wizardFields.password,
+                                   m_wizardFields.multisigSeed,
+                                   m_wizardFields.multisigMMSRecovery,
+                                   m_wizardFields.restoreHeight,
+                                   m_wizardFields.subaddressLookahead);
+        return;
+    }
+
     // If we're connected to the websocket, use the reported height for new wallets to skip initial synchronization.
     if (m_wizardFields.mode == WizardMode::CreateWallet && currentBlockHeight > 0) {
         qInfo() << "New wallet, setting restore height to latest blockheight: " << currentBlockHeight;
@@ -157,9 +220,10 @@ void WalletWizard::onCreateWallet() {
         m_wizardFields.seed.setRestoreHeight(m_wizardFields.restoreHeight);
     }
 
-    bool newWallet = m_wizardFields.mode == WizardMode::CreateWallet;
+    bool newWallet = (m_wizardFields.mode == WizardMode::CreateWallet || m_wizardFields.mode == WizardMode::CreateMultisig);
 
-    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead, newWallet);
+    bool giveToWizard = m_wizardFields.mode == WizardMode::CreateMultisig;
+    emit createWallet(m_wizardFields.seed, walletPath, m_wizardFields.password, m_wizardFields.seedLanguage, m_wizardFields.seedOffsetPassphrase, m_wizardFields.subaddressLookahead, newWallet, giveToWizard);
 }
 
 QString WalletWizard::helpPage() {
@@ -195,4 +259,8 @@ void WalletWizard::showHelp() {
     if (!doc.isEmpty()) {
         windowManager()->showDocs(this, doc);
     }
+}
+
+WalletWizard::~WalletWizard() {
+    delete m_wizardFields.wallet;
 }

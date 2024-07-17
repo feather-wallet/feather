@@ -8,6 +8,7 @@
 
 #include "AddressBook.h"
 #include "Coins.h"
+#include "MultisigMessageStore.h"
 #include "Subaddress.h"
 #include "SubaddressAccount.h"
 #include "TransactionHistory.h"
@@ -22,6 +23,8 @@
 #include "model/SubaddressModel.h"
 #include "model/SubaddressAccountModel.h"
 #include "model/CoinsModel.h"
+#include "model/MultisigMessageModel.h"
+#include "model/MultisigIncomingTxModel.h"
 
 #include "utils/ScopeGuard.h"
 
@@ -47,9 +50,11 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
         , m_subaddressAccount(new SubaddressAccount(this, wallet->getWallet(), this))
         , m_refreshNow(false)
         , m_refreshEnabled(false)
+        , m_mmsRefreshEnabled(false)
         , m_scheduler(this)
         , m_useSSL(true)
         , m_coins(new Coins(this, wallet->getWallet(), this))
+        , m_mmsStore(new MultisigMessageStore(this, wallet->getWallet(), this))
         , m_storeTimer(new QTimer(this))
 {
     m_walletListener = new WalletListenerImpl(this);
@@ -60,6 +65,8 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     m_subaddressModel = new SubaddressModel(this, m_subaddress);
     m_subaddressAccountModel = new SubaddressAccountModel(this, m_subaddressAccount);
     m_coinsModel = new CoinsModel(this, m_coins);
+    m_mmsModel = new MultisigMessageModel(this, m_mmsStore);
+    m_msIncomingTxModel = new MultisigIncomingTxModel(this, m_mmsStore);
 
     if (this->status() == Status_Ok) {
         startRefreshThread();
@@ -86,6 +93,9 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     connect(m_subaddress, &Subaddress::corrupted, [this]{
        emit keysCorrupted();
     });
+
+    connect(m_mmsStore, &MultisigMessageStore::multisigInfoImported, m_coins, &Coins::refresh);
+    connect(m_mmsStore, &MultisigMessageStore::multisigInfoExported, m_coins, &Coins::refresh);
 }
 
 // #################### Status ####################
@@ -126,6 +136,12 @@ NetworkType::Type Wallet::nettype() const {
 
 bool Wallet::viewOnly() const {
     return m_wallet2->watch_only();
+}
+
+bool Wallet::isMultisig() const {
+    bool ready, multisig;
+    multisig = m_wallet2->multisig(&ready);
+    return multisig;
 }
 
 bool Wallet::isDeterministic() const {
@@ -342,6 +358,12 @@ QString Wallet::getSeed(const QString &seedOffset) const {
     return QString::fromStdString(std::string(seed.data(), seed.size()));
 }
 
+QString Wallet::getMultisigSeed() const {
+    epee::wipeable_string seed;
+    m_wallet2->get_multisig_seed(seed, "");
+    return QString::fromStdString(std::string(seed.data(), seed.size()));
+}
+
 qsizetype Wallet::seedLength() const {
     auto seedLength = this->getCacheAttribute("feather.seed").split(" ", Qt::SkipEmptyParts).length();
     return seedLength ? seedLength : 25;
@@ -420,47 +442,54 @@ void Wallet::startRefreshThread()
     const auto future = m_scheduler.run([this] {
         // Beware! This code does not run in the GUI thread.
 
-        constexpr const std::chrono::seconds refreshInterval{10};
         constexpr const std::chrono::milliseconds intervalResolution{100};
 
         auto last = std::chrono::steady_clock::now();
         while (!m_scheduler.stopping())
         {
-            if (m_refreshEnabled && (!isHwBacked() || isDeviceConnected()))
+            if ((!isHwBacked() || isDeviceConnected()))
             {
                 const auto now = std::chrono::steady_clock::now();
                 const auto elapsed = now - last;
-                if (elapsed >= refreshInterval || m_refreshNow)
+                if (elapsed >= m_refreshInterval || m_refreshNow)
                 {
-                    m_refreshNow = false;
+                    if (m_refreshEnabled) {
+                        m_refreshNow = false;
 
-                    // get daemonHeight and targetHeight
-                    // daemonHeight and targetHeight will be 0 if call to get_info fails
-                    quint64 daemonHeight = m_walletImpl->daemonBlockChainHeight();
-                    bool success = daemonHeight > 0;
+                        // get daemonHeight and targetHeight
+                        // daemonHeight and targetHeight will be 0 if call to get_info fails
+                        quint64 daemonHeight = m_walletImpl->daemonBlockChainHeight();
+                        bool success = daemonHeight > 0;
 
-                    quint64 targetHeight = 0;
-                    if (success) {
-                        targetHeight = m_walletImpl->daemonBlockChainTargetHeight();
-                    }
-                    bool haveHeights = (daemonHeight > 0 && targetHeight > 0);
-
-                    emit heightsRefreshed(haveHeights, daemonHeight, targetHeight);
-
-                    // Don't call refresh function if we don't have the daemon and target height
-                    // We do this to prevent to UI from getting confused about the amount of blocks that are still remaining
-                    if (haveHeights) {
-                        QMutexLocker locker(&m_asyncMutex);
-
-                        if (m_newWallet) {
-                            // Set blockheight to daemonHeight for newly created wallets to speed up initial sync
-                            m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
-                            m_newWallet = false;
+                        quint64 targetHeight = 0;
+                        if (success) {
+                            targetHeight = m_walletImpl->daemonBlockChainTargetHeight();
                         }
+                        bool haveHeights = (daemonHeight > 0 && targetHeight > 0);
 
-                        m_walletImpl->refresh();
+                        emit heightsRefreshed(haveHeights, daemonHeight, targetHeight);
+
+                        // Don't call refresh function if we don't have the daemon and target height
+                        // We do this to prevent to UI from getting confused about the amount of blocks that are still remaining
+                        if (haveHeights) {
+                            QMutexLocker locker(&m_asyncMutex);
+
+                            if (m_newWallet) {
+                                // Set blockheight to daemonHeight for newly created wallets to speed up initial sync
+                                m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
+                                m_newWallet = false;
+                            }
+
+                            m_walletImpl->refresh();
+                        }
+                        last = std::chrono::steady_clock::now();
                     }
-                    last = std::chrono::steady_clock::now();
+
+                    if (m_mmsRefreshEnabled)
+                    {
+                        m_mmsStore->receiveMessages();
+                        last = std::chrono::steady_clock::now();
+                    }
                 }
             }
 
@@ -539,6 +568,7 @@ void Wallet::onNewBlock(uint64_t walletHeight) {
 void Wallet::onUpdated() {
     this->updateBalance();
     if (this->isSynchronized()) {
+//        m_mmsStore->exportMultisig();
         this->refreshModels();
     }
 }
@@ -563,6 +593,11 @@ void Wallet::refreshModels() {
     m_history->refresh();
     m_coins->refresh();
     this->subaddress()->refresh(this->currentSubaddressAccount());
+    m_mmsStore->refresh();
+}
+
+void Wallet::setRefreshInterval(qint64 seconds) {
+    m_refreshInterval = std::chrono::seconds{seconds};
 }
 
 // #################### Hardware wallet ####################
@@ -1023,6 +1058,13 @@ PendingTransaction * Wallet::loadSignedTxFromStr(const std::string &data)
     return result;
 }
 
+PendingTransaction * Wallet::restoreMultisigTransaction(const std::string &data)
+{
+    Monero::PendingTransaction *ptImpl = m_walletImpl->restoreMultisigTransaction(data);
+    PendingTransaction *result = new PendingTransaction(ptImpl, this);
+    return result;
+}
+
 bool Wallet::submitTxFile(const QString &fileName) const
 {
     qDebug() << "Trying to submit " << fileName;
@@ -1101,6 +1143,18 @@ Coins* Wallet::coins() const {
 
 CoinsModel* Wallet::coinsModel() const {
     return m_coinsModel;
+}
+
+MultisigMessageStore* Wallet::mmsStore() const {
+    return m_mmsStore;
+}
+
+MultisigMessageModel* Wallet::mmsModel() const {
+    return m_mmsModel;
+}
+
+MultisigIncomingTxModel* Wallet::msIncomingTxModel() const {
+    return m_msIncomingTxModel;
 }
 
 // #################### Transaction proofs ####################
@@ -1286,6 +1340,55 @@ QString Wallet::make_uri(const QString &address, quint64 &amount, const QString 
     std::string uri = m_walletImpl->make_uri(address.toStdString(), "", amount, description.toStdString(), recipient.toStdString(), error);
     return QString::fromStdString(uri);
 }
+
+// #################### Multisig ####################
+
+void Wallet::setMMSRefreshEnabled(bool enabled) {
+    m_mmsRefreshEnabled = enabled;
+}
+
+bool Wallet::hasMultisigPartialKeyImages() {
+    return m_walletImpl->hasMultisigPartialKeyImages();
+}
+
+QStringList Wallet::getMultisigSigners() {
+    QStringList signers;
+    mms::message_store& ms = m_wallet2->get_message_store();
+    quint32 authorizedSigners = ms.get_num_authorized_signers();
+    for (uint32_t j = 1; j < authorizedSigners; ++j)
+    {
+        mms::authorized_signer signer = ms.get_signer(j);
+        signers << QString::fromStdString(ms.signer_to_string(signer, 50));;
+    }
+    return signers;
+}
+
+QString Wallet::getMultisigSignerConfig() {
+    mms::message_store& ms = m_wallet2->get_message_store();
+    std::string signer_config;
+    ms.get_signer_config(signer_config);
+    std::string hex_signer_config = epee::string_tools::buff_to_hex_nodelimer(signer_config);
+    return QString::fromStdString(hex_signer_config);
+}
+
+quint32 Wallet::multisigSigners() {
+    return m_wallet2->get_multisig_signers();
+}
+
+quint32 Wallet::multisigThreshold() {
+    mms::message_store& ms = m_wallet2->get_message_store();
+    quint32 authorizedSigners = ms.get_num_required_signers();
+    return authorizedSigners;
+}
+
+//QString Wallet::originalPrimaryAddress() {
+////    m_wallet2->m_original_address
+//    return "";
+//}
+//
+//QString Wallet::originalSecretViewkey() {
+//    return QString::fromStdString(epee::string_tools::pod_to_hex(m_wallet2->m_original_view_secret_key));
+//}
 
 // #################### Misc / Unused ####################
 

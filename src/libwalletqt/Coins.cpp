@@ -76,6 +76,23 @@ void Coins::refresh()
             ci->m_coinbase = td.m_tx.vin.size() == 1 && td.m_tx.vin[0].type() == typeid(cryptonote::txin_gen);
             ci->m_description = m_wallet->getCacheAttribute(QString("coin.description:%1").arg(ci->m_pubKey));
             ci->m_change = m_wallet2->is_change(td);
+            ci->m_keyImagePartial = td.m_key_image_partial;
+
+            bool haveMultisigK = true;
+            if (td.m_multisig_k.empty()) {
+                haveMultisigK = false;
+            }
+            for (const auto &k : td.m_multisig_k) {
+                if (k == rct::zero()) {
+                    haveMultisigK = false;
+                    break;
+                }
+            }
+            ci->m_haveMultisigK = haveMultisigK;
+
+            for (const auto& info : td.m_multisig_info) {
+                ci->m_multisigInfo.append(QString::fromStdString(m_wallet2->get_signer_label(info.m_signer)));
+            }
 
             m_rows.push_back(ci);
         }

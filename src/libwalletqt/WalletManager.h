@@ -58,6 +58,15 @@ public:
                                   const QString &subaddressLookahead = ""
                                   );
 
+    Wallet * restoreMultisigWallet(const QString &path,
+                                   const QString &password,
+                                   NetworkType::Type nettype,
+                                   const QString &multisigSeed,
+                                   const QString &mmsRecovery,
+                                   quint64 restoreHeight = 0,
+                                   quint64 kdfRounds = 1,
+                                   const QString &subaddressLookahead = "");
+
     Wallet * createDeterministicWalletFromSpendKey(const QString &path,
                                                    const QString &password,
                                                    const QString &language,

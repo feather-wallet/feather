@@ -71,6 +71,9 @@ class SubaddressAccount;
 class SubaddressAccountModel;
 class Coins;
 class CoinsModel;
+class MultisigMessageStore;
+class MultisigMessageModel;
+class MultisigIncomingTxModel;
 
 struct TxProofResult {
     TxProofResult() {}
@@ -133,6 +136,8 @@ public:
     //! returns if view only wallet
     bool viewOnly() const;
 
+    bool isMultisig() const;
+
     //! return true if deterministic keys
     bool isDeterministic() const;
 
@@ -175,6 +180,7 @@ public:
 
     //! returns mnemonic seed
     QString getSeed(const QString &seedOffset) const;
+    QString getMultisigSeed() const;
 
     qsizetype seedLength() const;
 
@@ -226,6 +232,8 @@ public:
     void syncStatusUpdated(quint64 height, quint64 target);
 
     void refreshModels();
+
+    void setRefreshInterval(qint64 seconds);
 
     // ##### Hardware wallet #####
     bool isHwBacked() const;
@@ -342,6 +350,8 @@ public:
     PendingTransaction * loadSignedTxFile(const QString &fileName);
     PendingTransaction * loadSignedTxFromStr(const std::string &data);
 
+    PendingTransaction * restoreMultisigTransaction(const std::string &data);
+
     //! Submit a transfer from file
     bool submitTxFile(const QString &fileName) const;
 
@@ -359,6 +369,9 @@ public:
     SubaddressAccountModel* subaddressAccountModel() const;
     Coins* coins() const;
     CoinsModel* coinsModel() const;
+    MultisigMessageModel* mmsModel() const;
+    MultisigIncomingTxModel* msIncomingTxModel() const;
+    MultisigMessageStore* mmsStore() const;
 
     // ##### Transaction proofs #####
 
@@ -385,6 +398,20 @@ public:
     QVariantMap parse_uri_to_object(const QString &uri) const;
 
     QString make_uri(const QString &address, quint64 &amount, const QString &description, const QString &recipient) const;
+
+    // ##### Multisig #####
+
+    void setMMSRefreshEnabled(bool enabled);
+
+    bool hasMultisigPartialKeyImages();
+    QStringList getMultisigSigners();
+
+    QString getMultisigSignerConfig();
+    quint32 multisigSigners();
+    quint32 multisigThreshold();
+
+//    QString originalPrimaryAddress();
+//    QString originalSecretViewkey();
 
     // ##### Misc / Unused #####
 
@@ -498,6 +525,10 @@ private:
     Coins *m_coins;
     CoinsModel *m_coinsModel;
 
+    MultisigMessageStore *m_mmsStore;
+    MultisigMessageModel *m_mmsModel;
+    MultisigIncomingTxModel *m_msIncomingTxModel;
+
     QMutex m_asyncMutex;
     QString m_daemonUsername;
     QString m_daemonPassword;
@@ -505,6 +536,8 @@ private:
     QMutex m_proxyMutex;
     std::atomic<bool> m_refreshNow;
     std::atomic<bool> m_refreshEnabled;
+    std::atomic<bool> m_mmsRefreshEnabled;
+    std::chrono::seconds m_refreshInterval{10};
     WalletListenerImpl *m_walletListener;
     FutureScheduler m_scheduler;
 

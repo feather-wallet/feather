@@ -39,6 +39,9 @@ public:
     QString description() const;
     bool change() const;
     QString txNote() const;
+    bool keyImagePartial() const;
+    bool haveMultisigK() const;
+    QStringList multisigInfo() const;
 
     void setUnlocked(bool unlocked);
 
@@ -71,6 +74,9 @@ private:
     QString m_description;
     bool m_change;
     QString m_txNote;
+    bool m_keyImagePartial;
+    bool m_haveMultisigK;
+    QStringList m_multisigInfo;
 };
 
 #endif //FEATHER_COINSINFO_H

@@ -4,6 +4,7 @@
 #include "WalletListenerImpl.h"
 #include "Wallet.h"
 #include "WalletManager.h"
+#include "MultisigMessageStore.h"
 
 WalletListenerImpl::WalletListenerImpl(Wallet * w)
     : m_wallet(w)
@@ -30,6 +31,11 @@ void WalletListenerImpl::moneyReceived(const std::string &txId, uint64_t amount)
     // Incoming tx included in a block.
     QString qTxId = QString::fromStdString(txId);
     qDebug() << Q_FUNC_INFO << qTxId << " " << WalletManager::displayAmount(amount);
+
+    if (m_wallet->isMultisig()) {
+        // TODO: causes too many exports
+        m_wallet->mmsStore()->exportMultisig();
+    }
 
     emit m_wallet->moneyReceived(qTxId, amount);
 }

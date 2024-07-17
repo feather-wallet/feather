@@ -72,6 +72,20 @@ void TxDetailsSimple::setDetails(Wallet *wallet, PendingTransaction *tx, const Q
         ui->label_fee->setStyleSheet(ColorScheme::RED.asStylesheet(true));
         ui->label_fee->setToolTip("Unrealistic fee. You may be connected to a malicious node.");
     }
+
+//    if (wallet->isMultisig()) {
+//        ui->btn_
+//    }
+
+//    if (wallet->isMultisig()) {
+//        tx->
+//
+//        auto multisigState = wallet->multisig();
+//        if (multisigState.isMultisig && m_signers.size() < multisigState.threshold) {
+//            throw runtime_error("Not enough signers to send multisig transaction");
+//        }
+//        ui->label_signatures->setText()
+//    }
 }
 
 TxDetailsSimple::~TxDetailsSimple() = default;

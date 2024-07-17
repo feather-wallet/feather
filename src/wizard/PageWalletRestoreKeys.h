@@ -23,7 +23,8 @@ class PageWalletRestoreKeys : public QWizardPage
     enum walletType {
         ViewOnly = 0,
         Spendable = 1,
-        Spendable_Nondeterministic = 2
+        Spendable_Nondeterministic = 2,
+        Multisig = 3,
     };
 
 public:

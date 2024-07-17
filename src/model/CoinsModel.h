@@ -22,6 +22,8 @@ public:
     enum ModelColumn
     {
         KeyImageKnown = 0,
+        HaveMultisigK,
+        MultisigInfo,
         PubKey,
         TxID,
         Address,

@@ -53,6 +53,14 @@ QStringList PendingTransaction::txid() const
     return list;
 }
 
+QStringList PendingTransaction::prefixHashes() const
+{
+    QStringList prefixHashes;
+    for (const auto &hash : m_pimpl->prefixHashes()) {
+        prefixHashes.append(QString::fromStdString(hash));
+    }
+    return prefixHashes;
+}
 
 quint64 PendingTransaction::txCount() const
 {
@@ -96,6 +104,48 @@ void PendingTransaction::refresh()
     for (const auto i : m_pimpl->getAll()) {
         m_pending_tx_info.append(new PendingTransactionInfo(i, this));
     }
+}
+
+quint32 PendingTransaction::saveToMMS() {
+    return m_pimpl->saveToMMS();
+}
+
+QStringList PendingTransaction::destinationAddresses(int index) {
+    std::vector<std::string> dests = m_pimpl->destinations(index);
+    QStringList destinations;
+    for (const auto &dest : dests) {
+        destinations << QString::fromStdString(dest);
+    }
+
+    return destinations;
+}
+
+void PendingTransaction::signMultisigTx() {
+    m_pimpl->signMultisigTx();
+}
+
+quint64 PendingTransaction::signaturesNeeded() {
+    return m_pimpl->signaturesNeeded();
+}
+
+bool PendingTransaction::enoughMultisigSignatures() {
+    return m_pimpl->enoughMultisigSignatures();
+}
+
+QStringList PendingTransaction::signersKeys() {
+    QStringList keys;
+    for (const auto &key : m_pimpl->signersKeys()) {
+        keys.append(QString::fromStdString(key));
+    }
+    return keys;
+}
+
+bool PendingTransaction::haveWeSigned() const {
+    return m_pimpl->haveWeSigned();
+}
+
+bool PendingTransaction::canSign() const {
+    return m_pimpl->canSign();
 }
 
 PendingTransaction::PendingTransaction(Monero::PendingTransaction *pt, QObject *parent)

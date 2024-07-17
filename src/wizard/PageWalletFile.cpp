@@ -120,6 +120,9 @@ QString PageWalletFile::defaultWalletName() {
                     walletStr = QString("trezor_%1");
             }
         }
+        else if (m_fields->mode == WizardMode::CreateMultisig || m_fields->mode == WizardMode::RestoreMultisig) {
+            walletStr = QString("multisig_%1");
+        }
         walletName = walletStr.arg(count);
         count++;
     } while (this->walletPathExists(walletName));

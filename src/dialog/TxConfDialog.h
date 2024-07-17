@@ -23,6 +23,8 @@ public:
     explicit TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString &address, const QString &description, QWidget *parent = nullptr);
     ~TxConfDialog() override;
 
+    quint32 getMultisigSignerIndex();
+
     bool showAdvanced = false;
 
 private:

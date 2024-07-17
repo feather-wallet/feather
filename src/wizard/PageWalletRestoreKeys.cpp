@@ -77,6 +77,7 @@ PageWalletRestoreKeys::PageWalletRestoreKeys(WizardFields *fields, QWidget *pare
 }
 
 void PageWalletRestoreKeys::initializePage() {
+    ui->stackedWidget->setCurrentIndex(0);
     this->showInputLines();
 }
 
@@ -97,10 +98,16 @@ void PageWalletRestoreKeys::showInputLines() {
         ui->frame_viewKey->hide();
         ui->frame_spendKey->show();
     }
-    else {
+    else if (ui->combo_walletType->currentIndex() == walletType::Spendable_Nondeterministic){
         ui->frame_address->show();
         ui->frame_viewKey->show();
         ui->frame_spendKey->show();
+    }
+
+    if (ui->combo_walletType->currentIndex() == walletType::Multisig) {
+        ui->stackedWidget->setCurrentIndex(1);
+    } else {
+        ui->stackedWidget->setCurrentIndex(0);
     }
 
     ui->line_address->setText("");
@@ -110,6 +117,12 @@ void PageWalletRestoreKeys::showInputLines() {
 
 bool PageWalletRestoreKeys::validatePage() {
     auto errStyle = "QLineEdit{border: 1px solid red;}";
+
+    if (walletType() == walletType::Multisig) {
+        // TODO: validation
+        m_fields->multisigSeed = ui->multisigSeed->toPlainText();
+        return true;
+    }
 
     ui->line_address->setStyleSheet("");
     ui->line_viewkey->setStyleSheet("");

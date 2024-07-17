@@ -26,10 +26,12 @@ public:
 
 signals:
     void createWallet();
+    void createMultisigWallet();
 
 private:
     Ui::PageSetPassword *ui;
 
+    bool m_walletCreated = false;
     WizardFields *m_fields;
 };
 

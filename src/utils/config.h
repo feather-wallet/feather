@@ -25,6 +25,7 @@ public:
         warnOnStagenet,
         warnOnTestnet,
         warnOnKiImport,
+        warnOnMultisigExperimental,
 
         homeWidget,
         donateBeg,

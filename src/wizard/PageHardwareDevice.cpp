@@ -16,14 +16,13 @@ PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->combo_deviceType->addItem("Ledger Nano S (PLUS) / X", DeviceType::LEDGER);
-    ui->combo_deviceType->addItem("Trezor Model T / Safe 3", DeviceType::TREZOR);
+    this->setTitle("Restore from hardware device");
 
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageHardwareDevice::onOptionsClicked);
 }
 
 void PageHardwareDevice::initializePage() {
-    ui->radioNewWallet->setChecked(true);
+    ui->radio_create->setChecked(true);
 }
 
 int PageHardwareDevice::nextId() const {
@@ -35,8 +34,13 @@ int PageHardwareDevice::nextId() const {
 }
 
 bool PageHardwareDevice::validatePage() {
-    m_fields->deviceType = static_cast<DeviceType>(ui->combo_deviceType->currentData().toInt());
-    m_fields->showSetRestoreHeightPage = ui->radioRestoreWallet->isChecked();
+    if (ui->radio_ledger->isChecked()) {
+        m_fields->deviceType = DeviceType::LEDGER;
+    } else {
+        m_fields->deviceType = DeviceType::TREZOR;
+    }
+
+    m_fields->showSetRestoreHeightPage = ui->radio_restore->isChecked();
     return true;
 }
 

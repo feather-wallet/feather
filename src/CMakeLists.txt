@@ -20,8 +20,8 @@ endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
-add_subdirectory(third-party/singleapplication)
+#set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
+#add_subdirectory(third-party/singleapplication)
 
 if (CHECK_UPDATES)
     add_subdirectory(openpgp)
@@ -55,6 +55,8 @@ file(GLOB SOURCE_FILES
         "widgets/*.cpp"
         "wizard/*.h"
         "wizard/*.cpp"
+        "wizard/multisig/*.h"
+        "wizard/multisig/*.cpp"
         "wallet/*.h"
         "wallet/*.cpp"
         "qrcode/*.h"
@@ -272,7 +274,7 @@ target_link_libraries(feather PRIVATE
         Threads::Threads
         ${QRENCODE_LIBRARY}
         ${POLYSEED_LIBRARY}
-        SingleApplication::SingleApplication
+#        SingleApplication::SingleApplication
         ${ICU_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZLIB_LIBRARIES}

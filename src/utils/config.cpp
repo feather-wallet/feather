@@ -21,6 +21,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::warnOnStagenet,{QS("warnOnStagenet"), true}},
         {Config::warnOnTestnet,{QS("warnOnTestnet"), true}},
         {Config::warnOnKiImport,{QS("warnOnKiImport"), true}},
+        {Config::warnOnMultisigExperimental,{QS("warnOnMultisigExperimental"), true}},
         {Config::logLevel,{QS("logLevel"), 0}},
 
         {Config::homeWidget,{QS("homeWidget"), "ccs"}},

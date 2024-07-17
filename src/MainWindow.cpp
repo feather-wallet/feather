@@ -239,6 +239,10 @@ void MainWindow::initWidgets() {
     m_coinsWidget = new CoinsWidget(m_wallet, this);
     ui->coinsWidgetLayout->addWidget(m_coinsWidget);
 
+    // [MMS]
+    m_mmsWidget = new MMSWidget(m_wallet, this);
+    ui->mmsWidgetLayout->addWidget(m_mmsWidget);
+
     // [Plugins..]
     for (auto* plugin : m_plugins) {
         if (!plugin->hasParent()) {
@@ -485,6 +489,7 @@ void MainWindow::initWalletContext() {
     });
     
     connect(m_wallet, &Wallet::multiBroadcast,      this, &MainWindow::onMultiBroadcast);
+    connect(m_wallet->mmsStore(), &MultisigMessageStore::askToSign, this, &MainWindow::onAskToSign);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -523,6 +528,8 @@ QString MainWindow::walletKeysPath() {
 }
 
 void MainWindow::onWalletOpened() {
+    qDebug() << this->thread();
+
     qDebug() << Q_FUNC_INFO;
     m_splashDialog->hide();
 
@@ -552,6 +559,13 @@ void MainWindow::onWalletOpened() {
     m_wallet->coins()->refresh();
     m_coinsWidget->setModel(m_wallet->coinsModel(), m_wallet->coins());
     m_wallet->coinsModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
+
+    // mms page
+    if (m_wallet->isMultisig()) {
+        m_wallet->mmsStore()->refresh();
+        m_mmsWidget->setModel(m_wallet->mmsModel(), m_wallet->msIncomingTxModel(), m_wallet->mmsStore());
+        m_wallet->setMMSRefreshEnabled(true);
+    }
 
     // Coin labeling uses set_tx_note, so we need to refresh history too
     connect(m_wallet->coins(), &Coins::descriptionChanged, [this] {
@@ -692,6 +706,47 @@ void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
             m_rpc->setDaemonAddress(address);
             m_rpc->sendRawTransaction(i.value());
         }
+    }
+}
+
+void MainWindow::onAskToSign(PendingTransaction *tx) {
+    QString address = tx->destinationAddresses(0)[0];
+
+    TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
+    dialog_adv.setMultisigTransaction(tx);
+    dialog_adv.exec();
+
+    // TODO: UNSAFE
+    m_wallet->mmsStore()->refresh(false);
+
+    return;
+
+    TxConfDialog dialog{m_wallet, tx, address, m_wallet->tmpTxDescription, this};
+    switch (dialog.exec()) {
+        case QDialog::Rejected:
+        {
+            if (!dialog.showAdvanced) {
+                m_wallet->disposeTransaction(tx);
+            }
+            break;
+        }
+        case QDialog::Accepted:
+        {
+            tx->signMultisigTx();
+            if (tx->status() != PendingTransaction::Status_Ok) {
+                Utils::showError(this, "Unable to sign multisig transaction", tx->errorString());
+                return;
+            }
+
+            m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
+            break;
+        }
+    }
+
+    if (dialog.showAdvanced) {
+        TxConfAdvDialog dialog_adv{m_wallet, m_wallet->tmpTxDescription, this};
+        dialog_adv.setTransaction(tx);
+        dialog_adv.exec();
     }
 }
 
@@ -957,8 +1012,17 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
             break;
         }
         case QDialog::Accepted:
-            m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
+        {
+            if (m_wallet->isMultisig() && m_wallet->multisigThreshold() > 1) {
+                quint32 id = tx->saveToMMS();
+                m_wallet->mmsStore()->sendPendingTransaction(id, dialog.getMultisigSignerIndex());
+                m_wallet->coins()->refresh();
+                m_sendWidget->clearFields();
+            } else {
+                m_wallet->commitTransaction(tx, m_wallet->tmpTxDescription);
+            }
             break;
+        }
     }
 
     if (dialog.showAdvanced) {
@@ -1037,13 +1101,19 @@ void MainWindow::showSeedDialog() {
         return;
     }
 
-    if (!m_wallet->isDeterministic()) {
+    if (!m_wallet->isDeterministic() && !m_wallet->isMultisig()) {
         Utils::showInfo(this, "Seed unavailable", "Wallet is non-deterministic and has no seed",
                         {"To obtain wallet keys go to Wallet -> Keys"}, "show_wallet_seed");
         return;
     }
 
     if (!this->verifyPassword()) {
+        return;
+    }
+
+    if (m_wallet->isMultisig() && m_wallet->hasMultisigPartialKeyImages()) {
+        Utils::copyToClipboard(m_wallet->getMultisigSeed());
+        Utils::showInfo(this, "Multisig seed copied to clipboard");
         return;
     }
 
@@ -1680,6 +1750,10 @@ void MainWindow::updateTitle() {
 
     if (m_wallet->viewOnly()) {
         title += " [view-only]";
+    }
+
+    if (m_wallet->isMultisig()) {
+        title += " [multisig]";
     }
 
     title += " - Feather";

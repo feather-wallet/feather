@@ -76,11 +76,25 @@ TxConfDialog::TxConfDialog(Wallet *wallet, PendingTransaction *tx, const QString
         ui->label_fee->setToolTip("Unrealistic fee. You may be connected to a malicious node.");
     }
 
-    ui->buttonBox->button(QDialogButtonBox::Ok)->setText("Send");
+    bool readyToSend = tx->enoughMultisigSignatures();
+
+    if (!readyToSend) {
+        ui->combo_sendTo->addItem("All cosigners");
+        ui->combo_sendTo->addItems(m_wallet->getMultisigSigners());
+    } else {
+        ui->label_sendTo->hide();
+        ui->combo_sendTo->hide();
+    }
+
+    ui->buttonBox->button(QDialogButtonBox::Ok)->setText(!readyToSend ? "Sign" : "Send");
 
     connect(ui->btn_Advanced, &QPushButton::clicked, this, &TxConfDialog::setShowAdvanced);
 
     this->adjustSize();
+}
+
+quint32 TxConfDialog::getMultisigSignerIndex() {
+    return ui->combo_sendTo->currentIndex();
 }
 
 void TxConfDialog::setShowAdvanced() {

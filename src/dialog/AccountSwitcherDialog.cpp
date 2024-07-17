@@ -50,7 +50,7 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
     connect(m_wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
 
     this->update();
-    this->updateSelection();
+//    this->updateSelection();
 }
 
 void AccountSwitcherDialog::update() {

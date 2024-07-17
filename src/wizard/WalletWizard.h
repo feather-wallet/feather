@@ -19,12 +19,26 @@ enum WizardMode {
     OpenWallet,
     RestoreFromSeed,
     RestoreFromKeys,
-    CreateWalletFromDevice
+    CreateWalletFromDevice,
+    CreateMultisig,
+    RestoreMultisig
 };
 
 enum DeviceType {
     LEDGER = 0,
     TREZOR
+};
+
+enum SignerConfig {
+    AUTOMATIC = 0,
+    SEMI_AUTOMATIC,
+    MANUAL
+};
+
+struct MMSSigner {
+    quint32 index = 0;
+    QString label;
+    QString address;
 };
 
 struct WizardFields {
@@ -46,6 +60,17 @@ struct WizardFields {
     Seed::Type seedType;
     DeviceType deviceType;
     QString subaddressLookahead;
+    bool multisigInitiator = false;
+    QString multisigSetupKey;
+    quint32 multisigThreshold = 0;
+    quint32 multisigSigners = 0;
+    bool multisigAutomaticSetup = true;
+    QString multisigUsername;
+    QString multisigService;
+    QString multisigChannel;
+    QString multisigSeed;
+    QString multisigMMSRecovery;
+    Wallet *wallet = nullptr;
 
     void clearFields() {
         showSetSeedPassphrasePage = false;
@@ -58,6 +83,7 @@ struct WizardFields {
         secretSpendKey = "";
         restoreHeight = 0;
         subaddressLookahead = "";
+        wallet = nullptr;
     }
 
     WizardFields(): deviceType(DeviceType::LEDGER), mode(WizardMode::CreateWallet),
@@ -78,26 +104,50 @@ public:
         Page_SetSubaddressLookahead,
         Page_OpenWallet,
         Page_Network,
+        Page_Recover,
         Page_WalletRestoreSeed,
         Page_WalletRestoreKeys,
         Page_SetRestoreHeight,
         Page_HardwareDevice,
         Page_NetworkProxy,
         Page_NetworkWebsocket,
-        Page_Plugins
+        Page_Plugins,
+        Page_MultisigExperimentalWarning,
+        Page_MultisigCreateSetupKey,
+        Page_MultisigParticipants,
+        Page_MultisigOwnAddress,
+        Page_MultisigSignerInfo,
+        Page_MultisigSetupDebug,
+        Page_MultisigSeed,
+        Page_MultisigEnterSetupKey,
+        Page_MultisigEnterChannel,
+        Page_MultisigSignerConfig,
+        Page_MultisigShowSetupKey,
+        Page_MultisigEnterName,
+        Page_MultisigSetupWallet,
+        Page_MultisigVerifyAddress,
+        Page_MultisigRestoreSeed,
+        Page_MultisigMMSRecoveryInfo,
+        Page_MultisigRestoreMMSRecoveryInfo,
+        Page_KeyType
     };
 
     explicit WalletWizard(QWidget *parent = nullptr);
+    ~WalletWizard() override;
+
     void resetFields();
+    void setWallet(Wallet* wallet);
 
 signals:
     void initialNetworkConfigured();
     void showSettings();
     void openWallet(QString path, QString password);
+    void showWallet(Wallet *wallet);
 
     void createWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead);
     void createWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString subaddressLookahead = "");
-    void createWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet);
+    void createWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet, bool giveToWizard);
+    void restoreMultisigWallet(const QString &path, const QString &password, const QString &multisigSeed, const QString &mmsRecovery, quint64 restoreHeight, const QString &subaddressLookahead);
 
 private slots:
     void onCreateWallet();

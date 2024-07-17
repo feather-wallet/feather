@@ -89,11 +89,8 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
     ui->coins->setColumnHidden(CoinsModel::SpentHeight, true);
     ui->coins->setColumnHidden(CoinsModel::Frozen, true);
 
-    if (!m_wallet->viewOnly()) {
-        ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, true);
-    } else {
-        ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, false);
-    }
+    bool showKeyImageKnown = m_wallet->viewOnly() || m_wallet->isMultisig();
+    ui->coins->setColumnHidden(CoinsModel::KeyImageKnown, !showKeyImageKnown);
 
     ui->coins->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->coins->header()->setSectionResizeMode(CoinsModel::Label, QHeaderView::Stretch);
@@ -332,6 +329,11 @@ void CoinsWidget::editLabel() {
 bool CoinsWidget::isCoinSpendable(CoinsInfo *coin) {
     if (!coin->keyImageKnown()) {
         Utils::showError(this, "Unable to spend outputs", "Selected output has unknown key image");
+        return false;
+    }
+
+    if (!coin->haveMultisigK()) {
+        Utils::showError(this, "Unable to spend outputs", "We already spent this output in another transaction proposal, other participants would not be able to sign both transactions");
         return false;
     }
 

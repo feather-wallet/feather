@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QtCore>
 #include <QtGui>
-#include <singleapplication.h>
+//#include <singleapplication.h>
 
 #include "config-feather.h"
 #include "constants.h"
@@ -88,6 +88,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     qputenv("QT_QPA_PLATFORM", "windows:darkmode=1");
 #endif
 
+// Force XCB to deal with 'Could not find the Qt platform plugin "wayland" in ""'
+#if defined(Q_OS_LINUX) && defined(STATIC)
+    qputenv("QT_QPA_PLATFORM", "xcb");
+#endif
+
     QStringList argv_;
     for(int i = 0; i != argc; i++){
         argv_ << QString::fromStdString(argv[i]);
@@ -137,7 +142,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 #endif
 
-    SingleApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QApplication::setQuitOnLastWindowClosed(false);
     QApplication::setApplicationName("FeatherWallet");
@@ -243,10 +248,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     auto wm = windowManager();
     wm->setEventFilter(&filter);
+    wm->raise();
 
-    QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
-        wm->raise();
-    });
+//    QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
+//        wm->raise();
+//    });
 
     return QApplication::exec();
 }

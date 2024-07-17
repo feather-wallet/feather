@@ -28,7 +28,7 @@ public:
     void wizardOpenWallet();
     void close();
     void closeWindow(MainWindow *window);
-    void showWizard(WalletWizard::Page startPage);
+    void showWizard(WalletWizard::Page startPage, Wallet *wallet = nullptr);
     void restartApplication(const QString &binaryFilename);
     void raise();
 
@@ -68,9 +68,10 @@ private slots:
     void onChangeTheme(const QString &themeName);
 
 private:
-    void tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet);
+    void tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet, bool giveToWizard = false);
     void tryCreateWalletFromDevice(const QString &path, const QString &password, const QString &deviceName, int restoreHeight, const QString &subaddressLookahead);
     void tryCreateWalletFromKeys(const QString &path, const QString &password, const QString &address, const QString &viewkey, const QString &spendkey, quint64 restoreHeight, const QString &subaddressLookahead);
+    void tryRestoreMultisigWallet(const QString &path, const QString &password, const QString &multisigSeed, const QString &mmsRecovery, quint64 restoreHeight, const QString &subaddressLookahead);
 
     bool autoOpenWallet();
 
@@ -107,6 +108,7 @@ private:
     bool m_openWalletTriedOnce = false;
     bool m_openingWallet = false;
     bool m_initialNetworkConfigured = false;
+    bool m_aboutToShowWizard = false;
 
     QThread *m_cleanupThread;
 };

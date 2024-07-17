@@ -13,29 +13,42 @@ PageSetPassword::PageSetPassword(WizardFields *fields, QWidget *parent)
     , m_fields(fields)
 {
     ui->setupUi(this);
-    this->setFinalPage(true);
 
     ui->frame_password->setInfo(icons()->icon("lock"), "Choose a password to encrypt your wallet keys.");
 
     connect(ui->widget_password, &PasswordSetWidget::passwordEntryChanged, [this]{
         this->completeChanged();
     });
-
-    this->setButtonText(QWizard::FinishButton, "Create/Open wallet");
 }
 
 void PageSetPassword::initializePage() {
+//    bool multisig = ( || m_fields->mode == WizardMode::RestoreMultisig);
+    this->setFinalPage(m_fields->mode != WizardMode::CreateMultisig);
+//    this->setFinalPage(true);
+    this->setButtonText(QWizard::FinishButton, "Create/Open wallet");
+    this->setButtonText(QWizard::CommitButton, "Next");
+    this->setCommitPage(true);
     this->setTitle(m_fields->modeText);
     ui->widget_password->resetFields();
 }
 
 bool PageSetPassword::validatePage() {
     m_fields->password = ui->widget_password->password();
-    emit createWallet();
+
+    // Prevent double clicks from creating a wallet twice
+    if (!m_walletCreated) {
+        emit createWallet();
+        m_walletCreated = true;
+    }
+
     return true;
 }
 
 int PageSetPassword::nextId() const {
+    if (m_fields->mode == WizardMode::CreateMultisig) {
+        return WalletWizard::Page_MultisigCreateSetupKey;
+    }
+
     return -1;
 }
 

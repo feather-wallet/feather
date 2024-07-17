@@ -39,6 +39,7 @@
     <file>assets/images/eye_blind.png</file>
     <file>assets/images/file.png</file>
     <file>assets/images/file_manager_32px.png</file>
+    <file>assets/images/freeze.png</file>
     <file>assets/images/gnome-calc.png</file>
     <file>assets/images/hd_32px.png</file>
     <file>assets/images/history.png</file>
@@ -58,6 +59,7 @@
     <file>assets/images/localMonero_logo.png</file>
     <file>assets/images/localMonero_register.svg</file>
     <file>assets/images/lock.svg</file>
+    <file>assets/images/mail.png</file>
     <file>assets/images/microphone.png</file>
     <file>assets/images/mining.png</file>
     <file>assets/images/network.png</file>

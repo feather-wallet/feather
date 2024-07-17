@@ -119,6 +119,16 @@
          </property>
         </widget>
        </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_sendTo">
+         <property name="text">
+          <string>Send to:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QComboBox" name="combo_sendTo"/>
+       </item>
       </layout>
      </item>
     </layout>

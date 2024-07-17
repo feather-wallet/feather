@@ -124,6 +124,18 @@ QString CoinsInfo::txNote() const {
     return m_txNote;
 }
 
+bool CoinsInfo::keyImagePartial() const {
+    return m_keyImagePartial;
+}
+
+bool CoinsInfo::haveMultisigK() const {
+    return m_haveMultisigK;
+}
+
+QStringList CoinsInfo::multisigInfo() const {
+    return m_multisigInfo;
+}
+
 CoinsInfo::CoinsInfo(QObject *parent)
         : QObject(parent)
         , m_blockHeight(0)
@@ -142,6 +154,8 @@ CoinsInfo::CoinsInfo(QObject *parent)
         , m_unlocked(false)
         , m_coinbase(false)
         , m_change(false)
+        , m_keyImagePartial(false)
+        , m_haveMultisigK(false)
 {
 
 }

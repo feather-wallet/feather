@@ -165,3 +165,7 @@ QString TransactionRow::rings_formatted() const
     }
     return rings;
 }
+
+QString TransactionRow::prefixHash() const {
+    return m_prefixHash;
+}

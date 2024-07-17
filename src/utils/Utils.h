@@ -89,6 +89,7 @@ namespace Utils
     void externalLinkWarning(QWidget *parent, const QString &url);
 
     QString displayAddress(const QString& address, int sections = 3, const QString & sep = " ");
+    QString chunkAddress(const QString& address);
     QTextCharFormat addressTextFormat(const SubaddressIndex &index, quint64 amount);
 
     QFont getMonospaceFont();
@@ -116,6 +117,7 @@ namespace Utils
     void clearLayout(QLayout *layout, bool deleteWidgets = true);
 
     QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync = false);
+    QString formatRestoreHeight(Wallet *wallet);
 }
 
 #endif //FEATHER_UTILS_H

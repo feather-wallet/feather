@@ -26,6 +26,8 @@ private:
     Ui::PageMenu *ui;
     WalletKeysFilesModel *m_walletKeysFilesModel;
     WizardFields *m_fields;
+
+    WalletWizard::Page m_nextPage;
 };
 
 #endif //FEATHER_WIZARDMENU_H

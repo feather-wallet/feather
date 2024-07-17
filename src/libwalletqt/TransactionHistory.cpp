@@ -185,6 +185,10 @@ void TransactionHistory::refresh()
                 t->m_rings.append(ring);
             }
 
+            qDebug() << pd.m_tx.extra;
+            qDebug() << pd.m_tx.version;
+            t->m_prefixHash = QString::fromStdString(epee::string_tools::pod_to_hex(cryptonote::get_transaction_prefix_hash(pd.m_tx)));
+
             m_rows.append(t);
         }
 

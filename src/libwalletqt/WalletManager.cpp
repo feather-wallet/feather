@@ -95,9 +95,12 @@ Wallet *WalletManager::openWallet(const QString &path, const QString &password, 
     auto wallet = new Wallet(w);
 
     // move wallet to the GUI thread. Otherwise it wont be emitting signals
+    qDebug() << wallet->thread();
+    qDebug() << qApp->thread();
     if (wallet->thread() != qApp->thread()) {
         wallet->moveToThread(qApp->thread());
     }
+    qDebug() << wallet->thread();
 
     return wallet;
 }
@@ -172,6 +175,16 @@ void WalletManager::createWalletFromDeviceAsync(const QString &path, const QStri
         Wallet *wallet = createWalletFromDevice(path, password, nettype, deviceName, restoreHeight, subaddressLookahead);
         emit walletCreated(wallet);
     });
+}
+
+Wallet* WalletManager::restoreMultisigWallet(const QString &path, const QString &password, NetworkType::Type nettype,
+                                          const QString &multisigSeed, const QString &mmsRecovery, quint64 restoreHeight,
+                                          quint64 kdfRounds,
+                                          const QString &subaddressLookahead)
+{
+    QMutexLocker locker(&m_mutex);
+    Monero::Wallet * w = m_pimpl->recoverMultisigWallet(path.toStdString(), password.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight, multisigSeed.toStdString(), mmsRecovery.toStdString(), kdfRounds, subaddressLookahead.toStdString());
+    return new Wallet(w);
 }
 
 bool WalletManager::walletExists(const QString &path) const

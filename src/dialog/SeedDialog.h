@@ -23,6 +23,7 @@ public:
 
 private:
     void setSeed(const QString &seed);
+    void setMultisigSeed(const QString &seed);
 
     QScopedPointer<Ui::SeedDialog> ui;
     Wallet *m_wallet;

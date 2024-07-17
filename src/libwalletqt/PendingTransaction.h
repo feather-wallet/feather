@@ -31,12 +31,23 @@ public:
     quint64 dust() const;
     quint64 fee() const;
     QStringList txid() const;
+    QStringList prefixHashes() const;
     quint64 txCount() const;
     QList<QVariant> subaddrIndices() const;
     std::string unsignedTxToBin() const;
     QString unsignedTxToBase64() const;
     QString signedTxToHex(int index) const;
     void refresh();
+    quint32 saveToMMS();
+    QStringList destinationAddresses(int index);
+    void signMultisigTx();
+    quint64 signaturesNeeded();
+    bool enoughMultisigSignatures();
+
+    QStringList signersKeys();
+
+    bool haveWeSigned() const;
+    bool canSign() const;
 
     PendingTransactionInfo * transaction(int index) const;
 

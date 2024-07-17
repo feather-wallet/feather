@@ -165,6 +165,10 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tIn
             amount = (tInfo.balanceDelta() < 0) ? amount : "+" + amount;
             return amount;
         }
+//        case Column::TxPrefixHash:
+//        {
+//            return tInfo.prefixHash().mid(0, 8);
+//        }
         case Column::TxID: {
             if (conf()->get(Config::historyShowFullTxid).toBool()) {
                 return tInfo.hash();
@@ -217,6 +221,8 @@ QVariant TransactionHistoryModel::headerData(int section, Qt::Orientation orient
                 return QString("Amount");
             case Column::TxID:
                 return QString("Txid");
+//            case Column::TxPrefixHash:
+//                return QString("Prefix hash");
             case Column::FiatAmount:
                 return QString("Fiat");
             default:

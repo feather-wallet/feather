@@ -26,7 +26,7 @@ WindowManager::WindowManager(QObject *parent)
     m_splashDialog = new SplashDialog();
     m_cleanupThread = new QThread(this);
 
-    connect(m_walletManager, &WalletManager::walletOpened,        this, &WindowManager::onWalletOpened);
+    connect(m_walletManager, &WalletManager::walletOpened, this, &WindowManager::onWalletOpened);
     connect(m_walletManager, &WalletManager::walletCreated,       this, &WindowManager::onWalletCreated);
     connect(m_walletManager, &WalletManager::deviceButtonRequest, this, &WindowManager::onDeviceButtonRequest);
     connect(m_walletManager, &WalletManager::deviceButtonPressed, this, &WindowManager::onDeviceButtonPressed);
@@ -75,6 +75,16 @@ void WindowManager::quitAfterLastWindow() {
         return;
     }
 
+    if (m_openingWallet) {
+        qDebug() << "We're openening a wallet, don't quit application";
+        return;
+    }
+
+    if (m_wizard && m_wizard->isVisible()) {
+        qDebug() << "This wizard is still open, don't quit application";
+        return;
+    }
+
     qDebug() << "No wizards in progress and no wallets open, quitting application.";
     this->close();
 }
@@ -85,10 +95,18 @@ void WindowManager::close() {
         window->close();
     }
 
-    m_wizard->deleteLater();
-    m_splashDialog->deleteLater();
-    m_tray->deleteLater();
-    m_docsDialog->deleteLater();
+    if (m_splashDialog) {
+        m_splashDialog->deleteLater();
+    }
+    if (m_tray) {
+        m_tray->deleteLater();
+    }
+    if (m_wizard) {
+        m_wizard->deleteLater();
+    }
+    if (m_docsDialog) {
+        m_docsDialog->deleteLater();
+    }
 
     torManager()->stop();
 
@@ -296,10 +314,28 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
 
     m_splashDialog->hide();
     m_openWalletTriedOnce = false;
+
+    QString multisigSetup = wallet->getCacheAttribute("feather.multisig_setup");
+    if (multisigSetup == "started") {
+        qDebug() << "Multisig setup in progress, but not finished.";
+        m_openingWallet = false;
+        this->showWizard(WalletWizard::Page_MultisigCreateSetupKey, wallet);
+        return;
+    }
+    else if (multisigSetup == "configured") {
+        qDebug() << "Multisig setup configured, but not completed";
+        m_openingWallet = false;
+        this->showWizard(WalletWizard::Page_MultisigSetupWallet, wallet);
+        return;
+    }
+
+    qDebug() << "creating new mainwindow";
     auto *window = new MainWindow(this, wallet);
     m_windows.append(window);
-    this->buildTrayMenu();
+
     m_openingWallet = false;
+
+    this->buildTrayMenu();
 }
 
 void WindowManager::onWalletOpenPasswordRequired(bool invalidPassword, const QString &path) {
@@ -338,7 +374,7 @@ bool WindowManager::autoOpenWallet() {
 // ######################## WALLET CREATION ########################
 
 void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage,
-                                    const QString &seedOffset, const QString &subaddressLookahead, bool newWallet) {
+                                    const QString &seedOffset, const QString &subaddressLookahead, bool newWallet, bool giveToWizard) {
     if (Utils::fileExists(path)) {
         this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", QString("File already exists: %1").arg(path)});
         return;
@@ -366,7 +402,14 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
     wallet->setCacheAttribute("feather.seedoffset", seedOffset);
 
     if (newWallet) {
-        wallet->setNewWallet();
+       wallet->setNewWallet();
+    }
+
+    if (giveToWizard) {
+        qDebug() << "Giving wallet to wizard instead of opening";
+        m_wizard->setWallet(wallet);
+        m_openingWallet = false;
+        return;
     }
 
     this->onWalletOpened(wallet);
@@ -412,6 +455,26 @@ void WindowManager::tryCreateWalletFromKeys(const QString &path, const QString &
 
         wallet = m_walletManager->createWalletFromKeys(path, password, constants::seedLanguage, constants::networkType, address, viewkey, spendkey, restoreHeight, constants::kdfRounds, subaddressLookahead);
     }
+
+    m_openingWallet = true;
+    this->onWalletOpened(wallet);
+}
+
+void WindowManager::tryRestoreMultisigWallet(const QString &path, const QString &password, const QString &multisigSeed,
+                                             const QString &mmsRecovery, quint64 restoreHeight, const QString &subaddressLookahead)
+{
+    if (Utils::fileExists(path)) {
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", QString("File already exists: %1").arg(path)});
+        return;
+    }
+
+    if (multisigSeed.isEmpty()) {
+        this->handleWalletError({nullptr, Utils::ERROR, "Failed to create wallet", "Multisig seed is empty"});
+        return;
+    }
+
+    Wallet *wallet;
+    wallet = m_walletManager->restoreMultisigWallet(path, password, constants::networkType, multisigSeed, mmsRecovery, restoreHeight, constants::kdfRounds, subaddressLookahead);
 
     m_openingWallet = true;
     this->onWalletOpened(wallet);
@@ -686,6 +749,8 @@ WalletWizard* WindowManager::createWizard(WalletWizard::Page startPage) {
     connect(wizard, &WalletWizard::createWallet, this, &WindowManager::tryCreateWallet);
     connect(wizard, &WalletWizard::createWalletFromKeys, this, &WindowManager::tryCreateWalletFromKeys);
     connect(wizard, &WalletWizard::createWalletFromDevice, this, &WindowManager::tryCreateWalletFromDevice);
+    connect(wizard, &WalletWizard::restoreMultisigWallet, this, &WindowManager::tryRestoreMultisigWallet);
+    connect(wizard, &WalletWizard::showWallet, [this](Wallet *wallet){this->onWalletOpened(wallet);});
     return wizard;
 }
 
@@ -698,12 +763,17 @@ void WindowManager::initWizard() {
     this->showWizard(startPage);
 }
 
-void WindowManager::showWizard(WalletWizard::Page startPage) {
+void WindowManager::showWizard(WalletWizard::Page startPage, Wallet *wallet) {
     if (!m_wizard) {
         m_wizard = this->createWizard(startPage);
     }
 
     m_wizard->resetFields();
+
+    if (wallet) {
+        m_wizard->setWallet(wallet);
+    }
+
     m_wizard->setStartId(startPage);
     m_wizard->restart();
     m_wizard->setEnabled(true);

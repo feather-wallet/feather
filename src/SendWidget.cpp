@@ -243,6 +243,9 @@ void SendWidget::sendClicked() {
         #endif
     }
 
+    // TODO: force key image sync here for multisig wallets?
+//    if (m_wallet->isMultisig() && m_wallet->mul)
+
     m_wallet->createTransaction(recipient, amount, description, sendAll);
 }
 

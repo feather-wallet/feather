@@ -21,27 +21,34 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
         m_wallet->setSeedLanguage(constants::seedLanguage);
     }
 
-    QString seedOffset = m_wallet->getCacheAttribute("feather.seedoffset");
-    QString seed = m_wallet->getCacheAttribute("feather.seed");
-    auto seedLength = m_wallet->seedLength();
-
-    QString seed_25_words = m_wallet->getSeed(seedOffset);
-
-    if (seedLength >= 24) {
+    if (m_wallet->isMultisig()) {
+        this->setMultisigSeed(m_wallet->getMultisigSeed());
+        ui->frameSeedOffset->setVisible(false);
         ui->check_toggleSeedType->hide();
-        this->setSeed(seed_25_words);
-    } else {
-        this->setSeed(seed);
         ui->frameRestoreHeight->setVisible(false);
+    } else {
+        QString seedOffset = m_wallet->getCacheAttribute("feather.seedoffset");
+        QString seed = m_wallet->getCacheAttribute("feather.seed");
+        auto seedLength = m_wallet->seedLength();
+
+        QString seed_25_words = m_wallet->getSeed(seedOffset);
+
+        if (seedLength >= 24) {
+            ui->check_toggleSeedType->hide();
+            this->setSeed(seed_25_words);
+        } else {
+            this->setSeed(seed);
+            ui->frameRestoreHeight->setVisible(false);
+        }
+
+        ui->frameSeedOffset->setVisible(!seedOffset.isEmpty());
+        ui->line_seedOffset->setText(seedOffset);
+
+        connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed](bool toggled){
+            this->setSeed(toggled ? seed_25_words : seed);
+            ui->frameRestoreHeight->setVisible(toggled);
+        });
     }
-
-    ui->frameSeedOffset->setVisible(!seedOffset.isEmpty());
-    ui->line_seedOffset->setText(seedOffset);
-
-    connect(ui->check_toggleSeedType, &QCheckBox::toggled, [this, seed_25_words, seed](bool toggled){
-        this->setSeed(toggled ? seed_25_words : seed);
-        ui->frameRestoreHeight->setVisible(toggled);
-    });
 
     ui->label_restoreHeightHelp->setHelpText("", "Should you restore your wallet in the future, "
                                              "specifying this block number will recover your wallet quicker.", "restore_height");
@@ -59,10 +66,23 @@ void SeedDialog::setSeed(const QString &seed) {
                                        "</p>"
                                        "<b>WARNING:</b>"
                                        "<ul>"
-                                       "<li>Never disclose your seed.</li>"
+                                       "<li>Never disclose your seed</li>"
                                        "<li>Never type it on a website</li>"
                                        "<li>Do not store it electronically</li>"
                                        "</ul>").arg(words));
+}
+
+void SeedDialog::setMultisigSeed(const QString &seed) {
+    ui->seed->setPlainText(seed);
+
+    ui->label_warning->setText("<p>This seed will allow you to recover your wallet in case "
+                                       "of computer failure."
+                                       "</p>"
+                                       "<b>WARNING:</b>"
+                                       "<ul>"
+                                       "<li>Never disclose your seed</li>"
+                                       "<li>Never type it on a website</li>"
+                                       "</ul>");
 }
 
 SeedDialog::~SeedDialog() = default;

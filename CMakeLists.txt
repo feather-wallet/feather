@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(feather
-  VERSION "2.6.5"
+  VERSION "2.6.7"
   DESCRIPTION "A free Monero desktop wallet"
   LANGUAGES CXX C ASM
 )
@@ -284,10 +284,13 @@ if (WIN32)
 endif()
 
 if(STATIC)
-#    add_linker_flag_if_supported(-static-libgcc STATIC_FLAGS)
-#    add_linker_flag_if_supported(-static-libstdc++ STATIC_FLAGS)
     if(MINGW)
         add_linker_flag_if_supported(-static STATIC_FLAGS)
+    elseif (NOT (APPLE OR FREEBSD OR OPENBSD OR DRAGONFLY))
+        if(NOT "${ARCH}" STREQUAL "armv7-a")
+            add_linker_flag_if_supported(-static-libgcc STATIC_FLAGS)
+            add_linker_flag_if_supported(-static-libstdc++ STATIC_FLAGS)
+        endif()
     endif()
 endif()
 

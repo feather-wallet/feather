@@ -30,7 +30,6 @@ Q_OBJECT
 public:
     bool coin(int index, std::function<void (CoinsInfo &)> callback);
     CoinsInfo * coin(int index);
-    void refresh();
     void refreshUnlocked();
     void freeze(QString &publicKey);
     void thaw(QString &publicKey);
@@ -40,6 +39,9 @@ public:
 
     quint64 count() const;
     void clearRows();
+
+public slots:
+    void refresh();
 
 signals:
     void refreshStarted() const;

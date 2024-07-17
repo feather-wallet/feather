@@ -90,12 +90,22 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
             switch (index.column()) {
                 case KeyImageKnown:
                 {
-                    if (cInfo.keyImageKnown()) {
-                        result = QVariant(icons()->icon("eye1.png"));
-                    }
-                    else {
+                    if (!cInfo.keyImageKnown() || cInfo.keyImagePartial()) {
                         result = QVariant(icons()->icon("eye_blind.png"));
                     }
+                    else {
+                        result = QVariant(icons()->icon("eye1.png"));
+                    }
+                    break;
+                }
+                case HaveMultisigK:
+                {
+                    if (cInfo.haveMultisigK()) {
+                        result = QVariant(icons()->icon("status_connected.svg"));
+                    } else {
+                        result = QVariant(icons()->icon("status_lagging.svg"));
+                    }
+                    break;
                 }
             }
         }
@@ -116,6 +126,21 @@ QVariant CoinsModel::data(const QModelIndex &index, int role) const
                     } else {
                         result = "Key image unknown. Outgoing transactions that include this output will not be detected.";
                     }
+                    break;
+                }
+                case HaveMultisigK:
+                {
+                    if (cInfo.haveMultisigK()) {
+                        result = "We can spend this output in a transaction proposal.";
+                    } else {
+                        result = "We have recently spent this output in a transaction proposal.";
+                    }
+                    break;
+                }
+                case MultisigInfo:
+                {
+                    result = cInfo.multisigInfo().join(", ") + " can sign a transaction that spends this output";
+                    break;
                 }
             }
             if (cInfo.frozen()) {
@@ -148,6 +173,8 @@ QVariant CoinsModel::headerData(int section, Qt::Orientation orientation, int ro
         switch(section) {
             case PubKey:
                 return QString("Pub Key");
+            case MultisigInfo:
+                return QString("Multisig info");
             case TxID:
                 return QString("TxID");
             case BlockHeight:
@@ -217,6 +244,10 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
     {
         case KeyImageKnown:
             return "";
+        case HaveMultisigK:
+            return "";
+        case MultisigInfo:
+            return cInfo.multisigInfo().join(", ");
         case PubKey:
             return cInfo.pubKey().mid(0,8);
         case TxID:

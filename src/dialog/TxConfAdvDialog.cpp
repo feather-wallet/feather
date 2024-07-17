@@ -103,6 +103,38 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
     this->setupConstructionData(ci);
 }
 
+void TxConfAdvDialog::setMultisigTransaction(PendingTransaction *tx) {
+    m_multisig = true;
+    m_tx = tx;
+    m_tx->refresh();
+
+    ui->btn_exportSigned->hide();
+    ui->btn_exportTxKey->hide();
+    ui->btn_sign->show();
+    ui->btn_send->show();
+    ui->btn_send->setEnabled(false);
+
+    if (m_tx->haveWeSigned()) {
+        ui->btn_sign->setEnabled(false);
+    }
+
+    if (m_tx->enoughMultisigSignatures()) {
+        ui->btn_send->setEnabled(true);
+    }
+
+//    ui->btn_send->setText(m_tx->signaturesNeeded() == 1 ? "S");
+//
+//    if (m_tx->signaturesNeeded() == 1) {
+//
+//    }
+
+    PendingTransactionInfo *ptx = m_tx->transaction(0);
+
+    ui->txid->setText("n/a");
+    this->setAmounts(tx->amount(), tx->fee());
+    this->setupConstructionData(ptx);
+}
+
 void TxConfAdvDialog::setAmounts(quint64 amount, quint64 fee) {
     QString preferredCur = conf()->get(Config::preferredFiatCurrency).toString();
 
@@ -180,6 +212,29 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
 }
 
 void TxConfAdvDialog::signTransaction() {
+    if (m_multisig) {
+
+        m_tx->signMultisigTx();
+        if (m_tx->status() != PendingTransaction::Status_Ok) {
+            Utils::showError(this, "Unable to sign multisig transaction", m_tx->errorString());
+
+//            auto button = QMessageBox::question(this, "Export multisig info?", "Do you want to export multisig info now?");
+//            if (result == QMessageBox::Yes) {
+//                m_wallet->mmsStore()->ex
+//            }
+
+            return;
+        }
+
+        if (m_tx->enoughMultisigSignatures()) {
+            ui->btn_send->setText("Broadcast");
+        }
+
+        ui->btn_sign->setEnabled(false);
+        ui->btn_send->setEnabled(true);
+        return;
+    }
+
     this->accept();
 }
 

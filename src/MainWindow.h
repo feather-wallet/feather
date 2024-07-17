@@ -38,6 +38,7 @@
 #include "SendWidget.h"
 #include "ReceiveWidget.h"
 #include "CoinsWidget.h"
+#include "MMSWidget.h"
 
 #include "WindowManager.h"
 #include "plugins/Plugin.h"
@@ -165,6 +166,7 @@ private slots:
     void onProxySettingsChanged();
     void onOfflineMode(bool offline);
     void onMultiBroadcast(const QMap<QString, QString> &txHexMap);
+    void onAskToSign(PendingTransaction *tx);
 
 private:
     friend WindowManager;
@@ -220,6 +222,7 @@ private:
     SendWidget *m_sendWidget = nullptr;
     ReceiveWidget *m_receiveWidget = nullptr;
     CoinsWidget *m_coinsWidget = nullptr;
+    MMSWidget *m_mmsWidget = nullptr;
 
     QPointer<QAction> m_clearRecentlyOpenAction;
 
