@@ -23,6 +23,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
         , offerList(new QList<QSharedPointer<OfferEntry>>())
         , swapDialog(new AtomicSwap(this))
         , procList(new QList<QSharedPointer<QProcess>>())
+        , fundDialog(new AtomicFundDialog(this))
 {
     ui->setupUi(this);
 
@@ -58,16 +59,20 @@ AtomicWidget::AtomicWidget(QWidget *parent)
 
     connect(ui->btn_swap, &QPushButton::clicked, this, [this]{
         auto rows = ui->offerBookTable->selectionModel()->selectedRows();
-        if (rows.size() < 1){
-            ui->meta_label->setText("You must select an offer to use for swap, refresh if there aren't any");
-        } else {
-            QModelIndex index = rows.at(0);
-            QString seller = index.sibling(index.row(), 3).data().toString();
+        clean();
+        // UNCOMENT after testing
+        //if (rows.size() < 1){
+        //    ui->meta_label->setText("You must select an offer to use for swap, refresh if there aren't any");
+        //} else {
+            //QModelIndex index = rows.at(0);
+            //QString seller = index.sibling(index.row(), 3).data().toString();
+            QString seller = "test";
             //Add proper error checking on ui input after rest of swap is implemented
             QString btcChange = ui->change_address->text();
             QString xmrReceive = ui->xmr_address->text();
+            sleep(1);
             runSwap(seller,btcChange, xmrReceive);
-        }
+        //}
     });
 
     connect(ui->btn_addRendezvous, &QPushButton::clicked, this, [this]{
@@ -84,7 +89,6 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     });
     connect(swapDialog,&AtomicSwap::cleanProcs, this, [this]{clean();});
 
-
     this->updateStatus();
 }
 
@@ -95,10 +99,7 @@ void AtomicWidget::skinChanged() {
 
 void AtomicWidget::showAtomicConfigureDialog() {
     AtomicConfigDialog dialog{this};
-
-    if (dialog.exec() == QDialog::Accepted) {
-
-    }
+    dialog.show();
 }
 
 void AtomicWidget::showAtomicSwapDialog() {
@@ -115,57 +116,62 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
     // Remove after testing
-    //arguments << "--testnet";
+    arguments << "--testnet";
+    arguments << "--debug";
     arguments << "-j";
     arguments << "buy-xmr";
     arguments << "--change-address";
-    //arguments << "tb1qzndh6u8qgl2ee4k4gl9erg947g67hyx03vvgen";
-    arguments << btcChange;
+    arguments << "tb1qzndh6u8qgl2ee4k4gl9erg947g67hyx03vvgen";
+    //arguments << btcChange;
     arguments << "--receive-address";
-    //arguments << "78YnzFTp3UUMgtKuAJCP2STcbxRZPDPveJ5YGgfg5doiPahS9suWF1r3JhKqjM1McYBJvu8nhkXExGfXVkU6n5S6AXrg4KP";
-    arguments << xmrReceive;
+    arguments << "78YnzFTp3UUMgtKuAJCP2STcbxRZPDPveJ5YGgfg5doiPahS9suWF1r3JhKqjM1McYBJvu8nhkXExGfXVkU6n5S6AXrg4KP";
+    //arguments << xmrReceive;
     arguments << "--seller";
-    //arguments << "/ip4/127.0.0.1/tcp/9939/p2p/12D3KooWQA4fXDYLNXgxPsVZmnR8kh2wwHUQnkH9e1Wjc8KyJ7p8";
+    arguments << "/ip4/127.0.0.1/tcp/9939/p2p/12D3KooWQA4fXDYLNXgxPsVZmnR8kh2wwHUQnkH9e1Wjc8KyJ7p8";
     // Remove after testing
-    //arguments << "--electrum-rpc";
-    //arguments << "tcp://127.0.0.1:50001";
-    //arguments << "--bitcoin-target-block";
-    //arguments << "8";
-    //arguments << "--monero-daemon-address";
-    //arguments << "http://127.0.0.1:38083";
+    arguments << "--electrum-rpc";
+    arguments << "tcp://127.0.0.1:50001";
+    arguments << "--bitcoin-target-block";
+    arguments << "1";
+    arguments << "--monero-daemon-address";
+    arguments << "node.monerodevs.org:38089";
     // Uncomment after testing
-    arguments << seller;
+    //arguments << seller;
     arguments << "--tor-socks5-port";
     arguments << m_instance->get(Config::socks5Port).toString();
 
 
     auto *swap = new QProcess();
     procList->append(QSharedPointer<QProcess>(swap));
-
-    swap->setReadChannel(QProcess::StandardError);
-    connect(swap, &QProcess::readyReadStandardError,this, [this, swap] {
+    swap->setProcessChannelMode(QProcess::MergedChannels);
+    swap->setReadChannel(QProcess::StandardOutput);
+    connect(swap, &QProcess::readyRead,this, [this, swap] {
         while(swap->canReadLine()){
             QJsonParseError err;
             const QByteArray& rawline = swap->readLine();
             QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
             qDebug() << rawline;
+            bool check;
             if (line["fields"]["message"].toString().contains("Connected to Alice")){
                 qDebug() << "Successfully connected";
                 swapDialog->logLine(line["fields"].toString());
             } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
                 qDebug() << "Deposit to btc to segwit address";
                 QString address = line["fields"]["deposit_address"].toString();
-                QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
-                AtomicFundDialog dialog(qobject_cast<QWidget*>(parent()), &qrc,  "Deposit BTC to this address", address);
-                connect(&dialog,&AtomicFundDialog::cleanProcs, this, [this]{clean();});
-                connect(this, &AtomicWidget::receivedBTC,&dialog, [ &dialog]{
-                    disconnect(&dialog, SIGNAL(cleanProcs()), nullptr, nullptr);
-                    dialog.close();});
-                dialog.exec();
+                fundDialog = new AtomicFundDialog(this,  "Deposit BTC to this address", address);
+                //dialog->setModal(true);
+                fundDialog->show();
             } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
-                emit receivedBTC(line["fields"]["new_balance"].toString().split(" ")[0].toFloat());
+                swapDialog->updateStatus(line["fields"]["new_balance"].toString().split(" ")[0] + " BTC received, starting swap");
+                fundDialog->close();
                 qDebug() << "Spawn atomic swap progress dialog";
                 showAtomicSwapDialog();
+            } else if ( QString confs = line["fields"]["seen_confirmations"].toString(); !confs.isEmpty()){
+                qDebug() << "Updating xmrconfs " + confs;
+                swapDialog->updateXMRConf(confs.toInt());
+            } else if (QString message = line["fields"]["message"].toString(); !QString::compare(message, "Bitcoin transaction status changed")){
+                qDebug() << "Updating btconfs " + line["fields"]["new_status"].toString().split(" ")[2];
+                swapDialog->updateBTCConf(line["fields"]["new_status"].toString().split(" ")[2].toInt());
             }
             //Insert line conditionals here
         }
@@ -245,15 +251,16 @@ AtomicWidget::~AtomicWidget() {
 
 void AtomicWidget::clean() {
     for (const auto& proc : *procList){
-        if(!proc->atEnd())
-            proc->terminate();
+            proc->kill();
     }
     if(QString::compare("WINDOWS",m_instance->get(Config::operatingSystem).toString()) != 0) {
         qDebug() << "Closing monero-wallet-rpc";
-        (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
                                                          "/mainnet/monero/monero-wallet-rpc"});
-        (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
                                                          "/testnet/monero/monero-wallet-rpc"});
     }
 }
+
+
 

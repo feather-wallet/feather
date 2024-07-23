@@ -20,7 +20,7 @@ class AtomicFundDialog : public WindowModalDialog {
     Q_OBJECT
 
 public:
-    explicit AtomicFundDialog(QWidget *parent, QrCode *qrCode, const QString &title = "Qr Code", const QString &btc_address = "Error Restart swap");
+    explicit AtomicFundDialog(QWidget *parent, const QString &title = "Qr Code", const QString &btc_address = "Error Restart swap");
     ~AtomicFundDialog() override;
 signals:
     void cleanProcs();
@@ -31,6 +31,7 @@ private:
     QScopedPointer<Ui::AtomicFundDialog> ui;
     QPixmap m_pixmap;
     QString address;
+    QrCode qrCode;
 };
 
 

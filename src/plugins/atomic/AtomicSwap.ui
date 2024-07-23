@@ -96,6 +96,16 @@
             </widget>
            </item>
            <item>
+            <widget class="QLabel" name="btc_hint">
+             <property name="pixmap">
+              <pixmap>hint-icon.png</pixmap>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::TextFormat::PlainText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QLabel" name="label_xmr">
              <property name="text">
               <string>XMR :</string>

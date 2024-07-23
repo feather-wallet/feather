@@ -13,6 +13,7 @@
 #include "OfferModel.h"
 #include "AtomicSwap.h"
 #include "config.h"
+#include "AtomicFundDialog.h"
 
 namespace Ui {
     class AtomicWidget;
@@ -34,8 +35,7 @@ public slots:
 private slots:
     void showAtomicConfigureDialog();
     void runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive);
-signals:
-    void receivedBTC(float new_amount);
+
 private:
     void updateStatus();
 
@@ -45,6 +45,7 @@ private:
     OfferModel *o_model;
     QList<QSharedPointer<OfferEntry>> *offerList;
     AtomicSwap *swapDialog;
+    AtomicFundDialog *fundDialog;
 
     void showAtomicSwapDialog();
 

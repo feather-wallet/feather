@@ -8,20 +8,21 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-AtomicFundDialog::AtomicFundDialog(QWidget *parent, QrCode *qrCode, const QString &title, const QString &btc_address)
+AtomicFundDialog::AtomicFundDialog(QWidget *parent, const QString &title, const QString &btc_address)
         : WindowModalDialog(parent)
         , ui(new Ui::AtomicFundDialog)
         , address(btc_address)
+        , qrCode(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH)
 {
     ui->setupUi(this);
     this->setWindowTitle(title);
-    ui->qrWidget->setQrCode(qrCode);
-    m_pixmap = qrCode->toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
 
+    ui->qrWidget->setQrCode(&qrCode);
+    m_pixmap = qrCode.toPixmap(1).scaled(500, 500, Qt::KeepAspectRatio);
+    connect(ui->btn_CopyAddress, &QPushButton::clicked, this, &AtomicFundDialog::copyAddress);
     connect(ui->btn_CopyImage, &QPushButton::clicked, this, &AtomicFundDialog::copyImage);
     connect(ui->btn_Save, &QPushButton::clicked, this, &AtomicFundDialog::saveImage);
     connect(ui->btn_Close, &QPushButton::clicked, [this](){
-        emit cleanProcs();
         accept();
     });
 

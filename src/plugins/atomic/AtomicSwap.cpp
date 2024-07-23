@@ -14,6 +14,11 @@ AtomicSwap::AtomicSwap(QWidget *parent) :
     ui->setupUi(this);
     //ui->debug_log->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
+    QPixmap pixmapTarget = QPixmap(":/assets/images/hint-icon.png");
+    int size=20;
+    pixmapTarget = pixmapTarget.scaled(size-5, size-5, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    ui->btc_hint->setPixmap(pixmapTarget);
+    ui->btc_hint->setToolTip("Alice is expected to send monero lock after one btc confirmation,\nswap is cancelable after 72 btc confirmations,\nyou will lose your funds if you don't refund before 144 confirmations");
     this->setContentsMargins(3,3,3,3);
     this->adjustSize();
 }
