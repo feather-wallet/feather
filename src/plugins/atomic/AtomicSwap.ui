@@ -37,7 +37,7 @@
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
-       <widget class="QPushButton" name="pushButton">
+       <widget class="QPushButton" name="btn_cancel">
         <property name="text">
          <string>Cancel </string>
         </property>

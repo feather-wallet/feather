@@ -12,6 +12,7 @@
 #include <QDir>
 
 
+
 class Config : public QObject
 {
     Q_OBJECT
@@ -154,6 +155,7 @@ public:
         rendezVous,
         swapPath,
         operatingSystem,
+        pendingSwap,
     };
 
     enum PrivacyLevel {

@@ -24,6 +24,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
         , swapDialog(new AtomicSwap(this))
         , procList(new QList<QSharedPointer<QProcess>>())
         , fundDialog(new AtomicFundDialog(this))
+        , recoverDialog(new AtomicRecoverDialog(this))
 {
     ui->setupUi(this);
 
@@ -42,7 +43,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     ui->offerBookTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->btn_configure->setEnabled(true);
 
-    if (!Config::instance()->get(Config::swapPath).toString().isEmpty())
+    if (!m_instance->get(Config::swapPath).toString().isEmpty())
         ui->meta_label->setText("Refresh offer book before swapping to prevent errors");
 
     connect(ui->btn_configure, &QPushButton::clicked, this, &AtomicWidget::showAtomicConfigureDialog);
@@ -82,13 +83,21 @@ AtomicWidget::AtomicWidget(QWidget *parent)
                                              tr("p2p multi address of rendezvous point"), QLineEdit::Normal,
                                              "", &ok);
         if (ok && !text.isEmpty()) {
-            QStringList copy = Config::instance()->get(Config::rendezVous).toStringList();
+            QStringList copy = m_instance->get(Config::rendezVous).toStringList();
             copy.append(text);
-            Config::instance()->set(Config::rendezVous,copy);
+            m_instance->set(Config::rendezVous,copy);
         }
     });
     connect(swapDialog,&AtomicSwap::cleanProcs, this, [this]{clean();});
 
+    //Remove after testing
+    //QVariant var;
+    //var.setValue(HistoryEntry {QDateTime::currentDateTime(),"test-id"});
+    //m_instance->set(Config::pendingSwap, QVariantList{var});
+    //auto recd = new AtomicRecoverDialog();
+    //if (!recd->historyEmpty()){
+    //    recd->show();
+    //}
     this->updateStatus();
 }
 
@@ -99,7 +108,7 @@ void AtomicWidget::skinChanged() {
 
 void AtomicWidget::showAtomicConfigureDialog() {
     AtomicConfigDialog dialog{this};
-    dialog.show();
+    dialog.exec();
 }
 
 void AtomicWidget::showAtomicSwapDialog() {
@@ -146,6 +155,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     swap->setProcessChannelMode(QProcess::MergedChannels);
     swap->setReadChannel(QProcess::StandardOutput);
     connect(swap, &QProcess::readyRead,this, [this, swap] {
+        //Refactor and move this to a slot in atomicswap, move fund dialog to be part of atomic swap
         while(swap->canReadLine()){
             QJsonParseError err;
             const QByteArray& rawline = swap->readLine();
@@ -163,6 +173,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
                 fundDialog->show();
             } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
                 swapDialog->updateStatus(line["fields"]["new_balance"].toString().split(" ")[0] + " BTC received, starting swap");
+                swapDialog->setSwap(line["span"]["swap_id"].toString());
                 fundDialog->close();
                 qDebug() << "Spawn atomic swap progress dialog";
                 showAtomicSwapDialog();

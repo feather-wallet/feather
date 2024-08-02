@@ -14,6 +14,7 @@
 #include "AtomicSwap.h"
 #include "config.h"
 #include "AtomicFundDialog.h"
+#include "AtomicRecoverDialog.h"
 
 namespace Ui {
     class AtomicWidget;
@@ -46,7 +47,7 @@ private:
     QList<QSharedPointer<OfferEntry>> *offerList;
     AtomicSwap *swapDialog;
     AtomicFundDialog *fundDialog;
-
+    AtomicRecoverDialog *recoverDialog;
     void showAtomicSwapDialog();
 
     QList<QSharedPointer<QProcess>> *procList;

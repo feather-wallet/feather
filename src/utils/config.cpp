@@ -149,6 +149,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
                                                             "/dns4/swap.sethforprivacy.com/tcp/8888/p2p/12D3KooWCULyZKuV9YEkb6BX8FuwajdvktSzmMg4U5ZX2uYZjHeu"}}},
         {Config::swapPath, {QS("swapPath"), ""}},
         {Config::operatingSystem, {QS("operatingSystem"), OS}},
+        {Config::pendingSwap, {QS("pendingSwap"), QVariantList{}}},
 };
 
 

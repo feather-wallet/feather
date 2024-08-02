@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QTime>
 #include "components.h"
+#include "AtomicFundDialog.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -25,11 +26,15 @@ public:
     void updateBTCConf(int confs);
     void updateXMRConf(int confs);
     void setTitle(QString title);
+    void setSwap(QString swapId);
 signals:
     void cleanProcs();
 private:
     Ui::AtomicSwap *ui;
-
+    QString id;
+    AtomicFundDialog fundDialog;
+    int btc_confs;
+    void cancel();
 
 };
 

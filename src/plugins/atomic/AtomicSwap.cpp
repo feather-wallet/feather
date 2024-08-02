@@ -5,12 +5,14 @@
 // You may need to build the project (run Qt uic code generator) to get "ui_AtomicSwap.h" resolved
 
 #include "AtomicSwap.h"
+
+#include <utility>
 #include "ui_AtomicSwap.h"
 #include "AtomicWidget.h"
 
 
 AtomicSwap::AtomicSwap(QWidget *parent) :
-        WindowModalDialog(parent), ui(new Ui::AtomicSwap) {
+        WindowModalDialog(parent), ui(new Ui::AtomicSwap), fundDialog( new AtomicFundDialog(this)) {
     ui->setupUi(this);
     //ui->debug_log->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
@@ -21,6 +23,7 @@ AtomicSwap::AtomicSwap(QWidget *parent) :
     ui->btc_hint->setToolTip("Alice is expected to send monero lock after one btc confirmation,\nswap is cancelable after 72 btc confirmations,\nyou will lose your funds if you don't refund before 144 confirmations");
     this->setContentsMargins(3,3,3,3);
     this->adjustSize();
+    connect(ui->btn_cancel, &QPushButton::clicked, this, &AtomicSwap::cancel);
 }
 
 
@@ -44,6 +47,7 @@ void AtomicSwap::updateXMRConf(int confs) {
 }
 
 void AtomicSwap::updateBTCConf(int confs) {
+    btc_confs = confs;
     ui->label_btc_cons->setText(QString::number(confs));
     this->update();
 }
@@ -53,3 +57,10 @@ void AtomicSwap::setTitle(QString title) {
     this->update();
 }
 
+void AtomicSwap::setSwap(QString swapId){
+    id = std::move(swapId);
+}
+
+void AtomicSwap::cancel(){
+
+}
