@@ -88,7 +88,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
             m_instance->set(Config::rendezVous,copy);
         }
     });
-    connect(swapDialog,&AtomicSwap::cleanProcs, this, [this]{clean();});
+
 
     //Remove after testing
     //QVariant var;
@@ -136,7 +136,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "78YnzFTp3UUMgtKuAJCP2STcbxRZPDPveJ5YGgfg5doiPahS9suWF1r3JhKqjM1McYBJvu8nhkXExGfXVkU6n5S6AXrg4KP";
     //arguments << xmrReceive;
     arguments << "--seller";
-    arguments << "/ip4/127.0.0.1/tcp/9939/p2p/12D3KooWQA4fXDYLNXgxPsVZmnR8kh2wwHUQnkH9e1Wjc8KyJ7p8";
+    arguments << "/ip4/127.0.0.1/tcp/9939/p2p/12D3KooW9yDFYojXnZRdqS9UXcfP2amgwoYdSjujwWdRw4LTSdWw";
     // Remove after testing
     arguments << "--electrum-rpc";
     arguments << "tcp://127.0.0.1:50001";
@@ -148,48 +148,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     //arguments << seller;
     arguments << "--tor-socks5-port";
     arguments << m_instance->get(Config::socks5Port).toString();
-
-
-    auto *swap = new QProcess();
-    procList->append(QSharedPointer<QProcess>(swap));
-    swap->setProcessChannelMode(QProcess::MergedChannels);
-    swap->setReadChannel(QProcess::StandardOutput);
-    connect(swap, &QProcess::readyRead,this, [this, swap] {
-        //Refactor and move this to a slot in atomicswap, move fund dialog to be part of atomic swap
-        while(swap->canReadLine()){
-            QJsonParseError err;
-            const QByteArray& rawline = swap->readLine();
-            QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
-            qDebug() << rawline;
-            bool check;
-            if (line["fields"]["message"].toString().contains("Connected to Alice")){
-                qDebug() << "Successfully connected";
-                swapDialog->logLine(line["fields"].toString());
-            } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
-                qDebug() << "Deposit to btc to segwit address";
-                QString address = line["fields"]["deposit_address"].toString();
-                fundDialog = new AtomicFundDialog(this,  "Deposit BTC to this address", address);
-                //dialog->setModal(true);
-                fundDialog->show();
-            } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
-                swapDialog->updateStatus(line["fields"]["new_balance"].toString().split(" ")[0] + " BTC received, starting swap");
-                swapDialog->setSwap(line["span"]["swap_id"].toString());
-                fundDialog->close();
-                qDebug() << "Spawn atomic swap progress dialog";
-                showAtomicSwapDialog();
-            } else if ( QString confs = line["fields"]["seen_confirmations"].toString(); !confs.isEmpty()){
-                qDebug() << "Updating xmrconfs " + confs;
-                swapDialog->updateXMRConf(confs.toInt());
-            } else if (QString message = line["fields"]["message"].toString(); !QString::compare(message, "Bitcoin transaction status changed")){
-                qDebug() << "Updating btconfs " + line["fields"]["new_status"].toString().split(" ")[2];
-                swapDialog->updateBTCConf(line["fields"]["new_status"].toString().split(" ")[2].toInt());
-            }
-            //Insert line conditionals here
-        }
-    });
-
-    swap->start(m_instance->get(Config::swapPath).toString(),arguments);
-    qDebug() << "process started";
+    swapDialog->runSwap(arguments);
 
 }
 
@@ -253,6 +212,7 @@ void AtomicWidget::list(const QString& rendezvous) {
 
 AtomicWidget::~AtomicWidget() {
     qDebug()<< "Exiting widget!!";
+    delete swapDialog;
     delete o_model;
     delete offerList;
     clean();

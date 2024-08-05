@@ -7,6 +7,7 @@
 
 #include <QDialog>
 #include <QTime>
+#include <QProcess>
 #include "components.h"
 #include "AtomicFundDialog.h"
 
@@ -27,12 +28,15 @@ public:
     void updateXMRConf(int confs);
     void setTitle(QString title);
     void setSwap(QString swapId);
+public slots:
+    void runSwap(QStringList swap);
 signals:
     void cleanProcs();
 private:
     Ui::AtomicSwap *ui;
     QString id;
-    AtomicFundDialog fundDialog;
+    AtomicFundDialog* fundDialog;
+    QList<QSharedPointer<QProcess>>* procList;
     int btc_confs;
     void cancel();
 
