@@ -53,6 +53,8 @@ jobs:
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
         run: sudo apt update; sudo apt -y install guix git ca-certificates
+      - name: fix apparmor
+        run: sudo cp .github/workflows/guix /etc/apparmor.d/guix; sudo /etc/init.d/apparmor reload; sudo aa-enforce guix
       - name: build
         run: SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
       - uses: actions/upload-artifact@v4
