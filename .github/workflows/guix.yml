@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   cache-sources:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,7 +20,7 @@ jobs:
         run: make -C contrib/depends download
 
   build-guix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [cache-sources]
     strategy:
       fail-fast: false
@@ -63,7 +63,7 @@ jobs:
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
 
   bundle-logs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build-guix]
     steps:
       - uses: actions/download-artifact@v4
