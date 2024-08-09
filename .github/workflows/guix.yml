@@ -52,7 +52,7 @@ jobs:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install guix git ca-certificates
+        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils
       - name: fix apparmor
         run: sudo cp .github/workflows/guix /etc/apparmor.d/guix; sudo /etc/init.d/apparmor reload; sudo aa-enforce guix
       - name: build
