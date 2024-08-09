@@ -60,13 +60,21 @@ void AtomicSwap::runSwap(QStringList arguments){
                 this->updateXMRConf(confs.toInt());
             } else if (QString message = line["fields"]["message"].toString(); !QString::compare(message, "Bitcoin transaction status changed")){
                 qDebug() << "Updating btconfs " + line["fields"]["new_status"].toString().split(" ")[2];
-                this->updateBTCConf(line["fields"]["new_status"].toString().split(" ")[2].toInt());
+                QString status = line["fields"]["new_status"].toString();
+                bool ok;
+                auto confirmations = status.split(" ")[2].toInt(&ok, 10);
+                if(ok) {
+                    this->updateBTCConf(confirmations);
+                } else {
+                    this->updateStatus("Found txid " + line["fields"]["txid"].toString() + " in mempool");
+                }
+
             }
             //Insert line conditionals here
         }
     });
 
-    swap->start(Config::instance()->get(Config::swapPath).toString(),arguments);
+    swap->start(conf()->get(Config::swapPath).toString(),arguments);
     qDebug() << "process started";
 }
 AtomicSwap::~AtomicSwap() {
@@ -74,7 +82,7 @@ AtomicSwap::~AtomicSwap() {
     for (const auto& proc : *procList){
         proc->kill();
     }
-    if(QString::compare("WINDOWS",Config::instance()->get(Config::operatingSystem).toString()) != 0) {
+    if(QString::compare("WINDOWS",conf()->get(Config::operatingSystem).toString()) != 0) {
         qDebug() << "Closing monero-wallet-rpc";
         (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
                                                         "/mainnet/monero/monero-wallet-rpc"});

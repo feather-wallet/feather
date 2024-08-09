@@ -8,6 +8,7 @@
 #include <QDialog>
 #include "components.h"
 #include "History.h"
+#include "AtomicSwap.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class AtomicRecoverDialog; }
@@ -22,8 +23,12 @@ public:
     void appendHistory(HistoryEntry entry);
     ~AtomicRecoverDialog() override;
 
+private slots:
+    void updateBtn(const QModelIndex &index);
 private:
     Ui::AtomicRecoverDialog *ui;
+    AtomicSwap *swapDialog;
+
 };
 
 

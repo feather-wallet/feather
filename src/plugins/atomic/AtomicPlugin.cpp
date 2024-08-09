@@ -5,6 +5,7 @@
 #include "AtomicConfigDialog.h"
 
 #include "plugins/PluginRegistry.h"
+#include "constants.h"
 
 AtomicPlugin::AtomicPlugin()
 {
@@ -64,7 +65,11 @@ void AtomicPlugin::skinChanged() {
 }
 
 const bool AtomicPlugin::registered = [] {
-    PluginRegistry::registerPlugin(AtomicPlugin::create());
-    PluginRegistry::getInstance().registerPluginCreator(&AtomicPlugin::create);
-    return true;
+    if(constants::networkType!=NetworkType::TESTNET) {
+        PluginRegistry::registerPlugin(AtomicPlugin::create());
+        PluginRegistry::getInstance().registerPluginCreator(&AtomicPlugin::create);
+        return true;
+    }
+    
+    return false;
 }();

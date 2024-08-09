@@ -90,7 +90,7 @@ void AtomicConfigDialog::extract() {
     swapPath.append("/swapTool");
     QFile binaryFile(swapPath);
     binaryFile.open(QIODevice::WriteOnly);
-    auto operatingSystem = Config::instance()->get(Config::operatingSystem).toString().toStdString();
+    auto operatingSystem = conf()->get(Config::operatingSystem).toString().toStdString();
     if(strcmp("WIN",operatingSystem.c_str()) == 0) {
         // UNZIP
         zip *z = zip_open(tempFile.toStdString().c_str(), 0, 0);
@@ -114,7 +114,7 @@ void AtomicConfigDialog::extract() {
         zip_fclose(f);
         //And close the archive
         zip_close(z);
-        Config::instance()->set(Config::swapPath,swapPath);
+        conf()->set(Config::swapPath,swapPath);
     } else {
 
         struct archive *a;
@@ -145,7 +145,7 @@ void AtomicConfigDialog::extract() {
 
         archive_write_close(ext);
         archive_write_free(ext);
-        Config::instance()->set(Config::swapPath, QString(savePath.c_str()));
+        conf()->set(Config::swapPath, QString(savePath.c_str()));
     }
     qDebug() << "Finished";
     binaryFile.close();

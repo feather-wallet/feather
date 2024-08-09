@@ -6,6 +6,7 @@
 
 #include "Plugin.h"
 #include "utils/config.h"
+#include "constants.h"
 
 class PluginRegistry {
 public:
@@ -35,7 +36,7 @@ public:
     }
 
     bool isPluginEnabled(const QString &id) {
-        if (!pluginMap.contains(id)) {
+        if (!pluginMap.contains(id) or (QString::compare(id,"atomic")==0 && constants::networkType==NetworkType::TESTNET)) {
             return false;
         }
 

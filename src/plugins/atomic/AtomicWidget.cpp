@@ -11,6 +11,7 @@
 #include "AtomicConfigDialog.h"
 #include "OfferModel.h"
 #include "utils/AppData.h"
+#include "utils/nodes.h"
 #include "utils/ColorScheme.h"
 #include "utils/WebsocketNotifier.h"
 #include "AtomicFundDialog.h"
@@ -18,7 +19,6 @@
 AtomicWidget::AtomicWidget(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::AtomicWidget)
-        , m_instance(Config::instance())
         , o_model(new OfferModel(this))
         , offerList(new QList<QSharedPointer<OfferEntry>>())
         , swapDialog(new AtomicSwap(this))
@@ -43,7 +43,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     ui->offerBookTable->horizontalHeader()->setSectionResizeMode(3, QHeaderView::Stretch);
     ui->btn_configure->setEnabled(true);
 
-    if (!m_instance->get(Config::swapPath).toString().isEmpty())
+    if (!conf()->get(Config::swapPath).toString().isEmpty())
         ui->meta_label->setText("Refresh offer book before swapping to prevent errors");
 
     connect(ui->btn_configure, &QPushButton::clicked, this, &AtomicWidget::showAtomicConfigureDialog);
@@ -53,7 +53,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
 
         ui->meta_label->setText("Updating offer book this may take a bit, if no offers appear after a while try refreshing again");
 
-        QStringList pointList = m_instance->get(Config::rendezVous).toStringList();
+        QStringList pointList = conf()->get(Config::rendezVous).toStringList();
         for(const QString& point :pointList)
             AtomicWidget::list(point);
     });
@@ -83,22 +83,21 @@ AtomicWidget::AtomicWidget(QWidget *parent)
                                              tr("p2p multi address of rendezvous point"), QLineEdit::Normal,
                                              "", &ok);
         if (ok && !text.isEmpty()) {
-            QStringList copy = m_instance->get(Config::rendezVous).toStringList();
+            QStringList copy = conf()->get(Config::rendezVous).toStringList();
             copy.append(text);
-            m_instance->set(Config::rendezVous,copy);
+            conf()->set(Config::rendezVous,copy);
         }
     });
 
 
     //Remove after testing
-    //QVariant var;
-    //var.setValue(HistoryEntry {QDateTime::currentDateTime(),"test-id"});
-    //m_instance->set(Config::pendingSwap, QVariantList{var});
-    //auto recd = new AtomicRecoverDialog();
-    //if (!recd->historyEmpty()){
-    //    recd->show();
-    //}
-    this->updateStatus();
+    QVariant var;
+    var.setValue(HistoryEntry {QDateTime::currentDateTime(),"test-id"});
+    conf()->set(Config::pendingSwap, QVariantList{var});
+    auto recd = new AtomicRecoverDialog(this);
+    if (!recd->historyEmpty()){
+        recd->show();
+    }
 }
 
 
@@ -111,13 +110,6 @@ void AtomicWidget::showAtomicConfigureDialog() {
     dialog.exec();
 }
 
-void AtomicWidget::showAtomicSwapDialog() {
-    swapDialog->show();
-}
-
-void AtomicWidget::updateStatus() {
-
-}
 
 void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive) {
     qDebug() << "starting swap";
@@ -125,7 +117,9 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
     // Remove after testing
-    arguments << "--testnet";
+    if (constants::networkType==NetworkType::STAGENET){
+        arguments << "--testnet";
+    }
     arguments << "--debug";
     arguments << "-j";
     arguments << "buy-xmr";
@@ -142,12 +136,24 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "tcp://127.0.0.1:50001";
     arguments << "--bitcoin-target-block";
     arguments << "1";
+    auto nodes = conf()->get(Config::nodes).toJsonObject();
+    if (nodes.isEmpty()) {
+        auto jsonData = conf()->get(Config::nodes).toByteArray();
+        if (Utils::validateJSON(jsonData)) {
+            auto doc = QJsonDocument::fromJson(jsonData);
+            nodes = doc.object();
+        }
+    }
+    qDebug() << nodes.value("0").toObject()["ws"].toArray()[0];
     arguments << "--monero-daemon-address";
-    arguments << "node.monerodevs.org:38089";
+    //arguments << "node.monerodevs.org:38089";
+    arguments << nodes.value("0").toObject()["ws"].toArray()[0].toString();
     // Uncomment after testing
     //arguments << seller;
-    arguments << "--tor-socks5-port";
-    arguments << m_instance->get(Config::socks5Port).toString();
+    if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        arguments << "--tor-socks5-port";
+        arguments << conf()->get(Config::socks5Port).toString();
+    }
     swapDialog->runSwap(arguments);
 
 }
@@ -156,16 +162,21 @@ void AtomicWidget::list(const QString& rendezvous) {
     QStringList arguments;
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
+    if (constants::networkType==NetworkType::STAGENET){
+        arguments << "--testnet";
+    }
     arguments << "-j";
     arguments << "list-sellers";
-    arguments << "--tor-socks5-port";
-    arguments << m_instance->get(Config::socks5Port).toString();
+    if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        arguments << "--tor-socks5-port";
+        arguments << conf()->get(Config::socks5Port).toString();
+    }
     arguments << "--rendezvous-point";
     arguments << rendezvous;
     auto *swap = new QProcess();
     procList->append(QSharedPointer<QProcess>(swap));
     swap->setReadChannel(QProcess::StandardError);
-    //swap->start(m_instance->get(Config::swapPath).toString(), arguments);
+    //swap->start(conf()->get(Config::swapPath).toString(), arguments);
     connect(swap, &QProcess::finished, this, [this, swap]{
         QJsonDocument parsedLine;
         QJsonParseError parseError;
@@ -203,7 +214,7 @@ void AtomicWidget::list(const QString& rendezvous) {
         o_model->updateOffers(*offerList);
         return list;
     });
-    swap->start(m_instance->get(Config::swapPath).toString(), arguments);
+    swap->start(conf()->get(Config::swapPath).toString(), arguments);
     //swap->waitForFinished(120000);
 
 
@@ -216,7 +227,6 @@ AtomicWidget::~AtomicWidget() {
     delete o_model;
     delete offerList;
     clean();
-    delete m_instance;
     delete procList;
 }
 
@@ -224,7 +234,7 @@ void AtomicWidget::clean() {
     for (const auto& proc : *procList){
             proc->kill();
     }
-    if(QString::compare("WINDOWS",m_instance->get(Config::operatingSystem).toString()) != 0) {
+    if(QString::compare("WINDOWS",conf()->get(Config::operatingSystem).toString()) != 0) {
         qDebug() << "Closing monero-wallet-rpc";
         (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
                                                          "/mainnet/monero/monero-wallet-rpc"});

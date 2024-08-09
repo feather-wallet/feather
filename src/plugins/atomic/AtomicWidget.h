@@ -38,8 +38,6 @@ private slots:
     void runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive);
 
 private:
-    void updateStatus();
-
     QScopedPointer<Ui::AtomicWidget> ui;
     bool m_comboBoxInit = false;
     QTimer m_statusTimer;
@@ -48,10 +46,8 @@ private:
     AtomicSwap *swapDialog;
     AtomicFundDialog *fundDialog;
     AtomicRecoverDialog *recoverDialog;
-    void showAtomicSwapDialog();
 
     QList<QSharedPointer<QProcess>> *procList;
-    Config *m_instance;
 };
 
 #endif // FEATHER_ATOMICWIDGET_H
