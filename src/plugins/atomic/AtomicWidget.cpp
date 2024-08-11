@@ -61,19 +61,45 @@ AtomicWidget::AtomicWidget(QWidget *parent)
     connect(ui->btn_swap, &QPushButton::clicked, this, [this]{
         auto rows = ui->offerBookTable->selectionModel()->selectedRows();
         clean();
-        // UNCOMENT after testing
-        //if (rows.size() < 1){
-        //    ui->meta_label->setText("You must select an offer to use for swap, refresh if there aren't any");
-        //} else {
-            //QModelIndex index = rows.at(0);
-            //QString seller = index.sibling(index.row(), 3).data().toString();
-            QString seller = "test";
+        if (rows.size() < 1){
+            ui->meta_label->setText("You must select an offer to use for swap, refresh if there aren't any");
+        } else {
+            QModelIndex index = rows.at(0);
+            QString seller = index.sibling(index.row(), 3).data().toString();
             //Add proper error checking on ui input after rest of swap is implemented
             QString btcChange = ui->change_address->text();
+            QRegularExpression btcMain("^(bc1)[a-zA-HJ-NP-Z0-9]{39}$");
+            QRegularExpression btcTest("^(tb1)[a-zA-HJ-NP-Z0-9]{39}$");
             QString xmrReceive = ui->xmr_address->text();
+            if(xmrReceive.isEmpty()) {
+                QMessageBox::warning(this, "Warning", "XMR receive address is required to start swap");
+                return;
+            }
+            QRegularExpression xmrMain("^[48][0-9AB][1-9A-HJ-NP-Za-km-z]{93}");
+            QRegularExpression xmrStage("^[57][0-9AB][1-9A-HJ-NP-Za-km-z]{93}");
+            if (constants::networkType==NetworkType::STAGENET){
+                if(!btcChange.isEmpty() && !btcTest.match(btcChange).hasMatch()){
+                    QMessageBox::warning(this, "Warning","BTC change address is wrong, not a bech32 segwit address, or on wrong network");
+                    return;
+                }
+                if(!xmrStage.match(xmrReceive).hasMatch()){
+                    QMessageBox::warning(this, "Warning","XMR receive address is improperly formated or on wrong network");
+                    return;
+                }
+            } else {
+                if(!btcChange.isEmpty() && !btcMain.match(btcChange).hasMatch()){
+                    QMessageBox::warning(this, "Warning","BTC change address is wrong, not a bech32 segwit address,or on wrong network");
+                    return;
+                }
+                if(!xmrMain.match(xmrReceive).hasMatch()){
+                    QMessageBox::warning(this, "Warning","XMR receive address is improperly formated or on wrong network");
+                    return;
+                }
+            }
+
             sleep(1);
             runSwap(seller,btcChange, xmrReceive);
-        //}
+        }
     });
 
     connect(ui->btn_addRendezvous, &QPushButton::clicked, this, [this]{
@@ -89,11 +115,6 @@ AtomicWidget::AtomicWidget(QWidget *parent)
         }
     });
 
-
-    //Remove after testing
-    QVariant var;
-    var.setValue(HistoryEntry {QDateTime::currentDateTime(),"test-id"});
-    conf()->set(Config::pendingSwap, QVariantList{var});
     auto recd = new AtomicRecoverDialog(this);
     if (!recd->historyEmpty()){
         recd->show();
@@ -124,18 +145,10 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "-j";
     arguments << "buy-xmr";
     arguments << "--change-address";
-    arguments << "tb1qzndh6u8qgl2ee4k4gl9erg947g67hyx03vvgen";
-    //arguments << btcChange;
+    arguments << btcChange;
     arguments << "--receive-address";
-    arguments << "78YnzFTp3UUMgtKuAJCP2STcbxRZPDPveJ5YGgfg5doiPahS9suWF1r3JhKqjM1McYBJvu8nhkXExGfXVkU6n5S6AXrg4KP";
-    //arguments << xmrReceive;
-    arguments << "--seller";
-    arguments << "/ip4/127.0.0.1/tcp/9939/p2p/12D3KooW9yDFYojXnZRdqS9UXcfP2amgwoYdSjujwWdRw4LTSdWw";
-    // Remove after testing
-    arguments << "--electrum-rpc";
-    arguments << "tcp://127.0.0.1:50001";
-    arguments << "--bitcoin-target-block";
-    arguments << "1";
+    arguments << xmrReceive;
+
     auto nodes = conf()->get(Config::nodes).toJsonObject();
     if (nodes.isEmpty()) {
         auto jsonData = conf()->get(Config::nodes).toByteArray();
@@ -144,12 +157,10 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
             nodes = doc.object();
         }
     }
-    qDebug() << nodes.value("0").toObject()["ws"].toArray()[0];
     arguments << "--monero-daemon-address";
-    //arguments << "node.monerodevs.org:38089";
     arguments << nodes.value("0").toObject()["ws"].toArray()[0].toString();
-    // Uncomment after testing
-    //arguments << seller;
+    arguments << "--seller";
+    arguments << seller;
     if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
         arguments << "--tor-socks5-port";
         arguments << conf()->get(Config::socks5Port).toString();
@@ -176,23 +187,16 @@ void AtomicWidget::list(const QString& rendezvous) {
     auto *swap = new QProcess();
     procList->append(QSharedPointer<QProcess>(swap));
     swap->setReadChannel(QProcess::StandardError);
-    //swap->start(conf()->get(Config::swapPath).toString(), arguments);
     connect(swap, &QProcess::finished, this, [this, swap]{
         QJsonDocument parsedLine;
         QJsonParseError parseError;
         QList<QSharedPointer<OfferEntry>> list;
-        qDebug() << "Subprocess has finished";
         auto output = QString::fromLocal8Bit(swap->readAllStandardError());
-        qDebug() << "Crashes before splitting";
         auto lines = output.split(QRegularExpression("[\r\n]"),Qt::SkipEmptyParts);
-        qDebug() << lines.size();
-        qDebug() << "parsing Output";
 
 
         for(const auto& line : lines){
-            qDebug() << line;
             if(line.contains("status")){
-                qDebug() << "status contained";
                 parsedLine = QJsonDocument::fromJson(line.toLocal8Bit(), &parseError );
                 if (parsedLine["fields"]["status"].toString().contains("Online")){
                     bool skip = false;
@@ -205,17 +209,14 @@ void AtomicWidget::list(const QString& rendezvous) {
                         ui->meta_label->setText("Updated offer book");
                         offerList->append(QSharedPointer<OfferEntry>(entry));
                     }
-                    qDebug() << entry;
                 }
             }
         }
-        qDebug() << "exits fine";
         swap->close();
         o_model->updateOffers(*offerList);
         return list;
     });
     swap->start(conf()->get(Config::swapPath).toString(), arguments);
-    //swap->waitForFinished(120000);
 
 
 
@@ -233,13 +234,6 @@ AtomicWidget::~AtomicWidget() {
 void AtomicWidget::clean() {
     for (const auto& proc : *procList){
             proc->kill();
-    }
-    if(QString::compare("WINDOWS",conf()->get(Config::operatingSystem).toString()) != 0) {
-        qDebug() << "Closing monero-wallet-rpc";
-        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
-                                                         "/mainnet/monero/monero-wallet-rpc"});
-        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
-                                                         "/testnet/monero/monero-wallet-rpc"});
     }
 }
 

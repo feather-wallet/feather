@@ -9,6 +9,7 @@
 #include "History.h"
 #include "config.h"
 #include "AtomicSwap.h"
+#include "Utils.h"
 #include <QStandardItemModel>
 
 AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
@@ -57,8 +58,20 @@ AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
         }
         arguments << "--swap-id";
         arguments << ui->swap_history->selectionModel()->selectedRows().at(0).sibling(0,1).data().toString();
-        arguments << "--tor-socks5-port";
-        arguments << conf()->get(Config::socks5Port).toString();
+        arguments << "--monero-daemon-address";
+        auto nodes = conf()->get(Config::nodes).toJsonObject();
+        if (nodes.isEmpty()) {
+            auto jsonData = conf()->get(Config::nodes).toByteArray();
+            if (Utils::validateJSON(jsonData)) {
+                auto doc = QJsonDocument::fromJson(jsonData);
+                nodes = doc.object();
+            }
+        }
+        arguments << nodes.value("0").toObject()["ws"].toArray()[0].toString();
+        if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+            arguments << "--tor-socks5-port";
+            arguments << conf()->get(Config::socks5Port).toString();
+        }
         swapDialog->runSwap(arguments);
     });
 }

@@ -58,13 +58,14 @@ void AtomicConfigDialog::downloadBinary() {
     tempFile = download->fileName();
     QString url;
     auto operatingSystem = Config::instance()->get(Config::operatingSystem).toString().toStdString();
+    QString firstPart = "https://github.com/comit-network/xmr-btc-swap/releases/download/" + conf()->get(Config::swapVersion).toString();
     if(strcmp("WIN",operatingSystem.c_str()) == 0) {
         // HARD CODED DOWNload URL CHANGE IF PROBLEMS
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Windows_x86_64.zip");
+        url = QString(firstPart+"/swap_"+conf()->get(Config::swapVersion).toString()+"_Windows_x86_64.zip");
     } else if (strcmp("LINUX",operatingSystem.c_str())==0){
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Linux_x86_64.tar");
+        url = QString(firstPart+"/swap_"+conf()->get(Config::swapVersion).toString()+"_Linux_x86_64.tar");
     } else {
-        url = QString("https://github.com/comit-network/xmr-btc-swap/releases/download/0.13.1/swap_0.13.1_Linux_x86_64.tar");
+        url = QString(firstPart + "/swap_" + conf()->get(Config::swapVersion).toString() + "_Darwin_x86_64.tar");
     }
 
     archive = network->get(this, url);
@@ -72,7 +73,6 @@ void AtomicConfigDialog::downloadBinary() {
     QStringList answer;
     connect(archive,&QNetworkReply::readyRead, this, [this]{
         QByteArray data= archive->readAll();
-        qDebug() << "received data of size: " << data.size();
         download->write(data.constData(), data.size());
     });
     connect(archive, &QNetworkReply::finished,
@@ -82,7 +82,6 @@ void AtomicConfigDialog::downloadBinary() {
 void AtomicConfigDialog::extract() {
 
     ui->downloadLabel->setText("Download Successful, extracting binary to final destination");
-    qDebug() << "extracting";
     download->close();
     archive->deleteLater();
 

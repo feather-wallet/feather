@@ -27,7 +27,6 @@ public:
     void updateBTCConf(int confs);
     void updateXMRConf(int confs);
     void setTitle(QString title);
-    void setSwap(QString swapId);
 public slots:
     void runSwap(QStringList swap);
 signals:

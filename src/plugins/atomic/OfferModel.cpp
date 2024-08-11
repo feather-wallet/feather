@@ -21,7 +21,6 @@ void OfferModel::clear() {
 
 void OfferModel::updateOffers(const QList<QSharedPointer<OfferEntry>> &posts) {
     beginResetModel();
-    qDebug() << "updating Offers";
     m_offers.clear();
     for (const auto& post : posts) {
         m_offers.push_back(post);

@@ -150,6 +150,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::swapPath, {QS("swapPath"), ""}},
         {Config::operatingSystem, {QS("operatingSystem"), OS}},
         {Config::pendingSwap, {QS("pendingSwap"), QVariantList{}}},
+        {Config::swapVersion, {QS("swapVersion"), "0.13.4"}},
 };
 
 

@@ -156,6 +156,7 @@ public:
         swapPath,
         operatingSystem,
         pendingSwap,
+        swapVersion,
     };
 
     enum PrivacyLevel {

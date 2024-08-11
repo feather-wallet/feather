@@ -6,8 +6,8 @@
 
 #include "AtomicSwap.h"
 
-#include <utility>
 #include <QJsonParseError>
+#include <qt6/QtWidgets/QMessageBox>
 #include "ui_AtomicSwap.h"
 #include "AtomicWidget.h"
 
@@ -15,7 +15,6 @@
 AtomicSwap::AtomicSwap(QWidget *parent) :
         WindowModalDialog(parent), ui(new Ui::AtomicSwap), fundDialog( new AtomicFundDialog(this)), procList(new QList<QSharedPointer<QProcess>>()) {
     ui->setupUi(this);
-    //ui->debug_log->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
     ui->label_status->setTextInteractionFlags(Qt::TextSelectableByKeyboard | Qt::TextSelectableByMouse);
     QPixmap pixmapTarget = QPixmap(":/assets/images/hint-icon.png");
     int size=20;
@@ -33,7 +32,6 @@ void AtomicSwap::runSwap(QStringList arguments){
     swap->setProcessChannelMode(QProcess::MergedChannels);
     swap->setReadChannel(QProcess::StandardOutput);
     connect(swap, &QProcess::readyRead,this, [this, swap] {
-        //Refactor and move this to a slot in atomicswap, move fund dialog to be part of atomic swap
         while(swap->canReadLine()){
             QJsonParseError err;
             const QByteArray& rawline = swap->readLine();
@@ -51,14 +49,18 @@ void AtomicSwap::runSwap(QStringList arguments){
                 fundDialog->show();
             } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
                 this->updateStatus(line["fields"]["new_balance"].toString().split(" ")[0] + " BTC received, starting swap");
-                this->setSwap(line["span"]["swap_id"].toString());
+                QVariant var;
+                var.setValue(HistoryEntry {QDateTime::currentDateTime(),line["span"]["swap_id"].toString()});
+                QVariantList past = conf()->get(Config::pendingSwap).toList();
+                past.append(var);
+                conf()->set(Config::pendingSwap,past);
                 fundDialog->close();
                 qDebug() << "Spawn atomic swap progress dialog";
                 this->show();
             } else if ( QString confs = line["fields"]["seen_confirmations"].toString(); !confs.isEmpty()){
                 qDebug() << "Updating xmrconfs " + confs;
                 this->updateXMRConf(confs.toInt());
-            } else if (QString message = line["fields"]["message"].toString(); !QString::compare(message, "Bitcoin transaction status changed")){
+            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message, "Bitcoin transaction status changed")==0){
                 qDebug() << "Updating btconfs " + line["fields"]["new_status"].toString().split(" ")[2];
                 QString status = line["fields"]["new_status"].toString();
                 bool ok;
@@ -68,9 +70,31 @@ void AtomicSwap::runSwap(QStringList arguments){
                 } else {
                     this->updateStatus("Found txid " + line["fields"]["txid"].toString() + " in mempool");
                 }
-
+            } else if (QString message = line["fields"]["message"].toString(); message.startsWith("Swap completed")){
+                QVariantList past = conf()->get(Config::pendingSwap).toList();
+                past.removeLast();
+                conf()->set(Config::pendingSwap, past);
+                this->updateStatus("Swap has successfully completed you can close this window now");
+            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message,"Advancing state")==0){
+                this->updateStatus("State of swap has advanced to " + line["fields"]["state"].toString());
+            } else if (QString refund = line["fields"]["kind"].toString(); QString::compare(refund,"refund")==0){
+                QString txid = line["fields"]["txid"].toString();
+                QString id = line["span"]["swap_id"].toString();
+                QVariantList past = conf()->get(Config::pendingSwap).toList();
+                for(int i=0;i<past.length();i++){
+                    if(QString::compare(past[i].value<HistoryEntry>().id,id)==0) {
+                        past.remove(i);
+                        break;
+                    }
+                }
+                conf()->set(Config::pendingSwap, past);
+                QMessageBox::information(this,"Cancel and Refund","Swap refunded succesfully with txid " + txid);
+            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message, "API call resulted in an error")==0){
+                QString err = line["fields"]["err"].toString().split("\n")[0].split(":")[1];
+                QMessageBox::warning(this, "Cancel and Refund", "Time lock hasn't expired yet so cancel failed. Try again in " + err + "blocks");
+            } else if (QString message = line["fields"]["latest_version"].toString(); !message.isEmpty()){
+                conf()->set(Config::swapVersion,message);
             }
-            //Insert line conditionals here
         }
     });
 
@@ -82,18 +106,8 @@ AtomicSwap::~AtomicSwap() {
     for (const auto& proc : *procList){
         proc->kill();
     }
-    if(QString::compare("WINDOWS",conf()->get(Config::operatingSystem).toString()) != 0) {
-        qDebug() << "Closing monero-wallet-rpc";
-        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
-                                                        "/mainnet/monero/monero-wallet-rpc"});
-        (new QProcess)->start("kill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
-                                                        "/testnet/monero/monero-wallet-rpc"});
-    }
-
 }
 void AtomicSwap::logLine(QString line){
-    //ui->debug_log->setText(ui->debug_log->toPlainText().append(QTime::currentTime().toString() + ":" + line));
-
     this->update();
 }
 void AtomicSwap::updateStatus(QString status){
@@ -117,9 +131,6 @@ void AtomicSwap::setTitle(QString title) {
     this->update();
 }
 
-void AtomicSwap::setSwap(QString swapId){
-    id = std::move(swapId);
-}
 
 void AtomicSwap::cancel(){
 
