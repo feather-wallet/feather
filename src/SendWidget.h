@@ -18,7 +18,7 @@ Q_OBJECT
 
 public:
     explicit SendWidget(Wallet *wallet, QWidget *parent = nullptr);
-    void fill(const QString &address, const QString &description, double amount = 0);
+    void fill(const QString &address, const QString &description, double amount = 0, bool overrideDescription = true);
     void fill(double amount);
     void clearFields();
     void payToMany();

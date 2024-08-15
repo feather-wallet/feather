@@ -37,7 +37,7 @@ public slots:
     void setSearchFilter(const QString &filter);
 
 signals:
-    void fillAddress(QString &address);
+    void fill(QString &address, QString &description);
 
 private slots:
     void showHeaderMenu(const QPoint &position);

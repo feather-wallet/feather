@@ -112,11 +112,13 @@ void SendWidget::fill(double amount) {
     ui->lineAmount->setText(QString::number(amount));
 }
 
-void SendWidget::fill(const QString &address, const QString &description, double amount) {
+void SendWidget::fill(const QString &address, const QString &description, double amount, bool overrideDescription) {
     ui->lineAddress->setText(address);
     ui->lineAddress->moveCursor(QTextCursor::Start);
 
-    ui->lineDescription->setText(description);
+    if (overrideDescription || ui->lineDescription->text().isEmpty()) {
+      ui->lineDescription->setText(description);
+    }
 
     if (amount > 0)
         ui->lineAmount->setText(QString::number(amount));

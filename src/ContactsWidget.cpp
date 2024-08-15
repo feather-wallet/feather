@@ -96,7 +96,8 @@ void ContactsWidget::copyName() {
 void ContactsWidget::payTo() {
     QModelIndex index = ui->contacts->currentIndex();
     QString address = index.model()->data(index.siblingAtColumn(AddressBookModel::Address), Qt::UserRole).toString();
-    emit fillAddress(address);
+    QString description = index.model()->data(index.siblingAtColumn(AddressBookModel::Description), Qt::UserRole).toString();
+    emit fill(address, description);
 }
 
 void ContactsWidget::setShowFullAddresses(bool show) {
