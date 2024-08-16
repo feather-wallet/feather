@@ -59,6 +59,13 @@ jobs:
         run: sudo apt purge apparmor
       - name: build
         run: SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+      - name: virustotal scan
+        if: matrix.toolchain.target == 'x86_64-w64-mingw32'
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.toolchain.target }}
