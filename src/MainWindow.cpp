@@ -482,6 +482,17 @@ void MainWindow::initWalletContext() {
        }
     });
 
+    connect(m_wallet, &Wallet::moneyReceived, this, [this](const QString &txId, uint64_t amount){
+        if (m_wallet->isSynchronized() && !m_locked) {
+            m_wallet->coins()->refresh();
+            QVector<CoinsInfo*> new_tx_coins = m_wallet->coins()->coins_from_txid(txId);
+       	    if(new_tx_coins.size() > 0 && new_tx_coins.front()->coinbase()) {
+           	    auto notify = QString("%1 XMR (pending)").arg(WalletManager::displayAmount(amount, false));
+           	    m_windowManager->notify("Mining payment received", notify, 5000);
+	        }
+        }
+    });
+
     // Device
     connect(m_wallet, &Wallet::deviceButtonRequest, this, &MainWindow::onDeviceButtonRequest);
     connect(m_wallet, &Wallet::deviceButtonPressed, this, &MainWindow::onDeviceButtonPressed);
