@@ -1,8 +1,8 @@
 package=openssl
-$(package)_version=3.2.1
+$(package)_version=3.3.1
 $(package)_download_path=https://www.openssl.org/source
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=83c7329fe52c850677d75e5d0b0ca245309b97e8ecbcfdc1dfdc4ab9fac35b39
+$(package)_sha256_hash=777cd596284c883375a2a7a11bf5d2786fc5413255efab20c50d6ffe6d020b7e
 
 define $(package)_set_vars
 $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB="$($(package)_ranlib)" CC="$($(package)_cc)"
@@ -49,7 +49,8 @@ $(package)_config_opts_x86_64_freebsd=BSD-x86_64
 endef
 
 define $(package)_preprocess_cmds
-  sed -i.old 's|crypto ssl apps util tools fuzz providers doc|crypto ssl util tools providers|' build.info
+  sed -i.old 's|crypto ssl apps util tools fuzz providers doc|crypto ssl util tools providers|' build.info &&\
+  rm -rf doc demos apps test
 endef
 
 define $(package)_config_cmds

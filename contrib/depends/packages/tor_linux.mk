@@ -1,8 +1,8 @@
 package=tor_linux
-$(package)_version=0.4.8.10
+$(package)_version=0.4.8.12
 $(package)_download_path=https://dist.torproject.org/
 $(package)_file_name=tor-$($(package)_version).tar.gz
-$(package)_sha256_hash=e628b4fab70edb4727715b23cf2931375a9f7685ac08f2c59ea498a178463a86
+$(package)_sha256_hash=ca7cc735d98e3747b58f2f3cc14f804dd789fa0fb333a84dcb6bd70adbb8c874
 $(package)_dependencies=libevent openssl zlib
 
 define $(package)_set_vars
@@ -15,6 +15,12 @@ define $(package)_set_vars
     $(package)_cflags+=-O2
     $(package)_cxxflags+=-O2
     $(package)_ldflags+=$(guix_ldflags)
+endef
+
+define $(package)_preprocess_cmds
+    rm Makefile.in aclocal.m4 ar-lib compile config.guess config.sub configure depcomp install-sh missing orconfig.h.in test-driver &&\
+    rm -rf doc/man &&\
+    autoreconf -fi
 endef
 
 define $(package)_config_cmds

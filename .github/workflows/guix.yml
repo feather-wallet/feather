@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   cache-sources:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
         with:
@@ -20,7 +20,7 @@ jobs:
         run: make -C contrib/depends download
 
   build-guix:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [cache-sources]
     strategy:
       fail-fast: false
@@ -52,9 +52,20 @@ jobs:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install guix git ca-certificates
+        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils
+      - name: fix apparmor
+        run: sudo cp .github/workflows/guix /etc/apparmor.d/guix; sudo /etc/init.d/apparmor reload; sudo aa-enforce guix || echo "failed"
+      - name: purge apparmor
+        run: sudo apt purge apparmor
       - name: build
-        run: SUBSTITUTE_URLS='http://ci.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+        run: SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+      - name: virustotal scan
+        if: matrix.toolchain.target == 'x86_64-w64-mingw32'
+        uses: crazy-max/ghaction-virustotal@v4
+        with:
+          vt_api_key: ${{ secrets.VT_API_KEY }}
+          files: |
+            guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.toolchain.target }}
@@ -63,7 +74,7 @@ jobs:
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
 
   bundle-logs:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: [build-guix]
     steps:
       - uses: actions/download-artifact@v4

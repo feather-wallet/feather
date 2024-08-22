@@ -237,7 +237,9 @@ void MainWindow::initWidgets() {
         m_historyWidget->setSearchText(text);
         ui->tabWidget->setCurrentIndex(this->findTab("History"));
     });
-    connect(m_contactsWidget, &ContactsWidget::fillAddress, m_sendWidget, &SendWidget::fillAddress);
+    connect(m_contactsWidget, &ContactsWidget::fill, [this](const QString &address, const QString &description){
+        m_sendWidget->fill(address, description, 0, true);
+    });
 
     // [Coins]
     m_coinsWidget = new CoinsWidget(m_wallet, this);
