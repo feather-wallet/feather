@@ -7,7 +7,6 @@
 
 #include <QDialog>
 #include "components.h"
-#include "History.h"
 #include "AtomicSwap.h"
 
 QT_BEGIN_NAMESPACE
@@ -20,7 +19,7 @@ Q_OBJECT
 public:
     explicit AtomicRecoverDialog(QWidget *parent = nullptr);
     bool historyEmpty();
-    void appendHistory(HistoryEntry entry);
+    void appendHistory(QString entry);
     ~AtomicRecoverDialog() override;
 
 private slots:

@@ -22,6 +22,7 @@ class AtomicFundDialog : public WindowModalDialog {
 public:
     explicit AtomicFundDialog(QWidget *parent, const QString &title = "Qr Code", const QString &btc_address = "Error Restart swap");
     ~AtomicFundDialog() override;
+    void updateMin(QString min);
 signals:
     void cleanProcs();
 private:

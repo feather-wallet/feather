@@ -34,6 +34,7 @@ signals:
 private:
     Ui::AtomicSwap *ui;
     QString id;
+    QString min;
     AtomicFundDialog* fundDialog;
     QList<QSharedPointer<QProcess>>* procList;
     int btc_confs;

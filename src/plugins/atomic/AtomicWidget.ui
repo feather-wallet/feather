@@ -31,7 +31,7 @@
        <item>
         <widget class="QLineEdit" name="change_address">
          <property name="text">
-          <string>bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq</string>
+          <string/>
          </property>
         </widget>
        </item>
@@ -49,7 +49,7 @@
        <item>
         <widget class="QLineEdit" name="xmr_address">
          <property name="text">
-          <string>888tNkZrPN6JsEgekjMnABU4TBzc2Dt29EPAvkRxbANsAnjyPbb3iQ1YBRk1UXcdRsiKc9dhwMVgN5S9cQUiyoogDavup3H</string>
+          <string/>
          </property>
         </widget>
        </item>

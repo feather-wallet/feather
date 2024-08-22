@@ -51,7 +51,9 @@ void AtomicFundDialog::copyAddress(){
     QMessageBox::information(this, "Information", "BTC deposit address copied to clipboard");
 }
 
-
+void AtomicFundDialog::updateMin(QString min){
+    ui->label_status->setText("Deposit at least " + min + " BTC to cover fee");
+}
 
 AtomicFundDialog::~AtomicFundDialog() {
     emit cleanProcs();

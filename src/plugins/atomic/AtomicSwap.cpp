@@ -10,6 +10,8 @@
 #include <qt6/QtWidgets/QMessageBox>
 #include "ui_AtomicSwap.h"
 #include "AtomicWidget.h"
+#include "constants.h"
+#include "networktype.h"
 
 
 AtomicSwap::AtomicSwap(QWidget *parent) :
@@ -20,7 +22,7 @@ AtomicSwap::AtomicSwap(QWidget *parent) :
     int size=20;
     pixmapTarget = pixmapTarget.scaled(size-5, size-5, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->btc_hint->setPixmap(pixmapTarget);
-    ui->btc_hint->setToolTip("Alice is expected to send monero lock after one btc confirmation,\nswap is cancelable after 72 btc confirmations,\nyou will lose your funds if you don't refund before 144 confirmations");
+    ui->btc_hint->setToolTip("Alice is expected to send monero lock after one btc confirmation,\nswap is cancelable after 72 btc confirmations,\nyou will lose your funds if you don't refund before 144 confirmations\n\nResumed swaps may not have accurate numbers for confirmations!!!");
     this->setContentsMargins(3,3,3,3);
     this->adjustSize();
     connect(ui->btn_cancel, &QPushButton::clicked, this, &AtomicSwap::cancel);
@@ -38,21 +40,25 @@ void AtomicSwap::runSwap(QStringList arguments){
             QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
             qDebug() << rawline;
             bool check;
-            if (line["fields"]["message"].toString().contains("Connected to Alice")){
+            QString message = line["fields"]["message"].toString();
+            if (message.contains("Connected to Alice")){
                 qDebug() << "Successfully connected";
                 this->logLine(line["fields"].toString());
             } else if (!line["fields"]["deposit_address"].toString().isEmpty()){
                 qDebug() << "Deposit to btc to segwit address";
                 QString address = line["fields"]["deposit_address"].toString();
                 fundDialog = new AtomicFundDialog(this,  "Deposit BTC to this address", address);
+                fundDialog->updateMin(min);
+                fundDialog->update();
                 //dialog->setModal(true);
                 fundDialog->show();
-            } else if (line["fields"]["message"].toString().startsWith("Received Bitcoin")){
+            } else if (message.startsWith("Received Bitcoin")){
                 this->updateStatus(line["fields"]["new_balance"].toString().split(" ")[0] + " BTC received, starting swap");
-                QVariant var;
-                var.setValue(HistoryEntry {QDateTime::currentDateTime(),line["span"]["swap_id"].toString()});
+                QString entry = line["span"]["swap_id"].toString() + ":" + QDateTime::currentDateTime().toString("dd.MM.yyyy.hh.mm.ss");
+                qDebug() << "Swap logged as ";
+                qDebug() << entry;
                 QVariantList past = conf()->get(Config::pendingSwap).toList();
-                past.append(var);
+                past.append(entry);
                 conf()->set(Config::pendingSwap,past);
                 fundDialog->close();
                 qDebug() << "Spawn atomic swap progress dialog";
@@ -60,40 +66,46 @@ void AtomicSwap::runSwap(QStringList arguments){
             } else if ( QString confs = line["fields"]["seen_confirmations"].toString(); !confs.isEmpty()){
                 qDebug() << "Updating xmrconfs " + confs;
                 this->updateXMRConf(confs.toInt());
-            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message, "Bitcoin transaction status changed")==0){
-                qDebug() << "Updating btconfs " + line["fields"]["new_status"].toString().split(" ")[2];
+            } else if (QString::compare(message, "Bitcoin transaction status changed")==0){
                 QString status = line["fields"]["new_status"].toString();
-                bool ok;
-                auto confirmations = status.split(" ")[2].toInt(&ok, 10);
-                if(ok) {
-                    this->updateBTCConf(confirmations);
-                } else {
+                auto parts = status.split(" ");
+                if (parts.length() == 2){
                     this->updateStatus("Found txid " + line["fields"]["txid"].toString() + " in mempool");
+
+                }else {
+                    auto confirmations = parts[2].toInt();
+                    this->updateBTCConf(confirmations);
                 }
-            } else if (QString message = line["fields"]["message"].toString(); message.startsWith("Swap completed")){
+            } else if (message.startsWith("Swap completed")){
                 QVariantList past = conf()->get(Config::pendingSwap).toList();
                 past.removeLast();
                 conf()->set(Config::pendingSwap, past);
                 this->updateStatus("Swap has successfully completed you can close this window now");
-            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message,"Advancing state")==0){
+            } else if (QString::compare(message,"Advancing state")==0){
                 this->updateStatus("State of swap has advanced to " + line["fields"]["state"].toString());
             } else if (QString refund = line["fields"]["kind"].toString(); QString::compare(refund,"refund")==0){
                 QString txid = line["fields"]["txid"].toString();
                 QString id = line["span"]["swap_id"].toString();
-                QVariantList past = conf()->get(Config::pendingSwap).toList();
+                QStringList past = conf()->get(Config::pendingSwap).toStringList();
                 for(int i=0;i<past.length();i++){
-                    if(QString::compare(past[i].value<HistoryEntry>().id,id)==0) {
+                    if(QString::compare(past[i].split(":")[0],id)==0) {
                         past.remove(i);
                         break;
                     }
                 }
                 conf()->set(Config::pendingSwap, past);
                 QMessageBox::information(this,"Cancel and Refund","Swap refunded succesfully with txid " + txid);
-            } else if (QString message = line["fields"]["message"].toString(); QString::compare(message, "API call resulted in an error")==0){
+            } else if ( QString::compare(message, "API call resulted in an error")==0){
                 QString err = line["fields"]["err"].toString().split("\n")[0].split(":")[1];
                 QMessageBox::warning(this, "Cancel and Refund", "Time lock hasn't expired yet so cancel failed. Try again in " + err + "blocks");
-            } else if (QString message = line["fields"]["latest_version"].toString(); !message.isEmpty()){
-                conf()->set(Config::swapVersion,message);
+            } else if (QString latest_version = line["fields"]["latest_version"].toString(); !latest_version.isEmpty()){
+                QMessageBox::warning(this, "Outdated swap version","A newer version of COMIT xmr-btc swap tool is available, delete current binary and re auto install to upgrade");
+                conf()->set(Config::swapVersion,latest_version);
+            } else if (message.startsWith("Acquiring swap lock") && QString::compare("Resume",line["span"]["method_name"].toString())==0){
+                updateStatus("Beginning resumption of previous swap");
+                this->show();
+            } else if (message.startsWith("Deposit at least")){
+                min = message.split(" ")[3];
             }
         }
     });
@@ -105,6 +117,16 @@ AtomicSwap::~AtomicSwap() {
     delete ui;
     for (const auto& proc : *procList){
         proc->kill();
+    }
+    if(conf()->get(Config::operatingSystem)=="WINDOWS"){
+        (new QProcess)->start("tskill", QStringList{"monero-wallet-rpc"});
+    }else {
+        if (constants::networkType==NetworkType::STAGENET){
+            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +"/testnet/monero/monero-wallet-rpc"});
+        } else {
+            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+                                                             "/mainnet/monero/monero-wallet-rpc"});
+        }
     }
 }
 void AtomicSwap::logLine(QString line){

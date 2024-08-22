@@ -6,10 +6,10 @@
 
 #include "AtomicRecoverDialog.h"
 #include "ui_AtomicRecoverDialog.h"
-#include "History.h"
 #include "config.h"
 #include "AtomicSwap.h"
 #include "Utils.h"
+#include "constants.h"
 #include <QStandardItemModel>
 
 AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
@@ -17,27 +17,33 @@ AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
     ui->setupUi(this);
     auto model = new QStandardItemModel();
     ui->swap_history->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    ui->swap_history->setModel(model);
+    ui->swap_history->setSelectionMode(QAbstractItemView::SingleSelection);
     ui->btn_refund_resume->setVisible(false);
     ui->swap_history->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->swap_history->verticalHeader()->setVisible(false);
     // Makes it easy to see if button is in refund or resume mode
     ui->btn_refund_resume->setProperty("Refund",0);
     this->setWindowFlag(Qt::WindowStaysOnTopHint);
+    this->raise();
     model->setHorizontalHeaderItem(0, new QStandardItem("Swap-Id"));
     model->setHorizontalHeaderItem(1, new QStandardItem("Timestamp swap started"));
     model->setHorizontalHeaderItem(2, new QStandardItem("Status"));
 
     QList<QStandardItem*> rowData;
-    auto data = conf()->get(Config::pendingSwap).value<QVariantList>();
+    qDebug() << conf()->get(Config::pendingSwap);
+    QStringList data = conf()->get(Config::pendingSwap).toStringList();
+    qDebug() << data;
     for(int i=0; i< data.size(); i++){
-            auto entry = data[i].value<HistoryEntry>();
-            qint64 difference = entry.timestamp.secsTo(QDateTime::currentDateTime());
+            QStringList entry = data[i].split(":");
+            qDebug() << "Swap-id - " + entry[0];
+            QString id = entry[0];
+            QDateTime timestamp = QDateTime::fromString(entry[1],"dd.MM.yyyy.hh.mm.ss");
+            qint64 difference = timestamp.secsTo(QDateTime::currentDateTime());
 
             if (difference < 86400) {
                 rowData.clear();
-                rowData << new QStandardItem(entry.id);
-                rowData << new QStandardItem(entry.timestamp.toString("MM-dd-yyyy hh:mm"));
+                rowData << new QStandardItem(id);
+                rowData << new QStandardItem(timestamp.toString("MM-dd-yyyy hh:mm"));
                 if (difference > 43200){
                     rowData << new QStandardItem("Refundable");
                 } else
@@ -47,27 +53,26 @@ AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
                 data.remove(i);
             }
         }
+    ui->swap_history->setModel(model);
     conf()->set(Config::pendingSwap,data);
     connect(ui->swap_history, &QAbstractItemView::clicked, this, &AtomicRecoverDialog::updateBtn);
     connect(ui->btn_refund_resume, &QPushButton::clicked, this, [this]{
         QStringList arguments;
+        if (constants::networkType==NetworkType::STAGENET) {
+            arguments << "--testnet";
+        }
+        arguments << "-j";
+        arguments << "--debug";
+        arguments << "-d";
+        arguments << Config::defaultConfigDir().absolutePath();
         if (ui->btn_refund_resume->property("Refund").toBool()){
             arguments << "cancel-and-refund";
         } else {
             arguments << "resume";
         }
         arguments << "--swap-id";
-        arguments << ui->swap_history->selectionModel()->selectedRows().at(0).sibling(0,1).data().toString();
-        arguments << "--monero-daemon-address";
-        auto nodes = conf()->get(Config::nodes).toJsonObject();
-        if (nodes.isEmpty()) {
-            auto jsonData = conf()->get(Config::nodes).toByteArray();
-            if (Utils::validateJSON(jsonData)) {
-                auto doc = QJsonDocument::fromJson(jsonData);
-                nodes = doc.object();
-            }
-        }
-        arguments << nodes.value("0").toObject()["ws"].toArray()[0].toString();
+        auto row = ui->swap_history->selectionModel()->selectedRows().at(0);
+        arguments << row.sibling(row.row(),0).data().toString();
         if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
             arguments << "--tor-socks5-port";
             arguments << conf()->get(Config::socks5Port).toString();
@@ -94,11 +99,9 @@ bool AtomicRecoverDialog::historyEmpty(){
 }
 
 
-void AtomicRecoverDialog::appendHistory(HistoryEntry entry){
+void AtomicRecoverDialog::appendHistory(QString entry){
     auto current = conf()->get(Config::pendingSwap).value<QVariantList>();
-    auto var = QVariant();
-    var.setValue(entry);
-    current.append(var);
+    current.append(entry);
     conf()->set(Config::pendingSwap, current);
 }
 AtomicRecoverDialog::~AtomicRecoverDialog() {

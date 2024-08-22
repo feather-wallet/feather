@@ -11,7 +11,6 @@
 #include "AtomicConfigDialog.h"
 #include "OfferModel.h"
 #include "utils/AppData.h"
-#include "utils/nodes.h"
 #include "utils/ColorScheme.h"
 #include "utils/WebsocketNotifier.h"
 #include "AtomicFundDialog.h"
@@ -137,7 +136,6 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     QStringList  arguments;
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
-    // Remove after testing
     if (constants::networkType==NetworkType::STAGENET){
         arguments << "--testnet";
     }
@@ -149,6 +147,8 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     arguments << "--receive-address";
     arguments << xmrReceive;
 
+    //Doesn't work cause wallet rpc
+    /*
     auto nodes = conf()->get(Config::nodes).toJsonObject();
     if (nodes.isEmpty()) {
         auto jsonData = conf()->get(Config::nodes).toByteArray();
@@ -159,6 +159,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
     }
     arguments << "--monero-daemon-address";
     arguments << nodes.value("0").toObject()["ws"].toArray()[0].toString();
+     */
     arguments << "--seller";
     arguments << seller;
     if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
@@ -234,6 +235,16 @@ AtomicWidget::~AtomicWidget() {
 void AtomicWidget::clean() {
     for (const auto& proc : *procList){
             proc->kill();
+    }
+    if(conf()->get(Config::operatingSystem)=="WINDOWS"){
+        (new QProcess)->start("tskill", QStringList{"monero-wallet-rpc"});
+    }else {
+        if (constants::networkType==NetworkType::STAGENET){
+            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +"/testnet/monero/monero-wallet-rpc"});
+        } else {
+            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+                                                             "/mainnet/monero/monero-wallet-rpc"});
+        }
     }
 }
 
