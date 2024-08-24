@@ -15,6 +15,7 @@
              ((gnu packages gettext) #:select (gettext-minimal))
              (gnu packages gperf)
              ((gnu packages installers) #:select (nsis-x86_64))
+	     (gnu packages backup)
              ((gnu packages libusb) #:select (libplist))
              ((gnu packages linux) #:select (linux-libre-headers-6.1 util-linux))
              (gnu packages llvm)
@@ -296,6 +297,8 @@ chain for " target " development."))
         python-minimal
         ;; Git
         git-minimal
+	;; Libarchive
+	libarchive
         ;; Xcb
         xcb-util
         xcb-util-cursor

@@ -1,12 +1,12 @@
-packages := boost openssl libiconv unbound qrencode libsodium polyseed hidapi protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp
+packages := boost openssl libiconv unbound qrencode libsodium polyseed hidapi protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp libarchive
 native_packages := native_qt native_protobuf
 
-linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
+linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime 
 linux_native_packages =
 
 x86_64_linux_packages := flatstart
 
-darwin_packages :=
+darwin_packages := 
 darwin_native_packages = darwin_sdk native_cctools native_libtapi
 
 mingw32_packages =

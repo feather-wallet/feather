@@ -7,7 +7,7 @@
 #include "AtomicSwap.h"
 
 #include <QJsonParseError>
-#include <qt6/QtWidgets/QMessageBox>
+#include <QMessageBox>
 #include "ui_AtomicSwap.h"
 #include "AtomicWidget.h"
 #include "constants.h"

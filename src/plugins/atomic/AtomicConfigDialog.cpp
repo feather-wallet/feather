@@ -7,10 +7,12 @@
 #include <QNetworkReply>
 #include <QDir>
 #include <stdio.h>
-#include <archive.h>
+#ifdef Q_OS_WIN
 #include <zip.h>
-
+#else
+#include <archive.h>
 #include <archive_entry.h>
+#endif
 #include <QFileDialog>
 
 #include "utils/config.h"
@@ -89,9 +91,10 @@ void AtomicConfigDialog::extract() {
     swapPath.append("/swapTool");
     QFile binaryFile(swapPath);
     binaryFile.open(QIODevice::WriteOnly);
-    auto operatingSystem = conf()->get(Config::operatingSystem).toString().toStdString();
-    if(strcmp("WIN",operatingSystem.c_str()) == 0) {
+    //auto operatingSystem = conf()->get(Config::operatingSystem).toString().toStdString();
+    //if(strcmp("WIN",operatingSystem.c_str()) == 0) {
         // UNZIP
+#ifdef Q_OS_WIN
         zip *z = zip_open(tempFile.toStdString().c_str(), 0, 0);
 
         //Search for the file of given name
@@ -114,7 +117,8 @@ void AtomicConfigDialog::extract() {
         //And close the archive
         zip_close(z);
         conf()->set(Config::swapPath,swapPath);
-    } else {
+#else
+    //} else {
 
         struct archive *a;
         struct archive *ext;
@@ -145,7 +149,8 @@ void AtomicConfigDialog::extract() {
         archive_write_close(ext);
         archive_write_free(ext);
         conf()->set(Config::swapPath, QString(savePath.c_str()));
-    }
+#endif
+    //}
     qDebug() << "Finished";
     binaryFile.close();
     ui->downloadLabel->setText("Swap tool installation complete, Atomic swaps are ready !");

@@ -96,7 +96,6 @@ AtomicWidget::AtomicWidget(QWidget *parent)
                 }
             }
 
-            sleep(1);
             runSwap(seller,btcChange, xmrReceive);
         }
     });
