@@ -114,7 +114,6 @@ void AtomicSwap::runSwap(QStringList arguments){
     qDebug() << "process started";
 }
 AtomicSwap::~AtomicSwap() {
-    delete ui;
     for (const auto& proc : *procList){
         proc->kill();
     }

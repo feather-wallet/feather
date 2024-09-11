@@ -132,6 +132,7 @@ void AtomicWidget::showAtomicConfigureDialog() {
 
 void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, const QString& xmrReceive) {
     qDebug() << "starting swap";
+    clean();
     QStringList  arguments;
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
@@ -173,6 +174,7 @@ void AtomicWidget::list(const QString& rendezvous) {
     QStringList arguments;
     arguments << "--data-base-dir";
     arguments << Config::defaultConfigDir().absolutePath();
+    arguments << "--debug";
     if (constants::networkType==NetworkType::STAGENET){
         arguments << "--testnet";
     }
@@ -184,6 +186,7 @@ void AtomicWidget::list(const QString& rendezvous) {
     }
     arguments << "--rendezvous-point";
     arguments << rendezvous;
+    qDebug() << "rendezvous point: " + rendezvous;
     auto *swap = new QProcess();
     procList->append(QSharedPointer<QProcess>(swap));
     swap->setReadChannel(QProcess::StandardError);
@@ -196,13 +199,14 @@ void AtomicWidget::list(const QString& rendezvous) {
 
 
         for(const auto& line : lines){
+            qDebug() << line;
             if(line.contains("status")){
                 parsedLine = QJsonDocument::fromJson(line.toLocal8Bit(), &parseError );
                 if (parsedLine["fields"]["status"].toString().contains("Online")){
                     bool skip = false;
                     auto  entry = new OfferEntry(parsedLine["fields"]["price"].toString().split( ' ')[0].toDouble(),parsedLine["fields"]["min_quantity"].toString().split(' ')[0].toDouble(),parsedLine["fields"]["max_quantity"].toString().split(' ')[0].toDouble(), parsedLine["fields"]["address"].toString());
                     for(const auto& post : *offerList){
-                        if(std::equal(entry->address.begin(), entry->address.end(),post->address.begin(),post->address.end()))
+                        if(entry->max == 0 || std::equal(entry->address.begin(), entry->address.end(),post->address.begin(),post->address.end()))
                             skip = true;
                     }
                     if (!skip) {
@@ -210,6 +214,9 @@ void AtomicWidget::list(const QString& rendezvous) {
                         offerList->append(QSharedPointer<OfferEntry>(entry));
                     }
                 }
+            } else if (line.contains("GLIBC_")){
+                QMessageBox::critical(this, "GLIBC outdated", "Upgrade your GLIBC to at least 2.32 to use this tool");
+                clean();
             }
         }
         swap->close();
@@ -233,18 +240,27 @@ AtomicWidget::~AtomicWidget() {
 
 void AtomicWidget::clean() {
     for (const auto& proc : *procList){
-            proc->kill();
+        proc->kill();
     }
+    auto cleanWallet =  new QProcess;
+    auto cleanSwap = new QProcess;
     if(conf()->get(Config::operatingSystem)=="WINDOWS"){
-        (new QProcess)->start("tskill", QStringList{"monero-wallet-rpc"});
+        (cleanWallet)->start("tskill", QStringList{"monero-wallet-rpc"});
+        (cleanWallet)->start("tskill", QStringList{"swap"});
     }else {
         if (constants::networkType==NetworkType::STAGENET){
-            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +"/testnet/monero/monero-wallet-rpc"});
+            (cleanWallet)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +"/testnet/monero/monero-wallet-rpc"});
+            (cleanSwap)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+                                                          "/*"});
         } else {
-            (new QProcess)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+            (cleanWallet)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
                                                              "/mainnet/monero/monero-wallet-rpc"});
+            (cleanSwap)->start("pkill", QStringList{"-f", Config::defaultConfigDir().absolutePath() +
+                                                             "/*"});
         }
     }
+    cleanWallet->waitForFinished();
+    cleanSwap->waitForFinished();
 }
 
 

@@ -136,7 +136,6 @@ void AtomicConfigDialog::extract() {
             if (r == ARCHIVE_EOF)
                 break;
             savePath = Config::defaultConfigDir().absolutePath().toStdString().append("/").append(archive_entry_pathname(entry));
-            qDebug() << savePath;
             archive_entry_set_pathname(entry, savePath.c_str());
             r = archive_write_header(ext, entry);
             copy_data(a, ext);
