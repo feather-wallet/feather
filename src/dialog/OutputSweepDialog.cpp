@@ -15,7 +15,7 @@ OutputSweepDialog::OutputSweepDialog(QWidget *parent, quint64 amount)
 
     connect(ui->checkBox_churn, &QCheckBox::toggled, [&](bool toggled){
        ui->lineEdit_address->setEnabled(!toggled);
-       ui->lineEdit_address->setText(toggled ? "Primary address" : "");
+       ui->lineEdit_address->setText(toggled ? "This account" : "");
     });
 
     connect(ui->buttonBox, &QDialogButtonBox::accepted, [&](){

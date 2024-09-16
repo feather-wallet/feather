@@ -901,7 +901,7 @@ void Wallet::createTransactionMultiDest(const QVector<QString> &addresses, const
 
 void Wallet::sweepOutputs(const QVector<QString> &keyImages, QString address, bool churn, int outputs, int feeLevel) {
     if (churn) {
-        address = this->address(0, 0);
+        address = this->address(m_currentSubaddressAccount, 0);
     }
 
     qInfo() << "Creating transaction";
