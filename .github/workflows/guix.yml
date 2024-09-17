@@ -80,7 +80,16 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           merge-multiple: true
+      - name: print hashes
+        run: |
+          uname --machine && find **/output/ -type f -print0 | env LC_ALL=C sort -z | xargs -r0 sha256sum >> $GITHUB_STEP_SUMMARY
       - uses: actions/upload-artifact@v4
         with:
           name: "logs"
           path: '**/logs/**'
+      - uses: ncipollo/release-action@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          artifacts: "**/*.AppImage,**/*-linux-arm.zip,**/*-linux-arm64.zip,**/*-linux-riscv64.zip,**/*-linux.zip,**/*-mac-arm64.zip,**/*-mac.zip,**/*-win.zip,**/FeatherWalletSetup-*.exe,**/feather-{{github.ref_name}}.tar.gz"
+          draft: true
+          name: v${{github.ref_name}}
