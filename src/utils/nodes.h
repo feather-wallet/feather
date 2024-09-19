@@ -78,6 +78,10 @@ struct FeatherNode {
             return true;
         }
 
+        if (host.endsWith(".local")) { // RFC 6762
+            return true;
+        }
+
         QHostAddress address(host);
 
         bool validipv4;
