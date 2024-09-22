@@ -5,7 +5,9 @@
 #include <QApplication>
 #include <QtCore>
 #include <QtGui>
+#if !defined(Q_OS_MAC)
 #include <singleapplication.h>
+#endif
 
 #include "config-feather.h"
 #include "constants.h"
@@ -64,6 +66,8 @@ void signal_handler(int signum) {
 
 int main(int argc, char *argv[])
 {
+    qDebug() << "Reached main";
+
     Q_INIT_RESOURCE(assets);
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
@@ -131,11 +135,17 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 #endif
 
+    qDebug() << "Setting up QApplication";
+
+#if defined(Q_OS_MAC)
+    // https://github.com/itay-grudev/SingleApplication/issues/136#issuecomment-1925441403
+    QApplication app(argc, argv);
+#else
     SingleApplication app(argc, argv);
+#endif
 
     QApplication::setQuitOnLastWindowClosed(false);
     QApplication::setApplicationName("FeatherWallet");
-
 
     // Setup config directories
     QString configDir = Config::defaultConfigDir().path();
@@ -238,9 +248,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     auto wm = windowManager();
     wm->setEventFilter(&filter);
 
+#if !defined(Q_OS_MAC)
     QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
         wm->raise();
     });
+#endif
 
     return QApplication::exec();
 }
