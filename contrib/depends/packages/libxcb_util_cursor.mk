@@ -1,12 +1,12 @@
 package=libxcb_util_cursor
-$(package)_version=0.1.4
+$(package)_version=0.1.5
 $(package)_download_path=https://xcb.freedesktop.org/dist
 $(package)_file_name=xcb-util-cursor-$($(package)_version).tar.gz
-$(package)_sha256_hash=cc8608ebb695742b6cf84712be29b2b66aa5f6768039528794fca0fa283022bf
+$(package)_sha256_hash=0e9c5446dc6f3beb8af6ebfcc9e27bcc6da6fe2860f7fc07b99144dfa568e93b
 $(package)_dependencies=libxcb libxcb_util_render libxcb_util_image
 
 define $(package)_set_vars
-$(package)_config_opts=--disable-shared --disable-devel-docs --without-doxygen
+$(package)_config_opts := --disable-shared --disable-devel-docs --without-doxygen
 $(package)_config_opts += --disable-dependency-tracking --enable-option-checking
 endef
 
