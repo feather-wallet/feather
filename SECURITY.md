@@ -22,9 +22,9 @@ You must describe a **plausible scenario** in which a loss of funds can occur (o
 
 Only **the code** of the **latest tagged release** of **[this repository](https://github.com/feather-wallet/feather/)** is in scope.
 
-**The bounty can only be awarded in XMR**. The bounty amount for your report is determined by the maintainers and ranges from USD 150 to USD 3000 (in terms of XMR) and depends on the severity of the issue and other factors.
+**The bounty can only be rewarded in XMR**. The bounty amount for your report is determined by the maintainers and ranges from USD 150 to USD 3000 (in terms of XMR) and depends on the severity of the issue and other factors.
 
-Further clarifying scope:
+Clarifications on scope:
 
 - The issue **must be present in a [signed](https://docs.featherwallet.org/guides/release-signing-key) [release build](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md)**. Custom builds, including distribution packages, are out of scope.
 - The developers **must be able to reproduce and fix the issue**. If the issue cannot be fixed **in our code** for any reason, it is out of scope.
