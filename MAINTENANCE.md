@@ -13,20 +13,24 @@ This document is written for developers and users interested in learning how Fea
   - Review the diff of any altered package to mitigate the risk of supply chain attacks
 - Update compilers and security flags for better binary security
 - Reduce the number of third-party dependencies
-- Keep the website VPS up-to-date and secure
-- Further harden the [release process](RELEASE.md)
+- Keep the [website](https://github.com/feather-wallet/feather-site/blob/master/mirrors.txt) VPS up-to-date and secure
+- Contact relevant authorities to take [phishing sites](https://gist.github.com/tobtoht/4039fa3cf922d4fe8bca2f8e3ddac63b) offline
+- Make improvements to the [release process](RELEASE.md)
 
 Goals:
 
 - Set up a bug bounty program for issues that affect privacy or security
 - Set up a status page with information about project health
 - Set up a feed for security bulletins
+- Sandbox components that handle untrusted input (e.g. QR code scanner)
+- Create a package manager for secure distribution of portable binaries
+- `-static-pie` release binaries for Linux targets
 
 Security issues that affect Feather always warrant a new release as soon as possible.
 
 ### 2. Reproducibility
 
-- Improve and maintain tools to check for reproducibility defects
+- Improve and maintain tools to check for non-determinism
 - Ensure releases are reproducible and stay that way
 - Upload source archives to the fallback mirror
 
@@ -38,7 +42,7 @@ Our Guix time-machine is currently pinned at a commit which implements the
 
 ### 3. Bugs
 
-- Fix reproducible bugs and crashes
+- Fix bugs and crashes
 
 To report a bug, please see: https://docs.featherwallet.org/guides/report-an-issue
 
@@ -57,6 +61,7 @@ Feather does not currently have a test suite (apart from the tests in the Monero
 
 Goals:
 - Reconsider and document default settings
+- Write a document on threat modeling
 
 Documentation is available at https://docs.featherwallet.org
 
@@ -68,15 +73,11 @@ Documentation is available at https://docs.featherwallet.org
 Feather should first and foremost be a good __wallet__.
 Improving features that are closer to this end should have priority.
 
-### 7. Packaging
+### 7. Platform Support
 
 - Add support for more architectures and operating systems
 - Drop support for End-of-Life distributions
-
-Goals:
-
-- Debian and Guix packages
-- Create a document with guidelines for packagers
+- Add support for new hardware wallets
 
 See: https://docs.featherwallet.org/guides/supported-operating-systems
 
