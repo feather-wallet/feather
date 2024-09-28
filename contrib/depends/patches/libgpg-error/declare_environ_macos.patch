@@ -1,0 +1,20 @@
+Subject: [PATCH] core: Declare environ for macOS and others.
+---
+Index: src/spawn-posix.c
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/spawn-posix.c b/src/spawn-posix.c
+--- a/src/spawn-posix.c	(revision d18e28a948307fab016b1eed467a70653ca9576e)
++++ b/src/spawn-posix.c	(revision a59e902b887fd92337c9728f668cf9c89da3957a)
+@@ -57,6 +57,9 @@
+ 
+ #include "gpgrt-int.h"
+ 
++/* (Only glibc's unistd.h declares this iff _GNU_SOURCE is used.)  */
++extern char **environ;
++
+ 
+ /* Definition for the gpgrt_spawn_actions_t.  Note that there is a
+  * different one for Windows.  */
