@@ -15,6 +15,8 @@ set(PACKAGE_URL "https://featherwallet.org/")
 set(COPYRIGHT_YEAR "2024")
 set(COPYRIGHT_HOLDERS "The Monero Project")
 
+cmake_policy(SET CMP0074 NEW)
+
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)

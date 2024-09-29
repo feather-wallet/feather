@@ -319,8 +319,8 @@ chain for " target " development."))
              (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
            (list
-             gcc-toolchain-10
-             (list gcc-toolchain-10 "static")
+             gcc-toolchain-11
+             (list gcc-toolchain-11 "static")
              binutils
              clang-toolchain-10
              ldid))

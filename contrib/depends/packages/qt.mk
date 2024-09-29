@@ -54,7 +54,6 @@ $(package)_config_opts += -DINSTALL_LIBEXECDIR=$(build_prefix)/bin
 $(package)_config_opts += -DQT_BUILD_EXAMPLES=FALSE
 $(package)_config_opts += -DQT_BUILD_TESTS=FALSE
 $(package)_config_opts += -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
-
 $(package)_config_opts += -DINPUT_cups=no
 $(package)_config_opts += -DINPUT_egl=no
 $(package)_config_opts += -DINPUT_eglfs=no

@@ -293,6 +293,9 @@ if(DEPENDS)
 endif()
 
 if(DEVICE_TREZOR_READY)
+    if (DEPENDS)
+        find_package(Protobuf CONFIG REQUIRED)
+    endif()
     target_link_libraries(feather PRIVATE ${TREZOR_DEP_LIBS})
 endif()
 
