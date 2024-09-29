@@ -22,6 +22,7 @@ public:
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
+    bool isComplete() const override;
 
 private:
     Ui::PageSetSubaddressLookahead *ui;
