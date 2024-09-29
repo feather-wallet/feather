@@ -56,8 +56,6 @@ endif()
 
 endif()
 
-set(ICONV_LIBRARIES @prefix@/lib/libiconv.a)
-
 SET(ZMQ_INCLUDE_PATH @prefix@/include)
 SET(ZMQ_LIB @prefix@/lib/libzmq.a)
 

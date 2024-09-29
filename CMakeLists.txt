@@ -138,16 +138,18 @@ if(MINGW)
 endif()
 
 set(BOOST_COMPONENTS
-        system
-        filesystem
-        thread
-        date_time
         chrono
+        date_time
+        filesystem
+        program_options
         regex
         serialization
-        program_options
-        locale
+        system
+        thread
 )
+if (WIN32)
+    list(APPEND BOOST_COMPONENTS locale)
+endif()
 
 if(STACK_TRACE AND UNIX AND NOT APPLE)
     list(APPEND BOOST_COMPONENTS

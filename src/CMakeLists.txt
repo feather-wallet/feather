@@ -288,10 +288,6 @@ if(CHECK_UPDATES)
     target_link_libraries(feather PRIVATE openpgp)
 endif()
 
-if(DEPENDS)
-    target_link_libraries(feather PRIVATE ${ICONV_LIBRARIES})
-endif()
-
 if(DEVICE_TREZOR_READY)
     find_package(Protobuf CONFIG)
     if (NOT Protobuf_FOUND)

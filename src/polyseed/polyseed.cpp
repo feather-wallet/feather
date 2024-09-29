@@ -7,15 +7,12 @@
 #include <sodium/core.h>
 #include <sodium/utils.h>
 #include <sodium/randombytes.h>
-#include <boost/locale.hpp>
 
 #include <array>
 
 #include <QString>
 
 namespace polyseed {
-
-    static std::locale locale;
 
     static size_t utf8_nfc(const char* str, polyseed_str norm) {
         auto Qstr = QString(str);
@@ -62,10 +59,6 @@ namespace polyseed {
         if (sodium_init() == -1) {
             throw std::runtime_error("sodium_init failed");
         }
-
-        boost::locale::generator gen;
-        gen.locale_cache_enabled(true);
-        locale = gen("");
 
         sodium_memzero(seed, POLYSEED_RANDBYTES);
 
