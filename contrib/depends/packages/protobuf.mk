@@ -12,6 +12,7 @@ define $(package)_set_vars
   $(package)_config_opts+=-Dprotobuf_BUILD_SHARED_LIBS=OFF
   $(package)_config_opts+=-Dprotobuf_BUILD_PROTOC_BINARIES=OFF
   $(package)_config_opts+=-Dprotobuf_WITH_ZLIB=OFF
+  $(package)_config_opts+=-Dprotobuf_BUILD_LIBUPB=OFF
 endef
 
 define $(package)_preprocess_cmds
