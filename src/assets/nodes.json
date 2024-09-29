@@ -19,7 +19,10 @@
       "rucknium757bokwv3ss35ftgc3gzb7hgbvvglbg3hisp7tsj2fkd2nyd.onion:18081"
     ],
     "i2p": [
-      "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089"
+      "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089",
+      "vdmnehdjkpkg57nthgnjfuaqgku673r5bpbqg56ix6fyqoywgqrq.b32.i2p:18089",
+      "uqj3aphckqtjsitz7kxx5flqpwjlq5ppr3chazfued7xucv3nheq.b32.i2p:18089",
+      "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p:18089"
     ],
     "clearnet": [
       "node.community.rino.io:18081",
