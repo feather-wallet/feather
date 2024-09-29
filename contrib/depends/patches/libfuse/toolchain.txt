@@ -13,6 +13,7 @@ endian = 'little'
 
 [project options]
 utils = false
+examples = false
 
 [built-in options]
 default_library = 'static'
