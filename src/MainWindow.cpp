@@ -910,7 +910,7 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
         return;
     }
     else if (tx->txCount() > 1) {
-        Utils::showError(this, "Failed to construct transaction", "Split transactions are not supported", {"Try sending a smaller amount."});
+        Utils::showError(this, "Failed to construct transaction", "Transaction tries to spend too many inputs", {"Send a smaller amount of XMR to yourself first."});
         m_wallet->disposeTransaction(tx);
         return;
     }
