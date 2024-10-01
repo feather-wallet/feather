@@ -312,6 +312,7 @@ WalletManager::WalletManager(QObject *parent)
 
 WalletManager::~WalletManager()
 {
+    qDebug() << "~WalletManager" << QThread::currentThreadId();
     m_scheduler.shutdownWaitForFinished();
 }
 

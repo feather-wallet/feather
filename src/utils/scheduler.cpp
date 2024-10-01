@@ -10,6 +10,7 @@ FutureScheduler::FutureScheduler(QObject *parent)
 
 FutureScheduler::~FutureScheduler()
 {
+    qDebug() << "~FutureScheduler:" << QThread::currentThreadId();
     shutdownWaitForFinished();
 }
 

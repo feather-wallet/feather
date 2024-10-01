@@ -1431,7 +1431,7 @@ void Wallet::getTxPoolStatsAsync() {
 
 Wallet::~Wallet()
 {
-    qDebug("~Wallet: Closing wallet");
+    qDebug() << "~Wallet: Closing wallet" << QThread::currentThreadId();
 
     pauseRefresh();
     m_walletImpl->stop();
@@ -1448,5 +1448,5 @@ Wallet::~Wallet()
 
     delete m_walletImpl;
     m_walletImpl = nullptr;
-    qDebug("m_walletImpl deleted");
+    qDebug() << "m_walletImpl deleted" << QThread::currentThreadId();
 }

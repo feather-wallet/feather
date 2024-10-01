@@ -67,7 +67,7 @@ WindowManager::~WindowManager() {
     qDebug() << "~WindowManager";
     m_cleanupThread->quit();
     m_cleanupThread->wait();
-    qDebug() << "Cleanup thread done";
+    qDebug() << "WindowManager: cleanup thread done" << QThread::currentThreadId();
 }
 
 // ######################## APPLICATION LIFECYCLE ########################
@@ -82,7 +82,7 @@ void WindowManager::quitAfterLastWindow() {
 }
 
 void WindowManager::close() {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
     for (const auto &window: m_windows) {
         window->close();
     }
@@ -102,12 +102,14 @@ void WindowManager::close() {
 
     torManager()->stop();
 
+    deleteLater();
+
     qDebug() << "Calling QApplication::quit()";
     QApplication::quit();
 }
 
 void WindowManager::closeWindow(MainWindow *window) {
-    qDebug() << "closing Window";
+    qDebug() << "WindowManager: closing Window";
     m_windows.removeOne(window);
 
     // Move Wallet to a different thread for cleanup, so it doesn't block GUI thread

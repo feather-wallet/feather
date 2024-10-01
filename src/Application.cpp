@@ -79,6 +79,7 @@ Application::Application(int& argc, char** argv)
 
 Application::~Application()
 {
+    qDebug() << "~Application";
     if (m_lockFile) {
         m_lockFile->unlock();
         delete m_lockFile;

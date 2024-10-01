@@ -1207,6 +1207,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     qDebug() << Q_FUNC_INFO;
 
     if (!this->cleanedUp) {
+        qDebug() << "MainWindow: cleaning up";
         this->cleanedUp = true;
 
         emit aboutToQuit();
@@ -1934,5 +1935,5 @@ int MainWindow::findTab(const QString &title) {
 }
 
 MainWindow::~MainWindow() {
-    qDebug() << "~MainWindow";
+    qDebug() << "~MainWindow" << QThread::currentThreadId();
 }
