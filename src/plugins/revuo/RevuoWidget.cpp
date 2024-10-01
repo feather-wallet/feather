@@ -4,6 +4,8 @@
 #include "RevuoWidget.h"
 #include "ui_RevuoWidget.h"
 
+#include <QJsonArray>
+
 #include "utils/ColorScheme.h"
 #include "Utils.h"
 #include "utils/WebsocketNotifier.h"

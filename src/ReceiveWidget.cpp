@@ -5,7 +5,6 @@
 #include "ui_ReceiveWidget.h"
 
 #include <QMenu>
-#include <QMessageBox>
 
 #include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"

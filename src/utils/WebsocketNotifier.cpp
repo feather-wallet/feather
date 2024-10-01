@@ -2,8 +2,6 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "WebsocketNotifier.h"
-#include "Utils.h"
-#include "utils/os/tails.h"
 #include "utils/os/whonix.h"
 #include "plugins/PluginRegistry.h"
 

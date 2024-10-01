@@ -8,6 +8,7 @@
 
 #include "constants.h"
 #include "WalletWizard.h"
+#include "model/WalletKeysFilesModel.h"
 
 PageOpenWallet::PageOpenWallet(WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)

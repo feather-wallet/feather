@@ -7,12 +7,6 @@
 #include <QThread>
 #include <QMutex>
 #include <QWaitCondition>
-#include <QEvent>
-#include <QCamera>
-
-#include <ZXing/ReadBarcode.h>
-
-#include "qrcode/utils/QrCodeUtils.h"
 
 class QrScanThread : public QThread
 {

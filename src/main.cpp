@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
+#include <QSslSocket>
+
 #include "Application.h"
 #include "config-feather.h"
 #include "constants.h"
@@ -8,6 +10,9 @@
 #include "utils/os/Prestium.h"
 #include "WindowManager.h"
 #include "config.h"
+#include <wallet/api/wallet2_api.h>
+#include "libwalletqt/Wallet.h"
+#include "libwalletqt/WalletManager.h"
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
 #define BOOST_STACKTRACE_LINK

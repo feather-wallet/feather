@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include "utils/Utils.h"
-
 #include "WalletWizard.h"
+
+#include <QPushButton>
+
 #include "PageMenu.h"
 #include "PageOpenWallet.h"
 #include "PagePlugins.h"
@@ -21,10 +22,7 @@
 #include "PageNetworkWebsocket.h"
 #include "constants.h"
 #include "WindowManager.h"
-
-#include <QLineEdit>
-#include <QVBoxLayout>
-#include <QScreen>
+#include "utils/AppData.h"
 
 WalletWizard::WalletWizard(QWidget *parent)
     : QWizard(parent)

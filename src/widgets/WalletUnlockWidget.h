@@ -5,9 +5,8 @@
 #define FEATHER_WALLETUNLOCKWIDGET_H
 
 #include <QWidget>
-#include <QMenu>
 
-#include "Wallet.h"
+class Wallet;
 
 namespace Ui {
     class WalletUnlockWidget;

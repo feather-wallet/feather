@@ -5,12 +5,15 @@
 #define FEATHER_UTILS_H
 
 #include <QRegularExpression>
-#include <QStandardItemModel>
 #include <QTextCharFormat>
 #include <QMessageBox>
+#include <QSettings>
+#include <QStandardItem>
+#include <QMetaEnum>
 
-#include "libwalletqt/Wallet.h"
 #include "networktype.h"
+
+class SubaddressIndex;
 
 namespace Utils
 {

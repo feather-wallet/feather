@@ -8,7 +8,6 @@
 #include <QFileDialog>
 
 #include "dialog/TxConfAdvDialog.h"
-#include "utils/config.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 

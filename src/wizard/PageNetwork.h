@@ -4,11 +4,8 @@
 #ifndef FEATHER_WIZARDNETWORK_H
 #define FEATHER_WIZARDNETWORK_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
-
-#include "utils/nodes.h"
+#include <QFutureWatcher>
 
 namespace Ui {
     class PageNetwork;

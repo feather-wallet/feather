@@ -5,9 +5,8 @@
 #define FEATHER_PAGESETSEEDPASSPHRASE_H
 
 #include <QWizardPage>
-#include <QWidget>
 
-#include "WalletWizard.h"
+class WizardFields;
 
 namespace Ui {
     class PageSetSeedPassphrase;

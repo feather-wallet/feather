@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "AppData.h"
+
+#include <QCoreApplication>
+
 #include "config.h"
 #include "WebsocketNotifier.h"
 

@@ -1,8 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include <iomanip>
 #include "Seed.h"
+
+#include "constants.h"
+#include "monero_seed/monero_seed.hpp"
+#include "polyseed/polyseed.h"
+#include "utils/AppData.h"
+
+#include <sstream>
+#include <utility>
+#include <iomanip>
 
 Seed::Seed(Type type, NetworkType::Type networkType, QString language, const char* secret)
     : type(type)

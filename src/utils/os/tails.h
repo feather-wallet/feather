@@ -4,6 +4,8 @@
 #ifndef TAILSOS_H
 #define TAILSOS_H
 
+#include <QString>
+
 class TailsOS
 {
 public:

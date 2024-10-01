@@ -11,10 +11,9 @@
 #include <QTimer>
 #include <QVideoSink>
 
-#include "QrScanThread.h"
-
-#include <bcur/bc-ur.hpp>
 #include <bcur/ur-decoder.hpp>
+
+class QrScanThread;
 
 namespace Ui {
     class QrCodeScanWidget;

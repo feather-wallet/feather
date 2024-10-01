@@ -6,7 +6,12 @@
 
 #include <QObject>
 
-#include "libwalletqt/PendingTransactionInfo.h"
+namespace Monero {
+    class UnsignedTransaction;
+    class Wallet;
+}
+
+class ConstructionInfo;
 
 class UnsignedTransaction : public QObject
 {
@@ -14,9 +19,9 @@ class UnsignedTransaction : public QObject
 
 public:
     enum Status {
-        Status_Ok       = Monero::UnsignedTransaction::Status_Ok,
-        Status_Error    = Monero::UnsignedTransaction::Status_Error,
-        Status_Critical    = Monero::UnsignedTransaction::Status_Critical
+        Status_Ok = 0,
+        Status_Error = 1,
+        Status_Critical = 2
     };
     Q_ENUM(Status)
 

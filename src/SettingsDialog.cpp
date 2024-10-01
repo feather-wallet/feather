@@ -12,6 +12,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "utils/AppData.h"
 #include "utils/Icons.h"
+#include "utils/nodes.h"
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
 #include "WindowManager.h"

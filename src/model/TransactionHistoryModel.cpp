@@ -5,7 +5,6 @@
 #include "TransactionHistory.h"
 #include "constants.h"
 #include "utils/config.h"
-#include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 #include "utils/AppData.h"
 #include "utils/Utils.h"

@@ -2,7 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "UnsignedTransaction.h"
-#include <QDebug>
+
+#include "ConstructionInfo.h"
+#include <wallet/api/wallet2_api.h>
 
 UnsignedTransaction::Status UnsignedTransaction::status() const
 {

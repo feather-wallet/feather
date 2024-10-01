@@ -6,7 +6,7 @@
 
 #include <QWidget>
 
-#include "libwalletqt/Wallet.h"
+class Wallet;
 
 namespace Ui {
     class SendWidget;

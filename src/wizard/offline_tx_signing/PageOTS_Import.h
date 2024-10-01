@@ -22,7 +22,6 @@ public:
     void initializePage() override;
     bool validatePage() override;
     bool isComplete() const override;
-    bool openFile(std::string &data);
 
 private slots:
     void onScanFinished(bool success);

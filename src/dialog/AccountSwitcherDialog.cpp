@@ -8,6 +8,7 @@
 
 #include "libwalletqt/SubaddressAccount.h"
 #include "libwalletqt/WalletManager.h"
+#include "model/SubaddressAccountModel.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 

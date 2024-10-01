@@ -4,17 +4,13 @@
 #ifndef FEATHER_SettingsDIALOG_H
 #define FEATHER_SettingsDIALOG_H
 
-
-#include <QAbstractButton>
 #include <QDialog>
-#include <QSettings>
-
-#include "widgets/NodeWidget.h"
 
 namespace Ui {
     class Settings;
 }
 
+class Nodes;
 class Settings : public QDialog
 {
 Q_OBJECT

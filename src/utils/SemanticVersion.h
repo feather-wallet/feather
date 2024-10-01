@@ -5,6 +5,7 @@
 #define FEATHER_SEMANTICVERSION_H
 
 #include <QObject>
+#include <QRegularExpression>
 
 struct SemanticVersion
 {

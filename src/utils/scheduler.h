@@ -4,13 +4,9 @@
 #ifndef FUTURE_SCHEDULER_H
 #define FUTURE_SCHEDULER_H
 
-#include <functional>
-
 #include <QtConcurrent/QtConcurrent>
 #include <QFuture>
-//#include <QJSValue>
 #include <QMutex>
-#include <QMutexLocker>
 #include <QPair>
 #include <QWaitCondition>
 

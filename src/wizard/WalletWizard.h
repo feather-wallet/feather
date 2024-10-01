@@ -5,8 +5,6 @@
 #define FEATHER_WALLETWIZARD_H
 
 #include <QWizard>
-#include <QLabel>
-#include <QRadioButton>
 
 #include "model/WalletKeysFilesModel.h"
 #include "utils/RestoreHeightLookup.h"

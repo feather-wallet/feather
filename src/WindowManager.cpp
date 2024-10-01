@@ -10,14 +10,20 @@
 
 #include "Application.h"
 #include "constants.h"
+#include "MainWindow.h"
+#include "dialog/DocsDialog.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/SplashDialog.h"
+#include "dialog/TorInfoDialog.h"
+#include "libwalletqt/WalletManager.h"
+#include "libwalletqt/Wallet.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
+#include "utils/AppData.h"
 
 WindowManager::WindowManager(QObject *parent)
     : QObject(parent)

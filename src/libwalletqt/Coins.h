@@ -9,7 +9,6 @@
 #include <QObject>
 #include <QList>
 #include <QReadWriteLock>
-#include <QDateTime>
 
 #include "Wallet.h"
 

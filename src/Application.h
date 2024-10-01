@@ -8,7 +8,6 @@
 #include <QtNetwork/qlocalserver.h>
 
 class QLockFile;
-class QSocketNotifier;
 
 class Application : public QApplication {
     Q_OBJECT

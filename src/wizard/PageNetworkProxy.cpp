@@ -3,9 +3,10 @@
 
 #include "PageNetworkProxy.h"
 #include "ui_PageNetworkProxy.h"
-#include "WalletWizard.h"
 
-#include <QSysInfo>
+#include <QTimer>
+
+#include "WalletWizard.h"
 
 PageNetworkProxy::PageNetworkProxy(QWidget *parent)
     : QWizardPage(parent)

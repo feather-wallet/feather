@@ -8,7 +8,6 @@
 #include <QTimer>
 
 #include "qrcode/QrCode.h"
-#include "widgets/QrCodeWidget.h"
 #include <bcur/bc-ur.hpp>
 
 namespace Ui {

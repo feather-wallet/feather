@@ -3,11 +3,12 @@
 
 #include "PageHardwareDevice.h"
 #include "ui_PageHardwareDevice.h"
-#include "WalletWizard.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
+
+#include "WalletWizard.h"
 
 PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)

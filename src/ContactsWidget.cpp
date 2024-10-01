@@ -7,7 +7,10 @@
 #include <QMessageBox>
 
 #include "dialog/ContactsDialog.h"
+#include "model/AddressBookModel.h"
+#include "model/AddressBookProxyModel.h"
 #include "libwalletqt/AddressBook.h"
+#include "libwalletqt/Wallet.h"
 #include "libwalletqt/WalletManager.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"

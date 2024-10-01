@@ -26,7 +26,6 @@ private slots:
     void importFromStr(const std::string &data) override;
     
 private:
-    void onSuccess();
     bool proceed();
 };
 

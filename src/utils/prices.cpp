@@ -1,7 +1,10 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include "utils/prices.h"
+#include "prices.h"
+
+#include <QJsonArray>
+#include <QJsonObject>
 
 Prices::Prices(QObject *parent)
     : QObject(parent)

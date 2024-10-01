@@ -5,6 +5,7 @@
 #include "ui_BountiesWidget.h"
 
 #include <QTableWidget>
+#include <QJsonArray>
 
 #include "BountiesModel.h"
 #include "utils/Utils.h"

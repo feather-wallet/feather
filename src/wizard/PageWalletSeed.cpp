@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include "WalletWizard.h"
 #include "PageWalletSeed.h"
 #include "ui_PageWalletSeed.h"
 
@@ -10,7 +9,9 @@
 #include <QDialogButtonBox>
 #include <QPushButton>
 #include <QShortcut>
+#include <QTimer>
 
+#include "WalletWizard.h"
 #include "constants.h"
 #include "Seed.h"
 #include "Icons.h"

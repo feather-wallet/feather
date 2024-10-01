@@ -5,6 +5,8 @@
 
 #include <QVariant>
 
+#include <wallet/api/wallet2_api.h>
+
 PendingTransaction::Status PendingTransaction::status() const
 {
     return static_cast<Status>(m_pimpl->status());

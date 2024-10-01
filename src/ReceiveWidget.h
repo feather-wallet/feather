@@ -6,7 +6,6 @@
 
 #include <QMenu>
 #include <QWidget>
-#include <QSvgWidget>
 
 #include "libwalletqt/Subaddress.h"
 #include "libwalletqt/Wallet.h"

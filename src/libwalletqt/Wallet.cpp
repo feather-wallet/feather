@@ -12,6 +12,7 @@
 #include "SubaddressAccount.h"
 #include "TransactionHistory.h"
 #include "WalletManager.h"
+#include "WalletListenerImpl.h"
 
 #include "config.h"
 #include "constants.h"
@@ -355,6 +356,22 @@ QString Wallet::getSeedLanguage() const
 void Wallet::setSeedLanguage(const QString &lang)
 {
     m_wallet2->set_seed_language(lang.toStdString());
+}
+
+QString Wallet::getSecretViewKey() const {
+    return QString::fromStdString(m_walletImpl->secretViewKey());
+}
+
+QString Wallet::getPublicViewKey() const {
+    return QString::fromStdString(m_walletImpl->publicViewKey());
+}
+
+QString Wallet::getSecretSpendKey() const {
+    return QString::fromStdString(m_walletImpl->secretSpendKey());
+}
+
+QString Wallet::getPublicSpendKey() const {
+    return QString::fromStdString(m_walletImpl->publicSpendKey());
 }
 
 // #################### Node connection ####################
@@ -866,7 +883,7 @@ void Wallet::createTransaction(const QString &address, quint64 amount, const QSt
     m_scheduler.run([this, all, address, amount, feeLevel, subtractFeeFromAmount] {
         std::set<uint32_t> subaddr_indices;
 
-        Monero::PendingTransaction *ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? Monero::optional<uint64_t>() : Monero::optional<uint64_t>(amount), constants::mixin,
+        Monero::PendingTransaction *ptImpl = m_walletImpl->createTransaction(address.toStdString(), "", all ? std::optional<uint64_t>() : std::optional<uint64_t>(amount), constants::mixin,
                                                                              static_cast<Monero::PendingTransaction::Priority>(feeLevel),
                                                                              currentSubaddressAccount(), subaddr_indices, m_selectedInputs, subtractFeeFromAmount);
 
@@ -1329,6 +1346,10 @@ QString Wallet::getDaemonLogPath() const {
 
 bool Wallet::setRingDatabase(const QString &path) {
     return m_walletImpl->setRingDatabase(path.toStdString());
+}
+
+quint64 Wallet::getWalletCreationHeight() const {
+    return m_walletImpl->getRefreshFromBlockHeight();
 }
 
 void Wallet::setWalletCreationHeight(quint64 height) {

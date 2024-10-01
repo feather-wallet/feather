@@ -7,6 +7,7 @@
 #include "utils/Utils.h"
 #include "components.h"
 #include "dialog/QrCodeDialog.h"
+#include "libwalletqt/Wallet.h"
 
 AddressCheckerIndexDialog::AddressCheckerIndexDialog(Wallet *wallet, QWidget *parent)
         : WindowModalDialog(parent)

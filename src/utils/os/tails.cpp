@@ -1,10 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
+#include "tails.h"
+
+#include <QDir>
 #include <QRegularExpression>
 #include <QMessageBox>
 
-#include "tails.h"
 #include "Utils.h"
 
 bool TailsOS::detected = false;

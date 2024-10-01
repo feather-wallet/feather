@@ -7,6 +7,7 @@
 #include <QtConcurrent/QtConcurrent>
 
 #include "constants.h"
+#include "utils/nodes.h"
 #include "utils/os/Prestium.h"
 #include "Utils.h"
 #include "WalletWizard.h"

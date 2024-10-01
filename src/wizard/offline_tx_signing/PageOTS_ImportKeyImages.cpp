@@ -6,7 +6,6 @@
 #include "OfflineTxSigningWizard.h"
 
 #include <QCheckBox>
-#include <QFileDialog>
 
 #include "utils/config.h"
 #include "utils/Icons.h"

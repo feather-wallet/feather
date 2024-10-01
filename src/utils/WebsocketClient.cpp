@@ -4,9 +4,12 @@
 #include "WebsocketClient.h"
 
 #include <QCoreApplication>
-#include "utils/Utils.h"
+#include <QRandomGenerator>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 #include "utils/config.h"
+#include "utils/Utils.h"
 
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)

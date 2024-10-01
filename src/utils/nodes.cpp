@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include <QObject>
-
 #include "nodes.h"
+
+#include "libwalletqt/Wallet.h"
 #include "utils/AppData.h"
 #include "utils/Utils.h"
 #include "utils/os/tails.h"

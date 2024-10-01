@@ -4,15 +4,6 @@
 #include "QrCodeScanDialog.h"
 #include "ui_QrCodeScanDialog.h"
 
-#include <QCamera>
-#include <QMediaDevices>
-#include <QCameraDevice>
-#include <QMessageBox>
-#include <QImageCapture>
-#include <QVideoFrame>
-
-#include "Utils.h"
-
 QrCodeScanDialog::QrCodeScanDialog(QWidget *parent, bool scan_ur)
         : QDialog(parent)
         , ui(new Ui::QrCodeScanDialog)

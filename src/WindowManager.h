@@ -5,17 +5,20 @@
 #define FEATHER_WINDOWMANAGER_H
 
 #include <QObject>
+#include <QSystemTrayIcon>
 
-#include "dialog/DocsDialog.h"
-#include "dialog/TorInfoDialog.h"
-#include "libwalletqt/WalletManager.h"
-#include "libwalletqt/Wallet.h"
-#include "MainWindow.h"
+#include "utils/EventFilter.h"
 #include "utils/nodes.h"
 #include "wizard/WalletWizard.h"
 #include "Utils.h"
 
 class MainWindow;
+class DocsDialog;
+class TorInfoDialog;
+class WalletManager;
+class Wallet;
+class SplashDialog;
+
 class WindowManager : public QObject {
 Q_OBJECT
 

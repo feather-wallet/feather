@@ -4,13 +4,9 @@
 #ifndef FEATHER_WIZARDRESTORE_H
 #define FEATHER_WIZARDRESTORE_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
-#include <QTextEdit>
 #include <QCompleter>
-
-#include "utils/textedit.h"
+#include <QStringListModel>
 
 namespace Ui {
     class PageWalletRestoreSeed;

@@ -4,6 +4,10 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "config.h"
+
+#include <QCoreApplication>
+#include <QStandardPaths>
+
 #include "utils/Utils.h"
 #include "utils/os/tails.h"
 

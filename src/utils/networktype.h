@@ -4,7 +4,6 @@
 #pragma once
 
 #include <QObject>
-#include <wallet/api/wallet2_api.h>
 
 class NetworkType : public QObject
 {
@@ -12,9 +11,9 @@ class NetworkType : public QObject
 
 public:
     enum Type : uint8_t {
-        MAINNET = Monero::MAINNET,
-        TESTNET = Monero::TESTNET,
-        STAGENET = Monero::STAGENET
+        MAINNET = 0,
+        TESTNET = 1,
+        STAGENET = 2
     };
     Q_ENUM(Type)
 };

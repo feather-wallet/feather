@@ -4,8 +4,6 @@
 #ifndef FEATHER_BALANCEDIALOG_H
 #define FEATHER_BALANCEDIALOG_H
 
-#include <QDialog>
-
 #include "components.h"
 #include "libwalletqt/Wallet.h"
 

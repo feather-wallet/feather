@@ -5,6 +5,7 @@
 #include "ui_AboutDialog.h"
 
 #include <QMessageBox>
+#include <QDate>
 
 #include "config-feather.h"
 #include "utils/Utils.h"

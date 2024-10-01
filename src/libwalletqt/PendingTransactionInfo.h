@@ -11,6 +11,10 @@
 class Input;
 class Transfer;
 
+namespace Monero {
+    class PendingTransactionInfo;
+}
+
 class PendingTransactionInfo : public ConstructionInfo
 {
     Q_OBJECT

@@ -5,6 +5,7 @@
 #define FEATHER_DAEMON_RPC_H
 
 #include <QObject>
+#include <QJsonObject>
 
 #include "utils/Networking.h"
 

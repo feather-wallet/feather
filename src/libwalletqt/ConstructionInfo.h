@@ -4,12 +4,15 @@
 #ifndef FEATHER_CONSTRUCTIONINFO_H
 #define FEATHER_CONSTRUCTIONINFO_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QObject>
 #include <QSet>
 
 class Input;
 class Transfer;
+
+namespace Monero {
+    class TransactionConstructionInfo;
+}
 
 class ConstructionInfo : public QObject
 {

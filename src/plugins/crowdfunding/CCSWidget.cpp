@@ -5,6 +5,7 @@
 #include "ui_CCSWidget.h"
 
 #include <QTableWidget>
+#include <QJsonArray>
 
 #include "CCSProgressDelegate.h"
 #include "utils/Utils.h"

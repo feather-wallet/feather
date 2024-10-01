@@ -4,12 +4,7 @@
 #ifndef FEATHER_COINSMODEL_H
 #define FEATHER_COINSMODEL_H
 
-#include <wallet/api/wallet2_api.h>
-
 #include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
-#include <QDebug>
-#include <QIcon>
 
 class Coins;
 class CoinsInfo;

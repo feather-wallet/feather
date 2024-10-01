@@ -7,9 +7,9 @@
 #include <QLabel>
 #include <QStandardItemModel>
 #include <QWizardPage>
-#include <QWidget>
 
-#include "model/WalletKeysFilesModel.h"
+class WalletKeysFilesModel;
+class WalletKeysFilesProxyModel;
 
 namespace Ui {
     class PageOpenWallet;

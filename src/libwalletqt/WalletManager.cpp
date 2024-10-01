@@ -5,6 +5,7 @@
 #include "Wallet.h"
 
 #include "utils/ScopeGuard.h"
+#include <wallet/api/wallet2_api.h>
 
 class WalletPassphraseListenerImpl : public Monero::WalletListener, public PassphraseReceiver
 {
@@ -24,7 +25,7 @@ public:
         m_phelper.onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
 
-    Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
+    std::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
     {
         qDebug() << __FUNCTION__;
         return m_phelper.onDevicePassphraseRequest(on_device);

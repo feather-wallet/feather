@@ -5,7 +5,6 @@
 
 #include <QCoreApplication>
 #include <QNetworkProxy>
-#include <QRegularExpression>
 #include <QUrl>
 
 #include "utils/config.h"

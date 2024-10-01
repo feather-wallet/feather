@@ -5,6 +5,7 @@
 #include "ui_DocsDialog.h"
 
 #include <QScrollBar>
+#include <QDirIterator>
 
 #include "utils/Utils.h"
 #include "ColorScheme.h"

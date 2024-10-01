@@ -12,7 +12,6 @@
 #include "Utils.h"
 #include "utils/AsyncTask.h"
 #include "utils/Networking.h"
-#include "utils/NetworkManager.h"
 #include "utils/SemanticVersion.h"
 
 Updater::Updater(QObject *parent) :

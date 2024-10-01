@@ -8,9 +8,9 @@
 #include <QWidget>
 #include <QMenu>
 
-#include "model/AddressBookModel.h"
-#include "model/AddressBookProxyModel.h"
-#include "libwalletqt/Wallet.h"
+class AddressBookModel;
+class AddressBookProxyModel;
+class Wallet;
 
 namespace Ui {
 class ContactsWidget;
