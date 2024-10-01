@@ -30,7 +30,6 @@ public:
     void closeWindow(MainWindow *window);
     void showWizard(WalletWizard::Page startPage);
     void restartApplication(const QString &binaryFilename);
-    void raise();
 
     void showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab = false);
 
@@ -59,6 +58,7 @@ public slots:
     void tryOpenWallet(const QString &path, const QString &password);
 
 private slots:
+    void raise();
     void onWalletOpened(Wallet *wallet);
     void onWalletCreated(Wallet *wallet);
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);

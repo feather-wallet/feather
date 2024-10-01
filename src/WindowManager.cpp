@@ -3,12 +3,12 @@
 
 #include "WindowManager.h"
 
-#include <QApplication>
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QWindow>
 
+#include "Application.h"
 #include "constants.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/SplashDialog.h"
@@ -33,6 +33,7 @@ WindowManager::WindowManager(QObject *parent)
     connect(m_walletManager, &WalletManager::deviceError,         this, &WindowManager::onDeviceError);
     connect(m_walletManager, &WalletManager::walletPassphraseNeeded, this, &WindowManager::onWalletPassphraseNeeded);
 
+    connect(qApp, SIGNAL(anotherInstanceStarted()), this, SLOT(raise()));
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
 
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
@@ -66,6 +67,7 @@ WindowManager::~WindowManager() {
     qDebug() << "~WindowManager";
     m_cleanupThread->quit();
     m_cleanupThread->wait();
+    qDebug() << "Cleanup thread done";
 }
 
 // ######################## APPLICATION LIFECYCLE ########################
@@ -100,6 +102,7 @@ void WindowManager::close() {
 
     torManager()->stop();
 
+    qDebug() << "Calling QApplication::quit()";
     QApplication::quit();
 }
 

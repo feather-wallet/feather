@@ -1,17 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include <QResource>
-#include <QApplication>
-#include <QtCore>
-#include <QtGui>
-#if !defined(Q_OS_MAC)
-#include <singleapplication.h>
-#endif
-
+#include "Application.h"
 #include "config-feather.h"
 #include "constants.h"
-#include "MainWindow.h"
 #include "utils/EventFilter.h"
 #include "utils/os/Prestium.h"
 #include "WindowManager.h"
@@ -23,8 +15,6 @@
 #include <boost/stacktrace.hpp>
 #include <fstream>
 #endif
-
-#include <QObject>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -89,12 +79,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
 #endif
 
-#if defined(Q_OS_MAC)
-    // https://github.com/itay-grudev/SingleApplication/issues/136#issuecomment-1925441403
-    QApplication app(argc, argv);
-#else
-    SingleApplication app(argc, argv);
-#endif
+    Application app(argc, argv);
 
     QApplication::setApplicationName("Feather");
     QApplication::setApplicationVersion(FEATHER_VERSION);
@@ -119,6 +104,11 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     parser.process(app);
 
     if (parser.isSet(versionOption) || parser.isSet(helpOption)) {
+        return EXIT_SUCCESS;
+    }
+
+    if (app.isAlreadyRunning()) {
+        qWarning() << "Another instance of Feather is already running";
         return EXIT_SUCCESS;
     }
 
@@ -193,8 +183,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     conf()->set(Config::restartRequired, false);
 
-    parser.process(app); // Parse again for --help and --version
-
     if (!quiet) {
         QMap<QString, QString> info;
         info["Qt"] = QT_VERSION_STR;
@@ -238,13 +226,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     auto wm = windowManager();
     wm->setEventFilter(&filter);
 
-#if !defined(Q_OS_MAC)
-    QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
-        wm->raise();
-    });
-#endif
-
-    int exitCode = QApplication::exec();
-    qDebug() << "QApplication::exec() returned";
+    int exitCode = Application::exec();
+    qDebug() << "Application::exec() returned";
     return exitCode;
 }

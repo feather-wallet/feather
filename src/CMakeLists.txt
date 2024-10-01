@@ -20,11 +20,6 @@ endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-if (NOT APPLE)
-    set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
-    add_subdirectory(third-party/singleapplication)
-endif()
-
 if (CHECK_UPDATES)
     add_subdirectory(openpgp)
 endif()
@@ -279,10 +274,6 @@ target_link_libraries(feather PRIVATE
         ${ZLIB_LIBRARIES}
         ${BCUR_LIBRARY}
 )
-
-if(NOT APPLE)
-    target_link_libraries(feather PRIVATE SingleApplication::SingleApplication)
-endif()
 
 if(CHECK_UPDATES)
     target_link_libraries(feather PRIVATE openpgp)
