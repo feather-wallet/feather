@@ -4,13 +4,12 @@
 #include "SendWidget.h"
 #include "ui_SendWidget.h"
 
-#include <QMessageBox>
-
 #include "ColorScheme.h"
 #include "constants.h"
 #include "utils/AppData.h"
 #include "utils/config.h"
 #include "Icons.h"
+#include "libwalletqt/Wallet.h"
 #include "libwalletqt/WalletManager.h"
 
 #if defined(WITH_SCANNER)
@@ -29,8 +28,7 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     QString amount_rx = R"(^\d{0,8}[\.,]\d{0,12}|(all)$)";
     QRegularExpression rx;
     rx.setPattern(amount_rx);
-    QValidator *validator = new QRegularExpressionValidator(rx, this);
-    ui->lineAmount->setValidator(validator);
+    ui->lineAmount->setValidator(new QRegularExpressionValidator(rx, this));
 
     connect(m_wallet, &Wallet::initiateTransaction, this, &SendWidget::disableSendButton);
     connect(m_wallet, &Wallet::transactionCreated, this, &SendWidget::enableSendButton);
