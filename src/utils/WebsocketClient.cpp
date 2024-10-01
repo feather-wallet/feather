@@ -12,6 +12,8 @@ WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)
     , webSocket(new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this))
 {
+    connect(qApp, &QCoreApplication::aboutToQuit, this, &WebsocketClient::stop);
+
     connect(webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
     connect(webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
     connect(webSocket, &QWebSocket::disconnected, this, &WebsocketClient::onDisconnected);
@@ -26,7 +28,6 @@ WebsocketClient::WebsocketClient(QObject *parent)
         }
     });
     m_pingTimer.setInterval(30 * 1000);
-    m_pingTimer.start();
 
     connect(&m_connectionTimeout, &QTimer::timeout, this, &WebsocketClient::onConnectionTimeout);
 
@@ -67,9 +68,11 @@ void WebsocketClient::restart() {
 }
 
 void WebsocketClient::stop() {
+    qDebug() << Q_FUNC_INFO;
     m_stopped = true;
     webSocket->close();
     m_connectionTimeout.stop();
+    m_pingTimer.stop();
 }
 
 void WebsocketClient::onConnected() {
@@ -89,6 +92,7 @@ void WebsocketClient::onStateChanged(QAbstractSocket::SocketState state) {
     }
     else if (state == QAbstractSocket::ConnectedState) {
         m_connectionTimeout.stop();
+        m_pingTimer.start();
     }
 }
 

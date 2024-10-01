@@ -117,3 +117,7 @@ WebsocketNotifier* WebsocketNotifier::instance()
 
     return m_instance;
 }
+
+WebsocketNotifier::~WebsocketNotifier() {
+    qDebug() << "~WebsocketNotifier" << QThread::currentThreadId();
+}

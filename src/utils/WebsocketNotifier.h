@@ -18,6 +18,7 @@ class WebsocketNotifier : public QObject {
 
 public:
     explicit WebsocketNotifier(QObject *parent);
+    ~WebsocketNotifier();
 
     QMap<NetworkType::Type, int> heights;
     WebsocketClient *websocketClient;
