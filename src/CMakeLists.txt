@@ -249,11 +249,8 @@ if (DEPENDS)
 endif()
 
 target_link_libraries(feather PRIVATE
-        wallet_merged
-        ${LMDB_LIBRARY}
+        wallet_api
         epee
-        ${UNBOUND_LIBRARY}
-        ${SODIUM_LIBRARY}
         easylogging
         ringct
         ${Boost_LIBRARIES}
