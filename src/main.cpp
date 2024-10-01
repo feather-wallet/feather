@@ -66,8 +66,6 @@ void signal_handler(int signum) {
 
 int main(int argc, char *argv[])
 {
-    qDebug() << "Reached main";
-
     Q_INIT_RESOURCE(assets);
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
@@ -86,32 +84,42 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
-    QStringList argv_;
-    for(int i = 0; i != argc; i++){
-        argv_ << QString::fromStdString(argv[i]);
-    }
+#if defined(Q_OS_LINUX)
+    // PassThrough results in muddy text
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+#endif
+
+#if defined(Q_OS_MAC)
+    // https://github.com/itay-grudev/SingleApplication/issues/136#issuecomment-1925441403
+    QApplication app(argc, argv);
+#else
+    SingleApplication app(argc, argv);
+#endif
+
+    QApplication::setApplicationName("Feather");
+    QApplication::setApplicationVersion(FEATHER_VERSION);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("feather");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.setApplicationDescription("Feather - a free Monero desktop wallet");
+    QCommandLineOption helpOption = parser.addHelpOption();
+    QCommandLineOption versionOption = parser.addVersionOption();
 
-    QCommandLineOption useLocalTorOption(QStringList() << "use-local-tor", "Use system wide installed Tor instead of the bundled.");
+    QCommandLineOption useLocalTorOption("use-local-tor", "Use system wide installed Tor instead of the bundled.");
     parser.addOption(useLocalTorOption);
 
-    QCommandLineOption quietModeOption(QStringList() << "quiet", "Limit console output");
+    QCommandLineOption quietModeOption("quiet", "Limit console output");
     parser.addOption(quietModeOption);
 
-    QCommandLineOption stagenetOption(QStringList() << "stagenet", "Stagenet is for development purposes only.");
+    QCommandLineOption stagenetOption("stagenet", "Stagenet is for development purposes only.");
     parser.addOption(stagenetOption);
 
-    QCommandLineOption testnetOption(QStringList() << "testnet", "Testnet is for development purposes only.");
+    QCommandLineOption testnetOption("testnet", "Testnet is for development purposes only.");
     parser.addOption(testnetOption);
 
-    bool parsed = parser.parse(argv_);
-    if (!parsed) {
-        qCritical() << parser.errorText();
-        exit(1);
+    parser.process(app);
+
+    if (parser.isSet(versionOption) || parser.isSet(helpOption)) {
+        return EXIT_SUCCESS;
     }
 
     bool stagenet = parser.isSet(stagenetOption);
@@ -126,26 +134,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     else
         constants::networkType = NetworkType::MAINNET;
 
-    // Setup QApplication
-    QApplication::setDesktopSettingsAware(true); // use system font
-    QApplication::setApplicationVersion(FEATHER_VERSION);
-
-#if defined(Q_OS_LINUX)
-    // PassThrough results in muddy text
-    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
-#endif
-
-    qDebug() << "Setting up QApplication";
-
-#if defined(Q_OS_MAC)
-    // https://github.com/itay-grudev/SingleApplication/issues/136#issuecomment-1925441403
-    QApplication app(argc, argv);
-#else
-    SingleApplication app(argc, argv);
-#endif
-
     QApplication::setQuitOnLastWindowClosed(false);
-    QApplication::setApplicationName("FeatherWallet");
+    QApplication::setDesktopSettingsAware(true); // use system font
 
     // Setup config directories
     QString configDir = Config::defaultConfigDir().path();
@@ -254,5 +244,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     });
 #endif
 
-    return QApplication::exec();
+    int exitCode = QApplication::exec();
+    qDebug() << "QApplication::exec() returned";
+    return exitCode;
 }
