@@ -71,7 +71,7 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
 
     // context menu
     ui->addresses->setContextMenuPolicy(Qt::CustomContextMenu);
-    m_showTransactionsAction = new QAction("Show transactions");
+    m_showTransactionsAction = new QAction("Show transactions", this);
     connect(m_showTransactionsAction, &QAction::triggered, this, &ReceiveWidget::onShowTransactions);
     connect(ui->addresses, &QTreeView::customContextMenuRequested, this, &ReceiveWidget::showContextMenu);
     connect(ui->addresses, &SubaddressView::copyAddress, this, &ReceiveWidget::copyAddress);

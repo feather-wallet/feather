@@ -51,9 +51,12 @@ namespace Ui {
     class MainWindow;
 }
 
-struct ToggleTab {
-    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction) :
-            tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction) {}
+class ToggleTab : QObject {
+Q_OBJECT
+
+public:
+    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction, QObject *parent = nullptr) :
+            QObject(parent), tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction) {}
     QWidget *tab;
     QString key;
     QString name;

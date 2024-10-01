@@ -37,7 +37,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
     connect(ui->line_host, &QLineEdit::textChanged, this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Port]
-    auto *portValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]")};
+    auto *portValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{1,4}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]"), this};
     ui->line_port->setValidator(portValidator);
     ui->line_port->setText(conf()->get(Config::socks5Port).toString());
     connect(ui->line_port, &QLineEdit::textChanged, this, &NetworkProxyWidget::onProxySettingsChanged);

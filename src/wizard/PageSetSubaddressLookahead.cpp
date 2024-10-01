@@ -16,7 +16,7 @@ PageSetSubaddressLookahead::PageSetSubaddressLookahead(WizardFields *fields, QWi
 {
     ui->setupUi(this);
 
-    auto *indexValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{0,5}")};
+    auto *indexValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{0,5}"), this};
 
     ui->line_major->setValidator(indexValidator);
     connect(ui->line_major, &QLineEdit::textChanged, [this]{

@@ -105,7 +105,7 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow();
+            auto* t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_coinbase = pd.m_coinbase;
             t->m_amount = pd.m_amount;
@@ -152,7 +152,7 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow();
+            auto* t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
 
             t->m_amount = pd.m_amount_out - change;
@@ -206,7 +206,7 @@ void TransactionHistory::refresh()
                 payment_id = payment_id.substr(0,16);
             bool is_failed = pd.m_state == tools::wallet2::unconfirmed_transfer_details::failed;
 
-            auto *t = new TransactionRow();
+            auto *t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
 
             t->m_amount = pd.m_amount_out - change;
@@ -254,7 +254,7 @@ void TransactionHistory::refresh()
             std::string payment_id = epee::string_tools::pod_to_hex(i->first);
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
-            auto *t = new TransactionRow();
+            auto *t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_amount = pd.m_amount;
             t->m_balanceDelta = pd.m_amount;
