@@ -4,8 +4,6 @@
 #include "URSettingsDialog.h"
 #include "ui_URSettingsDialog.h"
 
-#include <QFileDialog>
-
 #include "utils/config.h"
 #include "utils/Utils.h"
 

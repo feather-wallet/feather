@@ -15,8 +15,6 @@
 #include "utils/nodes.h"
 #include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
-#include "WindowManager.h"
-#include "plugins/PluginRegistry.h"
 #include "utils/ColorScheme.h"
 
 Settings::Settings(Nodes *nodes, QWidget *parent)
