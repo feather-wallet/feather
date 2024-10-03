@@ -29,25 +29,44 @@ You can submit attestations to the [feather-sigs](https://github.com/feather-wal
 
 If you're just here to get a build running (e.g. to test your changes) and quickly want to get up and running:
 
+### Install Guix
+
+On Ubuntu 22.04, Debian 11, or later:
+
 ```bash
-# Install guix
-$ apt install guix  # ubuntu 22.04, debian 11, or later
-or
-# use the install script: https://guix.gnu.org/manual/en/html_node/Binary-Installation.html
-
-# Clone the repo
-$ git clone https://github.com/feather-wallet/feather
-$ cd feather
-
-# Run the build
-$ ./contrib/guix/guix-build  # this will build all targets using all available cores
-or
-$ JOBS=N ./contrib/guix/guix-build  # this will limit the amount of threads to N
-or
-$ HOSTS="x86_64-linux-gnu" ./contrib/guix/guix-build  # to only build the x86_64 linux target
+$ apt install guix
 ```
 
-If you're looking to submit an attestation, follow the instructions below.
+If Guix is not available in your package manager, use the official [install script](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html).
+
+### Clone the repo
+
+```bash
+$ git clone https://github.com/feather-wallet/feather
+$ cd feather
+```
+
+### Run the build
+
+To build all targets using all available cores:
+
+```bash
+$ ./contrib/guix/guix-build
+```
+
+To limit the number of threads to N:
+
+```
+$ JOBS=N ./contrib/guix/guix-build
+```
+
+To only build the x86_64 linux target:
+
+```
+$ HOSTS="x86_64-linux-gnu" ./contrib/guix/guix-build
+```
+
+More recognized environment variables can be found further below.
 
 # Installation and Setup
 
