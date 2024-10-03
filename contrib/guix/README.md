@@ -1,22 +1,19 @@
 # Bootstrappable Feather Wallet Builds
 
-This directory contains the files necessary to perform [bootstrappable](b17e) Feather Wallet builds.
+This directory contains the files necessary to perform [bootstrappable](https://bootstrappable.org) Feather Wallet builds.
 
 Bootstrappability allows us to _audit and reproduce_ our toolchain instead of blindly _trusting_ binary downloads.
 Our build environment can be built from source, [all the way down](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/).
-It allows us to reduce our supply chain attack surface by only including the packages that we need, and nothing else.
 
 We achieve bootstrappability by using [Guix](https://guix.gnu.org/) as a functional package manager. Guix runs on any Linux distribution and on
 most architectures (x86_64, aarch64, riscv64). To produce reproducible release binaries, you only need to install Guix
 and run the build script.
 
-Unlike [Gitian](https://github.com/devrandom/gitian-builder), we are not limited to the package set of a particular Ubuntu version. Guix allows us to pick and choose
-our toolchains. We are able to use the latest compilers while targeting older versions of glibc. Packages that are not
-available in Guix can easily be defined in the [manifest](https://github.com/feather-wallet/feather/blob/master/contrib/guix/manifest.scm) or upstreamed.
-
-Guix allows us to modify any detail about our build environment with ease. Debugging build issues takes less time
-because we have shell access to the build environment. Our source code is bind mounted into the container, so
-edits to package definitions can be tested incrementally.
+Guix allows us to modify any detail about our build environment with ease.
+Unlike [Gitian](https://github.com/devrandom/gitian-builder), we are not limited to the package set of a particular Ubuntu version.
+With Guix, we can configure our toolchains to use the latest compilers while still targeting older versions of glibc.
+We drastically reduce our supply chain attack surface by only including the package we need in our build environment, and nothing else.
+Packages that are not available in Guix can easily be defined in the [manifest](https://github.com/feather-wallet/feather/blob/master/contrib/guix/manifest.scm) or upstreamed.
 
 Feather releases are independently reproduced and cryptographically attested to by multiple contributors.
 You can submit attestations to the [feather-sigs](https://github.com/feather-wallet/feather-sigs) repo.
@@ -397,6 +394,5 @@ used.
 If you start `guix-daemon` using an init script, you can edit said script to
 supply this flag.
 
-[b17e]: https://bootstrappable.org/
 [r12e/source-date-epoch]: https://reproducible-builds.org/docs/source-date-epoch/
 [env-vars-list]: #recognized-environment-variables
