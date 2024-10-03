@@ -1,13 +1,22 @@
 # Bootstrappable Feather Wallet Builds
 
-This directory contains the files necessary to perform bootstrappable Feather Wallet 
-builds.
+This directory contains the files necessary to perform [bootstrappable](b17e) Feather Wallet builds.
 
-[Bootstrappability][b17e] furthers our binary security guarantees by allowing us
-to _audit and reproduce_ our toolchain instead of blindly _trusting_ binary
-downloads.
+Bootstrappability allows us to _audit and reproduce_ our toolchain instead of blindly _trusting_ binary downloads.
+Our build environment can be built from source, [all the way down](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/).
+It allows us to reduce our supply chain attack surface by only including the packages that we need, and nothing else.
 
-We achieve bootstrappability by using Guix as a functional package manager.
+We achieve bootstrappability by using Guix as a functional package manager. Guix runs on any Linux distribution and on
+most architectures (x86_64, aarch64, riscv64). To produce reproducible release binaries, you only need to install Guix
+and run the build script.
+
+Unlike Gitian, we are not limited to the package set of a particular Ubuntu version. Guix allows us to pick and choose
+our toolchains. We are able to use the latest compilers while targeting older versions of glibc. Packages that are not
+available in Guix can easily be defined in the manifest or upstreamed.
+
+Guix allows us to modify any detail about our build environment with ease. Debugging build issues takes less time
+because we have shell access to the build environment. Our source code is bind mounted into the container, so
+edits to package definitions can be tested incrementally.
 
 # Requirements
 
