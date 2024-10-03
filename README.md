@@ -1,38 +1,63 @@
 # Feather Wallet
 
-Feather is a free, open-source Monero wallet for Linux, Tails, macOS and Windows. It is written in C++ with the Qt framework.
+Feather is a free Monero desktop wallet for Linux, Tails, macOS and Windows. It is written in C++ with the Qt framework.
 
-Copyright (c) 2020-2024, The Monero Project.
+- **easy-to-use**, **small** and **fast** - Feather runs well on any modern hardware, including virtual machines and live operating systems.
+- **beginner friendly**, but also caters to advanced Monero users by providing a [feature set](https://docs.featherwallet.org/guides/features) that is on par with the official CLI.
+- ships with **sane defaults** that suit most users, but can also be configured for high or uncommon threat models.
+- serves as a testing grounds for **experimental features** that may later be adopted in the reference wallets.
+
+## Download
+
+You can download Feather from **[featherwallet.org](https://featherwallet.org/download/)** or **[GitHub](https://github.com/feather-wallet/feather/releases)**.
+
+If you need help installing installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
+
+Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). 
+We recommend that you verify downloads with GPG.
 
 ## Resources
 
-* Web: [featherwallet.org](https://featherwallet.org)
-* Docs: [docs.featherwallet.org](https://docs.featherwallet.org)
-* Git: [github.com/feather-wallet/feather](https://github.com/feather-wallet/feather)
-* Reddit: [/r/FeatherWallet](https://old.reddit.com/r/FeatherWallet)
-* Lemmy: [monero.town/c/featherwallet](https://monero.town/c/featherwallet)
-* Mail: dev@featherwallet.org
+* [Official Site](https://featherwallet.org)
+* [Documentation](https://docs.featherwallet.org)
+* [Git Repository](https://github.com/feather-wallet/feather)
+* [Matrix](https://matrix.to/#/#feather:monero.social)
 * IRC: `#feather` on [OFTC](https://www.oftc.net/)
-* Matrix: [matrix.to/#/#feather:monero.social](https://matrix.to/#/#feather:monero.social)
+* Mail: dev@featherwallet.org
 
-**Download** the latest release [here](https://featherwallet.org/download).
+If you need help with your wallet, please contact us via Matrix or IRC.
+If you don't have an IRC client, you can join the room via [webchat](https://webchat.oftc.net/?randomnick=1&channels=feather).
+If you don’t receive a response immediately please idle in the room.
 
-## Supporting the project
+## Release Builds
 
-Feather is a 100% community-sponsored project. If you want to join our efforts, the easiest thing you can do is support the project financially.
+To learn how to run a bootstrappable release build, see: [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md)
 
-Donations help pay for hosting, build servers, domain names, e-mail and other recurring costs. Any amount helps.
+For release attestations, see: http://github.com/feather-wallet/feather-sigs
 
-`47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f`
-
-## Deterministic builds
-
-See [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md) for more information.
+For release policy, see: [RELEASE.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/RELEASE.md)
 
 ## Development
 
 If you are looking to set up a development environment for Feather, see [HACKING.md](https://github.com/feather-wallet/feather/blob/master/HACKING.md).
 
-It is highly recommended that you join the `#feather` IRC channel on [OFTC](https://www.oftc.net/) or [`#feather:monero.social`](https://matrix.to/#/#feather:monero.social) on Matrix if you 
-are hacking on Feather. Due to the nature of this open source software project, idling in this channel is the best 
-way to stay updated on best practices and new developments.
+It is highly recommended that you join our Matrix or IRC channel if you are hacking on Feather.
+Idling in this channel is the best way to stay updated on best practices and new developments.
+
+For information on how Feather is maintained, see: [MAINTENANCE.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/MAINTENANCE.md)
+
+To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/RELEASE.md)
+
+## Support
+
+Feather is funded entirely through donations. We don't take a cut from transaction fees and make no money from exchange integrations.
+
+Donations help pay for hosting, build servers, domain names, e-mail and other recurring costs. Any amount helps.
+
+`47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f`
+
+## License
+
+Feather is free and open-source software, [licensed under BSD-3](https://raw.githubusercontent.com/feather-wallet/feather/master/LICENSE).
+
+Copyright (c) 2020-2024, The Monero Project
