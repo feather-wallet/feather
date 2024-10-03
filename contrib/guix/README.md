@@ -23,11 +23,34 @@ You can submit attestations to the [feather-sigs](https://github.com/feather-wal
 
 # Requirements
 
-Conservatively, you will need an x86_64 machine with:
+- any Linux distribution
+- 50 GB of free disk space
+- 4 or more cores recommended
+- 2 GB RAM per thread
 
-- 16GB of free disk space on the partition that /gnu/store will reside in
-- 8GB of free disk space **per platform triple** you're planning on building
-  (see the `HOSTS` [environment variable description][env-vars-list])
+# Quick setup
+
+If you're just here to get a build running (e.g. to test your changes) and quickly want to get up and running:
+
+```bash
+# Install guix
+$ apt install guix  # ubuntu 22.04, debian 11, or later
+or
+# use the install script: https://guix.gnu.org/manual/en/html_node/Binary-Installation.html
+
+# Clone the repo
+$ git clone https://github.com/feather-wallet/feather
+$ cd feather
+
+# Run the build
+$ ./contrib/guix/guix-build  # this will build all targets using all available cores
+or
+$ JOBS=N ./contrib/guix/guix-build  # this will limit the amount of threads to N
+or
+$ HOSTS="x86_64-linux-gnu" ./contrib/guix/guix-build  # to only build the x86_64 linux target
+```
+
+If you're looking to submit an attestation, follow the instructions below.
 
 # Installation and Setup
 
