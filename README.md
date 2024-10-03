@@ -13,7 +13,12 @@ You can download Feather from **[featherwallet.org](https://featherwallet.org/do
 
 If you need help installing installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
 
-Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). 
+Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). The fingerprint is:
+
+```
+8185 E158 A333 30C7 FD61 BC0D 1F76 E155 CEFB A71C
+```
+
 We recommend that you verify downloads with GPG.
 
 ## Resources
@@ -33,9 +38,9 @@ If you don’t receive a response immediately please idle in the room.
 
 To learn how to run a bootstrappable release build, see: [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md)
 
-For release attestations, see: http://github.com/feather-wallet/feather-sigs
+For release attestations, see the [feather-sigs](http://github.com/feather-wallet/feather-sigs) repo.
 
-For release policy, see: [RELEASE.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/RELEASE.md)
+For release policy, see: [RELEASE.md](https://github.com/feather-wallet/feather/blob/master/RELEASE.md)
 
 ## Development
 
@@ -44,9 +49,9 @@ If you are looking to set up a development environment for Feather, see [HACKING
 It is highly recommended that you join our Matrix or IRC channel if you are hacking on Feather.
 Idling in this channel is the best way to stay updated on best practices and new developments.
 
-For information on how Feather is maintained, see: [MAINTENANCE.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/MAINTENANCE.md)
+For information on how Feather is maintained, see: [MAINTENANCE.md](https://github.com/feather-wallet/feather/blob/master/MAINTENANCE.md)
 
-To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/RELEASE.md)
+To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/RELEASE.md)
 
 ## Support
 
