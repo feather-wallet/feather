@@ -51,7 +51,7 @@ Idling in this channel is the best way to stay updated on best practices and new
 
 For information on how Feather is maintained, see: [MAINTENANCE.md](https://github.com/feather-wallet/feather/blob/master/MAINTENANCE.md)
 
-To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/RELEASE.md)
+To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/SECURITY.md)
 
 ## Support
 
