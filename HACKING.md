@@ -1,15 +1,12 @@
 # Documentation for developers
 
-Feather is developed primarily on Linux, but can also be built and debugged on macOS. Development on Windows is not 
-currently supported. 
+Feather is developed primarily on Linux, but can also be built on macOS. Development on Windows is not currently supported.
+
+We support development on rolling release distributions and the latest version of Ubuntu. Building on older stable distributions is not guaranteed to work.
 
 ## Setting up a development environment
 
 ### Dependencies
-
-Note: Feather requires Qt 6.3 or later. Make sure your distro's package manager provides this version. 
-If not, it is recommended that you install Qt manually using the online installer, which can be found here:
-https://www.qt.io/download (under open-source).
 
 #### Arch Linux
 
@@ -17,13 +14,13 @@ https://www.qt.io/download (under open-source).
 pacman -S git cmake base-devel ccache unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-multimedia libzip hidapi protobuf zxing-cpp
 ```
 
-#### Ubuntu 22.04
+#### Ubuntu 24.04
 
 ```bash
 apt update
 apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev libqrencode-dev  \
-    qt6-base-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev libzip-dev libsodium-dev libgcrypt-dev \
-    libx11-xcb-dev libprotobuf-dev libhidapi-dev libzxing-dev
+    qt6-base-dev qt6-multimedia-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev libzip-dev libsodium-dev libgcrypt-dev \
+    libx11-xcb-dev libprotobuf-dev protobuf-compiler libhidapi-dev libzxing-dev
 ```
 
 #### Void Linux
@@ -92,9 +89,8 @@ git submodule update --init --recursive
 We recommend using Jetbrains Clion for Feather development. It integrates nicely with CMake and comes with a built-in
 debugger. 
 
-To pass CMake flags to CLion, go to `File->Settings->Build->CMake`, set Build Type to `Debug` and set your
-preferred CMake options. If you installed Qt using the online installer you may have to add 
-`-DCMAKE_PREFIX_PATH=/path/to/qt/installation` in the CMake options. More CMake options are documented below.
+To pass CMake flags to CLion, go to `File -> Settings -> Build -> CMake`, set Build Type to `Debug` and set your
+preferred CMake options.  More CMake options are documented below.
 
 Run CMake (`View -> Tool Windows -> CMake`). Click on the 🔃 (`Reload CMake Project`) button.
 
