@@ -4,6 +4,7 @@ $(package)_download_path=https://www.nlnetlabs.nl/downloads/$(package)/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=e7dca7d6b0f81bdfa6fa64ebf1053b5a999a5ae9278a87ef182425067ea14521
 $(package)_dependencies=openssl expat
+$(package)_patches += CVE-2024-8508.patch
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-shared --enable-static --without-pyunbound --prefix=$(host_prefix)
@@ -18,6 +19,7 @@ endef
 define $(package)_preprocess_cmds
   rm configure~ doc/IP-BasedActions.pdf doc/ietf67-design-02.odp doc/ietf67-design-02.pdf doc/CNAME-basedRedirectionDesignNotes.pdf &&\
   rm -rf testdata dnscrypt/testdata &&\
+  patch -p1 -i $($(package)_patch_dir)/CVE-2024-8508.patch && \
   autoconf
 endef
 
