@@ -116,6 +116,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     this->onWalletOpened();
 
+    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &MainWindow::updateBalance);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &MainWindow::updateBalance);
+
 #ifdef DONATE_BEG
     this->donationNag();
 #endif
@@ -581,6 +584,10 @@ void MainWindow::onWalletOpened() {
     }
 }
 
+void MainWindow::updateBalance() {
+    this->onBalanceUpdated(m_wallet->balance(), m_wallet->unlockedBalance());
+}
+
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
     bool hide = conf()->get(Config::hideBalance).toBool();
     int displaySetting = conf()->get(Config::balanceDisplay).toInt();
@@ -599,6 +606,12 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
         if (displaySetting == Config::spendablePlusUnconfirmed && balance > spendable) {
             balance_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false, decimals));
         }
+    }
+
+    if (conf()->get(Config::balanceShowFiat).toBool()) {
+        QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+        double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance / constants::cdiv);
+        balance_str += QString(" (%1)").arg(Utils::amountToCurrencyString(balanceFiatAmount, fiatCurrency));
     }
 
     m_statusLabelBalance->setToolTip("Click for details");

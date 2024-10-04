@@ -439,6 +439,7 @@ QLocale getCurrencyLocale(const QString &currencyCode) {
         for (const auto& locale_: allLocales) {
             if (locale_.currencySymbol(QLocale::CurrencyIsoCode) == currencyCode) {
                 locale = locale_;
+                break;
             }
         }
         localeCache[currencyCode] = locale;

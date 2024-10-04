@@ -67,7 +67,7 @@ BalanceTickerWidget::BalanceTickerWidget(QWidget *parent, Wallet *wallet, bool t
 
     connect(m_wallet, &Wallet::balanceUpdated, this, &BalanceTickerWidget::updateDisplay);
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &BalanceTickerWidget::updateDisplay);
-    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &BalanceTickerWidget::updateDisplay);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &BalanceTickerWidget::updateDisplay);
 }
 
 void BalanceTickerWidget::updateDisplay() {

@@ -131,6 +131,7 @@ private slots:
     void onTxPoolBacklog(const QVector<quint64> &backlog, quint64 originalFeeLevel, quint64 automaticFeeLevel);
 
     // libwalletqt
+    void updateBalance();
     void onBalanceUpdated(quint64 balance, quint64 spendable);
     void onSyncStatus(quint64 height, quint64 target, bool daemonSync);
     void onWalletOpened();

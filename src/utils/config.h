@@ -80,6 +80,7 @@ public:
         dateFormat,
         timeFormat,
         balanceDisplay,
+        balanceShowFiat,
         preferredFiatCurrency,
 
         // Network -> Proxy

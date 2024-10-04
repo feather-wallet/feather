@@ -131,10 +131,18 @@ void Settings::setupAppearanceTab() {
         emit updateBalance();
     });
 
+    // [Balance show fiat]
+    ui->checkBox_balanceShowFiat->setChecked(conf()->get(Config::balanceShowFiat).toBool());
+    connect(ui->checkBox_balanceShowFiat, &QCheckBox::toggled, [this](bool toggled){
+       conf()->set(Config::balanceShowFiat, toggled);
+       emit updateBalance();
+    });
+
     // [Preferred fiat currency]
     QStringList availableFiatCurrencies = appData()->prices.rates.keys();
     for (const auto &currency : availableFiatCurrencies) {
         ui->comboBox_fiatCurrency->addItem(currency);
+        emit updateBalance();
     }
 
     QStringList fiatCurrencies;
@@ -151,6 +159,7 @@ void Settings::setupAppearanceTab() {
         QString selection = ui->comboBox_fiatCurrency->itemText(index);
         conf()->set(Config::preferredFiatCurrency, selection);
         emit preferredFiatCurrencyChanged(selection);
+        emit updateBalance();
     });
 }
 
