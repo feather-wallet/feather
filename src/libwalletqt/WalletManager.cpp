@@ -13,7 +13,7 @@ public:
     explicit WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
 
     void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override { (void)txId; (void)amount; (void)coinbase;};
     void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
     void newBlock(uint64_t height) override { (void) height; };
     void updated() override {};

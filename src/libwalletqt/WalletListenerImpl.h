@@ -16,7 +16,7 @@ public:
 
     virtual void moneySpent(const std::string &txId, uint64_t amount) override;
 
-    virtual void moneyReceived(const std::string &txId, uint64_t amount) override;
+    virtual void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override;
 
     virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override;
 

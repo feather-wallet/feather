@@ -435,7 +435,7 @@ signals:
     void refreshed(bool success, const QString &message);
 
     void moneySpent(const QString &txId, quint64 amount);
-    void moneyReceived(const QString &txId, quint64 amount);
+    void moneyReceived(const QString &txId, quint64 amount, bool coinbase);
     void unconfirmedMoneyReceived(const QString &txId, quint64 amount);
     void newBlock(quint64 height, quint64 targetHeight);
     void walletCreationHeightChanged();

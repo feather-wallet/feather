@@ -485,6 +485,12 @@ void MainWindow::initWalletContext() {
            m_windowManager->notify("Payment received", notify, 5000);
        }
     });
+    connect(m_wallet, &Wallet::moneyReceived, this, [this](const QString &txId, uint64_t amount, bool coinbase){
+        if (m_wallet->isSynchronized() && !m_locked && coinbase) {
+            auto notify = QString("%1 XMR").arg(WalletManager::displayAmount(amount, false));
+            m_windowManager->notify("Mining payment received", notify, 5000);
+        }
+    });
 
     // Device
     connect(m_wallet, &Wallet::deviceButtonRequest, this, &MainWindow::onDeviceButtonRequest);
