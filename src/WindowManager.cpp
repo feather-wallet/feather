@@ -290,7 +290,16 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             WalletManager::clearWalletCache(wallet->cachePath());
             errMsg = QString("%1\n\nWallet cache is unusable, moving it.").arg(errMsg);
             this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"Try opening this wallet again.", "If this keeps happening, please file a bug report."}, "report_an_issue"});
-        } else {
+        }
+        else if (errMsg.startsWith("failed to read file")) {
+#if defined(Q_OS_MACOS)
+            Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"You may need to give Feather permission to access the folder", "In the System Settings app, go to 'Privacy & Security' -> 'Files & Folders'"}};
+#else
+            Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"You may need to change the permissions on the wallet directory."}};
+#endif
+            this->handleWalletError(message);
+        }
+        else {
             Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet"};
             this->handleDeviceError(errMsg, message);
             this->handleWalletError(message);
