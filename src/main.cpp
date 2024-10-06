@@ -86,7 +86,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     Application app(argc, argv);
 
-    QApplication::setApplicationName("Feather");
+    QApplication::setApplicationName("FeatherWallet");
     QApplication::setApplicationVersion(FEATHER_VERSION);
 
     QCommandLineParser parser;
