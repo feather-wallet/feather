@@ -284,6 +284,7 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
             this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
+            return; // Do not remove this
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc") || errMsg == "invalid signature") {
             qCritical() << errMsg;
@@ -304,6 +305,8 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             this->handleDeviceError(errMsg, message);
             this->handleWalletError(message);
         }
+
+        m_openingWallet = false;
         return;
     }
 
