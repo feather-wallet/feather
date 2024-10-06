@@ -284,6 +284,7 @@ chain for " target " development."))
         p7zip
         zip
         unzip
+        upx
         ;; Build tools
         gnu-make
         libtool

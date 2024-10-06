@@ -1,8 +1,0 @@
-#!/bin/bash
-
-HERE="$(dirname "$(readlink -f "${0}")")"
-echo $HERE
-
-# Tails 5.8 sets QT_QPA_PLATFORM to wayland which breaks our app
-export QT_QPA_PLATFORM=xcb
-${APPDIR}/usr/bin/feather $*

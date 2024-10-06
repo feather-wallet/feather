@@ -374,12 +374,16 @@ mkdir -p "$DISTSRC"
             ;;
     esac
 
+    # We no longer ship 'real' AppImages
+    # The .AppImage extension is just there to trick file managers into allowing right click -> open.
     case "$HOST" in
+        riscv64-linux*)
+            ;;
         *linux*)
+            upx build/bin/feather -o build/bin/feather.upx
             if [ "$OPTIONS" != "pack" ]; then
-                bash contrib/AppImage/build-appimage.sh
                 APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
-                mv feather.AppImage "${APPIMAGENAME}"
+                cp build/bin/feather.upx "${APPIMAGENAME}"
                 cp "${APPIMAGENAME}" "${INSTALLPATH}/"
                 cp "${APPIMAGENAME}" "${OUTDIR}/"
             fi
