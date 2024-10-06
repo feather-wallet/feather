@@ -75,9 +75,9 @@ void TransactionHistory::refresh()
         clearRows();
 
         quint64 lastTxHeight = 0;
+        bool hasFakePaymentId = m_wallet->isTrezor();
         m_locked = false;
         m_minutesToUnlock = 0;
-
 
         uint64_t min_height = 0;
         uint64_t max_height = (uint64_t)-1;
@@ -176,7 +176,7 @@ void TransactionHistory::refresh()
             // single output transaction might contain multiple transfers
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id)), this);
+                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
                 t->m_transfers.append(transfer);
             }
             for (auto const &r: pd.m_rings)
@@ -229,7 +229,7 @@ void TransactionHistory::refresh()
 
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id)), this);
+                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
                 t->m_transfers.append(transfer);
             }
             for (auto const &r: pd.m_rings)

@@ -52,6 +52,7 @@ public:
     QList<QString> destinations() const;
     QList<Transfer*> transfers() const;
     QString rings_formatted() const;
+    bool hasPaymentId() const;
 
 private:
     explicit TransactionRow(QObject *parent);

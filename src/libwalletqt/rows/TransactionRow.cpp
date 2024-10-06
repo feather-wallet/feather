@@ -167,6 +167,10 @@ QString TransactionRow::rings_formatted() const
     return rings;
 }
 
+bool TransactionRow::hasPaymentId() const {
+    return m_paymentId != "0000000000000000";
+}
+
 TransactionRow::~TransactionRow()
 {
     qDeleteAll(m_transfers);

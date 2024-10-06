@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>929</width>
-    <height>715</height>
+    <height>723</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -185,6 +185,16 @@
        </widget>
       </item>
       <item>
+       <widget class="InfoFrame" name="frame_destinationsWarning">
+        <property name="frameShape">
+         <enum>QFrame::StyledPanel</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Raised</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QTextEdit" name="outputs">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
@@ -287,6 +297,14 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InfoFrame</class>
+   <extends>QFrame</extends>
+   <header>components.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
