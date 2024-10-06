@@ -477,12 +477,18 @@ mkdir -p "$DISTSRC"
                                 || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
                             ;;
                     esac
-                    find . -name "*.AppImage" -print0 \
-                        | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                    find . -name "*.AppImage" \
-                        | sort \
-                        | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
-                        || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                    case "$HOST" in
+                        riscv64-*)
+                            ;;
+                        *)
+                            find . -name "*.AppImage" -print0 \
+                                | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                            find . -name "*.AppImage" \
+                                | sort \
+                                | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
+                                || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                            ;;
+                    esac
                 else
                     find . -print0 \
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"

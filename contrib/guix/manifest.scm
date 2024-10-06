@@ -294,7 +294,6 @@ chain for " target " development."))
         bison
         gperf
         gettext-minimal
-        squashfs-tools
         cmake-minimal
         meson
         ninja
