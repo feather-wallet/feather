@@ -284,7 +284,6 @@ chain for " target " development."))
         p7zip
         zip
         unzip
-        upx
         ;; Build tools
         gnu-make
         libtool
@@ -294,6 +293,7 @@ chain for " target " development."))
         bison
         gperf
         gettext-minimal
+        squashfs-tools
         cmake-minimal
         meson
         ninja

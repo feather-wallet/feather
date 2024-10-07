@@ -374,16 +374,12 @@ mkdir -p "$DISTSRC"
             ;;
     esac
 
-    # We no longer ship 'real' AppImages
-    # The .AppImage extension is just there to trick file managers into allowing right click -> open.
     case "$HOST" in
-        riscv64-linux*)
-            ;;
         *linux*)
-            upx build/bin/feather -o build/bin/feather.upx
             if [ "$OPTIONS" != "pack" ]; then
+                bash contrib/AppImage/build-appimage.sh
                 APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
-                cp build/bin/feather.upx "${APPIMAGENAME}"
+                mv feather.AppImage "${APPIMAGENAME}"
                 cp "${APPIMAGENAME}" "${INSTALLPATH}/"
                 cp "${APPIMAGENAME}" "${OUTDIR}/"
             fi
@@ -477,18 +473,12 @@ mkdir -p "$DISTSRC"
                                 || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
                             ;;
                     esac
-                    case "$HOST" in
-                        riscv64-*)
-                            ;;
-                        *)
-                            find . -name "*.AppImage" -print0 \
-                                | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                            find . -name "*.AppImage" \
-                                | sort \
-                                | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
-                                || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
-                            ;;
-                    esac
+                    find . -name "*.AppImage" -print0 \
+                        | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                    find . -name "*.AppImage" \
+                        | sort \
+                        | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
+                        || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
                 else
                     find . -print0 \
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
