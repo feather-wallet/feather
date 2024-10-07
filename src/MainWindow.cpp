@@ -615,7 +615,7 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
         }
     }
 
-    if (conf()->get(Config::balanceShowFiat).toBool()) {
+    if (conf()->get(Config::balanceShowFiat).toBool() && !hide) {
         QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
         double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance / constants::cdiv);
         balance_str += QString(" (%1)").arg(Utils::amountToCurrencyString(balanceFiatAmount, fiatCurrency));
