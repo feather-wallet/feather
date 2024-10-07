@@ -113,6 +113,7 @@ private slots:
     void menuToggleTabVisible(const QString &key);
     void menuClearHistoryClicked();
     void onExportHistoryCSV();
+    void onImportHistoryDescriptionsCSV();
     void onExportContactsCSV();
     void onCreateDesktopEntry();
     void onShowDocumentation();

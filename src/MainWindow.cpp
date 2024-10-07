@@ -315,6 +315,7 @@ void MainWindow::initMenu() {
 
     // [Wallet] -> [History]
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
+    connect(ui->actionImportHistoryCSV, &QAction::triggered, this, &MainWindow::onImportHistoryDescriptionsCSV);
 
     // [Wallet] -> [Contacts]
     connect(ui->actionExportContactsCSV, &QAction::triggered, this, &MainWindow::onExportContactsCSV);
@@ -575,7 +576,7 @@ void MainWindow::onWalletOpened() {
         m_wallet->history()->refresh();
     });
     // Vice versa
-    connect(m_wallet->history(), &TransactionHistory::txNoteChanged, [this] {
+    connect(m_wallet->transactionHistoryModel(), &TransactionHistoryModel::transactionDescriptionChanged, [this] {
         m_wallet->coins()->refresh();
     });
 
@@ -1711,6 +1712,21 @@ void MainWindow::onExportHistoryCSV() {
         fn += ".csv";
     m_wallet->history()->writeCSV(fn);
     Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
+}
+
+void MainWindow::onImportHistoryDescriptionsCSV() {
+    const QString fileName = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QString error = m_wallet->history()->importLabelsFromCSV(fileName);
+    if (!error.isEmpty()) {
+        Utils::showError(this, "Unable to import transaction descriptions from CSV", error);
+    }
+    else {
+        Utils::showInfo(this, "Successfully imported transaction descriptions from CSV");
+    }
 }
 
 void MainWindow::onExportContactsCSV() {

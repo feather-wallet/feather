@@ -34,13 +34,15 @@ public:
     TransactionRow* transaction(int index);
     void refresh();
     void setTxNote(const QString &txid, const QString &note);
-    bool writeCSV(const QString &path);
     quint64 count() const;
     QDateTime firstDateTime() const;
     QDateTime lastDateTime() const;
     quint64 minutesToUnlock() const;
     bool locked() const;
     void clearRows();
+
+    bool writeCSV(const QString &path);
+    QString importLabelsFromCSV(const QString &fileName);
 
 signals:
     void refreshStarted() const;

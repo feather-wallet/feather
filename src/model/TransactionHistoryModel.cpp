@@ -236,6 +236,8 @@ bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &
                     hash = tInfo.hash();
                 });
                 m_transactionHistory->setTxNote(hash, value.toString());
+                m_transactionHistory->refresh();
+                emit transactionDescriptionChanged();
                 break;
             }
             default:

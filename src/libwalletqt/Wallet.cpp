@@ -74,10 +74,6 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
         this->updateBalance();
     }
 
-    connect(this->history(), &TransactionHistory::txNoteChanged, [this]{
-        this->history()->refresh();
-    });
-
     connect(this, &Wallet::refreshed, this, &Wallet::onRefreshed);
     connect(this, &Wallet::newBlock, this, &Wallet::onNewBlock);
     connect(this, &Wallet::updated, this, &Wallet::onUpdated);

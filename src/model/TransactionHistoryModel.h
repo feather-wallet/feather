@@ -45,6 +45,7 @@ public:
 
 signals:
     void transactionHistoryChanged();
+    void transactionDescriptionChanged();
 
 private:
     QVariant parseTransactionInfo(const TransactionRow &tInfo, int column, int role) const;

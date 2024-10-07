@@ -34,6 +34,8 @@ CoinsInfo* Coins::coin(int index)
 
 void Coins::refresh()
 {
+    qDebug() << Q_FUNC_INFO;
+
     emit refreshStarted();
 
     boost::shared_lock<boost::shared_mutex> transfers_lock(m_wallet2->m_transfers_mutex);
