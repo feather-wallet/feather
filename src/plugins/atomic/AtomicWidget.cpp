@@ -180,9 +180,13 @@ void AtomicWidget::list(const QString& rendezvous) {
     }
     arguments << "-j";
     arguments << "list-sellers";
-    if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+    //Temporary fix till comit xmr btc updates libp2p to work with modern rendezvous points
+    if(!ui->btn_clearnet->isChecked() && conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
         arguments << "--tor-socks5-port";
         arguments << conf()->get(Config::socks5Port).toString();
+    } else if (ui->btn_clearnet->isChecked()) {
+        arguments << "--tor-socks5-port";
+        arguments << "0";
     }
     arguments << "--rendezvous-point";
     arguments << rendezvous;
