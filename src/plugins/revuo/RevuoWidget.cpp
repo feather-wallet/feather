@@ -92,7 +92,7 @@ void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
 }
 
 void RevuoWidget::onSelectItem(int index) {
-    if (index >= m_items.length()) {
+    if (index >= m_items.length() || index < 0) {
         ui->textBrowser->setText("<h4>No item selected</h4>");
         return;
     }
