@@ -1798,8 +1798,8 @@ void MainWindow::donationNag() {
 
     donationCounter++;
     if (donationCounter % constants::donationBoundary == 0) {
-        auto msg = "Feather is a 100% community-sponsored endeavor. Please consider supporting "
-                   "the project financially. Get rid of this message by donating any amount.";
+        auto msg = "Feather development is funded entirely through donations.\n\nPlease consider supporting "
+                   "the project. Donate any amount to remove this reminder.";
         int ret = QMessageBox::information(this, "Donate to Feather", msg, QMessageBox::Yes, QMessageBox::No);
         if (ret == QMessageBox::Yes) {
             this->donateButtonClicked();
