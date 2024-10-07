@@ -7,13 +7,18 @@
 #include <QString>
 #include <QStringList>
 
-struct RevuoItem {
-    RevuoItem(const QString &title, const QString &url, const QStringList &newsbytes)
-        : title(title), url(url), newsbytes(newsbytes){};
+struct RevuoItem : QObject
+{
+    Q_OBJECT
+
+public:
+    explicit RevuoItem(QObject *parent)
+        : QObject(parent) {};
 
     QString title;
     QString url;
     QStringList newsbytes;
+    QList<QPair<QString, QString>> events;
 };
 
 #endif //FEATHER_REVUOITEM_H
