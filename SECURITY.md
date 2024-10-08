@@ -35,6 +35,7 @@ Clarifications on scope:
 - Any form of coercion, physical or psychological, is out of scope.
 - Vulnerabilities that are attributable to hardware are out of scope.
 - If the issue was fixed in the `master` branch before we receive your report, it is invalid and not eligible for a bounty from this program.
+- If the vulnerability involves binary exploitation, we may ask you to provide a proof of concept of secret key exfiltration.
 - Vulnerabilities that are present in the monero submodule but were not introduced in patches made by the Feather developers must
   be reported [upstream](https://github.com/monero-project/meta/blob/master/VULNERABILITY_RESPONSE_PROCESS.md) and are not eligible for a bounty from this program.
 - Vulnerabilities that are present in any of our third-party dependencies must be reported upstream and are not eligible for a bounty from this program.
