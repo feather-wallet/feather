@@ -134,6 +134,12 @@ DocsDialog::DocsDialog(QWidget *parent)
         this->updateHighlights(ui->search->text());
     });
 
+    // Pressing 'enter' in the search box shouldn't close the dialog
+    QPushButton *closeButton = ui->buttonBox->button(QDialogButtonBox::Close);
+    if (closeButton) {
+        closeButton->setAutoDefault(false);
+    }
+
     this->showDoc("report_an_issue");
 }
 
