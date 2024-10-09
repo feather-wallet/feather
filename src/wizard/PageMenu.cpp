@@ -4,6 +4,8 @@
 #include "PageMenu.h"
 #include "ui_PageMenu.h"
 
+#include <QTimer>
+
 #include "config-feather.h"
 #include "WalletWizard.h"
 
@@ -27,6 +29,10 @@ void PageMenu::initializePage() {
     } else {
         ui->radioCreate->setChecked(true);
     }
+
+    QTimer::singleShot(0, [this]{
+        wizard()->button(QWizard::NextButton)->setFocus();
+    });
 
     // Don't show setup wizard again
     conf()->set(Config::firstRun, false);
