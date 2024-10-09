@@ -59,7 +59,7 @@ CCSWidget::CCSWidget(QWidget *parent)
                     c->url = QString("https://ccs.getmonero.org/%1").arg(urlpath);
                 }
                 else if (c->organizer == "MAGIC") {
-                    c->url = QString("https://monerofund.org/%1").arg(urlpath);
+                    c->url = QString("https://donate.magicgrants.org/%1").arg(urlpath);
                 }
                 else {
                     continue;
