@@ -49,7 +49,7 @@ public slots:
     void disallowSending();
 
 private slots:
-    void onDataPasted(const QString &data);
+    void onDataFromQR(const QString &data);
 
 private:
     void setupComboBox();
