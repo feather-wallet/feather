@@ -45,7 +45,7 @@ SendWidget::SendWidget(Wallet *wallet, QWidget *parent)
     connect(ui->lineAmount, &QLineEdit::textChanged, this, &SendWidget::amountEdited);
     connect(ui->lineAddress, &QPlainTextEdit::textChanged, this, &SendWidget::addressEdited);
     connect(ui->btn_openAlias, &QPushButton::clicked, this, &SendWidget::aliasClicked);
-    connect(ui->lineAddress, &PayToEdit::dataPasted, this, &SendWidget::onDataPasted);
+    connect(ui->lineAddress, &PayToEdit::dataPasted, this, &SendWidget::onDataFromQR);
     ui->label_conversionAmount->setText("");
     ui->label_conversionAmount->hide();
     ui->btn_openAlias->hide();
@@ -140,7 +140,7 @@ void SendWidget::scanClicked() {
 
     auto dialog = new QrCodeScanDialog(this, false);
     dialog->exec();
-    ui->lineAddress->setText(dialog->decodedString());
+    this->onDataFromQR(dialog->decodedString());
     dialog->deleteLater();
 #else
     Utils::showError(this, "Can't open QR scanner", "Feather was built without webcam QR scanner support");
@@ -402,13 +402,17 @@ void SendWidget::setSubtractFeeFromAmountEnabled(bool enabled) {
     ui->check_subtractFeeFromAmount->setVisible(enabled);
 }
 
-void SendWidget::onDataPasted(const QString &data) {
+void SendWidget::onDataFromQR(const QString &data) {
     if (!data.isEmpty()) {
         QVariantMap uriData = m_wallet->parse_uri_to_object(data);
         if (!uriData.contains("error")) {
             ui->lineAddress->setText(uriData.value("address").toString());
             ui->lineDescription->setText(uriData.value("tx_description").toString());
-            ui->lineAmount->setText(uriData.value("amount").toString());
+
+            // Strip trailing zeroes
+            auto amountStr = uriData.value("amount").toString();
+            auto amount = WalletManager::amountFromString(amountStr);
+            ui->lineAmount->setText(WalletManager::displayAmount(amount, false));
         } else {
             ui->lineAddress->setText(data);
         }
