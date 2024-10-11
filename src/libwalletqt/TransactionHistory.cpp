@@ -64,6 +64,8 @@ TransactionRow* TransactionHistory::transaction(int index)
 
 void TransactionHistory::refresh()
 {
+    qDebug() << Q_FUNC_INFO;
+
     QDateTime firstDateTime = QDate(2014, 4, 18).startOfDay();
     QDateTime lastDateTime  = QDateTime::currentDateTime().addDays(1); // tomorrow (guard against jitter and timezones)
 
@@ -75,9 +77,9 @@ void TransactionHistory::refresh()
         clearRows();
 
         quint64 lastTxHeight = 0;
+        bool hasFakePaymentId = m_wallet->isTrezor();
         m_locked = false;
         m_minutesToUnlock = 0;
-
 
         uint64_t min_height = 0;
         uint64_t max_height = (uint64_t)-1;
@@ -105,7 +107,7 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow();
+            auto* t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_coinbase = pd.m_coinbase;
             t->m_amount = pd.m_amount;
@@ -152,7 +154,7 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow();
+            auto* t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
 
             t->m_amount = pd.m_amount_out - change;
@@ -176,7 +178,7 @@ void TransactionHistory::refresh()
             // single output transaction might contain multiple transfers
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id)), this);
+                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
                 t->m_transfers.append(transfer);
             }
             for (auto const &r: pd.m_rings)
@@ -206,7 +208,7 @@ void TransactionHistory::refresh()
                 payment_id = payment_id.substr(0,16);
             bool is_failed = pd.m_state == tools::wallet2::unconfirmed_transfer_details::failed;
 
-            auto *t = new TransactionRow();
+            auto *t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
 
             t->m_amount = pd.m_amount_out - change;
@@ -229,7 +231,7 @@ void TransactionHistory::refresh()
 
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id)), this);
+                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
                 t->m_transfers.append(transfer);
             }
             for (auto const &r: pd.m_rings)
@@ -254,7 +256,7 @@ void TransactionHistory::refresh()
             std::string payment_id = epee::string_tools::pod_to_hex(i->first);
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
-            auto *t = new TransactionRow();
+            auto *t = new TransactionRow(this);
             t->m_paymentId = QString::fromStdString(payment_id);
             t->m_amount = pd.m_amount;
             t->m_balanceDelta = pd.m_amount;
@@ -281,12 +283,14 @@ void TransactionHistory::refresh()
 void TransactionHistory::setTxNote(const QString &txid, const QString &note)
 {
     cryptonote::blobdata txid_data;
-    if(!epee::string_tools::parse_hexstr_to_binbuff(txid.toStdString(), txid_data) || txid_data.size() != sizeof(crypto::hash))
+    if (!epee::string_tools::parse_hexstr_to_binbuff(txid.toStdString(), txid_data) || txid_data.size() != sizeof(crypto::hash)) {
+        qDebug() << Q_FUNC_INFO << "invalid txid";
         return;
+    }
+
     const crypto::hash htxid = *reinterpret_cast<const crypto::hash*>(txid_data.data());
 
     m_wallet2->set_tx_note(htxid, note.toStdString());
-    refresh();
     emit txNoteChanged();
 }
 
@@ -401,4 +405,102 @@ bool TransactionHistory::writeCSV(const QString &path) {
 
     data = QString("blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId,fiatAmount,fiatCurrency%1").arg(data);
     return Utils::fileWrite(path, data);
+}
+
+QStringList parseCSVLine(const QString &line) {
+    QStringList result;
+    QString currentField;
+    bool inQuotes = false;
+
+    for (int i = 0; i < line.length(); ++i) {
+        QChar currentChar = line[i];
+
+        if (currentChar == '"') {
+            if (inQuotes && i + 1 < line.length() && line[i + 1] == '"') {
+                currentField.append('"');
+                ++i;
+            } else {
+                inQuotes = !inQuotes;
+            }
+        } else if (currentChar == ',' && !inQuotes) {
+            result.append(currentField.trimmed());
+            currentField.clear();
+        } else {
+            currentField.append(currentChar);
+        }
+    }
+
+    result.append(currentField.trimmed());
+    return result;
+}
+
+QString TransactionHistory::importLabelsFromCSV(const QString &fileName) {
+    QFile file(fileName);
+
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return QString("Could not open file: %1").arg(fileName);
+    }
+
+    QTextStream in(&file);
+
+    QList<QStringList> fields;
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        fields.append(parseCSVLine(line));
+    }
+
+    if (fields.empty()) {
+        return "CSV file appears to be empty";
+    }
+
+    qint64 txidField = -1;
+    qint64 descriptionField = -1;
+
+    QStringList header = fields[0];
+    for (int i = 0; i < header.length(); i++) {
+        if (header[i] == "txid") {
+            txidField = i;
+            continue;
+        }
+        if (header[i] == "description") {
+            descriptionField = i;
+        }
+    }
+
+    if (txidField < 0) {
+        return "'txid' field not found in CSV header";
+    }
+    if (descriptionField < 0) {
+        return "'description' field not found in CSV header";
+    }
+    qint64 maxIndex = std::max(txidField, descriptionField);
+
+    QList<QPair<QString, QString>> descriptions;
+
+    for (int i = 1; i < fields.length(); i++) {
+        const auto& row = fields[i];
+        if (maxIndex >= row.length()) {
+            qDebug() << "Row with invalid length in CSV";
+            continue;
+        }
+
+        if (row[txidField].isEmpty()) {
+            continue;
+        }
+
+        if (row[descriptionField].isEmpty()) {
+            continue;
+        }
+
+        descriptions.push_back({row[txidField], row[descriptionField]});
+    }
+
+    for (const auto& description : descriptions) {
+        qDebug() << "Setting note for tx:" << description.first << "description:" << description.second;
+        this->setTxNote(description.first, description.second);
+    }
+
+    this->refresh();
+
+    return {};
 }

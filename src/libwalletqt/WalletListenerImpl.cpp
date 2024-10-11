@@ -25,13 +25,13 @@ void WalletListenerImpl::moneySpent(const std::string &txId, uint64_t amount)
     emit m_wallet->moneySpent(qTxId, amount);
 }
 
-void WalletListenerImpl::moneyReceived(const std::string &txId, uint64_t amount)
+void WalletListenerImpl::moneyReceived(const std::string &txId, uint64_t amount, bool coinbase)
 {
     // Incoming tx included in a block.
     QString qTxId = QString::fromStdString(txId);
     qDebug() << Q_FUNC_INFO << qTxId << " " << WalletManager::displayAmount(amount);
 
-    emit m_wallet->moneyReceived(qTxId, amount);
+    emit m_wallet->moneyReceived(qTxId, amount, coinbase);
 }
 
 void WalletListenerImpl::unconfirmedMoneyReceived(const std::string &txId, uint64_t amount)
@@ -85,7 +85,7 @@ void WalletListenerImpl::onPassphraseEntered(const QString &passphrase, bool ent
     m_phelper.onPassphraseEntered(passphrase, enter_on_device, entry_abort);
 }
 
-Monero::optional<std::string> WalletListenerImpl::onDevicePassphraseRequest(bool & on_device)
+std::optional<std::string> WalletListenerImpl::onDevicePassphraseRequest(bool & on_device)
 {
     qDebug() << __FUNCTION__;
     return m_phelper.onDevicePassphraseRequest(on_device);

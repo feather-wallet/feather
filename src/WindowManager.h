@@ -5,17 +5,20 @@
 #define FEATHER_WINDOWMANAGER_H
 
 #include <QObject>
+#include <QSystemTrayIcon>
 
-#include "dialog/DocsDialog.h"
-#include "dialog/TorInfoDialog.h"
-#include "libwalletqt/WalletManager.h"
-#include "libwalletqt/Wallet.h"
-#include "MainWindow.h"
+#include "utils/EventFilter.h"
 #include "utils/nodes.h"
 #include "wizard/WalletWizard.h"
 #include "Utils.h"
 
 class MainWindow;
+class DocsDialog;
+class TorInfoDialog;
+class WalletManager;
+class Wallet;
+class SplashDialog;
+
 class WindowManager : public QObject {
 Q_OBJECT
 
@@ -30,7 +33,6 @@ public:
     void closeWindow(MainWindow *window);
     void showWizard(WalletWizard::Page startPage);
     void restartApplication(const QString &binaryFilename);
-    void raise();
 
     void showSettings(Nodes *nodes, QWidget *parent, bool showProxyTab = false);
 
@@ -59,6 +61,7 @@ public slots:
     void tryOpenWallet(const QString &path, const QString &password);
 
 private slots:
+    void raise();
     void onWalletOpened(Wallet *wallet);
     void onWalletCreated(Wallet *wallet);
     void onWalletOpenPasswordRequired(bool invalidPassword, const QString &path);

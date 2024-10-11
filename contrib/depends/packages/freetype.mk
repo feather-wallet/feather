@@ -1,18 +1,20 @@
 package=freetype
-$(package)_version=2.13.2
+$(package)_version=2.13.3
 $(package)_download_path=https://sourceforge.net/projects/freetype/files/freetype2/$($(package)_version)/
-$(package)_file_name=freetype-$($(package)_version).tar.xz
-$(package)_sha256_hash=12991c4e55c506dd7f9b765933e62fd2be2e06d421505d7950a132e4f1bb484d
+$(package)_file_name=freetype-$($(package)_version).tar.gz
+$(package)_sha256_hash=5c3a8e78f7b24c20b25b54ee575d6daa40007a5f4eea2845861c3409b3021747
 
 define $(package)_set_vars
-  $(package)_config_opts  = --without-zlib --without-png --without-harfbuzz --without-bzip2 --enable-static --disable-shared
+  $(package)_config_opts := --without-zlib --without-png --without-harfbuzz --without-bzip2 --enable-static --disable-shared
   $(package)_config_opts += --enable-option-checking --without-brotli
   $(package)_config_opts += --with-pic
 endef
 
+define $(package)_preprocess_cmds
+  rm -rf docs
+endef
+
 define $(package)_config_cmds
-  printenv && \
-  echo "$($(package)_autoconf)" && \
   $($(package)_autoconf)
 endef
 

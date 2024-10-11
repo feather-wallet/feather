@@ -4,9 +4,6 @@
 #ifndef FEATHER_ABOUT_H
 #define FEATHER_ABOUT_H
 
-#include <QDialog>
-#include <QStringListModel>
-
 #include "components.h"
 
 namespace Ui {

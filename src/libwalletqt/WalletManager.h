@@ -4,8 +4,6 @@
 #ifndef WALLETMANAGER_H
 #define WALLETMANAGER_H
 
-#include <wallet/api/wallet2_api.h>
-
 #include <QObject>
 #include <QMutex>
 #include <QPointer>

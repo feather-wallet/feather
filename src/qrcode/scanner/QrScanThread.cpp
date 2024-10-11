@@ -2,9 +2,10 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "QrScanThread.h"
-#include <QDebug>
 
 #include <ZXing/ReadBarcode.h>
+
+#include "utils/QrCodeUtils.h"
 
 QrScanThread::QrScanThread(QObject *parent)
     : QThread(parent)

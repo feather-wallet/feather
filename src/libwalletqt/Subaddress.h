@@ -4,10 +4,8 @@
 #ifndef SUBADDRESS_H
 #define SUBADDRESS_H
 
-#include <functional>
-
-#include <QReadWriteLock>
 #include <QObject>
+#include <QReadWriteLock>
 #include <QList>
 #include <QDateTime>
 

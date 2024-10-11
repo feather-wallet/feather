@@ -4,9 +4,10 @@
 #ifndef FEATHER_WIZARDMENU_H
 #define FEATHER_WIZARDMENU_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
+
+class WizardFields;
+class WalletKeysFilesModel;
 
 namespace Ui {
     class PageMenu;

@@ -8,6 +8,8 @@
 
 #include "dialog/TxInfoDialog.h"
 #include "dialog/TxProofDialog.h"
+#include "model/TransactionHistoryProxyModel.h"
+#include "libwalletqt/Wallet.h"
 #include "libwalletqt/WalletManager.h"
 #include "utils/config.h"
 #include "utils/Icons.h"

@@ -5,6 +5,7 @@
 
 #include "Input.h"
 #include "Transfer.h"
+#include <wallet/api/wallet2_api.h>
 
 quint64 ConstructionInfo::unlockTime() const {
     return m_unlockTime;

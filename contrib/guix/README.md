@@ -1,21 +1,72 @@
 # Bootstrappable Feather Wallet Builds
 
-This directory contains the files necessary to perform bootstrappable Feather Wallet 
-builds.
+This directory contains the files necessary to perform [bootstrappable](https://bootstrappable.org) Feather Wallet builds.
 
-[Bootstrappability][b17e] furthers our binary security guarantees by allowing us
-to _audit and reproduce_ our toolchain instead of blindly _trusting_ binary
-downloads.
+Bootstrappability allows us to _audit and reproduce_ our toolchain instead of blindly _trusting_ binary downloads.
+Our build environment can be built from source, [all the way down](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/).
 
-We achieve bootstrappability by using Guix as a functional package manager.
+We achieve bootstrappability by using [Guix](https://guix.gnu.org/) as a functional package manager. Guix runs on any Linux distribution and on
+most architectures (x86_64, aarch64, riscv64). To produce reproducible release binaries, you only need to install Guix
+and run the build script.
+
+Guix allows us to modify any detail about our build environment with ease.
+Unlike [Gitian](https://github.com/devrandom/gitian-builder), we are not limited to the package set of a particular Ubuntu version.
+With Guix, we can configure our toolchains to use the latest compilers while still targeting older versions of glibc.
+We drastically reduce our supply chain attack surface by only including the package we need in our build environment, and nothing else.
+Packages that are not available in Guix can easily be defined in the [manifest](https://github.com/feather-wallet/feather/blob/master/contrib/guix/manifest.scm) or upstreamed.
+
+Feather releases are independently reproduced and cryptographically attested to by multiple contributors.
+You can submit attestations to the [feather-sigs](https://github.com/feather-wallet/feather-sigs) repo.
 
 # Requirements
 
-Conservatively, you will need an x86_64 machine with:
+- any Linux distribution
+- 50 GB of free disk space
+- 4 or more cores recommended
+- 2 GB RAM per thread
 
-- 16GB of free disk space on the partition that /gnu/store will reside in
-- 8GB of free disk space **per platform triple** you're planning on building
-  (see the `HOSTS` [environment variable description][env-vars-list])
+# Quick setup
+
+If you're just here to get a build running (e.g. to test your changes) and quickly want to get up and running:
+
+### Install Guix
+
+On Ubuntu 22.04, Debian 11, or later:
+
+```bash
+$ apt install guix
+```
+
+If Guix is not available in your package manager, use the official [install script](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html).
+
+### Clone the repo
+
+```bash
+$ git clone https://github.com/feather-wallet/feather
+$ cd feather
+```
+
+### Run the build
+
+To build all targets using all available cores:
+
+```bash
+$ ./contrib/guix/guix-build
+```
+
+To limit the number of threads to N:
+
+```
+$ JOBS=N ./contrib/guix/guix-build
+```
+
+To only build the x86_64 linux target:
+
+```
+$ HOSTS="x86_64-linux-gnu" ./contrib/guix/guix-build
+```
+
+More recognized environment variables can be found further below.
 
 # Installation and Setup
 
@@ -362,6 +413,5 @@ used.
 If you start `guix-daemon` using an init script, you can edit said script to
 supply this flag.
 
-[b17e]: https://bootstrappable.org/
 [r12e/source-date-epoch]: https://reproducible-builds.org/docs/source-date-epoch/
 [env-vars-list]: #recognized-environment-variables

@@ -13,20 +13,36 @@ This document is written for developers and users interested in learning how Fea
   - Review the diff of any altered package to mitigate the risk of supply chain attacks
 - Update compilers and security flags for better binary security
 - Reduce the number of third-party dependencies
-- Keep the website VPS up-to-date and secure
-- Further harden the [release process](RELEASE.md)
+- Keep the [website](https://github.com/feather-wallet/feather-site/blob/master/mirrors.txt) VPS up-to-date and secure
+- Contact relevant authorities to take [phishing sites](https://gist.github.com/tobtoht/4039fa3cf922d4fe8bca2f8e3ddac63b) offline
+- Make improvements to the [release process](RELEASE.md)
 
 Goals:
 
 - Set up a bug bounty program for issues that affect privacy or security
 - Set up a status page with information about project health
 - Set up a feed for security bulletins
+- Sandbox components that handle untrusted input (e.g. QR code scanner)
+- Create a package manager for secure distribution of portable binaries
+- `-static-pie` release binaries for Linux targets
 
 Security issues that affect Feather always warrant a new release as soon as possible.
 
-### 2. Reproducibility
+### 2. Continuity
 
-- Improve and maintain tools to check for reproducibility defects
+- Keep the website and services online
+- Keep source repositories accessible
+- Make sure that running release builds is easy to set up and reproducible in time
+
+Goals:
+
+- Make sure the project is transmissible
+- Make sure that setting up release infrastructure, release engineering, and maintenance are extensively documented
+- Make the websocket server repository public
+
+### 3. Reproducibility
+
+- Improve and maintain tools to check for non-determinism
 - Ensure releases are reproducible and stay that way
 - Upload source archives to the fallback mirror
 
@@ -36,31 +52,32 @@ To learn more about Feather's build system, see: [`contrib/guix/README.md`](http
 Our Guix time-machine is currently pinned at a commit which implements the 
 [Full-Source Bootstrap](https://guix.gnu.org/en/blog/2023/the-full-source-bootstrap-building-from-source-all-the-way-down/).
 
-### 3. Bugs
+### 4. Bugs
 
-- Fix reproducible bugs and crashes
+- Fix bugs and crashes
 
 To report a bug, please see: https://docs.featherwallet.org/guides/report-an-issue
 
-### 4. Tests
+### 5. Tests
 
 - Improve test coverage
 - Write more test cases
 
 Feather does not currently have a test suite (apart from the tests in the Monero submodule), this is a WIP.
 
-### 5. Documentation
+### 6. Documentation
 
 - Make sure the documentation accurately reflects the latest release
 - Add troubleshooting guides for common problems
-  - Ideally, most support questions can be answered with a link to the documentation
 
 Goals:
+- Most support questions can be answered with a link to the documentation
 - Reconsider and document default settings
+- Write a document on threat modeling
 
 Documentation is available at https://docs.featherwallet.org
 
-### 6. Improvements
+### 7. Improvements
 
 - Improve existing features
 - Improve UI/UX
@@ -68,19 +85,15 @@ Documentation is available at https://docs.featherwallet.org
 Feather should first and foremost be a good __wallet__.
 Improving features that are closer to this end should have priority.
 
-### 7. Packaging
+### 8. Platform Support
 
 - Add support for more architectures and operating systems
 - Drop support for End-of-Life distributions
-
-Goals:
-
-- Debian and Guix packages
-- Create a document with guidelines for packagers
+- Add support for new hardware wallets
 
 See: https://docs.featherwallet.org/guides/supported-operating-systems
 
-### 8. Optimization, cleanup and continuity
+### 9. Optimization
 
 Miscellaneous maintenance tasks.
 
@@ -98,9 +111,9 @@ Miscellaneous maintenance tasks.
 
 Goals:
 
-- Make sure Feather is ready for the migration to [Seraphis](https://github.com/seraphis-migration/wallet3)
+- Make sure Feather is ready for the migration to [FCMP++](https://www.getmonero.org/2024/04/27/fcmps.html)
 
-### 9. Features
+### 10. Features
 
 - Implement new features
   - Allow Feather to be used or configured for higher, esoteric or new threat models
@@ -112,7 +125,7 @@ compared to its expected maintenance and support burden.
 
 For a non-exhaustive list of potentially new features, see: https://featherwallet.org/ideas
 
-### 10. Upstreaming
+### 11. Upstreaming
 
 - Upstream tried and tested features, bugfixes and useful patches
   - Bugfixes should be upstreamed without delay

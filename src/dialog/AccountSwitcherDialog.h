@@ -4,10 +4,8 @@
 #ifndef FEATHER_ACCOUNTSWITCHERDIALOG_H
 #define FEATHER_ACCOUNTSWITCHERDIALOG_H
 
-#include <QDialog>
-
-#include "libwalletqt/Wallet.h"
 #include "components.h"
+#include "libwalletqt/Wallet.h"
 #include "model/SubaddressAccountModel.h"
 
 namespace Ui {

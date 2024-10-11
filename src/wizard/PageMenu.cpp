@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include "WalletWizard.h"
 #include "PageMenu.h"
 #include "ui_PageMenu.h"
 
-#include <QFileDialog>
+#include <QTimer>
 
 #include "config-feather.h"
+#include "WalletWizard.h"
 
 PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)
         : QWizardPage(parent)
@@ -18,7 +18,7 @@ PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget 
     ui->setupUi(this);
     this->setButtonText(QWizard::FinishButton, "Open recent wallet");
 
-    ui->label_version->setText(QString("Feather %1 — by dsc & tobtoht").arg(FEATHER_VERSION));
+    ui->label_version->setText(QString("Feather %1 — by featherwallet.org").arg(FEATHER_VERSION));
 
     QString settingsSkin = conf()->get(Config::skin).toString();
 }
@@ -29,6 +29,10 @@ void PageMenu::initializePage() {
     } else {
         ui->radioCreate->setChecked(true);
     }
+
+    QTimer::singleShot(0, [this]{
+        wizard()->button(QWizard::NextButton)->setFocus();
+    });
 
     // Don't show setup wizard again
     conf()->set(Config::firstRun, false);

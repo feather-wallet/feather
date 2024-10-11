@@ -8,8 +8,11 @@
 #include <QMediaDevices>
 #include <QComboBox>
 
+#include <bcur/bc-ur.hpp>
+
 #include "utils/config.h"
 #include "utils/Icons.h"
+#include "QrScanThread.h"
 
 QrCodeScanWidget::QrCodeScanWidget(QWidget *parent)
         : QWidget(parent)

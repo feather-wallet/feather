@@ -4,7 +4,6 @@
 #include "EventFilter.h"
 
 #include <QKeyEvent>
-#include <QDebug>
 
 EventFilter::EventFilter(QObject *parent)
     : QObject(parent)

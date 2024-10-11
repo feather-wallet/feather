@@ -4,8 +4,7 @@
 #ifndef FEATHER_CONSTANTS_H
 #define FEATHER_CONSTANTS_H
 
-#include <QtGlobal>
-#include <QUrl>
+#include <QString>
 
 #include "networktype.h"
 

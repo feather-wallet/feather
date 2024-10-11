@@ -6,7 +6,7 @@
 
 #include <QWidget>
 
-#include "libwalletqt/Wallet.h"
+class Wallet;
 
 namespace Ui {
     class SendWidget;
@@ -49,7 +49,7 @@ public slots:
     void disallowSending();
 
 private slots:
-    void onDataPasted(const QString &data);
+    void onDataFromQR(const QString &data);
 
 private:
     void setupComboBox();

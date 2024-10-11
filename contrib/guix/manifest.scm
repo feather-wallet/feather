@@ -120,10 +120,17 @@ desirable for building Feather Wallet release binaries."
     (search-our-patches "gcc-remap-guix-store.patch"
                         "vmov-alignment.patch")))
 
+(define (winpthreads-patches mingw-w64-x86_64-winpthreads)
+  (package-with-extra-patches mingw-w64-x86_64-winpthreads
+    (search-our-patches "winpthreads-remap-guix-store.patch")))
+
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
   (let* ((xbinutils (cross-binutils target))
-         (pthreads-xlibc mingw-w64-x86_64-winpthreads)
+         (machine (substring target 0 (string-index target #\-)))
+         (pthreads-xlibc (winpthreads-patches (make-mingw-w64 machine
+                                         #:xgcc (cross-gcc target #:xgcc (gcc-mingw-patches base-gcc))
+                                         #:with-winpthreads? #t)))
          (pthreads-xgcc (cross-gcc target
                                     #:xgcc (gcc-mingw-patches mingw-w64-base-gcc)
                                     #:xbinutils xbinutils
@@ -322,8 +329,8 @@ chain for " target " development."))
              (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
            (list
-             gcc-toolchain-10
-             (list gcc-toolchain-10 "static")
+             gcc-toolchain-11
+             (list gcc-toolchain-11 "static")
              binutils
              clang-toolchain-10
              ldid))

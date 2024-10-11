@@ -7,8 +7,11 @@
 #include <QObject>
 #include <QList>
 
-#include <wallet/api/wallet2_api.h>
 #include "PendingTransactionInfo.h"
+
+namespace Monero {
+    class PendingTransaction;
+}
 
 class PendingTransaction : public QObject
 {
@@ -16,9 +19,9 @@ class PendingTransaction : public QObject
 
 public:
     enum Status {
-        Status_Ok       = Monero::PendingTransaction::Status_Ok,
-        Status_Error    = Monero::PendingTransaction::Status_Error,
-        Status_Critical = Monero::PendingTransaction::Status_Critical
+        Status_Ok       = 0,
+        Status_Error    = 1,
+        Status_Critical = 2
     };
     Q_ENUM(Status)
 

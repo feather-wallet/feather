@@ -499,6 +499,7 @@
       <string>History</string>
      </property>
      <addaction name="actionExport_CSV"/>
+     <addaction name="actionImportHistoryCSV"/>
     </widget>
     <widget class="QMenu" name="menuContacts">
      <property name="title">
@@ -937,6 +938,11 @@
   <action name="actionTxPoolViewer">
    <property name="text">
     <string>Tx pool viewer</string>
+   </property>
+  </action>
+  <action name="actionImportHistoryCSV">
+   <property name="text">
+    <string>Import descriptions from CSV</string>
    </property>
   </action>
  </widget>

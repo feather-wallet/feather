@@ -9,7 +9,6 @@
 #include <QObject>
 #include <QList>
 #include <QReadWriteLock>
-#include <QDateTime>
 
 #include "Wallet.h"
 
@@ -32,8 +31,10 @@ public:
     CoinsInfo * coin(int index);
     void refresh();
     void refreshUnlocked();
-    void freeze(QString &publicKey);
-    void thaw(QString &publicKey);
+
+    void freeze(QStringList &publicKeys);
+    void thaw(QStringList &publicKeys);
+
     QVector<CoinsInfo*> coins_from_txid(const QString &txid);
     QVector<CoinsInfo*> coinsFromKeyImage(const QStringList &keyimages);
     void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
@@ -44,8 +45,6 @@ public:
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
-    void coinFrozen() const;
-    void coinThawed() const;
     void descriptionChanged() const;
 
 private:

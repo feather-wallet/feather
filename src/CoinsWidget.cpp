@@ -324,18 +324,12 @@ QVector<CoinsInfo*> CoinsWidget::currentEntries() {
 }
 
 void CoinsWidget::freezeCoins(QStringList &pubkeys) {
-    for (auto &pubkey : pubkeys) {
-        m_wallet->coins()->freeze(pubkey);
-    }
-    m_wallet->coins()->refresh();
+    m_wallet->coins()->freeze(pubkeys);
     m_wallet->updateBalance();
 }
 
 void CoinsWidget::thawCoins(QStringList &pubkeys) {
-    for (auto &pubkey : pubkeys) {
-        m_wallet->coins()->thaw(pubkey);
-    }
-    m_wallet->coins()->refresh();
+    m_wallet->coins()->thaw(pubkeys);
     m_wallet->updateBalance();
 }
 

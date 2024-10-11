@@ -4,11 +4,9 @@
 #ifndef MONERO_GUI_PASSPHRASEHELPER_H
 #define MONERO_GUI_PASSPHRASEHELPER_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QMutex>
 #include <QPointer>
 #include <QWaitCondition>
-#include <QMutex>
 
 /**
  * Implements component responsible for showing entry prompt to the user,
@@ -32,7 +30,7 @@ class PassphraseHelper {
 public:
     PassphraseHelper(PassphrasePrompter * prompter=nullptr): m_prompter(prompter) {};
     PassphraseHelper(const PassphraseHelper & h): PassphraseHelper(h.m_prompter) {};
-    Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device);
+    std::optional<std::string> onDevicePassphraseRequest(bool & on_device);
     void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort);
 
 private:

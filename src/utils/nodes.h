@@ -4,13 +4,18 @@
 #ifndef FEATHER_NODES_H
 #define FEATHER_NODES_H
 
+#include <QObject>
+#include <QJsonObject>
 #include <QTimer>
 #include <QRegularExpression>
 #include <QHostAddress>
+#include <QUrl>
 
 #include "model/NodeModel.h"
 #include "utils/Utils.h"
 #include "utils/config.h"
+
+class Wallet;
 
 enum NodeSource {
     websocket = 0,
@@ -75,6 +80,10 @@ struct FeatherNode {
         QString host = url.host();
 
         if (host == "localhost") {
+            return true;
+        }
+
+        if (host.endsWith(".local")) { // RFC 6762
             return true;
         }
 

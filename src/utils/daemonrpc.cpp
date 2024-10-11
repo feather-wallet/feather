@@ -3,6 +3,9 @@
 
 #include "daemonrpc.h"
 
+#include <QJsonArray>
+#include <QJsonDocument>
+
 DaemonRpc::DaemonRpc(QObject *parent, QString daemonAddress)
         : QObject(parent)
         , m_network(new Networking(this))

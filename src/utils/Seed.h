@@ -4,17 +4,11 @@
 #ifndef FEATHER_SEED_H
 #define FEATHER_SEED_H
 
-#include "constants.h"
-#include "libwalletqt/Wallet.h"
-#include "monero_seed/monero_seed.hpp"
-#include "polyseed/polyseed.h"
-#include "utils/AppData.h"
-
+#include <QMap>
 #include <QString>
 #include <QStringList>
 
-#include <sstream>
-#include <utility>
+#include "networktype.h"
 
 struct Seed {
     enum Type {

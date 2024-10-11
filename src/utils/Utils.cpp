@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
+#include "Utils.h"
+
 #include <QApplication>
 #include <QMessageBox>
 #include <QClipboard>
@@ -9,14 +11,20 @@
 #include <QFontDatabase>
 #include <QTcpSocket>
 #include <QFileDialog>
+#include <QLayout>
+#include <QLayoutItem>
+#include <QJsonDocument>
+#include <QThread>
+#include <QStandardPaths>
+#include <QProcess>
 
 #include "constants.h"
 #include "networktype.h"
-#include "Utils.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
+#include "libwalletqt/Wallet.h"
 #include "WindowManager.h"
 
 namespace Utils {
@@ -431,6 +439,7 @@ QLocale getCurrencyLocale(const QString &currencyCode) {
         for (const auto& locale_: allLocales) {
             if (locale_.currencySymbol(QLocale::CurrencyIsoCode) == currencyCode) {
                 locale = locale_;
+                break;
             }
         }
         localeCache[currencyCode] = locale;

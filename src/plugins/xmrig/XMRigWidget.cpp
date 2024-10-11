@@ -20,7 +20,7 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::XMRigWidget)
         , m_wallet(wallet)
-        , m_XMRig(new XmRig(Config::defaultConfigDir().path()))
+        , m_XMRig(new XmRig(Config::defaultConfigDir().path(), this))
         , m_model(new QStandardItemModel(this))
         , m_contextMenu(new QMenu(this))
 {

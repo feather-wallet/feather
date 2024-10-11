@@ -7,7 +7,6 @@
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
-#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QShortcut>
 

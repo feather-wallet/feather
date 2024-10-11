@@ -3,11 +3,12 @@
 
 #include "PageHardwareDevice.h"
 #include "ui_PageHardwareDevice.h"
-#include "WalletWizard.h"
 
 #include <QCheckBox>
 #include <QDialogButtonBox>
 #include <QPushButton>
+
+#include "WalletWizard.h"
 
 PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)
@@ -16,8 +17,8 @@ PageHardwareDevice::PageHardwareDevice(WizardFields *fields, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->combo_deviceType->addItem("Ledger Nano S (PLUS) / X", DeviceType::LEDGER);
-    ui->combo_deviceType->addItem("Trezor Model T / Safe 3", DeviceType::TREZOR);
+    ui->combo_deviceType->addItem("Ledger", DeviceType::LEDGER);
+    ui->combo_deviceType->addItem("Trezor", DeviceType::TREZOR);
 
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageHardwareDevice::onOptionsClicked);
 }

@@ -5,7 +5,8 @@
 #define ADDRESSCHECKERINDEXDIALOG_H
 
 #include "components.h"
-#include "Wallet.h"
+
+class Wallet;
 
 namespace Ui {
     class AddressCheckerIndexDialog;

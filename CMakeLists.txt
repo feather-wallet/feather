@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.18)
 
 project(feather
-  VERSION "2.6.8"
+  VERSION "2.7.0"
   DESCRIPTION "A free Monero desktop wallet"
   LANGUAGES CXX C ASM
 )
@@ -14,6 +14,8 @@ set(PACKAGE_BUGREPORT "https://github.com/feather-wallet/feather/issues")
 set(PACKAGE_URL "https://featherwallet.org/")
 set(COPYRIGHT_YEAR "2024")
 set(COPYRIGHT_HOLDERS "The Monero Project")
+
+cmake_policy(SET CMP0074 NEW)
 
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
@@ -71,9 +73,7 @@ if (NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/monero/CMakeLists.txt")
     message(FATAL_ERROR "'monero/CMakeLists.txt' does not exist, did you forget to:\ngit submodule update --init --recursive --progress")
 endif()
 add_subdirectory(monero EXCLUDE_FROM_ALL)
-set_property(TARGET wallet_merged PROPERTY FOLDER "monero")
 get_directory_property(ARCH_WIDTH DIRECTORY "monero" DEFINITION ARCH_WIDTH)
-get_directory_property(UNBOUND_LIBRARY DIRECTORY "monero" DEFINITION UNBOUND_LIBRARY)
 get_directory_property(DEVICE_TREZOR_READY DIRECTORY "monero" DEFINITION DEVICE_TREZOR_READY)
 get_directory_property(TREZOR_DEP_LIBS DIRECTORY "monero" DEFINITION TREZOR_DEP_LIBS)
 get_directory_property(OPENBSD DIRECTORY "monero" DEFINITION OPENBSD)
@@ -89,10 +89,6 @@ endif()
 
 # pthread
 find_package(Threads REQUIRED)
-
-# Sodium
-find_library(SODIUM_LIBRARY sodium)
-message(STATUS "libsodium: libraries at ${SODIUM_LIBRARY}")
 
 # QrEncode
 find_package(QREncode REQUIRED)
@@ -136,26 +132,11 @@ if(MINGW)
     set(MINGW_FLAG "${MINGW_FLAG} -DWIN32_LEAN_AND_MEAN")
     set(Boost_THREADAPI win32)
 endif()
-
-set(BOOST_COMPONENTS
-        system
-        filesystem
-        thread
-        date_time
-        chrono
-        regex
-        serialization
-        program_options
-        locale
-)
+set(Boost_USE_MULTITHREADED ON)
 
 if(STACK_TRACE AND UNIX AND NOT APPLE)
-    list(APPEND BOOST_COMPONENTS
-            stacktrace_basic)
+    find_package(Boost 1.58 REQUIRED COMPONENTS stacktrace_basic)
 endif()
-
-set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.58 REQUIRED COMPONENTS ${BOOST_COMPONENTS})
 
 if(UNIX AND NOT APPLE)
     if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -248,13 +229,6 @@ endif()
 if (NOT WIN32 AND NOT OPENBSD AND NOT "${CMAKE_CXX_COMPILER_ID}" MATCHES "Clang")
     add_c_flag_if_supported(-fstack-clash-protection C_SECURITY_FLAGS)
     add_cxx_flag_if_supported(-fstack-clash-protection CXX_SECURITY_FLAGS)
-endif()
-
-# -mmitigate-rop
-# removed in GCC 9.1 (or before ?), but still accepted, so spams the output
-if (NOT (CMAKE_C_COMPILER_ID STREQUAL "GNU" AND NOT CMAKE_C_COMPILER_VERSION VERSION_LESS 9.1))
-    add_c_flag_if_supported(-mmitigate-rop C_SECURITY_FLAGS)
-    add_cxx_flag_if_supported(-mmitigate-rop CXX_SECURITY_FLAGS)
 endif()
 
 # linker

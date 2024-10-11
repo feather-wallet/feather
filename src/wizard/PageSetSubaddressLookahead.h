@@ -5,9 +5,8 @@
 #define FEATHER_PAGESETSUBADDRESSLOOKAHEAD_H
 
 #include <QWizardPage>
-#include <QWidget>
 
-#include "WalletWizard.h"
+class WizardFields;
 
 namespace Ui {
     class PageSetSubaddressLookahead;
@@ -22,6 +21,7 @@ public:
     void initializePage() override;
     bool validatePage() override;
     int nextId() const override;
+    bool isComplete() const override;
 
 private:
     Ui::PageSetSubaddressLookahead *ui;

@@ -51,9 +51,12 @@ namespace Ui {
     class MainWindow;
 }
 
-struct ToggleTab {
-    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction) :
-            tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction) {}
+class ToggleTab : QObject {
+Q_OBJECT
+
+public:
+    ToggleTab(QWidget *tab, QString name, QString description, QAction *menuAction, QObject *parent = nullptr) :
+            QObject(parent), tab(tab), key(std::move(name)), name(std::move(description)), menuAction(menuAction) {}
     QWidget *tab;
     QString key;
     QString name;
@@ -110,6 +113,7 @@ private slots:
     void menuToggleTabVisible(const QString &key);
     void menuClearHistoryClicked();
     void onExportHistoryCSV();
+    void onImportHistoryDescriptionsCSV();
     void onExportContactsCSV();
     void onCreateDesktopEntry();
     void onShowDocumentation();
@@ -128,6 +132,7 @@ private slots:
     void onTxPoolBacklog(const QVector<quint64> &backlog, quint64 originalFeeLevel, quint64 automaticFeeLevel);
 
     // libwalletqt
+    void updateBalance();
     void onBalanceUpdated(quint64 balance, quint64 spendable);
     void onSyncStatus(quint64 height, quint64 target, bool daemonSync);
     void onWalletOpened();

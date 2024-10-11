@@ -6,7 +6,6 @@
 
 #include <QObject>
 #include <QPointer>
-#include <QCoreApplication>
 
 #include "prices.h"
 #include "TxFiatHistory.h"

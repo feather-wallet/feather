@@ -8,6 +8,7 @@
 #include <QPushButton>
 
 #include "utils/Utils.h"
+#include "libwalletqt/Wallet.h"
 
 WalletUnlockWidget::WalletUnlockWidget(QWidget *parent, Wallet *wallet)
         : QWidget(parent)

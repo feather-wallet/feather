@@ -3,21 +3,27 @@
 
 #include "WindowManager.h"
 
-#include <QApplication>
 #include <QDialogButtonBox>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QWindow>
 
+#include "Application.h"
 #include "constants.h"
+#include "MainWindow.h"
+#include "dialog/DocsDialog.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/SplashDialog.h"
+#include "dialog/TorInfoDialog.h"
+#include "libwalletqt/WalletManager.h"
+#include "libwalletqt/Wallet.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
+#include "utils/AppData.h"
 
 WindowManager::WindowManager(QObject *parent)
     : QObject(parent)
@@ -33,6 +39,7 @@ WindowManager::WindowManager(QObject *parent)
     connect(m_walletManager, &WalletManager::deviceError,         this, &WindowManager::onDeviceError);
     connect(m_walletManager, &WalletManager::walletPassphraseNeeded, this, &WindowManager::onWalletPassphraseNeeded);
 
+    connect(qApp, SIGNAL(anotherInstanceStarted()), this, SLOT(raise()));
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
 
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
@@ -66,6 +73,7 @@ WindowManager::~WindowManager() {
     qDebug() << "~WindowManager";
     m_cleanupThread->quit();
     m_cleanupThread->wait();
+    qDebug() << "WindowManager: cleanup thread done" << QThread::currentThreadId();
 }
 
 // ######################## APPLICATION LIFECYCLE ########################
@@ -80,7 +88,7 @@ void WindowManager::quitAfterLastWindow() {
 }
 
 void WindowManager::close() {
-    qDebug() << Q_FUNC_INFO;
+    qDebug() << Q_FUNC_INFO << QThread::currentThreadId();
     for (const auto &window: m_windows) {
         window->close();
     }
@@ -100,11 +108,14 @@ void WindowManager::close() {
 
     torManager()->stop();
 
+    deleteLater();
+
+    qDebug() << "Calling QApplication::quit()";
     QApplication::quit();
 }
 
 void WindowManager::closeWindow(MainWindow *window) {
-    qDebug() << "closing Window";
+    qDebug() << "WindowManager: closing Window";
     m_windows.removeOne(window);
 
     // Move Wallet to a different thread for cleanup, so it doesn't block GUI thread
@@ -273,17 +284,29 @@ void WindowManager::onWalletOpened(Wallet *wallet) {
             bool showIncorrectPassword = m_openWalletTriedOnce;
             m_openWalletTriedOnce = true;
             this->onWalletOpenPasswordRequired(showIncorrectPassword, wallet->keysPath());
+            return; // Do not remove this
         }
         else if (errMsg == QString("basic_string::_M_replace_aux") || errMsg == QString("std::bad_alloc") || errMsg == "invalid signature") {
             qCritical() << errMsg;
             WalletManager::clearWalletCache(wallet->cachePath());
             errMsg = QString("%1\n\nWallet cache is unusable, moving it.").arg(errMsg);
             this->handleWalletError({nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"Try opening this wallet again.", "If this keeps happening, please file a bug report."}, "report_an_issue"});
-        } else {
+        }
+        else if (errMsg.startsWith("failed to read file")) {
+#if defined(Q_OS_MACOS)
+            Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"You may need to give Feather permission to access the folder", "In the System Settings app, go to 'Privacy & Security' -> 'Files & Folders'"}};
+#else
+            Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet", errMsg, {"You may need to change the permissions on the wallet directory."}};
+#endif
+            this->handleWalletError(message);
+        }
+        else {
             Utils::Message message{nullptr, Utils::ERROR, "Unable to open wallet"};
             this->handleDeviceError(errMsg, message);
             this->handleWalletError(message);
         }
+
+        m_openingWallet = false;
         return;
     }
 

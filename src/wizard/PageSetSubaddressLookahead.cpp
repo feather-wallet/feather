@@ -5,7 +5,9 @@
 #include "ui_PageSetSubaddressLookahead.h"
 #include "WalletWizard.h"
 
-#include <QIntValidator>
+#include <QRegularExpressionValidator>
+
+#include "Icons.h"
 
 PageSetSubaddressLookahead::PageSetSubaddressLookahead(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)
@@ -14,11 +16,19 @@ PageSetSubaddressLookahead::PageSetSubaddressLookahead(WizardFields *fields, QWi
 {
     ui->setupUi(this);
 
-    // uint32_t can go up to 4294967294, but this isn't realistic
-    auto indexValidator = new QIntValidator(1, 2147483647, this);
+    auto *indexValidator = new QRegularExpressionValidator{QRegularExpression("[0-9]{0,5}"), this};
 
     ui->line_major->setValidator(indexValidator);
+    connect(ui->line_major, &QLineEdit::textChanged, [this]{
+        this->completeChanged();
+    });
+
     ui->line_minor->setValidator(indexValidator);
+    connect(ui->line_major, &QLineEdit::textChanged, [this]{
+        this->completeChanged();
+    });
+
+    ui->infoFrame->setInfo(icons()->icon("warning"), "Lookahead must be non-zero.");
 
     this->setTitle("Subaddress Lookahead");
 }
@@ -31,6 +41,7 @@ void PageSetSubaddressLookahead::initializePage() {
         ui->line_major->setText("50");
         ui->line_minor->setText("200");
     }
+    ui->infoFrame->hide();
 }
 
 bool PageSetSubaddressLookahead::validatePage() {
@@ -40,4 +51,19 @@ bool PageSetSubaddressLookahead::validatePage() {
 
 int PageSetSubaddressLookahead::nextId() const {
     return WalletWizard::Page_WalletFile;
+}
+
+bool PageSetSubaddressLookahead::isComplete() const {
+    ui->infoFrame->hide();
+
+    if (ui->line_major->text().isEmpty() || ui->line_major->text().toInt() == 0) {
+       ui->infoFrame->show();
+       return false;
+   }
+   if (ui->line_minor->text().isEmpty() || ui->line_minor->text().toInt() == 0) {
+       ui->infoFrame->show();
+       return false;
+   }
+
+   return true;
 }

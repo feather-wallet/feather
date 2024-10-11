@@ -30,17 +30,15 @@ public slots:
 
 private slots:
     void onLinkActivated(const QUrl &link);
-    void onSelectItem(const QString &item);
+    void onSelectItem(int index);
     void onOpenLink();
     void onDonate();
-    void showContextMenu(const QPoint &pos);
 
 private:
     QScopedPointer<Ui::RevuoWidget> ui;
 
-    QMenu *m_contextMenu;
-    QHash<QString, QString> m_items;
-    QHash<QString, QString> m_links;
+    QStringList m_items;
+    QStringList m_links;
 };
 
 

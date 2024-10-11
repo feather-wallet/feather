@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include <QValidator>
 #include "PageSetRestoreHeight.h"
 #include "ui_PageSetRestoreHeight.h"
-#include "WalletWizard.h"
-#include "constants.h"
 
+#include <QValidator>
+
+#include "constants.h"
+#include "utils/AppData.h"
 #include "utils/Icons.h"
+#include "WalletWizard.h"
 
 PageSetRestoreHeight::PageSetRestoreHeight(WizardFields *fields, QWidget *parent)
         : QWizardPage(parent)

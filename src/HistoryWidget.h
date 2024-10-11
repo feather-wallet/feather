@@ -7,10 +7,8 @@
 #include <QWidget>
 #include <QMenu>
 
-#include "libwalletqt/Coins.h"
-#include "libwalletqt/Wallet.h"
-#include "model/TransactionHistoryModel.h"
-#include "model/TransactionHistoryProxyModel.h"
+class TransactionHistoryProxyModel;
+class Wallet;
 
 namespace Ui {
     class HistoryWidget;

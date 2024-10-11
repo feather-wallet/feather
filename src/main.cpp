@@ -1,19 +1,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
-#include <QResource>
-#include <QApplication>
-#include <QtCore>
-#include <QtGui>
-#include <singleapplication.h>
+#include <QSslSocket>
 
+#include "Application.h"
 #include "config-feather.h"
 #include "constants.h"
-#include "MainWindow.h"
 #include "utils/EventFilter.h"
 #include "utils/os/Prestium.h"
 #include "WindowManager.h"
 #include "config.h"
+#include <wallet/api/wallet2_api.h>
+#include "libwalletqt/Wallet.h"
+#include "libwalletqt/WalletManager.h"
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
 #define BOOST_STACKTRACE_LINK
@@ -21,8 +20,6 @@
 #include <boost/stacktrace.hpp>
 #include <fstream>
 #endif
-
-#include <QObject>
 
 #if defined(Q_OS_WIN)
 #include <windows.h>
@@ -82,32 +79,42 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 }
 #endif
 
-    QStringList argv_;
-    for(int i = 0; i != argc; i++){
-        argv_ << QString::fromStdString(argv[i]);
-    }
+#if defined(Q_OS_LINUX)
+    // PassThrough results in muddy text
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
+#endif
+
+    Application app(argc, argv);
+
+    QApplication::setApplicationName("FeatherWallet");
+    QApplication::setApplicationVersion(FEATHER_VERSION);
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("feather");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    parser.setApplicationDescription("Feather - a free Monero desktop wallet");
+    QCommandLineOption helpOption = parser.addHelpOption();
+    QCommandLineOption versionOption = parser.addVersionOption();
 
-    QCommandLineOption useLocalTorOption(QStringList() << "use-local-tor", "Use system wide installed Tor instead of the bundled.");
+    QCommandLineOption useLocalTorOption("use-local-tor", "Use system wide installed Tor instead of the bundled.");
     parser.addOption(useLocalTorOption);
 
-    QCommandLineOption quietModeOption(QStringList() << "quiet", "Limit console output");
+    QCommandLineOption quietModeOption("quiet", "Limit console output");
     parser.addOption(quietModeOption);
 
-    QCommandLineOption stagenetOption(QStringList() << "stagenet", "Stagenet is for development purposes only.");
+    QCommandLineOption stagenetOption("stagenet", "Stagenet is for development purposes only.");
     parser.addOption(stagenetOption);
 
-    QCommandLineOption testnetOption(QStringList() << "testnet", "Testnet is for development purposes only.");
+    QCommandLineOption testnetOption("testnet", "Testnet is for development purposes only.");
     parser.addOption(testnetOption);
 
-    bool parsed = parser.parse(argv_);
-    if (!parsed) {
-        qCritical() << parser.errorText();
-        exit(1);
+    parser.process(app);
+
+    if (parser.isSet(versionOption) || parser.isSet(helpOption)) {
+        return EXIT_SUCCESS;
+    }
+
+    if (app.isAlreadyRunning()) {
+        qWarning() << "Another instance of Feather is already running";
+        return EXIT_SUCCESS;
     }
 
     bool stagenet = parser.isSet(stagenetOption);
@@ -122,20 +129,8 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     else
         constants::networkType = NetworkType::MAINNET;
 
-    // Setup QApplication
-    QApplication::setDesktopSettingsAware(true); // use system font
-    QApplication::setApplicationVersion(FEATHER_VERSION);
-
-#if defined(Q_OS_LINUX)
-    // PassThrough results in muddy text
-    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::Round);
-#endif
-
-    SingleApplication app(argc, argv);
-
     QApplication::setQuitOnLastWindowClosed(false);
-    QApplication::setApplicationName("FeatherWallet");
-
+    QApplication::setDesktopSettingsAware(true); // use system font
 
     // Setup config directories
     QString configDir = Config::defaultConfigDir().path();
@@ -193,8 +188,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 
     conf()->set(Config::restartRequired, false);
 
-    parser.process(app); // Parse again for --help and --version
-
     if (!quiet) {
         QMap<QString, QString> info;
         info["Qt"] = QT_VERSION_STR;
@@ -238,9 +231,7 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     auto wm = windowManager();
     wm->setEventFilter(&filter);
 
-    QObject::connect(&app, &SingleApplication::instanceStarted, [&wm]() {
-        wm->raise();
-    });
-
-    return QApplication::exec();
+    int exitCode = Application::exec();
+    qDebug() << "Application::exec() returned";
+    return exitCode;
 }

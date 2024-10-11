@@ -5,6 +5,7 @@
 #include "Wallet.h"
 
 #include "utils/ScopeGuard.h"
+#include <wallet/api/wallet2_api.h>
 
 class WalletPassphraseListenerImpl : public Monero::WalletListener, public PassphraseReceiver
 {
@@ -12,7 +13,7 @@ public:
     explicit WalletPassphraseListenerImpl(WalletManager * mgr): m_mgr(mgr), m_phelper(mgr) {}
 
     void moneySpent(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
-    void moneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
+    void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override { (void)txId; (void)amount; (void)coinbase;};
     void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override { (void)txId; (void)amount; };
     void newBlock(uint64_t height) override { (void) height; };
     void updated() override {};
@@ -24,7 +25,7 @@ public:
         m_phelper.onPassphraseEntered(passphrase, enter_on_device, entry_abort);
     }
 
-    Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
+    std::optional<std::string> onDevicePassphraseRequest(bool & on_device) override
     {
         qDebug() << __FUNCTION__;
         return m_phelper.onDevicePassphraseRequest(on_device);
@@ -312,6 +313,7 @@ WalletManager::WalletManager(QObject *parent)
 
 WalletManager::~WalletManager()
 {
+    qDebug() << "~WalletManager" << QThread::currentThreadId();
     m_scheduler.shutdownWaitForFinished();
 }
 

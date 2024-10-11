@@ -5,13 +5,7 @@
 #define FEATHER_QRCODESCANDIALOG_H
 
 #include <QDialog>
-#include <QCamera>
 #include <QScopedPointer>
-#include <QMediaCaptureSession>
-#include <QTimer>
-#include <QVideoSink>
-
-#include "QrScanThread.h"
 
 namespace Ui {
     class QrCodeScanDialog;

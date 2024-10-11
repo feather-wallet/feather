@@ -6,8 +6,9 @@
 #include "Transfer.h"
 #include "Ring.h"
 
-TransactionRow::TransactionRow()
-        : m_direction(TransactionRow::Direction_Out)
+TransactionRow::TransactionRow(QObject *parent)
+        : QObject(parent)
+        , m_direction(TransactionRow::Direction_Out)
         , m_pending(false)
         , m_failed(false)
         , m_coinbase(false)
@@ -164,4 +165,14 @@ QString TransactionRow::rings_formatted() const
         rings += "\n\n";
     }
     return rings;
+}
+
+bool TransactionRow::hasPaymentId() const {
+    return m_paymentId != "0000000000000000";
+}
+
+TransactionRow::~TransactionRow()
+{
+    qDeleteAll(m_transfers);
+    qDeleteAll(m_rings);
 }

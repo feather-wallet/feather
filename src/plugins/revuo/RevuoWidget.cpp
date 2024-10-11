@@ -4,30 +4,28 @@
 #include "RevuoWidget.h"
 #include "ui_RevuoWidget.h"
 
+#include <QJsonArray>
+
 #include "utils/ColorScheme.h"
 #include "Utils.h"
+#include "utils/Icons.h"
 #include "utils/WebsocketNotifier.h"
 
 RevuoWidget::RevuoWidget(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::RevuoWidget)
-        , m_contextMenu(new QMenu(this))
 {
     ui->setupUi(this);
 
     ui->textBrowser->setOpenLinks(false);
     ui->textBrowser->document()->setDefaultStyleSheet("a {color: white; }");
+    ui->textBrowser->setText("<h4>No item selected</h4>");
     connect(ui->textBrowser, &QTextBrowser::anchorClicked, this, &RevuoWidget::onLinkActivated);
 
-    ui->textBrowser->setText("<h4>No item selected</h4>");
+    ui->btn_openLink->setIcon(icons()->icon("external-link.svg"));
+    connect(ui->btn_openLink, &QPushButton::clicked, this, &RevuoWidget::onOpenLink);
 
-    m_contextMenu->addAction("Open link", this, &RevuoWidget::onOpenLink);
-    m_contextMenu->addAction("Donate to author", this, &RevuoWidget::onDonate);
-
-    ui->splitter->setStretchFactor(1, 5);
-
-    connect(ui->listWidget, &QListWidget::currentTextChanged, this, &RevuoWidget::onSelectItem);
-    connect(ui->listWidget, &QListWidget::customContextMenuRequested, this, &RevuoWidget::showContextMenu);
+    connect(ui->combo_issue, &QComboBox::currentIndexChanged, this, &RevuoWidget::onSelectItem);
 
     connect(websocketNotifier(), &WebsocketNotifier::dataReceived, this, [this](const QString& type, const QJsonValue& json) {
         if (type == "revuo") {
@@ -37,18 +35,21 @@ RevuoWidget::RevuoWidget(QWidget *parent)
             for (const auto &entry: revuo_data) {
                 auto obj = entry.toObject();
 
-                QStringList newsbytes;
+                QSharedPointer<RevuoItem> item = QSharedPointer<RevuoItem>(new RevuoItem(this));
+
                 for (const auto &n : obj.value("newsbytes").toArray()) {
-                    newsbytes.append(n.toString());
+                    item->newsbytes.append(n.toString());
                 }
 
-                auto revuoItem = new RevuoItem(
-                        obj.value("title").toString(),
-                        obj.value("url").toString(),
-                        newsbytes);
+                for (const auto &e : obj.value("events").toArray()) {
+                    auto f = e.toObject();
+                    item->events.append({f.value("date").toString(), f.value("description").toString()});
+                }
 
-                QSharedPointer<RevuoItem> r = QSharedPointer<RevuoItem>(revuoItem);
-                l.append(r);
+                item->title = obj.value("title").toString();
+                item->url = obj.value("url").toString();
+
+                l.append(item);
             }
 
             this->updateItems(l);
@@ -57,6 +58,10 @@ RevuoWidget::RevuoWidget(QWidget *parent)
 }
 
 void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
+    m_items.clear();
+    m_links.clear();
+    ui->combo_issue->clear();
+
     QStringList titles;
     for (const auto &item : items) {
         titles << item->title;
@@ -65,26 +70,34 @@ void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
         for (const auto &newsbyte : item->newsbytes) {
             text += "<p> • " + newsbyte + "</p>\n";
         }
-        text += QString("<br>\nRead the whole issue in your <a href=\"%1\">browser</a>.").arg(item->url);
+        text += "<h3>Upcoming Events</h3>\n";
+        if (item->events.isEmpty()) {
+            text += "<p>There are no upcoming events.</p>\n";
+        }
+        for (const auto &event : item->events) {
+            text += "<h4>" + event.first + "</h4>\n";
+            text += "<p>" + event.second + "</p>\n";
+        }
+        text += "<hr>";
+        text += QString("Read the whole issue in your <a href=\"%1\">browser</a>.").arg(item->url);
         text += "<br><br>\nEnjoy Revuo? Consider a <a href=\"feather://donate-revuo\">donation</a> to the author.";
 
-        m_items[item->title] = text;
-        m_links[item->title] = item->url;
+        m_items.append(text);
+        m_links.append(item->url);
+        ui->combo_issue->addItem(item->title);
     }
 
-    ui->listWidget->clear();
-    ui->listWidget->addItems(titles);
-    ui->listWidget->setCurrentRow(0);
-    ui->listWidget->setMinimumWidth(ui->listWidget->sizeHintForColumn(0) + 10);
+    ui->combo_issue->setCurrentIndex(0);
+
 }
 
-void RevuoWidget::onSelectItem(const QString &item) {
-    auto *currentItem = ui->listWidget->currentItem();
-    if (currentItem == nullptr) {
+void RevuoWidget::onSelectItem(int index) {
+    if (index >= m_items.length() || index < 0) {
+        ui->textBrowser->setText("<h4>No item selected</h4>");
         return;
     }
-    QString title = currentItem->text();
-    ui->textBrowser->setText(m_items[title]);
+
+    ui->textBrowser->setText(m_items[index]);
 }
 
 void RevuoWidget::onLinkActivated(const QUrl &link) {
@@ -96,12 +109,8 @@ void RevuoWidget::onLinkActivated(const QUrl &link) {
     Utils::externalLinkWarning(this, link.toString());
 }
 
-void RevuoWidget::showContextMenu(const QPoint &pos) {
-    m_contextMenu->exec(ui->listWidget->viewport()->mapToGlobal(pos));
-}
-
 void RevuoWidget::onOpenLink() {
-    QString currentItem = ui->listWidget->currentItem()->text();
+    int currentItem = ui->combo_issue->currentIndex();
     Utils::externalLinkWarning(this, m_links[currentItem]);
 }
 
@@ -117,7 +126,7 @@ void RevuoWidget::skinChanged() {
     auto stylesheet = QString("a {color: %1; }").arg(color);
 
     ui->textBrowser->document()->setDefaultStyleSheet(stylesheet);
-    this->onSelectItem("");
+    this->onSelectItem(0);
 }
 
 RevuoWidget::~RevuoWidget() = default;

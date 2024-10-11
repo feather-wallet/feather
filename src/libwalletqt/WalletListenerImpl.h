@@ -16,7 +16,7 @@ public:
 
     virtual void moneySpent(const std::string &txId, uint64_t amount) override;
 
-    virtual void moneyReceived(const std::string &txId, uint64_t amount) override;
+    virtual void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override;
 
     virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override;
 
@@ -35,7 +35,7 @@ public:
 
     virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override;
 
-    virtual Monero::optional<std::string> onDevicePassphraseRequest(bool & on_device) override;
+    virtual std::optional<std::string> onDevicePassphraseRequest(bool & on_device) override;
 
 private:
     Wallet * m_wallet;

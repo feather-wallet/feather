@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "PendingTransactionInfo.h"
+#include <wallet/api/wallet2_api.h>
 
 quint64 PendingTransactionInfo::fee() const {
     return m_fee;

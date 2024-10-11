@@ -70,10 +70,14 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
     ui->frameInputs->hide();
 //    }
 
+    ui->frame_destinationsWarning->hide();
+
     QTextCursor cursor = ui->outputs->textCursor();
 
     auto transfers = txInfo->transfers();
     if (!transfers.isEmpty()) {
+        bool hasIntegrated = false;
+
         for (const auto& transfer : transfers) {
             auto address = transfer->address();
             auto amount = WalletManager::displayAmount(transfer->amount());
@@ -81,9 +85,21 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
             cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
             cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
             cursor.insertBlock();
+
+            if (WalletManager::baseAddressFromIntegratedAddress(transfer->address(), constants::networkType) != transfer->address()) {
+                hasIntegrated = true;
+            }
         }
         ui->label_outputs->setText(QString("Destinations (%2)").arg(QString::number(transfers.size())));
         this->adjustHeight(ui->outputs, transfers.size());
+
+        // Trezor saves a mangled payment ID.
+        if (m_wallet->isTrezor() && !hasIntegrated && txInfo->hasPaymentId()) {
+            ui->frame_destinationsWarning->setInfo(icons()->icon("warning"), "The address displayed here does not contain a payment ID. "
+                                                                             "If you are making a repeat payment to a service, "
+                                                                             "do not copy the address from here to prevent a loss of funds.");
+            ui->frame_destinationsWarning->show();
+        }
     } else {
         ui->frameOutputs->hide();
     }

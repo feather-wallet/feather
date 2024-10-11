@@ -5,7 +5,6 @@
 #include "TransactionHistory.h"
 #include "constants.h"
 #include "utils/config.h"
-#include "utils/ColorScheme.h"
 #include "utils/Icons.h"
 #include "utils/AppData.h"
 #include "utils/Utils.h"
@@ -237,6 +236,8 @@ bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &
                     hash = tInfo.hash();
                 });
                 m_transactionHistory->setTxNote(hash, value.toString());
+                m_transactionHistory->refresh();
+                emit transactionDescriptionChanged();
                 break;
             }
             default:

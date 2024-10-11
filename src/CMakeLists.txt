@@ -20,11 +20,6 @@ endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-set(QAPPLICATION_CLASS QApplication CACHE STRING "Inheritance class for SingleApplication")
-add_subdirectory(third-party/singleapplication)
-
-
-
 if (CHECK_UPDATES)
     add_subdirectory(openpgp)
 endif()
@@ -227,7 +222,7 @@ if(STATIC)
 endif()
 
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_definitions(feather PRIVATE QT_NO_DEBUG=0)
+    target_compile_definitions(feather PRIVATE QT_NO_DEBUG=1)
 endif()
 
 target_compile_definitions(feather
@@ -254,11 +249,8 @@ if (DEPENDS)
 endif()
 
 target_link_libraries(feather PRIVATE
-        wallet_merged
-        ${LMDB_LIBRARY}
+        wallet_api
         epee
-        ${UNBOUND_LIBRARY}
-        ${SODIUM_LIBRARY}
         easylogging
         ringct
         ${Boost_LIBRARIES}
@@ -274,7 +266,6 @@ target_link_libraries(feather PRIVATE
         Threads::Threads
         ${QRENCODE_LIBRARY}
         ${POLYSEED_LIBRARY}
-        SingleApplication::SingleApplication
         ${ICU_LIBRARIES}
         ${LIBZIP_LIBRARIES}
         ${ZLIB_LIBRARIES}
@@ -285,11 +276,11 @@ if(CHECK_UPDATES)
     target_link_libraries(feather PRIVATE openpgp)
 endif()
 
-if(DEPENDS)
-    target_link_libraries(feather PRIVATE ${ICONV_LIBRARIES})
-endif()
-
 if(DEVICE_TREZOR_READY)
+    find_package(Protobuf CONFIG)
+    if (NOT Protobuf_FOUND)
+        find_package(Protobuf REQUIRED)
+    endif()
     target_link_libraries(feather PRIVATE ${TREZOR_DEP_LIBS})
 endif()
 

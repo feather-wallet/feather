@@ -4,12 +4,9 @@
 #ifndef FEATHER_PAGEHARDWAREDEVICE_H
 #define FEATHER_PAGEHARDWAREDEVICE_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
-#include <QDir>
 
-#include "WalletWizard.h"
+class WizardFields;
 
 namespace Ui {
     class PageHardwareDevice;

@@ -5,9 +5,9 @@
 #define FEATHER_OFFLINETXSIGNINGWIZARD_H
 
 #include <QWizard>
-#include "Wallet.h"
-
 #include <QFileDialog>
+
+#include "Wallet.h"
 #include "qrcode/scanner/QrCodeScanWidget.h"
 
 struct TxWizardFields {

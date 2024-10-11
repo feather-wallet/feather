@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
+#include "utils/Networking.h"
+
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
+#include <QJsonDocument>
 
-#include "utils/Utils.h"
-#include "utils/Networking.h"
 #include "utils/NetworkManager.h"
 #include "config.h"
 

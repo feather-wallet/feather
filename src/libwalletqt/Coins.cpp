@@ -34,6 +34,8 @@ CoinsInfo* Coins::coin(int index)
 
 void Coins::refresh()
 {
+    qDebug() << Q_FUNC_INFO;
+
     emit refreshStarted();
 
     boost::shared_lock<boost::shared_mutex> transfers_lock(m_wallet2->m_transfers_mutex);
@@ -103,48 +105,52 @@ quint64 Coins::count() const
     return m_rows.length();
 }
 
-void Coins::freeze(QString &publicKey)
+void Coins::freeze(QStringList &publicKeys)
 {
     crypto::public_key pk;
-    if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
-    {
-        qWarning() << "Invalid public key: " << publicKey;
-        return;
+
+    for (const auto& publicKey : publicKeys) {
+        if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
+        {
+            qWarning() << "Invalid public key: " << publicKey;
+            continue;
+        }
+
+        try
+        {
+            m_wallet2->freeze(pk);
+        }
+        catch (const std::exception& e)
+        {
+            qWarning() << "freeze: " << e.what();
+        }
     }
 
-    try
-    {
-        m_wallet2->freeze(pk);
-        refresh();
-    }
-    catch (const std::exception& e)
-    {
-        qWarning() << "freeze: " << e.what();
-    }
-
-    emit coinFrozen();
+    refresh();
 }
 
-void Coins::thaw(QString &publicKey)
+void Coins::thaw(QStringList &publicKeys)
 {
     crypto::public_key pk;
-    if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
-    {
-        qWarning() << "Invalid public key: " << publicKey;
-        return;
+
+    for (const auto& publicKey : publicKeys) {
+        if (!epee::string_tools::hex_to_pod(publicKey.toStdString(), pk))
+        {
+            qWarning() << "Invalid public key: " << publicKey;
+            continue;
+        }
+
+        try
+        {
+            m_wallet2->thaw(pk);
+        }
+        catch (const std::exception& e)
+        {
+            qWarning() << "thaw: " << e.what();
+        }
     }
 
-    try
-    {
-        m_wallet2->thaw(pk);
-        refresh();
-    }
-    catch (const std::exception& e)
-    {
-        qWarning() << "thaw: " << e.what();
-    }
-
-    emit coinThawed();
+    refresh();
 }
 
 QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)

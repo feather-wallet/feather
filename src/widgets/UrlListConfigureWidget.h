@@ -5,7 +5,6 @@
 #define FEATHER_URLLISTCONFIGUREWIDGET_H
 
 #include <QWidget>
-#include <QTextEdit>
 
 #include "utils/config.h"
 

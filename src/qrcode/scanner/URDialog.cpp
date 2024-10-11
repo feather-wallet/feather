@@ -8,7 +8,6 @@
 #include <QInputDialog>
 
 #include "utils/Utils.h"
-#include "WalletManager.h"
 
 URDialog::URDialog(QWidget *parent)
         : WindowModalDialog(parent)

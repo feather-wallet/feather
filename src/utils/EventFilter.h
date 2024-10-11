@@ -16,7 +16,6 @@ public:
 protected:
     bool eventFilter(QObject *obj, QEvent *ev);
 
-
 signals:
     void userActivity();
 };

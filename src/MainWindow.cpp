@@ -26,12 +26,13 @@
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/Transfer.h"
+#include "libwalletqt/TransactionHistory.h"
+#include "model/AddressBookModel.h"
 #include "plugins/PluginRegistry.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
-#include "utils/SemanticVersion.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
@@ -115,6 +116,9 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     conf()->set(Config::firstRun, false);
 
     this->onWalletOpened();
+
+    connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &MainWindow::updateBalance);
+    connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &MainWindow::updateBalance);
 
 #ifdef DONATE_BEG
     this->donationNag();
@@ -312,6 +316,7 @@ void MainWindow::initMenu() {
 
     // [Wallet] -> [History]
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
+    connect(ui->actionImportHistoryCSV, &QAction::triggered, this, &MainWindow::onImportHistoryDescriptionsCSV);
 
     // [Wallet] -> [Contacts]
     connect(ui->actionExportContactsCSV, &QAction::triggered, this, &MainWindow::onExportContactsCSV);
@@ -324,7 +329,7 @@ void MainWindow::initMenu() {
 
     // Show/Hide Coins
     connect(ui->actionShow_Coins, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-    m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins);
+    m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins, this);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Coins, "Coins");
 
     // Show/Hide Plugins..
@@ -336,7 +341,7 @@ void MainWindow::initMenu() {
         auto* pluginAction = new QAction(QString("Show %1").arg(plugin->displayName()), this);
         ui->menuView->insertAction(plugin->insertFirst() ? ui->actionPlaceholderBegin : ui->actionPlaceholderEnd, pluginAction);
         connect(pluginAction, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-        m_tabShowHideMapper[plugin->displayName()] = new ToggleTab(plugin->tab(), plugin->displayName(), plugin->displayName(), pluginAction);
+        m_tabShowHideMapper[plugin->displayName()] = new ToggleTab(plugin->tab(), plugin->displayName(), plugin->displayName(), pluginAction, this);
         m_tabShowHideSignalMapper->setMapping(pluginAction, plugin->displayName());
     }
     ui->actionPlaceholderBegin->setVisible(false);
@@ -482,6 +487,12 @@ void MainWindow::initWalletContext() {
            m_windowManager->notify("Payment received", notify, 5000);
        }
     });
+    connect(m_wallet, &Wallet::moneyReceived, this, [this](const QString &txId, uint64_t amount, bool coinbase){
+        if (m_wallet->isSynchronized() && !m_locked && coinbase) {
+            auto notify = QString("%1 XMR").arg(WalletManager::displayAmount(amount, false));
+            m_windowManager->notify("Mining payment received", notify, 5000);
+        }
+    });
 
     // Device
     connect(m_wallet, &Wallet::deviceButtonRequest, this, &MainWindow::onDeviceButtonRequest);
@@ -566,7 +577,7 @@ void MainWindow::onWalletOpened() {
         m_wallet->history()->refresh();
     });
     // Vice versa
-    connect(m_wallet->history(), &TransactionHistory::txNoteChanged, [this] {
+    connect(m_wallet->transactionHistoryModel(), &TransactionHistoryModel::transactionDescriptionChanged, [this] {
         m_wallet->coins()->refresh();
     });
 
@@ -579,6 +590,10 @@ void MainWindow::onWalletOpened() {
     if (conf()->get(Config::writeRecentlyOpenedWallets).toBool()) {
         this->addToRecentlyOpened(m_wallet->cachePath());
     }
+}
+
+void MainWindow::updateBalance() {
+    this->onBalanceUpdated(m_wallet->balance(), m_wallet->unlockedBalance());
 }
 
 void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
@@ -599,6 +614,12 @@ void MainWindow::onBalanceUpdated(quint64 balance, quint64 spendable) {
         if (displaySetting == Config::spendablePlusUnconfirmed && balance > spendable) {
             balance_str += QString(" (+%1 XMR unconfirmed)").arg(WalletManager::displayAmount(balance - spendable, false, decimals));
         }
+    }
+
+    if (conf()->get(Config::balanceShowFiat).toBool() && !hide) {
+        QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+        double balanceFiatAmount = appData()->prices.convert("XMR", fiatCurrency, balance / constants::cdiv);
+        balance_str += QString(" (%1)").arg(Utils::amountToCurrencyString(balanceFiatAmount, fiatCurrency));
     }
 
     m_statusLabelBalance->setToolTip("Click for details");
@@ -911,7 +932,7 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
         return;
     }
     else if (tx->txCount() > 1) {
-        Utils::showError(this, "Failed to construct transaction", "Split transactions are not supported", {"Try sending a smaller amount."});
+        Utils::showError(this, "Failed to construct transaction", "Transaction tries to spend too many inputs", {"Send a smaller amount of XMR to yourself first."});
         m_wallet->disposeTransaction(tx);
         return;
     }
@@ -1208,6 +1229,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     qDebug() << Q_FUNC_INFO;
 
     if (!this->cleanedUp) {
+        qDebug() << "MainWindow: cleaning up";
         this->cleanedUp = true;
 
         emit aboutToQuit();
@@ -1693,6 +1715,21 @@ void MainWindow::onExportHistoryCSV() {
     Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
 }
 
+void MainWindow::onImportHistoryDescriptionsCSV() {
+    const QString fileName = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
+    if (fileName.isEmpty()) {
+        return;
+    }
+
+    QString error = m_wallet->history()->importLabelsFromCSV(fileName);
+    if (!error.isEmpty()) {
+        Utils::showError(this, "Unable to import transaction descriptions from CSV", error);
+    }
+    else {
+        Utils::showInfo(this, "Successfully imported transaction descriptions from CSV");
+    }
+}
+
 void MainWindow::onExportContactsCSV() {
     auto *model = m_wallet->addressBookModel();
     if (model->rowCount() <= 0){
@@ -1762,8 +1799,8 @@ void MainWindow::donationNag() {
 
     donationCounter++;
     if (donationCounter % constants::donationBoundary == 0) {
-        auto msg = "Feather is a 100% community-sponsored endeavor. Please consider supporting "
-                   "the project financially. Get rid of this message by donating any amount.";
+        auto msg = "Feather development is funded entirely through donations.\n\nPlease consider supporting "
+                   "the project. Donate any amount to remove this reminder.";
         int ret = QMessageBox::information(this, "Donate to Feather", msg, QMessageBox::Yes, QMessageBox::No);
         if (ret == QMessageBox::Yes) {
             this->donateButtonClicked();
@@ -1935,5 +1972,5 @@ int MainWindow::findTab(const QString &title) {
 }
 
 MainWindow::~MainWindow() {
-    qDebug() << "~MainWindow";
+    qDebug() << "~MainWindow" << QThread::currentThreadId();
 }

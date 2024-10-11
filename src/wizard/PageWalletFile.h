@@ -4,10 +4,9 @@
 #ifndef FEATHER_CREATEWALLET_H
 #define FEATHER_CREATEWALLET_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
-#include <QDir>
+
+class WizardFields;
 
 namespace Ui {
     class PageWalletFile;

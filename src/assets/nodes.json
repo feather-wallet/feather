@@ -3,8 +3,6 @@
     "tor": [
       "sfprpc2fws6ltnq4hyr7lvpul3nank5layd7q7tyc5h4gy4h77gtabad.onion:18089",
       "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
-      "6dsdenp6vjkvqzy4wzsnzn6wixkdzihx3khiumyzieauxuxslmcaeiad.onion:18081",
-      "56wl7y2ebhamkkiza4b7il4mrzwtyvpdym7bm2bkg3jrei2je646k3qd.onion:18089",
       "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
       "mhfsxznn5pi4xuxohj5k7unqp73sa6d44mbeewbpxnm25z3wzfogcfyd.onion:18081",
       "7inib34hqn2ocmlaaxjshdavbdn5w5rfdff735lbz33765j2pz3tn4ad.onion:18081",
@@ -21,10 +19,10 @@
       "rucknium757bokwv3ss35ftgc3gzb7hgbvvglbg3hisp7tsj2fkd2nyd.onion:18081"
     ],
     "i2p": [
-      "ynk3hrwte23asonojqeskoulek2g2cd6tqg4neghnenfyljrvhga.b32.i2p:18081",
-      "t7lce3j7mwxt32h755u3njjp3k6og3defgueo3iecgsexxnkoezouobc.b32.i2p:18089",
-      "ecnfc7oyzzw3jmwc2omxzccbik33wyyaofxsfow7342z6kjanq6a.b32.i2p:18089",
-      "xmp3afekvuhbmzxl2bgj6ju23d6feqpumxuzdqzq4aysbijohdxa.b32.i2p:18089"
+      "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089",
+      "vdmnehdjkpkg57nthgnjfuaqgku673r5bpbqg56ix6fyqoywgqrq.b32.i2p:18089",
+      "uqj3aphckqtjsitz7kxx5flqpwjlq5ppr3chazfued7xucv3nheq.b32.i2p:18089",
+      "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p:18089"
     ],
     "clearnet": [
       "node.community.rino.io:18081",

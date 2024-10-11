@@ -4,22 +4,26 @@
 #ifndef WALLET_H
 #define WALLET_H
 
-#include <QElapsedTimer>
 #include <QObject>
 #include <QMutex>
-#include <QList>
-#include <QtConcurrent/QtConcurrent>
 
 #include "utils/scheduler.h"
 #include "PendingTransaction.h"
 #include "UnsignedTransaction.h"
 #include "utils/networktype.h"
 #include "PassphraseHelper.h"
-#include "WalletListenerImpl.h"
 #include "rows/TxBacklogEntry.h"
+
+#include <set>
+
+class WalletListenerImpl;
 
 namespace Monero {
     struct Wallet; // forward declaration
+}
+
+namespace tools {
+    struct wallet2;
 }
 
 struct TxProof {
@@ -94,17 +98,17 @@ public:
     ~Wallet() override;
 
     enum Status {
-        Status_Ok          = Monero::Wallet::Status_Ok,
-        Status_Error       = Monero::Wallet::Status_Error,
-        Status_Critical    = Monero::Wallet::Status_Critical,
-        Status_BadPassword = Monero::Wallet::Status_BadPassword
+        Status_Ok          = 0,
+        Status_Error       = 1,
+        Status_Critical    = 2,
+        Status_BadPassword = 3
     };
 
     Q_ENUM(Status)
 
     enum ConnectionStatus {
-        ConnectionStatus_Disconnected    = Monero::Wallet::ConnectionStatus_Disconnected,
-        ConnectionStatus_WrongVersion    = Monero::Wallet::ConnectionStatus_WrongVersion,
+        ConnectionStatus_Disconnected    = 0,
+        ConnectionStatus_WrongVersion    = 2,
         ConnectionStatus_Connecting = 9,
         ConnectionStatus_Synchronizing = 10,
         ConnectionStatus_Synchronized = 11
@@ -186,10 +190,10 @@ public:
     void setSeedLanguage(const QString &lang);
 
     //! Get wallet keys
-    QString getSecretViewKey() const {return QString::fromStdString(m_walletImpl->secretViewKey());}
-    QString getPublicViewKey() const {return QString::fromStdString(m_walletImpl->publicViewKey());}
-    QString getSecretSpendKey() const {return QString::fromStdString(m_walletImpl->secretSpendKey());}
-    QString getPublicSpendKey() const {return QString::fromStdString(m_walletImpl->publicSpendKey());}
+    QString getSecretViewKey() const;
+    QString getPublicViewKey() const;
+    QString getSecretSpendKey() const;
+    QString getPublicSpendKey() const;
 
     // ##### Node connection #####
 
@@ -399,7 +403,7 @@ public:
 
     bool setRingDatabase(const QString &path);
 
-    quint64 getWalletCreationHeight() const {return m_walletImpl->getRefreshFromBlockHeight();}
+    quint64 getWalletCreationHeight() const;
     void setWalletCreationHeight(quint64 height);
 
     //! Rescan spent outputs
@@ -431,7 +435,7 @@ signals:
     void refreshed(bool success, const QString &message);
 
     void moneySpent(const QString &txId, quint64 amount);
-    void moneyReceived(const QString &txId, quint64 amount);
+    void moneyReceived(const QString &txId, quint64 amount, bool coinbase);
     void unconfirmedMoneyReceived(const QString &txId, quint64 amount);
     void newBlock(quint64 height, quint64 targetHeight);
     void walletCreationHeightChanged();
@@ -528,7 +532,5 @@ private:
     QTimer *m_storeTimer = nullptr;
     std::set<std::string> m_selectedInputs;
 };
-
-
 
 #endif // WALLET_H

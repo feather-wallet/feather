@@ -4,11 +4,7 @@
 #ifndef SUBADDRESSMODEL_H
 #define SUBADDRESSMODEL_H
 
-#include <wallet/api/wallet2_api.h>
-
 #include <QAbstractTableModel>
-#include <QSortFilterProxyModel>
-#include <QDebug>
 
 #include "rows/SubaddressRow.h"
 

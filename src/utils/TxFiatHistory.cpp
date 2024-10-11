@@ -2,6 +2,9 @@
 // SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #include "TxFiatHistory.h"
+
+#include <QJsonObject>
+
 #include "utils/Utils.h"
 
 TxFiatHistory::TxFiatHistory(int genesis_timestamp, const QString &configDirectory, QObject *parent)

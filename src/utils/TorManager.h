@@ -4,11 +4,10 @@
 #ifndef FEATHER_TOR_H
 #define FEATHER_TOR_H
 
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
-#include <QRegularExpression>
-#include <QtNetwork>
+#include <QObject>
+#include <QProcess>
+#include <QTimer>
+
 #include "utils/SemanticVersion.h"
 
 class TorManager : public QObject

@@ -4,10 +4,7 @@
 #ifndef FEATHER_RINGS_H
 #define FEATHER_RINGS_H
 
-#include <wallet/api/wallet2_api.h>
 #include <QObject>
-#include <QList>
-#include <utility>
 
 class Ring : public QObject
 {

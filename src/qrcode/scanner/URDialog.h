@@ -4,8 +4,6 @@
 #ifndef FEATHER_URDIALOG_H
 #define FEATHER_URDIALOG_H
 
-#include <QDialog>
-
 #include "components.h"
 
 namespace Ui {

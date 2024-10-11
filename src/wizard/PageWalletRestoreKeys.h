@@ -4,13 +4,9 @@
 #ifndef FEATHER_WIZARDVIEWONLY_H
 #define FEATHER_WIZARDVIEWONLY_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
-#include <QTextEdit>
-#include <QCompleter>
 
-#include "WalletWizard.h"
+class WizardFields;
 
 namespace Ui {
     class PageWalletRestoreKeys;

@@ -4,11 +4,11 @@
 #ifndef FEATHER_CREATEWALLETSEED_H
 #define FEATHER_CREATEWALLETSEED_H
 
-#include <QLabel>
 #include <QWizardPage>
-#include <QWidget>
 
-#include "utils/Utils.h"
+#include "utils/Seed.h"
+
+class WizardFields;
 
 namespace Ui {
     class PageWalletSeed;

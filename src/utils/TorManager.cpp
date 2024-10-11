@@ -3,7 +3,8 @@
 
 #include "utils/TorManager.h"
 
-#include <QDesktopServices>
+#include <QCoreApplication>
+#include <QDirIterator>
 
 #include "utils/config.h"
 #include "utils/Utils.h"

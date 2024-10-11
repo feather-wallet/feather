@@ -243,7 +243,7 @@ void UpdateDialog::onInstallUpdate() {
     }
 
     if (m_updater->platformTag == "win-installer") {
-        this->setStatus("Installer written. Click 'restart' to close Feather and start the installer.");
+        this->setStatus("Installer written. Click 'Restart Feather' to close Feather and start the installer.");
     } else {
         this->setStatus("Installation successful. Do you want to restart Feather now?");
     }
