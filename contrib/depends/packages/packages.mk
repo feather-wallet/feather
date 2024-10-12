@@ -1,4 +1,4 @@
-packages := boost openssl unbound qrencode libsodium polyseed hidapi abseil protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp
+packages := boost openssl unbound qrencode libsodium polyseed hidapi abseil protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp libarchive
 native_packages := native_qt native_abseil native_protobuf
 
 linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime 
