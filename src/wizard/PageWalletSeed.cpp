@@ -53,7 +53,7 @@ PageWalletSeed::PageWalletSeed(WizardFields *fields, QWidget *parent)
         this->seedRoulette(0);
     });
     connect(ui->btnCopy, &QPushButton::clicked, [this]{
-        Utils::copyToClipboard(m_seed.mnemonic.join(" "));
+        Utils::copyToClipboard(m_seed.mnemonic.join(" ").trimmed());
     });
     connect(ui->btnOptions, &QPushButton::clicked, this, &PageWalletSeed::onOptionsClicked);
 }
@@ -82,7 +82,7 @@ void PageWalletSeed::generateSeed(const char* secret) {
     QString mnemonic;
 
     m_seed = Seed(Seed::Type::POLYSEED, constants::networkType, "English", secret);
-    mnemonic = m_seed.mnemonic.join(" ");
+    mnemonic = m_seed.mnemonic.join(" ").trimmed();
     m_restoreHeight = m_seed.restoreHeight;
 
     this->displaySeed(mnemonic);
