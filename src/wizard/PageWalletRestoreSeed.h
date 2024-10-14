@@ -43,7 +43,7 @@ private:
         int length;
         QStringList words;
         QStringListModel completerModel;
-        SpaceCompleter completer;
+        QCompleter completer;
         Seed::Type type;
     };
 

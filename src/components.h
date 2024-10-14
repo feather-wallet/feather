@@ -118,13 +118,4 @@ public:
     }
 };
 
-class SpaceCompleter : public QCompleter {
-protected:
-    QString pathFromIndex(const QModelIndex &index) const override
-    {
-        QString completion = QCompleter::pathFromIndex(index);
-        return completion + ' ';
-    }
-};
-
 #endif //FEATHER_COMPONENTS_H
