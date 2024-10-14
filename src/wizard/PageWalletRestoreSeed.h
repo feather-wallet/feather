@@ -8,6 +8,8 @@
 #include <QCompleter>
 #include <QStringListModel>
 
+#include "components.h"
+
 namespace Ui {
     class PageWalletRestoreSeed;
 }
@@ -41,7 +43,7 @@ private:
         int length;
         QStringList words;
         QStringListModel completerModel;
-        QCompleter completer;
+        SpaceCompleter completer;
         Seed::Type type;
     };
 

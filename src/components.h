@@ -4,6 +4,7 @@
 #ifndef FEATHER_COMPONENTS_H
 #define FEATHER_COMPONENTS_H
 
+#include <QCompleter>
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QDialog>
@@ -114,6 +115,15 @@ public:
         }
 
         return QValidator::Acceptable;
+    }
+};
+
+class SpaceCompleter : public QCompleter {
+protected:
+    QString pathFromIndex(const QModelIndex &index) const override
+    {
+        QString completion = QCompleter::pathFromIndex(index);
+        return completion + ' ';
     }
 };
 
