@@ -9,13 +9,19 @@
 #include <QInputDialog>
 #include <QJsonParseError>
 #include <QJsonDocument>
-
 #include "AtomicConfigDialog.h"
 #include "OfferModel.h"
 #include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/WebsocketNotifier.h"
 #include "AtomicFundDialog.h"
+#include "WalletManager.h"
+
+#ifdef QT_OS_WIN
+#define WINDOWS 1
+#else
+#define WINDOWS 0
+#endif
 
 AtomicWidget::AtomicWidget(QWidget *parent)
         : QWidget(parent)
@@ -76,14 +82,12 @@ AtomicWidget::AtomicWidget(QWidget *parent)
                 QMessageBox::warning(this, "Warning", "XMR receive address is required to start swap");
                 return;
             }
-            QRegularExpression xmrMain("^[48][0-9AB][1-9A-HJ-NP-Za-km-z]{93}");
-            QRegularExpression xmrStage("^[57][0-9AB][1-9A-HJ-NP-Za-km-z]{93}");
             if (constants::networkType==NetworkType::STAGENET){
                 if(!btcChange.isEmpty() && !btcTest.match(btcChange).hasMatch()){
                     QMessageBox::warning(this, "Warning","BTC change address is wrong, not a bech32 segwit address, or on wrong network");
                     return;
                 }
-                if(!xmrStage.match(xmrReceive).hasMatch()){
+                if(WalletManager::addressValid(xmrReceive,NetworkType::STAGENET)){
                     QMessageBox::warning(this, "Warning","XMR receive address is improperly formated or on wrong network");
                     return;
                 }
@@ -92,7 +96,7 @@ AtomicWidget::AtomicWidget(QWidget *parent)
                     QMessageBox::warning(this, "Warning","BTC change address is wrong, not a bech32 segwit address,or on wrong network");
                     return;
                 }
-                if(!xmrMain.match(xmrReceive).hasMatch()){
+                if(WalletManager::addressValid(xmrReceive,NetworkType::MAINNET)){
                     QMessageBox::warning(this, "Warning","XMR receive address is improperly formated or on wrong network");
                     return;
                 }
@@ -164,7 +168,7 @@ void AtomicWidget::runSwap(const QString& seller, const QString& btcChange, cons
      */
     arguments << "--seller";
     arguments << seller;
-    if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+    if(conf()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
         arguments << "--tor-socks5-port";
         arguments << conf()->get(Config::socks5Port).toString();
     }
@@ -183,7 +187,7 @@ void AtomicWidget::list(const QString& rendezvous) {
     arguments << "-j";
     arguments << "list-sellers";
     //Temporary fix till comit xmr btc updates libp2p to work with modern rendezvous points
-    if(!ui->btn_clearnet->isChecked() && conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+    if(!ui->btn_clearnet->isChecked() && conf()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
         arguments << "--tor-socks5-port";
         arguments << conf()->get(Config::socks5Port).toString();
     } else if (ui->btn_clearnet->isChecked()) {
@@ -229,7 +233,7 @@ void AtomicWidget::list(const QString& rendezvous) {
         o_model->updateOffers(*offerList);
         return list;
     });
-    swap->start(conf()->get(Config::swapPath).toString(), arguments);
+    swap->start(AtomicConfigDialog::getPath(), arguments);
 
 
 
@@ -250,7 +254,7 @@ void AtomicWidget::clean() {
     }
     auto cleanWallet =  new QProcess;
     auto cleanSwap = new QProcess;
-    if(conf()->get(Config::operatingSystem)=="WINDOWS"){
+    if(WINDOWS){
         (cleanWallet)->start("tskill", QStringList{"monero-wallet-rpc"});
         (cleanWallet)->start("tskill", QStringList{"swap"});
     }else {

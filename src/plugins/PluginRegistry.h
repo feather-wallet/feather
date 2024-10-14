@@ -36,7 +36,7 @@ public:
     }
 
     bool isPluginEnabled(const QString &id) {
-        if (!pluginMap.contains(id) or (QString::compare(id,"atomic")==0 && constants::networkType==NetworkType::TESTNET)) {
+        if (!pluginMap.contains(id) || (QString::compare(id,"atomic")==0 && constants::networkType==NetworkType::TESTNET)) {
             return false;
         }
 

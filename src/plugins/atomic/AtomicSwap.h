@@ -1,6 +1,5 @@
-//
-// Created by dev on 6/11/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #ifndef FEATHER_ATOMICSWAP_H
 #define FEATHER_ATOMICSWAP_H
@@ -32,11 +31,11 @@ public slots:
 signals:
     void cleanProcs();
 private:
-    Ui::AtomicSwap *ui;
+    Ui::AtomicSwap *ui = nullptr;
     QString id;
     QString min;
     AtomicFundDialog* fundDialog;
-    QList<QSharedPointer<QProcess>>* procList;
+    QList<QSharedPointer<QProcess>>* procList = nullptr;
     int btc_confs;
     void cancel();
 

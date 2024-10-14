@@ -1,6 +1,5 @@
-//
-// Created by dev on 6/11/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 // You may need to build the project (run Qt uic code generator) to get "ui_AtomicSwap.h" resolved
 
@@ -8,11 +7,17 @@
 
 #include <QJsonParseError>
 #include <QMessageBox>
+
+#include "AtomicConfigDialog.h"
 #include "ui_AtomicSwap.h"
 #include "AtomicWidget.h"
 #include "constants.h"
 #include "networktype.h"
-
+#ifdef QT_OS_WIN
+#define WINDOWS 1
+#else
+#define WINDOWS 0
+#endif
 
 AtomicSwap::AtomicSwap(QWidget *parent) :
         WindowModalDialog(parent), ui(new Ui::AtomicSwap), fundDialog( new AtomicFundDialog(this)), procList(new QList<QSharedPointer<QProcess>>()) {
@@ -38,6 +43,13 @@ void AtomicSwap::runSwap(QStringList arguments){
             QJsonParseError err;
             const QByteArray& rawline = swap->readLine();
             QJsonDocument line = QJsonDocument::fromJson(rawline, &err);
+            if (err.error != QJsonParseError::NoError) {
+                qDebug()<<err.errorString();
+                QMessageBox::critical(this, "Swap Binary output error", "The swap binary did not output proper json.\nThe binary may be corrupted, throwing an unhandled error, or been overwritten.\nError string: " +err.errorString());
+                swap->close();
+                this->close();
+                return;
+            }
             qDebug() << rawline;
             bool check;
             QString message = line["fields"]["message"].toString();
@@ -99,8 +111,7 @@ void AtomicSwap::runSwap(QStringList arguments){
                 QString err = line["fields"]["err"].toString().split("\n")[0].split(":")[1];
                 QMessageBox::warning(this, "Cancel and Refund", "Time lock hasn't expired yet so cancel failed. Try again in " + err + "blocks");
             } else if (QString latest_version = line["fields"]["latest_version"].toString(); !latest_version.isEmpty()){
-                QMessageBox::warning(this, "Outdated swap version","A newer version of COMIT xmr-btc swap tool is available, delete current binary and re auto install to upgrade");
-                conf()->set(Config::swapVersion,latest_version);
+                QMessageBox::warning(this, "Outdated swap version","A newer version of COMIT xmr-btc swap tool is available");
             } else if (message.startsWith("Acquiring swap lock") && QString::compare("Resume",line["span"]["method_name"].toString())==0){
                 updateStatus("Beginning resumption of previous swap");
                 this->show();
@@ -110,14 +121,14 @@ void AtomicSwap::runSwap(QStringList arguments){
         }
     });
 
-    swap->start(conf()->get(Config::swapPath).toString(),arguments);
+    swap->start(AtomicConfigDialog::getPath(),arguments);
     qDebug() << "process started";
 }
 AtomicSwap::~AtomicSwap() {
     for (const auto& proc : *procList){
         proc->kill();
     }
-    if(conf()->get(Config::operatingSystem)=="WINDOWS"){
+    if(WINDOWS){
         (new QProcess)->start("tskill", QStringList{"monero-wallet-rpc"});
     }else {
         if (constants::networkType==NetworkType::STAGENET){

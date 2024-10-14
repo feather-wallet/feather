@@ -5,15 +5,7 @@ $(package)_file_name=$(package)-$($(package)_version).tar.xz
 $(package)_sha256_hash=f887755c434a736a609cbd28d87ddbfbe9d6a3bb5b703c22c02f6af80a802735
 
 define $(package)_config_cmds
-    CC="$($(package)_cc)" \
-    CXX="$($(package)_cxx)" \
-    AR="$($(package)_ar)" \
-    RANLIB="$($(package)_ranlib)" \
-    LIBTOOL="$($(package)_libtool)" \
-    LDLAGS="$($(package)_ldflags)" \
-    CFLAGS="-fPIE" \
-    CXXFLAGS="-fPIE" \
-	./configure --host=$(host) --enable-static --prefix=$(host_prefix) --without-iconv
+    $($(package)_autoconf)
 endef
 
 define $(package)_build_cmds

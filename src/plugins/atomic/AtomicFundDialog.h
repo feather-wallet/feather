@@ -1,6 +1,5 @@
-//
-// Created by dev on 7/8/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #ifndef FEATHER_ATOMICFUNDDIALOG_H
 #define FEATHER_ATOMICFUNDDIALOG_H

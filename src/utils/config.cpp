@@ -12,13 +12,7 @@
 #include "utils/os/tails.h"
 
 #define QS QStringLiteral
-#if defined(Q_OS_WIN64)
-#define OS "WINDOWS"
-#elif defined(Q_OS_DARWIN)
-#define OS "MAC"
-#else
-#define OS "LINUX"
-#endif
+
 struct ConfigDirective
 {
     QString name;
@@ -150,10 +144,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/atomicswaps.majesticbank.at/tcp/8888/p2p/12D3KooWKJUwP45K7fLbwGY1VM5V3U7LseU8EwJiAozUFrq5ihoF",
                                                             "/dns4/discover.unstoppableswap.net/tcp/8888/p2p/12D3KooWA6cnqJpVnreBVnoro8midDL9Lpzmg8oJPoAGi7YYaamE",
                                                             "/dns4/eratosthen.es/tcp/7798/p2p/12D3KooWAh7EXXa2ZyegzLGdjvj1W4G3EXrTGrf6trraoT1MEobs"}}},
-        {Config::swapPath, {QS("swapPath"), ""}},
-        {Config::operatingSystem, {QS("operatingSystem"), OS}},
         {Config::pendingSwap, {QS("pendingSwap"), QStringList{}}},
-        {Config::swapVersion, {QS("swapVersion"), "0.13.4"}},
 };
 
 

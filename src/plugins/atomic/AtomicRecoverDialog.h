@@ -1,6 +1,5 @@
-//
-// Created by dev on 7/29/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #ifndef FEATHER_ATOMICRECOVERDIALOG_H
 #define FEATHER_ATOMICRECOVERDIALOG_H
@@ -25,8 +24,8 @@ public:
 private slots:
     void updateBtn(const QModelIndex &index);
 private:
-    Ui::AtomicRecoverDialog *ui;
-    AtomicSwap *swapDialog;
+    Ui::AtomicRecoverDialog *ui = nullptr;
+    AtomicSwap *swapDialog = nullptr;
 
 };
 

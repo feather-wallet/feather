@@ -23,6 +23,7 @@ Q_OBJECT
 public:
     explicit AtomicConfigDialog(QWidget *parent = nullptr);
     ~AtomicConfigDialog() override;
+    static QString getPath();
 
 public slots:
     void extract();
@@ -30,14 +31,11 @@ public slots:
 private:
     void downloadBinary();
     int copy_data(struct archive *ar, struct archive *aw);
-
+    void saveSwapPath(QString path);
     QScopedPointer<Ui::AtomicConfigDialog> ui;
-
-    QNetworkReply* archive;
+    QNetworkReply* archive = nullptr;
     QString tempFile;
-    QTemporaryFile* download;
-
-
+    QTemporaryFile* download = nullptr;
 };
 
 

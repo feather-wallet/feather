@@ -41,13 +41,13 @@ private:
     QScopedPointer<Ui::AtomicWidget> ui;
     bool m_comboBoxInit = false;
     QTimer m_statusTimer;
-    OfferModel *o_model;
-    QList<QSharedPointer<OfferEntry>> *offerList;
-    AtomicSwap *swapDialog;
-    AtomicFundDialog *fundDialog;
-    AtomicRecoverDialog *recoverDialog;
+    OfferModel *o_model = nullptr;
+    QList<QSharedPointer<OfferEntry>> *offerList = nullptr;
+    AtomicSwap *swapDialog = nullptr;
+    AtomicFundDialog *fundDialog = nullptr;
+    AtomicRecoverDialog *recoverDialog = nullptr;
 
-    QList<QSharedPointer<QProcess>> *procList;
+    QList<QSharedPointer<QProcess>> *procList = nullptr;
 };
 
 #endif // FEATHER_ATOMICWIDGET_H

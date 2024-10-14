@@ -304,8 +304,6 @@ chain for " target " development."))
         python-minimal
         ;; Git
         git-minimal
-	;; Libarchive
-	libarchive
         ;; Xcb
         xcb-util
         xcb-util-cursor

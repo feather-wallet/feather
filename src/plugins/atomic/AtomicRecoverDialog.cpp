@@ -1,6 +1,5 @@
-//
-// Created by dev on 7/29/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 // You may need to build the project (run Qt uic code generator) to get "ui_AtomicRecoverDialog.h" resolved
 
@@ -40,11 +39,11 @@ AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
             QDateTime timestamp = QDateTime::fromString(entry[1],"dd.MM.yyyy.hh.mm.ss");
             qint64 difference = timestamp.secsTo(QDateTime::currentDateTime());
 
-            if (difference < 86400) {
+            if (difference < 86400) { // 86400 is number of seconds in a day (if a swap is older it is punished)
                 rowData.clear();
                 rowData << new QStandardItem(id);
                 rowData << new QStandardItem(timestamp.toString("MM-dd-yyyy hh:mm"));
-                if (difference > 43200){
+                if (difference > 43200){ // 43200 is number of seconds in 12 hours
                     rowData << new QStandardItem("Refundable");
                 } else
                     rowData << new QStandardItem("Recoverable/Pending Refund Timelock");
@@ -73,7 +72,7 @@ AtomicRecoverDialog::AtomicRecoverDialog(QWidget *parent) :
         arguments << "--swap-id";
         auto row = ui->swap_history->selectionModel()->selectedRows().at(0);
         arguments << row.sibling(row.row(),0).data().toString();
-        if(conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
+        if(conf()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
             arguments << "--tor-socks5-port";
             arguments << conf()->get(Config::socks5Port).toString();
         }

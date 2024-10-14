@@ -5,18 +5,30 @@
 #include "ui_AtomicConfigDialog.h"
 
 #include <QNetworkReply>
-#include <QDir>
 #include <stdio.h>
+#include <QFileDialog>
+#include "utils/config.h"
+#include "utils/Networking.h"
+
 #ifdef Q_OS_WIN
 #include <zip.h>
+#define OS 1 // "WINDOWS"
 #else
 #include <archive.h>
 #include <archive_entry.h>
+#ifdef Q_PROCESSOR_X86_64
+#define ARCH 1 // "x86_64"
+#elifdef Q_PROCESSOR_ARM_V7
+#define ARCH 2 // "armv7")
+#else
+#define ARCH 3 // "assumes aarch64 or unsupported"
 #endif
-#include <QFileDialog>
-
-#include "utils/config.h"
-#include "utils/Networking.h"
+#ifdef Q_OS_DARWIN
+#define OS 2 // "MAC"
+#else
+#define OS 3 // "LINUX"
+#endif
+#endif
 
 AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
         : WindowModalDialog(parent)
@@ -40,7 +52,7 @@ AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
         QString path = QFileDialog::getOpenFileName(this, "Select swap binary file",
                                                     Config::defaultConfigDir().absolutePath(),
                                                     "Binary Executable (*)");
-        Config::instance()->set(Config::swapPath, path);
+        saveSwapPath(path);
         if(path.isEmpty()){
             return;
         }
@@ -53,21 +65,50 @@ AtomicConfigDialog::AtomicConfigDialog(QWidget *parent)
     this->adjustSize();
 }
 
+QString AtomicConfigDialog::getPath() {
+    QFile* pathFile = new QFile(Config::defaultConfigDir().absolutePath() +"/swapPath.conf");
+    pathFile->open(QIODevice::ReadOnly);
+    QString toolPath = pathFile->readAll();
+    pathFile->close();
+    return toolPath;
+}
+
+void AtomicConfigDialog::saveSwapPath(QString path) {
+    QFile* pathFile = new QFile(Config::defaultConfigDir().absolutePath() +"/swapPath.conf");
+    pathFile->open(QIODevice::WriteOnly);
+    pathFile->resize(0);
+    pathFile->write(path.toStdString().c_str());
+    pathFile->close();
+}
 void AtomicConfigDialog::downloadBinary() {
     auto* network = new Networking(this);
     download = new QTemporaryFile(this);
     download->open();
     tempFile = download->fileName();
     QString url;
-    auto operatingSystem = Config::instance()->get(Config::operatingSystem).toString().toStdString();
-    QString firstPart = "https://github.com/comit-network/xmr-btc-swap/releases/download/" + conf()->get(Config::swapVersion).toString();
-    if(strcmp("WIN",operatingSystem.c_str()) == 0) {
+    QString swapVersion = "0.13.4";
+    QString firstPart = "https://github.com/UnstoppableSwap/core/releases/download/" + swapVersion;
+    if(OS == 1) {
         // HARD CODED DOWNload URL CHANGE IF PROBLEMS
-        url = QString(firstPart+"/swap_"+conf()->get(Config::swapVersion).toString()+"_Windows_x86_64.zip");
-    } else if (strcmp("LINUX",operatingSystem.c_str())==0){
-        url = QString(firstPart+"/swap_"+conf()->get(Config::swapVersion).toString()+"_Linux_x86_64.tar");
+        url = QString(firstPart+"/swap_"+ swapVersion + "_Windows_x86_64.zip");
+    } else if (OS == 3){
+        if (ARCH == 1) {
+            url = QString(firstPart+"/swap_"+ swapVersion + "_Linux_x86_64.tar");
+        } else if (ARCH == 2) {
+            url = QString(firstPart+"/swap_"+ swapVersion + "_Linux_armv7.tar");
+        } else {
+            qDebug() << "Unsupported architecture";
+            throw std::runtime_error("Unsupported architecture");
+        }
     } else {
-        url = QString(firstPart + "/swap_" + conf()->get(Config::swapVersion).toString() + "_Darwin_x86_64.tar");
+        if (ARCH == 1) {
+            url = QString(firstPart + "/swap_"+ swapVersion + "_Darwin_x86_64.tar");
+        } else if (ARCH == 3) {
+            url = QString(firstPart + "/swap_"+ swapVersion + "_Darwin_aarch64.tar");
+        } else {
+            qDebug() << "Unsupported architecture";
+            throw std::runtime_error("Unsupported architecture");
+        }
     }
 
     archive = network->get(this, url);
@@ -88,7 +129,7 @@ void AtomicConfigDialog::extract() {
     archive->deleteLater();
 
     auto swapPath = Config::defaultConfigDir().absolutePath();
-    swapPath.append("/swapTool");
+    swapPath.append("/swap");
     QFile binaryFile(swapPath);
     binaryFile.open(QIODevice::WriteOnly);
     //auto operatingSystem = conf()->get(Config::operatingSystem).toString().toStdString();
@@ -116,7 +157,7 @@ void AtomicConfigDialog::extract() {
         zip_fclose(f);
         //And close the archive
         zip_close(z);
-        conf()->set(Config::swapPath,swapPath);
+        saveSwapPath(swapPath+".exe");
 #else
     //} else {
 
@@ -147,7 +188,7 @@ void AtomicConfigDialog::extract() {
 
         archive_write_close(ext);
         archive_write_free(ext);
-        conf()->set(Config::swapPath, QString(savePath.c_str()));
+        saveSwapPath(swapPath);
 #endif
     //}
     qDebug() << "Finished";

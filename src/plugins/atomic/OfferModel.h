@@ -1,6 +1,5 @@
-//
-// Created by dev on 5/23/24.
-//
+// SPDX-License-Identifier: BSD-3-Clause
+// SPDX-FileCopyrightText: 2020-2024 The Monero Project
 
 #ifndef FEATHER_OFFERMODEL_H
 #define FEATHER_OFFERMODEL_H
