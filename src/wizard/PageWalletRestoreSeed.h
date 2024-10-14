@@ -48,9 +48,12 @@ private:
     void onSeedTypeToggled();
     void onSeedLanguageChanged(const QString &language);
     void onOptionsClicked();
+    void onCompleterActiviated(const QString &text);
 
     Ui::PageWalletRestoreSeed *ui;
     WizardFields *m_fields;
+    bool m_wordAutocompleted;
+    int m_needCursorMove;
 
     seedType m_polyseed;
     seedType m_tevador;

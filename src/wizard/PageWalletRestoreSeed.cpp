@@ -22,6 +22,8 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     : QWizardPage(parent)
     , ui(new Ui::PageWalletRestoreSeed)
     , m_fields(fields)
+    , m_wordAutocompleted(false)
+    , m_needCursorMove(0)
 {
     ui->setupUi(this);
 
@@ -58,6 +60,41 @@ PageWalletRestoreSeed::PageWalletRestoreSeed(WizardFields *fields, QWidget *pare
     m_legacy.length = 25;
     m_legacy.setWords(m_wordlists["English"]);
     ui->combo_seedLanguage->setCurrentText("English");
+
+    // Attempt to add a space after a word when a user auto-completes it. We have to fight QT a bit here by adding the space
+    // and adjusting the cursor in different functions due to the order in which the QT completer runs our callback and when it
+    // actually adds the word to the TextEdit.
+    connect(&m_polyseed.completer, QOverload<const QString &>::of(&QCompleter::activated), this, &PageWalletRestoreSeed::onCompleterActiviated);
+    connect(&m_tevador.completer, QOverload<const QString &>::of(&QCompleter::activated), this, &PageWalletRestoreSeed::onCompleterActiviated);
+    connect(&m_legacy.completer, QOverload<const QString &>::of(&QCompleter::activated), this, &PageWalletRestoreSeed::onCompleterActiviated);
+
+    connect(ui->seedEdit, &QTextEdit::textChanged, [this](){
+        if (m_wordAutocompleted) {
+            m_wordAutocompleted = false;
+
+            QString contents = ui->seedEdit->toPlainText();
+            QTextCursor cursor = ui->seedEdit->textCursor();
+            if (contents[cursor.position()] == QChar(' ')) {
+                return;
+            }
+
+            ui->seedEdit->insertPlainText(" ");
+            cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, 1);
+            ui->seedEdit->setTextCursor(cursor);
+        }
+    });
+
+    connect(ui->seedEdit, &QTextEdit::cursorPositionChanged, [this](){
+        if (m_needCursorMove) {
+            m_needCursorMove--;
+            if (m_needCursorMove != 0)
+                return;
+
+            QTextCursor cursor = ui->seedEdit->textCursor();
+            cursor.movePosition(QTextCursor::Right, QTextCursor::MoveAnchor, 1);
+            ui->seedEdit->setTextCursor(cursor);
+        }
+    });
 
     ui->seedEdit->setAcceptRichText(false);
     ui->seedEdit->setMaximumHeight(150);
@@ -237,4 +274,35 @@ void PageWalletRestoreSeed::onOptionsClicked() {
     m_fields->showSetRestoreHeightPage = check_overrideCreationDate.isChecked();
     m_fields->showSetSeedPassphrasePage = check_setSeedPasshprase.isChecked();
     m_fields->showSetSubaddressLookaheadPage = check_subaddressLookahead.isChecked();
+}
+
+void PageWalletRestoreSeed::onCompleterActiviated(const QString &text) {
+    QString contents = ui->seedEdit->toPlainText();
+    QTextCursor cursor = ui->seedEdit->textCursor();
+    int pos = cursor.position() - 1;
+    while (pos != -1) {
+        if (contents[pos] == QChar(' ')) {
+            break;
+        }
+
+        pos--;
+    }
+    pos++;
+
+    if (pos + text.size() > contents.size()) {
+        m_wordAutocompleted = true;
+        return;
+    }
+
+    QString word = contents.sliced(pos, text.size());
+    if (word == text) {
+        // Why the 2? Because QT will adjust the cursor twice for some reason, if we attempt to move the cursor
+        // on the during the first event it will get overriden by QT when it changes the cursor for the second time.
+        // So we need to only move it after we have counted 2 events.
+        m_needCursorMove = 2;
+        ui->seedEdit->insertPlainText(" ");
+        return;
+    }
+
+    m_wordAutocompleted = true;
 }
