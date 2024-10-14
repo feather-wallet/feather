@@ -11,8 +11,6 @@
 #include <QPointer>
 #include <QDir>
 
-
-
 class Config : public QObject
 {
     Q_OBJECT

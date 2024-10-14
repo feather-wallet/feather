@@ -70,7 +70,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     this->restoreGeo();
 
     this->initStatusBar();
-
     this->initPlugins();
     this->initWidgets();
     this->initMenu();

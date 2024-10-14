@@ -246,7 +246,7 @@ void ReceiveWidget::updateQrCode(){
 
 void ReceiveWidget::showQrCodeDialog() {
     SubaddressRow* row = this->currentEntry();
-
+    if (!row) return;
     QString address = this->getAddress(row->getRow());
     QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
     QrCodeDialog dialog{this, &qr, "Address"};

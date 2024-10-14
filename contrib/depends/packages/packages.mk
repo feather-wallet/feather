@@ -1,12 +1,12 @@
 packages := boost openssl unbound qrencode libsodium polyseed hidapi abseil protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp libarchive
 native_packages := native_qt native_abseil native_protobuf
 
-linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime 
+linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime
 linux_native_packages =
 
 x86_64_linux_packages := flatstart
 
-darwin_packages := 
+darwin_packages :=
 darwin_native_packages = darwin_sdk native_cctools native_libtapi
 
 mingw32_packages =
@@ -18,4 +18,3 @@ qt_mingw32_packages := qt
 
 tor_linux_packages := libevent tor_linux
 tor_darwin_packages := tor_darwin
-tor_mingw32_packages := tor_mingw32
