@@ -28,6 +28,7 @@
              ((gnu packages version-control) #:select (git-minimal))
              (gnu packages xorg)
              (gnu packages zig)
+             (guix build-system cmake)
              (guix build-system gnu)
              (guix build-system trivial)
              (guix download)
@@ -258,6 +259,28 @@ chain for " target " development."))
     (description "Put real or fake signatures in a Mach-O.")
     (license license:gpl3+)))
 
+(define osslsigncode
+  (package
+    (name "osslsigncode")
+    (version "2.5")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/mtrojnar/osslsigncode")
+                     (commit version)))
+              (sha256
+                (base32
+                  "1j47vwq4caxfv0xw68kw5yh00qcpbd56d7rq6c483ma3y7s96yyz"))))
+    (build-system cmake-build-system)
+    (inputs (list openssl))
+    (home-page "https://github.com/mtrojnar/osslsigncode")
+    (synopsis "Authenticode signing and timestamping tool")
+    (description "osslsigncode is a small tool that implements part of the
+functionality of the Microsoft tool signtool.exe - more exactly the Authenticode
+signing and timestamping. But osslsigncode is based on OpenSSL and cURL, and
+thus should be able to compile on most platforms where these exist.")
+    (license license:gpl3+))) ; license is with openssl exception
+
 (packages->manifest
  (append
   (list ;; The Basics
@@ -318,7 +341,9 @@ chain for " target " development."))
              gcc-toolchain-12
              (list gcc-toolchain-12 "static")
              (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
-             nsis-x86_64))
+             nsis-x86_64
+             nss-certs
+             osslsigncode))
           ((string-contains target "-linux-")
            (list
              gcc-toolchain-12
