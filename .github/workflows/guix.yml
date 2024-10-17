@@ -43,7 +43,11 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.ref }}
           submodules: recursive
+      # https://github.com/actions/checkout/issues/1467
+      - name: git fetch tags
+        run: git fetch --tags
       - name: remove bundled packages
         run: sudo rm -rf /usr/local
       - name: depends sources cache
