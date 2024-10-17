@@ -73,11 +73,22 @@ jobs:
           files: |
             guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
       - uses: actions/upload-artifact@v4
+        id: upload-artifact
         with:
           name: ${{ matrix.toolchain.target }}
           path: |
             guix/guix-build-*/output/${{ matrix.toolchain.target }}/*
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
+      - uses: signpath/github-action-submit-signing-request@v1
+        if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_KEY }}'
+          organization-id: 'd3e94749-9c69-44e9-82de-c65cb3832869'
+          project-slug: 'feather'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: 'installer'
+          github-artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
+          wait-for-completion: true
 
   bundle-logs:
     runs-on: ubuntu-24.04
