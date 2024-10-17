@@ -1,44 +1,41 @@
-# Feather Wallet
+# Feather Atomic
 
-Feather is a free Monero desktop wallet for Linux, Tails, macOS and Windows. It is written in C++ with the Qt framework.
+Feather Atomic is a plugin for the free, open-source Monero wallet for Linux, Tails, macOS and Windows, Feather. It is written in C++ with the Qt framework.
 
-- **easy-to-use**, **small** and **fast** - Feather runs well on any modern hardware, including virtual machines and live operating systems.
-- **beginner friendly**, but also caters to advanced Monero users by providing a [feature set](https://docs.featherwallet.org/guides/features) that is on par with the official CLI.
-- ships with **sane defaults** that suit most users, but can also be configured for high or uncommon threat models.
-- serves as a testing grounds for **experimental features** that may later be adopted in the reference wallets.
+## Usage
+Make sure to click configure button in the atomic tab and either auto install the swap binary or select the already installed binary.
+All files relevant to swap will be stored in feathers config directory including the binary if you auto install.
 
-## Download
+### If after installing the swap tool, refresh fails to show any swaps make sure to check that you have a version of GLIBC greater or equal to 2.32 or this plugin will not be able to run on your system.
 
-You can download Feather from **[featherwallet.org](https://featherwallet.org/download/)** or **[GitHub](https://github.com/feather-wallet/feather/releases)**.
+### Running a swap
+1. Click refresh offers (may take a little if routing through tor)
+2. Click the offer you would like to take from the table
+3. Enter a BTC change address (make sure you are using a testnet address if feather is running stagenet mode)
+4. Enter a XMR receive address
+5. Click swap
+6. Wait for fund dialog to appear, send at least the minimum BTC covering tx fees to the address and not more then the max BTC of the offer (if there is BTC from a previous uncompleted swap then this dialog may not appear)
+7. Once the transaction is detected in the BTC mempool a different dialog will appear showing the status of confirmations for BTC and XMR side of swap
+8. If all goes right after the BTC transaction reaches at least 1 confirmation and the XMR transaction reaches at least 10 confirmations the swap complete and both parties should be happy with their new coins
 
-If you need help installing installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
+### Recovery
+If for some reason the swap isn't able to be completed when ran, one party goes offline, application crashes, etc then a recovery dialog will automatically appear next time you launch feather atomic as long as the swap still can be resumed or canceled. 
+#### To cancel a swap
+1. Make sure swap has had enough BTC confirmations to be able to be canceled (should take about 12 hours, gui reflect if it can be canceled)
+2. Click the swap you wish to cancel then click the cancel button
+3. A dialog will spawn and then after a moment the dialog should update to say the swap has been canceled
 
-Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). The fingerprint is:
+#### To resume a swap
+1. Click the swap you wish to resume then click the resume button
+2. If the seller is still online then the normal swap dialog will appear
+3. The confirmations may not always be accurate when resuming so rely on the status message in the dialog to follow progress of the swap.
+4. As long as both parties stay online the swap should continue as normal and end with both parties having their new coins
 
-```
-8185 E158 A333 30C7 FD61 BC0D 1F76 E155 CEFB A71C
-```
 
-We recommend that you verify downloads with GPG.
+### Testnet4 swap demo
 
-## Resources
 
-* [Official Site](https://featherwallet.org)
-* [Documentation](https://docs.featherwallet.org)
-* [Git Repository](https://github.com/feather-wallet/feather)
-* [Matrix](https://matrix.to/#/#feather:monero.social)
-* IRC: `#feather` on [OFTC](https://www.oftc.net/)
-* Mail: dev@featherwallet.org
-
-If you need help with your wallet, please contact us via Matrix or IRC.
-If you don't have an IRC client, you can join the room via [webchat](https://webchat.oftc.net/?randomnick=1&channels=feather).
-If you don’t receive a response immediately please idle in the room.
-
-## Release Builds
-
-To learn how to run a bootstrappable release build, see: [contrib/guix/README.md](https://github.com/feather-wallet/feather/blob/master/contrib/guix/README.md)
-
-For release attestations, see the [feather-sigs](http://github.com/feather-wallet/feather-sigs) repo.
+https://github.com/user-attachments/assets/b7871a2f-21d0-46e2-b575-b9ba885a810d
 
 For release policy, see: [RELEASE.md](https://github.com/feather-wallet/feather/blob/master/RELEASE.md)
 
