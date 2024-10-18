@@ -56,7 +56,7 @@ jobs:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils
+        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils osslsigncode
       - name: fix apparmor
         run: sudo cp .github/workflows/guix /etc/apparmor.d/guix; sudo /etc/init.d/apparmor reload; sudo aa-enforce guix || echo "failed"
       - name: purge apparmor
@@ -89,6 +89,17 @@ jobs:
           artifact-configuration-slug: 'installer'
           github-artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
           wait-for-completion: true
+          output-artifact-directory: codesigning/
+      - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
+        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/FeatherWalletSetup-*.exe -out codesigning/test.pem
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
+        id: upload-artifact
+        with:
+          name: ${{ matrix.toolchain.target }}.pem
+          path: |
+            codesigning/test.pem
+
 
   bundle-logs:
     runs-on: ubuntu-24.04
