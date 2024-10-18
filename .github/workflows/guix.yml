@@ -94,7 +94,6 @@ jobs:
         run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/FeatherWalletSetup-*.exe -out codesigning/test.pem
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
-        id: upload-artifact
         with:
           name: ${{ matrix.toolchain.target }}.pem
           path: |
