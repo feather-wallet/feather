@@ -149,6 +149,13 @@ public:
         // Tickers
         tickers,
         tickersShowFiatBalance,
+
+        // Atomic Settings
+        rendezVous,
+        swapPath,
+        operatingSystem,
+        pendingSwap,
+        swapVersion,
     };
 
     enum PrivacyLevel {

@@ -47,7 +47,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
 
         // Tabs
-        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc"}}},
+        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc", "Atomic"}}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // History
@@ -134,11 +134,17 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig", "atomic"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
         {Config::tickersShowFiatBalance, {QS("tickersShowFiatBalance"), true}},
+
+        // Atomic
+        {Config::rendezVous, {QS("rendezVous"), QStringList{"/dns4/atomicswaps.majesticbank.at/tcp/8888/p2p/12D3KooWKJUwP45K7fLbwGY1VM5V3U7LseU8EwJiAozUFrq5ihoF",
+                                                            "/dns4/discover.unstoppableswap.net/tcp/8888/p2p/12D3KooWA6cnqJpVnreBVnoro8midDL9Lpzmg8oJPoAGi7YYaamE",
+                                                            "/dns4/eratosthen.es/tcp/7798/p2p/12D3KooWAh7EXXa2ZyegzLGdjvj1W4G3EXrTGrf6trraoT1MEobs"}}},
+        {Config::pendingSwap, {QS("pendingSwap"), QStringList{}}},
 };
 
 
