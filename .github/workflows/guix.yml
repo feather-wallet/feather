@@ -91,13 +91,13 @@ jobs:
           wait-for-completion: true
           output-artifact-directory: codesigning/
       - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
-        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/FeatherWalletSetup-*.exe -out codesigning/test.pem
+        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/FeatherWalletSetup-*.exe -out codesigning/${{matrix.toolchain.target}}-${{github.ref_name}}.pem
       - uses: actions/upload-artifact@v4
         if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
         with:
           name: ${{ matrix.toolchain.target }}.pem
           path: |
-            codesigning/test.pem
+            codesigning/${{matrix.toolchain.target}}-${{github.ref_name}}.pem
 
 
   bundle-logs:
