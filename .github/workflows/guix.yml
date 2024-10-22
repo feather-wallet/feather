@@ -149,3 +149,20 @@ jobs:
           name: ${{ matrix.toolchain.target }}.pem
           path: |
             codesigning/${{ matrix.toolchain.target }}-${{github.ref_name}}.pem
+      - uses: actions/checkout@v4
+        with:
+          repository: tobtoht/feather-sigs
+          path: feather-sigs
+          ref: main
+          token: ${{ secrets.FEATHER_SIGS_PAT }}
+      - name: "submit signatures"
+        run: |
+          mkdir -p feather-sigs/codesigning/${{github.ref_name}}/
+          cp codesigning/*.pem feather-sigs/codesigning/${{github.ref_name}}/
+          cd feather-sigs
+          git checkout -b ${{github.ref_name}}-${{ matrix.toolchain.target }}
+          git configure --global user.name "GitHub"
+          git configure --global user.email ""
+          git add add codesigning
+          git commit -m "add codesignature for ${{github.ref_name}}/${{ matrix.toolchain.target }}"
+          git push origin ${{github.ref_name}}-${{ matrix.toolchain.target }}
