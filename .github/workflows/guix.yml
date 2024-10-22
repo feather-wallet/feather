@@ -137,8 +137,8 @@ jobs:
           organization-id: 'd3e94749-9c69-44e9-82de-c65cb3832869'
           project-slug: 'feather'
           signing-policy-slug: 'test-signing'
-          artifact-configuration-slug: ${{ ARTIFACT_SLUG }}
-          github-artifact-id: ${{ ARTIFACT_ID }}
+          artifact-configuration-slug: ${{ env.ARTIFACT_SLUG }}
+          github-artifact-id: ${{ env.ARTIFACT_ID }}
           wait-for-completion: true
           output-artifact-directory: codesigning/
       - name: "extract signature"
