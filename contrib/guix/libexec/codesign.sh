@@ -31,6 +31,7 @@ Required environment variables as seen inside the container:
     DETACHED_SIGS_REPO: ${DETACHED_SIGS_REPO:?not set}
     DIST_ARCHIVE_BASE: ${DIST_ARCHIVE_BASE:?not set}
     DISTNAME: ${DISTNAME:?not set}
+    VERSION: ${VERSION:?not set}
     HOST: ${HOST:?not set}
     SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH:?not set}
     DISTSRC: ${DISTSRC:?not set}
@@ -55,11 +56,6 @@ mkdir -p "$DISTSRC"
 (
     cd "$DISTSRC"
 
-    tar -xf "$UNSIGNED_TARBALL"
-
-    mkdir -p codesignatures
-    tar -C codesignatures -xf "$CODESIGNATURE_GIT_ARCHIVE"
-
     case "$HOST" in
         *mingw*)
             find "$PWD" -name "*-unsigned.exe" | while read -r infile; do
@@ -70,7 +66,7 @@ mkdir -p "$DISTSRC"
                                  -in "$infile" \
                                  -out "${OUTDIR}/${infile_base/-unsigned}" \
                                  -CAfile "$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt" \
-                                 -sigin codesignatures/win/"$infile_base".pem
+                                 -sigin /detached-sigs/codesignatures/"${VERSION}"/"$infile_base".pem
             done
             ;;
         *)
