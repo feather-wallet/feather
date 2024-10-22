@@ -37,7 +37,9 @@ jobs:
           - target: "x86_64-w64-mingw32.installer"
           - target: "x86_64-apple-darwin"
           - target: "arm64-apple-darwin"
-
+    outputs:
+      WIN_INSTALLER_ARTIFACT_ID: ${{ steps.win-installer.outputs.WIN_INSTALLER_ARTIFACT_ID }}
+      WIN_EXECUTABLE_ARTIFACT_ID: ${{ steps.win-executable.outputs.WIN_EXECUTABLE_ARTIFACT_ID }}
     name: ${{ matrix.toolchain.target }}
     steps:
       - uses: actions/checkout@v4
@@ -79,26 +81,12 @@ jobs:
           path: |
             guix/guix-build-*/output/${{ matrix.toolchain.target }}/*
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
-      - uses: signpath/github-action-submit-signing-request@v1
-        if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
-        with:
-          api-token: '${{ secrets.SIGNPATH_API_KEY }}'
-          organization-id: 'd3e94749-9c69-44e9-82de-c65cb3832869'
-          project-slug: 'feather'
-          signing-policy-slug: 'test-signing'
-          artifact-configuration-slug: 'installer'
-          github-artifact-id: ${{ steps.upload-artifact.outputs.artifact-id }}
-          wait-for-completion: true
-          output-artifact-directory: codesigning/
       - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
-        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/FeatherWalletSetup-*.exe -out codesigning/${{matrix.toolchain.target}}-${{github.ref_name}}.pem
-      - uses: actions/upload-artifact@v4
-        if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
-        with:
-          name: ${{ matrix.toolchain.target }}.pem
-          path: |
-            codesigning/${{matrix.toolchain.target}}-${{github.ref_name}}.pem
-
+        id: win-installer
+        run: echo "WIN_INSTALLER_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> $GITHUB_ENV
+      - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32' }}
+        id: win-executable
+        run: echo "WIN_EXECUTABLE_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> $GITHUB_ENV
 
   bundle-logs:
     runs-on: ubuntu-24.04
@@ -122,3 +110,42 @@ jobs:
           artifacts: "**/*.AppImage,**/*-linux-arm.zip,**/*-linux-arm64.zip,**/*-linux-riscv64.zip,**/*-linux.zip,**/*-mac-arm64.zip,**/*-mac.zip,**/*-win.zip,**/FeatherWalletSetup-*.exe,**/feather-${{github.ref_name}}.tar.gz"
           draft: true
           name: v${{github.ref_name}}
+
+  codesigning:
+    runs-on: ubuntu-24.04
+    needs: [bundle-logs]
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - target: "x86_64-w64-mingw32"
+          - target: "x86_64-w64-mingw32.installer"
+    steps:
+      - name: "set artifact id"
+        run: |
+          if [ "${{ matrix.toolchain.target }}" == "x86_64-w64-mingw32" ]; then
+            echo "ARTIFACT_ID=${{ needs.build-guix.outputs.WIN_EXECUTABLE_ARTIFACT_ID }}" >> $GITHUB_ENV
+            echo "ARTIFACT_SLUG=executable" >> $GITHUB_ENV
+          elif [ "${{ matrix.toolchain.target }}" == "x86_64-w64-mingw32.installer" ]; then
+            echo "ARTIFACT_ID=${{ needs.build-guix.outputs.WIN_INSTALLER_ARTIFACT_ID }}" >> $GITHUB_ENV
+            echo "ARTIFACT_SLUG=installer" >> $GITHUB_ENV
+          fi
+      - uses: signpath/github-action-submit-signing-request@v1
+        name: "request signature"
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_KEY }}'
+          organization-id: 'd3e94749-9c69-44e9-82de-c65cb3832869'
+          project-slug: 'feather'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: ${{ ARTIFACT_SLUG }}
+          github-artifact-id: ${{ ARTIFACT_ID }}
+          wait-for-completion: true
+          output-artifact-directory: codesigning/
+      - name: "extract signature"
+        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/*-unsigned.exe -out codesigning/${{ matrix.toolchain.target }}-${{github.ref_name}}.pem
+      - uses: actions/upload-artifact@v4
+        name: "upload signature"
+        with:
+          name: ${{ matrix.toolchain.target }}.pem
+          path: |
+            codesigning/${{ matrix.toolchain.target }}-${{github.ref_name}}.pem
