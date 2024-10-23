@@ -163,8 +163,8 @@ jobs:
           cp codesigning/*.pem feather-sigs/codesigning/${{github.ref_name}}/
           cd feather-sigs
           git checkout -b ${{github.ref_name}}-${{ matrix.toolchain.target }}
-          git configure --global user.name "GitHub"
-          git configure --global user.email ""
+          git config --global user.name "GitHub"
+          git config --global user.email ""
           git add add codesigning
           git commit -m "add codesignature for ${{github.ref_name}}/${{ matrix.toolchain.target }}"
           git push origin ${{github.ref_name}}-${{ matrix.toolchain.target }}
