@@ -121,6 +121,8 @@ jobs:
           - target: "x86_64-w64-mingw32"
           - target: "x86_64-w64-mingw32.installer"
     steps:
+      - name: install dependencies
+        run: sudo apt update; sudo apt -y install osslsigncode
       - name: "set artifact id"
         run: |
           if [ "${{ matrix.toolchain.target }}" == "x86_64-w64-mingw32" ]; then
