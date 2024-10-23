@@ -113,7 +113,7 @@ jobs:
 
   codesigning:
     runs-on: ubuntu-24.04
-    needs: [bundle-logs]
+    needs: [build-guix, bundle-logs]
     strategy:
       fail-fast: false
       matrix:
