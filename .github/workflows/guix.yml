@@ -83,10 +83,10 @@ jobs:
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
       - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
         id: win-installer
-        run: echo "WIN_INSTALLER_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> $GITHUB_ENV
+        run: echo "WIN_INSTALLER_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
       - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32' }}
         id: win-executable
-        run: echo "WIN_EXECUTABLE_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> $GITHUB_ENV
+        run: echo "WIN_EXECUTABLE_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
 
   bundle-logs:
     runs-on: ubuntu-24.04
