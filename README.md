@@ -11,7 +11,7 @@ Feather is a free Monero desktop wallet for Linux, Tails, macOS and Windows. It 
 
 You can download Feather from **[featherwallet.org](https://featherwallet.org/download/)** or **[GitHub](https://github.com/feather-wallet/feather/releases)**.
 
-If you need help installing installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
+If you need help installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
 
 Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). The fingerprint is:
 
