@@ -36,6 +36,7 @@ Required environment variables as seen inside the container:
     SOURCE_DATE_EPOCH: ${SOURCE_DATE_EPOCH:?not set}
     DISTSRC: ${DISTSRC:?not set}
     OUTDIR: ${OUTDIR:?not set}
+    LOGDIR: ${LOGDIR:?not set}
 EOF
 
 ACTUAL_OUTDIR="${OUTDIR}"
@@ -88,5 +89,5 @@ mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
     } | xargs realpath --relative-base="$PWD" \
         | xargs sha256sum \
         | sort -k2 \
-        | sponge "$ACTUAL_OUTDIR"/SHA256SUMS.part
+        | sponge "$LOGDIR"/codesigned/SHA256SUMS.part
 )

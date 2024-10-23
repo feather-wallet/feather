@@ -121,7 +121,7 @@ if (( ${#sha256sum_fragments[@]} )); then
     for logdir in "${sha256sum_fragments[@]}"; do
         echo "    '$logdir'"
         case "$logdir" in
-            "$LOGDIR_BASE"/*-codesigned/SHA256SUMS.part)
+            "$LOGDIR_BASE"/codesigned/SHA256SUMS.part)
                 codesigned_fragments+=("$logdir")
                 ;;
             *)
