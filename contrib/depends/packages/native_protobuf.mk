@@ -1,8 +1,8 @@
 package=native_protobuf
-$(package)_version=28.2
+$(package)_version=28.3
 $(package)_download_path=https://github.com/protocolbuffers/protobuf/releases/download/v$($(package)_version)
 $(package)_file_name=protobuf-$($(package)_version).tar.gz
-$(package)_sha256_hash=b2340aa47faf7ef10a0328190319d3f3bee1b24f426d4ce8f4253b6f27ce16db
+$(package)_sha256_hash=7c3ebd7aaedd86fa5dc479a0fda803f602caaf78d8aff7ce83b89e1b8ae7442a
 $(package)_dependencies=native_abseil
 
 define $(package)_set_vars
@@ -14,7 +14,7 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  rm -rf docs php/src/GPBMetadata compatibility objectivec/Tests csharp/keys php/tests src/google/protobuf/testdata csharp/src/Google.Protobuf.Test
+  rm -rf examples docs php/src/GPBMetadata compatibility objectivec/Tests csharp/keys php/tests src/google/protobuf/testdata csharp/src/Google.Protobuf.Test
 endef
 
 define $(package)_config_cmds
