@@ -52,9 +52,6 @@ void signal_handler(int signum) {
         out.close();
     }
 
-    // Make a last ditch attempt to restart the application
-    QProcess::startDetached(qApp->arguments()[0], qApp->arguments());
-
     ::raise(SIGABRT);
 }
 #endif
