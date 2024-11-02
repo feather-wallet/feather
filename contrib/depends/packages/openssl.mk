@@ -9,6 +9,7 @@ $(package)_config_env=AR="$($(package)_ar)" ARFLAGS=$($(package)_arflags) RANLIB
 $(package)_config_env_android=ANDROID_NDK_ROOT="$(host_prefix)/native" PATH="$(host_prefix)/native/bin" CC=clang AR=ar RANLIB=ranlib
 $(package)_build_env_android=ANDROID_NDK_ROOT="$(host_prefix)/native"
 $(package)_config_opts=--prefix=$(host_prefix) --openssldir=$(host_prefix)/etc/openssl --libdir=$(host_prefix)/lib
+$(package)_config_opts+=no-apps
 $(package)_config_opts+=no-capieng
 $(package)_config_opts+=no-dso
 $(package)_config_opts+=no-dtls1

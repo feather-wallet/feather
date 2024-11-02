@@ -1,0 +1,37 @@
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 48f08f0..92170ef 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -132,7 +132,7 @@ CONFIG_CLEAN_VPATH_FILES =
+ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
+ 	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)" \
+ 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)"
+-PROGRAMS = $(bin_PROGRAMS)
++PROGRAMS = 
+ am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+ am__vpath_adj = case $$p in \
+     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+diff --git a/tests/Makefile.in b/tests/Makefile.in
+index 27900c3..c9503dc 100644
+--- a/tests/Makefile.in
++++ b/tests/Makefile.in
+@@ -110,8 +110,8 @@ host_triplet = @host@
+ @USE_RSA_TRUE@am__append_1 = pkcs1v2 t-rsa-pss t-rsa-15 t-rsa-testparm
+ @USE_DSA_TRUE@am__append_2 = fips186-dsa dsa-rfc6979 t-dsa
+ @USE_ECC_TRUE@am__append_3 = curves t-ecdsa t-ed25519 t-cv25519 t-x448 t-ed448
+-TESTS = $(am__EXEEXT_4) $(tests_sh) $(am__EXEEXT_5) $(tests_sh_last)
+-EXTRA_PROGRAMS = testapi$(EXEEXT) pkbench$(EXEEXT)
++TESTS = 
++EXTRA_PROGRAMS = 
+ noinst_PROGRAMS = testdrv$(EXEEXT) $(am__EXEEXT_4) $(am__EXEEXT_5) \
+ 	fipsdrv$(EXEEXT) rsacvt$(EXEEXT) genhashdata$(EXEEXT) \
+ 	gchash$(EXEEXT)
+@@ -147,7 +147,7 @@ am__EXEEXT_4 = version$(EXEEXT) t-secmem$(EXEEXT) mpitests$(EXEEXT) \
+ 	t-mlkem$(EXEEXT) $(am__EXEEXT_1) $(am__EXEEXT_2) \
+ 	$(am__EXEEXT_3)
+ am__EXEEXT_5 = benchmark$(EXEEXT) bench-slope$(EXEEXT)
+-PROGRAMS = $(noinst_PROGRAMS)
++PROGRAMS = 
+ aeswrap_SOURCES = aeswrap.c
+ aeswrap_OBJECTS = aeswrap.$(OBJEXT)
+ aeswrap_LDADD = $(LDADD)

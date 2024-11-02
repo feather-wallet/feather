@@ -7,7 +7,7 @@ linux_native_packages =
 x86_64_linux_packages := flatstart
 
 darwin_packages :=
-darwin_native_packages = darwin_sdk native_cctools native_libtapi
+darwin_native_packages = darwin_sdk
 
 mingw32_packages =
 mingw32_native_packages =

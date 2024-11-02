@@ -4,7 +4,7 @@ $(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(pac
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=8ccbb9ab055205ac76632c9eeddd1ed6fc66936fc56afc2ed0fd5d9e23da3097
-$(package)_darwin_dependencies=native_cctools native_qt openssl
+$(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
@@ -22,6 +22,8 @@ $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
 $(package)_patches += revert-f67ee7c39.patch
+$(package)_patches += macos-available-qtbase.patch
+$(package)_patches += macos-available-qtmultimedia.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -191,6 +193,7 @@ define $(package)_preprocess_cmds
 	     -e 's|@host_prefix@|$(host_prefix)|' \
 	     -e 's|@cmake_c_flags@|$(darwin_CC_)|' \
 	     -e 's|@cmake_cxx_flags@|$(darwin_CXX_)|' \
+	     -e 's|@cmake_ld_flags@|$(darwin_LDFLAGS)|'\
 	     -e 's|@wmf_libs@|$(WMF_LIBS)|' \
       toolchain.cmake && \
   cd qtbase && \
@@ -198,11 +201,13 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
+  patch -p1 -i $($(package)_patch_dir)/macos-available-qtbase.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
   patch -p1 -i $($(package)_patch_dir)/no-resonance-audio.patch && \
-  patch -p1 -i $($(package)_patch_dir)/revert-f67ee7c39.patch
+  patch -p1 -i $($(package)_patch_dir)/revert-f67ee7c39.patch && \
+  patch -p1 -i $($(package)_patch_dir)/macos-available-qtmultimedia.patch
 endef
 
 define $(package)_config_cmds
@@ -210,7 +215,7 @@ define $(package)_config_cmds
   export PKG_CONFIG_SYSROOT_DIR=/ && \
   export PKG_CONFIG_LIBDIR=$(host_prefix)/lib/pkgconfig && \
   export QT_MAC_SDK_NO_VERSION_CHECK=1 && \
-  env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH -u OBJC_INCLUDE_PATH -u OBJCPLUS_INCLUDE_PATH -u CPATH -u LIBRARY_PATH cmake $($(package)_config_opts)
+  $($(package)_cmake)
 endef
 
 define $(package)_build_cmds

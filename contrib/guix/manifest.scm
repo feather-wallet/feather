@@ -353,7 +353,8 @@ thus should be able to compile on most platforms where these exist.")
            (list
              gcc-toolchain-11
              (list gcc-toolchain-11 "static")
-             binutils
-             clang-toolchain-10
-             ldid))
+             ldid
+             clang-toolchain-17
+             lld-17
+             (make-lld-wrapper lld-17 #:lld-as-ld? #t)))
           (else '())))))

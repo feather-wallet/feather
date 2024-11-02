@@ -1,0 +1,13 @@
+diff --git a/libs/filesystem/src/directory.cpp b/libs/filesystem/src/directory.cpp
+index 0cf5025..cd38e1b 100644
+--- a/libs/filesystem/src/directory.cpp
++++ b/libs/filesystem/src/directory.cpp
+@@ -279,7 +279,7 @@ inline system::error_code dir_itr_close(dir_itr_imp& imp) noexcept
+ // Obtains a file descriptor from the directory iterator
+ inline int dir_itr_fd(dir_itr_imp const& imp, system::error_code& ec)
+ {
+-    int fd = ::dirfd(static_cast< DIR* >(imp.handle));
++    int fd = dirfd(static_cast< DIR* >(imp.handle));
+     if (BOOST_UNLIKELY(fd < 0))
+     {
+         int err = errno;

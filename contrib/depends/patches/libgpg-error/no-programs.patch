@@ -1,0 +1,13 @@
+diff --git a/src/Makefile.in b/src/Makefile.in
+index 882f4ad..4c99ddc 100644
+--- a/src/Makefile.in
++++ b/src/Makefile.in
+@@ -154,7 +154,7 @@ CONFIG_CLEAN_VPATH_FILES =
+ am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(libdir)" \
+ 	"$(DESTDIR)$(bindir)" "$(DESTDIR)$(m4datadir)" \
+ 	"$(DESTDIR)$(pkgconfigdir)" "$(DESTDIR)$(includedir)"
+-PROGRAMS = $(bin_PROGRAMS) $(noinst_PROGRAMS)
++PROGRAMS = 
+ am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+ am__vpath_adj = case $$p in \
+     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \

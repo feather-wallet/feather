@@ -300,12 +300,6 @@ if(STATIC AND UNIX AND NOT APPLE)
     target_link_libraries(feather PRIVATE Qt6::QComposePlatformInputContextPlugin)
 endif()
 
-if(DEPENDS AND APPLE)
-    # TODO: Needed for ___isOSVersionAtLeast
-    target_link_libraries(feather PRIVATE
-            ${CMAKE_OSX_SYSROOT}/lib/darwin/libclang_rt.osx.a)
-endif()
-
 if(DEPENDS AND UNIX AND NOT APPLE)
     target_link_libraries(XCB::XCB INTERFACE ${LIBXAU_LIBRARY})
 endif()
