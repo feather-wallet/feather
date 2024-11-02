@@ -1,9 +1,9 @@
 package=native_qt
-$(package)_version=6.7.3
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(package)_version)/submodules
+$(package)_version=6.8.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.8/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=8ccbb9ab055205ac76632c9eeddd1ed6fc66936fc56afc2ed0fd5d9e23da3097
+$(package)_sha256_hash=1bad481710aa27f872de6c9f72651f89a6107f0077003d0ebfcc9fd15cba3c75
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches  = dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
@@ -13,16 +13,16 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=f03bb7df619cd9ac9dba110e30b7bcab5dd88eb8bdc9cc752563b4367233203f
+$(package)_qttools_sha256_hash=403115d8268503c6cc6e43310c8ae28eb9e605072a5d04e4a2de8b6af39981f7
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=40142cb71fb1e07ad612bc361b67f5d54cd9367f9979ae6b86124a064deda06b
+$(package)_qtsvg_sha256_hash=cf7a593d5e520f8177240610d9e55d5b75b0887fe5f385554ff64377f1646199
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=304d28b8e592435293893b0110d5f3534407604d1e04d8a0b0e5b34afe577303
+$(package)_qtmultimedia_sha256_hash=28766aa562fa7aa7dfa8420defd6ece90a891a0496b8d8a4c51958182d73cfcd
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=74e512798c7ddbda354a2d8d975211454bbabb47afb7e598892067a5828c0995
+$(package)_qtshadertools_sha256_hash=44692dc93482374bf3b39e96c881fa08275f0bf82958b68a7e3c796b76d4c4cb
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)

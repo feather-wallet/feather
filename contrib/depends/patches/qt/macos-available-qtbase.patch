@@ -1,5 +1,5 @@
 diff --git a/src/gui/platform/darwin/qappleiconengine.mm b/src/gui/platform/darwin/qappleiconengine.mm
-index a346c4d1f1..a1d02a97cb 100644
+index d99da6da84..c6cd8ffe87 100644
 --- a/src/gui/platform/darwin/qappleiconengine.mm
 +++ b/src/gui/platform/darwin/qappleiconengine.mm
 @@ -362,15 +362,6 @@ auto *configuredImage(const NSImage *image, const QColor &color)
@@ -19,10 +19,10 @@ index a346c4d1f1..a1d02a97cb 100644
      return [image imageWithSymbolConfiguration:config];
  }
 diff --git a/src/gui/rhi/qrhimetal.mm b/src/gui/rhi/qrhimetal.mm
-index 232b2374b3..d28d966ad1 100644
+index 3046b76427..8c1e7fd13f 100644
 --- a/src/gui/rhi/qrhimetal.mm
 +++ b/src/gui/rhi/qrhimetal.mm
-@@ -4685,10 +4685,6 @@ id<MTLLibrary> QRhiMetalData::createMetalLib(const QShader &shader, QShader::Var
+@@ -4710,10 +4710,6 @@ id<MTLLibrary> QRhiMetalData::createMetalLib(const QShader &shader, QShader::Var
                                               QString *error, QByteArray *entryPoint, QShaderKey *activeKey)
  {
      QVarLengthArray<int, 8> versions;
@@ -30,6 +30,6 @@ index 232b2374b3..d28d966ad1 100644
 -        versions << 30;
 -    if (@available(macOS 12, iOS 15, *))
 -        versions << 24;
-     if (@available(macOS 11, iOS 14, *))
-         versions << 23;
-     if (@available(macOS 10.15, iOS 13, *))
+     versions << 23 << 22 << 21 << 20 << 12;
+ 
+     const QList<QShaderKey> shaders = shader.availableShaders();

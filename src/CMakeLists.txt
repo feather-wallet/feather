@@ -301,6 +301,9 @@ if(STATIC AND UNIX AND NOT APPLE)
 endif()
 
 if(DEPENDS AND UNIX AND NOT APPLE)
+    # workaround for: undefined reference to `XauGetBestAuthByAddr'
+    find_library(LIBXAU_LIBRARY Xau REQUIRED)
+    message(STATUS "libXau: libraries at ${LIBXAU_LIBRARY}")
     target_link_libraries(XCB::XCB INTERFACE ${LIBXAU_LIBRARY})
 endif()
 

@@ -9,6 +9,8 @@ set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 
 set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 
+set(CMAKE_FIND_ROOT_PATH @host_prefix@)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     set(CMAKE_FIND_ROOT_PATH @host_prefix@;@wmf_libs@)
 endif()

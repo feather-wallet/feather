@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.7.3
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.7/$($(package)_version)/submodules
+$(package)_version=6.8.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.8/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=8ccbb9ab055205ac76632c9eeddd1ed6fc66936fc56afc2ed0fd5d9e23da3097
+$(package)_sha256_hash=1bad481710aa27f872de6c9f72651f89a6107f0077003d0ebfcc9fd15cba3c75
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus
@@ -27,19 +27,19 @@ $(package)_patches += macos-available-qtmultimedia.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=f03bb7df619cd9ac9dba110e30b7bcab5dd88eb8bdc9cc752563b4367233203f
+$(package)_qttools_sha256_hash=403115d8268503c6cc6e43310c8ae28eb9e605072a5d04e4a2de8b6af39981f7
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=40142cb71fb1e07ad612bc361b67f5d54cd9367f9979ae6b86124a064deda06b
+$(package)_qtsvg_sha256_hash=cf7a593d5e520f8177240610d9e55d5b75b0887fe5f385554ff64377f1646199
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=ba03007db7ee68a5bc3e3bd1d71e11f3e1f84e470bcb8c54cd7c01bbe1c5990e
+$(package)_qtwebsockets_sha256_hash=c14be05c46b71c2a89865987ffe0a8d40d8ecb01d48dcdca7fc02ba83a5eaf6f
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=304d28b8e592435293893b0110d5f3534407604d1e04d8a0b0e5b34afe577303
+$(package)_qtmultimedia_sha256_hash=28766aa562fa7aa7dfa8420defd6ece90a891a0496b8d8a4c51958182d73cfcd
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=74e512798c7ddbda354a2d8d975211454bbabb47afb7e598892067a5828c0995
+$(package)_qtshadertools_sha256_hash=44692dc93482374bf3b39e96c881fa08275f0bf82958b68a7e3c796b76d4c4cb
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -56,91 +56,105 @@ $(package)_config_opts += -DINSTALL_LIBEXECDIR=$(build_prefix)/bin
 $(package)_config_opts += -DQT_BUILD_EXAMPLES=FALSE
 $(package)_config_opts += -DQT_BUILD_TESTS=FALSE
 $(package)_config_opts += -DCMAKE_TOOLCHAIN_FILE=toolchain.cmake
-$(package)_config_opts += -DINPUT_cups=no
-$(package)_config_opts += -DINPUT_egl=no
-$(package)_config_opts += -DINPUT_eglfs=no
-$(package)_config_opts += -DINPUT_evdev=no
-$(package)_config_opts += -DINPUT_gif=no
-$(package)_config_opts += -DINPUT_glib=no
-$(package)_config_opts += -DINPUT_icu=no
-$(package)_config_opts += -DINPUT_ico=no
-$(package)_config_opts += -DINPUT_kms=no
-$(package)_config_opts += -DINPUT_linuxfb=no
-$(package)_config_opts += -DINPUT_libudev=no
-$(package)_config_opts += -DINPUT_mtdev=no
-$(package)_config_opts += -DINPUT_openssl=linked
-$(package)_config_opts += -DINPUT_openvg=no
-$(package)_config_opts += -DINPUT_permissions=yes
-$(package)_config_opts += -DINPUT_reduce_relocations=no
-$(package)_config_opts += -DINPUT_schannel=no
-$(package)_config_opts += -DINPUT_sctp=no
-$(package)_config_opts += -DINPUT_securetransport=no
-$(package)_config_opts += -DINPUT_system_proxies=no
-$(package)_config_opts += -DINPUT_use_gold_linker_alias=no
-$(package)_config_opts += -DINPUT_zstd=no
-$(package)_config_opts += -DINPUT_pkg_config=yes
-$(package)_config_opts += -DINPUT_libpng=qt
-$(package)_config_opts += -DINPUT_pcre=qt
-$(package)_config_opts += -DINPUT_harfbuzz=qt
-$(package)_config_opts += -DINPUT_system_zlib=no
-$(package)_config_opts += -DINPUT_colordialog=no
-$(package)_config_opts += -DINPUT_dial=no
-$(package)_config_opts += -DINPUT_fontcombobox=no
-$(package)_config_opts += -DINPUT_image_heuristic_mask=no
-$(package)_config_opts += -DINPUT_keysequenceedit=no
-$(package)_config_opts += -DINPUT_lcdnumber=no
-$(package)_config_opts += -DINPUT_networkdiskcache=no
-$(package)_config_opts += -DINPUT_pdf=no
-$(package)_config_opts += -DINPUT_printdialog=no
-$(package)_config_opts += -DINPUT_printer=no
-$(package)_config_opts += -DINPUT_printpreviewdialog=no
-$(package)_config_opts += -DINPUT_printpreviewwidget=no
-$(package)_config_opts += -DINPUT_printsupport=no
-$(package)_config_opts += -DINPUT_sessionmanager=no
-$(package)_config_opts += -DINPUT_spatialaudio=no
-$(package)_config_opts += -DINPUT_sql=no
-$(package)_config_opts += -DINPUT_syntaxhighlighter=no
-$(package)_config_opts += -DINPUT_textmarkdownwriter=no
-$(package)_config_opts += -DINPUT_textodfwriter=no
-$(package)_config_opts += -DINPUT_topleveldomain=no
-$(package)_config_opts += -DINPUT_undocommand=no
-$(package)_config_opts += -DINPUT_undogroup=no
-$(package)_config_opts += -DINPUT_undostack=no
-$(package)_config_opts += -DINPUT_undoview=no
-$(package)_config_opts += -DINPUT_vnc=no
+$(package)_config_opts += -DQT_FEATURE_cups=OFF
+$(package)_config_opts += -DQT_FEATURE_qmake=OFF
+$(package)_config_opts += -DQT_FEATURE_egl=OFF
+$(package)_config_opts += -DQT_FEATURE_egl_x11=OFF
+$(package)_config_opts += -DQT_FEATURE_xcb_egl_plugin=OFF
+$(package)_config_opts += -DQT_FEATURE_xcb_glx_plugin=OFF
+$(package)_config_opts += -DQT_FEATURE_eglfs=OFF
+$(package)_config_opts += -DQT_FEATURE_evdev=OFF
+$(package)_config_opts += -DQT_FEATURE_gif=OFF
+$(package)_config_opts += -DQT_FEATURE_glib=OFF
+$(package)_config_opts += -DQT_FEATURE_icu=OFF
+$(package)_config_opts += -DQT_FEATURE_ico=OFF
+$(package)_config_opts += -DQT_FEATURE_kms=OFF
+$(package)_config_opts += -DQT_FEATURE_linuxfb=OFF
+$(package)_config_opts += -DQT_FEATURE_libudev=OFF
+$(package)_config_opts += -DQT_FEATURE_mtdev=OFF
+$(package)_config_opts += -DQT_FEATURE_openssl=ON
+$(package)_config_opts += -DQT_FEATURE_openssl_linked=ON
+$(package)_config_opts += -DQT_FEATURE_openvg=OFF
+$(package)_config_opts += -DQT_FEATURE_permissions=ON
+$(package)_config_opts += -DQT_FEATURE_reduce_relocations=OFF
+$(package)_config_opts += -DQT_FEATURE_schannel=OFF
+$(package)_config_opts += -DQT_FEATURE_sctp=OFF
+$(package)_config_opts += -DQT_FEATURE_securetransport=OFF
+$(package)_config_opts += -DQT_FEATURE_system_proxies=OFF
+$(package)_config_opts += -DQT_FEATURE_use_gold_linker_alias=OFF
+$(package)_config_opts += -DQT_FEATURE_zstd=OFF
+$(package)_config_opts += -DQT_FEATURE_pkg_config=ON
+$(package)_config_opts += -DQT_FEATURE_system_png=OFF
+$(package)_config_opts += -DQT_FEATURE_system_pcre2=OFF
+$(package)_config_opts += -DQT_FEATURE_system_harfbuzz=OFF
+$(package)_config_opts += -DQT_FEATURE_system_zlib=OFF
+$(package)_config_opts += -DQT_FEATURE_colordialog=OFF
+$(package)_config_opts += -DQT_FEATURE_dial=OFF
+$(package)_config_opts += -DQT_FEATURE_fontcombobox=OFF
+$(package)_config_opts += -DQT_FEATURE_image_heuristic_mask=OFF
+$(package)_config_opts += -DQT_FEATURE_keysequenceedit=OFF
+$(package)_config_opts += -DQT_FEATURE_lcdnumber=OFF
+$(package)_config_opts += -DQT_FEATURE_networkdiskcache=OFF
+$(package)_config_opts += -DQT_FEATURE_pdf=OFF
+$(package)_config_opts += -DQT_FEATURE_printdialog=OFF
+$(package)_config_opts += -DQT_FEATURE_printer=OFF
+$(package)_config_opts += -DQT_FEATURE_printpreviewdialog=OFF
+$(package)_config_opts += -DQT_FEATURE_printpreviewwidget=OFF
+$(package)_config_opts += -DQT_FEATURE_printsupport=OFF
+$(package)_config_opts += -DQT_FEATURE_sessionmanager=OFF
+$(package)_config_opts += -DQT_FEATURE_spatialaudio=OFF
+$(package)_config_opts += -DQT_FEATURE_sql=OFF
+$(package)_config_opts += -DQT_FEATURE_syntaxhighlighter=OFF
+$(package)_config_opts += -DQT_FEATURE_tabletevent=OFF
+$(package)_config_opts += -DQT_FEATURE_textmarkdownwriter=OFF
+$(package)_config_opts += -DQT_FEATURE_textodfwriter=OFF
+$(package)_config_opts += -DQT_FEATURE_topleveldomain=OFF
+$(package)_config_opts += -DQT_FEATURE_undocommand=OFF
+$(package)_config_opts += -DQT_FEATURE_undogroup=OFF
+$(package)_config_opts += -DQT_FEATURE_undostack=OFF
+$(package)_config_opts += -DQT_FEATURE_undoview=OFF
+$(package)_config_opts += -DQT_FEATURE_vnc=OFF
 
 $(package)_config_opts_linux += -DQT_QMAKE_TARGET_MKSPEC=linux-g++
-$(package)_config_opts_linux += -DINPUT_xcb=yes
-$(package)_config_opts_linux += -DINPUT_xcb_xlib=no
-$(package)_config_opts_linux += -DINPUT_xlib=no
-$(package)_config_opts_linux += -DINPUT_freetype=system
-$(package)_config_opts_linux += -DINPUT_fontconfig=yes
+$(package)_config_opts_linux += -DQT_FEATURE_xcb=ON
+$(package)_config_opts_linux += -DQT_FEATURE_xcb_xlib=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_xlib=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_freetype=ON
+$(package)_config_opts_linux += -DQT_FEATURE_system_freetype=ON
+$(package)_config_opts_linux += -DQT_FEATURE_fontconfig=ON
 $(package)_config_opts_linux += -DINPUT_opengl=no
-$(package)_config_opts_linux += -DINPUT_vulkan=no
-$(package)_config_opts_linux += -DINPUT_backtrace=no
-$(package)_config_opts_linux += -DINPUT_dbus=linked
+$(package)_config_opts_linux += -DQT_FEATURE_opengl=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_opengles2=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_opengles3=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_opengles31=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_opengles32=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_opengl_desktop=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_vulkan=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_backtrace=OFF
+$(package)_config_opts_linux += -DQT_FEATURE_dbus=ON
+$(package)_config_opts_linux += -DQT_FEATURE_dbus_linked=ON
 $(package)_config_opts_linux += -DBUILD_WITH_PCH=OFF
 
 $(package)_config_opts_mingw32 += -DQT_QMAKE_TARGET_MKSPEC=win32-g++
 $(package)_config_opts_mingw32 += -DINPUT_opengl=no
-$(package)_config_opts_mingw32 += -DINPUT_dbus=no
-$(package)_config_opts_mingw32 += -DINPUT_freetype=no
-$(package)_config_opts_mingw32 += -DINPUT_ffmpeg=no
-$(package)_config_opts_mingw32 += -DINPUT_wmf=yes
+$(package)_config_opts_mingw32 += -DQT_FEATURE_dbus=OFF
+$(package)_config_opts_mingw32 += -DQT_FEATURE_freetype=OFF
+$(package)_config_opts_mingw32 += -DQT_FEATURE_ffmpeg=OFF
+$(package)_config_opts_mingw32 += -DQT_FEATURE_wmf=ON
 $(package)_config_opts_mingw32 += -DBUILD_WITH_PCH=ON
 
 $(package)_config_opts_darwin += -DQT_QMAKE_TARGET_MKSPEC=macx-clang
 # see #138
-$(package)_config_opts_darwin += -DINPUT_accessibility=no
-$(package)_config_opts_darwin += -DINPUT_dbus=no
-$(package)_config_opts_darwin += -DINPUT_freetype=no
-$(package)_config_opts_darwin += -DINPUT_ffmpeg=no
+$(package)_config_opts_darwin += -DQT_FEATURE_accessibility=OFF
+$(package)_config_opts_darwin += -DQT_FEATURE_dbus=OFF
+$(package)_config_opts_darwin += -DQT_FEATURE_freetype=OFF
+$(package)_config_opts_darwin += -DQT_FEATURE_ffmpeg=OFF
 $(package)_config_opts_darwin += -DQMAKE_MACOSX_DEPLOYMENT_TARGET=11.0
 $(package)_config_opts_darwin += -DBUILD_WITH_PCH=OFF
 $(package)_config_opts_darwin += '-DQT_QMAKE_DEVICE_OPTIONS=MAC_SDK_PATH=$(host_prefix)/native/SDK;MAC_SDK_VERSION=$(OSX_SDK_VERSION);CROSS_COMPILE=$(host)-;MAC_TARGET=$(host);XCODE_VERSION=$(XCODE_VERSION)'
 $(package)_config_opts_darwin += -DQT_NO_APPLE_SDK_AND_XCODE_CHECK=ON
 # work around a build issue in qfutex_mac_p.h
-$(package)_config_opts_darwin += -DINPUT_appstore_compliant=yes
+$(package)_config_opts_darwin += -DQT_FEATURE_appstore_compliant=ON
 
 $(package)_config_opts += -G Ninja
 
@@ -205,10 +219,10 @@ define $(package)_preprocess_cmds
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/no-resonance-audio.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-f67ee7c39.patch && \
   patch -p1 -i $($(package)_patch_dir)/macos-available-qtmultimedia.patch
 endef
+
 
 define $(package)_config_cmds
   export OPENSSL_LIBS=${$(package)_openssl_flags_$(host_os)} \

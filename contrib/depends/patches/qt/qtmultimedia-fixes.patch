@@ -1,58 +1,35 @@
-From 677c6d3e58064e9d10472e5ca75380b31631d12a Mon Sep 17 00:00:00 2001
-From: tobtoht <tob@featherwallet.org>
-Date: Tue, 3 Jan 2023 13:00:51 +0100
-Subject: [PATCH] qtmultimedia fixes
-
----
- src/multimedia/configure.cmake                         |  3 +--
- src/multimedia/windows/qwindowsmediadevices.cpp        |  2 +-
- src/multimedia/windows/qwindowsresampler.cpp           |  2 +-
- src/plugins/multimedia/darwin/qdarwinintegration.mm    |  3 +--
- src/plugins/multimedia/windows/common/mfmetadata_p.h   |  2 +-
- .../windows/decoder/mfaudiodecodercontrol.cpp          |  2 +-
- .../windows/mediacapture/qwindowsmediadevicereader_p.h |  4 ++--
- .../windows/mediacapture/qwindowsmediaencoder.cpp      |  2 +-
- .../multimedia/windows/player/mfplayercontrol_p.h      |  2 +-
- .../multimedia/windows/player/mfplayersession.cpp      |  2 +-
- src/plugins/multimedia/windows/player/mftvideo.cpp     |  2 +-
- .../multimedia/windows/qwindowsvideodevices.cpp        |  4 ++--
- 13 files changed, 19 insertions(+), 21 deletions(-)
-
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
-index 609806507..40b1b9b36 100644
+index bbad7f94b..c7d382592 100644
 --- a/src/multimedia/configure.cmake
 +++ b/src/multimedia/configure.cmake
-@@ -24,7 +24,6 @@ qt_find_package(WrapPulseAudio PROVIDED_TARGETS WrapPulseAudio::WrapPulseAudio M
- qt_find_package(WMF PROVIDED_TARGETS WMF::WMF MODULE_NAME multimedia QMAKE_LIB wmf)
- qt_find_package(EGL)
-
+@@ -33,21 +33,6 @@ if(TARGET EGL::EGL)
+ endif()
+ qt_find_package(EGL PROVIDED_TARGETS EGL::EGL)
+ 
+-
 -qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg)
+-qt_find_package_extend_sbom(
+-    TARGETS
+-        FFmpeg::avcodec
+-        FFmpeg::avformat
+-        FFmpeg::avutil
+-        FFmpeg::swresample
+-        FFmpeg::swscale
+-    ATTRIBUTION_FILE_DIR_PATHS
+-        # Need to pass an absolute path here, otherwise the file will be relative to the root of
+-        # the source tree, not the current dir, because system libraries are processed in the
+-        # source root directory.
+-        ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ffmpeg
+-)
+ qt_find_package(PipeWire PROVIDED_TARGETS PipeWire::PipeWire MODULE_NAME multimedia QMAKE_LIB pipewire)
  qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
-
- #### Tests
-@@ -76,7 +75,7 @@ qt_feature("ffmpeg" PRIVATE
+ 
+@@ -100,7 +85,7 @@ qt_feature("ffmpeg" PRIVATE
      LABEL "FFmpeg"
      ENABLE INPUT_ffmpeg STREQUAL 'yes'
      DISABLE INPUT_ffmpeg STREQUAL 'no'
 -    CONDITION FFmpeg_FOUND AND (APPLE OR WIN32 OR ANDROID OR QNX OR QT_FEATURE_pulseaudio)
 +    CONDITION UNIX OR WIN32
  )
- qt_feature("alsa" PUBLIC PRIVATE
-     LABEL "ALSA (experimental)"
-diff --git a/src/plugins/multimedia/darwin/qdarwinintegration.mm b/src/plugins/multimedia/darwin/qdarwinintegration.mm
-index 5e26fe5c4..3e82655b0 100644
---- a/src/plugins/multimedia/darwin/qdarwinintegration.mm
-+++ b/src/plugins/multimedia/darwin/qdarwinintegration.mm
-@@ -39,8 +39,7 @@ public:
- QDarwinIntegration::QDarwinIntegration()
- {
- #if defined(Q_OS_MACOS) && QT_MACOS_PLATFORM_SDK_EQUAL_OR_ABOVE(__MAC_11_0)
--    if (__builtin_available(macOS 11.0, *))
--        VTRegisterSupplementalVideoDecoderIfAvailable(kCMVideoCodecType_VP9);
-+    VTRegisterSupplementalVideoDecoderIfAvailable(kCMVideoCodecType_VP9);
- #endif
-     m_videoDevices = new QAVFVideoDevices(this);
- }
--- 
-2.39.0
-
+ qt_feature("pipewire" PRIVATE
+     LABEL "PipeWire"

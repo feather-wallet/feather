@@ -79,13 +79,6 @@ get_directory_property(OPENBSD DIRECTORY "monero" DEFINITION OPENBSD)
 get_directory_property(FREEBSD DIRECTORY "monero" DEFINITION FREEBSD)
 get_directory_property(DRAGONFLY DIRECTORY "monero" DEFINITION DRAGONFLY)
 
-# libXau
-# workaround for: undefined reference to `XauGetBestAuthByAddr'
-if (DEPENDS AND UNIX AND NOT APPLE)
-    find_library(LIBXAU_LIBRARY Xau)
-    message(STATUS "libXau: libraries at ${LIBXAU_LIBRARY}")
-endif()
-
 # pthread
 find_package(Threads REQUIRED)
 
