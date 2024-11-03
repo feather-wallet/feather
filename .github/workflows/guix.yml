@@ -36,7 +36,9 @@ jobs:
           - target: "x86_64-w64-mingw32.installer"
           - target: "x86_64-apple-darwin"
           - target: "arm64-apple-darwin"
-
+    outputs:
+      WIN_INSTALLER_ARTIFACT_ID: ${{ steps.win-installer.outputs.WIN_INSTALLER_ARTIFACT_ID }}
+      WIN_EXECUTABLE_ARTIFACT_ID: ${{ steps.win-executable.outputs.WIN_EXECUTABLE_ARTIFACT_ID }}
     name: ${{ matrix.toolchain.target }}
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +57,7 @@ jobs:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils
+        run: sudo apt update; sudo apt -y install guix git ca-certificates apparmor-utils osslsigncode
       - name: fix apparmor
         run: sudo cp .github/workflows/guix /etc/apparmor.d/guix; sudo /etc/init.d/apparmor reload; sudo aa-enforce guix || echo "failed"
       - name: purge apparmor
@@ -72,11 +74,18 @@ jobs:
           files: |
             guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
       - uses: actions/upload-artifact@v4
+        id: upload-artifact
         with:
           name: ${{ matrix.toolchain.target }}
           path: |
             guix/guix-build-*/output/${{ matrix.toolchain.target }}/*
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
+      - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32.installer' }}
+        id: win-installer
+        run: echo "WIN_INSTALLER_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
+      - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32' }}
+        id: win-executable
+        run: echo "WIN_EXECUTABLE_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
 
   bundle-logs:
     runs-on: ubuntu-24.04
@@ -100,3 +109,45 @@ jobs:
           artifacts: "**/*.AppImage,**/*-linux-arm.zip,**/*-linux-arm64.zip,**/*-linux-riscv64.zip,**/*-linux.zip,**/*-mac-arm64.zip,**/*-mac.zip,**/*-win.zip,**/FeatherWalletSetup-*.exe,**/feather-${{github.ref_name}}.tar.gz"
           draft: true
           name: v${{github.ref_name}}
+
+  codesigning:
+    runs-on: ubuntu-24.04
+    needs: [build-guix, bundle-logs]
+    if: startsWith(github.ref, 'refs/tags/')
+    strategy:
+      fail-fast: false
+      matrix:
+        toolchain:
+          - target: "x86_64-w64-mingw32"
+          - target: "x86_64-w64-mingw32.installer"
+    steps:
+      - name: install dependencies
+        run: sudo apt update; sudo apt -y install osslsigncode
+      - name: "set artifact id"
+        run: |
+          if [ "${{ matrix.toolchain.target }}" == "x86_64-w64-mingw32" ]; then
+            echo "ARTIFACT_ID=${{ needs.build-guix.outputs.WIN_EXECUTABLE_ARTIFACT_ID }}" >> $GITHUB_ENV
+            echo "ARTIFACT_SLUG=executable" >> $GITHUB_ENV
+          elif [ "${{ matrix.toolchain.target }}" == "x86_64-w64-mingw32.installer" ]; then
+            echo "ARTIFACT_ID=${{ needs.build-guix.outputs.WIN_INSTALLER_ARTIFACT_ID }}" >> $GITHUB_ENV
+            echo "ARTIFACT_SLUG=installer" >> $GITHUB_ENV
+          fi
+      - uses: signpath/github-action-submit-signing-request@v1
+        name: "request signature"
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_KEY }}'
+          organization-id: 'd3e94749-9c69-44e9-82de-c65cb3832869'
+          project-slug: 'feather'
+          signing-policy-slug: 'test-signing'
+          artifact-configuration-slug: ${{ env.ARTIFACT_SLUG }}
+          github-artifact-id: ${{ env.ARTIFACT_ID }}
+          wait-for-completion: true
+          output-artifact-directory: codesigning/
+      - name: "extract signature"
+        run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/*-unsigned.exe -out codesigning/${{ matrix.toolchain.target }}-${{github.ref_name}}.pem
+      - uses: actions/upload-artifact@v4
+        name: "upload signature"
+        with:
+          name: ${{ matrix.toolchain.target }}.pem
+          path: |
+            codesigning/${{ matrix.toolchain.target }}-${{github.ref_name}}.pem
