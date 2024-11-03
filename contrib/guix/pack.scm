@@ -6,7 +6,9 @@
   (guix download)
   ((guix licenses) #:prefix license:)
   (guix packages)
-  (guix utils))
+  (guix utils)
+  (gnu packages xorg)
+  )
 
 (define utf8-locales
   (make-glibc-utf8-locales
@@ -18,4 +20,5 @@
   (append
     (list nss-certs
           fontconfig
-          utf8-locales)))
+          utf8-locales
+          xkeyboard-config)))

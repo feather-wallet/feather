@@ -32,7 +32,7 @@ cd files
 cp /feather/contrib/depends/x86_64-linux-gnu/bin/startup .
 
 # Copy feather binary
-cp /feather-bin feather
+cp /outdir/feather feather
 
 # Copy metadata
 cp -r /feather/contrib/flatpak/share .
@@ -47,6 +47,7 @@ GUIX_PROFILE=$(get_store_path "profile")
 GUIX_GLIBC=$(get_store_path "glibc")
 GUIX_FONTCONFIG=$(get_store_path "fontconfig")
 GUIX_GCC=$(get_store_path "gcc")
+GUIX_KEYBOARD_CONFIG=$(get_store_path "keyboard-config")
 
 # Patch Feather binary
 patchelf --set-interpreter "/${GUIX_GLIBC}/lib/ld-linux-x86-64.so.2" feather
@@ -81,6 +82,8 @@ ln -s "/run/host/fonts" share/fonts
 ln -s "/run/host/fonts-cache" share/fonts-cache
 ln -s "/${GUIX_PROFILE}/share/locale" share/locale
 ln -s "/${GUIX_PROFILE}/share/xml" share/xml
+
+ln -s "/${GUIX_KEYBOARD_CONFIG}/share/X11" share/X11
 
 # Setup profile symlink
 ln -s "/${GUIX_PROFILE}" profile

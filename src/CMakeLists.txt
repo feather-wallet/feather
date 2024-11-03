@@ -18,6 +18,10 @@ if (WITH_SCANNER)
             MultimediaWidgets)
 endif()
 
+IF (UNIX AND NOT APPLE)
+    list(APPEND QT_COMPONENTS WaylandClient)
+endif()
+
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
 if (CHECK_UPDATES)
@@ -292,12 +296,17 @@ if (WITH_SCANNER)
     )
 endif()
 
+if(UNIX AND NOT APPLE)
+    target_link_libraries(feather PRIVATE Qt::WaylandClient)
+endif()
+
 if(STATIC AND APPLE)
     target_link_libraries(feather PRIVATE Qt6::QDarwinCameraPermissionPlugin)
 endif()
 
 if(STATIC AND UNIX AND NOT APPLE)
     target_link_libraries(feather PRIVATE Qt6::QComposePlatformInputContextPlugin)
+    target_link_libraries(feather PRIVATE Qt6::QWaylandIntegrationPlugin)
 endif()
 
 if(DEPENDS AND UNIX AND NOT APPLE)
@@ -305,6 +314,11 @@ if(DEPENDS AND UNIX AND NOT APPLE)
     find_library(LIBXAU_LIBRARY Xau REQUIRED)
     message(STATUS "libXau: libraries at ${LIBXAU_LIBRARY}")
     target_link_libraries(XCB::XCB INTERFACE ${LIBXAU_LIBRARY})
+
+    # make sure Wayland::Client links to libffi
+    find_library(LIBFFI_LIBRARY ffi REQUIRED)
+    message(STATUS "libffi: libraries at ${LIBFFI_LIBRARY}")
+    target_link_libraries(Wayland::Client INTERFACE ${LIBFFI_LIBRARY})
 endif()
 
 if(STACK_TRACE AND CMAKE_C_COMPILER_ID STREQUAL "GNU")

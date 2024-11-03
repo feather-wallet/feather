@@ -29,6 +29,9 @@
 #if defined(Q_OS_LINUX) && defined(STATIC)
 Q_IMPORT_PLUGIN(QXcbIntegrationPlugin)
 Q_IMPORT_PLUGIN(QComposePlatformInputContextPlugin) // Needed for dead keys on Linux
+Q_IMPORT_PLUGIN(QWaylandIntegrationPlugin)
+Q_IMPORT_PLUGIN(QWaylandXdgShellIntegrationPlugin)
+Q_IMPORT_PLUGIN(QWaylandBradientDecorationPlugin)
 #endif
 
 #if defined(Q_OS_MAC) && defined(STATIC)

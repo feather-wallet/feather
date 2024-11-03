@@ -461,7 +461,7 @@ EOF
 
         case "$OPTIONS" in
             pack)
-                FEATHER_BIN="$(outdir_for_host "$host")/feather"
+                OUTDIR="$(outdir_for_host "$host")"
                 export VERSION=${VERSION}
                 time-machine pack -S /profile=. --manifest="${PWD}/contrib/guix/pack.scm"
                 PACK=$(time-machine pack --manifest="${PWD}/contrib/guix/pack.scm")
@@ -473,7 +473,7 @@ EOF
                                          --share="$PACK"=/pack \
                                          --share="$(outdir_for_host "$host")"=/output \
                                          --share="$LOGDIR_BASE"=/logdir-base \
-                                         --share="$FEATHER_BIN"=/feather-bin \
+                                         --share="$OUTDIR"=/outdir \
                                          --keep-failed \
                                          --fallback \
                                          --user="user" \

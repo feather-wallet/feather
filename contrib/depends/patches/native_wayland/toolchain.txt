@@ -1,0 +1,20 @@
+[binaries]
+c = '@cc@'
+cpp = '@cxx@'
+ar = '@ar@'
+strip = '@strip@'
+pkgconfig = '/home/user/.guix-profile/bin/pkg-config'
+
+[host_machine]
+system = 'linux'
+cpu_family = '@arch@'
+cpu = '@arch@'
+endian = 'little'
+
+[project options]
+tests = false
+documentation = false
+dtd_validation = false
+
+[built-in options]
+prefix = '@build_prefix@'

@@ -4,6 +4,7 @@ $(package)_download_path=https://download.qt.io/official_releases/qt/6.8/$($(pac
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=1bad481710aa27f872de6c9f72651f89a6107f0077003d0ebfcc9fd15cba3c75
+$(package)_linux_dependencies=native_wayland
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches  = dont_hardcode_pwd.patch
 $(package)_patches += fast_fixed_dtoa_no_optimize.patch
@@ -24,10 +25,14 @@ $(package)_qtmultimedia_sha256_hash=28766aa562fa7aa7dfa8420defd6ece90a891a0496b8
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
 $(package)_qtshadertools_sha256_hash=44692dc93482374bf3b39e96c881fa08275f0bf82958b68a7e3c796b76d4c4cb
 
+$(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
+$(package)_qtwayland_sha256_hash=175758591638ebf1c6fbb66ac11c7fa0eb8d4ed52e9243cc59075d06a6a2060a
+
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
 $(package)_extra_sources += $($(package)_qtmultimedia_file_name)
 $(package)_extra_sources += $($(package)_qtshadertools_file_name)
+$(package)_extra_sources += $($(package)_qtwayland_file_name)
 
 define $(package)_set_vars
 $(package)_config_opts_release = -release
@@ -119,7 +124,8 @@ $(call fetch_file,$(package),$($(package)_download_path),$($(package)_download_f
 $(call fetch_file,$(package),$($(package)_download_path),$($(package)_qttools_file_name),$($(package)_qttools_file_name),$($(package)_qttools_sha256_hash)) && \
 $(call fetch_file,$(package),$($(package)_download_path),$($(package)_qtsvg_file_name),$($(package)_qtsvg_file_name),$($(package)_qtsvg_sha256_hash)) && \
 $(call fetch_file,$(package),$($(package)_download_path),$($(package)_qtmultimedia_file_name),$($(package)_qtmultimedia_file_name),$($(package)_qtmultimedia_sha256_hash)) && \
-$(call fetch_file,$(package),$($(package)_download_path),$($(package)_qtshadertools_file_name),$($(package)_qtshadertools_file_name),$($(package)_qtshadertools_sha256_hash))
+$(call fetch_file,$(package),$($(package)_download_path),$($(package)_qtshadertools_file_name),$($(package)_qtshadertools_file_name),$($(package)_qtshadertools_sha256_hash)) && \
+$(call fetch_file,$(package),$($(package)_download_path),$($(package)_qtwayland_file_name),$($(package)_qtwayland_file_name),$($(package)_qtwayland_sha256_hash))
 endef
 
 define $(package)_extract_cmds
@@ -129,6 +135,7 @@ define $(package)_extract_cmds
   echo "$($(package)_qtsvg_sha256_hash)  $($(package)_source_dir)/$($(package)_qtsvg_file_name)" >> $($(package)_extract_dir)/.$($(package)_file_name).hash && \
   echo "$($(package)_qtmultimedia_sha256_hash)  $($(package)_source_dir)/$($(package)_qtmultimedia_file_name)" >> $($(package)_extract_dir)/.$($(package)_file_name).hash && \
   echo "$($(package)_qtshadertools_sha256_hash)  $($(package)_source_dir)/$($(package)_qtshadertools_file_name)" >> $($(package)_extract_dir)/.$($(package)_file_name).hash && \
+  echo "$($(package)_qtwayland_sha256_hash)  $($(package)_source_dir)/$($(package)_qtwayland_file_name)" >> $($(package)_extract_dir)/.$($(package)_file_name).hash && \
   $(build_SHA256SUM) -c $($(package)_extract_dir)/.$($(package)_file_name).hash && \
   mkdir qtbase && \
   $(build_TAR) --no-same-owner --strip-components=1 -xf $($(package)_source) -C qtbase && \
@@ -139,7 +146,9 @@ define $(package)_extract_cmds
   mkdir qtmultimedia && \
   $(build_TAR) --no-same-owner --strip-components=1 -xf $($(package)_source_dir)/$($(package)_qtmultimedia_file_name) -C qtmultimedia && \
   mkdir qtshadertools && \
-  $(build_TAR) --no-same-owner --strip-components=1 -xf $($(package)_source_dir)/$($(package)_qtshadertools_file_name) -C qtshadertools
+  $(build_TAR) --no-same-owner --strip-components=1 -xf $($(package)_source_dir)/$($(package)_qtshadertools_file_name) -C qtshadertools && \
+  mkdir qtwayland && \
+  $(build_TAR) --no-same-owner --strip-components=1 -xf $($(package)_source_dir)/$($(package)_qtwayland_file_name) -C qtwayland
 endef
 
 define $(package)_preprocess_cmds
