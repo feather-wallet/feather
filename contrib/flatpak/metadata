@@ -6,6 +6,6 @@ command=/app/startup
 
 [Context]
 shared=network;ipc;
-sockets=x11;wayland;
+sockets=wayland;fallback-x11;
 devices=all;
 filesystems=~/Monero:create;
