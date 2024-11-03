@@ -11,24 +11,25 @@ We support development on rolling release distributions and the latest version o
 #### Arch Linux
 
 ```bash
-pacman -S git cmake base-devel ccache unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-multimedia libzip hidapi protobuf zxing-cpp
+pacman -S git cmake base-devel ccache unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-wayland qt6-multimedia libzip hidapi protobuf zxing-cpp
 ```
 
 #### Ubuntu 24.04
 
 ```bash
 apt update
-apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev libqrencode-dev  \
-    qt6-base-dev qt6-multimedia-dev libgl1-mesa-dev libqt6svg6-dev libqt6websockets6-dev libzip-dev libsodium-dev libgcrypt-dev \
-    libx11-xcb-dev libprotobuf-dev protobuf-compiler libhidapi-dev libzxing-dev
+apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-all-dev \
+            libqrencode-dev qt6-base-dev qt6-svg-dev qt6-websockets-dev qt6-multimedia-dev \
+            qt6-wayland-dev libzip-dev libsodium-dev libgcrypt20-dev libx11-xcb-dev \
+            libprotobuf-dev libhidapi-dev libzxing-dev libusb-1.0-0-dev
 ```
 
 #### Void Linux
 
 ```bash
 xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodium-devel zlib-devel qt6-base-devel \
-                qt6-svg-devel qt6-websockets-devel qt6-multimedia-devel libgcrypt-devel libzip-devel hidapi-devel protobuf \
-                protobuf-devel qrencode-devel zxing-cpp-devel
+                qt6-svg-devel qt6-websockets-devel qt6-multimedia-devel qt6-wayland-devel libgcrypt-devel libzip-devel \
+                hidapi-devel protobuf protobuf-devel qrencode-devel zxing-cpp-devel
 ```
 
 #### macOS
