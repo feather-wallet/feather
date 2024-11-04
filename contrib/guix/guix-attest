@@ -221,8 +221,8 @@ mkdir -p "$outsigdir"
         #       not needed if there are no $codesigned_fragments
         cat "${sha256sum_fragments[@]}" \
             | sort -u \
-            | sort -k2 \
             | basenameify_SHA256SUMS \
+            | sort -k2 \
                 > "$temp_all"
         if [ -e all.SHA256SUMS ]; then
             # The SHA256SUMS already exists, make sure it's exactly what we

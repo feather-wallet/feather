@@ -263,7 +263,7 @@ chain for " target " development."))
 (define osslsigncode
   (package
     (name "osslsigncode")
-    (version "2.5")
+    (version "2.9")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -271,9 +271,9 @@ chain for " target " development."))
                      (commit version)))
               (sha256
                 (base32
-                  "1j47vwq4caxfv0xw68kw5yh00qcpbd56d7rq6c483ma3y7s96yyz"))))
+                  "160dwjzpwaxism6r7ryn7dgfq78rk3nkbg9m2kwg512hhn20blqh"))))
     (build-system cmake-build-system)
-    (inputs (list openssl))
+    (inputs (list openssl zlib))
     (home-page "https://github.com/mtrojnar/osslsigncode")
     (synopsis "Authenticode signing and timestamping tool")
     (description "osslsigncode is a small tool that implements part of the
@@ -336,7 +336,7 @@ thus should be able to compile on most platforms where these exist.")
         xcb-util-wm
     )
   (let ((target (getenv "HOST")))
-    (cond ((string-suffix? "-mingw32" target)
+    (cond ((string-contains target "-mingw32")
            ;; Windows
            (list
              gcc-toolchain-12
