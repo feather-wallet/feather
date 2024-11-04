@@ -66,9 +66,50 @@ Example w/o signing, just creating SHA256SUMS:
 EOF
 }
 
-if [ -z "$GUIX_SIGS_REPO" ] || [ -z "$SIGNER" ]; then
-    cmd_usage
-    exit 1
+if [ -z "${GUIX_SIGS_REPO}" ]; then
+    echo "[HINT] Fork and clone the feather-sigs repo, if you haven't already:"
+    echo "https://github.com/feather-wallet/feather-sigs"
+    echo ""
+
+    printf "Enter path to 'feather-sigs' repo: "
+    read -r repo
+
+    if [ ! -d "${repo}" ]; then
+        echo "ERR: directory does not exist"
+        exit 1
+    fi
+
+    export GUIX_SIGS_REPO="$repo"
+    wizard=1
+fi
+
+if [ -z "${SIGNER}" ]; then
+    printf "Enter your GitHub username: "
+    read -r signer
+
+    if [ -z "$signer" ]; then
+        echo "ERR: signer name can't be empty"
+        exit 1
+    fi
+
+    echo ""
+    echo "[HINT] To find your GPG fingerprint use:"
+    echo "gpg --list-secret-keys --keyid-format=long"
+    echo "It should look like: E87BD921CDD885C9D78A38C5E45B10DD027D2472"
+    echo ""
+
+    printf "Enter fingerprint of your GPG key: "
+    read -r fingerprint
+
+    export SIGNER="${fingerprint}=${signer}"
+    wizard=1
+fi
+
+if [ -n "$wizard" ]; then
+    echo ""
+    echo "Next time, invoke this command as:"
+    echo "env GUIX_SIGS_REPO=${GUIX_SIGS_REPO} SIGNER=${SIGNER} make attest"
+    echo ""
 fi
 
 ################

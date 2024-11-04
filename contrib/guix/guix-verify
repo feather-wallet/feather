@@ -37,9 +37,19 @@ Example overriding signer's manifest to use as base
 EOF
 }
 
-if [ -z "$GUIX_SIGS_REPO" ]; then
-    cmd_usage
-    exit 1
+if [ -z "${GUIX_SIGS_REPO}" ]; then
+    printf "Enter path to 'feather-sigs' repo: "
+    read -r GUIX_SIGS_REPO
+
+    if [ ! -d "${GUIX_SIGS_REPO}" ]; then
+        echo "Directory does not exist"
+        exit 1
+    fi
+
+    echo ""
+    echo "Next time, invoke this command as:"
+    echo "env GUIX_SIGS_REPO=${GUIX_SIGS_REPO} make verify"
+    echo ""
 fi
 
 ################
