@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>org.featherwallet.feather.desktop</id>
+    <name>Feather</name>
+    <summary>Monero desktop wallet</summary>
+    <metadata_license>CC0-1.0</metadata_license>
+    <project_license>BSD-3-Clause</project_license>
+    <categories>
+        <category>Network</category>
+        <category>Qt</category>
+        <category>Finance</category>
+        <category>Office</category>
+    </categories>
+    <description>
+        <p>Feather is a Monero wallet for the desktop (with a GUI built on Qt)
+            with the following features:</p>
+        <ul>
+            <li>
+                Easy-to-use, small and fast - Feather
+                runs well on any modern hardware, including virtual machines
+                and live operating systems.
+            </li>
+            <li>
+                Beginner friendly, but also caters to advanced Monero
+                users by providing a feature set that is on par with the official CLI.
+            </li>
+            <li>
+                Ships with sane defaults that suit most users, but
+                can also be configured for high or uncommon threat models.
+            </li>
+            <li>
+                Serves as a testing grounds for experimental features
+                that may later be adopted in the reference wallets.
+            </li>
+        </ul>
+    </description>
+    <launchable type="desktop-id">feather.desktop</launchable>
+    <screenshots>
+        <screenshot type="default">
+            <image>https://featherwallet.org/img/receive_light.png</image>
+            <caption>The main Feather Wallet window.</caption>
+        </screenshot>
+    </screenshots>
+    <url type="homepage">https://featherwallet.org/</url>
+    <url type="bugtracker">https://github.com/feather-wallet/feather</url>
+    <url type="donation">https://docs.featherwallet.org/guides/donate</url>
+    <url type="contact">https://docs.featherwallet.org/guides/report-an-issue</url>
+    <url type="help">https://docs.featherwallet.org</url>
+    <url type="vcs-browser">https://github.com/feather-wallet/feather</url>
+
+    <developer id="org.featherwallet">
+        <name>The Monero Project</name>
+    </developer>
+
+    <content_rating type="oars-1.1" />
+</component>
