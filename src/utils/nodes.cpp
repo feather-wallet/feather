@@ -312,18 +312,18 @@ FeatherNode Nodes::pickEligibleNode() {
         return rtn;
     }
 
-    QVector<int> node_indeces;
+    QVector<int> node_indices;
     int i = 0;
     for (const auto &node: nodes) {
-        node_indeces.push_back(i);
+        node_indices.push_back(i);
         i++;
     }
     unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
-    std::shuffle(node_indeces.begin(), node_indeces.end(), std::default_random_engine(seed));
+    std::shuffle(node_indices.begin(), node_indices.end(), std::default_random_engine(seed));
 
     // Pick random eligible node
     int mode_height = this->modeHeight(nodes);
-    for (int index : node_indeces) {
+    for (int index : node_indices) {
         const FeatherNode &node = nodes.at(index);
 
         // This may fail to detect bad nodes if cached nodes are used
@@ -359,7 +359,7 @@ FeatherNode Nodes::pickEligibleNode() {
 
     // All nodes tried, and none eligible
     // Don't show node exhaustion warning if single custom node is used
-    if (wsMode || node_indeces.size() > 1) {
+    if (wsMode || node_indices.size() > 1) {
         this->exhausted();
     }
     return rtn;
