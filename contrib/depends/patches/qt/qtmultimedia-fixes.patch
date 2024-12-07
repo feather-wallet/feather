@@ -1,13 +1,19 @@
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
-index bbad7f94b..c7d382592 100644
+index fd69e8186..23657d9f5 100644
 --- a/src/multimedia/configure.cmake
 +++ b/src/multimedia/configure.cmake
-@@ -33,21 +33,6 @@ if(TARGET EGL::EGL)
+@@ -65,27 +65,6 @@ if(TARGET EGL::EGL)
  endif()
  qt_find_package(EGL PROVIDED_TARGETS EGL::EGL)
  
+-# If FFMPEG_DIR is specified, we require FFmpeg to be present. This makes
+-# configuration problems easier to detect, and reduces risk of silent
+-# fallback to native backends.
+-if (DEFINED FFMPEG_DIR)
+-    set(ffmpeg_required REQUIRED)
+-endif()
 -
--qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg)
+-qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg ${ffmpeg_required})
 -qt_find_package_extend_sbom(
 -    TARGETS
 -        FFmpeg::avcodec
@@ -24,7 +30,7 @@ index bbad7f94b..c7d382592 100644
  qt_find_package(PipeWire PROVIDED_TARGETS PipeWire::PipeWire MODULE_NAME multimedia QMAKE_LIB pipewire)
  qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
  
-@@ -100,7 +85,7 @@ qt_feature("ffmpeg" PRIVATE
+@@ -138,7 +117,7 @@ qt_feature("ffmpeg" PRIVATE
      LABEL "FFmpeg"
      ENABLE INPUT_ffmpeg STREQUAL 'yes'
      DISABLE INPUT_ffmpeg STREQUAL 'no'

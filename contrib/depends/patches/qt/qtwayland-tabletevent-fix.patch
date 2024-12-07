@@ -1,0 +1,15 @@
+diff --git a/src/client/qwaylandinputdevice.cpp b/src/client/qwaylandinputdevice.cpp
+index f435b953..068834c2 100644
+--- a/src/client/qwaylandinputdevice.cpp
++++ b/src/client/qwaylandinputdevice.cpp
+@@ -609,8 +609,10 @@ void QWaylandInputDevice::setCursor(const QCursor *cursor, const QSharedPointer<
+     if (mPointer)
+         mPointer->updateCursor();
+ 
++#if QT_CONFIG(tabletevent)
+     if (mTabletSeat)
+         mTabletSeat->updateCursor();
++#endif
+ }
+ #endif
+ 
