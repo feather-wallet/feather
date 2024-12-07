@@ -1,8 +1,8 @@
 package=libzip
-$(package)_version=1.11.1
+$(package)_version=1.11.2
 $(package)_download_path=https://libzip.org/download/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=c0e6fa52a62ba11efd30262290dc6970947aef32e0cc294ee50e9005ceac092a
+$(package)_sha256_hash=6b2a43837005e1c23fdfee532b78f806863e412d2089b9c42b49ab08cbcd7665
 $(package)_dependencies=zlib
 
 define $(package)_set_vars
