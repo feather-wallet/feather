@@ -1,6 +1,6 @@
 package=boost
 $(package)_version=1.85.0
-$(package)_download_path=https://boostorg.jfrog.io/artifactory/main/release/$($(package)_version)/source/
+$(package)_download_path=https://archives.boost.io/release/$($(package)_version)/source/
 $(package)_file_name=$(package)_$(subst .,_,$($(package)_version)).tar.gz
 $(package)_sha256_hash=be0d91732d5b0cc6fbb275c7939974457e79b54d6f07ce2e3dfdd68bef883b0b
 $(package)_patches=disable_addr2line.patch filesystem_macos_sdk.patch

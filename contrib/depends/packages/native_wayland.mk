@@ -1,5 +1,5 @@
-package := native_wayland
-$(package)_version := 1.23.1
+package=native_wayland
+$(package)_version=1.23.1
 $(package)_download_path := https://gitlab.freedesktop.org/wayland/wayland/-/releases/$($(package)_version)/downloads/
 $(package)_file_name := wayland-$($(package)_version).tar.xz
 $(package)_sha256_hash := 864fb2a8399e2d0ec39d56e9d9b753c093775beadc6022ce81f441929a81e5ed

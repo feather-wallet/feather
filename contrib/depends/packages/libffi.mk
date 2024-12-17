@@ -1,5 +1,5 @@
-package := libffi
-$(package)_version := 3.4.6
+package=libffi
+$(package)_version=3.4.6
 $(package)_download_path := https://github.com/libffi/$(package)/releases/download/v$($(package)_version)
 $(package)_file_name := libffi-$($(package)_version).tar.gz
 $(package)_sha256_hash := b0dea9df23c863a7a50e825440f3ebffabd65df1497108e5d437747843895a4e
