@@ -984,6 +984,8 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
 
     this->history()->refresh();
     this->coins()->refresh();
+    this->subaddress()->refresh(this->currentSubaddressAccount());
+
     this->updateBalance();
 
     if (!success) {
