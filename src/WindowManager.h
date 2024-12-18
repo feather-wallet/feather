@@ -68,7 +68,7 @@ private slots:
     void onInitialNetworkConfigured();
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
-    void onDeviceError(const QString &errorMessage);
+    void onDeviceError(const QString &errorMessage, quint64 errorCode);
     void onWalletPassphraseNeeded(bool on_device);
     void onChangeTheme(const QString &themeName);
 

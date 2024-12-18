@@ -121,7 +121,7 @@ signals:
     void walletPassphraseNeeded(bool onDevice);
     void deviceButtonRequest(quint64 buttonCode);
     void deviceButtonPressed();
-    void deviceError(const QString &message);
+    void deviceError(const QString &message, quint64 errorCode);
     void openAliasResolved(const QString &alias, const QString &address, bool dnssecValid);
 
 private:

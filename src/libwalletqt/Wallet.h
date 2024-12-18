@@ -441,7 +441,7 @@ signals:
     void walletCreationHeightChanged();
     void deviceButtonRequest(quint64 buttonCode);
     void deviceButtonPressed();
-    void deviceError(const QString &message);
+    void deviceError(const QString &message, quint64 errorCode);
     void walletPassphraseNeeded(bool onDevice);
     void beginCommitTransaction();
     void transactionCommitted(bool status, PendingTransaction *t, const QStringList& txid, const QMap<QString, QString> &txHexMap);

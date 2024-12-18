@@ -161,7 +161,7 @@ private slots:
     void onResendTransaction(const QString &txid);
     void importContacts();
     void importTransaction();
-    void onDeviceError(const QString &error);
+    void onDeviceError(const QString &error, quint64 errorCode);
     void onDeviceButtonRequest(quint64 code);
     void onDeviceButtonPressed();
     void onWalletPassphraseNeeded(bool on_device);

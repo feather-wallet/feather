@@ -73,10 +73,10 @@ void WalletListenerImpl::onDeviceButtonPressed()
     emit m_wallet->deviceButtonPressed();
 }
 
-void WalletListenerImpl::onDeviceError(const std::string &message)
+void WalletListenerImpl::onDeviceError(const std::string &message, unsigned int error_code)
 {
     qDebug() << __FUNCTION__;
-    emit m_wallet->deviceError(QString::fromStdString(message));
+    emit m_wallet->deviceError(QString::fromStdString(message), error_code);
 }
 
 void WalletListenerImpl::onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort)

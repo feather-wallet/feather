@@ -608,7 +608,7 @@ void WindowManager::onDeviceButtonPressed() {
     m_splashDialog->hide();
 }
 
-void WindowManager::onDeviceError(const QString &errorMessage) {
+void WindowManager::onDeviceError(const QString &errorMessage, quint64 errorCode) {
     // TODO: when does this get called?
     qCritical() << Q_FUNC_INFO << errorMessage;
 }

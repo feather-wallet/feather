@@ -43,10 +43,10 @@ public:
         emit m_mgr->deviceButtonPressed();
     }
 
-    void onDeviceError(const std::string &message) override
+    void onDeviceError(const std::string &message, unsigned int error_code) override
     {
         qDebug() << __FUNCTION__;
-        emit m_mgr->deviceError(QString::fromStdString(message));
+        emit m_mgr->deviceError(QString::fromStdString(message), error_code);
     }
 
 private:

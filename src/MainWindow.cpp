@@ -1431,7 +1431,7 @@ void MainWindow::importTransaction() {
     dialog.exec();
 }
 
-void MainWindow::onDeviceError(const QString &error) {
+void MainWindow::onDeviceError(const QString &error, quint64 errorCode) {
     qCritical() << "Device error: " << error;
 
     if (m_showDeviceError) {
@@ -1441,7 +1441,13 @@ void MainWindow::onDeviceError(const QString &error) {
     m_statusBtnHwDevice->setIcon(this->hardwareDeviceUnpairedIcon());
     while (true) {
         m_showDeviceError = true;
-        auto result = QMessageBox::question(this, "Hardware device", "Lost connection to hardware device. Attempt to reconnect?");
+
+        QString prompt = "Lost connection to hardware device. Attempt to reconnect?";
+        if (errorCode == 0x5515) {
+            prompt = QString("Device must be unlocked to continue scanning. Attempt to continue?");
+        }
+
+        auto result = QMessageBox::question(this, "Hardware device", prompt);
         if (result == QMessageBox::Yes) {
             bool r = m_wallet->reconnectDevice();
             if (r) {

@@ -31,7 +31,7 @@ public:
 
     virtual void onDeviceButtonPressed() override;
 
-    virtual void onDeviceError(const std::string &message) override;
+    virtual void onDeviceError(const std::string &message, unsigned int error_code) override;
 
     virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override;
 
