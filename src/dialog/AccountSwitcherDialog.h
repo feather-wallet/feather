@@ -22,12 +22,15 @@ public:
 
     void update();
 
+protected:
+    void showEvent(QShowEvent *event) override;
+
 private slots:
     void showContextMenu(const QPoint& point);
     void updateSelection();
 
 private:
-    void switchAccount();
+    void switchAccount(const QModelIndex &index);
     void copyLabel();
     void copyBalance();
     void editLabel();

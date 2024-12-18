@@ -39,7 +39,7 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
     ui->accounts->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->accounts->header()->setSectionResizeMode(SubaddressAccountModel::Label, QHeaderView::Stretch);
 
-    connect(ui->accounts->selectionModel(), &QItemSelectionModel::currentChanged, this, &AccountSwitcherDialog::switchAccount);
+    connect(ui->accounts, &QTreeView::clicked, this, &AccountSwitcherDialog::switchAccount);
     connect(ui->accounts, &QTreeView::customContextMenuRequested, this, &AccountSwitcherDialog::showContextMenu);
 
     connect(ui->btn_newAccount, &QPushButton::clicked, [this]{
@@ -47,11 +47,14 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
        m_wallet->subaddressAccount()->refresh();
     });
 
-    connect(m_wallet, &Wallet::currentSubaddressAccountChanged, this, &AccountSwitcherDialog::updateSelection);
     connect(m_wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);
+}
+
+void AccountSwitcherDialog::showEvent(QShowEvent *event) {
+    QDialog::showEvent(event);
 
     this->update();
-    this->updateSelection();
+    m_wallet->switchSubaddressAccount(m_wallet->currentSubaddressAccount());
 }
 
 void AccountSwitcherDialog::update() {
@@ -59,13 +62,8 @@ void AccountSwitcherDialog::update() {
     m_wallet->subaddressAccount()->refresh();
 }
 
-void AccountSwitcherDialog::switchAccount() {
-    auto row = this->currentEntry();
-    if (!row) {
-        return;
-    }
-
-    m_wallet->switchSubaddressAccount(row->getRow());
+void AccountSwitcherDialog::switchAccount(const QModelIndex &index) {
+    m_wallet->switchSubaddressAccount(m_proxyModel->mapToSource(index).row());
 }
 
 void AccountSwitcherDialog::copyLabel() {
@@ -93,11 +91,13 @@ void AccountSwitcherDialog::editLabel() {
 }
 
 void AccountSwitcherDialog::updateSelection() {
-    QModelIndex index = m_model->index(m_wallet->currentSubaddressAccount(), 0);
+    QModelIndex index = m_proxyModel->index(m_wallet->currentSubaddressAccount(), 0);
     if (!index.isValid()) {
         return;
     }
-    ui->accounts->selectionModel()->select(index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+
+    ui->accounts->setCurrentIndex(index);
+    ui->accounts->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
 }
 
 void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
