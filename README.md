@@ -13,13 +13,13 @@ You can download Feather from **[featherwallet.org](https://featherwallet.org/do
 
 If you need help installing Feather, check the [installation documentation](https://docs.featherwallet.org/).
 
-We recommend that you verify downloads with GPG. Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). The fingerprint is:
+Releases are signed with our [release signing key](https://docs.featherwallet.org/guides/release-signing-key). The fingerprint is:
 
 ```
 8185 E158 A333 30C7 FD61 BC0D 1F76 E155 CEFB A71C
 ```
 
-Windows releases are code-signed for free by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
+We recommend that you verify downloads with GPG.
 
 ## Resources
 
