@@ -1,6 +1,6 @@
 Name "Feather Wallet"
 
-OutFile "${CUR_PATH}\contrib\installers\windows\FeatherWalletSetup-@PROJECT_VERSION@-unsigned.exe"
+OutFile "${CUR_PATH}\contrib\installers\windows\FeatherWalletSetup-@PROJECT_VERSION@.exe"
 RequestExecutionLevel highest
 SetCompressor /SOLID lzma
 SetDateSave off

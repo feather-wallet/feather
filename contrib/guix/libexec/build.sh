@@ -415,9 +415,25 @@ mkdir -p "$DISTSRC"
         # for release
         case "$HOST" in
             *mingw*)
-                if [ -z "$OPTIONS" ]; then
-                    mv feather.exe "${OUTDIR}/${DISTNAME}-unsigned.exe"
-                fi
+                case "$OPTIONS" in
+                    installer)
+                        find . -print0 \
+                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                        find . \
+                            | sort \
+                            | zip -X@ "${OUTDIR}/${DISTNAME}-win-installer.zip" \
+                            || ( rm -f "${OUTDIR}/${DISTNAME}-win-installer.zip" && exit 1 )
+                        ;;
+                    "")
+                        mv feather.exe ${DISTNAME}.exe && \
+                        find . -print0 \
+                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                        find . \
+                            | sort \
+                            | zip -X@ "${OUTDIR}/${DISTNAME}-win.zip" \
+                            || ( rm -f "${OUTDIR}/${DISTNAME}-win.zip" && exit 1 )
+                        ;;
+                esac
                 ;;
             *linux*)
                 if [ "$OPTIONS" != "pack" ]; then
