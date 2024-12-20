@@ -404,13 +404,6 @@ mkdir -p "$DISTSRC"
                 ;;
         esac
 
-        # Ad-hoc code signing
-        case "$HOST" in
-            arm64-apple-darwin)
-                ldid -S -Cadhoc,linker-signed Feather.app
-                ;;
-        esac
-
         # Finally, deterministically produce {non-,}debug binary tarballs ready
         # for release
         case "$HOST" in
