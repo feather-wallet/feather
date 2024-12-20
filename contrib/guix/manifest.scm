@@ -520,8 +520,8 @@ inspecting signatures in Mach-O binaries.")
            (list
              gcc-toolchain-11
              (list gcc-toolchain-11 "static")
-             clang-toolchain-17
-             lld-17
-             (make-lld-wrapper lld-17 #:lld-as-ld? #t)
+             clang-toolchain-18
+             lld-18
+             (make-lld-wrapper lld-18 #:lld-as-ld? #t)
              python-signapple))
           (else '())))))
