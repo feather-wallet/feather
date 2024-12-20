@@ -224,7 +224,7 @@ endif()
 
 # linker
 if (APPLE)
-    add_linker_flag_if_supported(-Wl,-bind_at_load LD_SECURITY_FLAGS)
+    add_linker_flag_if_supported(-Wl,-fixup_chains LD_SECURITY_FLAGS)
     add_linker_flag_if_supported(-Wl,-dead_strip LD_SECURITY_FLAGS)
     add_linker_flag_if_supported(-Wl,-dead_strip_dylibs LD_SECURITY_FLAGS)
 endif()
