@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.8.1
+$(package)_version=6.8.2
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.8/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=40b14562ef3bd779bc0e0418ea2ae08fa28235f8ea6e8c0cb3bce1d6ad58dcaf
+$(package)_sha256_hash=012043ce6d411e6e8a91fdc4e05e6bedcfa10fcb1347d3c33908f7fdd10dfe05
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus wayland native_wayland
@@ -21,29 +21,28 @@ $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
-$(package)_patches += revert-f67ee7c39.patch
 $(package)_patches += macos-available-qtbase.patch
 $(package)_patches += macos-available-qtmultimedia.patch
 $(package)_patches += qtwayland-tabletevent-fix.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=9d43d409be08b8681a0155a9c65114b69c9a3fc11aef6487bb7fdc5b283c432d
+$(package)_qttools_sha256_hash=326381b7d43f07913612f291abc298ae79bd95382e2233abce982cff2b53d2c0
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=3d0de73596e36b2daa7c48d77c4426bb091752856912fba720215f756c560dd0
+$(package)_qtsvg_sha256_hash=aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=e4cfdae8760bedd1c2b00429a6c9bf88cc11c5018dcb46bde277fb1edf341e3f
+$(package)_qtwebsockets_sha256_hash=919df562ba3446c8393992d112085ad2d96d23aaf802b1cd7a30bf3ba2fe8cbe
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=75fa87134f9afab7f0a62c55a4744799ac79519560d19c8e1d4c32bdd173f953
+$(package)_qtmultimedia_sha256_hash=34f561fdc07b158bcc4ad040b596fc6086c48908060e854b473b557e4feb1569
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=55b70cd632473a8043c74ba89310f7ba9c5041d253bc60e7ae1fa789169c4846
+$(package)_qtshadertools_sha256_hash=d1d5f90e8885fc70d63ac55a4ce4d9a2688562033a000bc4aff9320f5f551871
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=2226fbde4e2ddd12f8bf4b239c8f38fd706a54e789e63467dfddc77129eca203
+$(package)_qtwayland_sha256_hash=5e46157908295f2bf924462d8c0855b0508ba338ced9e810891fefa295dc9647
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -238,7 +237,6 @@ define $(package)_preprocess_cmds
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/revert-f67ee7c39.patch && \
   patch -p1 -i $($(package)_patch_dir)/macos-available-qtmultimedia.patch && \
   cd ../qtwayland && \
   patch -p1 -i $($(package)_patch_dir)/qtwayland-tabletevent-fix.patch

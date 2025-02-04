@@ -1941,7 +1941,7 @@ index 000000000..44abde914
 +    doCheckCameras();
 +}
 +
-+QList<QCameraDevice> QV4L2CameraDevices::videoDevices() const
++QList<QCameraDevice> QV4L2CameraDevices::videoInputs() const
 +{
 +    return m_cameras;
 +}
@@ -2104,7 +2104,7 @@ index 000000000..ce424d3b6
 +public:
 +    QV4L2CameraDevices(QPlatformMediaIntegration *integration);
 +
-+    QList<QCameraDevice> videoDevices() const override;
++    QList<QCameraDevice> videoInputs() const override;
 +
 +public Q_SLOTS:
 +    void checkCameras();
