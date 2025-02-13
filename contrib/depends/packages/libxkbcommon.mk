@@ -1,8 +1,8 @@
 package=libxkbcommon
-$(package)_version=1.7.0
-$(package)_download_path=https://xkbcommon.org/download/
-$(package)_file_name=libxkbcommon-$($(package)_version).tar.xz
-$(package)_sha256_hash=65782f0a10a4b455af9c6baab7040e2f537520caa2ec2092805cdfd36863b247
+$(package)_version=1.8.0
+$(package)_download_path=https://github.com/xkbcommon/libxkbcommon/archive/refs/tags
+$(package)_file_name=xkbcommon-$($(package)_version).tar.gz
+$(package)_sha256_hash=025c53032776ed850fbfb92683a703048cd70256df4ac1a1ec41ed3455d5d39c
 $(package)_dependencies=libxcb
 $(package)_patches=no-test-x11.patch toolchain.txt
 
