@@ -2,7 +2,7 @@ package=libffi
 $(package)_version=3.4.7
 $(package)_download_path := https://github.com/libffi/$(package)/releases/download/v$($(package)_version)
 $(package)_file_name := libffi-$($(package)_version).tar.gz
-$(package)_sha256_hash := 76653f135dde3036036c500e11861648ffbf9e1fc5b233ff473c60897d9db0ea
+$(package)_sha256_hash := 138607dee268bdecf374adf9144c00e839e38541f75f24a1fcf18b78fda48b2d
 
 define $(package)_set_vars
   $(package)_config_opts := --enable-option-checking --disable-dependency-tracking
