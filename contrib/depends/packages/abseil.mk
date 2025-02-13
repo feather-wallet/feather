@@ -11,7 +11,8 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-   patch -p1 -i $($(package)_patch_dir)/no_librt.patch
+   patch -p1 -i $($(package)_patch_dir)/no_librt.patch && \
+   rm -rf absl/time/internal/cctz/testdata
 endef
 
 define $(package)_config_cmds
