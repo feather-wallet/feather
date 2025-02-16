@@ -1711,13 +1711,26 @@ void MainWindow::onTxPoolBacklog(const QVector<quint64> &backlog, quint64 origin
 }
 
 void MainWindow::onExportHistoryCSV() {
-    QString fn = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
-    if (fn.isEmpty())
+    QString filePath = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
+    if (filePath.isEmpty())
         return;
-    if (!fn.endsWith(".csv"))
-        fn += ".csv";
-    m_wallet->history()->writeCSV(fn);
-    Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(fn));
+    if (!filePath.endsWith(".csv"))
+        filePath += ".csv";
+    QFileInfo fileInfo(filePath);
+    QDir dir = fileInfo.absoluteDir();
+
+    if (!dir.exists()) {
+        Utils::showError(this, "Unable to export transaction history", QString("Path does not exist: %1").arg(dir.absolutePath()));
+        return;
+    }
+
+    bool success = m_wallet->history()->writeCSV(filePath);
+    if (!success) {
+        Utils::showError(this, "Unable to export transaction history", QString("No permission to write to: %1").arg(filePath));
+        return;
+    }
+
+    Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(filePath));
 }
 
 void MainWindow::onImportHistoryDescriptionsCSV() {

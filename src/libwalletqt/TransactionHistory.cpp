@@ -400,9 +400,6 @@ bool TransactionHistory::writeCSV(const QString &path) {
         data += line;
     }
 
-    if (data.isEmpty())
-        return false;
-
     data = QString("blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId,fiatAmount,fiatCurrency%1").arg(data);
     return Utils::fileWrite(path, data);
 }
