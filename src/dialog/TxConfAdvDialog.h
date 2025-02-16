@@ -50,6 +50,7 @@ private:
     QMenu *m_exportSignedMenu;
     QMenu *m_exportTxKeyMenu;
     QString m_txid;
+    QString m_description;
     bool m_offline;
 };
 

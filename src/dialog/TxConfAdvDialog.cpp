@@ -26,6 +26,7 @@ TxConfAdvDialog::TxConfAdvDialog(Wallet *wallet, const QString &description, QWi
     , m_exportSignedMenu(new QMenu(this))
     , m_exportTxKeyMenu(new QMenu(this))
     , m_offline(offline)
+    , m_description(description)
 {
     ui->setupUi(this);
 
@@ -214,7 +215,7 @@ void TxConfAdvDialog::txKeyCopy() {
 
 void TxConfAdvDialog::broadcastTransaction() {
     if (m_tx == nullptr) return;
-    m_wallet->commitTransaction(m_tx);
+    m_wallet->commitTransaction(m_tx, m_description);
     QDialog::accept();
 }
 
