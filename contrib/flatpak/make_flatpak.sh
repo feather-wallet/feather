@@ -39,6 +39,10 @@ cp -r /feather/contrib/flatpak/share .
 touch --no-dereference --date="@${SOURCE_DATE_EPOCH}" share/metainfo/${APP_ID}.metainfo.xml
 gzip -c share/metainfo/${APP_ID}.metainfo.xml > share/app-info/xmls/${APP_ID}.xml.gz
 
+# Copy icons
+mkdir -p share/icons
+cp -r /feather/contrib/flatpak/icons/gnome share/icons
+
 # Extract guix pack
 tar xf /pack .
 
