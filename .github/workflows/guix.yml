@@ -84,6 +84,26 @@ jobs:
           vt_api_key: ${{ secrets.VT_API_KEY }}
           files: |
             guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
+
+      - name: codesign macos
+        if: ${{ contains(github.ref, '-rc') && (matrix.toolchain.target == 'arm64-apple-darwin' || matrix.toolchain.target == 'x86_64-apple-darwin') }}
+        run: |
+          sudo apt install -y python3-poetry xxd unzip
+          git clone https://github.com/achow101/signapple.git
+          cd signapple
+          git reset --hard 0c087854fd2822ab63512cbfa3b55706239b27c2
+          poetry install
+          echo "${{ secrets.MACOS_P12 }}" > p12.hex
+          xxd -r -p p12.hex p12
+          echo "${{ secrets.MACOS_P8 }}" > p8.hex
+          xxd -r -p p8.hex AuthKey_CC49BC72BA.p8
+          mkdir -p /tmp/codesign/detached
+          cp ../guix/guix-build-*/output/${{ matrix.toolchain.target }}/*.zip /tmp/codesign
+          unzip /tmp/codesign/*.zip -d /tmp/codesign
+          poetry run python codesign.py sign -f --passphrase="${{ secrets.MACOS_P12_PASSPHRASE }}" --detach /tmp/codesign/detached p12 /tmp/codesign/Feather.app --hardened-runtime
+          poetry run python codesign.py apply /tmp/codesign/Feather.app /tmp/codesign/detached/Feather.app
+          poetry run python codesign.py notarize --detach /tmp/codesign/detached --passphrase="" AuthKey_CC49BC72BA.p8 "${{ secrets.MACOS_NOTARIZE_API_KEY }}" /tmp/codesign/Feather.app
+
       - uses: actions/upload-artifact@v4
         id: upload-artifact
         with:
@@ -97,6 +117,12 @@ jobs:
       - if: ${{ matrix.toolchain.target == 'x86_64-w64-mingw32' }}
         id: win-executable
         run: echo "WIN_EXECUTABLE_ARTIFACT_ID=${{ steps.upload-artifact.outputs.artifact-id }}" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v4
+        if: ${{ contains(github.ref, '-rc') && (matrix.toolchain.target == 'arm64-apple-darwin' || matrix.toolchain.target == 'x86_64-apple-darwin') }}
+        with:
+          name: ${{ matrix.toolchain.target }}-codesignatures
+          path: |
+            /tmp/codesign/detached/*
 
   bundle-logs:
     runs-on: ubuntu-24.04
