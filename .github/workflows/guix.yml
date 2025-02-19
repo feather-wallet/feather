@@ -75,7 +75,7 @@ jobs:
       - name: codesign macos
         if: ${{ matrix.toolchain.target == 'arm64-apple-darwin' }}
         run: |
-          apt install python3-poetry xxd unzip
+          sudo apt install -y python3-poetry xxd unzip
           git clone https://github.com/achow101/signapple.git
           cd signapple
           poetry install
