@@ -81,10 +81,14 @@ jobs:
           poetry install
           echo "${{ secrets.MACOS_P12 }}" > p12.hex
           xxd -r -p p12.hex p12
+          echo "${{ secrets.MACOS_P8 }}" > p8.hex
+          xxd -r -p p8.hex p8
           mkdir -p /tmp/codesign/detached
           cp ../guix/guix-build-*/output/${{ matrix.toolchain.target }}/*.zip /tmp/codesign
           unzip /tmp/codesign/*.zip -d /tmp/codesign
-          poetry run python codesign.py sign -f --passphrase="" --detach /tmp/codesign/detached p12 /tmp/codesign/Feather.app --hardened-runtime
+          poetry run python codesign.py sign -f --passphrase="${{ secrets.MACOS_P12_PASSPHRASE }}" --detach /tmp/codesign/detached p12 /tmp/codesign/Feather.app --hardened-runtime
+          poetry run python codesign.py apply /tmp/codesign/Feather.app /tmp/codesign/detached/Feather.app
+          poetry run python codesign.py notarize --detach /tmp/codesign/detached --passphrase="" p8 "${{ secrets.MACOS_NOTARIZE_API_KEY }}" /tmp/codesign/Feather.app
 
       - uses: actions/upload-artifact@v4
         with:
@@ -92,6 +96,12 @@ jobs:
           path: |
             guix/guix-build-*/output/${{ matrix.toolchain.target }}/*
             guix/guix-build-*/logs/${{ matrix.toolchain.target }}/*
+      - uses: actions/upload-artifact@v4
+        if: ${{ matrix.toolchain.target == 'arm64-apple-darwin' }}
+        with:
+          name: ${{ matrix.toolchain.target }}-codesignatures
+          path: |
+            /tmp/codesign/detached/*
 
   bundle-logs:
     runs-on: ubuntu-24.04
