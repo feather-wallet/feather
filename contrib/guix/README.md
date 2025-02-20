@@ -118,7 +118,7 @@ env GUIX_SIGS_REPO=<path/to/feather-sigs> SIGNER=<gpg-key-fingerprint>=<gh_usern
 See `./contrib/guix/guix-attest --help` for more information on the various ways
 `guix-attest` can be invoked.
 
-For a step-by-step walkthrough, see: https://paste.debian.net/plainh/2457c02c. Make sure to replace the version number
+For a step-by-step walkthrough, see: https://paste.debian.net/plainh/dfecbbcc. Make sure to replace the version number
 with the version you want to build.
 
 ## Verifying build output attestations

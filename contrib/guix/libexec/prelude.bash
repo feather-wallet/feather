@@ -67,6 +67,7 @@ time-machine() {
 
 VERSION="${FORCE_VERSION:-$(git_head_version)}"
 DISTNAME="${DISTNAME:-feather-${VERSION}}"
+RELEASE="$(is_release)"
 
 VERSION_BASE_DIR="${VERSION_BASE_DIR:-${PWD}}"
 version_base_prefix="${VERSION_BASE_DIR}/guix/guix-build-"

@@ -1,3 +1,5 @@
+set(QRC_LIST)
+
 if (TOR_DIR)
     FILE(GLOB TOR_FILES LIST_DIRECTORIES false ${TOR_DIR}/*)
 

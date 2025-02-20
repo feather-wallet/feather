@@ -49,7 +49,7 @@ void signal_handler(int signum) {
     if (conf()->get(Config::writeStackTraceToDisk).toBool()) {
         QString crashLogPath{Config::defaultConfigDir().path() + "/crash_report.txt"};
         std::ofstream out(crashLogPath.toStdString());
-        out << QString("Version: %1-%2\n").arg(FEATHER_VERSION, FEATHER_COMMIT).toStdString();
+        out << QString("Version: %1\n").arg(FEATHER_VERSION).toStdString();
         out << QString("OS: %1\n").arg(QSysInfo::prettyProductName()).toStdString();
         out << keyStream.str();
         out.close();

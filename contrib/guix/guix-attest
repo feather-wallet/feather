@@ -39,49 +39,28 @@ cmd_usage() {
 cat <<EOF
 Synopsis:
 
-    env GUIX_SIGS_REPO=<path/to/feather-sigs> \\
-        SIGNER=GPG_KEY_NAME[=SIGNER_NAME] \\
+    env SIGNER=GPG_KEY_NAME[=SIGNER_NAME] \\
         [ NO_SIGN=1 ]
       ./contrib/guix/guix-attest
 
 Example w/o overriding signing name:
 
-    env GUIX_SIGS_REPO=/home/user/feather-sigs \\
-        SIGNER=achow101 \\
+    env SIGNER=achow101 \\
       ./contrib/guix/guix-attest
 
 Example overriding signing name:
 
-    env GUIX_SIGS_REPO=/home/user/feather-sigs \\
-        SIGNER=0x96AB007F1A7ED999=dongcarl \\
+    env SIGNER=0x96AB007F1A7ED999=dongcarl \\
       ./contrib/guix/guix-attest
 
 Example w/o signing, just creating SHA256SUMS:
 
-    env GUIX_SIGS_REPO=/home/user/feather-sigs \\
-        SIGNER=achow101 \\
+    env SIGNER=achow101 \\
         NO_SIGN=1 \\
       ./contrib/guix/guix-attest
 
 EOF
 }
-
-if [ -z "${GUIX_SIGS_REPO}" ]; then
-    echo "[HINT] Fork and clone the feather-sigs repo, if you haven't already:"
-    echo "https://github.com/feather-wallet/feather-sigs"
-    echo ""
-
-    printf "Enter path to 'feather-sigs' repo: "
-    read -r repo
-
-    if [ ! -d "${repo}" ]; then
-        echo "ERR: directory does not exist"
-        exit 1
-    fi
-
-    export GUIX_SIGS_REPO="$repo"
-    wizard=1
-fi
 
 if [ -z "${SIGNER}" ]; then
     printf "Enter your GitHub username: "
@@ -108,26 +87,8 @@ fi
 if [ -n "$wizard" ]; then
     echo ""
     echo "Next time, invoke this command as:"
-    echo "env GUIX_SIGS_REPO=${GUIX_SIGS_REPO} SIGNER=${SIGNER} make attest"
+    echo "env SIGNER=${SIGNER} make attest"
     echo ""
-fi
-
-################
-# GUIX_SIGS_REPO should exist as a directory
-################
-
-if [ ! -d "$GUIX_SIGS_REPO" ]; then
-cat << EOF
-ERR: The specified GUIX_SIGS_REPO is not an existent directory:
-
-    '$GUIX_SIGS_REPO'
-
-Hint: Please clone the feather-sigs repository and point to it with the
-      GUIX_SIGS_REPO environment variable.
-
-EOF
-cmd_usage
-exit 1
 fi
 
 ################
@@ -154,19 +115,15 @@ shopt -s nullglob
 sha256sum_fragments=( "$LOGDIR_BASE"/*/SHA256SUMS.part ) # This expands to an array of directories...
 shopt -u nullglob
 
-noncodesigned_fragments=()
-codesigned_fragments=()
+fragments=()
 
 if (( ${#sha256sum_fragments[@]} )); then
     echo "Found build output SHA256SUMS fragments:"
     for logdir in "${sha256sum_fragments[@]}"; do
         echo "    '$logdir'"
         case "$logdir" in
-            "$LOGDIR_BASE"/*-codesigned/SHA256SUMS.part)
-                codesigned_fragments+=("$logdir")
-                ;;
             *)
-                noncodesigned_fragments+=("$logdir")
+                fragments+=("$logdir")
                 ;;
         esac
     done
@@ -223,66 +180,39 @@ basenameify_SHA256SUMS() {
     sed -E 's@(^[[:xdigit:]]{64}[[:space:]]+).+/([^/]+$)@\1\2@'
 }
 
-outsigdir="$GUIX_SIGS_REPO/$VERSION/$signer_name"
+outsigdir="external/feather-sigs/$VERSION/$signer_name"
 mkdir -p "$outsigdir"
 (
     cd "$outsigdir"
 
-    temp_noncodesigned="$(mktemp)"
-    trap 'rm -rf -- "$temp_noncodesigned"' EXIT
+    temp_file="$(mktemp)"
+    trap 'rm -rf -- "$temp_file"' EXIT
 
-    if (( ${#noncodesigned_fragments[@]} )); then
-        cat "${noncodesigned_fragments[@]}" \
+    if (( ${#fragments[@]} )); then
+        cat "${fragments[@]}" \
             | sort -u \
             | basenameify_SHA256SUMS \
             | sort -k2 \
-                > "$temp_noncodesigned"
-        if [ -e noncodesigned.SHA256SUMS ]; then
-            # The SHA256SUMS already exists, make sure it's exactly what we
-            # expect, error out if not
-            if diff -u noncodesigned.SHA256SUMS "$temp_noncodesigned"; then
-                echo "A noncodesigned.SHA256SUMS file already exists for '${VERSION}' and is up-to-date."
-            else
-                shasum_already_exists noncodesigned.SHA256SUMS
-                exit 1
-            fi
-        else
-            mv "$temp_noncodesigned" noncodesigned.SHA256SUMS
-        fi
-    else
-        echo "ERR: No noncodesigned outputs found for '${VERSION}', exiting..."
-        exit 1
-    fi
-
-    temp_all="$(mktemp)"
-    trap 'rm -rf -- "$temp_all"' EXIT
-
-    if (( ${#codesigned_fragments[@]} )); then
-        # Note: all.SHA256SUMS attests to all of $sha256sum_fragments, but is
-        #       not needed if there are no $codesigned_fragments
-        cat "${sha256sum_fragments[@]}" \
-            | sort -u \
-            | basenameify_SHA256SUMS \
-            | sort -k2 \
-                > "$temp_all"
+                > "$temp_file"
         if [ -e all.SHA256SUMS ]; then
             # The SHA256SUMS already exists, make sure it's exactly what we
             # expect, error out if not
-            if diff -u all.SHA256SUMS "$temp_all"; then
-                echo "An all.SHA256SUMS file already exists for '${VERSION}' and is up-to-date."
+            if diff -u all.SHA256SUMS "$temp_file"; then
+                echo "A SHA256SUMS file already exists for '${VERSION}' and is up-to-date."
             else
                 shasum_already_exists all.SHA256SUMS
                 exit 1
             fi
         else
-            mv "$temp_all" all.SHA256SUMS
+            mv "$temp_file" all.SHA256SUMS
         fi
     else
-        # It is fine to have the codesigned outputs be missing (perhaps the
-        # detached codesigs have not been published yet), just print a log
-        # message instead of erroring out
-        echo "INFO: No codesigned outputs found for '${VERSION}', skipping..."
+        echo "ERR: No outputs found for '${VERSION}', exiting..."
+        exit 1
     fi
+
+    temp_all="$(mktemp)"
+    trap 'rm -rf -- "$temp_all"' EXIT
 
     if [ -z "$NO_SIGN" ]; then
         echo "Signing SHA256SUMS to produce SHA256SUMS.asc"

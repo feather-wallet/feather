@@ -1,14 +1,11 @@
 build:
 	@./contrib/guix/guix-build
 
-codesign:
-	@./contrib/guix/guix-codesign
-
 attest:
 	@./contrib/guix/guix-attest
 
 verify:
-	@./contrib/guix/guix-attest
+	@./contrib/guix/guix-verify
 
 clean:
 	@./contrib/guix/guix-clean

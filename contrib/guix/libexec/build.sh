@@ -35,6 +35,7 @@ cat << EOF
 Required environment variables as seen inside the container:
     DIST_ARCHIVE_BASE: ${DIST_ARCHIVE_BASE:?not set}
     DISTNAME: ${DISTNAME:?not set}
+    RELEASE: ${RELEASE:?not set}
     HOST: ${HOST:?not set}
     COMMIT_TIMESTAMP: ${COMMIT_TIMESTAMP:?not set}
     JOBS: ${JOBS:?not set}
@@ -44,8 +45,11 @@ Required environment variables as seen inside the container:
     OPTIONS: ${OPTIONS}
 EOF
 
+mkdir -p ${DISTSRC}
+ln -s "${DISTSRC}" /distsrc
+
 ACTUAL_OUTDIR="${OUTDIR}"
-OUTDIR="${DISTSRC}/output"
+OUTDIR="/distsrc/output"
 
 # Use a fixed timestamp for depends builds so hashes match across commits that don't make changes to the build system
 export SOURCE_DATE_EPOCH=1397818193
@@ -274,9 +278,8 @@ export USE_DEVICE_TREZOR_MANDATORY=1
 
 # Make $HOST-specific native binaries from depends available in $PATH
 export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
-mkdir -p "$DISTSRC"
 (
-    cd "$DISTSRC"
+    cd "/distsrc"
 
     # Extract the source tarball
     tar --strip-components=1 -xf "${GIT_ARCHIVE}"
@@ -284,7 +287,7 @@ mkdir -p "$DISTSRC"
     # Setup the directory where our Bitcoin Core build for HOST will be
     # installed. This directory will also later serve as the input for our
     # binary tarballs.
-    INSTALLPATH="${DISTSRC}/installed"
+    INSTALLPATH="/distsrc/installed"
     mkdir -p "${INSTALLPATH}"
 
 
@@ -313,6 +316,9 @@ mkdir -p "$DISTSRC"
             ;;
         *gnueabihf)
             CMAKEVARS+=" -DNO_AES=On" # Raspberry Pi
+            ;;
+        *darwin*)
+            CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
             ;;
     esac
 
@@ -401,8 +407,20 @@ mkdir -p "$DISTSRC"
         case "$HOST" in
             *darwin*)
                 mv "feather.app" "Feather.app"
+                mkdir -p Feather.app/Contents/bin
+                cp -a /feather/contrib/depends/${HOST}/Tor/libevent-2.1.7.dylib Feather.app/Contents/bin
+                cp -a /feather/contrib/depends/${HOST}/Tor/tor Feather.app/Contents/bin
                 ;;
         esac
+
+        # Code-signing
+        if [ "$RELEASE" -ne 0 ]; then
+          case "$HOST" in
+              *darwin*)
+                  signapple apply Feather.app "/distsrc/external/feather-codesigning/signatures/${HOST}/Feather.app"
+                  ;;
+          esac
+        fi
 
         # Finally, deterministically produce {non-,}debug binary tarballs ready
         # for release

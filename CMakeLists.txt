@@ -64,7 +64,7 @@ if(STATIC)
 endif()
 
 include(CMakePackageConfigHelpers)
-include(VersionFeather)
+configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
 #### Dependencies ####
 # Monero

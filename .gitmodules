@@ -7,3 +7,9 @@
 [submodule "external/feather-docs"]
 	path = external/feather-docs
 	url = https://github.com/feather-wallet/feather-docs.git
+[submodule "external/feather-sigs"]
+	path = external/feather-sigs
+	url = https://github.com/feather-wallet/feather-sigs.git
+[submodule "external/feather-codesigning"]
+	path = external/feather-codesigning
+	url = https://github.com/feather-wallet/feather-codesigning.git
