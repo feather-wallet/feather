@@ -82,7 +82,7 @@ jobs:
           echo "${{ secrets.MACOS_P12 }}" > p12.hex
           xxd -r -p p12.hex p12
           mkdir -p /tmp/codesign/detached
-          cp guix/guix-build-*/output/${{ matrix.toolchain.target }}/*.zip /tmp/codesign
+          cp ../guix/guix-build-*/output/${{ matrix.toolchain.target }}/*.zip /tmp/codesign
           unzip /tmp/codesign/*.zip -d /tmp/codesign
           poetry run python codesign.py sign -f --passphrase="" --detach /tmp/codesign/detached p12 /tmp/codesign/Feather.app --hardened-runtime
 
