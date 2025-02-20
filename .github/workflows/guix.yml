@@ -88,7 +88,7 @@ jobs:
           unzip /tmp/codesign/*.zip -d /tmp/codesign
           poetry run python codesign.py sign -f --passphrase="${{ secrets.MACOS_P12_PASSPHRASE }}" --detach /tmp/codesign/detached p12 /tmp/codesign/Feather.app --hardened-runtime
           poetry run python codesign.py apply /tmp/codesign/Feather.app /tmp/codesign/detached/Feather.app
-          poetry run python codesign.py notarize --detach /tmp/codesign/detached --passphrase="" p8 "${{ secrets.MACOS_NOTARIZE_API_KEY }}" /tmp/codesign/Feather.app
+          poetry run python codesign.py notarize --detach /tmp/codesign/detached --passphrase="" AuthKey_CC49BC72BA.p8 "${{ secrets.MACOS_NOTARIZE_API_KEY }}" /tmp/codesign/Feather.app
 
       - uses: actions/upload-artifact@v4
         with:
