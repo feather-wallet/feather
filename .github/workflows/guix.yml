@@ -82,7 +82,7 @@ jobs:
           echo "${{ secrets.MACOS_P12 }}" > p12.hex
           xxd -r -p p12.hex p12
           echo "${{ secrets.MACOS_P8 }}" > p8.hex
-          xxd -r -p p8.hex p8
+          xxd -r -p p8.hex AuthKey_CC49BC72BA.p8
           mkdir -p /tmp/codesign/detached
           cp ../guix/guix-build-*/output/${{ matrix.toolchain.target }}/*.zip /tmp/codesign
           unzip /tmp/codesign/*.zip -d /tmp/codesign
