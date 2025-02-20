@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: 2012 thomasv@gitorious
-// SPDX-FileCopyrightText: 2020-2024 The Monero Project
+// SPDX-FileCopyrightText: The Monero Project
 
 #ifndef FEATHER_COLORSCHEME_H
 #define FEATHER_COLORSCHEME_H

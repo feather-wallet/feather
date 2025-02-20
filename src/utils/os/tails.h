@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2024 The Monero Project
+// SPDX-FileCopyrightText: The Monero Project
 
 #ifndef TAILSOS_H
 #define TAILSOS_H

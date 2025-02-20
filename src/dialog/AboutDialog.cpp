@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2024 The Monero Project
+// SPDX-FileCopyrightText: The Monero Project
 
 #include "AboutDialog.h"
 #include "ui_AboutDialog.h"
@@ -21,7 +21,6 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto about = Utils::fileOpenQRC(":assets/about.txt");
     auto about_text = Utils::barrayToString(about);
     about_text = about_text.replace("<feather_version>", FEATHER_VERSION);
-    about_text = about_text.replace("<current_year>", QString::number(QDate::currentDate().year()));
     ui->copyrightText->setPlainText(about_text);
 
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");

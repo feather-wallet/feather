@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2020-2024 The Monero Project
+// SPDX-FileCopyrightText: The Monero Project
 
 #ifndef FEATHER_WALLETKEYSFILESMODEL_H
 #define FEATHER_WALLETKEYSFILESMODEL_H

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-// SPDX-FileCopyrightText: 2014-2022 The Monero Project
+// SPDX-FileCopyrightText: The Monero Project
 
 #pragma once
 

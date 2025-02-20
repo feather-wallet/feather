@@ -65,4 +65,4 @@ Donations help pay for hosting, build servers, domain names, e-mail and other re
 
 Feather is free and open-source software, [licensed under BSD-3](https://raw.githubusercontent.com/feather-wallet/feather/master/LICENSE).
 
-Copyright (c) 2020-2024, The Monero Project
+Copyright (c) 2020-2025, The Monero Project
