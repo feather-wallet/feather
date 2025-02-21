@@ -118,6 +118,9 @@ $(package)_config_opts += -no-zstd
 ifneq ($(LTO),)
 $(package)_config_opts += -ltcg
 endif
+
+$(package)_config_env := CC="$$($(package)_cc)"
+$(package)_config_env += CXX="$$($(package)_cxx)"
 endef
 
 define $(package)_fetch_cmds
