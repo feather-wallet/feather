@@ -71,7 +71,7 @@ jobs:
           sudo aa-enforce guix || true
           sudo apt purge apparmor
       - name: build
-        run: SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+        run: ADDITIONAL_GUIX_TIMEMACHINE_FLAGS="--disable-authentication" SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
       - name: virustotal scan
         env:
           VT_API_KEY: ${{ secrets.VT_API_KEY }}
