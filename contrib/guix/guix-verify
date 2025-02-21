@@ -37,44 +37,11 @@ Example overriding signer's manifest to use as base
 EOF
 }
 
-if [ -z "${GUIX_SIGS_REPO}" ]; then
-    printf "Enter path to 'feather-sigs' repo: "
-    read -r GUIX_SIGS_REPO
-
-    if [ ! -d "${GUIX_SIGS_REPO}" ]; then
-        echo "Directory does not exist"
-        exit 1
-    fi
-
-    echo ""
-    echo "Next time, invoke this command as:"
-    echo "env GUIX_SIGS_REPO=${GUIX_SIGS_REPO} make verify"
-    echo ""
-fi
-
-################
-# GUIX_SIGS_REPO should exist as a directory
-################
-
-if [ ! -d "$GUIX_SIGS_REPO" ]; then
-cat << EOF
-ERR: The specified GUIX_SIGS_REPO is not an existent directory:
-
-    '$GUIX_SIGS_REPO'
-
-Hint: Please clone the feather-sigs repository and point to it with the
-      GUIX_SIGS_REPO environment variable.
-
-EOF
-cmd_usage
-exit 1
-fi
-
 ##############
 ##  Verify  ##
 ##############
 
-OUTSIGDIR_BASE="${GUIX_SIGS_REPO}/${VERSION}"
+OUTSIGDIR_BASE="external/feather-sigs/${VERSION}"
 echo "Looking for signature directories in '${OUTSIGDIR_BASE}'"
 echo ""
 
@@ -101,37 +68,6 @@ verify() {
 }
 
 shopt -s nullglob
-all_noncodesigned=( "$OUTSIGDIR_BASE"/*/noncodesigned.SHA256SUMS )
-shopt -u nullglob
-
-echo "--------------------"
-echo ""
-if (( ${#all_noncodesigned[@]} )); then
-    compare_noncodesigned="${all_noncodesigned[0]}"
-    if [[ -n "$SIGNER" ]]; then
-        signer_noncodesigned="$OUTSIGDIR_BASE/$SIGNER/noncodesigned.SHA256SUMS"
-        if [[ -f "$signer_noncodesigned" ]]; then
-            echo "Using $SIGNER's manifest as the base to compare against"
-            compare_noncodesigned="$signer_noncodesigned"
-        else
-            echo "Unable to find $SIGNER's manifest, using the first one found"
-        fi
-    else
-        echo "No SIGNER provided, using the first manifest found"
-    fi
-
-    for current_manifest in "${all_noncodesigned[@]}"; do
-        verify "$compare_noncodesigned" "$current_manifest"
-    done
-
-    echo "DONE: Checking output signatures for noncodesigned.SHA256SUMS"
-    echo ""
-else
-    echo "WARN: No signature directories with noncodesigned.SHA256SUMS found"
-    echo ""
-fi
-
-shopt -s nullglob
 all_all=( "$OUTSIGDIR_BASE"/*/all.SHA256SUMS )
 shopt -u nullglob
 
@@ -155,14 +91,6 @@ if (( ${#all_all[@]} )); then
         verify "$compare_all" "$current_manifest"
     done
 
-    # Sanity check: there should be no entries that exist in
-    # noncodesigned.SHA256SUMS that doesn't exist in all.SHA256SUMS
-    if [[ "$(comm -23 <(sort "$compare_noncodesigned") <(sort "$compare_all") | wc -c)" -ne 0 ]]; then
-        echo "ERR: There are unique lines in noncodesigned.SHA256SUMS which"
-        echo "     do not exist in all.SHA256SUMS, something went very wrong."
-        exit 1
-    fi
-
     echo "DONE: Checking output signatures for all.SHA256SUMS"
     echo ""
 else
@@ -172,7 +100,7 @@ fi
 
 echo "===================="
 echo ""
-if (( ${#all_noncodesigned[@]} + ${#all_all[@]} == 0 )); then
+if (( ${#all_all[@]} == 0 )); then
     echo "ERR: Unable to perform any verifications as no signature directories"
     echo "     were found"
     echo ""
