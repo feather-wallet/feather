@@ -103,7 +103,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::writeRecentlyOpenedWallets, {QS("writeRecentlyOpenedWallets"), true}},
 
         {Config::blockExplorers, {QS("blockExplorers"), QStringList{"https://xmrchain.net/tx/%txid%",
-                                                                    "https://melo.tools/explorer/mainnet/tx/%txid%",
                                                                     "https://moneroblocks.info/tx/%txid%",
                                                                     "https://blockchair.com/monero/transaction/%txid%",
                                                                     "http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%txid%",
