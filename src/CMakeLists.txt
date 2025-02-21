@@ -229,6 +229,10 @@ if(STATIC)
     target_compile_definitions(feather PRIVATE STATIC=1)
 endif()
 
+if(OFFICIAL_BUILD)
+    target_compile_definitions(feather PRIVATE OFFICIAL_BUILD=1)
+endif()
+
 if (NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_definitions(feather PRIVATE QT_NO_DEBUG=1)
 endif()

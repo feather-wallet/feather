@@ -35,7 +35,8 @@ cat << EOF
 Required environment variables as seen inside the container:
     DIST_ARCHIVE_BASE: ${DIST_ARCHIVE_BASE:?not set}
     DISTNAME: ${DISTNAME:?not set}
-    RELEASE: ${RELEASE:?not set}
+    VERSION: ${VERSION:?not set}
+    COMMIT: ${COMMIT:?not set}
     HOST: ${HOST:?not set}
     COMMIT_TIMESTAMP: ${COMMIT_TIMESTAMP:?not set}
     JOBS: ${JOBS:?not set}
@@ -293,6 +294,11 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
 
     # Set appropriate CMake options for build type
     CMAKEVARS="-DWITH_SCANNER=On -DCHECK_UPDATES=On -DSELF_CONTAINED=On -DDONATE_BEG=On -DFEATHER_TARGET_TRIPLET=${HOST} -DWITH_PLUGIN_REDDIT=Off"
+
+    if [[ -n "${TAG}" ]]; then
+        CMAKEVARS+=" -DOFFICIAL_BUILD=On"
+    fi
+
     ANONDIST=""
     case "$HOST" in
         *mingw32)
@@ -415,12 +421,14 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
         esac
 
         # Code-signing
-        if [ "$RELEASE" -ne 0 ]; then
-          case "$HOST" in
-              *darwin*)
-                  signapple apply Feather.app "/distsrc/external/feather-codesigning/signatures/${HOST}/Feather.app"
-                  ;;
-          esac
+        if [[ -n "${TAG}" ]]; then
+            if [[ "${TAG}" != *"-rc"* ]]; then
+                case "$HOST" in
+                    *darwin*)
+                        signapple apply Feather.app "/distsrc/external/feather-codesigning/signatures/${HOST}/Feather.app"
+                        ;;
+                esac
+            fi
         fi
 
         # Finally, deterministically produce {non-,}debug binary tarballs ready

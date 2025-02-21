@@ -119,6 +119,8 @@ namespace Utils
     void clearLayout(QLayout *layout, bool deleteWidgets = true);
 
     QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync = false);
+
+    QString getVersion();
 }
 
 #endif //FEATHER_UTILS_H

@@ -446,8 +446,10 @@ EOF
                                  ${ADDITIONAL_GUIX_COMMON_FLAGS} ${ADDITIONAL_GUIX_ENVIRONMENT_FLAGS} \
                                  -- env HOST="$HOST" \
                                         DISTNAME="$DISTNAME" \
-                                        RELEASE="$RELEASE" \
                                         JOBS="$JOBS" \
+                                        VERSION="$VERSION" \
+                                        COMMIT="$COMMIT" \
+                                        TAG="$TAG" \
                                         COMMIT_TIMESTAMP="${COMMIT_TIMESTAMP:?unable to determine value}" \
                                         ${V:+V=1} \
                                         ${SOURCES_PATH:+SOURCES_PATH="$SOURCES_PATH"} \

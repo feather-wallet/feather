@@ -65,9 +65,17 @@ time-machine() {
 # Set common variables
 ################
 
-VERSION="${FORCE_VERSION:-$(git_head_version)}"
+COMMIT="$(git_head_commit)"
+TAG="$(git_head_tag)"
+
+if [[ -n "${TAG}" ]]; then
+    VERSION="${TAG}"
+else
+    VERSION="${COMMIT}"
+fi
+
+VERSION="${FORCE_VERSION:-${VERSION}}"
 DISTNAME="${DISTNAME:-feather-${VERSION}}"
-RELEASE="$(is_release)"
 
 VERSION_BASE_DIR="${VERSION_BASE_DIR:-${PWD}}"
 version_base_prefix="${VERSION_BASE_DIR}/guix/guix-build-"

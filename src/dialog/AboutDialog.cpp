@@ -20,7 +20,7 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->aboutImage->setPixmap(p.scaled(128, 128, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     auto about = Utils::fileOpenQRC(":assets/about.txt");
     auto about_text = Utils::barrayToString(about);
-    about_text = about_text.replace("<feather_version>", FEATHER_VERSION);
+    about_text = about_text.replace("<feather_version>", Utils::getVersion());
     ui->copyrightText->setPlainText(about_text);
 
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");

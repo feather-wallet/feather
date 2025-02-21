@@ -18,6 +18,7 @@
 #include <QStandardPaths>
 #include <QProcess>
 
+#include "config-feather.h"
 #include "constants.h"
 #include "networktype.h"
 #include "utils/ColorScheme.h"
@@ -692,5 +693,13 @@ QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync) {
     }
 
     return "Synchronized";
+}
+
+QString getVersion() {
+    QString version = QString("%1").arg(FEATHER_VERSION);
+#ifdef OFFICIAL_BUILD
+    version += " (release)";
+#endif
+    return version;
 }
 }
