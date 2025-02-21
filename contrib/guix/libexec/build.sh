@@ -502,6 +502,5 @@ mv --no-target-directory "$OUTDIR" "$ACTUAL_OUTDIR" \
         find "$ACTUAL_OUTDIR" -type f -not -name "*.txt"
     } | xargs realpath --relative-base="$PWD" \
       | xargs sha256sum \
-      | sort -k2 \
-      | sponge "$LOGDIR"/SHA256SUMS.part
+      | sort -k2 -o "$LOGDIR"/SHA256SUMS.part
 )

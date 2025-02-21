@@ -464,7 +464,6 @@ inspecting signatures in Mach-O binaries.")
         patch
         gawk
         sed
-        moreutils
         patchelf
         ;; Compression and archiving
         tar
