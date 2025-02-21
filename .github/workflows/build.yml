@@ -23,3 +23,22 @@ jobs:
           cd build
           cmake -DWITH_SCANNER=OFF ..
           cmake --build . -j $(nproc)
+
+  build-arch:
+    name: 'Arch Linux'
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+    steps:
+      - name: install dependencies
+        run: pacman -Syyu --noconfirm git cmake base-devel unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-wayland qt6-multimedia libzip hidapi protobuf zxing-cpp
+      - name: configure git
+        run: git config --global --add safe.directory '*'
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: ./.github/actions/set-make-job-count
+      - name: build
+        run: |
+          cmake -S . -B build
+          cmake --build build -j $(nproc)
