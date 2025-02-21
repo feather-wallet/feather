@@ -51,19 +51,19 @@ $ cd feather
 To build all targets using all available cores:
 
 ```bash
-$ ./contrib/guix/guix-build
+$ make build
 ```
 
 To limit the number of threads to N:
 
 ```
-$ JOBS=N ./contrib/guix/guix-build
+$ JOBS=N make build
 ```
 
 To only build the x86_64 linux target:
 
 ```
-$ HOSTS="x86_64-linux-gnu" ./contrib/guix/guix-build
+$ HOSTS="x86_64-linux-gnu" make build
 ```
 
 More recognized environment variables can be found further below.
@@ -89,7 +89,7 @@ To build Feather Wallet reproducibly with all default options, invoke the
 following from the top of a clean repository:
 
 ```sh
-./contrib/guix/guix-build
+make build
 ```
 
 ## Cleaning intermediate work directories
@@ -102,7 +102,7 @@ directories usually take up a large amount of disk space. Therefore, a
 worktree to save disk space:
 
 ```
-./contrib/guix/guix-clean
+make clean
 ```
 
 
@@ -112,11 +112,8 @@ After you've cloned the `feather-sigs` repository, to attest to the current
 worktree's commit/tag:
 
 ```
-env GUIX_SIGS_REPO=<path/to/feather-sigs> SIGNER=<gpg-key-fingerprint>=<gh_username> ./contrib/guix/guix-attest
+make attest
 ```
-
-See `./contrib/guix/guix-attest --help` for more information on the various ways
-`guix-attest` can be invoked.
 
 For a step-by-step walkthrough, see: https://paste.debian.net/plainh/dfecbbcc. Make sure to replace the version number
 with the version you want to build.
@@ -127,8 +124,8 @@ After at least one other signer has uploaded their signatures to the `feather-si
 repository:
 
 ```
-git -C <path/to/feather-sigs> pull
-env GUIX_SIGS_REPO=<path/to/feather-sigs> ./contrib/guix/guix-verify
+git submodule update --recursive
+make verify
 ```
 
 
@@ -144,7 +141,7 @@ help with this situation, the `guix-build` script honours the `SOURCES_PATH`,
 depends tree so that you can do something like:
 
 ```sh
-env SOURCES_PATH="$HOME/depends-SOURCES_PATH" BASE_CACHE="$HOME/depends-BASE_CACHE" ./contrib/guix/guix-build
+env SOURCES_PATH="$HOME/depends-SOURCES_PATH" BASE_CACHE="$HOME/depends-BASE_CACHE" make build
 ```
 
 Note that the paths that these environment variables point to **must be
@@ -160,7 +157,7 @@ which case you can override the default list by setting the space-separated
 `HOSTS` environment variable:
 
 ```sh
-env HOSTS='x86_64-w64-mingw32 x86_64-apple-darwin' ./contrib/guix/guix-build
+env HOSTS='x86_64-w64-mingw32 x86_64-apple-darwin' make build
 ```
 
 See the [recognized environment variables][env-vars-list] section for more
