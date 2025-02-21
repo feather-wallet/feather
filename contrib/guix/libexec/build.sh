@@ -221,7 +221,9 @@ make -C contrib/depends --jobs="$JOBS" HOST="$HOST" \
                                    x86_64_linux_RANLIB=x86_64-linux-gnu-gcc-ranlib \
                                    x86_64_linux_NM=x86_64-linux-gnu-gcc-nm \
                                    x86_64_linux_STRIP=x86_64-linux-gnu-strip \
-                                   guix_ldflags="$HOST_LDFLAGS"
+                                   guix_ldflags="$HOST_LDFLAGS" \
+                                   build_CC="${NATIVE_GCC}/bin/gcc -isystem ${NATIVE_GCC}/include" \
+                                   build_CXX="${NATIVE_GCC}/bin/g++ -isystem ${NATIVE_GCC}/include/c++ -isystem ${NATIVE_GCC}/include"
 
 # Log the depends package hashes
 DEPENDS_PACKAGES="$(make -C contrib/depends --no-print-directory HOST="$HOST" print-all_packages)"

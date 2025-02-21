@@ -102,7 +102,7 @@ chain for " target " development."))
       (home-page (package-home-page xgcc))
       (license (package-license xgcc)))))
 
-(define base-gcc gcc-12)
+(define base-gcc gcc-13)
 (define base-linux-kernel-headers linux-libre-headers-6.1)
 
 (define* (make-bitcoin-cross-toolchain target
@@ -121,8 +121,11 @@ desirable for building Feather Wallet release binaries."
 
 (define (gcc-mingw-patches gcc)
   (package-with-extra-patches gcc
-    (search-our-patches "gcc-remap-guix-store.patch"
-                        "vmov-alignment.patch")))
+    (search-our-patches "gcc-remap-guix-store.patch")))
+
+(define (binutils-mingw-patches binutils)
+  (package-with-extra-patches binutils
+    (search-our-patches "binutils-unaligned-default.patch")))
 
 (define (winpthreads-patches mingw-w64-x86_64-winpthreads)
   (package-with-extra-patches mingw-w64-x86_64-winpthreads
@@ -130,7 +133,7 @@ desirable for building Feather Wallet release binaries."
 
 (define (make-mingw-pthreads-cross-toolchain target)
   "Create a cross-compilation toolchain package for TARGET"
-  (let* ((xbinutils (cross-binutils target))
+  (let* ((xbinutils (binutils-mingw-patches (cross-binutils target)))
          (machine (substring target 0 (string-index target #\-)))
          (pthreads-xlibc (winpthreads-patches (make-mingw-w64 machine
                                          #:xgcc (cross-gcc target #:xgcc (gcc-mingw-patches base-gcc))
@@ -475,6 +478,8 @@ inspecting signatures in Mach-O binaries.")
         zip
         unzip
         ;; Build tools
+        gcc-toolchain-13
+        (list gcc-toolchain-13 "static")
         gnu-make
         libtool
         autoconf-2.71
@@ -505,21 +510,15 @@ inspecting signatures in Mach-O binaries.")
     (cond ((string-contains target "-mingw32")
            ;; Windows
            (list
-             gcc-toolchain-12
-             (list gcc-toolchain-12 "static")
              (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
              nsis-x86_64
              nss-certs
              osslsigncode))
           ((string-contains target "-linux-")
            (list
-             gcc-toolchain-12
-             (list gcc-toolchain-12 "static")
              (make-bitcoin-cross-toolchain target)))
           ((string-contains target "darwin")
            (list
-             gcc-toolchain-11
-             (list gcc-toolchain-11 "static")
              clang-toolchain-18
              lld-18
              (make-lld-wrapper lld-18 #:lld-as-ld? #t)
