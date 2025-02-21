@@ -298,7 +298,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
         *mingw32)
             case "$OPTIONS" in
                 installer)
-                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_INSTALLED=On -DTOR_DIR=Off -DTOR_VERSION=Off"
                     ;;
             esac
             ;;
@@ -318,7 +318,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             CMAKEVARS+=" -DNO_AES=On" # Raspberry Pi
             ;;
         *darwin*)
-            CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
+            CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off -DTOR_INSTALLED=On"
             ;;
     esac
 
@@ -410,6 +410,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
                 mkdir -p Feather.app/Contents/bin
                 cp -a /feather/contrib/depends/${HOST}/Tor/libevent-2.1.7.dylib Feather.app/Contents/bin
                 cp -a /feather/contrib/depends/${HOST}/Tor/tor Feather.app/Contents/bin
+                chmod +x Feather.app/Contents/bin/tor
                 ;;
         esac
 

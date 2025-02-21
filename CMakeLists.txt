@@ -28,6 +28,9 @@ option(DONATE_BEG "Prompt donation window every once in a while" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
 option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
 
+# internal configuration options
+option(TOR_INSTALLED "Is Tor installed on the filesystem?" OFF)
+
 # Plugins
 option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
 option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)

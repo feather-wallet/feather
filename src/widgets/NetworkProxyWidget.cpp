@@ -44,7 +44,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
 
     // [Tor settings]
     // [Let Feather start and manage a Tor daemon]
-#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
+#if !defined(HAS_TOR_BIN) && !defined(TOR_INSTALLED)
     ui->checkBox_torManaged->setChecked(false);
     ui->checkBox_torManaged->setEnabled(false);
     ui->checkBox_torManaged->setToolTip("Feather was bundled without Tor");
@@ -69,7 +69,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
 
     // [Show Tor logs]
     ui->frame_torShowLogs->setVisible(!conf()->get(Config::useLocalTor).toBool());
-#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
+#if !defined(HAS_TOR_BIN) && !defined(TOR_INSTALLED)
     ui->frame_torShowLogs->setVisible(false);
 #endif
     connect(ui->btn_torShowLogs, &QPushButton::clicked, [this]{

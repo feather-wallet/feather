@@ -20,10 +20,16 @@ TorManager::TorManager(QObject *parent)
     connect(m_checkConnectionTimer, &QTimer::timeout, this, &TorManager::checkConnection);
 
     this->torDir = Config::defaultConfigDir().filePath("tor");
-#if defined(PLATFORM_INSTALLER)
+#if defined(TOR_INSTALLED)
     // When installed, use directory relative to application path.
     this->torDir = QDir(Utils::applicationPath()).filePath("tor");
 #endif
+    if (QString(FEATHER_TARGET_TRIPLET) == "arm64-apple-darwin" || QString(FEATHER_TARGET_TRIPLET) == "x86_64-apple-darwin") {
+        QString featherBinaryPath = QCoreApplication::applicationDirPath();
+        QDir appBinaryDir(featherBinaryPath);
+        appBinaryDir.cd("..");
+        this->torDir = appBinaryDir.filePath("bin");
+    }
 
     this->torDataPath = Config::defaultConfigDir().filePath("tor/data");
 
@@ -187,10 +193,14 @@ bool TorManager::unpackBins() {
 
     this->torPath = QDir(this->torDir).filePath(torBin);
 
-#if defined(PLATFORM_INSTALLER)
+#if defined(TOR_INSTALLED)
     // We don't need to unpack if Tor was installed using the installer
     return true;
 #endif
+
+    if (QString(FEATHER_TARGET_TRIPLET) == "arm64-apple-darwin" || QString(FEATHER_TARGET_TRIPLET) == "x86_64-apple-darwin") {
+        return true;
+    }
 
     SemanticVersion embeddedVersion = SemanticVersion::fromString(QString(TOR_VERSION));
     SemanticVersion filesystemVersion = this->getVersion(torPath);
@@ -256,7 +266,7 @@ bool TorManager::shouldStartTorDaemon() {
     }
 
     // Don't start a Tor daemon if we don't have one
-#if !defined(HAS_TOR_BIN) && !defined(PLATFORM_INSTALLER)
+#if !defined(HAS_TOR_BIN) && !defined(TOR_INSTALLED)
     qWarning() << "Feather built without embedded Tor. Assuming --use-local-tor";
     return false;
 #endif

@@ -217,6 +217,10 @@ if(PLATFORM_INSTALLER)
     target_compile_definitions(feather PRIVATE PLATFORM_INSTALLER=1)
 endif()
 
+if(TOR_INSTALLED)
+    target_compile_definitions(feather PRIVATE TOR_INSTALLED=1)
+endif()
+
 if(STACK_TRACE)
     target_compile_definitions(feather PRIVATE STACK_TRACE=1)
 endif()
