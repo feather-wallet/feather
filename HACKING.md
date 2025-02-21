@@ -24,6 +24,14 @@ apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-
             libprotobuf-dev libhidapi-dev libzxing-dev libusb-1.0-0-dev
 ```
 
+#### Rhel 9 / Alma / Rocky
+
+```bash
+sudo dnf install epel-release -y
+sudo dnf groupinstall "Development Tools" -y
+sudo dnf install unbound-devel boost-devel qrencode-devel zxing-cpp-devel qt6-qtbase-devel qt6-qtsvg-devel qt6-qtwebsockets-devel qt6-qtmultimedia-devel qt6-qtwayland-devel libsodium-devel
+```
+
 #### Void Linux
 
 ```bash
