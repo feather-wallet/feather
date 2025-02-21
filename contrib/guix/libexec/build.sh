@@ -246,9 +246,7 @@ GIT_ARCHIVE="${DIST_ARCHIVE_BASE}/${DISTNAME}.tar.gz"
 # Create the source tarball if not already there
 if [ ! -e "$GIT_ARCHIVE" ]; then
     mkdir -p "$(dirname "$GIT_ARCHIVE")"
-    git rev-parse --short=12 HEAD > githash.txt
-    ( git ls-files --recurse-submodules ; echo "githash.txt" ) \
-    | cat \
+    git ls-files --recurse-submodules \
     | sort \
     | tar --create --transform "s,^,${DISTNAME}/," --mode='u+rw,go+r-w,a+X' --files-from=- \
     | gzip -9n > ${GIT_ARCHIVE}
