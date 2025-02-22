@@ -12,9 +12,9 @@ $(package)_config_opts+= --disable-dependency-tracking --enable-option-checking
 endef
 
 define $(package)_preprocess_cmds
+  rm -rf test && \
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub . && \
-  patch -p1 -i $($(package)_patch_dir)/no-tests.patch && \
-  autoreconf -i
+  patch -p1 -i $($(package)_patch_dir)/no-tests.patch
 endef
 
 define $(package)_config_cmds

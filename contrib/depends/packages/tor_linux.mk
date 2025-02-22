@@ -18,9 +18,7 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-    rm Makefile.in aclocal.m4 ar-lib compile config.guess config.sub configure depcomp install-sh missing orconfig.h.in test-driver &&\
-    rm -rf doc/man &&\
-    autoreconf -fi
+    rm -rf doc/man
 endef
 
 define $(package)_config_cmds

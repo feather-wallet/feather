@@ -20,10 +20,6 @@ $(package)_config_opts += --disable-xtest --disable-xv --disable-xvmc
 endef
 
 define $(package)_preprocess_cmds
-  find . -type f -name 'Makefile.in' -exec rm {} + && \
-  rm -rf build-aux/* && \
-  rm ChangeLog INSTALL aclocal.m4 configure m4/libtool.m4 m4/ltoptions.m4 m4/ltsugar.m4 m4/ltversion.m4 m4/lt~obsolete.m4 src/config.h.in && \
-  autoreconf -fi && \
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux && \
   patch -p1 -i $($(package)_patch_dir)/remove_pthread_stubs.patch
 endef

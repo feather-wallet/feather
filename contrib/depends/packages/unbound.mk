@@ -16,9 +16,8 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  rm configure~ doc/*.odp doc/*.pdf contrib/*.tar.gz contrib/*.tar.bz2 &&\
-  rm -rf testdata dnscrypt/testdata &&\
-  autoconf
+  rm doc/*.odp doc/*.pdf contrib/*.tar.gz contrib/*.tar.bz2 &&\
+  rm -rf testdata dnscrypt/testdata
 endef
 
 define $(package)_config_cmds

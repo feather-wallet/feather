@@ -1,23 +1,34 @@
-diff --git a/Makefile.am b/Makefile.am
-index 23956fd..0f4c3c9 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -12,5 +12,5 @@ ChangeLog:
- 
- dist-hook: ChangeLog INSTALL
- 
+diff --git a/Makefile.in b/Makefile.in
+index 03316e8..b5c6f49 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -361,7 +361,7 @@ top_srcdir = @top_srcdir@
+ xcbincludedir = @xcbincludedir@
+ ACLOCAL_AMFLAGS = -I m4
+ MAINTAINERCLEANFILES = ChangeLog INSTALL
 -SUBDIRS = image test
 +SUBDIRS = image
  EXTRA_DIST = autogen.sh README.md
-diff --git a/configure.ac b/configure.ac
-index 9cf3f5a..0949d55 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -18,7 +18,6 @@ PKG_CHECK_MODULES(XCB_UTIL, xcb-util)
- AC_CONFIG_FILES([
- 	Makefile
- 	image/Makefile
--	test/Makefile
- 	image/xcb-image.pc
- ])
- AC_OUTPUT
+ all: config.h
+ 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+diff --git a/configure b/configure
+index 3756ffc..46fcbc4 100755
+--- a/configure
++++ b/configure
+@@ -19952,7 +19952,7 @@ printf "%s\n" "yes" >&6; }
+ 
+ fi
+ 
+-ac_config_files="$ac_config_files Makefile image/Makefile test/Makefile image/xcb-image.pc"
++ac_config_files="$ac_config_files Makefile image/Makefile image/xcb-image.pc"
+ 
+ cat >confcache <<\_ACEOF
+ # This file is a shell script that caches the results of configure
+@@ -20980,7 +20980,6 @@ do
+     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
+     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
+     "image/Makefile") CONFIG_FILES="$CONFIG_FILES image/Makefile" ;;
+-    "test/Makefile") CONFIG_FILES="$CONFIG_FILES test/Makefile" ;;
+     "image/xcb-image.pc") CONFIG_FILES="$CONFIG_FILES image/xcb-image.pc" ;;
+ 
+   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;

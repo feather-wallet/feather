@@ -10,9 +10,6 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  find . -type f -name 'Makefile.in' -exec rm {} + && \
-  rm aclocal.m4 compile config.guess config.sub configure install-sh missing test-driver && \
-  autoreconf -fi && \
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub .
 endef
 

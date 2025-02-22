@@ -13,8 +13,7 @@ endef
 define $(package)_preprocess_cmds
   rm -rf builds/msvc &&\
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux/ && \
-  patch -p1 -i $($(package)_patch_dir)/fix-blake2b-symbol-naming.patch && \
-  autoconf
+  patch -p1 -i $($(package)_patch_dir)/fix-blake2b-symbol-naming.patch
 endef
 
 define $(package)_config_cmds

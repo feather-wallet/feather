@@ -1,30 +1,21 @@
 diff --git a/src/runtime/Makefile b/src/runtime/Makefile
-index d0cbf1f..905b130 100644
+index 1776c19..6207731 100644
 --- a/src/runtime/Makefile
 +++ b/src/runtime/Makefile
-@@ -1,21 +1,21 @@
- CC            = gcc
- CFLAGS        = -std=gnu99 -s -Os -D_FILE_OFFSET_BITS=64 -DGIT_COMMIT=\"${GIT_COMMIT}\" -T data_sections.ld -ffunction-sections -fdata-sections -Wl,--gc-sections -static
--LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lz
-+LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lpthread
+@@ -1,12 +1,12 @@
+ GIT_COMMIT := $(shell cat version)
+-CC            = clang
+-CFLAGS        = -std=gnu99 -Os -D_FILE_OFFSET_BITS=64 -DGIT_COMMIT=\"$(GIT_COMMIT)\" -T data_sections.ld -ffunction-sections -fdata-sections -Wl,--gc-sections -static -Wall -Werror -static-pie
+-LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lz -lfuse3
++CC            = gcc
++CFLAGS        = -std=gnu99 -Os -D_FILE_OFFSET_BITS=64 -DGIT_COMMIT=\"$(GIT_COMMIT)\" -T data_sections.ld -ffunction-sections -fdata-sections -Wl,--gc-sections -static -Wall
++LIBS          = -lsquashfuse -lsquashfuse_ll -lzstd -lfuse3 -lpthread
  
- all: runtime-fuse3 runtime-fuse3
+ all: runtime
  
- # Compile runtime
- runtime-fuse3.o: runtime.c
--	$(CC) -I/usr/local/include/squashfuse -I/usr/include/fuse -o runtime-fuse3.o -c $(CFLAGS) $^
-+	$(CC) -I${host_prefix}/include -I${host_prefix}/include/squashfuse -I${host_prefix}/include/fuse -o runtime-fuse3.o -c $(CFLAGS) $^
- 
- runtime-fuse3: runtime-fuse3.o
- 	$(CC) $(CFLAGS) $^ $(LIBS) -lfuse -o runtime-fuse3
- 
- runtime-fuse3.o: runtime.c
--	$(CC) -I/usr/local/include/squashfuse -I/usr/include/fuse3 -o runtime-fuse3.o -c $(CFLAGS) $^
-+	$(CC) -I${host_prefix}/include -I${host_prefix}/include/squashfuse -I${host_prefix}/include/fuse3 -o runtime-fuse3.o -c $(CFLAGS) $^
- 
- runtime-fuse3: runtime-fuse3.o
--	$(CC) $(CFLAGS) $^ $(LIBS) -lfuse3 -o runtime-fuse3
-+	$(CC) $(CFLAGS) $^ -L${host_prefix}/lib $(LIBS) -lfuse3 -lpthread -o runtime-fuse3
+ runtime: runtime.c
+-	$(CC) -I/usr/local/include/squashfuse -I/usr/include/fuse3 $(CFLAGS) $^ $(LIBS) -o $@
++	$(CC) -L${host_prefix}/lib -I${host_prefix}/include -I${host_prefix}/squashfuse -I${host_prefix}/include/fuse3 $(CFLAGS) $^ $(LIBS) -o $@
  
  clean:
- 	rm -f *.o runtime-fuse3 runtime-fuse3
+ 	rm -f runtime
