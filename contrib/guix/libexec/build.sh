@@ -83,8 +83,6 @@ store_path() {
 # includes/libs
 NATIVE_GCC="$(store_path gcc-toolchain)"
 NATIVE_GCC_STATIC="$(store_path gcc-toolchain static)"
-QT_LIBS="$(store_path xcb-util):$(store_path xcb-util-renderutil):$(store_path xcb-util-keysyms):$(store_path xcb-util-cursor):$(store_path xcb-util-image):$(store_path xcb-util-wm):"
-QT_LIBS_LIBS="$(echo "${QT_LIBS}" | sed 's/:/\/lib:/g')"
 
 unset LIBRARY_PATH
 unset CPATH
@@ -98,8 +96,6 @@ export C_INCLUDE_PATH="${NATIVE_GCC}/include"
 export CPLUS_INCLUDE_PATH="${NATIVE_GCC}/include/c++:${NATIVE_GCC}/include"
 export OBJC_INCLUDE_PATH="${NATIVE_GCC}/include"
 export OBJCPLUS_INCLUDE_PATH="${NATIVE_GCC}/include/c++:${NATIVE_GCC}/include"
-export QT_LIBS
-export QT_LIBS_LIBS
 
 prepend_to_search_env_var() {
     export "${1}=${2}${!1:+:}${!1}"

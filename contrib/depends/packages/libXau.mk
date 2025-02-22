@@ -31,3 +31,7 @@ endef
 define $(package)_stage_cmds
   DESTDIR=$($(package)_staging_dir) ninja -C build install
 endef
+
+define $(package)_postprocess_cmds
+  sed -i 's/Requires: xproto//g' lib/pkgconfig/xau.pc
+endef

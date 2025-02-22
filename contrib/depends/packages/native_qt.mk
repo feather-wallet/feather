@@ -166,7 +166,6 @@ define $(package)_config_cmds
   export PKG_CONFIG_LIBDIR=$(build_prefix)/lib/pkgconfig && \
   export QT_MAC_SDK_NO_VERSION_CHECK=1 && \
   unset CMAKE_PREFIX_PATH && \
-  export CMAKE_PREFIX_PATH="$(QT_LIBS)" && \
   cd qtbase && \
   ./configure -top-level $($(package)_config_opts)
 endef

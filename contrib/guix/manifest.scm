@@ -487,15 +487,6 @@ inspecting signatures in Mach-O binaries.")
 
         ;; Git
         git-minimal ; used to create the release source archive
-
-        ;; Xcb
-        ;; needed to build native_qt in depends
-        xcb-util
-        xcb-util-cursor
-        xcb-util-image
-        xcb-util-keysyms
-        xcb-util-renderutil
-        xcb-util-wm
     )
   (let ((target (getenv "HOST")))
     (cond ((string-contains target "-mingw32")
