@@ -505,7 +505,6 @@ inspecting signatures in Mach-O binaries.")
            (list
              (make-bitcoin-cross-toolchain target)
              squashfs-tools
-             gperf ;; used to build eudev in depends
              zig   ;; used to build flatstart in depends
           ))
           ((string-contains target "darwin")

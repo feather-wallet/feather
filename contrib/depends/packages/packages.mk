@@ -1,7 +1,7 @@
 packages := boost openssl unbound qrencode libsodium polyseed hidapi abseil protobuf libusb zlib libgpg-error libgcrypt expat libzip zxing-cpp
 native_packages := native_qt native_abseil native_protobuf
 
-linux_packages := eudev libfuse libsquashfuse zstd appimage_runtime wayland libffi
+linux_packages := libfuse libsquashfuse zstd appimage_runtime wayland libffi
 linux_native_packages := native_expat native_libffi native_wayland
 
 x86_64_linux_packages := flatstart
