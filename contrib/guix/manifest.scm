@@ -19,7 +19,6 @@
              ((gnu packages linux) #:select (linux-libre-headers-6.1 util-linux))
              (gnu packages llvm)
              (gnu packages mingw)
-             (gnu packages moreutils)
              (gnu packages ninja)
              (gnu packages perl)
              (gnu packages pkg-config)
@@ -452,27 +451,27 @@ inspecting signatures in Mach-O binaries.")
  (append
   (list ;; The Basics
         bash
+        coreutils-minimal ; includes basic shell utilities: cat, cp, echo, mkdir, etc
         which
-        coreutils-minimal
-        util-linux
+
         ;; File(system) inspection
         file
         grep
-        diffutils
-        findutils
+        diffutils ; provides diff
+        findutils ; provides find and xargs
+
         ;; File transformation
         patch
         gawk
         sed
         patchelf
+
         ;; Compression and archiving
         tar
-        bzip2
-        gzip
-        xz
-        p7zip
-        zip
-        unzip
+        gzip ; used to unpack most packages in depends
+        xz   ; used to unpack some packages in depends
+        zip  ; used to create release archives
+
         ;; Build tools
         gnu-make
         libtool
@@ -480,19 +479,20 @@ inspecting signatures in Mach-O binaries.")
         automake
         pkg-config
         bison
-        gperf
         gettext-minimal
-        squashfs-tools
         cmake-minimal
-        meson
+        meson ; used to build libfuse, wayland, libXau, libxkbcommon in depends
         ninja
-        zig
+
         ;; Scripting
-        perl
+        perl           ; required to build openssl in depends
         python-minimal
+
         ;; Git
-        git-minimal
+        git-minimal ; used to create the release source archive
+
         ;; Xcb
+        ;; needed to build native_qt in depends
         xcb-util
         xcb-util-cursor
         xcb-util-image
@@ -514,7 +514,11 @@ inspecting signatures in Mach-O binaries.")
            (list
              gcc-toolchain-12
              (list gcc-toolchain-12 "static")
-             (make-bitcoin-cross-toolchain target)))
+             (make-bitcoin-cross-toolchain target)
+             squashfs-tools
+             gperf ;; used to build eudev in depends
+             zig   ;; used to build flatstart in depends
+          ))
           ((string-contains target "darwin")
            (list
              gcc-toolchain-11
@@ -522,5 +526,7 @@ inspecting signatures in Mach-O binaries.")
              clang-toolchain-18
              lld-18
              (make-lld-wrapper lld-18 #:lld-as-ld? #t)
-             python-signapple))
+             python-signapple
+             p7zip ;; needed to extract tor_darwin .dmg
+             ))
           (else '())))))
