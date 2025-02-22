@@ -1,8 +1,9 @@
 package=libusb
 $(package)_version=1.0.27
-$(package)_download_path=https://github.com/libusb/libusb/releases/download/v$($(package)_version)
-$(package)_file_name=$(package)-$($(package)_version).tar.bz2
-$(package)_sha256_hash=ffaa41d741a8a3bee244ac8e54a72ea05bf2879663c098c82fc5757853441575
+$(package)_download_path=https://github.com/libusb/libusb/archive/refs/tags
+$(package)_download_file=v$($(package)_version).tar.gz
+$(package)_file_name=$(package)-$($(package)_version).tar.gz
+$(package)_sha256_hash=e8f18a7a36ecbb11fb820bd71540350d8f61bcd9db0d2e8c18a6fb80b214a3de
 $(package)_patches=fix-c11-check.patch
 
 define $(package)_preprocess_cmds
