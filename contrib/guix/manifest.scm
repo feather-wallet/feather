@@ -481,7 +481,6 @@ inspecting signatures in Mach-O binaries.")
         gnu-make
         pkg-config
         bison ; used to build libxkbcommon in depends
-        gettext-minimal
         cmake-minimal
         meson ; used to build libfuse, wayland, libXau, libxkbcommon in depends
         ninja
