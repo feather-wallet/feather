@@ -13,7 +13,6 @@
              (gnu packages gawk)
              (gnu packages gcc)
              ((gnu packages gettext) #:select (gettext-minimal))
-             (gnu packages gperf)
              ((gnu packages installers) #:select (nsis-x86_64))
              ((gnu packages libusb) #:select (libplist))
              ((gnu packages linux) #:select (linux-libre-headers-6.1 util-linux))
@@ -28,7 +27,6 @@
              ((gnu packages tls) #:select (openssl))
              ((gnu packages version-control) #:select (git-minimal))
              (gnu packages xorg)
-             (gnu packages zig)
              (guix build-system cmake)
              (guix build-system gnu)
              (guix build-system pyproject)
@@ -480,10 +478,9 @@ inspecting signatures in Mach-O binaries.")
         (list gcc-toolchain-13 "static")
         gnu-make
         pkg-config
-        bison ; used to build libxkbcommon in depends
         cmake-minimal
         meson ; used to build libfuse, wayland, libXau, libxkbcommon in depends
-        ninja
+        ninja ; used to build qt in depends
 
         ;; Scripting
         perl           ; required to build openssl in depends
@@ -497,7 +494,7 @@ inspecting signatures in Mach-O binaries.")
            ;; Windows
            (list
              (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
-             nsis-x86_64
+             nsis-x86_64     ;; used to build the installer
              nss-certs
              osslsigncode
              gettext-minimal ;; used to build libgpg-error in depends
@@ -506,6 +503,7 @@ inspecting signatures in Mach-O binaries.")
            (list
              (make-bitcoin-cross-toolchain target)
              squashfs-tools
+             bison ; used to build libxkbcommon in depends
           ))
           ((string-contains target "darwin")
            (list
