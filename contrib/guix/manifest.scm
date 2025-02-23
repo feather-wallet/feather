@@ -499,12 +499,13 @@ inspecting signatures in Mach-O binaries.")
              (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
              nsis-x86_64
              nss-certs
-             osslsigncode))
+             osslsigncode
+             gettext-minimal ;; used to build libgpg-error in depends
+             ))
           ((string-contains target "-linux-")
            (list
              (make-bitcoin-cross-toolchain target)
              squashfs-tools
-             zig   ;; used to build flatstart in depends
           ))
           ((string-contains target "darwin")
            (list
