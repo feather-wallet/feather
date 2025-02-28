@@ -15,6 +15,8 @@
 #include <QLayoutItem>
 #include <QJsonDocument>
 #include <QThread>
+#include <QDir>
+#include <QFile>
 #include <QStandardPaths>
 #include <QProcess>
 
@@ -130,6 +132,26 @@ QString getSaveFileName(QWidget* parent, const QString &caption, const QString &
     QFileInfo fileInfo(fn);
     conf()->set(Config::lastPath, fileInfo.absolutePath());
     return fn;
+}
+
+bool Utils::copyIconToUserFolder(const QString &sourcePath, const QString &destinationPath) {
+    QDir dir(destinationPath);
+    if (!dir.exists()) {
+        dir.mkpath(".");
+    }
+
+    QFile file(sourcePath);
+    if (!file.exists()) {
+        return false;
+    }
+
+    QString destFilePath = destinationPath + "/feather.svg";
+    QFile::remove(destFilePath); // Remove if it already exists to avoid copy failure
+    return file.copy(destFilePath);
+}
+
+QString Utils::getDefaultIconPath() {
+    return QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/icons/hicolor/scalable/apps";
 }
 
 QString getOpenFileName(QWidget* parent, const QString& caption, const QString& filter) {
