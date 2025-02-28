@@ -8,6 +8,9 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QCheckBox>
+#include <QFile>
+#include <QDir>
+#include <QStandardPaths>
 
 #include "constants.h"
 #include "dialog/AddressCheckerIndexDialog.h"
@@ -35,6 +38,7 @@
 #include "utils/Icons.h"
 #include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
+#include "utils/Utils.h"
 
 #include "wallet/wallet_errors.h"
 
@@ -79,7 +83,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     this->onOfflineMode(conf()->get(Config::offlineMode).toBool());
     conf()->set(Config::restartRequired, false);
-    
+
     // Websocket notifier
 #ifdef CHECK_UPDATES
     connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, m_updater.data(), &Updater::wsUpdatesReceived);
@@ -127,6 +131,20 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(&m_checkUserActivity, &QTimer::timeout, this, &MainWindow::checkUserActivity);
     m_checkUserActivity.setInterval(5000);
     m_checkUserActivity.start();
+    
+    // Call the setupIcon function during initialization
+    this->setupIcon();
+}
+
+void MainWindow::setupIcon() {
+#ifdef Q_OS_LINUX
+    QString iconSource = ":/assets/images/appicons/appicon.svg";
+    QString iconDestination = Utils::getDefaultIconPath();
+
+    if (!Utils::copyIconToUserFolder(iconSource, iconDestination)) {
+        QMessageBox::warning(this, tr("Icon Setup Failed"), tr("Failed to copy the application icon to the user folder."));
+    }
+#endif
 }
 
 void MainWindow::initStatusBar() {
