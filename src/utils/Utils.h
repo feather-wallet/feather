@@ -121,6 +121,10 @@ namespace Utils
     QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync = false);
 
     QString getVersion();
+
+    // Copy Icon for local .desktop file
+    bool copyIconToUserFolder(const QString &sourcePath, const QString &destinationPath);
+    QString getDefaultIconPath();
 }
 
 #endif //FEATHER_UTILS_H
