@@ -216,6 +216,9 @@ private:
     QIcon hardwareDevicePairedIcon();
     QIcon hardwareDeviceUnpairedIcon();
 
+    // Add the function declaration for setupIcon
+    void setupIcon();
+
     QScopedPointer<Ui::MainWindow> ui;
     WindowManager *m_windowManager;
     Wallet *m_wallet = nullptr;
