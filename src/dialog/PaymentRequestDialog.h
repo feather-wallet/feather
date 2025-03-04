@@ -28,6 +28,9 @@ private slots:
     void copyImage();
     void saveImage();
 
+    void calculateCrypto();
+    void calculateFiat();
+
 private:
     QScopedPointer<Ui::PaymentRequestDialog> ui;
     Wallet *m_wallet;

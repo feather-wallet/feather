@@ -10,6 +10,8 @@
 #include <QRegularExpressionValidator>
 
 #include "WalletManager.h"
+#include "utils/AppData.h"
+#include "utils/config.h"
 #include "utils/Utils.h"
 
 PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, Wallet *wallet, QString address)
@@ -24,9 +26,17 @@ PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, Wallet *wallet, QStr
     QRegularExpression rx;
     rx.setPattern(amount_rx);
     QValidator *validator = new QRegularExpressionValidator(rx, this);
-    ui->line_amountXMR->setValidator(validator);
+    ui->line_amount->setValidator(validator);
 
-    connect(ui->line_amountXMR, &QLineEdit::textChanged, this, &PaymentRequestDialog::updatePaymentRequest);
+    connect(ui->line_amount, &QLineEdit::textEdited, [this] (const QString &text){
+        this->calculateFiat();
+        this->updatePaymentRequest();
+    });
+    connect(ui->line_amountFiat, &QLineEdit::textEdited, [this](const QString &text) {
+        this->calculateCrypto();
+        this->updatePaymentRequest();
+    });
+
     connect(ui->line_description, &QLineEdit::textChanged, this, &PaymentRequestDialog::updatePaymentRequest);
     connect(ui->line_recipient, &QLineEdit::textChanged, this, &PaymentRequestDialog::updatePaymentRequest);
 
@@ -34,9 +44,26 @@ PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, Wallet *wallet, QStr
     connect(ui->btn_copyImage, &QPushButton::clicked, this, &PaymentRequestDialog::copyImage);
     connect(ui->btn_saveImage, &QPushButton::clicked, this, &PaymentRequestDialog::saveImage);
 
+    QString preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+    QStringList fiatSymbols = conf()->get(Config::fiatSymbols).toStringList();
+    if (fiatSymbols.contains(preferredFiatCurrency)) {
+        fiatSymbols.removeAll(preferredFiatCurrency);
+    }
+
+    ui->comboCurrency->addItem(preferredFiatCurrency);
+    ui->comboCurrency->addItems(fiatSymbols);
+    ui->comboCurrency->setCurrentIndex(0);
+    connect(ui->comboCurrency, &QComboBox::currentIndexChanged, [this] (int index){
+        calculateFiat();
+    });
+
+    if (conf()->get(Config::disableWebsocket).toBool()) {
+        ui->frame_fiat->hide();
+    }
+
     this->updatePaymentRequest();
 
-    ui->line_amountXMR->setFocus();
+    ui->line_amount->setFocus();
 
     this->adjustSize();
 }
@@ -44,7 +71,7 @@ PaymentRequestDialog::PaymentRequestDialog(QWidget *parent, Wallet *wallet, QStr
 void PaymentRequestDialog::updatePaymentRequest() {
     QString description = ui->line_description->text();
     QString recipient = ui->line_recipient->text();
-    quint64 amount = WalletManager::amountFromString(ui->line_amountXMR->text());
+    quint64 amount = WalletManager::amountFromString(ui->line_amount->text());
 
     QString uri = m_wallet->make_uri(m_address, amount, description, recipient);
 
@@ -56,6 +83,22 @@ void PaymentRequestDialog::updatePaymentRequest() {
     if (m_qrCode->isValid()) {
         ui->qrWidget->setQrCode(m_qrCode);
     }
+}
+
+void PaymentRequestDialog::calculateCrypto() {
+    QString fiatCurrency = ui->comboCurrency->currentText();
+    QString fiatAmount = ui->line_amountFiat->text();
+
+    double cryptoAmount = appData()->prices.convert(fiatCurrency, "XMR", fiatAmount.toDouble());
+    ui->line_amount->setText(QString::number(cryptoAmount, 'f', 10));
+}
+
+void PaymentRequestDialog::calculateFiat() {
+    QString fiatCurrency = ui->comboCurrency->currentText();
+    QString cryptoAmount = ui->line_amount->text();
+
+    double fiatAmount = appData()->prices.convert("XMR", fiatCurrency, cryptoAmount.toDouble());
+    ui->line_amountFiat->setText(QString::number(fiatAmount, 'f', 2));
 }
 
 void PaymentRequestDialog::copyLink() {
