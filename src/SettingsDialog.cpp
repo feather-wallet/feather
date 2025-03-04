@@ -286,13 +286,6 @@ void Settings::setupDisplayTab() {
         conf()->set(Config::hideNotifications, toggled);
     });
 
-    // [Hide tray icon]
-    ui->checkBox_hideTrayIcon->setChecked(conf()->get(Config::hideTrayIcon).toBool());
-    connect(ui->checkBox_hideTrayIcon, &QCheckBox::toggled, [this](bool toggled) {
-       conf()->set(Config::hideTrayIcon, toggled);
-        emit hideTrayIcon(toggled);
-    });
-
     // [Warn before opening external link]
     ui->checkBox_warnOnExternalLink->setChecked(conf()->get(Config::warnOnExternalLink).toBool());
     connect(ui->checkBox_warnOnExternalLink, &QCheckBox::clicked, this, [this]{
@@ -314,6 +307,21 @@ void Settings::setupDisplayTab() {
     ui->checkBox_lockOnMinimize->setChecked(conf()->get(Config::lockOnMinimize).toBool());
     connect(ui->checkBox_lockOnMinimize, &QCheckBox::toggled, [](bool toggled){
         conf()->set(Config::lockOnMinimize, toggled);
+    });
+
+    // [Show tray icon]
+    ui->checkBox_showTrayIcon->setChecked(conf()->get(Config::showTrayIcon).toBool());
+    connect(ui->checkBox_showTrayIcon, &QCheckBox::toggled, [this](bool toggled) {
+        conf()->set(Config::showTrayIcon, toggled);
+        ui->checkBox_minimizeToTray->setEnabled(toggled);
+        emit showTrayIcon(toggled);
+    });
+
+    // [Hide window to system tray when minimized]
+    ui->checkBox_minimizeToTray->setEnabled(ui->checkBox_showTrayIcon->isChecked());
+    ui->checkBox_minimizeToTray->setChecked(conf()->get(Config::minimizeToTray).toBool());
+    connect(ui->checkBox_minimizeToTray, &QCheckBox::toggled, [this](bool toggled) {
+        conf()->set(Config::minimizeToTray, toggled);
     });
 }
 

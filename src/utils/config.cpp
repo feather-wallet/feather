@@ -84,6 +84,8 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::inactivityLockEnabled, {QS("inactivityLockEnabled"), false}},
         {Config::inactivityLockTimeout, {QS("inactivityLockTimeout"), 10}},
         {Config::lockOnMinimize, {QS("lockOnMinimize"), false}},
+        {Config::showTrayIcon, {QS("showTrayIcon"), true}},
+        {Config::minimizeToTray, {QS("minimizeToTray"), false}},
         {Config::disableWebsocket, {QS("disableWebsocket"), false}},
         {Config::offlineMode, {QS("offlineMode"), false}},
 
@@ -98,7 +100,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::hideBalance, {QS("hideBalance"), false}},
         {Config::hideNotifications, {QS("hideNotifications"), false}},
         {Config::hideUpdateNotifications, {QS("hideUpdateNotifications"), false}},
-        {Config::hideTrayIcon, {QS("hideTrayIcon"), false}},
         {Config::disableLogging, {QS("disableLogging"), true}},
         {Config::writeStackTraceToDisk, {QS("writeStackTraceToDisk"), true}},
         {Config::writeRecentlyOpenedWallets, {QS("writeRecentlyOpenedWallets"), true}},

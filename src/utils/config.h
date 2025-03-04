@@ -113,11 +113,12 @@ public:
         hideBalance,
         hideUpdateNotifications,
         hideNotifications,
-        hideTrayIcon,
         warnOnExternalLink,
         inactivityLockEnabled,
         inactivityLockTimeout,
         lockOnMinimize,
+        showTrayIcon,
+        minimizeToTray,
 
         // Transactions
         multiBroadcast,

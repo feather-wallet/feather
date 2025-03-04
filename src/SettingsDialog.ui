@@ -671,7 +671,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_19" stretch="1,1,1,0,1,1,1">
+             <layout class="QVBoxLayout" name="verticalLayout_19" stretch="1,1,1,1,1,0,0,0">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
@@ -718,17 +718,6 @@
                   </property>
                   <property name="text">
                    <string>Hide transaction notifications</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_13">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_hideTrayIcon">
-                  <property name="text">
-                   <string>Hide tray icon</string>
                   </property>
                  </widget>
                 </item>
@@ -803,6 +792,47 @@
                  <widget class="QCheckBox" name="checkBox_lockOnMinimize">
                   <property name="text">
                    <string>Lock wallet after minimizing the window</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_13">
+                <item>
+                 <widget class="QCheckBox" name="checkBox_showTrayIcon">
+                  <property name="text">
+                   <string>Show tray icon</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_16">
+                <item>
+                 <spacer name="horizontalSpacer_2">
+                  <property name="orientation">
+                   <enum>Qt::Orientation::Horizontal</enum>
+                  </property>
+                  <property name="sizeType">
+                   <enum>QSizePolicy::Policy::Fixed</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>30</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_minimizeToTray">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="text">
+                   <string>Hide window to system tray when minimized</string>
                   </property>
                  </widget>
                 </item>

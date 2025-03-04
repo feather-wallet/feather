@@ -1255,6 +1255,9 @@ void MainWindow::changeEvent(QEvent* event)
         if (conf()->get(Config::lockOnMinimize).toBool()) {
             this->lockWallet();
         }
+        if (conf()->get(Config::showTrayIcon).toBool() && conf()->get(Config::minimizeToTray).toBool()) {
+            this->hide();
+        }
     } else {
         QMainWindow::changeEvent(event);
     }
