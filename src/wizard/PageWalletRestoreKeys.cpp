@@ -115,34 +115,51 @@ bool PageWalletRestoreKeys::validatePage() {
     ui->line_viewkey->setStyleSheet("");
     ui->label_errorString->hide();
 
-    QString address = ui->line_address->text().trimmed();
-    QString viewkey = ui->line_viewkey->text().trimmed();
-    QString spendkey = ui->line_spendkey->text().trimmed();
+    const QString address = ui->line_address->text().trimmed();
+    const QString viewkey = ui->line_viewkey->text().trimmed();
+    const QString spendkey = ui->line_spendkey->text().trimmed();
+
+    QStringList errors = {};
+    bool hasInvalidInput = false;
+    if (walletType() == walletType::Spendable || walletType() == walletType::Spendable_Nondeterministic) {
+        if (!ui->line_spendkey->hasAcceptableInput()) {
+            hasInvalidInput = true;
+            errors.append("invalid spend key");
+            ui->line_spendkey->setStyleSheet(errStyle);
+        }
+    }
 
     if (walletType() == walletType::ViewOnly || walletType() == walletType::Spendable_Nondeterministic) {
-        if (!WalletManager::addressValid(address, constants::networkType)){
-            ui->label_errorString->show();
-            ui->label_errorString->setText("Error: Invalid address.");
-            ui->line_address->setStyleSheet(errStyle);
-            return false;
+        if (!ui->line_viewkey->hasAcceptableInput()) {
+            hasInvalidInput = true;
+            errors.append("invalid view key");
+            ui->line_viewkey->setStyleSheet(errStyle);
         }
 
-        if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
-            ui->label_errorString->show();
-            ui->label_errorString->setText("Error: Invalid key.");
-            ui->line_viewkey->setStyleSheet(errStyle);
+        if (!WalletManager::addressValid(address, constants::networkType)) {
+            hasInvalidInput = true;
+            errors.append("invalid address");
+            ui->line_address->setStyleSheet(errStyle);
+        }
+    }
+
+    const QString errorString = "Error: " + errors.join(", ");
+    if (hasInvalidInput) {
+        ui->label_errorString->show();
+        ui->label_errorString->setText(errorString);
+        return false;
+    }
+
+    if (walletType() == walletType::Spendable_Nondeterministic) {
+        if (!WalletManager::keyValid(spendkey, address, false, constants::networkType)) {
+            Utils::showError(this, "Primary address does not correspond to private spend key.", "Double-check both values.");
             return false;
         }
     }
 
-    if (walletType() == walletType::Spendable || walletType() == walletType::Spendable_Nondeterministic) {
-        bool spendKeyValid = (ui->line_spendkey->hasAcceptableInput() && walletType() == walletType::Spendable)
-                || (WalletManager::keyValid(spendkey, address, false, constants::networkType) && walletType() == walletType::Spendable_Nondeterministic);
-
-        if (!spendKeyValid) {
-            ui->label_errorString->show();
-            ui->label_errorString->setText("Error: Invalid key.");
-            ui->line_spendkey->setStyleSheet(errStyle);
+    if (walletType() == walletType::ViewOnly || walletType() == walletType::Spendable_Nondeterministic) {
+        if (!WalletManager::keyValid(viewkey, address, true, constants::networkType)) {
+            Utils::showError(this, "Primary address does not correspond to private view key.", "Double-check both values.");
             return false;
         }
     }
