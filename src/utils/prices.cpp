@@ -6,6 +6,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 
+#include "config.h"
+#include "constants.h"
+
 Prices::Prices(QObject *parent)
     : QObject(parent)
 {
@@ -74,3 +77,13 @@ double Prices::convert(QString symbolFrom, QString symbolTo, double amount) {
     return 0.0;
 }
 
+QString Prices::atomicUnitsToPreferredFiatString(quint64 amount, bool wrapInParens) {
+    QString fiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+    double fiatAmount = convert("XMR", fiatCurrency, amount / constants::cdiv);
+    QString currencyString = Utils::amountToCurrencyString(fiatAmount, fiatCurrency);
+
+    if (wrapInParens) {
+        return QString("(%1)").arg(currencyString);
+    }
+    return currencyString;
+}

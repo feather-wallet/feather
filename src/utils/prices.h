@@ -30,6 +30,7 @@ public slots:
     void fiatPricesReceived(const QJsonObject &data);
 
     double convert(QString symbolFrom, QString symbolTo, double amount);
+    QString atomicUnitsToPreferredFiatString(quint64 amount, bool wrapInParens = false);
 
 signals:
     void fiatPricesUpdated();
