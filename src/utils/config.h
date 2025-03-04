@@ -113,6 +113,7 @@ public:
         hideBalance,
         hideUpdateNotifications,
         hideNotifications,
+        hideTrayIcon,
         warnOnExternalLink,
         inactivityLockEnabled,
         inactivityLockTimeout,

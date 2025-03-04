@@ -286,6 +286,13 @@ void Settings::setupDisplayTab() {
         conf()->set(Config::hideNotifications, toggled);
     });
 
+    // [Hide tray icon]
+    ui->checkBox_hideTrayIcon->setChecked(conf()->get(Config::hideTrayIcon).toBool());
+    connect(ui->checkBox_hideTrayIcon, &QCheckBox::toggled, [this](bool toggled) {
+       conf()->set(Config::hideTrayIcon, toggled);
+        emit hideTrayIcon(toggled);
+    });
+
     // [Warn before opening external link]
     ui->checkBox_warnOnExternalLink->setChecked(conf()->get(Config::warnOnExternalLink).toBool());
     connect(ui->checkBox_warnOnExternalLink, &QCheckBox::clicked, this, [this]{

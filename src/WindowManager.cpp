@@ -45,7 +45,7 @@ WindowManager::WindowManager(QObject *parent)
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
     m_tray->setToolTip("Feather Wallet");
     this->buildTrayMenu();
-    m_tray->show();
+    m_tray->setVisible(!conf()->get(Config::hideTrayIcon).toBool());
 
     this->initSkins();
     this->patchMacStylesheet();
@@ -193,6 +193,9 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
         for (const auto &window : m_windows) {
             window->onHideUpdateNotifications(hidden);
         }
+    });
+    connect(&settings, &Settings::hideTrayIcon, [this](bool hidden) {
+        m_tray->setVisible(!hidden);
     });
     connect(&settings, &Settings::pluginConfigured, [this](const QString &id) {
         emit pluginConfigured(id);

@@ -36,6 +36,7 @@ signals:
     void preferredFiatCurrencyChanged(QString currency);
     void skinChanged(QString skinName);
     void hideUpdateNotifications(bool hidden);
+    void hideTrayIcon(bool hidden);
     void websocketStatusChanged(bool enabled);
     void proxySettingsChanged();
     void updateBalance();
