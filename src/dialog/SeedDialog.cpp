@@ -2,6 +2,8 @@
 // SPDX-FileCopyrightText: The Monero Project
 
 #include "SeedDialog.h"
+
+#include "Utils.h"
 #include "ui_SeedDialog.h"
 
 #include "constants.h"
@@ -14,7 +16,7 @@ SeedDialog::SeedDialog(Wallet *wallet, QWidget *parent)
     ui->setupUi(this);
     ui->label_seedIcon->setPixmap(QPixmap(":/assets/images/seed.png").scaledToWidth(64, Qt::SmoothTransformation));
 
-    ui->label_restoreHeight->setText(QString::number(m_wallet->getWalletCreationHeight()));
+    ui->label_restoreHeight->setText(Utils::formatRestoreHeight(m_wallet->getWalletCreationHeight()));
 
     if (m_wallet->getSeedLanguage().isEmpty()) {
         qDebug() << "No seed language set, using default";

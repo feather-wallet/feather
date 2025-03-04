@@ -21,6 +21,7 @@
 #include "config-feather.h"
 #include "constants.h"
 #include "networktype.h"
+#include "utils/AppData.h"
 #include "utils/ColorScheme.h"
 #include "utils/config.h"
 #include "utils/os/tails.h"
@@ -693,6 +694,11 @@ QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync) {
     }
 
     return "Synchronized";
+}
+
+QString formatRestoreHeight(quint64 height) {
+    const QDateTime restoreDate = appData()->restoreHeights[constants::networkType]->heightToDate(height);
+    return QString("%1  (%2)").arg(QString::number(height), restoreDate.toString("yyyy-MM-dd"));
 }
 
 QString getVersion() {

@@ -53,8 +53,7 @@ void DebugInfoDialog::updateInfo() {
     ui->label_walletHeight->setText(QString::number(m_wallet->blockChainHeight()));
     ui->label_daemonHeight->setText(QString::number(m_wallet->daemonBlockChainHeight()));
     ui->label_targetHeight->setText(QString::number(m_wallet->daemonBlockChainTargetHeight()));
-    QDateTime restoreDate = appData()->restoreHeights[constants::networkType]->heightToDate(m_wallet->getWalletCreationHeight());
-    ui->label_restoreHeight->setText(QString("%1 (%2)").arg(QString::number(m_wallet->getWalletCreationHeight()), restoreDate.toString("yyyy-MM-dd")));
+    ui->label_restoreHeight->setText(Utils::formatRestoreHeight(m_wallet->getWalletCreationHeight()));
     ui->label_synchronized->setText(m_wallet->isSynchronized() ? "True" : "False");
 
     auto node = m_nodes->connection();

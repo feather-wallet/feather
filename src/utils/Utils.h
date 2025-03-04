@@ -119,6 +119,7 @@ namespace Utils
     void clearLayout(QLayout *layout, bool deleteWidgets = true);
 
     QString formatSyncStatus(quint64 height, quint64 target, bool daemonSync = false);
+    QString formatRestoreHeight(quint64 height);
 
     QString getVersion();
 }

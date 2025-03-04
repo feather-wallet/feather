@@ -20,7 +20,7 @@ ViewOnlyDialog::ViewOnlyDialog(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    ui->label_restoreHeight->setText(QString::number(m_wallet->getWalletCreationHeight()));
+    ui->label_restoreHeight->setText(Utils::formatRestoreHeight(wallet->getWalletCreationHeight()));
     ui->label_primaryAddress->setText(m_wallet->address(0, 0));
     ui->label_secretViewKey->setText(m_wallet->getSecretViewKey());
 
