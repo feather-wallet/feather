@@ -104,9 +104,9 @@ QVariant SubaddressModel::parseSubaddressRow(const SubaddressRow &subaddress, co
         {
             if (role == Qt::UserRole) {
                 if (subaddress.isPinned()) {
-                    return -1;
+                    return 0;
                 } else {
-                    return subaddress.getRow();
+                    return subaddress.getRow() + 1;
                 }
             }
             return "#" + QString::number(subaddress.getRow()) + " ";
