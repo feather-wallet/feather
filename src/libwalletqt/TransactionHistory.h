@@ -41,7 +41,6 @@ public:
     bool locked() const;
     void clearRows();
 
-    bool writeCSV(const QString &path);
     QString importLabelsFromCSV(const QString &fileName);
 
 signals:

@@ -342,68 +342,6 @@ void TransactionHistory::clearRows() {
     m_rows.clear();
 }
 
-bool TransactionHistory::writeCSV(const QString &path) {
-    QString data;
-    QReadLocker locker(&m_lock);
-
-    auto transactions = m_rows;
-
-    std::sort(transactions.begin(), transactions.end(), [](const TransactionRow *info1, const TransactionRow *info2){
-        return info1->blockHeight() < info2->blockHeight();
-    });
-
-    for (const auto &info : transactions) {
-        // collect column data
-        QDateTime timeStamp = info->timestamp();
-        double amount = info->amount();
-
-        // calc historical fiat price
-        QString fiatAmount;
-        QString preferredFiatSymbol = conf()->get(Config::preferredFiatCurrency).toString();
-        const double usd_price = appData()->txFiatHistory->get(timeStamp.toString("yyyyMMdd"));
-        double fiat_price = usd_price * amount;
-
-        if (preferredFiatSymbol != "USD")
-            fiat_price = appData()->prices.convert("USD", preferredFiatSymbol, fiat_price);
-        double fiat_rounded = ceil(Utils::roundSignificant(fiat_price, 3) * 100.0) / 100.0;
-        if (usd_price != 0)
-            fiatAmount = QString::number(fiat_rounded);
-        else
-            fiatAmount = "\"?\"";
-
-        QString direction = QString("");
-        if (info->direction() == TransactionRow::Direction_In)
-            direction = QString("in");
-        else if (info->direction() == TransactionRow::Direction_Out)
-            direction = QString("out");
-        else
-            continue;  // skip TransactionInfo::Direction_Both
-
-        QString displayAmount = info->displayAmount();
-        QString paymentId = info->paymentId();
-        if (paymentId == "0000000000000000") {
-            paymentId = "";
-        }
-
-        QString date = QString("%1T%2Z").arg(info->date(), info->time()); // ISO 8601
-
-        QString balanceDelta = WalletManager::displayAmount(info->balanceDelta());
-        if (info->direction() == TransactionRow::Direction_Out) {
-            balanceDelta = "-" + balanceDelta;
-        }
-
-        // format and write
-        QString line = QString("\n%1,%2,\"%3\",%4,\"%5\",%6,%7,%8,\"%9\",\"%10\",\"%11\",%12,\"%13\"")
-                .arg(QString::number(info->blockHeight()), QString::number(timeStamp.toSecsSinceEpoch()), date,
-                     QString::number(info->subaddrAccount()), direction, balanceDelta, info->displayAmount(),
-                     info->fee(), info->hash(), info->description(), paymentId, fiatAmount, preferredFiatSymbol);
-        data += line;
-    }
-
-    data = QString("blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId,fiatAmount,fiatCurrency%1").arg(data);
-    return Utils::fileWrite(path, data);
-}
-
 QStringList parseCSVLine(const QString &line) {
     QStringList result;
     QString currentField;

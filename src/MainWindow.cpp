@@ -13,6 +13,7 @@
 #include "dialog/AddressCheckerIndexDialog.h"
 #include "dialog/BalanceDialog.h"
 #include "dialog/DebugInfoDialog.h"
+#include "dialog/HistoryExportDialog.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/TxBroadcastDialog.h"
 #include "dialog/TxConfAdvDialog.h"
@@ -1714,26 +1715,8 @@ void MainWindow::onTxPoolBacklog(const QVector<quint64> &backlog, quint64 origin
 }
 
 void MainWindow::onExportHistoryCSV() {
-    QString filePath = QFileDialog::getSaveFileName(this, "Save CSV file", QDir::homePath(), "CSV (*.csv)");
-    if (filePath.isEmpty())
-        return;
-    if (!filePath.endsWith(".csv"))
-        filePath += ".csv";
-    QFileInfo fileInfo(filePath);
-    QDir dir = fileInfo.absoluteDir();
-
-    if (!dir.exists()) {
-        Utils::showError(this, "Unable to export transaction history", QString("Path does not exist: %1").arg(dir.absolutePath()));
-        return;
-    }
-
-    bool success = m_wallet->history()->writeCSV(filePath);
-    if (!success) {
-        Utils::showError(this, "Unable to export transaction history", QString("No permission to write to: %1").arg(filePath));
-        return;
-    }
-
-    Utils::showInfo(this, "CSV export", QString("Transaction history exported to %1").arg(filePath));
+    HistoryExportDialog dialog{m_wallet, this};
+    dialog.exec();
 }
 
 void MainWindow::onImportHistoryDescriptionsCSV() {
