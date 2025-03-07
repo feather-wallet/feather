@@ -4,28 +4,17 @@
 #ifndef FEATHER_CONTACTROW_H
 #define FEATHER_CONTACTROW_H
 
-#include <QObject>
+#include <QString>
+#include <utility>
 
-class ContactRow : public QObject
+struct ContactRow
 {
-    Q_OBJECT
+    QString address;
+    QString label;
 
-public:
-    ContactRow(QObject *parent, qsizetype row, const QString& address, const QString &label)
-            : QObject(parent)
-            , m_row(row)
-            , m_address(address)
-            , m_label(label) {}
-
-    qsizetype getRow() const;
-    const QString& getAddress() const;
-    const QString& getLabel() const;
-
-private:
-    qsizetype m_row;
-    QString m_address;
-    QString m_label;
+    ContactRow(const QString address_, const QString &label_)
+        : address(address_)
+        , label(label_) {}
 };
-
 
 #endif //FEATHER_CONTACTROW_H

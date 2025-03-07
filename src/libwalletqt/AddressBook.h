@@ -4,14 +4,10 @@
 #ifndef ADDRESSBOOK_H
 #define ADDRESSBOOK_H
 
-#include <QMap>
 #include <QObject>
-#include <QReadWriteLock>
 #include <QList>
-#include <QDateTime>
 
 #include "rows/ContactRow.h"
-#include "Wallet.h"
 
 namespace Monero {
 struct AddressBook;
@@ -21,6 +17,7 @@ namespace tools{
     class wallet2;
 }
 
+class Wallet;
 class AddressBook : public QObject
 {
     Q_OBJECT
@@ -34,7 +31,9 @@ public:
     };
     Q_ENUM(ErrorCode);
 
-    bool getRow(int index, std::function<void (ContactRow &)> callback) const;
+    const QList<ContactRow>& getRows();
+    const ContactRow& getRow(qsizetype i);
+
     bool addRow(const QString &address, const QString &description);
     bool deleteRow(int rowId);
     bool setDescription(int index, const QString &label);
@@ -45,19 +44,17 @@ public:
     void refresh();
     void clearRows();
 
-
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
     void descriptionChanged() const;
 
 private:
-    explicit AddressBook(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
+    explicit AddressBook(tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
 
-    Wallet *m_wallet;
     tools::wallet2 *m_wallet2;
-    QList<ContactRow*> m_rows;
+    QList<ContactRow> m_rows;
 
     QString m_errorString;
     ErrorCode m_errorCode;

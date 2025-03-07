@@ -5,10 +5,10 @@
 
 #include <wallet/wallet2.h>
 
-AddressBook::AddressBook(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
-     : QObject(parent)
-     , m_wallet(wallet)
-     , m_wallet2(wallet2)
+AddressBook::AddressBook(tools::wallet2 *wallet2, QObject *parent)
+    : QObject(parent)
+    , m_wallet2(wallet2)
+    , m_errorCode(Status_Ok)
 {
     this->refresh();
 }
@@ -29,37 +29,30 @@ void AddressBook::refresh()
 
     clearRows();
 
-    // Fetch from Wallet2 and create vector of AddressBookRow objects
-    std::vector<tools::wallet2::address_book_row> rows = m_wallet2->get_address_book();
-    for (qsizetype i = 0; i < rows.size(); ++i) {
-        tools::wallet2::address_book_row *row = &rows.at(i);
-
+    for (const auto &row : m_wallet2->get_address_book()) {
         std::string address;
-        if (row->m_has_payment_id)
-            address = cryptonote::get_account_integrated_address_as_str(m_wallet2->nettype(), row->m_address, row->m_payment_id);
+        if (row.m_has_payment_id)
+            address = cryptonote::get_account_integrated_address_as_str(m_wallet2->nettype(), row.m_address, row.m_payment_id);
         else
-            address = get_account_address_as_str(m_wallet2->nettype(), row->m_is_subaddress, row->m_address);
+            address = get_account_address_as_str(m_wallet2->nettype(), row.m_is_subaddress, row.m_address);
 
-        auto* abr = new ContactRow{this,
-                                   i,
-                                   QString::fromStdString(address),
-                                   QString::fromStdString(row->m_description)};
-        m_rows.push_back(abr);
+        m_rows.emplaceBack(QString::fromStdString(address), QString::fromStdString(row.m_description));
     }
-
 
     emit refreshFinished();
 }
 
-bool AddressBook::getRow(int index, std::function<void (ContactRow &)> callback) const
+const QList<ContactRow>& AddressBook::getRows()
 {
-    if (index < 0 || index >= m_rows.size())
-    {
-        return false;
-    }
+    return m_rows;
+}
 
-    callback(*m_rows.value(index));
-    return true;
+const ContactRow& AddressBook::getRow(const qsizetype i)
+{
+    if (i < 0 || i >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[i];
 }
 
 bool AddressBook::addRow(const QString &address, const QString &description)
@@ -73,7 +66,7 @@ bool AddressBook::addRow(const QString &address, const QString &description)
         return false;
     }
 
-    bool r =  m_wallet2->add_address_book_row(info.address, info.has_payment_id ? &info.payment_id : nullptr, description.toStdString(), info.is_subaddress);
+    bool r = m_wallet2->add_address_book_row(info.address, info.has_payment_id ? &info.payment_id : nullptr, description.toStdString(), info.is_subaddress);
     if (r)
         refresh();
     else
@@ -91,7 +84,7 @@ bool AddressBook::setDescription(int index, const QString &description) {
 
     tools::wallet2::address_book_row entry = ab[index];
     entry.m_description = description.toStdString();
-    bool r =  m_wallet2->set_address_book_row(index, entry.m_address, entry.m_has_payment_id ? &entry.m_payment_id : nullptr, entry.m_description, entry.m_is_subaddress);
+    bool r = m_wallet2->set_address_book_row(index, entry.m_address, entry.m_has_payment_id ? &entry.m_payment_id : nullptr, entry.m_description, entry.m_is_subaddress);
     if (r)
         refresh();
     else
@@ -114,6 +107,5 @@ qsizetype AddressBook::count() const
 
 void AddressBook::clearRows()
 {
-    qDeleteAll(m_rows);
     m_rows.clear();
 }

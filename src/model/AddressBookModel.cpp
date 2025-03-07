@@ -60,50 +60,47 @@ bool AddressBookModel::setData(const QModelIndex &index, const QVariant &value, 
 
 QVariant AddressBookModel::data(const QModelIndex &index, int role) const
 {
-    QVariant result;
-
-    bool found = m_addressBook->getRow(index.row(), [this, &result, &role, &index](const ContactRow &row) {
-        if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
-            switch (index.column()) {
-                case Address:
-                {
-                    QString address = row.getAddress();
-                    if (!m_showFullAddresses && role != Qt::UserRole) {
-                        address = Utils::displayAddress(address);
-                    }
-                    result = address;
-                    break;
-                }
-                case Description:
-                    result = row.getLabel();
-                    break;
-                default:
-                    qCritical() << "Invalid column" << index.column();
-            }
-        }
-        else if (role == Qt::FontRole) {
-            switch (index.column()) {
-                case Address:
-                    result = Utils::getMonospaceFont();
-            }
-        }
-        else if (role == Qt::DecorationRole) {
-            switch (index.column()) {
-                case Description: {
-                    return QVariant(m_contactIcon);  // @TODO: does not actually work
-                }
-                default: {
-                    return QVariant();
-                }
-            }
-        }
-        return QVariant();
-    });
-    if (!found) {
-        qCritical("%s: internal error: invalid index %d", __FUNCTION__, index.row());
+    const QList<ContactRow>& rows = m_addressBook->getRows();
+    if (index.row() < 0 || index.row() >= rows.size()) {
+        return {};
     }
+    const ContactRow& row = rows[index.row()];
 
-    return result;
+    if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+        switch (index.column()) {
+            case Address:
+            {
+                QString address = row.address;
+                if (!m_showFullAddresses && role != Qt::UserRole) {
+                    address = Utils::displayAddress(address);
+                }
+                return address;
+            }
+            case Description:
+                return row.label;
+            default:
+                qCritical() << "Invalid column" << index.column();
+        }
+    }
+    else if (role == Qt::FontRole) {
+        switch (index.column()) {
+            case Address:
+                return Utils::getMonospaceFont();
+            default:
+                return {};
+        }
+    }
+    else if (role == Qt::DecorationRole) {
+        switch (index.column()) {
+            case Description: {
+                return QVariant(m_contactIcon);  // @TODO: does not actually work
+            }
+            default: {
+                return {};
+            }
+        }
+    }
+    return {};
 }
 
 Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const
@@ -120,7 +117,7 @@ Qt::ItemFlags AddressBookModel::flags(const QModelIndex &index) const
 QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if (role != Qt::DisplayRole) {
-        return QVariant();
+        return {};
     }
     if (orientation == Qt::Horizontal)
     {
@@ -130,10 +127,10 @@ QVariant AddressBookModel::headerData(int section, Qt::Orientation orientation, 
             case Description:
                 return QString("Name");
             default:
-                return QVariant();
+                return {};
         }
     }
-    return QVariant();
+    return {};
 }
 
 bool AddressBookModel::deleteRow(int row)

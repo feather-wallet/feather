@@ -147,21 +147,18 @@ void ContactsWidget::newContact(QString address, QString name)
         std::swap(address, name);
     }
 
-    int num_addresses = m_wallet->addressBook()->count();
-    QString address_entry;
-    QString name_entry;
-    for (int i=0; i<num_addresses; i++) {
-        m_wallet->addressBook()->getRow(i, [&address_entry, &name_entry](const ContactRow &entry){
-            address_entry = entry.getAddress();
-            name_entry = entry.getLabel();
-        });
+    auto& rows = m_wallet->addressBook()->getRows();
+    for (int i = 0; i < rows.size(); i++) {
+        const ContactRow& row = rows[i];
 
-        if (address == address_entry) {
+        if (address == row.address) {
             Utils::showError(this, "Unable to add contact", "Address already exists in contacts", {}, "add_contact");
-            ui->contacts->setCurrentIndex(m_model->index(i,0)); // Highlight duplicate address
+            QModelIndex sourceIndex = m_model->index(i, 0);
+            ui->contacts->setCurrentIndex(m_proxyModel->mapFromSource(sourceIndex)); // Highlight duplicate address
             return;
         }
-        if (name == name_entry) {
+
+        if (name == row.label) {
             Utils::showError(this, "Unable to add contact", "Label already exists in contacts", {}, "add_contact");
             this->newContact(address, name);
             return;
