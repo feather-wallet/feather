@@ -29,6 +29,7 @@ CoinsWidget::CoinsWidget(Wallet *wallet, QWidget *parent)
     m_showSpentAction = m_headerMenu->addAction("Show spent outputs", this, &CoinsWidget::setShowSpent);
     m_showSpentAction->setCheckable(true);
     connect(ui->coins->header(), &QHeaderView::customContextMenuRequested, this, &CoinsWidget::showHeaderMenu);
+    ui->btn_options->setMenu(m_headerMenu);
 
     // copy menu
     m_copyMenu->addAction("Public Key", this, [this]{copy(copyField::PubKey);});
@@ -102,7 +103,7 @@ void CoinsWidget::setModel(CoinsModel * model, Coins * coins) {
 }
 
 void CoinsWidget::setSearchbarVisible(bool visible) {
-    ui->search->setVisible(visible);
+    ui->frame_search->setVisible(visible);
 }
 
 void CoinsWidget::focusSearchbar() {
