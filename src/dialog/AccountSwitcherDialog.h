@@ -35,8 +35,6 @@ private:
     void copyBalance();
     void editLabel();
 
-    AccountRow* currentEntry();
-
     QScopedPointer<Ui::AccountSwitcherDialog> ui;
     Wallet *m_wallet;
     SubaddressAccountModel *m_model;

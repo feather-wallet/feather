@@ -67,21 +67,25 @@ void AccountSwitcherDialog::switchAccount(const QModelIndex &index) {
 }
 
 void AccountSwitcherDialog::copyLabel() {
-    auto row = this->currentEntry();
-    if (!row) {
+    QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
+    if (!index.isValid()) {
         return;
     }
 
-    Utils::copyToClipboard(row->getLabel());
+    auto& row = m_wallet->subaddressAccountModel()->entryFromIndex(index);
+
+    Utils::copyToClipboard(row.label);
 }
 
 void AccountSwitcherDialog::copyBalance() {
-    auto row = this->currentEntry();
-    if (!row) {
+    QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
+    if (!index.isValid()) {
         return;
     }
 
-    Utils::copyToClipboard(row->getBalance());
+    auto& row = m_wallet->subaddressAccountModel()->entryFromIndex(index);
+
+    Utils::copyToClipboard(WalletManager::displayAmount(row.balance));
 }
 
 void AccountSwitcherDialog::editLabel() {
@@ -113,11 +117,6 @@ void AccountSwitcherDialog::showContextMenu(const QPoint &point) {
     menu->addAction("Edit label", this, &AccountSwitcherDialog::editLabel);
 
     menu->popup(ui->accounts->viewport()->mapToGlobal(point));
-}
-
-AccountRow* AccountSwitcherDialog::currentEntry() {
-    QModelIndex index = m_proxyModel->mapToSource(ui->accounts->currentIndex());
-    return m_wallet->subaddressAccountModel()->entryFromIndex(index);
 }
 
 AccountSwitcherDialog::~AccountSwitcherDialog() = default;

@@ -4,14 +4,9 @@
 #ifndef SUBADDRESSACCOUNT_H
 #define SUBADDRESSACCOUNT_H
 
-#include <functional>
-
 #include <QObject>
-#include <QReadWriteLock>
 #include <QList>
-#include <QDateTime>
 
-#include "Wallet.h"
 #include "rows/AccountRow.h"
 
 namespace tools {
@@ -23,30 +18,26 @@ class SubaddressAccount : public QObject
     Q_OBJECT
 
 public:
-    void getAll() const;
-    bool getRow(int index, std::function<void (AccountRow &row)> callback) const;
-    void addRow(const QString &label);
+    const QList<AccountRow>& getRows();
+    const AccountRow& row(int index) const;
 
+    void addRow(const QString &label);
     void setLabel(quint32 accountIndex, const QString &label);
+    qsizetype count() const;
 
     void refresh();
-
-    qsizetype count() const;
     void clearRows();
-
-    AccountRow* row(int index) const;
 
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
 
 private:
-    explicit SubaddressAccount(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
+    explicit SubaddressAccount(tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
 
-    Wallet *m_wallet;
     tools::wallet2 *m_wallet2;
-    QList<AccountRow*> m_rows;
+    QList<AccountRow> m_rows;
 };
 
 #endif // SUBADDRESSACCOUNT_H

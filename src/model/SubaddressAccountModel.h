@@ -36,7 +36,7 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    AccountRow* entryFromIndex(const QModelIndex &index) const;
+    const AccountRow& entryFromIndex(const QModelIndex &index) const;
 
 public slots:
     void startReset();

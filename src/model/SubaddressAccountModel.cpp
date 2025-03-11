@@ -45,32 +45,28 @@ int SubaddressAccountModel::columnCount(const QModelIndex &parent) const
 
 QVariant SubaddressAccountModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || static_cast<quint64>(index.row()) >= m_subaddressAccount->count())
+    const QList<AccountRow>& rows = m_subaddressAccount->getRows();
+    if (index.row() < 0 || index.row() >= rows.size()) {
         return {};
-
-    QVariant result;
-
-    bool found = m_subaddressAccount->getRow(index.row(), [this, &index, &result, &role](const AccountRow &row) {
-        if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
-            result = parseSubaddressAccountRow(row, index, role);
-        }
-        else if (role == Qt::FontRole) {
-            if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
-                result = Utils::getMonospaceFont();
-            }
-        }
-        else if (role == Qt::TextAlignmentRole) {
-            if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
-                result = Qt::AlignRight;
-            }
-        }
-    });
-
-    if (!found) {
-        qCritical("%s: internal error: invalid index %d", __FUNCTION__, index.row());
     }
 
-    return result;
+    const AccountRow& row = rows[index.row()];
+
+    if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+        return parseSubaddressAccountRow(row, index, role);
+    }
+    else if (role == Qt::FontRole) {
+        if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
+            return Utils::getMonospaceFont();
+        }
+    }
+    else if (role == Qt::TextAlignmentRole) {
+        if (index.column() == Column::Balance || index.column() == Column::UnlockedBalance) {
+            return Qt::AlignRight;
+        }
+    }
+
+    return {};
 }
 
 QVariant SubaddressAccountModel::parseSubaddressAccountRow(const AccountRow &row,
@@ -83,19 +79,19 @@ QVariant SubaddressAccountModel::parseSubaddressAccountRow(const AccountRow &row
             }
             return QString("#%1").arg(QString::number(index.row()));
         case Address:
-            return row.getAddress();
+            return row.address;
         case Label:
-            return row.getLabel();
+            return row.label;
         case Balance:
             if (role == Qt::UserRole) {
-                return WalletManager::amountFromString(row.getBalance());
+                return row.balance;
             }
-            return row.getBalance();
+            return WalletManager::displayAmount(row.balance);
         case UnlockedBalance:
             if (role == Qt::UserRole) {
-                return WalletManager::amountFromString(row.getUnlockedBalance());
+                return row.unlockedBalance;
             }
-            return row.getUnlockedBalance();
+            return WalletManager::displayAmount(row.unlockedBalance);
         default:
             return QVariant();
     }
@@ -143,7 +139,6 @@ bool SubaddressAccountModel::setData(const QModelIndex &index, const QVariant &v
     return false;
 }
 
-
 Qt::ItemFlags SubaddressAccountModel::flags(const QModelIndex &index) const
 {
     if (!index.isValid())
@@ -155,7 +150,7 @@ Qt::ItemFlags SubaddressAccountModel::flags(const QModelIndex &index) const
     return QAbstractTableModel::flags(index);
 }
 
-AccountRow* SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
+const AccountRow& SubaddressAccountModel::entryFromIndex(const QModelIndex &index) const {
     return m_subaddressAccount->row(index.row());
 }
 
