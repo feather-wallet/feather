@@ -4,7 +4,6 @@
 #include "TransactionRow.h"
 #include "WalletManager.h"
 #include "Transfer.h"
-#include "Ring.h"
 
 TransactionRow::TransactionRow(QObject *parent)
         : QObject(parent)
@@ -145,12 +144,12 @@ QList<QString> TransactionRow::destinations() const
 {
     QList<QString> dests;
     for (auto const& t: m_transfers) {
-        dests.append(t->address());
+        dests.append(t.address);
     }
     return dests;
 }
 
-QList<Transfer*> TransactionRow::transfers() const {
+QList<Transfer> TransactionRow::transfers() const {
     return m_transfers;
 }
 
@@ -158,8 +157,8 @@ QString TransactionRow::rings_formatted() const
 {
     QString rings;
     for (auto const& r: m_rings) {
-        rings += r->keyImage() + ": \n";
-        for (uint64_t m : r->ringMembers()){
+        rings += r.keyImage + ": \n";
+        for (uint64_t m : r.ringMembers){
             rings += QString::number(m) + " ";
         }
         rings += "\n\n";
@@ -173,6 +172,4 @@ bool TransactionRow::hasPaymentId() const {
 
 TransactionRow::~TransactionRow()
 {
-    qDeleteAll(m_transfers);
-    qDeleteAll(m_rings);
 }

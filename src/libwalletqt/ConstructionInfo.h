@@ -6,9 +6,9 @@
 
 #include <QObject>
 #include <QSet>
+#include "Transfer.h"
 
 class Input;
-class Transfer;
 
 namespace Monero {
     class TransactionConstructionInfo;
@@ -24,7 +24,7 @@ public:
     QVector<QString> subaddresses() const;
     quint64 minMixinCount() const;
     QList<Input*> inputs() const;
-    QList<Transfer*> outputs() const;
+    QList<Transfer> outputs() const;
 
 private:
     explicit ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl, QObject *parent = nullptr);
@@ -36,7 +36,7 @@ private:
     QVector<QString> m_subaddresses;
     quint64 m_minMixinCount;
     mutable QList<Input*> m_inputs;
-    mutable QList<Transfer*> m_outputs;
+    mutable QList<Transfer> m_outputs;
 };
 
 #endif //FEATHER_CONSTRUCTIONINFO_H

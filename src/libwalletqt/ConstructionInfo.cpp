@@ -27,7 +27,7 @@ QList<Input *> ConstructionInfo::inputs() const {
     return m_inputs;
 }
 
-QList<Transfer *> ConstructionInfo::outputs() const {
+QList<Transfer> ConstructionInfo::outputs() const {
     return m_outputs;
 }
 
@@ -44,8 +44,7 @@ ConstructionInfo::ConstructionInfo(const Monero::TransactionConstructionInfo *pi
 
     for (auto const &o : pimpl->outputs())
     {
-        Transfer *output = new Transfer(o.amount, QString::fromStdString(o.address), this);
-        m_outputs.append(output);
+        m_outputs.emplace_back(o.amount, QString::fromStdString(o.address));
     }
     for (uint32_t i : pimpl->subaddressIndices())
     {

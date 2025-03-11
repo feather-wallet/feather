@@ -79,14 +79,14 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
         bool hasIntegrated = false;
 
         for (const auto& transfer : transfers) {
-            auto address = transfer->address();
-            auto amount = WalletManager::displayAmount(transfer->amount());
+            auto address = transfer.address;
+            auto amount = WalletManager::displayAmount(transfer.amount);
             auto index = m_wallet->subaddressIndex(address);
-            cursor.insertText(address, Utils::addressTextFormat(index, transfer->amount()));
+            cursor.insertText(address, Utils::addressTextFormat(index, transfer.amount));
             cursor.insertText(QString(" %1").arg(amount), QTextCharFormat());
             cursor.insertBlock();
 
-            if (WalletManager::baseAddressFromIntegratedAddress(transfer->address(), constants::networkType) != transfer->address()) {
+            if (WalletManager::baseAddressFromIntegratedAddress(transfer.address, constants::networkType) != transfer.address) {
                 hasIntegrated = true;
             }
         }

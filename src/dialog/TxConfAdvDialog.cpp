@@ -151,10 +151,10 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
 
     for (const auto &out: ci->outputs()) {
         auto *item = new QTreeWidgetItem(ui->treeOutputs);
-        item->setText(0, out->address());
-        item->setText(1, WalletManager::displayAmount(out->amount()));
+        item->setText(0, out.address);
+        item->setText(1, WalletManager::displayAmount(out.amount));
         item->setFont(0, Utils::getMonospaceFont());
-        auto index = m_wallet->subaddressIndex(out->address());
+        auto index = m_wallet->subaddressIndex(out.address);
         QBrush brush;
         if (index.isChange()) {
             brush = QBrush(ColorScheme::YELLOW.asColor(true));
@@ -165,7 +165,7 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
             brush = QBrush(ColorScheme::GREEN.asColor(true));
             item->setToolTip(0, "Wallet receive address");
         }
-        else if (out->amount() == 0) {
+        else if (out.amount == 0) {
             brush = QBrush(ColorScheme::GRAY.asColor(true));
             item->setToolTip(0, "Dummy output (Min. 2 outs consensus rule)");
         }

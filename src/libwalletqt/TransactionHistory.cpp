@@ -8,7 +8,6 @@
 #include "constants.h"
 #include "WalletManager.h"
 #include "Transfer.h"
-#include "Ring.h"
 #include "wallet/wallet2.h"
 
 QString description(tools::wallet2 *wallet2, const tools::wallet2::payment_details &pd)
@@ -178,13 +177,15 @@ void TransactionHistory::refresh()
             // single output transaction might contain multiple transfers
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
-                t->m_transfers.append(transfer);
+                t->m_transfers.emplace_back(
+                    d.amount,
+                    QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)));
             }
             for (auto const &r: pd.m_rings)
             {
-                Ring *ring = new Ring(QString::fromStdString(epee::string_tools::pod_to_hex(r.first)), cryptonote::relative_output_offsets_to_absolute(r.second), this);
-                t->m_rings.append(ring);
+                t->m_rings.emplace_back(
+                    QString::fromStdString(epee::string_tools::pod_to_hex(r.first)),
+                    cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
             m_rows.append(t);
@@ -231,13 +232,15 @@ void TransactionHistory::refresh()
 
             for (auto const &d: pd.m_dests)
             {
-                Transfer *transfer = new Transfer(d.amount, QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)), this);
-                t->m_transfers.append(transfer);
+                t->m_transfers.emplace_back(
+                    d.amount,
+                    QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)));
             }
             for (auto const &r: pd.m_rings)
             {
-                Ring *ring = new Ring(QString::fromStdString(epee::string_tools::pod_to_hex(r.first)), cryptonote::relative_output_offsets_to_absolute(r.second), this);
-                t->m_rings.append(ring);
+                t->m_rings.emplace_back(
+                    QString::fromStdString(epee::string_tools::pod_to_hex(r.first)),
+                    cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
             m_rows.append(t);

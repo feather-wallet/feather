@@ -4,12 +4,20 @@
 #ifndef FEATHER_TRANSACTIONROW_H
 #define FEATHER_TRANSACTIONROW_H
 
-class Transfer;
-class Ring;
-
 #include <QObject>
 #include <QSet>
 #include <QDateTime>
+
+struct Ring
+{
+    QString keyImage;
+    std::vector<uint64_t> ringMembers;
+
+    explicit Ring(QString _keyImage, std::vector<uint64_t> _ringMembers)
+        : keyImage(std::move(_keyImage))
+        , ringMembers(std::move(_ringMembers)) {}
+};
+struct Transfer;
 
 class TransactionRow : public QObject
 {
@@ -50,7 +58,7 @@ public:
     QString time() const;
     QString paymentId() const;
     QList<QString> destinations() const;
-    QList<Transfer*> transfers() const;
+    QList<Transfer> transfers() const;
     QString rings_formatted() const;
     bool hasPaymentId() const;
 
@@ -59,8 +67,8 @@ private:
 
 private:
     friend class TransactionHistory;
-    QList<Transfer*> m_transfers;
-    QList<Ring*> m_rings;
+    QList<Transfer> m_transfers;
+    QList<Ring> m_rings;
     qint64 m_amount; // Amount that was sent (to destinations) or received, excludes tx fee
     qint64 m_balanceDelta; // How much the total balance was mutated as a result of this tx (includes tx fee)
     quint64 m_blockHeight;

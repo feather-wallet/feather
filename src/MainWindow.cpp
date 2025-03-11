@@ -943,7 +943,7 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
     tx->refresh();
     QSet<QString> outputAddresses;
     for (const auto &output : tx->transaction(0)->outputs()) {
-        outputAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(output->address(), constants::networkType));
+        outputAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(output.address, constants::networkType));
     }
     QSet<QString> destAddresses;
     for (const auto &addr : address) {

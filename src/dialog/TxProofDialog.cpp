@@ -22,7 +22,7 @@ TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionRow *tx
     m_direction = txInfo->direction();
 
     for (auto const &t: txInfo->transfers()) {
-        m_OutDestinations.push_back(t->address());
+        m_OutDestinations.push_back(t.address);
     }
 
     for (auto const &s: txInfo->subaddrIndex()) {
