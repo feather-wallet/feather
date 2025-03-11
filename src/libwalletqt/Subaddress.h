@@ -21,14 +21,17 @@ class Subaddress : public QObject
     Q_OBJECT
 
 public:
-    bool getRow(int index, std::function<void (SubaddressRow &row)> callback) const;
+    const QList<SubaddressRow>& getRows();
+    const SubaddressRow& getRow(qsizetype i);
+
     bool addRow(quint32 accountIndex, const QString &label);
     
     bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
 
     bool setHidden(const QString& address, bool hidden);
     bool isHidden(const QString& address);
-    
+    bool isHidden(const SubaddressRow& row);
+
     bool setPinned(const QString& address, bool pinned);
     bool isPinned(const QString& address);
     
@@ -37,7 +40,7 @@ public:
     [[nodiscard]] qsizetype count() const;
     void clearRows();
 
-    [[nodiscard]] SubaddressRow* row(int index) const;
+    const SubaddressRow& row(int index) const;
 
     QString getError() const;
 
@@ -52,7 +55,7 @@ private:
 
     Wallet* m_wallet;
     tools::wallet2 *m_wallet2;
-    QList<SubaddressRow*> m_rows;
+    QList<SubaddressRow> m_rows;
     
     QStringList m_pinned;
     QStringList m_hidden;

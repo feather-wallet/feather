@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: The Monero Project
 
 #include "Subaddress.h"
-#include <QDebug>
 
 #include <wallet/wallet2.h>
 
@@ -18,15 +17,17 @@ Subaddress::Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
     m_hidden = hidden.split(",");
 }
 
-bool Subaddress::getRow(int index, std::function<void (SubaddressRow &row)> callback) const
+const QList<SubaddressRow>& Subaddress::getRows()
 {
-    if (index < 0 || index >= m_rows.size())
-    {
-        return false;
-    }
+    return m_rows;
+}
 
-    callback(*m_rows.value(index));
-    return true;
+const SubaddressRow& Subaddress::getRow(const qsizetype i)
+{
+    if (i < 0 || i >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[i];
 }
 
 bool Subaddress::addRow(quint32 accountIndex, const QString &label)
@@ -87,7 +88,7 @@ bool Subaddress::setHidden(const QString &address, bool hidden)
 bool Subaddress::isHidden(const QString &address) 
 {
     return m_hidden.contains(address);
-};
+}
 
 bool Subaddress::setPinned(const QString &address, bool pinned) 
 {
@@ -143,16 +144,13 @@ bool Subaddress::refresh(quint32 accountIndex)
 
         QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
 
-        auto* row = new SubaddressRow{this,
-                                      i,
-                                      addressStr,
-                                      QString::fromStdString(m_wallet2->get_subaddress_label(index)),
-                                      m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i}),
-                                      this->isHidden(addressStr),
-                                      this->isPinned(addressStr)
-        };
-        
-        m_rows.append(row);
+        m_rows.emplace_back(
+            addressStr,
+            QString::fromStdString(m_wallet2->get_subaddress_label(index)),
+            m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i}),
+            this->isHidden(addressStr),
+            this->isPinned(addressStr)
+        );
     }
 
     // Make sure keys are intact. We NEVER want to display incorrect addresses in case of memory corruption.
@@ -175,12 +173,11 @@ qsizetype Subaddress::count() const
 }
 
 void Subaddress::clearRows() {
-    qDeleteAll(m_rows);
     m_rows.clear();
 }
 
-SubaddressRow* Subaddress::row(int index) const {
-    return m_rows.value(index);
+const SubaddressRow& Subaddress::row(int index) const {
+    return m_rows[index];
 }
 
 QString Subaddress::getError() const {

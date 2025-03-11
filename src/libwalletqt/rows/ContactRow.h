@@ -5,7 +5,6 @@
 #define FEATHER_CONTACTROW_H
 
 #include <QString>
-#include <utility>
 
 struct ContactRow
 {

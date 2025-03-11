@@ -55,10 +55,11 @@ private:
     SubaddressModel *m_model;
     SubaddressProxyModel *m_proxyModel;
 
+    QModelIndex getCurrentIndex();
+
     void addOption(QMenu *menu, const QString &text, Config::ConfigKey key, const std::function<void(bool show)>& func);
     void updateQrCode();
     void showQrCodeDialog();
-    SubaddressRow* currentEntry();
 };
 
 #endif //FEATHER_RECEIVEWIDGET_H

@@ -34,7 +34,7 @@ public:
 
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    SubaddressRow* entryFromIndex(const QModelIndex &index) const;
+    const SubaddressRow& entryFromIndex(const QModelIndex &index) const;
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
 

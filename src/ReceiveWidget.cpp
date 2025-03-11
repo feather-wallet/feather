@@ -6,6 +6,7 @@
 
 #include <QMenu>
 
+#include "libwalletqt/rows/SubaddressRow.h"
 #include "dialog/PaymentRequestDialog.h"
 #include "dialog/QrCodeDialog.h"
 #include "utils/config.h"
@@ -124,10 +125,12 @@ QString ReceiveWidget::getAddress(quint32 minorIndex) {
 }
 
 void ReceiveWidget::copyAddress() {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
 
-    QString address = this->getAddress(row->getRow());
+    QString address = this->getAddress(index.row());
     Utils::copyToClipboard(address);
 }
 
@@ -143,8 +146,11 @@ void ReceiveWidget::editLabel() {
 }
 
 void ReceiveWidget::showContextMenu(const QPoint &point) {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    auto& row = m_model->entryFromIndex(index);
 
     auto *menu = new QMenu(ui->addresses);
 
@@ -152,31 +158,35 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
     menu->addAction("Copy label", this, &ReceiveWidget::copyLabel);
     menu->addAction("Edit label", this, &ReceiveWidget::editLabel);
 
-    if (row->isUsed()) {
+    if (row.used) {
         menu->addAction(m_showTransactionsAction);
     }
 
     QAction *actionPin = menu->addAction("Pin address", [this](bool toggled){
-        SubaddressRow* row = this->currentEntry();
-        if (!row) return;
-        
-        QString address = row->getAddress();
-        m_wallet->subaddress()->setPinned(address, toggled);
+        QModelIndex index = getCurrentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        auto& row = m_model->entryFromIndex(index);
+
+        m_wallet->subaddress()->setPinned(row.address, toggled);
         m_proxyModel->invalidate();
     });
     actionPin->setCheckable(true);
-    actionPin->setChecked(row->isPinned());
+    actionPin->setChecked(row.pinned);
 
     QAction *actionHide = menu->addAction("Hide address", [this](bool toggled){
-        SubaddressRow* row = this->currentEntry();
-        if (!row) return;
-        
-        QString address = row->getAddress();
-        m_wallet->subaddress()->setHidden(address, toggled);
+        QModelIndex index = getCurrentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        auto& row = m_model->entryFromIndex(index);
+
+        m_wallet->subaddress()->setHidden(row.address, toggled);
         m_proxyModel->invalidate();
     });
     actionHide->setCheckable(true);
-    actionHide->setChecked(row->isHidden());
+    actionHide->setChecked(row.hidden);
 
     if (m_wallet->isHwBacked()) {
         menu->addAction("Show on device", this, &ReceiveWidget::showOnDevice);
@@ -186,20 +196,24 @@ void ReceiveWidget::showContextMenu(const QPoint &point) {
 }
 
 void ReceiveWidget::createPaymentRequest() {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
 
-    QString address = this->getAddress(row->getRow());
+    QString address = this->getAddress(index.row());
 
     PaymentRequestDialog dialog{this, m_wallet, address};
     dialog.exec();
 }
 
 void ReceiveWidget::onShowTransactions() {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
 
-    QString address = this->getAddress(row->getRow());
+    QString address = this->getAddress(index.row());
     emit showTransactions(address);
 }
 
@@ -214,9 +228,11 @@ void ReceiveWidget::showHeaderMenu(const QPoint& position)
 }
 
 void ReceiveWidget::showOnDevice() {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
-    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), row->getRow(), "");
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    m_wallet->deviceShowAddressAsync(m_wallet->currentSubaddressAccount(), index.row(), "");
 }
 
 void ReceiveWidget::generateSubaddress() {
@@ -227,14 +243,14 @@ void ReceiveWidget::generateSubaddress() {
 }
 
 void ReceiveWidget::updateQrCode(){
-    SubaddressRow* row = this->currentEntry();
-    if (!row) {
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
         ui->qrCode->clear();
         ui->btn_createPaymentRequest->hide();
         return;
     }
 
-    QString address = this->getAddress(row->getRow());
+    QString address = this->getAddress(index.row());
     const QrCode qrc(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::MEDIUM);
 
     int width = ui->qrCode->width() - 4;
@@ -245,22 +261,20 @@ void ReceiveWidget::updateQrCode(){
 }
 
 void ReceiveWidget::showQrCodeDialog() {
-    SubaddressRow* row = this->currentEntry();
-    if (!row) return;
+    QModelIndex index = getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
 
-    QString address = this->getAddress(row->getRow());
+    QString address = this->getAddress(index.row());
     QrCode qr(address, QrCode::Version::AUTO, QrCode::ErrorCorrectionLevel::HIGH);
     QrCodeDialog dialog{this, &qr, "Address"};
     dialog.exec();
 }
 
-SubaddressRow* ReceiveWidget::currentEntry() {
-    QModelIndexList list = ui->addresses->selectionModel()->selectedRows();
-    if (list.size() == 1) {
-        return m_model->entryFromIndex(m_proxyModel->mapToSource(list.first()));
-    } else {
-        return nullptr;
-    }
+QModelIndex ReceiveWidget::getCurrentIndex()
+{
+    return m_proxyModel->mapToSource(ui->addresses->currentIndex());
 }
 
 ReceiveWidget::~ReceiveWidget() = default;

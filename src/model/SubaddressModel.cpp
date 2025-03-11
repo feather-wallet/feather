@@ -40,60 +40,54 @@ int SubaddressModel::columnCount(const QModelIndex &parent) const
 
 QVariant SubaddressModel::data(const QModelIndex &index, int role) const
 {
-    if (!index.isValid() || index.row() < 0 || static_cast<quint64>(index.row()) >= m_subaddress->count())
-        return QVariant();
-
-    QVariant result;
+    const QList<SubaddressRow>& rows = m_subaddress->getRows();
+    if (index.row() < 0 || index.row() >= rows.size()) {
+        return {};
+    }
+    const SubaddressRow& row = rows[index.row()];
     
-    bool found = m_subaddress->getRow(index.row(), [this, &index, &role, &result](const SubaddressRow &subaddress) {
-        if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole){
-            result = parseSubaddressRow(subaddress, index, role);
-        }
-        
-        else if (role == Qt::DecorationRole) {
-            if (subaddress.isPinned() && index.column() == ModelColumn::Index) {
-                result = QVariant(icons()->icon("pin.png"));
-            }
-            else if (subaddress.isHidden() && index.column() == ModelColumn::Index) {
-                result = QVariant(icons()->icon("eye_blind.png"));
-            }
-        }
-        else if (role == Qt::BackgroundRole) {
-            switch(index.column()) {
-                case Address:
-                {
-                    if (subaddress.isUsed()) {
-                        result = QBrush(ColorScheme::RED.asColor(true));
-                    }
-                }
-            }
-        }
-        else if (role == Qt::FontRole) {
-            switch(index.column()) {
-                case Address:
-                {
-                   result = Utils::getMonospaceFont();
-                }
-            }
-        }
-        else if (role == Qt::ToolTipRole) {
-            switch(index.column()) {
-                case Address:
-                {
-                    if (subaddress.isUsed()) {
-                        result = "This address is used.";
-                    }
-                }
-            }
-        }
-    });
-
-    if (!found)
-    {
-        qCritical("%s: internal error: invalid index %d", __FUNCTION__, index.row());
+    if (role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole){
+        return parseSubaddressRow(row, index, role);
     }
 
-    return result;
+    else if (role == Qt::DecorationRole) {
+        if (row.pinned && index.column() == ModelColumn::Index) {
+            return QVariant(icons()->icon("pin.png"));
+        }
+        else if (row.hidden && index.column() == ModelColumn::Index) {
+            return QVariant(icons()->icon("eye_blind.png"));
+        }
+    }
+    else if (role == Qt::BackgroundRole) {
+        switch(index.column()) {
+            case Address:
+            {
+                if (row.used) {
+                    return QBrush(ColorScheme::RED.asColor(true));
+                }
+            }
+        }
+    }
+    else if (role == Qt::FontRole) {
+        switch(index.column()) {
+            case Address:
+            {
+               return Utils::getMonospaceFont();
+            }
+        }
+    }
+    else if (role == Qt::ToolTipRole) {
+        switch(index.column()) {
+            case Address:
+            {
+                if (row.used) {
+                    return "This address is used.";
+                }
+            }
+        }
+    }
+
+    return {};
 }
 
 QVariant SubaddressModel::parseSubaddressRow(const SubaddressRow &subaddress, const QModelIndex &index, int role) const
@@ -103,17 +97,17 @@ QVariant SubaddressModel::parseSubaddressRow(const SubaddressRow &subaddress, co
         case Index:
         {
             if (role == Qt::UserRole) {
-                if (subaddress.isPinned()) {
+                if (subaddress.pinned) {
                     return 0;
                 } else {
-                    return subaddress.getRow() + 1;
+                    return index.row() + 1;
                 }
             }
-            return "#" + QString::number(subaddress.getRow()) + " ";
+            return "#" + QString::number(index.row()) + " ";
         }
         case Address:
         {
-            QString address = subaddress.getAddress();
+            QString address = subaddress.address;
             if (!showFull && role != Qt::UserRole) {
                 address = Utils::displayAddress(address);
             }
@@ -127,10 +121,10 @@ QVariant SubaddressModel::parseSubaddressRow(const SubaddressRow &subaddress, co
             else if (index.row() == 0) {
                 return "Change";
             }
-            return subaddress.getLabel();
+            return subaddress.label;
         }
         case isUsed:
-            return subaddress.isUsed();
+            return subaddress.used;
         default:
             qCritical() << "Invalid column" << index.column();
             return QVariant();
@@ -195,7 +189,7 @@ void SubaddressModel::setCurrentSubaddressAccount(quint32 accountIndex) {
     m_currentSubaddressAccount = accountIndex;
 }
 
-SubaddressRow* SubaddressModel::entryFromIndex(const QModelIndex &index) const {
+const SubaddressRow& SubaddressModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_subaddress->count());
     return m_subaddress->row(index.row());
 }

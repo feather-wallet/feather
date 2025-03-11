@@ -4,37 +4,22 @@
 #ifndef FEATHER_SUBADDRESSROW_H
 #define FEATHER_SUBADDRESSROW_H
 
-#include <QObject>
+#include <QString>
 
-class SubaddressRow : public QObject 
+struct SubaddressRow
 {
-    Q_OBJECT
-    
-public:
-    SubaddressRow(QObject *parent, quint32 row, const QString& address, const QString &label, bool used, bool hidden, bool pinned)
-        : QObject(parent)
-        , m_row(row)
-        , m_address(address)
-        , m_label(label)
-        , m_used(used) 
-        , m_hidden(hidden)
-        , m_pinned(pinned) {}
-    
-    [[nodiscard]] quint32 getRow() const;
-    const QString& getAddress() const;
-    const QString& getLabel() const;
-    bool isUsed() const;
-    bool isHidden() const;
-    bool isPinned() const;
-    
-private:
-    quint32 m_row;
-    QString m_address;
-    QString m_label;
-    bool m_used = false;
-    bool m_hidden = false;
-    bool m_pinned = false;
-};
+    QString address;
+    QString label;
+    bool used = false;
+    bool hidden = false;
+    bool pinned = false;
 
+    SubaddressRow(const QString& address_, const QString &label_, bool used_, bool hidden_, bool pinned_)
+        : address(address_)
+        , label(label_)
+        , used(used_)
+        , hidden(hidden_)
+        , pinned(pinned_) {}
+};
 
 #endif //FEATHER_SUBADDRESSROW_H

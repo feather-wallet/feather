@@ -22,13 +22,14 @@ bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &so
     bool showHidden = conf()->get(Config::showHiddenAddresses).toBool();
     bool showChange = conf()->get(Config::showChangeAddresses).toBool();
 
-    SubaddressRow* subaddress = m_subaddress->row(sourceRow);
-    if (!subaddress) {
+    if (sourceRow < 0 || sourceRow >= m_subaddress->count()) {
         return false;
     }
+
+    const SubaddressRow& subaddress = m_subaddress->row(sourceRow);
     
     // Pinned addresses are always shown
-    if (subaddress->isPinned()) {
+    if (subaddress.pinned) {
         return true;
     }
     
@@ -37,13 +38,13 @@ bool SubaddressProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &so
         return false;
     }
 
-    if (!showHidden && subaddress->isHidden()) {
+    if (!showHidden && subaddress.hidden) {
         return false;
     }
 
     if (!m_searchRegExp.pattern().isEmpty()) {
-        return subaddress->getAddress().contains(m_searchCaseSensitiveRegExp) || subaddress->getLabel().contains(m_searchRegExp);
+        return subaddress.address.contains(m_searchCaseSensitiveRegExp) || subaddress.label.contains(m_searchRegExp);
     }
 
-    return (showUsed || !subaddress->isUsed());
+    return (showUsed || !subaddress.used);
 }
