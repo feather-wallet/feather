@@ -13,23 +13,17 @@ Coins::Coins(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
 
 }
 
-bool Coins::coin(int index, std::function<void (CoinsInfo &)> callback)
+const QList<CoinsInfo>& Coins::getRows()
 {
-    QReadLocker locker(&m_lock);
-
-    if (index < 0 || index >= m_rows.size()) {
-        qCritical("%s: no transaction info for index %d", __FUNCTION__, index);
-        qCritical("%s: there's %lld transactions in backend", __FUNCTION__, m_rows.count());
-        return false;
-    }
-
-    callback(*m_rows.value(index));
-    return true;
+    return m_rows;
 }
 
-CoinsInfo* Coins::coin(int index)
+const CoinsInfo& Coins::getRow(const qsizetype i)
 {
-    return m_rows.value(index);
+    if (i < 0 || i >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[i];
 }
 
 void Coins::refresh()
@@ -54,30 +48,30 @@ void Coins::refresh()
                 continue;
             }
 
-            auto ci = new CoinsInfo(this);
-            ci->m_blockHeight = td.m_block_height;
-            ci->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_txid));
-            ci->m_internalOutputIndex = td.m_internal_output_index;
-            ci->m_globalOutputIndex = td.m_global_output_index;
-            ci->m_spent = td.m_spent;
-            ci->m_frozen = td.m_frozen;
-            ci->m_spentHeight = td.m_spent_height;
-            ci->m_amount = td.m_amount;
-            ci->m_rct = td.m_rct;
-            ci->m_keyImageKnown = td.m_key_image_known;
-            ci->m_pkIndex = td.m_pk_index;
-            ci->m_subaddrIndex = td.m_subaddr_index.minor;
-            ci->m_subaddrAccount = td.m_subaddr_index.major;
-            ci->m_address = QString::fromStdString(m_wallet2->get_subaddress_as_str(td.m_subaddr_index)); // todo: this is expensive, cache maybe?
-            ci->m_addressLabel = QString::fromStdString(m_wallet2->get_subaddress_label(td.m_subaddr_index));
-            ci->m_txNote = QString::fromStdString(m_wallet2->get_tx_note(td.m_txid));
-            ci->m_keyImage = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_key_image));
-            ci->m_unlockTime = td.m_tx.unlock_time;
-            ci->m_unlocked = m_wallet2->is_transfer_unlocked(td);
-            ci->m_pubKey = QString::fromStdString(epee::string_tools::pod_to_hex(td.get_public_key()));
-            ci->m_coinbase = td.m_tx.vin.size() == 1 && td.m_tx.vin[0].type() == typeid(cryptonote::txin_gen);
-            ci->m_description = m_wallet->getCacheAttribute(QString("coin.description:%1").arg(ci->m_pubKey));
-            ci->m_change = m_wallet2->is_change(td);
+            CoinsInfo ci;
+            ci.blockHeight = td.m_block_height;
+            ci.hash = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_txid));
+            ci.internalOutputIndex = td.m_internal_output_index;
+            ci.globalOutputIndex = td.m_global_output_index;
+            ci.spent = td.m_spent;
+            ci.frozen = td.m_frozen;
+            ci.spentHeight = td.m_spent_height;
+            ci.amount = td.m_amount;
+            ci.rct = td.m_rct;
+            ci.keyImageKnown = td.m_key_image_known;
+            ci.pkIndex = td.m_pk_index;
+            ci.subaddrIndex = td.m_subaddr_index.minor;
+            ci.subaddrAccount = td.m_subaddr_index.major;
+            ci.address = QString::fromStdString(m_wallet2->get_subaddress_as_str(td.m_subaddr_index)); // todo: this is expensive, cache maybe?
+            ci.addressLabel = QString::fromStdString(m_wallet2->get_subaddress_label(td.m_subaddr_index));
+            ci.txNote = QString::fromStdString(m_wallet2->get_tx_note(td.m_txid));
+            ci.keyImage = QString::fromStdString(epee::string_tools::pod_to_hex(td.m_key_image));
+            ci.unlockTime = td.m_tx.unlock_time;
+            ci.unlocked = m_wallet2->is_transfer_unlocked(td);
+            ci.pubKey = QString::fromStdString(epee::string_tools::pod_to_hex(td.get_public_key()));
+            ci.coinbase = td.m_tx.vin.size() == 1 && td.m_tx.vin[0].type() == typeid(cryptonote::txin_gen);
+            ci.description = m_wallet->getCacheAttribute(QString("coin.description:%1").arg(ci.pubKey));
+            ci.change = m_wallet2->is_change(td);
 
             m_rows.push_back(ci);
         }
@@ -90,10 +84,10 @@ void Coins::refreshUnlocked()
 {
     QWriteLocker locker(&m_lock);
 
-    for (CoinsInfo* c : m_rows) {
-        if (!c->unlocked()) {
-            bool unlocked = m_wallet2->is_transfer_unlocked(c->unlockTime(), c->blockHeight());
-            c->setUnlocked(unlocked);
+    for (CoinsInfo& c : m_rows) {
+        if (!c.unlocked) {
+            bool unlocked = m_wallet2->is_transfer_unlocked(c.unlockTime, c.blockHeight);
+            c.setUnlocked(unlocked);
         }
     }
 }
@@ -153,30 +147,21 @@ void Coins::thaw(QStringList &publicKeys)
     refresh();
 }
 
-QVector<CoinsInfo*> Coins::coins_from_txid(const QString &txid)
-{
-    QVector<CoinsInfo*> coins;
-
-    for (int i = 0; i < this->count(); i++) {
-        CoinsInfo* coin = this->coin(i);
-        if (coin->hash() == txid) {
-            coins.append(coin);
+quint64 Coins::sumAmounts(const QStringList &keyImages) {
+    quint64 amount = 0;
+    for (const CoinsInfo& coin : m_rows) {
+        if (!coin.keyImageKnown) {
+            continue;
         }
-    }
-    return coins;
-}
 
-QVector<CoinsInfo*> Coins::coinsFromKeyImage(const QStringList &keyimages) {
-    QVector<CoinsInfo*> coins;
-
-    for (int i = 0; i < this->count(); i++) {
-        CoinsInfo* coin = this->coin(i);
-        if (coin->keyImageKnown() && keyimages.contains(coin->keyImage())) {
-            coins.append(coin);
+        if (!keyImages.contains(coin.keyImage)) {
+            continue;
         }
+
+        amount += coin.amount;
     }
 
-    return coins;
+    return amount;
 }
 
 void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const QString &description)
@@ -187,6 +172,5 @@ void Coins::setDescription(const QString &publicKey, quint32 accountIndex, const
 }
 
 void Coins::clearRows() {
-    qDeleteAll(m_rows);
     m_rows.clear();
 }

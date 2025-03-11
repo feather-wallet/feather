@@ -28,10 +28,6 @@ void CoinsModel::endReset(){
     endResetModel();
 }
 
-Coins * CoinsModel::coins() const {
-    return m_coins;
-}
-
 int CoinsModel::rowCount(const QModelIndex &parent) const
 {
     if (parent.isValid()) {
@@ -51,91 +47,81 @@ int CoinsModel::columnCount(const QModelIndex &parent) const
 
 QVariant CoinsModel::data(const QModelIndex &index, int role) const
 {
-    if (!m_coins) {
-        return QVariant();
+    const QList<CoinsInfo>& rows = m_coins->getRows();
+    if (index.row() < 0 || index.row() >= rows.size()) {
+        return {};
+    }
+    const CoinsInfo& row = rows[index.row()];
+
+    bool selected = row.keyImageKnown && m_selected.contains(row.keyImage);
+
+    if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+        return parseTransactionInfo(row, index.column(), role);
+    }
+    else if (role == Qt::BackgroundRole) {
+        if (row.spent) {
+            return QBrush(ColorScheme::RED.asColor(true));
+        }
+        if (row.frozen) {
+            return QBrush(ColorScheme::BLUE.asColor(true));
+        }
+        if (!row.unlocked) {
+            return QBrush(ColorScheme::YELLOW.asColor(true));
+        }
+        if (selected) {
+            return QBrush(ColorScheme::GREEN.asColor(true));
+        }
+    }
+    else if (role == Qt::TextAlignmentRole) {
+        switch (index.column()) {
+            case Amount:
+                return Qt::AlignRight;
+        }
+    }
+    else if (role == Qt::DecorationRole) {
+        switch (index.column()) {
+            case KeyImageKnown:
+            {
+                if (row.keyImageKnown) {
+                    return QVariant(icons()->icon("eye1.png"));
+                }
+                return QVariant(icons()->icon("eye_blind.png"));
+            }
+        }
+    }
+    else if (role == Qt::FontRole) {
+        switch(index.column()) {
+            case PubKey:
+            case TxID:
+            case Address:
+                return Utils::getMonospaceFont();
+        }
+    }
+    else if (role == Qt::ToolTipRole) {
+        switch(index.column()) {
+            case KeyImageKnown:
+            {
+                if (row.keyImageKnown) {
+                    return "Key image known";
+                }
+                return "Key image unknown. Outgoing transactions that include this output will not be detected.";
+            }
+        }
+        if (row.frozen) {
+            return "Output is frozen.";
+        }
+        if (!row.unlocked) {
+            return "Output is locked (needs more confirmations)";
+        }
+        if (row.spent) {
+            return "Output is spent";
+        }
+        if (selected) {
+            return "Coin selected to be spent";
+        }
     }
 
-    if (!index.isValid() || index.row() < 0 || static_cast<quint64>(index.row()) >= m_coins->count())
-        return QVariant();
-
-    QVariant result;
-
-    bool found = m_coins->coin(index.row(), [this, &index, &result, &role](const CoinsInfo &cInfo) {
-        bool selected = cInfo.keyImageKnown() && m_selected.contains(cInfo.keyImage());
-
-        if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
-            result = parseTransactionInfo(cInfo, index.column(), role);
-        }
-        else if (role == Qt::BackgroundRole) {
-            if (cInfo.spent()) {
-                result = QBrush(ColorScheme::RED.asColor(true));
-            }
-            else if (cInfo.frozen()) {
-                result = QBrush(ColorScheme::BLUE.asColor(true));
-            }
-            else if (!cInfo.unlocked()) {
-                result = QBrush(ColorScheme::YELLOW.asColor(true));
-            }
-            else if (selected) {
-                result = QBrush(ColorScheme::GREEN.asColor(true));
-            }
-        }
-        else if (role == Qt::TextAlignmentRole) {
-            switch (index.column()) {
-                case Amount:
-                    result = Qt::AlignRight;
-            }
-        }
-        else if (role == Qt::DecorationRole) {
-            switch (index.column()) {
-                case KeyImageKnown:
-                {
-                    if (cInfo.keyImageKnown()) {
-                        result = QVariant(icons()->icon("eye1.png"));
-                    }
-                    else {
-                        result = QVariant(icons()->icon("eye_blind.png"));
-                    }
-                }
-            }
-        }
-        else if (role == Qt::FontRole) {
-            switch(index.column()) {
-                case PubKey:
-                case TxID:
-                case Address:
-                    result = Utils::getMonospaceFont();
-            }
-        }
-        else if (role == Qt::ToolTipRole) {
-            switch(index.column()) {
-                case KeyImageKnown:
-                {
-                    if (cInfo.keyImageKnown()) {
-                        result = "Key image known";
-                    } else {
-                        result = "Key image unknown. Outgoing transactions that include this output will not be detected.";
-                    }
-                }
-            }
-            if (cInfo.frozen()) {
-                result = "Output is frozen.";
-            }
-            else if (!cInfo.unlocked()) {
-                result = "Output is locked (needs more confirmations)";
-            }
-            else if (cInfo.spent()) {
-                result = "Output is spent";
-            }
-            else if (selected) {
-                result = "Coin selected to be spent";
-            }
-        }
-    });
-    if (!found) {
-        qCritical("%s: internal error: no transaction info for index %d", __FUNCTION__, index.row());
-    }
-    return result;
+    return {};
 }
 
 QVariant CoinsModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -185,15 +171,9 @@ Qt::ItemFlags CoinsModel::flags(const QModelIndex &index) const
 bool CoinsModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     if (index.isValid() && role == Qt::EditRole) {
-        const int row = index.row();
+        const CoinsInfo& row = m_coins->getRow(index.row());
 
-        QString pubkey;
-        bool found = m_coins->coin(index.row(), [this, &pubkey](const CoinsInfo &cInfo) {
-            pubkey = cInfo.pubKey();
-        });
-        if (!found) {
-            return false;
-        }
+        QString pubkey = row.pubKey;
 
         switch (index.column()) {
             case Label:
@@ -218,33 +198,33 @@ QVariant CoinsModel::parseTransactionInfo(const CoinsInfo &cInfo, int column, in
         case KeyImageKnown:
             return "";
         case PubKey:
-            return cInfo.pubKey().mid(0,8);
+            return cInfo.pubKey.mid(0,8);
         case TxID:
-            return cInfo.hash().mid(0, 8) + " ";
+            return cInfo.hash.mid(0, 8) + " ";
         case BlockHeight:
-            return cInfo.blockHeight();
+            return cInfo.blockHeight;
         case Address:
-            return Utils::displayAddress(cInfo.address(), 1, "");
+            return Utils::displayAddress(cInfo.address, 1, "");
         case Label: {
-            if (!cInfo.description().isEmpty())
-                return cInfo.description();
-            if (!cInfo.txNote().isEmpty())
-                return cInfo.txNote();
-            return cInfo.addressLabel();
+            if (!cInfo.description.isEmpty())
+                return cInfo.description;
+            if (!cInfo.txNote.isEmpty())
+                return cInfo.txNote;
+            return cInfo.getAddressLabel();
         }
         case Spent:
-            return cInfo.spent();
+            return cInfo.spent;
         case SpentHeight:
-            return cInfo.spentHeight();
+            return cInfo.spentHeight;
         case Amount:
         {
             if (role == Qt::UserRole) {
-                return cInfo.amount();
+                return cInfo.amount;
             }
             return cInfo.displayAmount();
         }
         case Frozen:
-            return cInfo.frozen();
+            return cInfo.frozen;
         default:
         {
             qCritical() << "Unimplemented role";
@@ -265,7 +245,7 @@ void CoinsModel::setSelected(const QStringList &keyimages) {
     emit dataChanged(index(0, 0), index(rowCount() - 1, columnCount() - 1));
 }
 
-CoinsInfo* CoinsModel::entryFromIndex(const QModelIndex &index) const {
+const CoinsInfo& CoinsModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_coins->count());
-    return m_coins->coin(index.row());
+    return m_coins->getRow(index.row());
 }

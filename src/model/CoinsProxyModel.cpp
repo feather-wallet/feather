@@ -26,16 +26,16 @@ void CoinsProxyModel::setSearchFilter(const QString &searchString) {
 
 bool CoinsProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    CoinsInfo* coin = m_coins->coin(sourceRow);
+    const CoinsInfo& coin = m_coins->getRow(sourceRow);
 
-    if (!m_showSpent && coin->spent()) {
+    if (!m_showSpent && coin.spent) {
         return false;
     }
 
     if (!m_searchRegExp.pattern().isEmpty()) {
-        return coin->pubKey().contains(m_searchRegExp) || coin->address().contains(m_searchRegExp)
-                || coin->hash().contains(m_searchRegExp) || coin->addressLabel().contains(m_searchRegExp)
-                || coin->description().contains(m_searchRegExp);
+        return coin.pubKey.contains(m_searchRegExp) || coin.address.contains(m_searchRegExp)
+                || coin.hash.contains(m_searchRegExp) || coin.addressLabel.contains(m_searchRegExp)
+                || coin.description.contains(m_searchRegExp);
     }
 
     return true;

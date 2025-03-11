@@ -1673,11 +1673,7 @@ void MainWindow::onSelectedInputsChanged(const QStringList &selectedInputs) {
     ui->frame_coinControl->setVisible(numInputs > 0);
 
     if (numInputs > 0) {
-        quint64 totalAmount = 0;
-        auto coins = m_wallet->coins()->coinsFromKeyImage(selectedInputs);
-        for (const auto coin : coins) {
-            totalAmount += coin->amount();
-        }
+        quint64 totalAmount = m_wallet->coins()->sumAmounts(selectedInputs);
 
         QString text = QString("Coin control active: %1 selected outputs, %2 XMR").arg(QString::number(numInputs), WalletManager::displayAmount(totalAmount));
         ui->label_coinControl->setText(text);

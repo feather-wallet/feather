@@ -19,12 +19,11 @@ class OutputInfoDialog : public WindowModalDialog
 Q_OBJECT
 
 public:
-    explicit OutputInfoDialog(CoinsInfo *cInfo, QWidget *parent = nullptr);
+    explicit OutputInfoDialog(const CoinsInfo &cInfo, QWidget *parent = nullptr);
     ~OutputInfoDialog() override;
 
 private:
     QScopedPointer<Ui::OutputInfoDialog> ui;
 };
-
 
 #endif //FEATHER_OUTPUTINFODIALOG_H

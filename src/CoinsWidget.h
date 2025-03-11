@@ -83,10 +83,9 @@ private:
 
     void showContextMenu(const QPoint & point);
     void copy(copyField field);
-    CoinsInfo* currentEntry();
-    QVector<CoinsInfo*> currentEntries();
     QStringList selectedPubkeys();
-    bool isCoinSpendable(CoinsInfo* coin);
+    bool isCoinSpendable(const CoinsInfo& coin);
+    QModelIndex getCurrentIndex();
 };
 
 

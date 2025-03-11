@@ -4,73 +4,39 @@
 #ifndef FEATHER_COINSINFO_H
 #define FEATHER_COINSINFO_H
 
-#include <QObject>
-#include <QDateTime>
-#include <QSet>
+#include <QString>
 
-class Coins;
-
-class CoinsInfo : public QObject
+struct CoinsInfo
 {
-Q_OBJECT
+    quint64 blockHeight;
+    QString hash;
+    quint64 internalOutputIndex;
+    quint64 globalOutputIndex;
+    bool spent;
+    bool frozen;
+    quint64 spentHeight;
+    quint64 amount;
+    bool rct;
+    bool keyImageKnown;
+    quint64 pkIndex;
+    quint32 subaddrIndex;
+    quint32 subaddrAccount;
+    QString address;
+    QString addressLabel;
+    QString keyImage;
+    quint64 unlockTime;
+    bool unlocked;
+    QString pubKey;
+    bool coinbase;
+    QString description;
+    bool change;
+    QString txNote;
 
-public:
-    quint64 blockHeight() const;
-    QString hash() const;
-    quint64 internalOutputIndex() const;
-    quint64 globalOutputIndex() const;
-    bool spent() const;
-    bool frozen() const;
-    quint64 spentHeight() const;
-    quint64 amount() const;
+    QString getAddressLabel() const;
     QString displayAmount() const;
-    bool rct() const;
-    bool keyImageKnown() const;
-    quint64 pkIndex() const;
-    quint32 subaddrIndex() const;
-    quint32 subaddrAccount() const;
-    QString address() const;
-    QString addressLabel() const;
-    QString keyImage() const;
-    quint64 unlockTime() const;
-    bool unlocked() const;
-    QString pubKey() const;
-    bool coinbase() const;
-    QString description() const;
-    bool change() const;
-    QString txNote() const;
-
     void setUnlocked(bool unlocked);
 
-private:
-    explicit CoinsInfo(QObject *parent);
-
-private:
-    friend class Coins;
-
-    quint64 m_blockHeight;
-    QString m_hash;
-    quint64 m_internalOutputIndex;
-    quint64 m_globalOutputIndex;
-    bool m_spent;
-    bool m_frozen;
-    quint64 m_spentHeight;
-    quint64 m_amount;
-    bool m_rct;
-    bool m_keyImageKnown;
-    quint64 m_pkIndex;
-    quint32 m_subaddrIndex;
-    quint32 m_subaddrAccount;
-    QString m_address;
-    QString m_addressLabel;
-    QString m_keyImage;
-    quint64 m_unlockTime;
-    bool m_unlocked;
-    QString m_pubKey;
-    bool m_coinbase;
-    QString m_description;
-    bool m_change;
-    QString m_txNote;
+    explicit CoinsInfo();
 };
 
 #endif //FEATHER_COINSINFO_H

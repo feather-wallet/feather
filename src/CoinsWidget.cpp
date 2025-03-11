@@ -121,12 +121,15 @@ void CoinsWidget::showContextMenu(const QPoint &point) {
         menu->addAction(m_sweepOutputsAction);
     }
     else {
-        CoinsInfo* c = this->currentEntry();
-        if (!c) return;
+        auto index = this->getCurrentIndex();
+        if (!index.isValid()) {
+            return;
+        }
+        const CoinsInfo& c = m_model->entryFromIndex(index);
 
-        bool isSpent = c->spent();
-        bool isFrozen = c->frozen();
-        bool isUnlocked = c->unlocked();
+        bool isSpent = c.spent;
+        bool isFrozen = c.frozen;
+        bool isUnlocked = c.unlocked;
 
         menu->addAction(m_spendAction);
         menu->addMenu(m_copyMenu);
@@ -170,7 +173,7 @@ QStringList CoinsWidget::selectedPubkeys() {
 
     QStringList pubkeys;
     for (QModelIndex index: list) {
-        pubkeys << m_model->entryFromIndex(m_proxyModel->mapToSource(index))->pubKey();
+        pubkeys << m_model->entryFromIndex(m_proxyModel->mapToSource(index)).pubKey;
     }
     return pubkeys;
 }
@@ -186,16 +189,19 @@ void CoinsWidget::thawAllSelected() {
 }
 
 void CoinsWidget::spendSelected() {
-    QVector<CoinsInfo*> selectedCoins = this->currentEntries();
-    QStringList keyimages;
+    QModelIndexList selectedRows = ui->coins->selectionModel()->selectedRows();
 
-    for (const auto coin : selectedCoins) {
-        if (!coin) return;
+    QStringList keyimages;
+    for (const auto index : selectedRows) {
+        if (!index.isValid()) {
+            return;
+        }
+        const CoinsInfo& coin = m_model->entryFromIndex(m_proxyModel->mapToSource(index));
 
         bool spendable = this->isCoinSpendable(coin);
         if (!spendable) return;
 
-        QString keyImage = coin->keyImage();
+        QString keyImage = coin.keyImage;
         keyimages << keyImage;
     }
 
@@ -204,8 +210,11 @@ void CoinsWidget::spendSelected() {
 }
 
 void CoinsWidget::viewOutput() {
-    CoinsInfo* c = this->currentEntry();
-    if (!c) return;
+    auto index = this->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const CoinsInfo& c = m_model->entryFromIndex(index);
 
     auto * dialog = new OutputInfoDialog(c, this);
     dialog->show();
@@ -224,19 +233,23 @@ void CoinsWidget::onSweepOutputs() {
         return;
     }
 
-    QVector<CoinsInfo*> selectedCoins = this->currentEntries();
+    QModelIndexList selectedRows = ui->coins->selectionModel()->selectedRows();
+
     QVector<QString> keyImages;
 
     quint64 totalAmount = 0;
-    for (const auto coin : selectedCoins) {
-        if (!coin) return;
+    for (const auto index : selectedRows) {
+        if (!index.isValid()) {
+            return;
+        }
+        const CoinsInfo& coin = m_model->entryFromIndex(m_proxyModel->mapToSource(index));
 
         bool spendable = this->isCoinSpendable(coin);
         if (!spendable) return;
 
-        QString keyImage = coin->keyImage();
+        QString keyImage = coin.keyImage;
         keyImages.push_back(keyImage);
-        totalAmount += coin->amount();
+        totalAmount += coin.amount;
     }
 
     OutputSweepDialog dialog{this, totalAmount};
@@ -270,57 +283,42 @@ void CoinsWidget::onSweepOutputs() {
 }
 
 void CoinsWidget::copy(copyField field) {
-    CoinsInfo* c = this->currentEntry();
-    if (!c) return;
+    auto index = this->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const CoinsInfo& c = m_model->entryFromIndex(index);
 
     QString data;
     switch (field) {
         case PubKey:
-            data = c->pubKey();
+            data = c.pubKey;
             break;
         case KeyImage:
-            data = c->keyImage();
+            data = c.keyImage;
             break;
         case TxID:
-            data = c->hash();
+            data = c.hash;
             break;
         case Address:
-            data = c->address();
+            data = c.address;
             break;
         case Label: {
-            if (!c->description().isEmpty())
-                data = c->description();
+            if (!c.description.isEmpty())
+                data = c.description;
             else
-                data = c->addressLabel();
+                data = c.getAddressLabel();
             break;
         }
         case Height:
-            data = QString::number(c->blockHeight());
+            data = QString::number(c.blockHeight);
             break;
         case Amount:
-            data = c->displayAmount();
+            data = c.displayAmount();
             break;
     }
 
     Utils::copyToClipboard(data);
-}
-
-CoinsInfo* CoinsWidget::currentEntry() {
-    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
-    if (list.size() == 1) {
-        return m_model->entryFromIndex(m_proxyModel->mapToSource(list.first()));
-    } else {
-        return nullptr;
-    }
-}
-
-QVector<CoinsInfo*> CoinsWidget::currentEntries() {
-    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
-    QVector<CoinsInfo*> selectedCoins;
-    for (const auto index : list) {
-        selectedCoins.push_back(m_model->entryFromIndex(m_proxyModel->mapToSource(index)));
-    }
-    return selectedCoins;
 }
 
 void CoinsWidget::freezeCoins(QStringList &pubkeys) {
@@ -344,28 +342,38 @@ void CoinsWidget::editLabel() {
     ui->coins->edit(index);
 }
 
-bool CoinsWidget::isCoinSpendable(CoinsInfo *coin) {
-    if (!coin->keyImageKnown()) {
+bool CoinsWidget::isCoinSpendable(const CoinsInfo &coin) {
+    if (!coin.keyImageKnown) {
         Utils::showError(this, "Unable to spend outputs", "Selected output has unknown key image");
         return false;
     }
 
-    if (coin->spent()) {
+    if (coin.spent) {
         Utils::showError(this, "Unable to spend outputs", "Selected output was already spent");
         return false;
     }
 
-    if (coin->frozen()) {
+    if (coin.frozen) {
         Utils::showError(this, "Unable to spend outputs", "Selected output is frozen", {"Thaw the selected output(s) before spending"}, "freeze_thaw_outputs");
         return false;
     }
 
-    if (!coin->unlocked()) {
+    if (!coin.unlocked) {
         Utils::showError(this, "Unable to spend outputs", "Selected output is locked", {"Wait until the output has reached the required number of confirmation before spending."});
         return false;
     }
 
     return true;
+}
+
+QModelIndex CoinsWidget::getCurrentIndex()
+{
+    QModelIndexList list = ui->coins->selectionModel()->selectedRows();
+    if (list.length() < 1) {
+        return {};
+    }
+
+    return m_proxyModel->mapToSource(list.first());
 }
 
 CoinsWidget::~CoinsWidget() = default;

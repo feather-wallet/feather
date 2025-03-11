@@ -31,8 +31,6 @@ public:
 
     explicit CoinsModel(QObject *parent, Coins *coins);
 
-    Coins * coins() const;
-
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -40,7 +38,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    CoinsInfo* entryFromIndex(const QModelIndex &index) const;
+    const CoinsInfo& entryFromIndex(const QModelIndex &index) const;
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
     void setSelected(const QStringList &selected);
