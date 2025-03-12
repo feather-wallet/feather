@@ -545,14 +545,18 @@ void Wallet::onNewBlock(uint64_t walletHeight) {
     this->syncStatusUpdated(walletHeight, daemonHeight);
 
     if (this->isSynchronized()) {
-        this->refreshModels();
+        m_history->refresh();
+        m_coins->refresh();
+        this->subaddress()->updateUsed(this->currentSubaddressAccount());
     }
 }
 
 void Wallet::onUpdated() {
     this->updateBalance();
     if (this->isSynchronized()) {
-        this->refreshModels();
+        m_history->refresh();
+        m_coins->refresh();
+        this->subaddress()->updateUsed(this->currentSubaddressAccount());
     }
 }
 

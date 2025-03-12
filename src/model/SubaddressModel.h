@@ -38,6 +38,8 @@ public:
 
     void setCurrentSubaddressAccount(quint32 accountIndex);
 
+    void rowUpdated(qsizetype index);
+
 private:
     Subaddress *m_subaddress;
     QVariant parseSubaddressRow(const SubaddressRow &subaddress, const QModelIndex &index, int role) const;

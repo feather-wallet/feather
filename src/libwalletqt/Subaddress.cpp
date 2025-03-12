@@ -69,6 +69,18 @@ bool Subaddress::refresh(quint32 accountIndex)
     return !potentialWalletFileCorruption;
 }
 
+void Subaddress::updateUsed(quint32 accountIndex)
+{
+    for (quint32 i = 0; i < m_rows.count(); i++) {
+        SubaddressRow& row = m_rows[i];
+
+        if (m_wallet2->get_subaddress_used({accountIndex, i}) != row.used) {
+            row.used = !row.used;
+            emit rowUpdated(i);
+        }
+    }
+}
+
 qsizetype Subaddress::count() const
 {
     return m_rows.length();

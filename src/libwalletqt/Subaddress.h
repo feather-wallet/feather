@@ -20,6 +20,7 @@ class Subaddress : public QObject
 
 public:
     bool refresh(quint32 accountIndex);
+    void updateUsed(quint32 accountIndex);
     [[nodiscard]] qsizetype count() const;
 
     const SubaddressRow& row(int index) const;
@@ -38,6 +39,7 @@ public:
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
+    void rowUpdated(qsizetype index) const;
     void corrupted() const;
 
 private:

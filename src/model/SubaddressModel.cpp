@@ -19,6 +19,7 @@ SubaddressModel::SubaddressModel(QObject *parent, Subaddress *subaddress)
 {
     connect(m_subaddress, &Subaddress::refreshStarted, this, &SubaddressModel::beginResetModel);
     connect(m_subaddress, &Subaddress::refreshFinished, this, &SubaddressModel::endResetModel);
+    connect(m_subaddress, &Subaddress::rowUpdated, this, &SubaddressModel::rowUpdated);
 }
 
 int SubaddressModel::rowCount(const QModelIndex &parent) const
@@ -192,4 +193,9 @@ void SubaddressModel::setCurrentSubaddressAccount(quint32 accountIndex) {
 const SubaddressRow& SubaddressModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_subaddress->count());
     return m_subaddress->row(index.row());
+}
+
+void SubaddressModel::rowUpdated(qsizetype index)
+{
+    emit dataChanged(this->index(index, 0), this->index(index, SubaddressModel::COUNT - 1), {Qt::DisplayRole, Qt::EditRole});
 }
