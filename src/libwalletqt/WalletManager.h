@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef WALLETMANAGER_H
-#define WALLETMANAGER_H
+#ifndef FEATHER_WALLETMANAGER_H
+#define FEATHER_WALLETMANAGER_H
 
 #include <QObject>
 #include <QMutex>
@@ -138,4 +138,4 @@ private:
     FutureScheduler m_scheduler;
 };
 
-#endif // WALLETMANAGER_H
+#endif // FEATHER_WALLETMANAGER_H

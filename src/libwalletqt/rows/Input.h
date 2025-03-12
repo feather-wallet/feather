@@ -9,9 +9,9 @@ struct Input
     QString pubKey;
     quint64 amount;
 
-    explicit Input(uint64_t _amount, QString _pubkey)
-        : pubKey(std::move(_pubkey))
-        , amount(_amount) {}
+    explicit Input(uint64_t amount, QString pubkey)
+        : pubKey(std::move(pubkey))
+        , amount(amount) {}
 };
 
 #endif //FEATHER_INPUT_H

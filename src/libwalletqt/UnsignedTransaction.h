@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef UNSIGNEDTRANSACTION_H
-#define UNSIGNEDTRANSACTION_H
+#ifndef FEATHER_UNSIGNEDTRANSACTION_H
+#define FEATHER_UNSIGNEDTRANSACTION_H
 
 #include <QObject>
 
@@ -54,4 +54,4 @@ private:
     mutable QList<ConstructionInfo> m_construction_info;
 };
 
-#endif // UNSIGNEDTRANSACTION_H
+#endif // FEATHER_UNSIGNEDTRANSACTION_H

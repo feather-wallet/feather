@@ -10,8 +10,8 @@
 
 #include "constants.h"
 #include "dialog/QrCodeDialog.h"
-#include "libwalletqt/Input.h"
-#include "libwalletqt/Transfer.h"
+#include "libwalletqt/rows/Input.h"
+#include "libwalletqt/rows/Output.h"
 #include "libwalletqt/WalletManager.h"
 #include "qrcode/QrCode.h"
 #include "utils/AppData.h"

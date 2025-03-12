@@ -12,11 +12,11 @@ struct Ring
     QString keyImage;
     std::vector<uint64_t> ringMembers;
 
-    explicit Ring(QString _keyImage, std::vector<uint64_t> _ringMembers)
-        : keyImage(std::move(_keyImage))
-        , ringMembers(std::move(_ringMembers)) {}
+    explicit Ring(QString keyImage, std::vector<uint64_t> ringMembers)
+        : keyImage(std::move(keyImage))
+        , ringMembers(std::move(ringMembers)) {}
 };
-struct Transfer;
+struct Output;
 
 struct TransactionRow
 {
@@ -26,7 +26,7 @@ struct TransactionRow
         Direction_Both // invalid direction value, used for filtering
     };
 
-    QList<Transfer> transfers;
+    QList<Output> transfers;
     QList<Ring> rings;
     qint64 amount; // Amount that was sent (to destinations) or received, excludes tx fee
     qint64 balanceDelta; // How much the total balance was mutated as a result of this tx (includes tx fee)

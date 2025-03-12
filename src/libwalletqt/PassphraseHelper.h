@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef MONERO_GUI_PASSPHRASEHELPER_H
-#define MONERO_GUI_PASSPHRASEHELPER_H
+#ifndef FEATHER_PASSPHRASEHELPER_H
+#define FEATHER_PASSPHRASEHELPER_H
 
 #include <QMutex>
 #include <QPointer>
@@ -43,4 +43,4 @@ private:
 
 };
 
-#endif //MONERO_GUI_PASSPHRASEHELPER_H
+#endif //FEATHER_PASSPHRASEHELPER_H

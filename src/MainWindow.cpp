@@ -26,7 +26,7 @@
 #include "dialog/WalletCacheDebugDialog.h"
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/rows/CoinsInfo.h"
-#include "libwalletqt/Transfer.h"
+#include "libwalletqt/rows/Output.h"
 #include "libwalletqt/TransactionHistory.h"
 #include "model/AddressBookModel.h"
 #include "plugins/PluginRegistry.h"

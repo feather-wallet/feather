@@ -1,18 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef TRANSACTIONHISTORY_H
-#define TRANSACTIONHISTORY_H
+#ifndef FEATHER_TRANSACTIONHISTORY_H
+#define FEATHER_TRANSACTIONHISTORY_H
 
-#include <functional>
-
-#include <QObject>
-#include <QList>
 #include <QReadWriteLock>
-#include <QDateTime>
 
 #include "rows/TransactionRow.h"
-#include "Wallet.h"
 
 namespace tools {
     class wallet2;
@@ -23,23 +17,20 @@ struct TransactionHistory;
 }
 
 class TransactionInfo;
-
+class Wallet;
 class TransactionHistory : public QObject
 {
     Q_OBJECT
 
 public:
+    void refresh();
+    quint64 count() const;
+
     const TransactionRow& transaction(int index);
     const QList<TransactionRow>& getRows();
 
-    void refresh();
     void setTxNote(const QString &txid, const QString &note);
-    quint64 count() const;
-    QDateTime firstDateTime() const;
-    QDateTime lastDateTime() const;
-    quint64 minutesToUnlock() const;
     bool locked() const;
-    void clearRows();
 
     QString importLabelsFromCSV(const QString &fileName);
 
@@ -70,4 +61,4 @@ private:
     quint32 lastAccountIndex = 0;
 };
 
-#endif // TRANSACTIONHISTORY_H
+#endif // FEATHER_TRANSACTIONHISTORY_H

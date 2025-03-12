@@ -8,8 +8,6 @@
 #include <QList>
 #include <QReadWriteLock>
 
-#include "Wallet.h"
-
 namespace Monero {
     struct TransactionHistory;
 }
@@ -19,27 +17,23 @@ namespace tools {
 }
 
 class CoinsInfo;
-
+class Wallet;
 class Coins : public QObject
 {
 Q_OBJECT
 
 public:
-    const QList<CoinsInfo>& getRows();
-    const CoinsInfo& getRow(qsizetype i);
-
     void refresh();
     void refreshUnlocked();
+    quint64 count() const;
 
-    void freeze(QStringList &publicKeys);
-    void thaw(QStringList &publicKeys);
-
-    quint64 sumAmounts(const QStringList &keyImages);
+    const CoinsInfo& getRow(qsizetype i);
+    const QList<CoinsInfo>& getRows();
 
     void setDescription(const QString &publicKey, quint32 accountIndex, const QString &description);
-
-    quint64 count() const;
-    void clearRows();
+    void freeze(QStringList &publicKeys);
+    void thaw(QStringList &publicKeys);
+    quint64 sumAmounts(const QStringList &keyImages);
 
 signals:
     void refreshStarted() const;
@@ -48,15 +42,11 @@ signals:
 
 private:
     explicit Coins(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent = nullptr);
-
-private:
     friend class Wallet;
 
     Wallet *m_wallet;
     tools::wallet2 *m_wallet2;
     QList<CoinsInfo> m_rows;
-
-    mutable QReadWriteLock m_lock;
 };
 
 #endif //FEATHER_COINS_H

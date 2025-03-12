@@ -14,12 +14,12 @@ struct SubaddressRow
     bool hidden = false;
     bool pinned = false;
 
-    SubaddressRow(const QString& address_, const QString &label_, bool used_, bool hidden_, bool pinned_)
-        : address(address_)
-        , label(label_)
-        , used(used_)
-        , hidden(hidden_)
-        , pinned(pinned_) {}
+    SubaddressRow(const QString& address, const QString &label, bool used, bool hidden, bool pinned)
+        : address(address)
+        , label(label)
+        , used(used)
+        , hidden(hidden)
+        , pinned(pinned) {}
 };
 
 #endif //FEATHER_SUBADDRESSROW_H

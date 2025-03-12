@@ -12,7 +12,7 @@
 #include "libwalletqt/Coins.h"
 #include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/TransactionHistory.h"
-#include "libwalletqt/Transfer.h"
+#include "libwalletqt/rows/Output.h"
 #include "libwalletqt/WalletManager.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"

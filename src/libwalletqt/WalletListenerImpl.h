@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef MONERO_GUI_WALLETLISTENERIMPL_H
-#define MONERO_GUI_WALLETLISTENERIMPL_H
+#ifndef FEATHER_WALLETLISTENERIMPL_H
+#define FEATHER_WALLETLISTENERIMPL_H
 
 #include "wallet/api/wallet2_api.h"
 #include "PassphraseHelper.h"
@@ -14,32 +14,32 @@ class WalletListenerImpl : public Monero::WalletListener, public PassphraseRecei
 public:
     WalletListenerImpl(Wallet * w);
 
-    virtual void moneySpent(const std::string &txId, uint64_t amount) override;
+    void moneySpent(const std::string &txId, uint64_t amount) override;
 
-    virtual void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override;
+    void moneyReceived(const std::string &txId, uint64_t amount, bool coinbase) override;
 
-    virtual void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override;
+    void unconfirmedMoneyReceived(const std::string &txId, uint64_t amount) override;
 
-    virtual void newBlock(uint64_t height) override;
+    void newBlock(uint64_t height) override;
 
-    virtual void updated() override;
+    void updated() override;
 
     // called when wallet refreshed by background thread or explicitly
-    virtual void refreshed(bool success) override;
+    void refreshed(bool success) override;
 
-    virtual void onDeviceButtonRequest(uint64_t code) override;
+    void onDeviceButtonRequest(uint64_t code) override;
 
-    virtual void onDeviceButtonPressed() override;
+    void onDeviceButtonPressed() override;
 
-    virtual void onDeviceError(const std::string &message, unsigned int error_code) override;
+    void onDeviceError(const std::string &message, unsigned int error_code) override;
 
-    virtual void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override;
+    void onPassphraseEntered(const QString &passphrase, bool enter_on_device, bool entry_abort) override;
 
-    virtual std::optional<std::string> onDevicePassphraseRequest(bool & on_device) override;
+    std::optional<std::string> onDevicePassphraseRequest(bool & on_device) override;
 
 private:
     Wallet * m_wallet;
     PassphraseHelper m_phelper;
 };
 
-#endif //MONERO_GUI_WALLETLISTENERIMPL_H
+#endif //FEATHER_WALLETLISTENERIMPL_H

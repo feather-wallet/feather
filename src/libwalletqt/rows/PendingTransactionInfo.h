@@ -6,7 +6,7 @@
 
 #include "ConstructionInfo.h"
 
-#include <QObject>
+#include <QString>
 
 namespace Monero {
     class PendingTransactionInfo;

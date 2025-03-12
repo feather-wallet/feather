@@ -13,21 +13,11 @@ AddressBook::AddressBook(tools::wallet2 *wallet2, QObject *parent)
     this->refresh();
 }
 
-QString AddressBook::errorString() const
-{
-    return m_errorString;
-}
-
-AddressBook::ErrorCode AddressBook::errorCode() const
-{
-    return m_errorCode;
-}
-
 void AddressBook::refresh()
 {
     emit refreshStarted();
 
-    clearRows();
+    m_rows.clear();
 
     for (const auto &row : m_wallet2->get_address_book()) {
         std::string address;
@@ -42,17 +32,22 @@ void AddressBook::refresh()
     emit refreshFinished();
 }
 
+qsizetype AddressBook::count() const
+{
+    return m_rows.length();
+}
+
+const ContactRow& AddressBook::getRow(const qsizetype index)
+{
+    if (index < 0 || index >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[index];
+}
+
 const QList<ContactRow>& AddressBook::getRows()
 {
     return m_rows;
-}
-
-const ContactRow& AddressBook::getRow(const qsizetype i)
-{
-    if (i < 0 || i >= m_rows.size()) {
-        throw std::out_of_range("Index out of range");
-    }
-    return m_rows[i];
 }
 
 bool AddressBook::addRow(const QString &address, const QString &description)
@@ -74,7 +69,7 @@ bool AddressBook::addRow(const QString &address, const QString &description)
     return r;
 }
 
-bool AddressBook::setDescription(int index, const QString &description) {
+bool AddressBook::setDescription(qsizetype index, const QString &description) {
     m_errorString = "";
 
     const auto ab = m_wallet2->get_address_book();
@@ -92,20 +87,20 @@ bool AddressBook::setDescription(int index, const QString &description) {
     return r;
 }
 
-bool AddressBook::deleteRow(int rowId)
+bool AddressBook::deleteRow(qsizetype index)
 {
-    bool r = m_wallet2->delete_address_book_row(rowId);
+    bool r = m_wallet2->delete_address_book_row(index);
     if (r)
         refresh();
     return r;
 }
 
-qsizetype AddressBook::count() const
+QString AddressBook::errorString() const
 {
-    return m_rows.length();
+    return m_errorString;
 }
 
-void AddressBook::clearRows()
+AddressBook::ErrorCode AddressBook::errorCode() const
 {
-    m_rows.clear();
+    return m_errorCode;
 }

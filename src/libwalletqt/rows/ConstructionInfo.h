@@ -6,7 +6,7 @@
 
 #include <QSet>
 
-#include "Transfer.h"
+#include "Output.h"
 #include "Input.h"
 
 namespace Monero {
@@ -20,7 +20,7 @@ struct ConstructionInfo
     QVector<QString> subaddresses;
     quint64 minMixinCount;
     QList<Input> inputs;
-    QList<Transfer> outputs;
+    QList<Output> outputs;
 
     explicit ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl);
 };

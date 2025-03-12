@@ -5,42 +5,33 @@
 #define SUBADDRESS_H
 
 #include <QObject>
-#include <QReadWriteLock>
-#include <QList>
-#include <QDateTime>
+#include <QString>
 
-#include "Wallet.h"
 #include "rows/SubaddressRow.h"
 
 namespace tools {
     class wallet2;
 }
 
+class Wallet;
 class Subaddress : public QObject
 {
     Q_OBJECT
 
 public:
-    const QList<SubaddressRow>& getRows();
-    const SubaddressRow& getRow(qsizetype i);
-
-    bool addRow(quint32 accountIndex, const QString &label);
-    
-    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
-
-    bool setHidden(const QString& address, bool hidden);
-    bool isHidden(const QString& address);
-    bool isHidden(const SubaddressRow& row);
-
-    bool setPinned(const QString& address, bool pinned);
-    bool isPinned(const QString& address);
-    
     bool refresh(quint32 accountIndex);
-    
     [[nodiscard]] qsizetype count() const;
-    void clearRows();
 
     const SubaddressRow& row(int index) const;
+    const SubaddressRow& getRow(qsizetype i);
+    const QList<SubaddressRow>& getRows();
+
+    bool addRow(quint32 accountIndex, const QString &label);
+    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
+    bool setHidden(const QString& address, bool hidden);
+    bool setPinned(const QString& address, bool pinned);
+    bool isHidden(const QString& address);
+    bool isPinned(const QString& address);
 
     QString getError() const;
 

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef WALLET_H
-#define WALLET_H
+#ifndef FEATHER_WALLET_H
+#define FEATHER_WALLET_H
 
 #include <QObject>
 #include <QMutex>
@@ -533,4 +533,4 @@ private:
     std::set<std::string> m_selectedInputs;
 };
 
-#endif // WALLET_H
+#endif // FEATHER_WALLET_H

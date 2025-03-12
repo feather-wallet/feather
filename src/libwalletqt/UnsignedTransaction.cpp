@@ -3,7 +3,7 @@
 
 #include "UnsignedTransaction.h"
 
-#include "ConstructionInfo.h"
+#include "rows/ConstructionInfo.h"
 #include <wallet/api/wallet2_api.h>
 
 UnsignedTransaction::Status UnsignedTransaction::status() const

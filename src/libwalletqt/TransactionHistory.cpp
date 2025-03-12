@@ -6,9 +6,19 @@
 #include "utils/AppData.h"
 #include "utils/config.h"
 #include "constants.h"
+#include "Wallet.h"
 #include "WalletManager.h"
-#include "Transfer.h"
+#include "rows/Output.h"
 #include "wallet/wallet2.h"
+
+TransactionHistory::TransactionHistory(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
+    : QObject(parent)
+    , m_wallet(wallet)
+    , m_wallet2(wallet2)
+    , m_locked(false)
+{
+
+}
 
 QString description(tools::wallet2 *wallet2, const tools::wallet2::payment_details &pd)
 {
@@ -27,37 +37,20 @@ QString description(tools::wallet2 *wallet2, const tools::wallet2::payment_detai
     return description;
 }
 
-const TransactionRow& TransactionHistory::transaction(int index)
-{
-    if (index < 0 || index >= m_rows.size()) {
-        throw std::out_of_range("Index out of range");
-    }
-    return m_rows[index];
-}
-
-const QList<TransactionRow>& TransactionHistory::getRows()
-{
-    return m_rows;
-}
-
 void TransactionHistory::refresh()
 {
     qDebug() << Q_FUNC_INFO;
-
-    QDateTime firstDateTime = QDate(2014, 4, 18).startOfDay();
-    QDateTime lastDateTime  = QDateTime::currentDateTime().addDays(1); // tomorrow (guard against jitter and timezones)
 
     emit refreshStarted();
 
     {
         QWriteLocker locker(&m_lock);
 
-        clearRows();
+        m_rows.clear();
 
         quint64 lastTxHeight = 0;
         bool hasFakePaymentId = m_wallet->isTrezor();
         m_locked = false;
-        m_minutesToUnlock = 0;
 
         uint64_t min_height = 0;
         uint64_t max_height = (uint64_t)-1;
@@ -264,6 +257,26 @@ void TransactionHistory::refresh()
     emit refreshFinished();
 }
 
+quint64 TransactionHistory::count() const
+{
+    QReadLocker locker(&m_lock);
+
+    return m_rows.length();
+}
+
+const TransactionRow& TransactionHistory::transaction(int index)
+{
+    if (index < 0 || index >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[index];
+}
+
+const QList<TransactionRow>& TransactionHistory::getRows()
+{
+    return m_rows;
+}
+
 void TransactionHistory::setTxNote(const QString &txid, const QString &note)
 {
     cryptonote::blobdata txid_data;
@@ -278,51 +291,9 @@ void TransactionHistory::setTxNote(const QString &txid, const QString &note)
     emit txNoteChanged();
 }
 
-quint64 TransactionHistory::count() const
-{
-    QReadLocker locker(&m_lock);
-
-    return m_rows.length();
-}
-
-QDateTime TransactionHistory::firstDateTime() const
-{
-    return m_firstDateTime;
-}
-
-QDateTime TransactionHistory::lastDateTime() const
-{
-    return m_lastDateTime;
-}
-
-quint64 TransactionHistory::minutesToUnlock() const
-{
-    return m_minutesToUnlock;
-}
-
-bool TransactionHistory::TransactionHistory::locked() const
+bool TransactionHistory::locked() const
 {
     return m_locked;
-}
-
-
-TransactionHistory::TransactionHistory(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
-    : QObject(parent)
-    , m_wallet(wallet)
-    , m_wallet2(wallet2)
-    , m_minutesToUnlock(0)
-    , m_locked(false)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
-    m_firstDateTime = QDate(2014, 4, 18).startOfDay();
-#else
-    m_firstDateTime  = QDateTime(QDate(2014, 4, 18)); // the genesis block
-#endif
-    m_lastDateTime = QDateTime::currentDateTime().addDays(1); // tomorrow (guard against jitter and timezones)
-}
-
-void TransactionHistory::clearRows() {
-    m_rows.clear();
 }
 
 QStringList parseCSVLine(const QString &line) {

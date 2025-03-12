@@ -6,7 +6,7 @@
 
 #include <QMessageBox>
 
-#include "libwalletqt/Transfer.h"
+#include "libwalletqt/rows/Output.h"
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 

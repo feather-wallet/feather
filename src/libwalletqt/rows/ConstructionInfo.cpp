@@ -2,9 +2,6 @@
 // SPDX-FileCopyrightText: The Monero Project
 
 #include "ConstructionInfo.h"
-
-#include "Input.h"
-#include "Transfer.h"
 #include <wallet/api/wallet2_api.h>
 
 ConstructionInfo::ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl)

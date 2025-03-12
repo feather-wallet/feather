@@ -10,23 +10,11 @@ SubaddressAccount::SubaddressAccount(tools::wallet2 *wallet2, QObject *parent)
 {
 }
 
-void SubaddressAccount::addRow(const QString &label)
-{
-    m_wallet2->add_subaddress_account(label.toStdString());
-    refresh();
-}
-
-void SubaddressAccount::setLabel(quint32 accountIndex, const QString &label)
-{
-    m_wallet2->set_subaddress_label({accountIndex, 0}, label.toStdString());
-    refresh();
-}
-
 void SubaddressAccount::refresh()
 {
     emit refreshStarted();
 
-    this->clearRows();
+    m_rows.clear();
 
     for (uint32_t i = 0; i < m_wallet2->get_num_subaddress_accounts(); ++i)
     {
@@ -45,9 +33,12 @@ qsizetype SubaddressAccount::count() const
     return m_rows.length();
 }
 
-void SubaddressAccount::clearRows()
+const AccountRow& SubaddressAccount::row(const int index) const
 {
-    m_rows.clear();
+    if (index < 0 || index >= m_rows.size()) {
+        throw std::out_of_range("Index out of range");
+    }
+    return m_rows[index];
 }
 
 const QList<AccountRow>& SubaddressAccount::getRows()
@@ -55,10 +46,14 @@ const QList<AccountRow>& SubaddressAccount::getRows()
     return m_rows;
 }
 
-const AccountRow& SubaddressAccount::row(const int index) const
+void SubaddressAccount::addRow(const QString &label)
 {
-    if (index < 0 || index >= m_rows.size()) {
-        throw std::out_of_range("Index out of range");
-    }
-    return m_rows[index];
+    m_wallet2->add_subaddress_account(label.toStdString());
+    refresh();
+}
+
+void SubaddressAccount::setLabel(quint32 accountIndex, const QString &label)
+{
+    m_wallet2->set_subaddress_label({accountIndex, 0}, label.toStdString());
+    refresh();
 }

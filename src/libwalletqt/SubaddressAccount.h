@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef SUBADDRESSACCOUNT_H
-#define SUBADDRESSACCOUNT_H
+#ifndef FEATHER_SUBADDRESSACCOUNT_H
+#define FEATHER_SUBADDRESSACCOUNT_H
 
 #include <QObject>
 #include <QList>
@@ -18,15 +18,14 @@ class SubaddressAccount : public QObject
     Q_OBJECT
 
 public:
-    const QList<AccountRow>& getRows();
+    void refresh();
+    qsizetype count() const;
+
     const AccountRow& row(int index) const;
+    const QList<AccountRow>& getRows();
 
     void addRow(const QString &label);
     void setLabel(quint32 accountIndex, const QString &label);
-    qsizetype count() const;
-
-    void refresh();
-    void clearRows();
 
 signals:
     void refreshStarted() const;
@@ -40,4 +39,4 @@ private:
     QList<AccountRow> m_rows;
 };
 
-#endif // SUBADDRESSACCOUNT_H
+#endif // FEATHER_SUBADDRESSACCOUNT_H

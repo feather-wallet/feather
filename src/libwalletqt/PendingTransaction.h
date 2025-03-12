@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: BSD-3-Clause
 // SPDX-FileCopyrightText: The Monero Project
 
-#ifndef PENDINGTRANSACTION_H
-#define PENDINGTRANSACTION_H
+#ifndef FEATHER_PENDINGTRANSACTION_H
+#define FEATHER_PENDINGTRANSACTION_H
 
 #include <QObject>
 #include <QList>
 
-#include "PendingTransactionInfo.h"
+#include "rows/PendingTransactionInfo.h"
 
 namespace Monero {
     class PendingTransaction;
@@ -53,4 +53,4 @@ private:
     mutable QList<PendingTransactionInfo> m_pending_tx_info;
 };
 
-#endif // PENDINGTRANSACTION_H
+#endif // FEATHER_PENDINGTRANSACTION_H

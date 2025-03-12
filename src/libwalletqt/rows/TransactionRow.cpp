@@ -3,7 +3,7 @@
 
 #include "TransactionRow.h"
 #include "WalletManager.h"
-#include "Transfer.h"
+#include "Output.h"
 
 TransactionRow::TransactionRow()
         : amount(0)

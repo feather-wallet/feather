@@ -13,11 +13,11 @@ struct AccountRow
     quint64 balance;
     quint64 unlockedBalance;
 
-    AccountRow(const QString& address_, const QString &label_, uint64_t balance_, uint64_t unlockedBalance_)
-            : address(address_)
-            , label(label_)
-            , balance(balance_)
-            , unlockedBalance(unlockedBalance_) {}
+    AccountRow(const QString& address, const QString &label, uint64_t balance, uint64_t unlockedBalance)
+            : address(address)
+            , label(label)
+            , balance(balance)
+            , unlockedBalance(unlockedBalance) {}
 };
 
 #endif //FEATHER_ACCOUNTROW_H

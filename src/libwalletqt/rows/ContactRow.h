@@ -11,9 +11,9 @@ struct ContactRow
     QString address;
     QString label;
 
-    ContactRow(const QString address_, const QString &label_)
-        : address(address_)
-        , label(label_) {}
+    ContactRow(const QString address, const QString& label)
+        : address(address)
+        , label(label) {}
 };
 
 #endif //FEATHER_CONTACTROW_H
