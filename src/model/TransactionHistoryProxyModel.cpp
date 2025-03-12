@@ -21,17 +21,17 @@ TransactionHistory* TransactionHistoryProxyModel::history() {
 
 bool TransactionHistoryProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
 {
-    QString description, txid, subaddrlabel;
-    quint32 subaddrAccount;
-    QSet<quint32> subaddrIndex;
+    if (sourceRow < 0 || sourceRow >= m_history->count()) {
+        return false;
+    }
 
-    m_history->transaction(sourceRow, [&description, &txid, &subaddrlabel, &subaddrAccount, &subaddrIndex](TransactionRow &tInfo){
-        description = tInfo.description();
-        txid = tInfo.hash();
-        subaddrlabel = tInfo.label();
-        subaddrAccount = tInfo.subaddrAccount();
-        subaddrIndex = tInfo.subaddrIndex();
-    });
+    const TransactionRow& row = m_history->transaction(sourceRow);
+
+    QString description = row.description;
+    QString txid = row.hash;
+    QString subaddrlabel = row.label;
+    quint32 subaddrAccount = row.subaddrAccount;
+    QSet<quint32> subaddrIndex = row.subaddrIndex;
 
     bool addressFound;
     for (quint32 i : subaddrIndex) {

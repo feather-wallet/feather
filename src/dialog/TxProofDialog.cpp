@@ -10,23 +10,23 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
-TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, TransactionRow *txInfo)
+TxProofDialog::TxProofDialog(QWidget *parent, Wallet *wallet, const TransactionRow& txInfo)
     : WindowModalDialog(parent)
     , ui(new Ui::TxProofDialog)
     , m_wallet(wallet)
 {
     ui->setupUi(this);
 
-    m_txid = txInfo->hash();
+    m_txid = txInfo.hash;
 
-    m_direction = txInfo->direction();
+    m_direction = txInfo.direction;
 
-    for (auto const &t: txInfo->transfers()) {
+    for (auto const &t: txInfo.transfers) {
         m_OutDestinations.push_back(t.address);
     }
 
-    for (auto const &s: txInfo->subaddrIndex()) {
-        m_InDestinations.push_back(m_wallet->address(txInfo->subaddrAccount(), s));
+    for (auto const &s: txInfo.subaddrIndex) {
+        m_InDestinations.push_back(m_wallet->address(txInfo.subaddrAccount, s));
     }
 
     // Due to some logic in core we can't create OutProofs

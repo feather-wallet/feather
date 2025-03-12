@@ -33,7 +33,7 @@ TransactionHistory *TransactionHistoryModel::transactionHistory() const {
     return m_transactionHistory;
 }
 
-TransactionRow* TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
+const TransactionRow& TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_transactionHistory->count());
     return m_transactionHistory->transaction(index.row());
 }
@@ -55,87 +55,79 @@ int TransactionHistoryModel::columnCount(const QModelIndex &parent) const {
 }
 
 QVariant TransactionHistoryModel::data(const QModelIndex &index, int role) const {
-    if (!m_transactionHistory) {
-        return QVariant();
+    const QList<TransactionRow>& rows = m_transactionHistory->getRows();
+    if (index.row() < 0 || index.row() >= rows.size()) {
+        return {};
+    }
+    const TransactionRow& tInfo = rows[index.row()];
+
+    if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
+        return parseTransactionInfo(tInfo, index.column(), role);
+    }
+    else if (role == Qt::TextAlignmentRole) {
+        switch (index.column()) {
+            case Column::Amount:
+            case Column::FiatAmount:
+                return Qt::AlignRight;
+        }
+    }
+    else if (role == Qt::DecorationRole) {
+        switch (index.column()) {
+            case Column::Date:
+            {
+                if (tInfo.failed)
+                    return QVariant(icons()->icon("warning.png"));
+                else if (tInfo.pending)
+                    return QVariant(icons()->icon("unconfirmed.png"));
+                else if (tInfo.confirmations <= (1.0/5.0 * tInfo.confirmationsRequired()))
+                    return QVariant(icons()->icon("clock1.png"));
+                else if (tInfo.confirmations <= (2.0/5.0 * tInfo.confirmationsRequired()))
+                    return QVariant(icons()->icon("clock2.png"));
+                else if (tInfo.confirmations <= (3.0/5.0 * tInfo.confirmationsRequired()))
+                    return QVariant(icons()->icon("clock3.png"));
+                else if (tInfo.confirmations <= (4.0/5.0 * tInfo.confirmationsRequired()))
+                    return QVariant(icons()->icon("clock4.png"));
+                else if (tInfo.confirmations < tInfo.confirmationsRequired())
+                    return QVariant(icons()->icon("clock5.png"));
+                else if (tInfo.confirmations)
+                    return QVariant(icons()->icon("confirmed.svg"));
+            }
+        }
+    }
+    else if (role == Qt::ToolTipRole) {
+        switch(index.column()) {
+            case Column::Date:
+            {
+                if (tInfo.failed)
+                    return "Transaction failed";
+                else if (tInfo.confirmations < tInfo.confirmationsRequired())
+                    return QString("%1/%2 confirmations").arg(QString::number(tInfo.confirmations), QString::number(tInfo.confirmationsRequired()));
+                else
+                    return QString("%1 confirmations").arg(QString::number(tInfo.confirmations));
+            }
+        }
+    }
+    else if (role == Qt::ForegroundRole) {
+        switch(index.column()) {
+            case Column::FiatAmount:
+            case Column::Amount:
+            {
+                if (tInfo.balanceDelta < 0) {
+                    return QVariant(QColor("#BC1E1E"));
+                }
+            }
+        }
+    }
+    else if (role == Qt::FontRole) {
+        switch(index.column()) {
+            case Column::TxID:
+            {
+                return Utils::getMonospaceFont();
+            }
+        }
     }
 
-    if (!index.isValid() || index.row() < 0 || static_cast<quint64>(index.row()) >= m_transactionHistory->count())
-        return QVariant();
-
-    QVariant result;
-
-    bool found = m_transactionHistory->transaction(index.row(), [this, &index, &result, &role](const TransactionRow &tInfo) {
-        if(role == Qt::DisplayRole || role == Qt::EditRole || role == Qt::UserRole) {
-            result = parseTransactionInfo(tInfo, index.column(), role);
-        }
-        else if (role == Qt::TextAlignmentRole) {
-            switch (index.column()) {
-                case Column::Amount:
-                case Column::FiatAmount:
-                    result = Qt::AlignRight;
-            }
-        }
-        else if (role == Qt::DecorationRole) {
-            switch (index.column()) {
-                case Column::Date:
-                {
-                    if (tInfo.isFailed())
-                        result = QVariant(icons()->icon("warning.png"));
-                    else if (tInfo.isPending())
-                        result = QVariant(icons()->icon("unconfirmed.png"));
-                    else if (tInfo.confirmations() <= (1.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(icons()->icon("clock1.png"));
-                    else if (tInfo.confirmations() <= (2.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(icons()->icon("clock2.png"));
-                    else if (tInfo.confirmations() <= (3.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(icons()->icon("clock3.png"));
-                    else if (tInfo.confirmations() <= (4.0/5.0 * tInfo.confirmationsRequired()))
-                        result = QVariant(icons()->icon("clock4.png"));
-                    else if (tInfo.confirmations() < tInfo.confirmationsRequired())
-                        result = QVariant(icons()->icon("clock5.png"));
-                    else if (tInfo.confirmations())
-                        result = QVariant(icons()->icon("confirmed.svg"));
-                }
-            }
-        }
-        else if (role == Qt::ToolTipRole) {
-            switch(index.column()) {
-                case Column::Date:
-                {
-                    if (tInfo.isFailed())
-                        result = "Transaction failed";
-                    else if (tInfo.confirmations() < tInfo.confirmationsRequired())
-                        result = QString("%1/%2 confirmations").arg(QString::number(tInfo.confirmations()), QString::number(tInfo.confirmationsRequired()));
-                    else
-                        result = QString("%1 confirmations").arg(QString::number(tInfo.confirmations()));
-                }
-            }
-        }
-        else if (role == Qt::ForegroundRole) {
-            switch(index.column()) {
-                case Column::FiatAmount:
-                case Column::Amount:
-                {
-                    if (tInfo.balanceDelta() < 0) {
-                        result = QVariant(QColor("#BC1E1E"));
-                    }
-                }
-            }
-        }
-        else if (role == Qt::FontRole) {
-            switch(index.column()) {
-                case Column::TxID:
-                {
-                    result = Utils::getMonospaceFont();
-                }
-            }
-        }
-    });
-
-    if (!found) {
-        qCritical("%s: internal error: no transaction info for index %d", __FUNCTION__, index.row());
-    }
-    return result;
+    return {};
 }
 
 QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tInfo, int column, int role) const
@@ -145,39 +137,39 @@ QVariant TransactionHistoryModel::parseTransactionInfo(const TransactionRow &tIn
         case Column::Date:
         {
             if (role == Qt::UserRole) {
-                if (tInfo.blockHeight() > 0) {
-                    return tInfo.blockHeight();
+                if (tInfo.blockHeight > 0) {
+                    return tInfo.blockHeight;
                 }
-                return tInfo.timestamp().toMSecsSinceEpoch();
+                return tInfo.timestamp.toMSecsSinceEpoch();
             }
-            return tInfo.timestamp().toString(QString("%1 %2 ").arg(conf()->get(Config::dateFormat).toString(),
+            return tInfo.timestamp.toString(QString("%1 %2 ").arg(conf()->get(Config::dateFormat).toString(),
                                                                     conf()->get(Config::timeFormat).toString()));
         }
         case Column::Description:
-            return tInfo.description();
+            return tInfo.description;
         case Column::Amount:
         {
             if (role == Qt::UserRole) {
-                return tInfo.balanceDelta();
+                return tInfo.balanceDelta;
             }
-            QString amount = QString::number(tInfo.balanceDelta() / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
-            amount = (tInfo.balanceDelta() < 0) ? amount : "+" + amount;
+            QString amount = QString::number(tInfo.balanceDelta / constants::cdiv, 'f', conf()->get(Config::amountPrecision).toInt());
+            amount = (tInfo.balanceDelta < 0) ? amount : "+" + amount;
             return amount;
         }
         case Column::TxID: {
             if (conf()->get(Config::historyShowFullTxid).toBool()) {
-                return tInfo.hash();
+                return tInfo.hash;
             }
-            return Utils::displayAddress(tInfo.hash(), 1);
+            return Utils::displayAddress(tInfo.hash, 1);
         }
         case Column::FiatAmount:
         {
-            double usd_price = appData()->txFiatHistory->get(tInfo.timestamp().toString("yyyyMMdd"));
+            double usd_price = appData()->txFiatHistory->get(tInfo.timestamp.toString("yyyyMMdd"));
             if (usd_price == 0.0) {
                 return QString("?");
             }
 
-            double usd_amount = usd_price * (abs(tInfo.balanceDelta()) / constants::cdiv);
+            double usd_amount = usd_price * (abs(tInfo.balanceDelta) / constants::cdiv);
 
             QString preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
             if (preferredFiatCurrency != "USD") {
@@ -227,15 +219,11 @@ QVariant TransactionHistoryModel::headerData(int section, Qt::Orientation orient
 
 bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &value, int role) {
     if (index.isValid() && role == Qt::EditRole) {
-        QString hash;
-
         switch (index.column()) {
             case Column::Description:
             {
-                m_transactionHistory->transaction(index.row(), [this, &hash, &value](const TransactionRow &tInfo){
-                    hash = tInfo.hash();
-                });
-                m_transactionHistory->setTxNote(hash, value.toString());
+                const TransactionRow& row = m_transactionHistory->transaction(index.row());
+                m_transactionHistory->setTxNote(row.hash, value.toString());
                 m_transactionHistory->refresh();
                 emit transactionDescriptionChanged();
                 break;

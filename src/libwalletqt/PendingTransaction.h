@@ -42,7 +42,7 @@ public:
     quint64 weight(int index) const;
     void refresh();
 
-    PendingTransactionInfo * transaction(int index) const;
+    const PendingTransactionInfo& transaction(int index) const;
 
 private:
     explicit PendingTransaction(Monero::PendingTransaction * pt, QObject *parent = nullptr);
@@ -50,7 +50,7 @@ private:
 private:
     friend class Wallet;
     Monero::PendingTransaction * m_pimpl;
-    mutable QList<PendingTransactionInfo*> m_pending_tx_info;
+    mutable QList<PendingTransactionInfo> m_pending_tx_info;
 };
 
 #endif // PENDINGTRANSACTION_H

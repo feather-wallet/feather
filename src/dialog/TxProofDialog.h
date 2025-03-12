@@ -19,7 +19,7 @@ class TxProofDialog : public WindowModalDialog
     Q_OBJECT
 
 public:
-    explicit TxProofDialog(QWidget *parent, Wallet *wallet, TransactionRow *txid);
+    explicit TxProofDialog(QWidget *parent, Wallet *wallet, const TransactionRow &txid);
     ~TxProofDialog() override;
     void setTxId(const QString &txid);
     void getTxKey();

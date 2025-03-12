@@ -21,7 +21,7 @@ class TxInfoDialog : public QDialog
 Q_OBJECT
 
 public:
-    explicit TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *parent = nullptr);
+    explicit TxInfoDialog(Wallet *wallet, const TransactionRow &txInfo, QWidget *parent = nullptr);
     ~TxInfoDialog() override;
 
 signals:
@@ -31,14 +31,13 @@ private:
     void copyTxID();
     void copyTxKey();
     void createTxProof();
-    void setData(TransactionRow *tx);
+    void setData(const TransactionRow& tx);
     void updateData();
     void adjustHeight(QTextEdit *textEdit, qreal docHeight);
     void viewOnBlockExplorer();
 
     QScopedPointer<Ui::TxInfoDialog> ui;
     Wallet *m_wallet;
-    TransactionRow *m_txInfo;
     TxProofDialog *m_txProofDialog;
     QString m_txid;
 };

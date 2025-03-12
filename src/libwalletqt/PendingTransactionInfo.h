@@ -5,34 +5,21 @@
 #define FEATHER_PENDINGTRANSACTIONINFO_H
 
 #include "ConstructionInfo.h"
-#include <QObject>
-#include <QSet>
 
-class Input;
-class Transfer;
+#include <QObject>
 
 namespace Monero {
     class PendingTransactionInfo;
 }
 
-class PendingTransactionInfo : public ConstructionInfo
+struct PendingTransactionInfo : ConstructionInfo
 {
-    Q_OBJECT
+    quint64 fee;
+    quint64 dust;
+    bool dustAddedToFee;
+    QString txKey;
 
-public:
-    quint64 fee() const;
-    quint64 dust() const;
-    bool dustAddedToFee() const;
-    QString txKey() const;
-
-private:
-    explicit PendingTransactionInfo(const Monero::PendingTransactionInfo *pimpl, QObject *parent = nullptr);
-
-    friend class PendingTransaction;
-    quint64 m_fee;
-    quint64 m_dust;
-    bool m_dustAddedToFee;
-    QString m_txKey;
+    explicit PendingTransactionInfo(const Monero::PendingTransactionInfo *pimpl);
 };
 
 #endif //FEATHER_PENDINGTRANSACTIONINFO_H

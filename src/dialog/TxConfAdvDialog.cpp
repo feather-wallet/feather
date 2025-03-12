@@ -72,10 +72,10 @@ void TxConfAdvDialog::setTransaction(PendingTransaction *tx, bool isSigned) {
 
     m_tx = tx;
     m_tx->refresh();
-    PendingTransactionInfo *ptx = m_tx->transaction(0); //Todo: support split transactions
+    const PendingTransactionInfo& ptx = m_tx->transaction(0); //Todo: support split transactions
 
     // TODO: implement hasTxKey()
-    if (!m_wallet->isHwBacked() && m_tx->transaction(0)->txKey() == "0100000000000000000000000000000000000000000000000000000000000000") {
+    if (!m_wallet->isHwBacked() && m_tx->transaction(0).txKey == "0100000000000000000000000000000000000000000000000000000000000000") {
         ui->btn_exportTxKey->hide();
     }
 
@@ -100,7 +100,7 @@ void TxConfAdvDialog::setUnsignedTransaction(UnsignedTransaction *utx) {
 
     this->setAmounts(utx->amount(0), utx->fee(0));
 
-    ConstructionInfo *ci = m_utx->constructionInfo(0);
+    const ConstructionInfo& ci = m_utx->constructionInfo(0);
     this->setupConstructionData(ci);
 }
 
@@ -136,20 +136,20 @@ void TxConfAdvDialog::setAmounts(quint64 amount, quint64 fee) {
     }
 }
 
-void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
-    for (const auto &in: ci->inputs()) {
+void TxConfAdvDialog::setupConstructionData(const ConstructionInfo& ci) {
+    for (const auto &in: ci.inputs) {
         auto *item = new QTreeWidgetItem(ui->treeInputs);
-        item->setText(0, in->pubKey());
+        item->setText(0, in.pubKey);
         item->setFont(0, Utils::getMonospaceFont());
-        item->setText(1, WalletManager::displayAmount(in->amount()));
+        item->setText(1, WalletManager::displayAmount(in.amount));
     }
     ui->treeInputs->header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     ui->treeInputs->resizeColumnToContents(1);
     ui->treeInputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(ci->inputs().size())));
+    ui->label_inputs->setText(QString("Inputs (%1)").arg(QString::number(ci.inputs.size())));
 
-    for (const auto &out: ci->outputs()) {
+    for (const auto &out: ci.outputs) {
         auto *item = new QTreeWidgetItem(ui->treeOutputs);
         item->setText(0, out.address);
         item->setText(1, WalletManager::displayAmount(out.amount));
@@ -175,7 +175,7 @@ void TxConfAdvDialog::setupConstructionData(ConstructionInfo *ci) {
     ui->treeOutputs->resizeColumnToContents(1);
     ui->treeOutputs->header()->setSectionResizeMode(0, QHeaderView::Stretch);
 
-    ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(ci->outputs().size())));
+    ui->label_outputs->setText(QString("Outputs (%1)").arg(QString::number(ci.outputs.size())));
 
     this->adjustSize();
 }
@@ -210,7 +210,7 @@ void TxConfAdvDialog::txKeyCopy() {
         return;
     }
 
-    Utils::copyToClipboard(m_tx->transaction(0)->txKey());
+    Utils::copyToClipboard(m_tx->transaction(0).txKey);
 }
 
 void TxConfAdvDialog::broadcastTransaction() {

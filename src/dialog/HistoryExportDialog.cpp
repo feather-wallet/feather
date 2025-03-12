@@ -95,77 +95,77 @@ void HistoryExportDialog::exportHistory()
     QList<QPair<uint64_t, QString>> csvData;
 
     for (int i = 0; i < num_transactions; i++) {
-        TransactionRow* tx = m_wallet->history()->transaction(i);
+        const TransactionRow& tx = m_wallet->history()->transaction(i);
 
         QDate minimumDate = ui->date_min->date();
-        if (tx->timestamp().date() < minimumDate) {
+        if (tx.timestamp.date() < minimumDate) {
             continue;
         }
 
         QDate maximumDate = ui->date_max->date();
-        if (tx->timestamp().date() > maximumDate) {
+        if (tx.timestamp.date() > maximumDate) {
             continue;
         }
 
-        if (ui->check_excludePending->isChecked() && tx->isPending()) {
+        if (ui->check_excludePending->isChecked() && tx.pending) {
             continue;
         }
 
-        if (ui->check_excludeFailed->isChecked() && tx->isFailed()) {
+        if (ui->check_excludeFailed->isChecked() && tx.failed) {
             continue;
         }
 
-        if (ui->radio_incomingTransactions->isChecked() && tx->direction() != TransactionRow::Direction_In) {
+        if (ui->radio_incomingTransactions->isChecked() && tx.direction != TransactionRow::Direction_In) {
             continue;
         }
 
-        if (ui->radio_outgoingTransactions->isChecked() && tx->direction() != TransactionRow::Direction_Out) {
+        if (ui->radio_outgoingTransactions->isChecked() && tx.direction != TransactionRow::Direction_Out) {
             continue;
         }
 
-        if (ui->radio_coinbaseTransactions->isChecked() && !tx->isCoinbase()) {
+        if (ui->radio_coinbaseTransactions->isChecked() && !tx.coinbase) {
             continue;
         }
 
-        QString date = QString("%1T%2Z").arg(tx->date(), tx->time());
+        QString date = QString("%1T%2Z").arg(tx.date(), tx.time());
 
         QString direction = QString("");
-        if (tx->direction() == TransactionRow::Direction_In)
+        if (tx.direction == TransactionRow::Direction_In)
             direction = QString("in");
-        else if (tx->direction() == TransactionRow::Direction_Out)
+        else if (tx.direction == TransactionRow::Direction_Out)
             direction = QString("out");
         else
             continue;  // skip TransactionInfo::Direction_Both
 
-        QString balanceDelta = WalletManager::displayAmount(abs(tx->balanceDelta()));
-        if (tx->direction() == TransactionRow::Direction_Out) {
+        QString balanceDelta = WalletManager::displayAmount(abs(tx.balanceDelta));
+        if (tx.direction == TransactionRow::Direction_Out) {
             balanceDelta = "-" + balanceDelta;
         }
 
-        QString paymentId = tx->paymentId();
+        QString paymentId = tx.paymentId;
         if (paymentId == "0000000000000000") {
             paymentId = "";
         }
 
-        const double usd_price = appData()->txFiatHistory->get(tx->timestamp().toString("yyyyMMdd"));
-        double fiat_price = usd_price * tx->amount();
+        const double usd_price = appData()->txFiatHistory->get(tx.timestamp.toString("yyyyMMdd"));
+        double fiat_price = usd_price * tx.amountDouble();
         QString fiatAmount = (usd_price > 0) ? QString::number(fiat_price, 'f', 2) : "?";
 
         QString line = QString(R"(%1,%2,"%3",%4,"%5",%6,%7,%8,"%9","%10","%11","%12","%13")")
-        .arg(QString::number(tx->blockHeight()),
-             QString::number(tx->timestamp().toSecsSinceEpoch()),
+        .arg(QString::number(tx.blockHeight),
+             QString::number(tx.timestamp.toSecsSinceEpoch()),
              date,
-             QString::number(tx->subaddrAccount()),
+             QString::number(tx.subaddrAccount),
              direction,
              balanceDelta,
-             tx->displayAmount(),
-             tx->fee(),
-             tx->hash(),
-             tx->description(),
+             tx.displayAmount(),
+             tx.displayFee(),
+             tx.hash,
+             tx.description,
              paymentId,
              fiatAmount,
              "USD");
-        csvData.append({tx->blockHeight(), line});
+        csvData.append({tx.blockHeight, line});
     }
 
     std::sort(csvData.begin(), csvData.end(), [](const QPair<uint64_t, QString> &tx1, const QPair<uint64_t, QString> &tx2){

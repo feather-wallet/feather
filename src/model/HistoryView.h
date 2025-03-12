@@ -18,11 +18,12 @@ class HistoryView : public QTreeView
 public:
     explicit HistoryView(QWidget* parent = nullptr);
     void setHistoryModel(TransactionHistoryProxyModel *model);
-    TransactionRow* currentEntry();
 
     void setSearchMode(bool mode);
     QByteArray viewState() const;
     bool setViewState(const QByteArray& state);
+    QModelIndex getCurrentIndex();
+    TransactionHistoryModel* sourceModel();
 
 private slots:
     void showHeaderMenu(const QPoint& position);
@@ -36,8 +37,6 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 
 private:
-    TransactionHistoryModel* sourceModel();
-
     TransactionHistoryProxyModel* m_model;
     bool m_inSearchMode = false;
     bool m_columnsNeedRelayout = true;

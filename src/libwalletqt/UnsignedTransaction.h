@@ -41,7 +41,7 @@ public:
     void setFilename(const QString &fileName);
     void refresh();
 
-    ConstructionInfo * constructionInfo(int index) const;
+    const ConstructionInfo& constructionInfo(int index) const;
 
 private:
     explicit UnsignedTransaction(Monero::UnsignedTransaction * pt, Monero::Wallet *walletImpl, QObject *parent = nullptr);
@@ -51,7 +51,7 @@ private:
     Monero::UnsignedTransaction * m_pimpl;
     QString m_fileName;
     Monero::Wallet * m_walletImpl;
-    mutable QList<ConstructionInfo*> m_construction_info;
+    mutable QList<ConstructionInfo> m_construction_info;
 };
 
 #endif // UNSIGNEDTRANSACTION_H

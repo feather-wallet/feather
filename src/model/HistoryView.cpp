@@ -75,16 +75,6 @@ TransactionHistoryModel* HistoryView::sourceModel()
     return dynamic_cast<TransactionHistoryModel *>(m_model->sourceModel());
 }
 
-TransactionRow* HistoryView::currentEntry()
-{
-    QModelIndexList list = selectionModel()->selectedRows();
-    if (list.size() == 1) {
-        return this->sourceModel()->entryFromIndex(m_model->mapToSource(list.first()));
-    } else {
-        return nullptr;
-    }
-}
-
 void HistoryView::setSearchMode(bool mode) {
     if (!m_inSearchMode) {
         m_showTxidColumn = !header()->isSectionHidden(TransactionHistoryModel::TxID);
@@ -213,12 +203,26 @@ void HistoryView::resetViewToDefaults()
 }
 
 void HistoryView::keyPressEvent(QKeyEvent *event) {
-    TransactionRow* tx = this->currentEntry();
+    auto index = this->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = sourceModel()->entryFromIndex(index);
 
-    if (event->matches(QKeySequence::Copy) && tx) {
-        Utils::copyToClipboard(tx->hash());
+    if (event->matches(QKeySequence::Copy)) {
+        Utils::copyToClipboard(tx.hash);
     }
     else {
         QTreeView::keyPressEvent(event);
     }
+}
+
+QModelIndex HistoryView::getCurrentIndex()
+{
+    QModelIndexList list = this->selectionModel()->selectedRows();
+    if (list.length() < 1) {
+        return {};
+    }
+
+    return m_model->mapToSource(list.first());
 }

@@ -942,7 +942,7 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
     // TODO: also check that amounts match
     tx->refresh();
     QSet<QString> outputAddresses;
-    for (const auto &output : tx->transaction(0)->outputs()) {
+    for (const auto &output : tx->transaction(0).outputs) {
         outputAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(output.address, constants::networkType));
     }
     QSet<QString> destAddresses;
@@ -1053,8 +1053,17 @@ void MainWindow::onTransactionCommitted(bool success, PendingTransaction *tx, co
     msgBox.exec();
     if (msgBox.clickedButton() == showDetailsButton) {
         this->showHistoryTab();
-        TransactionRow *txInfo = m_wallet->history()->transaction(txid.first());
-        auto *dialog = new TxInfoDialog(m_wallet, txInfo, this);
+
+        const auto& rows = m_wallet->history()->getRows();
+        auto itr = std::find_if(rows.begin(), rows.end(),
+                [&](const TransactionRow& ti) {
+            return ti.hash == txid.first();
+        });
+        if (itr == rows.end()) {
+            return;
+        }
+
+        auto *dialog = new TxInfoDialog(m_wallet, *itr, this);
         connect(dialog, &TxInfoDialog::resendTranscation, this, &MainWindow::onResendTransaction);
         dialog->show();
         dialog->setAttribute(Qt::WA_DeleteOnClose);

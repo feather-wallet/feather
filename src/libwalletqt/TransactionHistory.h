@@ -29,9 +29,9 @@ class TransactionHistory : public QObject
     Q_OBJECT
 
 public:
-    bool transaction(int index, std::function<void (TransactionRow &)> callback);
-    TransactionRow * transaction(const QString &id);
-    TransactionRow* transaction(int index);
+    const TransactionRow& transaction(int index);
+    const QList<TransactionRow>& getRows();
+
     void refresh();
     void setTxNote(const QString &txid, const QString &note);
     quint64 count() const;
@@ -59,7 +59,7 @@ private:
 
     Wallet *m_wallet;
     tools::wallet2 *m_wallet2;
-    QList<TransactionRow*> m_rows;
+    QList<TransactionRow> m_rows;
 
     mutable QDateTime   m_firstDateTime;
     mutable QDateTime   m_lastDateTime;

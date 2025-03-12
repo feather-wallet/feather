@@ -30,7 +30,7 @@ public:
     void setUnsignedTransaction(UnsignedTransaction *utx);
 
 private:
-    void setupConstructionData(ConstructionInfo *ci);
+    void setupConstructionData(const ConstructionInfo& ci);
     void signTransaction();
     void broadcastTransaction();
     void closeDialog();

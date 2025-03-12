@@ -7,47 +7,21 @@
 #include "Transfer.h"
 #include <wallet/api/wallet2_api.h>
 
-quint64 ConstructionInfo::unlockTime() const {
-    return m_unlockTime;
-}
-
-QSet<quint32> ConstructionInfo::subaddressIndices() const {
-    return m_subaddressIndices;
-}
-
-QVector<QString> ConstructionInfo::subaddresses() const {
-    return m_subaddresses;
-}
-
-quint64 ConstructionInfo::minMixinCount() const {
-    return m_minMixinCount;
-}
-
-QList<Input *> ConstructionInfo::inputs() const {
-    return m_inputs;
-}
-
-QList<Transfer> ConstructionInfo::outputs() const {
-    return m_outputs;
-}
-
-ConstructionInfo::ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl, QObject *parent)
-        : QObject(parent)
-        , m_unlockTime(pimpl->unlockTime())
-        , m_minMixinCount(pimpl->minMixinCount())
+ConstructionInfo::ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl)
+        : unlockTime(pimpl->unlockTime())
+        , minMixinCount(pimpl->minMixinCount())
 {
     for (auto const &i : pimpl->inputs())
     {
-        Input *input = new Input(i.amount, QString::fromStdString(i.pubkey), this);
-        m_inputs.append(input);
+        inputs.emplace_back(i.amount, QString::fromStdString(i.pubkey));
     }
 
     for (auto const &o : pimpl->outputs())
     {
-        m_outputs.emplace_back(o.amount, QString::fromStdString(o.address));
+        outputs.emplace_back(o.amount, QString::fromStdString(o.address));
     }
     for (uint32_t i : pimpl->subaddressIndices())
     {
-        m_subaddressIndices.insert(i);
+        subaddressIndices.insert(i);
     }
 }

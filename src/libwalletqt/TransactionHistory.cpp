@@ -27,38 +27,17 @@ QString description(tools::wallet2 *wallet2, const tools::wallet2::payment_detai
     return description;
 }
 
-bool TransactionHistory::transaction(int index, std::function<void (TransactionRow &)> callback)
-{
-    QReadLocker locker(&m_lock);
-
-    if (index < 0 || index >= m_rows.size()) {
-        qCritical("%s: no transaction info for index %d", __FUNCTION__, index);
-        qCritical("%s: there's %d transactions in backend", __FUNCTION__, this->count());
-        return false;
-    }
-
-    callback(*m_rows.value(index));
-    return true;
-}
-
-TransactionRow* TransactionHistory::transaction(const QString &id)
-{
-    QReadLocker locker(&m_lock);
-
-    auto itr = std::find_if(m_rows.begin(), m_rows.end(),
-            [&](const TransactionRow * ti) {
-        return ti->hash() == id;
-    });
-    return itr != m_rows.end() ? *itr : nullptr;
-}
-
-TransactionRow* TransactionHistory::transaction(int index)
+const TransactionRow& TransactionHistory::transaction(int index)
 {
     if (index < 0 || index >= m_rows.size()) {
-        return nullptr;
+        throw std::out_of_range("Index out of range");
     }
-
     return m_rows[index];
+}
+
+const QList<TransactionRow>& TransactionHistory::getRows()
+{
+    return m_rows;
 }
 
 void TransactionHistory::refresh()
@@ -106,24 +85,24 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow(this);
-            t->m_paymentId = QString::fromStdString(payment_id);
-            t->m_coinbase = pd.m_coinbase;
-            t->m_amount = pd.m_amount;
-            t->m_balanceDelta = pd.m_amount;
-            t->m_fee = pd.m_fee;
-            t->m_direction = TransactionRow::Direction_In;
-            t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
-            t->m_blockHeight = pd.m_block_height;
-            t->m_subaddrIndex = { pd.m_subaddr_index.minor };
-            t->m_subaddrAccount = pd.m_subaddr_index.major;
-            t->m_label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
-            t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
-            t->m_confirmations = (wallet_height > pd.m_block_height) ? wallet_height - pd.m_block_height : 0;
-            t->m_unlockTime = pd.m_unlock_time;
-            t->m_description = description(m_wallet2, pd);
+            TransactionRow t;
+            t.paymentId = QString::fromStdString(payment_id);
+            t.coinbase = pd.m_coinbase;
+            t.amount = pd.m_amount;
+            t.balanceDelta = pd.m_amount;
+            t.fee = pd.m_fee;
+            t.direction = TransactionRow::Direction_In;
+            t.hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
+            t.blockHeight = pd.m_block_height;
+            t.subaddrIndex = { pd.m_subaddr_index.minor };
+            t.subaddrAccount = pd.m_subaddr_index.major;
+            t.label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
+            t.timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
+            t.confirmations = (wallet_height > pd.m_block_height) ? wallet_height - pd.m_block_height : 0;
+            t.unlockTime = pd.m_unlock_time;
+            t.description = description(m_wallet2, pd);
 
-            m_rows.append(t);
+            m_rows.append(std::move(t));
         }
 
         // confirmed output transactions
@@ -153,42 +132,42 @@ void TransactionHistory::refresh()
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
 
-            auto* t = new TransactionRow(this);
-            t->m_paymentId = QString::fromStdString(payment_id);
+            TransactionRow t;
+            t.paymentId = QString::fromStdString(payment_id);
 
-            t->m_amount = pd.m_amount_out - change;
-            t->m_balanceDelta = change - pd.m_amount_in;
-            t->m_fee = fee;
+            t.amount = pd.m_amount_out - change;
+            t.balanceDelta = change - pd.m_amount_in;
+            t.fee = fee;
 
-            t->m_direction = TransactionRow::Direction_Out;
-            t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(hash));
-            t->m_blockHeight = pd.m_block_height;
-            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(hash));
-            t->m_subaddrAccount = pd.m_subaddr_account;
-            t->m_label = QString::fromStdString(pd.m_subaddr_indices.size() == 1 ? m_wallet2->get_subaddress_label({pd.m_subaddr_account, *pd.m_subaddr_indices.begin()}) : "");
-            t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
-            t->m_confirmations = (wallet_height > pd.m_block_height) ? wallet_height - pd.m_block_height : 0;
+            t.direction = TransactionRow::Direction_Out;
+            t.hash = QString::fromStdString(epee::string_tools::pod_to_hex(hash));
+            t.blockHeight = pd.m_block_height;
+            t.description = QString::fromStdString(m_wallet2->get_tx_note(hash));
+            t.subaddrAccount = pd.m_subaddr_account;
+            t.label = QString::fromStdString(pd.m_subaddr_indices.size() == 1 ? m_wallet2->get_subaddress_label({pd.m_subaddr_account, *pd.m_subaddr_indices.begin()}) : "");
+            t.timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
+            t.confirmations = (wallet_height > pd.m_block_height) ? wallet_height - pd.m_block_height : 0;
 
-            for (uint32_t idx : t->subaddrIndex())
+            for (uint32_t idx : t.subaddrIndex)
             {
-                t->m_subaddrIndex.insert(idx);
+                t.subaddrIndex.insert(idx);
             }
 
             // single output transaction might contain multiple transfers
             for (auto const &d: pd.m_dests)
             {
-                t->m_transfers.emplace_back(
+                t.transfers.emplace_back(
                     d.amount,
                     QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)));
             }
             for (auto const &r: pd.m_rings)
             {
-                t->m_rings.emplace_back(
+                t.rings.emplace_back(
                     QString::fromStdString(epee::string_tools::pod_to_hex(r.first)),
                     cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
-            m_rows.append(t);
+            m_rows.append(std::move(t));
         }
 
         // unconfirmed output transactions
@@ -209,41 +188,41 @@ void TransactionHistory::refresh()
                 payment_id = payment_id.substr(0,16);
             bool is_failed = pd.m_state == tools::wallet2::unconfirmed_transfer_details::failed;
 
-            auto *t = new TransactionRow(this);
-            t->m_paymentId = QString::fromStdString(payment_id);
+            TransactionRow t;
+            t.paymentId = QString::fromStdString(payment_id);
 
-            t->m_amount = pd.m_amount_out - change;
-            t->m_balanceDelta = change - pd.m_amount_in;
-            t->m_fee = fee;
+            t.amount = pd.m_amount_out - change;
+            t.balanceDelta = change - pd.m_amount_in;
+            t.fee = fee;
 
-            t->m_direction = TransactionRow::Direction_Out;
-            t->m_failed = is_failed;
-            t->m_pending = true;
-            t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(hash));
-            t->m_description = QString::fromStdString(m_wallet2->get_tx_note(hash));
-            t->m_subaddrAccount = pd.m_subaddr_account;
-            t->m_label = QString::fromStdString(pd.m_subaddr_indices.size() == 1 ? m_wallet2->get_subaddress_label({pd.m_subaddr_account, *pd.m_subaddr_indices.begin()}) : "");
-            t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
-            t->m_confirmations = 0;
-            for (uint32_t idx : t->subaddrIndex())
+            t.direction = TransactionRow::Direction_Out;
+            t.failed = is_failed;
+            t.pending = true;
+            t.hash = QString::fromStdString(epee::string_tools::pod_to_hex(hash));
+            t.description = QString::fromStdString(m_wallet2->get_tx_note(hash));
+            t.subaddrAccount = pd.m_subaddr_account;
+            t.label = QString::fromStdString(pd.m_subaddr_indices.size() == 1 ? m_wallet2->get_subaddress_label({pd.m_subaddr_account, *pd.m_subaddr_indices.begin()}) : "");
+            t.timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
+            t.confirmations = 0;
+            for (uint32_t idx : t.subaddrIndex)
             {
-                t->m_subaddrIndex.insert(idx);
+                t.subaddrIndex.insert(idx);
             }
 
             for (auto const &d: pd.m_dests)
             {
-                t->m_transfers.emplace_back(
+                t.transfers.emplace_back(
                     d.amount,
                     QString::fromStdString(d.address(m_wallet2->nettype(), pd.m_payment_id, !hasFakePaymentId)));
             }
             for (auto const &r: pd.m_rings)
             {
-                t->m_rings.emplace_back(
+                t.rings.emplace_back(
                     QString::fromStdString(epee::string_tools::pod_to_hex(r.first)),
                     cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
-            m_rows.append(t);
+            m_rows.append(std::move(t));
         }
 
 
@@ -259,22 +238,24 @@ void TransactionHistory::refresh()
             std::string payment_id = epee::string_tools::pod_to_hex(i->first);
             if (payment_id.substr(16).find_first_not_of('0') == std::string::npos)
                 payment_id = payment_id.substr(0,16);
-            auto *t = new TransactionRow(this);
-            t->m_paymentId = QString::fromStdString(payment_id);
-            t->m_amount = pd.m_amount;
-            t->m_balanceDelta = pd.m_amount;
-            t->m_direction = TransactionRow::Direction_In;
-            t->m_hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
-            t->m_blockHeight = pd.m_block_height;
-            t->m_pending = true;
-            t->m_subaddrIndex = { pd.m_subaddr_index.minor };
-            t->m_subaddrAccount = pd.m_subaddr_index.major;
-            t->m_label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
-            t->m_timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
-            t->m_confirmations = 0;
-            t->m_description = description(m_wallet2, pd);
 
-            m_rows.append(t);
+            TransactionRow t;
+
+            t.paymentId = QString::fromStdString(payment_id);
+            t.amount = pd.m_amount;
+            t.balanceDelta = pd.m_amount;
+            t.direction = TransactionRow::Direction_In;
+            t.hash = QString::fromStdString(epee::string_tools::pod_to_hex(pd.m_tx_hash));
+            t.blockHeight = pd.m_block_height;
+            t.pending = true;
+            t.subaddrIndex = { pd.m_subaddr_index.minor };
+            t.subaddrAccount = pd.m_subaddr_index.major;
+            t.label = QString::fromStdString(m_wallet2->get_subaddress_label(pd.m_subaddr_index));
+            t.timestamp = QDateTime::fromSecsSinceEpoch(pd.m_timestamp);
+            t.confirmations = 0;
+            t.description = description(m_wallet2, pd);
+
+            m_rows.append(std::move(t));
 
             LOG_PRINT_L1(__FUNCTION__ << ": Unconfirmed payment found " << pd.m_amount);
         }
@@ -341,7 +322,6 @@ TransactionHistory::TransactionHistory(Wallet *wallet, tools::wallet2 *wallet2, 
 }
 
 void TransactionHistory::clearRows() {
-    qDeleteAll(m_rows);
     m_rows.clear();
 }
 

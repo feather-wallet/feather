@@ -84,15 +84,18 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
 
     QMenu menu(this);
 
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto txIdx = ui->history->getCurrentIndex();
+    if (!txIdx.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(txIdx);
 
-    bool unconfirmed = tx->isFailed() || tx->isPending();
-    if (unconfirmed && tx->direction() != TransactionRow::Direction_In) {
+    bool unconfirmed = tx.failed || tx.pending;
+    if (unconfirmed && tx.direction != TransactionRow::Direction_In) {
         menu.addAction("Resend transaction", this, &HistoryWidget::onResendTransaction);
     }
 
-    if (tx->isFailed()) {
+    if (tx.failed) {
         menu.addAction("Remove from history", this, &HistoryWidget::onRemoveFromHistory);
     }
 
@@ -105,20 +108,24 @@ void HistoryWidget::showContextMenu(const QPoint &point) {
 }
 
 void HistoryWidget::onResendTransaction() {
-    auto *tx = ui->history->currentEntry();
-    if (tx) {
-        QString txid = tx->hash();
-        emit resendTransaction(txid);
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
     }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
+    emit resendTransaction(tx.hash);
 }
 
 void HistoryWidget::onRemoveFromHistory() {
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
 
     auto result = QMessageBox::question(this, "Remove transaction from history", "Are you sure you want to remove this transaction from the history?");
     if (result == QMessageBox::Yes) {
-        m_wallet->removeFailedTx(tx->hash());
+        m_wallet->removeFailedTx(tx.hash);
     }
 }
 
@@ -132,8 +139,11 @@ void HistoryWidget::resetModel()
 }
 
 void HistoryWidget::showTxDetails() {
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
 
     auto *dialog = new TxInfoDialog(m_wallet, tx, this);
     connect(dialog, &TxInfoDialog::resendTranscation, [this](const QString &txid){
@@ -144,11 +154,13 @@ void HistoryWidget::showTxDetails() {
 }
 
 void HistoryWidget::onViewOnBlockExplorer() {
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
 
-    QString txid = tx->hash();
-    emit viewOnBlockExplorer(txid);
+    emit viewOnBlockExplorer(tx.hash);
 }
 
 void HistoryWidget::setSearchText(const QString &text) {
@@ -161,8 +173,11 @@ void HistoryWidget::setSearchFilter(const QString &filter) {
 }
 
 void HistoryWidget::createTxProof() {
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
 
     TxProofDialog dialog{this, m_wallet, tx};
     dialog.getTxKey();
@@ -170,20 +185,23 @@ void HistoryWidget::createTxProof() {
 }
 
 void HistoryWidget::copy(copyField field) {
-    auto *tx = ui->history->currentEntry();
-    if (!tx) return;
+    auto index = ui->history->getCurrentIndex();
+    if (!index.isValid()) {
+        return;
+    }
+    const TransactionRow& tx = ui->history->sourceModel()->entryFromIndex(index);
 
     QString data = [field, tx]{
         switch(field) {
             case copyField::TxID:
-                return tx->hash();
+                return tx.hash;
             case copyField::Description:
-                return tx->description();
+                return tx.description;
             case copyField::Date:
-                return tx->timestamp().toString(QString("%1 %2").arg(conf()->get(Config::dateFormat).toString(),
+                return tx.timestamp.toString(QString("%1 %2").arg(conf()->get(Config::dateFormat).toString(),
                                                                      conf()->get(Config::timeFormat).toString()));
             case copyField::Amount:
-                return WalletManager::displayAmount(abs(tx->balanceDelta()));
+                return WalletManager::displayAmount(abs(tx.balanceDelta));
             default:
                 return QString("");
         }

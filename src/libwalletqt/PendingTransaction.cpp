@@ -90,18 +90,17 @@ quint64 PendingTransaction::weight(int index) const
     return m_pimpl->weight(index);
 }
 
-PendingTransactionInfo * PendingTransaction::transaction(int index) const {
+const PendingTransactionInfo& PendingTransaction::transaction(int index) const {
     return m_pending_tx_info[index];
 }
 
 void PendingTransaction::refresh()
 {
-    qDeleteAll(m_pending_tx_info);
     m_pending_tx_info.clear();
 
     m_pimpl->refresh();
     for (const auto i : m_pimpl->getAll()) {
-        m_pending_tx_info.append(new PendingTransactionInfo(i, this));
+        m_pending_tx_info.emplace_back(i);
     }
 }
 

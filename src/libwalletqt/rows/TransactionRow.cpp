@@ -5,171 +5,75 @@
 #include "WalletManager.h"
 #include "Transfer.h"
 
-TransactionRow::TransactionRow(QObject *parent)
-        : QObject(parent)
-        , m_direction(TransactionRow::Direction_Out)
-        , m_pending(false)
-        , m_failed(false)
-        , m_coinbase(false)
-        , m_amount(0)
-        , m_balanceDelta(0)
-        , m_fee(0)
-        , m_blockHeight(0)
-        , m_subaddrAccount(0)
-        , m_confirmations(0)
-        , m_unlockTime(0)
-        , m_confirmationsRequired(0)
+TransactionRow::TransactionRow()
+        : amount(0)
+        , balanceDelta(0)
+        , blockHeight(0)
+        , confirmations(0)
+        , direction(TransactionRow::Direction_Out)
+        , subaddrAccount(0)
+        , unlockTime(0)
+        , failed(false)
+        , pending(false)
+        , coinbase(false)
+        , fee(0)
 {
 }
 
-TransactionRow::Direction TransactionRow::direction() const
+double TransactionRow::amountDouble() const
 {
-    return m_direction;
-}
-
-bool TransactionRow::isPending() const
-{
-    return m_pending;
-}
-
-bool TransactionRow::isFailed() const
-{
-    return m_failed;
-}
-
-bool TransactionRow::isCoinbase() const
-{
-    return m_coinbase;
-}
-
-qint64 TransactionRow::balanceDelta() const
-{
-    return m_balanceDelta;
-}
-
-double TransactionRow::amount() const
-{
-    // there's no unsigned uint64 for JS, so better use double
     return displayAmount().toDouble();
-}
-
-qint64 TransactionRow::atomicAmount() const
-{
-    return m_amount;
 }
 
 QString TransactionRow::displayAmount() const
 {
-    return WalletManager::displayAmount(m_amount);
+    return WalletManager::displayAmount(amount);
 }
 
-quint64 TransactionRow::atomicFee() const
+QString TransactionRow::displayFee() const
 {
-    return m_fee;
-}
-
-QString TransactionRow::fee() const
-{
-    if(m_fee == 0)
+    if (fee == 0)
         return "";
-    return WalletManager::displayAmount(m_fee);
-}
-
-quint64 TransactionRow::blockHeight() const
-{
-    return m_blockHeight;
-}
-
-QString TransactionRow::description() const
-{
-    return m_description;
-}
-
-QSet<quint32> TransactionRow::subaddrIndex() const
-{
-    return m_subaddrIndex;
-}
-
-quint32 TransactionRow::subaddrAccount() const
-{
-    return m_subaddrAccount;
-}
-
-QString TransactionRow::label() const
-{
-    return m_label;
-}
-
-quint64 TransactionRow::confirmations() const
-{
-    return m_confirmations;
+    return WalletManager::displayAmount(fee);
 }
 
 quint64 TransactionRow::confirmationsRequired() const
 {
-    return (m_blockHeight < m_unlockTime) ? m_unlockTime - m_blockHeight : 10;
-}
-
-quint64 TransactionRow::unlockTime() const
-{
-    return m_unlockTime;
-}
-
-QString TransactionRow::hash() const
-{
-    return m_hash;
-}
-
-QDateTime TransactionRow::timestamp() const
-{
-    return m_timestamp;
+    return (blockHeight < unlockTime) ? unlockTime - blockHeight : 10;
 }
 
 QString TransactionRow::date() const
 {
-    return timestamp().date().toString(Qt::ISODate);
+    return timestamp.date().toString(Qt::ISODate);
 }
 
 QString TransactionRow::time() const
 {
-    return timestamp().time().toString(Qt::ISODate);
-}
-
-QString TransactionRow::paymentId() const
-{
-    return m_paymentId;
+    return timestamp.time().toString(Qt::ISODate);
 }
 
 QList<QString> TransactionRow::destinations() const
 {
     QList<QString> dests;
-    for (auto const& t: m_transfers) {
+    for (auto const& t: transfers) {
         dests.append(t.address);
     }
     return dests;
 }
 
-QList<Transfer> TransactionRow::transfers() const {
-    return m_transfers;
-}
-
 QString TransactionRow::rings_formatted() const
 {
-    QString rings;
-    for (auto const& r: m_rings) {
-        rings += r.keyImage + ": \n";
+    QString ringsStr;
+    for (auto const& r: rings) {
+        ringsStr += r.keyImage + ": \n";
         for (uint64_t m : r.ringMembers){
-            rings += QString::number(m) + " ";
+            ringsStr += QString::number(m) + " ";
         }
-        rings += "\n\n";
+        ringsStr += "\n\n";
     }
-    return rings;
+    return ringsStr;
 }
 
 bool TransactionRow::hasPaymentId() const {
-    return m_paymentId != "0000000000000000";
-}
-
-TransactionRow::~TransactionRow()
-{
+    return paymentId != "0000000000000000";
 }

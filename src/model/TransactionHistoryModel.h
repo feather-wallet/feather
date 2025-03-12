@@ -33,7 +33,7 @@ public:
     explicit TransactionHistoryModel(QObject * parent = nullptr);
     void setTransactionHistory(TransactionHistory * th);
     TransactionHistory * transactionHistory() const;
-    TransactionRow* entryFromIndex(const QModelIndex& index) const;
+    const TransactionRow& entryFromIndex(const QModelIndex& index) const;
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;

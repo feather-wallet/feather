@@ -4,39 +4,25 @@
 #ifndef FEATHER_CONSTRUCTIONINFO_H
 #define FEATHER_CONSTRUCTIONINFO_H
 
-#include <QObject>
 #include <QSet>
-#include "Transfer.h"
 
-class Input;
+#include "Transfer.h"
+#include "Input.h"
 
 namespace Monero {
     class TransactionConstructionInfo;
 }
 
-class ConstructionInfo : public QObject
+struct ConstructionInfo
 {
-    Q_OBJECT
+    quint64 unlockTime;
+    QSet<quint32> subaddressIndices;
+    QVector<QString> subaddresses;
+    quint64 minMixinCount;
+    QList<Input> inputs;
+    QList<Transfer> outputs;
 
-public:
-    quint64 unlockTime() const;
-    QSet<quint32> subaddressIndices() const;
-    QVector<QString> subaddresses() const;
-    quint64 minMixinCount() const;
-    QList<Input*> inputs() const;
-    QList<Transfer> outputs() const;
-
-private:
-    explicit ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl, QObject *parent = nullptr);
-
-    friend class PendingTransactionInfo;
-    friend class UnsignedTransaction;
-    quint64 m_unlockTime;
-    QSet<quint32> m_subaddressIndices;
-    QVector<QString> m_subaddresses;
-    quint64 m_minMixinCount;
-    mutable QList<Input*> m_inputs;
-    mutable QList<Transfer> m_outputs;
+    explicit ConstructionInfo(const Monero::TransactionConstructionInfo *pimpl);
 };
 
 #endif //FEATHER_CONSTRUCTIONINFO_H

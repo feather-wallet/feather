@@ -87,18 +87,17 @@ void UnsignedTransaction::setFilename(const QString &fileName)
     m_fileName = fileName;
 }
 
-ConstructionInfo * UnsignedTransaction::constructionInfo(int index) const {
+const ConstructionInfo& UnsignedTransaction::constructionInfo(int index) const {
     return m_construction_info[index];
 }
 
 void UnsignedTransaction::refresh()
 {
-    qDeleteAll(m_construction_info);
     m_construction_info.clear();
 
     m_pimpl->refresh();
     for (const auto i : m_pimpl->getAll()) {
-        m_construction_info.append(new ConstructionInfo(i, this));
+        m_construction_info.emplace_back(i);
     }
 }
 

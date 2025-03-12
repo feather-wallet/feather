@@ -17,11 +17,10 @@
 #include "utils/Icons.h"
 #include "utils/Utils.h"
 
-TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *parent)
+TxInfoDialog::TxInfoDialog(Wallet *wallet, const TransactionRow &txInfo, QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::TxInfoDialog)
     , m_wallet(wallet)
-    , m_txInfo(txInfo)
     , m_txProofDialog(new TxProofDialog(this, wallet, txInfo))
 {
     ui->setupUi(this);
@@ -30,7 +29,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
     ui->btn_viewOnBlockExplorer->setToolTip("View on block explorer");
     connect(ui->btn_viewOnBlockExplorer, &QPushButton::clicked, this, &TxInfoDialog::viewOnBlockExplorer);
 
-    m_txid = txInfo->hash();
+    m_txid = txInfo.hash;
     ui->label_txid->setText(m_txid);
 
     connect(ui->btn_copyTxID, &QPushButton::clicked, this, &TxInfoDialog::copyTxID);
@@ -41,7 +40,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
 
     this->setData(txInfo);
 
-    if ((txInfo->isFailed() || txInfo->isPending()) && txInfo->direction() != TransactionRow::Direction_In) {
+    if ((txInfo.failed || txInfo.pending) && txInfo.direction != TransactionRow::Direction_In) {
         connect(ui->btn_rebroadcastTx, &QPushButton::pressed, [this]{
             emit resendTranscation(m_txid);
         });
@@ -49,7 +48,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
         ui->btn_rebroadcastTx->hide();
     }
 
-    if (txInfo->direction() == TransactionRow::Direction_In) {
+    if (txInfo.direction == TransactionRow::Direction_In) {
         ui->btn_CopyTxKey->setDisabled(true);
         ui->btn_CopyTxKey->setToolTip("No tx secret key available for incoming transactions.");
     }
@@ -74,7 +73,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
 
     QTextCursor cursor = ui->outputs->textCursor();
 
-    auto transfers = txInfo->transfers();
+    auto transfers = txInfo.transfers;
     if (!transfers.isEmpty()) {
         bool hasIntegrated = false;
 
@@ -94,7 +93,7 @@ TxInfoDialog::TxInfoDialog(Wallet *wallet, TransactionRow *txInfo, QWidget *pare
         this->adjustHeight(ui->outputs, transfers.size());
 
         // Trezor saves a mangled payment ID.
-        if (m_wallet->isTrezor() && !hasIntegrated && txInfo->hasPaymentId()) {
+        if (m_wallet->isTrezor() && !hasIntegrated && txInfo.hasPaymentId()) {
             ui->frame_destinationsWarning->setInfo(icons()->icon("warning"), "The address displayed here does not contain a payment ID. "
                                                                              "If you are making a repeat payment to a service, "
                                                                              "do not copy the address from here to prevent a loss of funds.");
@@ -122,10 +121,10 @@ void TxInfoDialog::adjustHeight(QTextEdit *textEdit, qreal docHeight) {
     textEdit->verticalScrollBar()->hide();
 }
 
-void TxInfoDialog::setData(TransactionRow *tx) {
-    QString blockHeight = QString::number(tx->blockHeight());
+void TxInfoDialog::setData(const TransactionRow &tx) {
+    QString blockHeight = QString::number(tx.blockHeight);
 
-    if (tx->isFailed()) {
+    if (tx.failed) {
         ui->label_status->setText("Status: Failed (node was unable to relay transaction)");
     }
     if (blockHeight == "0") {
@@ -133,41 +132,47 @@ void TxInfoDialog::setData(TransactionRow *tx) {
     }
     else {
         QString dateTimeFormat = QString("%1 %2").arg(conf()->get(Config::dateFormat).toString(), conf()->get(Config::timeFormat).toString());
-        QString date = tx->timestamp().toString(dateTimeFormat);
-        QString statusText = QString("Status: Included in block %1 (%2 confirmations) on %3").arg(blockHeight, QString::number(tx->confirmations()), date);
+        QString date = tx.timestamp.toString(dateTimeFormat);
+        QString statusText = QString("Status: Included in block %1 (%2 confirmations) on %3").arg(blockHeight, QString::number(tx.confirmations), date);
         ui->label_status->setText(statusText);
     }
 
 
-    if (tx->confirmationsRequired() > tx->confirmations()) {
-        bool mandatoryLock = tx->confirmationsRequired() == 10;
-        QString confsRequired = QString::number(tx->confirmationsRequired() - tx->confirmations());
+    if (tx.confirmationsRequired() > tx.confirmations) {
+        bool mandatoryLock = tx.confirmationsRequired() == 10;
+        QString confsRequired = QString::number(tx.confirmationsRequired() - tx.confirmations);
         ui->label_lock->setText(QString("Lock: Outputs become spendable in %1 blocks (%2)").arg(confsRequired, mandatoryLock ? "consensus rule" : "specified by sender"));
     } else {
         ui->label_lock->setText("Lock: Outputs are spendable");
     }
 
-    QString direction = tx->direction() == TransactionRow::Direction_In ? "received" : "sent";
-    ui->label_amount->setText(QString("Amount %1: %2 XMR").arg(direction, tx->displayAmount()));
+    QString direction = tx.direction == TransactionRow::Direction_In ? "received" : "sent";
+    ui->label_amount->setText(QString("Amount %1: %2 XMR").arg(direction, tx.displayAmount()));
 
     QString fee;
-    if (tx->isCoinbase())
+    if (tx.coinbase)
         fee = "Not applicable";
-    else if (tx->direction() == TransactionRow::Direction_In)
+    else if (tx.direction == TransactionRow::Direction_In)
         fee = "Paid by sender";
-    else if (tx->fee().isEmpty())
+    else if (tx.displayFee().isEmpty())
         fee = "N/A";
     else
-        fee = QString("%1 XMR").arg(tx->fee());
+        fee = QString("%1 XMR").arg(tx.displayFee());
 
     ui->label_fee->setText(QString("Fee: %1").arg(fee));
 
 }
 
 void TxInfoDialog::updateData() {
-    TransactionRow *tx = m_wallet->history()->transaction(m_txid);
-    if (!tx) return;
-    this->setData(tx);
+    const auto& rows = m_wallet->history()->getRows();
+    auto itr = std::find_if(rows.begin(), rows.end(),
+            [&](const TransactionRow& ti) {
+        return ti.hash == m_txid;
+    });
+    if (itr == rows.end()) {
+        return;
+    }
+    this->setData(*itr);
 }
 
 void TxInfoDialog::copyTxID() {
