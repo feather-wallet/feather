@@ -46,10 +46,6 @@ public:
 signals:
     void descriptionChanged();
 
-public slots:
-    void startReset();
-    void endReset();
-
 private:
     QVariant parseTransactionInfo(const CoinsInfo &cInfo, int column, int role) const;
 

@@ -16,16 +16,8 @@ CoinsModel::CoinsModel(QObject *parent, Coins *coins)
         : QAbstractTableModel(parent)
         , m_coins(coins)
 {
-    connect(m_coins, &Coins::refreshStarted, this, &CoinsModel::startReset);
-    connect(m_coins, &Coins::refreshFinished, this, &CoinsModel::endReset);
-}
-
-void CoinsModel::startReset(){
-    beginResetModel();
-}
-
-void CoinsModel::endReset(){
-    endResetModel();
+    connect(m_coins, &Coins::refreshStarted, this, &CoinsModel::beginResetModel);
+    connect(m_coins, &Coins::refreshFinished, this, &CoinsModel::endResetModel);
 }
 
 int CoinsModel::rowCount(const QModelIndex &parent) const
