@@ -62,16 +62,6 @@ void Coins::refresh()
     emit refreshFinished();
 }
 
-void Coins::refreshUnlocked()
-{
-    for (CoinsInfo& c : m_rows) {
-        if (!c.unlocked) {
-            bool unlocked = m_wallet2->is_transfer_unlocked(c.unlockTime, c.blockHeight);
-            c.setUnlocked(unlocked);
-        }
-    }
-}
-
 quint64 Coins::count() const
 {
     return m_rows.length();

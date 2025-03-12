@@ -24,7 +24,6 @@ Q_OBJECT
 
 public:
     void refresh();
-    void refreshUnlocked();
     quint64 count() const;
 
     const CoinsInfo& getRow(qsizetype i);
