@@ -29,10 +29,6 @@ void TransactionHistoryModel::setTransactionHistory(TransactionHistory *th) {
     emit transactionHistoryChanged();
 }
 
-TransactionHistory *TransactionHistoryModel::transactionHistory() const {
-    return m_transactionHistory;
-}
-
 const TransactionRow& TransactionHistoryModel::entryFromIndex(const QModelIndex &index) const {
     Q_ASSERT(index.isValid() && index.row() < m_transactionHistory->count());
     return m_transactionHistory->transaction(index.row());

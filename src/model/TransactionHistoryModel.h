@@ -17,7 +17,6 @@ class TransactionRow;
 class TransactionHistoryModel : public QAbstractTableModel
 {
     Q_OBJECT
-    Q_PROPERTY(TransactionHistory * transactionHistory READ transactionHistory WRITE setTransactionHistory NOTIFY transactionHistoryChanged)
 
 public:
     enum Column
@@ -32,7 +31,6 @@ public:
 
     explicit TransactionHistoryModel(QObject * parent = nullptr);
     void setTransactionHistory(TransactionHistory * th);
-    TransactionHistory * transactionHistory() const;
     const TransactionRow& entryFromIndex(const QModelIndex& index) const;
 
     int rowCount(const QModelIndex & parent = QModelIndex()) const override;
