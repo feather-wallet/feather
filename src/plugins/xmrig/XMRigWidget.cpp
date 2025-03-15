@@ -31,6 +31,8 @@ XMRigWidget::XMRigWidget(Wallet *wallet, QWidget *parent)
     connect(m_XMRig, &XmRig::error, this, &XMRigWidget::onProcessError);
     connect(m_XMRig, &XmRig::hashrate, this, &XMRigWidget::onHashrate);
 
+    ui->deprecationFrame->setInfo(icons()->icon("warning.png"), "This feature is deprecated and will be removed in an upcoming version.");
+
     // [Downloads] tab
     ui->tableView->setModel(m_model);
     m_contextMenu->addAction(icons()->icon("network.png"), "Download file", this, &XMRigWidget::linkClicked);
