@@ -333,11 +333,22 @@ bool xdgDesktopEntryRegister() {
 #endif
 
     QPixmap appIcon(":assets/images/appicons/64x64.png");
-    QString pathIcon = QString("%1/.local/share/icons/feather.png").arg(QDir::homePath());
-    if (!fileExists(pathIcon)) {
-        pixmapWrite(pathIcon, appIcon);
+    QString iconPathSuffix = "%1/.local/share/icons/feather.png";
+    QString iconPath = iconPathSuffix.arg(QDir::homePath());
+    if (!fileExists(iconPath)) {
+        pixmapWrite(iconPath, appIcon);
     }
     xdgDesktopEntryWrite(QStandardPaths::writableLocation(QStandardPaths::ApplicationsLocation) + "/feather-wallet.desktop");
+
+    // Also write to dotfiles persistence
+    if (TailsOS::detect() && TailsOS::detectDotPersistence()) {
+        QString basePath = "/live/persistence/TailsData_unlocked/dotfiles";
+        iconPath = iconPathSuffix.arg(basePath);
+        if (!fileExists(iconPath)) {
+            pixmapWrite(iconPath, appIcon);
+        }
+        xdgDesktopEntryWrite(basePath + "/.local/share/applications/feather-wallet.desktop");
+    }
 
     xdgRefreshApplications();
     return true;
