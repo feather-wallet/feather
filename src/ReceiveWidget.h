@@ -46,6 +46,7 @@ private slots:
     void showHeaderMenu(const QPoint& position);
     void showOnDevice();
     void generateSubaddress();
+    void exportSubaddresses();
 
 private:
     QScopedPointer<Ui::ReceiveWidget> ui;
