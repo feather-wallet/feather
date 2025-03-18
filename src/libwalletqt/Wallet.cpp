@@ -261,6 +261,16 @@ QString Wallet::getAddressSafe(quint32 accountIndex, quint32 addressIndex, bool 
         return {};
     }
 
+    if (!rct::isInMainSubgroup(rct::pk2rct(info.address.m_spend_public_key))) {
+        reason = "Spend public key is not is main subgroup";
+        return {};
+    }
+
+    if (!rct::isInMainSubgroup(rct::pk2rct(info.address.m_view_public_key))) {
+        reason = "View public key is not in main subgroup";
+        return {};
+    }
+
     ok = true;
     return QString::fromStdString(address_str);
 }
