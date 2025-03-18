@@ -176,6 +176,8 @@ public:
     void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
     QString getSubaddressLookahead() const;
 
+    bool isAddressTorsionFree(const QString& address);
+
     // ##### Seed #####
 
     //! returns mnemonic seed

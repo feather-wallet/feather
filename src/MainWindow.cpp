@@ -1388,6 +1388,11 @@ void MainWindow::showAddressChecker() {
         return;
     }
 
+    if (!m_wallet->isAddressTorsionFree(address)) {
+        Utils::showWarning(this, "Address is not torsion-free", "This address is not compatible with reference wallets.\n\nSending to this address MAY RESULT IN A LOSS OF FUNDS.");
+        return;
+    }
+
     SubaddressIndex index = m_wallet->subaddressIndex(address);
     if (!index.isValid()) {
         // TODO: probably mention lookahead here

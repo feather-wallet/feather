@@ -331,6 +331,15 @@ QString Wallet::getSubaddressLookahead() const {
     return QString("%1:%2").arg(QString::number(lookahead.first), QString::number(lookahead.second));
 }
 
+bool Wallet::isAddressTorsionFree(const QString& address) {
+    cryptonote::address_parse_info info;
+    bool r = cryptonote::get_account_address_from_str(info, m_wallet2->nettype(), address.toStdString());
+    if (!r) {
+        return false;
+    }
+    return rct::isInMainSubgroup(rct::pk2rct(info.address.m_spend_public_key)) && rct::isInMainSubgroup(rct::pk2rct(info.address.m_view_public_key));
+}
+
 // #################### Seed ####################
 
 QString Wallet::getSeed(const QString &seedOffset) const {
