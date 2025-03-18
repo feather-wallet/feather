@@ -9,7 +9,6 @@
 #include <QWidget>
 
 #include "utils/config.h"
-#include "utils/os/Prestium.h"
 
 NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
         : QWidget(parent)
@@ -95,11 +94,7 @@ void NetworkProxyWidget::updatePort() {
             break;
         }
         case Config::Proxy::i2p: {
-            if (Prestium::detect()) {
-                socks5port = 4448;
-            } else {
-                socks5port = 4447;
-            }
+            socks5port = 4447;
             break;
         }
         default: {

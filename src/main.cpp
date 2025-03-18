@@ -7,7 +7,6 @@
 #include "config-feather.h"
 #include "constants.h"
 #include "utils/EventFilter.h"
-#include "utils/os/Prestium.h"
 #include "WindowManager.h"
 #include "config.h"
 #include <wallet/api/wallet2_api.h>
@@ -175,13 +174,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     }
     if (!QDir().mkpath(walletDir))
         qCritical() << "Unable to create dir: " << walletDir;
-
-    // Prestium initial config
-    if (conf()->get(Config::firstRun).toBool() && Prestium::detect()) {
-        conf()->set(Config::proxy, Config::Proxy::i2p);
-        conf()->set(Config::socks5Port, Prestium::i2pPort());
-        conf()->set(Config::hideUpdateNotifications, true);
-    }
 
     if (parser.isSet("use-local-tor"))
         conf()->set(Config::useLocalTor, true);

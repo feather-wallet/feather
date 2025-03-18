@@ -8,7 +8,6 @@
 
 #include "constants.h"
 #include "utils/nodes.h"
-#include "utils/os/Prestium.h"
 #include "Utils.h"
 #include "WalletWizard.h"
 
@@ -57,10 +56,6 @@ PageNetwork::PageNetwork(QWidget *parent)
 }
 
 int PageNetwork::nextId() const {
-    if (Prestium::detect()) {
-        return WalletWizard::Page_NetworkWebsocket;
-    }
-
     return WalletWizard::Page_NetworkProxy;
 }
 
