@@ -222,6 +222,7 @@ QDir Config::defaultConfigDir() {
     }
 
     if (TailsOS::detect()) {
+#ifdef SELF_CONTAINED
         QString path = []{
             QString appImagePath = qgetenv("APPIMAGE");
             if (appImagePath.isEmpty()) {
@@ -241,6 +242,11 @@ QDir Config::defaultConfigDir() {
         }();
 
         return QDir(path);
+#else
+        if (TailsOS::detectDataPersistence()) {
+            return QDir::homePath() + "/Persistent/feather_data";
+        }
+#endif
     }
 
 #if defined(Q_OS_WIN)

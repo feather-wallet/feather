@@ -171,6 +171,7 @@ QString defaultWalletDir() {
     }
 
     if (TailsOS::detect()) {
+#ifdef SELF_CONTAINED
         QString path = []{
             // Starting in 1.1.0 the wallet and config directory were moved from ./.feather to ./feather_data
             // A user might accidentally delete the folder containing the file hidden folder after moving the AppImage
@@ -194,6 +195,11 @@ QString defaultWalletDir() {
         }();
 
         return path;
+#else
+        if (TailsOS::detectDataPersistence()) {
+            return QDir::homePath() + "/Persistent/feather_data/wallets";
+        }
+#endif
     }
 
 #if defined(Q_OS_LINUX) or defined(Q_OS_MAC)
