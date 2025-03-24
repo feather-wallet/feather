@@ -7,6 +7,8 @@
 #include "monero_seed/monero_seed.hpp"
 #include "polyseed/polyseed.h"
 #include "utils/AppData.h"
+#include "crypto/crypto.h"
+#include "mnemonics/electrum-words.h"
 
 #include <sstream>
 #include <utility>
@@ -129,6 +131,20 @@ Seed::Seed(Type type, QStringList mnemonic, NetworkType::Type networkType)
         }
         catch (const std::exception &e) {
             this->errorString = e.what();
+            return;
+        }
+    }
+
+    if (this->type == Type::MONERO) {
+        crypto::secret_key recovery_key;
+        std::string old_language;
+        if (!crypto::ElectrumWords::words_to_bytes(mnemonic.join(" ").toStdString(), recovery_key, old_language)) {
+            if (this->mnemonic.length() == 25) {
+                this->errorString = "Invalid checksum word";
+            }
+            else {
+                this->errorString = "Invalid seed";
+            }
             return;
         }
     }
