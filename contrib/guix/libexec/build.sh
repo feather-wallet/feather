@@ -377,8 +377,8 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             case "$OPTIONS" in
                 installer)
                     makensis -DCUR_PATH=$PWD -V2 contrib/installers/windows/setup.nsi
-                    cp contrib/installers/windows/FeatherWalletSetup-*.exe "${INSTALLPATH}/"
-                    mv contrib/installers/windows/FeatherWalletSetup-*.exe "${OUTDIR}/"
+                    cp contrib/installers/windows/FeatherWalletSetup.exe "${INSTALLPATH}/"
+                    mv contrib/installers/windows/FeatherWalletSetup.exe "${OUTDIR}/"
                     ;;
             esac
             ;;
@@ -423,6 +423,28 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
                     *darwin*)
                         signapple apply Feather.app "/distsrc/external/feather-codesigning/signatures/${HOST}/Feather.app"
                         ;;
+                    *mingw*)
+                        case "$OPTIONS" in
+                            installer)
+                                osslsigncode attach-signature \
+                                                 -in "FeatherWalletSetup.exe" \
+                                                 -out "FeatherWalletSetup.exe.tmp" \
+                                                 -CAfile "$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt" \
+                                                 -sigin "/distsrc/external/feather-codesigning/signatures/${HOST}/feather.installer.pem" || true
+                                cp FeatherWalletSetup.exe.tmp "${OUTDIR}/FeatherWalletSetup-${TAG}.exe"
+                                mv FeatherWalletSetup.exe.tmp "FeatherWalletSetup-${TAG}.exe"
+                                rm "${OUTDIR}/FeatherWalletSetup.exe"
+                                ;;
+                            "")
+                                osslsigncode attach-signature \
+                                                 -in "feather.exe" \
+                                                 -out "feather.exe.tmp" \
+                                                 -CAfile "$GUIX_ENVIRONMENT/etc/ssl/certs/ca-certificates.crt" \
+                                                 -sigin "/distsrc/external/feather-codesigning/signatures/${HOST}/feather.pem" || true
+                                mv feather.exe.tmp feather.exe
+                                ;;
+                        esac
+                        ;;
                 esac
             fi
         fi
@@ -431,25 +453,31 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
         # for release
         case "$HOST" in
             *mingw*)
-                case "$OPTIONS" in
-                    installer)
-                        find . -print0 \
-                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                        find . \
-                            | sort \
-                            | zip -X@ "${OUTDIR}/${DISTNAME}-win-installer.zip" \
-                            || ( rm -f "${OUTDIR}/${DISTNAME}-win-installer.zip" && exit 1 )
-                        ;;
-                    "")
-                        mv feather.exe ${DISTNAME}.exe && \
-                        find . -print0 \
-                            | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
-                        find . \
-                            | sort \
-                            | zip -X@ "${OUTDIR}/${DISTNAME}-win.zip" \
-                            || ( rm -f "${OUTDIR}/${DISTNAME}-win.zip" && exit 1 )
-                        ;;
-                esac
+                if [[ "${TAG}" == *"-rc"* ]]; then
+                    if [ -z "$OPTIONS" ]; then
+                        mv feather.exe "${OUTDIR}/${DISTNAME}.exe"
+                    fi
+                else
+                      case "$OPTIONS" in
+                          installer)
+                              find . -print0 \
+                                  | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                              find . \
+                                  | sort \
+                                  | zip -X@ "${OUTDIR}/${DISTNAME}-win-installer.zip" \
+                                  || ( rm -f "${OUTDIR}/${DISTNAME}-win-installer.zip" && exit 1 )
+                              ;;
+                          "")
+                              mv feather.exe ${DISTNAME}.exe && \
+                              find . -print0 \
+                                  | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
+                              find . \
+                                  | sort \
+                                  | zip -X@ "${OUTDIR}/${DISTNAME}-win.zip" \
+                                  || ( rm -f "${OUTDIR}/${DISTNAME}-win.zip" && exit 1 )
+                              ;;
+                      esac
+                fi
                 ;;
             *linux*)
                 if [ "$OPTIONS" != "pack" ]; then
