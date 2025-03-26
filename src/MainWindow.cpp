@@ -230,9 +230,6 @@ void MainWindow::initWidgets() {
     // [Send]
     m_sendWidget = new SendWidget(m_wallet, this);
     ui->sendWidgetLayout->addWidget(m_sendWidget);
-    // --------------
-    m_contactsWidget = new ContactsWidget(m_wallet, this);
-    ui->contactsWidgetLayout->addWidget(m_contactsWidget);
 
     // [Receive]
     m_receiveWidget = new ReceiveWidget(m_wallet, this);
@@ -241,13 +238,18 @@ void MainWindow::initWidgets() {
         m_historyWidget->setSearchText(text);
         ui->tabWidget->setCurrentIndex(this->findTab("History"));
     });
-    connect(m_contactsWidget, &ContactsWidget::fill, [this](const QString &address, const QString &description){
-        m_sendWidget->fill(address, description, 0, true);
-    });
 
     // [Coins]
     m_coinsWidget = new CoinsWidget(m_wallet, this);
     ui->coinsWidgetLayout->addWidget(m_coinsWidget);
+
+    // [Contacts]
+    m_contactsWidget = new ContactsWidget(m_wallet, this);
+    ui->contactsWidgetLayout->addWidget(m_contactsWidget);
+    connect(m_contactsWidget, &ContactsWidget::fill, [this](const QString &address, const QString &description){
+        m_sendWidget->fill(address, description, 0, true);
+        ui->tabWidget->setCurrentIndex(this->findTab("Send"));
+    });
 
     // [Plugins..]
     for (auto* plugin : m_plugins) {
@@ -331,6 +333,11 @@ void MainWindow::initMenu() {
     connect(ui->actionShow_Coins, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Coins"] = new ToggleTab(ui->tabCoins, "Coins", "Coins", ui->actionShow_Coins, this);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Coins, "Coins");
+
+    // Show/Hide Contacts
+    connect(ui->actionShow_Contacts, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["Contacts"] = new ToggleTab(ui->tabContacts, "Contacts", "Contacts", ui->actionShow_Contacts, this);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Contacts, "Contacts");
 
     // Show/Hide Plugins..
     for (const auto &plugin : m_plugins) {
@@ -1968,7 +1975,7 @@ void MainWindow::toggleSearchbar(bool visible) {
     int currentTab = ui->tabWidget->currentIndex();
     if (currentTab == this->findTab("History"))
         m_historyWidget->focusSearchbar();
-    else if (currentTab == this->findTab("Send"))
+    else if (currentTab == this->findTab("Contacts"))
         m_contactsWidget->focusSearchbar();
     else if (currentTab == this->findTab("Receive"))
         m_receiveWidget->focusSearchbar();

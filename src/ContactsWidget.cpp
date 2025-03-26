@@ -22,11 +22,6 @@ ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
 {
     ui->setupUi(this);
 
-    m_btn_addContact = new QPushButton(this);
-    m_btn_addContact->setIcon(icons()->icon("register.svg"));
-    ui->searchLayout->addWidget(m_btn_addContact, 0, Qt::AlignRight);
-    connect(m_btn_addContact, &QPushButton::clicked, [this]{this->newContact();});
-
     m_model = m_wallet->addressBookModel();
     m_proxyModel = new AddressBookProxyModel;
     m_proxyModel->setSourceModel(m_model);
@@ -40,8 +35,13 @@ ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
     // header context menu
     ui->contacts->header()->setContextMenuPolicy(Qt::CustomContextMenu);
     m_headerMenu = new QMenu(this);
+    m_headerMenu->addAction("New contact", [this] {
+        this->newContact();
+    });
     m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ContactsWidget::setShowFullAddresses);
     m_showFullAddressesAction->setCheckable(true);
+
+    ui->btn_options->setMenu(m_headerMenu);
 
     connect(ui->contacts->header(), &QHeaderView::customContextMenuRequested, this, &ContactsWidget::showHeaderMenu);
 
@@ -78,7 +78,7 @@ ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
 }
 
 void ContactsWidget::setSearchbarVisible(bool visible) {
-    ui->search->setVisible(visible);
+    ui->frame_search->setVisible(visible);
 }
 
 void ContactsWidget::focusSearchbar() {
