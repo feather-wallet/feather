@@ -251,6 +251,12 @@ void MainWindow::initWidgets() {
         ui->tabWidget->setCurrentIndex(this->findTab("Send"));
     });
 
+    // [Notes]
+    ui->notes->setPlainText(m_wallet->getCacheAttribute("wallet.notes"));
+    connect(ui->notes, &QPlainTextEdit::textChanged, [this] {
+       m_wallet->setCacheAttribute("wallet.notes", ui->notes->toPlainText());
+    });
+
     // [Plugins..]
     for (auto* plugin : m_plugins) {
         if (!plugin->hasParent()) {
@@ -338,6 +344,11 @@ void MainWindow::initMenu() {
     connect(ui->actionShow_Contacts, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
     m_tabShowHideMapper["Contacts"] = new ToggleTab(ui->tabContacts, "Contacts", "Contacts", ui->actionShow_Contacts, this);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Contacts, "Contacts");
+
+    // Show/Hide Notes
+    connect(ui->actionShow_Notes, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
+    m_tabShowHideMapper["Notes"] = new ToggleTab(ui->tabNotes, "Notes", "Notes", ui->actionShow_Notes, this);
+    m_tabShowHideSignalMapper->setMapping(ui->actionShow_Notes, "Notes");
 
     // Show/Hide Plugins..
     for (const auto &plugin : m_plugins) {

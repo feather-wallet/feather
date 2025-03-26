@@ -169,6 +169,32 @@
             </item>
            </layout>
           </widget>
+          <widget class="QWidget" name="tabNotes">
+           <attribute name="icon">
+            <iconset resource="assets.qrc">
+             <normaloff>:/assets/images/tab_notes.png</normaloff>:/assets/images/tab_notes.png</iconset>
+           </attribute>
+           <attribute name="title">
+            <string>Notes</string>
+           </attribute>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QPlainTextEdit" name="notes"/>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
         <item>
@@ -587,6 +613,7 @@
     <addaction name="actionPlaceholderBegin"/>
     <addaction name="actionShow_Coins"/>
     <addaction name="actionShow_Contacts"/>
+    <addaction name="actionShow_Notes"/>
     <addaction name="actionPlaceholderEnd"/>
     <addaction name="separator"/>
     <addaction name="actionShow_Searchbar"/>
@@ -960,6 +987,11 @@
   <action name="actionShow_Contacts">
    <property name="text">
     <string>Show Contacts</string>
+   </property>
+  </action>
+  <action name="actionShow_Notes">
+   <property name="text">
+    <string>Show Notes</string>
    </property>
   </action>
  </widget>
