@@ -68,7 +68,7 @@
         <enum>QPlainTextEdit::LineWrapMode::NoWrap</enum>
        </property>
        <property name="placeholderText">
-        <string>Paste address or QR code</string>
+        <string>Paste address, payment URI, OpenAlias, or QR code</string>
        </property>
       </widget>
      </item>
