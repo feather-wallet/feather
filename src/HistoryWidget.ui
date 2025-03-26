@@ -27,19 +27,57 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLineEdit" name="search">
-     <property name="placeholderText">
-      <string>Search txid, description..</string>
+    <widget class="QFrame" name="frame_search">
+     <property name="frameShape">
+      <enum>QFrame::Shape::NoFrame</enum>
      </property>
+     <property name="frameShadow">
+      <enum>QFrame::Shadow::Plain</enum>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QLineEdit" name="search">
+        <property name="placeholderText">
+         <string>Search txid, description..</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btn_options">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="assets.qrc">
+          <normaloff>:/assets/images/preferences.svg</normaloff>:/assets/images/preferences.svg</iconset>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::ToolButtonPopupMode::InstantPopup</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
     <widget class="QFrame" name="syncNotice">
      <property name="frameShape">
-      <enum>QFrame::StyledPanel</enum>
+      <enum>QFrame::Shape::StyledPanel</enum>
      </property>
      <property name="frameShadow">
-      <enum>QFrame::Raised</enum>
+      <enum>QFrame::Shadow::Raised</enum>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout">
       <property name="topMargin">
@@ -58,7 +96,7 @@
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -122,6 +160,8 @@
    <header>model/HistoryView.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="assets.qrc"/>
+ </resources>
  <connections/>
 </ui>

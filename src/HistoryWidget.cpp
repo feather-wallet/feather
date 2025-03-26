@@ -61,10 +61,12 @@ HistoryWidget::HistoryWidget(Wallet *wallet, QWidget *parent)
     if (!historyViewState.isEmpty()) {
         ui->history->setViewState(historyViewState);
     }
+
+    ui->btn_options->setMenu(ui->history->getMenu());
 }
 
 void HistoryWidget::setSearchbarVisible(bool visible) {
-    ui->search->setVisible(visible);
+    ui->frame_search->setVisible(visible);
 }
 
 void HistoryWidget::focusSearchbar() {

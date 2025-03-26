@@ -75,6 +75,11 @@ TransactionHistoryModel* HistoryView::sourceModel()
     return dynamic_cast<TransactionHistoryModel *>(m_model->sourceModel());
 }
 
+QMenu* HistoryView::getMenu()
+{
+    return m_headerMenu;
+}
+
 void HistoryView::setSearchMode(bool mode) {
     if (!m_inSearchMode) {
         m_showTxidColumn = !header()->isSectionHidden(TransactionHistoryModel::TxID);

@@ -25,6 +25,8 @@ public:
     QModelIndex getCurrentIndex();
     TransactionHistoryModel* sourceModel();
 
+    QMenu* getMenu();
+
 private slots:
     void showHeaderMenu(const QPoint& position);
     void toggleColumnVisibility(QAction* action);
