@@ -16,6 +16,10 @@ Subaddress::Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
 
     QString hidden = m_wallet->getCacheAttribute("feather.hiddenaddresses");
     m_hidden = hidden.split(",");
+
+    connect(this, &Subaddress::noUnusedSubaddresses, [this] {
+        this->addRow(m_wallet->currentSubaddressAccount(), "");
+    });
 }
 
 bool Subaddress::refresh(quint32 accountIndex)
@@ -24,6 +28,7 @@ bool Subaddress::refresh(quint32 accountIndex)
 
     m_rows.clear();
 
+    bool haveUnused = false;
     bool potentialWalletFileCorruption = false;
 
     for (quint32 i = 0; i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
@@ -46,13 +51,17 @@ bool Subaddress::refresh(quint32 accountIndex)
 
         QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
 
+        bool used = m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i});
         m_rows.emplace_back(
             addressStr,
             QString::fromStdString(m_wallet2->get_subaddress_label(index)),
-            m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i}),
+            used,
             this->isHidden(addressStr),
             this->isPinned(addressStr)
         );
+        if (!used && i > 0) {
+            haveUnused = true;
+        }
     }
 
     // Make sure keys are intact. We NEVER want to display incorrect addresses in case of memory corruption.
@@ -66,18 +75,30 @@ bool Subaddress::refresh(quint32 accountIndex)
 
     emit refreshFinished();
 
+    if (!haveUnused) {
+        emit noUnusedSubaddresses();
+    }
+
     return !potentialWalletFileCorruption;
 }
 
 void Subaddress::updateUsed(quint32 accountIndex)
 {
+    bool haveUnused = false;
     for (quint32 i = 0; i < m_rows.count(); i++) {
         SubaddressRow& row = m_rows[i];
 
-        if (m_wallet2->get_subaddress_used({accountIndex, i}) != row.used) {
+        bool used = m_wallet2->get_subaddress_used({accountIndex, i});
+        if (used != row.used) {
             row.used = !row.used;
             emit rowUpdated(i);
         }
+        if (!used && i > 0) {
+            haveUnused = true;
+        }
+    }
+    if (!haveUnused) {
+        emit noUnusedSubaddresses();
     }
 }
 

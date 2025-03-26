@@ -41,6 +41,7 @@ signals:
     void refreshFinished() const;
     void rowUpdated(qsizetype index) const;
     void corrupted() const;
+    void noUnusedSubaddresses() const;
 
 private:
     explicit Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
