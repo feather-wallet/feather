@@ -690,8 +690,11 @@
    </property>
   </action>
   <action name="actionShow_Coins">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Show Coins</string>
+    <string>Coins</string>
    </property>
   </action>
   <action name="actionShow_xmr_to">
@@ -985,13 +988,19 @@
    </property>
   </action>
   <action name="actionShow_Contacts">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Show Contacts</string>
+    <string>Contacts</string>
    </property>
   </action>
   <action name="actionShow_Notes">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
    <property name="text">
-    <string>Show Notes</string>
+    <string>Notes</string>
    </property>
   </action>
  </widget>

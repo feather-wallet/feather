@@ -356,7 +356,7 @@ void MainWindow::initMenu() {
             continue;
         }
 
-        auto* pluginAction = new QAction(QString("Show %1").arg(plugin->displayName()), this);
+        auto* pluginAction = new QAction(plugin->displayName(), this);
         ui->menuView->insertAction(plugin->insertFirst() ? ui->actionPlaceholderBegin : ui->actionPlaceholderEnd, pluginAction);
         connect(pluginAction, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
         m_tabShowHideMapper[plugin->displayName()] = new ToggleTab(plugin->tab(), plugin->displayName(), plugin->displayName(), pluginAction, this);
@@ -370,7 +370,9 @@ void MainWindow::initMenu() {
         const auto toggleTab = m_tabShowHideMapper.value(key);
         bool show = enabledTabs.contains(key);
 
-        toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
+        toggleTab->menuAction->setText(toggleTab->name);
+        toggleTab->menuAction->setCheckable(true);
+        toggleTab->menuAction->setChecked(show);
         ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
     }
     connect(m_tabShowHideSignalMapper, &QSignalMapper::mappedString, this, &MainWindow::menuToggleTabVisible);
@@ -539,7 +541,7 @@ void MainWindow::menuToggleTabVisible(const QString &key){
 
     conf()->set(Config::enabledTabs, enabledTabs);
     ui->tabWidget->setTabVisible(ui->tabWidget->indexOf(toggleTab->tab), show);
-    toggleTab->menuAction->setText((show ? QString("Hide ") : QString("Show ")) + toggleTab->name);
+    toggleTab->menuAction->setText(toggleTab->name);
 }
 
 void MainWindow::menuClearHistoryClicked() {
