@@ -4,7 +4,6 @@
 #include <QSslSocket>
 
 #include "Application.h"
-#include "config-feather.h"
 #include "constants.h"
 #include "utils/EventFilter.h"
 #include "WindowManager.h"

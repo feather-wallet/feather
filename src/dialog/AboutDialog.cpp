@@ -7,7 +7,6 @@
 #include <QMessageBox>
 #include <QDate>
 
-#include "config-feather.h"
 #include "utils/Utils.h"
 
 AboutDialog::AboutDialog(QWidget *parent)

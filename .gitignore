@@ -12,7 +12,6 @@ CMakeFiles
 cmake_install.cmake
 feather_autogen/
 feather.cbp
-src/config-feather.h
 src/assets_tor.qrc
 src/assets_docs.qrc
 feather.AppDir/*

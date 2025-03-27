@@ -10,7 +10,6 @@
 #include "utils/Utils.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "config-feather.h"
 
 TorManager::TorManager(QObject *parent)
     : QObject(parent)

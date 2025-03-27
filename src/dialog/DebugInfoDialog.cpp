@@ -4,7 +4,6 @@
 #include "DebugInfoDialog.h"
 #include "ui_DebugInfoDialog.h"
 
-#include "config-feather.h"
 #include "utils/AppData.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"

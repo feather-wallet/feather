@@ -67,7 +67,6 @@ if(STATIC)
 endif()
 
 include(CMakePackageConfigHelpers)
-configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
 #### Dependencies ####
 # Monero
@@ -149,7 +148,6 @@ if(TOR_DIR)
     endif()
 
     message(STATUS "Embedded Tor version: ${TOR_VERSION}")
-    configure_file("cmake/config-feather.h.cmake" "${CMAKE_CURRENT_SOURCE_DIR}/src/config-feather.h")
 
     # Always copy Tor when doing a reproducible build to prevent old versions from getting included
     if (REPRODUCIBLE)

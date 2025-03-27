@@ -6,7 +6,6 @@
 
 #include <QTimer>
 
-#include "config-feather.h"
 #include "WalletWizard.h"
 
 PageMenu::PageMenu(WizardFields *fields, WalletKeysFilesModel *wallets, QWidget *parent)

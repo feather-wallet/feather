@@ -182,6 +182,10 @@ target_include_directories(feather PUBLIC
         ${BCUR_INCLUDE_DIR}
 )
 
+target_compile_definitions(feather PRIVATE FEATHER_VERSION="${PROJECT_VERSION}")
+target_compile_definitions(feather PRIVATE FEATHER_TARGET_TRIPLET="${FEATHER_TARGET_TRIPLET}")
+target_compile_definitions(feather PRIVATE TOR_VERSION="${TOR_VERSION}")
+
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
             ${QtMultimedia_INCLUDE_DIRS}

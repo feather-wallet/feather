@@ -18,7 +18,6 @@
 #include <QStandardPaths>
 #include <QProcess>
 
-#include "config-feather.h"
 #include "constants.h"
 #include "networktype.h"
 #include "utils/AppData.h"

@@ -8,7 +8,6 @@
 #include <openpgp/hash.h>
 
 #include "utils/config.h"
-#include "config-feather.h"
 #include "Utils.h"
 #include "utils/AsyncTask.h"
 #include "utils/Networking.h"
