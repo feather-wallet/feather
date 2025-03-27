@@ -41,6 +41,8 @@ signals:
 
 private slots:
     void showHeaderMenu(const QPoint &position);
+    void importCSV();
+    void exportCSV();
 
 private:
     QScopedPointer<Ui::ContactsWidget> ui;

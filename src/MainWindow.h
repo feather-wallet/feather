@@ -114,7 +114,6 @@ private slots:
     void menuClearHistoryClicked();
     void onExportHistoryCSV();
     void onImportHistoryDescriptionsCSV();
-    void onExportContactsCSV();
     void onCreateDesktopEntry();
     void onShowDocumentation();
     void onReportBug();
@@ -159,7 +158,6 @@ private slots:
     void skinChanged(const QString &skinName);
     void onViewOnBlockExplorer(const QString &txid);
     void onResendTransaction(const QString &txid);
-    void importContacts();
     void importTransaction();
     void onDeviceError(const QString &error, quint64 errorCode);
     void onDeviceButtonRequest(quint64 code);

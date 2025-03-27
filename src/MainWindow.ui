@@ -538,13 +538,6 @@
      <addaction name="actionExport_CSV"/>
      <addaction name="actionImportHistoryCSV"/>
     </widget>
-    <widget class="QMenu" name="menuContacts">
-     <property name="title">
-      <string>Contacts</string>
-     </property>
-     <addaction name="actionExportContactsCSV"/>
-     <addaction name="actionImportContactsCSV"/>
-    </widget>
     <widget class="QMenu" name="menuAdvanced">
      <property name="title">
       <string>Advanced</string>
@@ -565,7 +558,6 @@
     <addaction name="actionViewOnly"/>
     <addaction name="separator"/>
     <addaction name="menuHistory"/>
-    <addaction name="menuContacts"/>
    </widget>
    <widget class="QMenu" name="menuTools">
     <property name="title">

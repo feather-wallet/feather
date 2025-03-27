@@ -5,6 +5,7 @@
 #include "ui_ContactsWidget.h"
 
 #include <QMessageBox>
+#include <QFileDialog>
 
 #include "dialog/ContactsDialog.h"
 #include "model/AddressBookModel.h"
@@ -38,6 +39,9 @@ ContactsWidget::ContactsWidget(Wallet *wallet, QWidget *parent)
     m_headerMenu->addAction("New contact", [this] {
         this->newContact();
     });
+    m_headerMenu->addAction("Import CSV", this, &ContactsWidget::importCSV);
+    m_headerMenu->addAction("Export CSV", this, &ContactsWidget::exportCSV);
+    m_headerMenu->addSeparator();
     m_showFullAddressesAction = m_headerMenu->addAction("Show full addresses", this, &ContactsWidget::setShowFullAddresses);
     m_showFullAddressesAction->setCheckable(true);
 
@@ -116,6 +120,42 @@ void ContactsWidget::showHeaderMenu(const QPoint& position)
 {
     m_showFullAddressesAction->setChecked(m_model->isShowFullAddresses());
     m_headerMenu->exec(QCursor::pos());
+}
+
+void ContactsWidget::importCSV() {
+    const QString targetFile = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
+    if(targetFile.isEmpty()) return;
+
+    auto *model = m_wallet->addressBookModel();
+    QMapIterator<QString, QString> i(model->readCSV(targetFile));
+    int inserts = 0;
+    while (i.hasNext()) {
+        i.next();
+        bool addressValid = WalletManager::addressValid(i.value(), m_wallet->nettype());
+        if(addressValid) {
+            m_wallet->addressBook()->addRow(i.value(), i.key());
+            inserts++;
+        }
+    }
+
+    Utils::showInfo(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
+}
+
+void ContactsWidget::exportCSV() {
+    auto *model = m_wallet->addressBookModel();
+    if (model->rowCount() <= 0){
+        Utils::showInfo(this, "Unable to export contacts", "No contacts to export");
+        return;
+    }
+
+    const QString targetDir = QFileDialog::getExistingDirectory(this, "Select CSV output directory ", QDir::homePath(), QFileDialog::ShowDirsOnly);
+    if(targetDir.isEmpty()) return;
+
+    qint64 now = QDateTime::currentMSecsSinceEpoch();
+    QString fn = QString("%1/monero-contacts_%2.csv").arg(targetDir, QString::number(now / 1000));
+    if (model->writeCSV(fn)) {
+        Utils::showInfo(this, "Contacts exported successfully", QString("Exported to: %1").arg(fn));
+    }
 }
 
 void ContactsWidget::newContact(QString address, QString name)

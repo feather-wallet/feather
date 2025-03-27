@@ -326,10 +326,6 @@ void MainWindow::initMenu() {
     connect(ui->actionExport_CSV, &QAction::triggered, this, &MainWindow::onExportHistoryCSV);
     connect(ui->actionImportHistoryCSV, &QAction::triggered, this, &MainWindow::onImportHistoryDescriptionsCSV);
 
-    // [Wallet] -> [Contacts]
-    connect(ui->actionExportContactsCSV, &QAction::triggered, this, &MainWindow::onExportContactsCSV);
-    connect(ui->actionImportContactsCSV, &QAction::triggered, this, &MainWindow::importContacts);
-
     // [View]
     m_tabShowHideSignalMapper = new QSignalMapper(this);
     connect(ui->actionShow_Searchbar, &QAction::toggled, this, &MainWindow::toggleSearchbar);
@@ -1340,25 +1336,6 @@ void MainWindow::onResendTransaction(const QString &txid) {
     dialog.exec();
 }
 
-void MainWindow::importContacts() {
-    const QString targetFile = QFileDialog::getOpenFileName(this, "Import CSV file", QDir::homePath(), "CSV Files (*.csv)");
-    if(targetFile.isEmpty()) return;
-
-    auto *model = m_wallet->addressBookModel();
-    QMapIterator<QString, QString> i(model->readCSV(targetFile));
-    int inserts = 0;
-    while (i.hasNext()) {
-        i.next();
-        bool addressValid = WalletManager::addressValid(i.value(), m_wallet->nettype());
-        if(addressValid) {
-            m_wallet->addressBook()->addRow(i.value(), i.key());
-            inserts++;
-        }
-    }
-
-    Utils::showInfo(this, "Contacts imported", QString("Total contacts imported: %1").arg(inserts));
-}
-
 void MainWindow::saveGeo() {
     conf()->set(Config::geometry, QString(saveGeometry().toBase64()));
     conf()->set(Config::windowState, QString(saveState().toBase64()));
@@ -1761,23 +1738,6 @@ void MainWindow::onImportHistoryDescriptionsCSV() {
     }
     else {
         Utils::showInfo(this, "Successfully imported transaction descriptions from CSV");
-    }
-}
-
-void MainWindow::onExportContactsCSV() {
-    auto *model = m_wallet->addressBookModel();
-    if (model->rowCount() <= 0){
-        Utils::showInfo(this, "Unable to export contacts", "No contacts to export");
-        return;
-    }
-
-    const QString targetDir = QFileDialog::getExistingDirectory(this, "Select CSV output directory ", QDir::homePath(), QFileDialog::ShowDirsOnly);
-    if(targetDir.isEmpty()) return;
-
-    qint64 now = QDateTime::currentMSecsSinceEpoch();
-    QString fn = QString("%1/monero-contacts_%2.csv").arg(targetDir, QString::number(now / 1000));
-    if (model->writeCSV(fn)) {
-        Utils::showInfo(this, "Contacts exported successfully", QString("Exported to: %1").arg(fn));
     }
 }
 
