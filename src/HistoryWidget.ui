@@ -50,7 +50,7 @@
       <item>
        <widget class="QLineEdit" name="search">
         <property name="placeholderText">
-         <string>Search txid, description..</string>
+         <string>Search...</string>
         </property>
        </widget>
       </item>
