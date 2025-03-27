@@ -1,5 +1,5 @@
 diff --git a/src/plugins/multimedia/CMakeLists.txt b/src/plugins/multimedia/CMakeLists.txt
-index 5bc39c1f8..c74f2ff4c 100644
+index 5b163e98a..eac405570 100644
 --- a/src/plugins/multimedia/CMakeLists.txt
 +++ b/src/plugins/multimedia/CMakeLists.txt
 @@ -2,7 +2,7 @@
@@ -976,7 +976,7 @@ index 000000000..95b069b64
 +#endif // QFFMPEGMEDIAMETADATA_H
 diff --git a/src/plugins/multimedia/v4l2/qffmpegvideosink.cpp b/src/plugins/multimedia/v4l2/qffmpegvideosink.cpp
 new file mode 100644
-index 000000000..93e7ceeed
+index 000000000..128ce2f56
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegvideosink.cpp
 @@ -0,0 +1,17 @@
@@ -991,18 +991,18 @@ index 000000000..93e7ceeed
 +{
 +}
 +
-+void QFFmpegVideoSink::setVideoFrame(const QVideoFrame &frame)
++void QFFmpegVideoSink::onVideoFrameChanged(const QVideoFrame &frame)
 +{
-+    QPlatformVideoSink::setVideoFrame(frame);
++
 +}
 +
 +QT_END_NAMESPACE
 diff --git a/src/plugins/multimedia/v4l2/qffmpegvideosink_p.h b/src/plugins/multimedia/v4l2/qffmpegvideosink_p.h
 new file mode 100644
-index 000000000..cbaa810d7
+index 000000000..9eac79129
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegvideosink_p.h
-@@ -0,0 +1,39 @@
+@@ -0,0 +1,40 @@
 +// Copyright (C) 2021 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -1035,7 +1035,8 @@ index 000000000..cbaa810d7
 +public:
 +    QFFmpegVideoSink(QVideoSink *sink);
 +
-+    void setVideoFrame(const QVideoFrame &frame) override;
++protected:
++    void onVideoFrameChanged(const QVideoFrame &frame) override;
 +};
 +
 +QT_END_NAMESPACE
@@ -1896,7 +1897,7 @@ index 000000000..79cc3cfa9
 +#endif // QV4L2CAMERA_H
 diff --git a/src/plugins/multimedia/v4l2/qv4l2cameradevices.cpp b/src/plugins/multimedia/v4l2/qv4l2cameradevices.cpp
 new file mode 100644
-index 000000000..44abde914
+index 000000000..c89ff69c6
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qv4l2cameradevices.cpp
 @@ -0,0 +1,168 @@
@@ -1941,7 +1942,7 @@ index 000000000..44abde914
 +    doCheckCameras();
 +}
 +
-+QList<QCameraDevice> QV4L2CameraDevices::videoInputs() const
++QList<QCameraDevice> QV4L2CameraDevices::findVideoInputs() const
 +{
 +    return m_cameras;
 +}
@@ -1949,7 +1950,7 @@ index 000000000..44abde914
 +void QV4L2CameraDevices::checkCameras()
 +{
 +    if (doCheckCameras())
-+        emit videoInputsChanged();
++        onVideoInputsChanged();
 +}
 +
 +bool QV4L2CameraDevices::doCheckCameras()
@@ -2070,10 +2071,10 @@ index 000000000..44abde914
 +#include "moc_qv4l2cameradevices_p.cpp"
 diff --git a/src/plugins/multimedia/v4l2/qv4l2cameradevices_p.h b/src/plugins/multimedia/v4l2/qv4l2cameradevices_p.h
 new file mode 100644
-index 000000000..ce424d3b6
+index 000000000..22ac44027
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qv4l2cameradevices_p.h
-@@ -0,0 +1,46 @@
+@@ -0,0 +1,47 @@
 +// Copyright (C) 2023 The Qt Company Ltd.
 +// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only
 +
@@ -2104,10 +2105,11 @@ index 000000000..ce424d3b6
 +public:
 +    QV4L2CameraDevices(QPlatformMediaIntegration *integration);
 +
-+    QList<QCameraDevice> videoInputs() const override;
-+
 +public Q_SLOTS:
 +    void checkCameras();
++
++protected:
++    QList<QCameraDevice> findVideoInputs() const override;
 +
 +private:
 +    bool doCheckCameras();

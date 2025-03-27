@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.8.2
+$(package)_version=6.8.3
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.8/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=012043ce6d411e6e8a91fdc4e05e6bedcfa10fcb1347d3c33908f7fdd10dfe05
+$(package)_sha256_hash=56001b905601bb9023d399f3ba780d7fa940f3e4861e496a7c490331f49e0b80
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus wayland native_wayland
@@ -27,22 +27,22 @@ $(package)_patches += qtwayland-tabletevent-fix.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=326381b7d43f07913612f291abc298ae79bd95382e2233abce982cff2b53d2c0
+$(package)_qttools_sha256_hash=02a4e219248b94f1333df843d25763f35251c1074cdc4fb5bda67d340f8c8b3a
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=aa2579f21ca66d19cbcf31d87e9067e07932635d36869c8239d4decd0a9dc1fa
+$(package)_qtsvg_sha256_hash=35eb516460f00f264eb504baa253432384351cf23fb9980a5857190e8deef438
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=919df562ba3446c8393992d112085ad2d96d23aaf802b1cd7a30bf3ba2fe8cbe
+$(package)_qtwebsockets_sha256_hash=fc6310c1b12d6e22a31062727aa6574ed69239d036c8a4247b3b089902709b11
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=34f561fdc07b158bcc4ad040b596fc6086c48908060e854b473b557e4feb1569
+$(package)_qtmultimedia_sha256_hash=32e82307d783172a3b984cc3c47c5e4e8b819cee3cbfc702c7012c47f15f6b01
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=d1d5f90e8885fc70d63ac55a4ce4d9a2688562033a000bc4aff9320f5f551871
+$(package)_qtshadertools_sha256_hash=f6ec88bf42deba84d8f6b5d0914636ceed4749ccb51d1945b2f79b322b7ecf47
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=5e46157908295f2bf924462d8c0855b0508ba338ced9e810891fefa295dc9647
+$(package)_qtwayland_sha256_hash=20fe385887d21190165a3180c17dcfc8b9a0e1da4ec76865b6334bdc709994b0
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
