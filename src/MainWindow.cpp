@@ -572,13 +572,12 @@ void MainWindow::onWalletOpened() {
     this->setEnabled(true);
 
     // receive page
-    m_wallet->subaddress()->refresh(m_wallet->currentSubaddressAccount());
+    m_wallet->subaddress()->refresh();
     if (m_wallet->subaddress()->count() == 1) {
         for (int i = 0; i < 10; i++) {
-            m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
+            m_wallet->subaddress()->addRow("");
         }
     }
-    m_wallet->subaddressModel()->setCurrentSubaddressAccount(m_wallet->currentSubaddressAccount());
 
     // history page
     m_wallet->history()->refresh();

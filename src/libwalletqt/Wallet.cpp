@@ -295,10 +295,9 @@ void Wallet::switchSubaddressAccount(quint32 accountIndex) {
         {
             qWarning() << "failed to set " << ATTRIBUTE_SUBADDRESS_ACCOUNT << " cache attribute";
         }
-        m_subaddress->refresh(m_currentSubaddressAccount);
+        m_subaddress->refresh();
         m_history->refresh();
         m_coins->refresh();
-        this->subaddressModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->coinsModel()->setCurrentSubaddressAccount(m_currentSubaddressAccount);
         this->updateBalance();
         this->setSelectedInputs({});
@@ -318,16 +317,8 @@ quint32 Wallet::numSubaddresses(quint32 accountIndex) const {
     return m_wallet2->get_num_subaddresses(accountIndex);
 }
 
-void Wallet::addSubaddress(const QString& label) {
-    m_wallet2->add_subaddress(currentSubaddressAccount(), label.toStdString());
-}
-
 QString Wallet::getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const {
     return QString::fromStdString(m_walletImpl->getSubaddressLabel(accountIndex, addressIndex));
-}
-
-void Wallet::setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label) {
-    m_walletImpl->setSubaddressLabel(accountIndex, addressIndex, label.toStdString());
 }
 
 void Wallet::deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId) {
@@ -440,6 +431,7 @@ void Wallet::initAsync(const QString &daemonAddress, bool trustedDaemon, quint64
 // #################### Synchronization (Refresh) ####################
 
 void Wallet::startRefresh() {
+    m_refreshEnabled = true;
     m_refreshEnabled = true;
     m_refreshNow = true;
 }
@@ -599,7 +591,7 @@ void Wallet::onRefreshed(bool success, const QString &message) {
 void Wallet::refreshModels() {
     m_history->refresh();
     m_coins->refresh();
-    this->subaddress()->refresh(this->currentSubaddressAccount());
+    m_subaddress->refresh();
 }
 
 // #################### Hardware wallet ####################
@@ -1008,7 +1000,7 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
 
     this->history()->refresh();
     this->coins()->refresh();
-    this->subaddress()->refresh(this->currentSubaddressAccount());
+    this->subaddress()->refresh();
 
     this->updateBalance();
 

@@ -36,9 +36,8 @@ public:
 
     const SubaddressRow& entryFromIndex(const QModelIndex &index) const;
 
-    void setCurrentSubaddressAccount(quint32 accountIndex);
-
     void rowUpdated(qsizetype index);
+    void beginRowAdded(qsizetype index);
 
 private:
     Subaddress *m_subaddress;

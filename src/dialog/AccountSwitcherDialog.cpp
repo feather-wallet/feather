@@ -43,8 +43,11 @@ AccountSwitcherDialog::AccountSwitcherDialog(Wallet *wallet, QWidget *parent)
     connect(ui->accounts, &QTreeView::customContextMenuRequested, this, &AccountSwitcherDialog::showContextMenu);
 
     connect(ui->btn_newAccount, &QPushButton::clicked, [this]{
-       m_wallet->addSubaddressAccount("New account");
-       m_wallet->subaddressAccount()->refresh();
+        m_wallet->addSubaddressAccount("New account");
+        m_wallet->subaddressAccount()->refresh();
+        for (int i = 0; i < 10; i ++) {
+            m_wallet->subaddress()->addRow("");
+        }
     });
 
     connect(m_wallet->subaddressAccount(), &SubaddressAccount::refreshFinished, this, &AccountSwitcherDialog::updateSelection);

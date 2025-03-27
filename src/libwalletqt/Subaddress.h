@@ -19,7 +19,7 @@ class Subaddress : public QObject
     Q_OBJECT
 
 public:
-    bool refresh(quint32 accountIndex);
+    bool refresh();
     void updateUsed(quint32 accountIndex);
     [[nodiscard]] qsizetype count() const;
 
@@ -27,8 +27,8 @@ public:
     const SubaddressRow& getRow(qsizetype i);
     const QList<SubaddressRow>& getRows();
 
-    bool addRow(quint32 accountIndex, const QString &label);
-    bool setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
+    bool addRow(const QString &label);
+    bool setLabel(quint32 addressIndex, const QString &label);
     bool setHidden(const QString& address, bool hidden);
     bool setPinned(const QString& address, bool pinned);
     bool isHidden(const QString& address);
@@ -42,8 +42,12 @@ signals:
     void rowUpdated(qsizetype index) const;
     void corrupted() const;
     void noUnusedSubaddresses() const;
+    void beginAddRow(qsizetype index) const;
+    void endAddRow() const;
 
 private:
+    bool emplaceRow(quint32 addressIndex);
+
     explicit Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
 

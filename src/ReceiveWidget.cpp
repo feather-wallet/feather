@@ -236,7 +236,7 @@ void ReceiveWidget::showOnDevice() {
 }
 
 void ReceiveWidget::generateSubaddress() {
-    bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
+    bool r = m_wallet->subaddress()->addRow("");
     if (!r) {
         Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->getError());
     }

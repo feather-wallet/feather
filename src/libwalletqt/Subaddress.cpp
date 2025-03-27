@@ -18,49 +18,25 @@ Subaddress::Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent)
     m_hidden = hidden.split(",");
 
     connect(this, &Subaddress::noUnusedSubaddresses, [this] {
-        this->addRow(m_wallet->currentSubaddressAccount(), "");
+        this->addRow("");
     });
 }
 
-bool Subaddress::refresh(quint32 accountIndex)
+bool Subaddress::refresh()
 {
     emit refreshStarted();
 
     m_rows.clear();
 
-    bool haveUnused = false;
     bool potentialWalletFileCorruption = false;
 
+    quint32 accountIndex = m_wallet->currentSubaddressAccount();
     for (quint32 i = 0; i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
     {
-        cryptonote::subaddress_index index = {accountIndex, i};
-        cryptonote::account_public_address address = m_wallet2->get_subaddress(index);
-
-        // Make sure we have previously generated Di
-        auto idx =  m_wallet2->get_subaddress_index(address);
-        if (!idx) {
+        bool r = emplaceRow(i);
+        if (!r) {
             potentialWalletFileCorruption = true;
             break;
-        }
-
-        // Verify mapping
-        if (idx != index) {
-            potentialWalletFileCorruption = true;
-            break;
-        }
-
-        QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
-
-        bool used = m_wallet2->get_subaddress_used({accountIndex, (uint32_t)i});
-        m_rows.emplace_back(
-            addressStr,
-            QString::fromStdString(m_wallet2->get_subaddress_label(index)),
-            used,
-            this->isHidden(addressStr),
-            this->isPinned(addressStr)
-        );
-        if (!used && i > 0) {
-            haveUnused = true;
         }
     }
 
@@ -74,10 +50,6 @@ bool Subaddress::refresh(quint32 accountIndex)
     }
 
     emit refreshFinished();
-
-    if (!haveUnused) {
-        emit noUnusedSubaddresses();
-    }
 
     return !potentialWalletFileCorruption;
 }
@@ -125,14 +97,52 @@ const QList<SubaddressRow>& Subaddress::getRows()
     return m_rows;
 }
 
-bool Subaddress::addRow(quint32 accountIndex, const QString &label)
+bool Subaddress::emplaceRow(quint32 addressIndex)
+{
+    cryptonote::subaddress_index index = {m_wallet->currentSubaddressAccount(), addressIndex};
+    cryptonote::account_public_address address = m_wallet2->get_subaddress(index);
+
+    // Make sure we have previously generated Di
+    auto idx =  m_wallet2->get_subaddress_index(address);
+    if (!idx) {
+        return false;
+    }
+
+    // Verify mapping
+    if (idx != index) {
+        return false;
+    }
+
+    if (m_rows.length() != addressIndex) {
+        return false;
+    }
+
+    QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
+
+    bool used = m_wallet2->get_subaddress_used(index);
+    m_rows.emplace_back(
+        addressStr,
+        QString::fromStdString(m_wallet2->get_subaddress_label(index)),
+        used,
+        this->isHidden(addressStr),
+        this->isPinned(addressStr),
+        index.is_zero()
+    );
+    return true;
+}
+
+bool Subaddress::addRow(const QString &label)
 {
     // This can fail if hardware device is unplugged during operating, catch here to prevent crash
     // Todo: Notify GUI that it was a device error
     try
     {
-        m_wallet2->add_subaddress(accountIndex, label.toStdString());
-        refresh(accountIndex);
+        quint32 addressIndex = m_wallet->numSubaddresses(m_wallet->currentSubaddressAccount());
+        m_wallet2->add_subaddress(m_wallet->currentSubaddressAccount(), label.toStdString());
+
+        emit beginAddRow(addressIndex);
+        emplaceRow(addressIndex);
+        emit endAddRow();
     }
     catch (const std::exception& e)
     {
@@ -145,11 +155,13 @@ bool Subaddress::addRow(quint32 accountIndex, const QString &label)
     return true;
 }
 
-bool Subaddress::setLabel(quint32 accountIndex, quint32 addressIndex, const QString &label)
+bool Subaddress::setLabel(quint32 addressIndex, const QString &label)
 {
     try {
-        m_wallet2->set_subaddress_label({accountIndex, addressIndex}, label.toStdString());
-        refresh(accountIndex);
+        m_wallet2->set_subaddress_label({m_wallet->currentSubaddressAccount(), addressIndex}, label.toStdString());
+        SubaddressRow& row = m_rows[addressIndex];
+        row.label = label;
+        emit rowUpdated(addressIndex);
     }
     catch (const std::exception& e)
     {
@@ -176,7 +188,7 @@ bool Subaddress::setHidden(const QString &address, bool hidden)
     
     bool r = m_wallet->setCacheAttribute("feather.hiddenaddresses", m_hidden.join(","));
     
-    refresh(m_wallet->currentSubaddressAccount());
+    refresh();
     return r;
 }
 
@@ -197,7 +209,7 @@ bool Subaddress::setPinned(const QString &address, bool pinned)
 
     bool r = m_wallet->setCacheAttribute("feather.pinnedaddresses", m_pinned.join(","));
 
-    refresh(m_wallet->currentSubaddressAccount());
+    refresh();
     return r;
 }
 

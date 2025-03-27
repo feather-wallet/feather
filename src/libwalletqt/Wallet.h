@@ -170,9 +170,7 @@ public:
     void addSubaddressAccount(const QString& label);
     quint32 numSubaddressAccounts() const;
     quint32 numSubaddresses(quint32 accountIndex) const;
-    void addSubaddress(const QString& label);
     QString getSubaddressLabel(quint32 accountIndex, quint32 addressIndex) const;
-    void setSubaddressLabel(quint32 accountIndex, quint32 addressIndex, const QString &label);
     void deviceShowAddressAsync(quint32 accountIndex, quint32 addressIndex, const QString &paymentId);
     QString getSubaddressLookahead() const;
 
