@@ -128,9 +128,29 @@
         </spacer>
        </item>
        <item>
+        <widget class="QSpinBox" name="spn_numBatchSubaddresses">
+         <property name="toolTip">
+          <string>Number of addresses to generate.</string>
+         </property>
+         <property name="minimum">
+          <number>1</number>
+         </property>
+         <property name="maximum">
+          <number>1000</number>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="btn_generateSubaddress">
          <property name="text">
           <string>Create new address</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btn_exportSubAddresses">
+         <property name="text">
+          <string>Export addresses</string>
          </property>
         </widget>
        </item>

@@ -4,6 +4,7 @@
 #include "ReceiveWidget.h"
 #include "ui_ReceiveWidget.h"
 
+#include <QFileDialog>
 #include <QMenu>
 
 #include "libwalletqt/rows/SubaddressRow.h"
@@ -81,6 +82,7 @@ ReceiveWidget::ReceiveWidget(Wallet *wallet, QWidget *parent)
 
     connect(ui->btn_generateSubaddress, &QPushButton::clicked, this, &ReceiveWidget::generateSubaddress);
     connect(ui->btn_createPaymentRequest, &QPushButton::clicked, this, &ReceiveWidget::createPaymentRequest);
+    connect(ui->btn_exportSubAddresses, &QPushButton::clicked, this, &ReceiveWidget::exportSubaddresses);
 }
 
 void ReceiveWidget::addOption(QMenu *menu, const QString &text, Config::ConfigKey key, const std::function<void(bool show)>& func) {
@@ -236,9 +238,39 @@ void ReceiveWidget::showOnDevice() {
 }
 
 void ReceiveWidget::generateSubaddress() {
-    bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
-    if (!r) {
-        Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->getError());
+    int numSubaddressesToGenerate = ui->spn_numBatchSubaddresses->value();
+
+    for (int subAddressIndex = 0; subAddressIndex < numSubaddressesToGenerate; subAddressIndex++) {
+        bool r = m_wallet->subaddress()->addRow(m_wallet->currentSubaddressAccount(), "");
+        if (!r) {
+            Utils::showError(this, "Failed to generate subaddress", m_wallet->subaddress()->getError());
+
+            //Stop the loop on first error, to prevent multiple errors if we batch create more than 1 address.
+            subAddressIndex = numSubaddressesToGenerate;
+        }
+    }
+}
+
+void ReceiveWidget::exportSubaddresses() {
+    QFileDialog exportAddressesdialog;
+    exportAddressesdialog.setAcceptMode(QFileDialog::AcceptSave);
+    exportAddressesdialog.setDirectory(".");
+    exportAddressesdialog.selectFile("Addresses.txt");
+
+    if (exportAddressesdialog.exec()) {
+        QString fileName = exportAddressesdialog.selectedFiles().first();
+        QFile file(fileName);
+
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+            Utils::showError(this, "Failed to export subaddress", "Could not export subaddresses to file.");
+        }
+
+        QTextStream stream(&file);
+        for (int i = 0; i < m_wallet->numSubaddresses(m_wallet->currentSubaddressAccount()); i++) {
+            QString address = this->getAddress(i);
+            stream << address << "\n";
+        }
+        file.close();
     }
 }
 
