@@ -180,6 +180,9 @@ chain for " target " development."))
             (list "--enable-initfini-array=yes",
                   "--enable-default-ssp=yes",
                   "--enable-default-pie=yes",
+                  "--enable-standard-branch-protection=yes",
+                  "--enable-cet=yes",
+                  "--disable-gcov",
                   building-on)))
         ((#:phases phases)
           `(modify-phases ,phases
@@ -215,6 +218,7 @@ chain for " target " development."))
           `(append ,flags
             ;; https://www.gnu.org/software/libc/manual/html_node/Configuring-and-compiling.html
             (list "--enable-stack-protector=all",
+                  "--enable-cet",
                   "--enable-bind-now",
                   "--disable-werror",
                   building-on)))
