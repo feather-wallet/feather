@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 export LC_ALL=C
-set -e -o pipefail
+set -ex -o pipefail
 
 # Source the common prelude, which:
 #   1. Checks if we're at the top directory of the Feather Wallet repository
