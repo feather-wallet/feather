@@ -46,6 +46,50 @@ $ git clone https://github.com/feather-wallet/feather
 $ cd feather
 ```
 
+### Before building
+
+#### Ubuntu
+
+On **Ubuntu**, you may run into the following error caused by [this Ubuntu bug](https://bugs.launchpad.net/ubuntu/+source/guix/+bug/2064115):
+
+`guix environment: error: mount: mount "none" on "/tmp/guix-directory.Ile657": Permission denied`
+
+To work around this issue, you need to create a permissive AppArmor profile for Guix:
+
+```bash
+$ apt install apparmor-utils
+$ cat <<EOL >> /etc/apparmor.d/guix
+abi <abi/4.0>,
+include <tunables/global>
+
+profile guix /usr/bin/guix flags=(unconfined) {
+  userns,
+  include if exists <local/guix>
+}
+EOL
+
+$ /etc/init.d/apparmor reload
+$ aa-enforce guix
+```
+
+#### Fedora
+
+On **Fedora**, you may run into the following error:
+
+`guix gc: error: remounting /gnu/store writable: Permission denied`
+
+To work around this issue, you need to temporarily disable SELinux:
+
+```bash
+sudo setenforce 0
+```
+
+You can re-enable it after the build with:
+
+```bash
+sudo setenforce 1
+```
+
 ### Run the build
 
 To build all targets using all available cores:
