@@ -70,6 +70,7 @@ void RevuoWidget::updateItems(const QList<QSharedPointer<RevuoItem>> &items) {
         for (const auto &newsbyte : item->newsbytes) {
             text += "<p> • " + newsbyte + "</p>\n";
         }
+        text += "╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍╍\n";
         text += "<h3>Upcoming Events</h3>\n";
         if (item->events.isEmpty()) {
             text += "<p>There are no upcoming events.</p>\n";
