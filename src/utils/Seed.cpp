@@ -138,7 +138,7 @@ Seed::Seed(Type type, QStringList mnemonic, NetworkType::Type networkType)
     if (this->type == Type::MONERO) {
         crypto::secret_key recovery_key;
         std::string old_language;
-        if (!crypto::ElectrumWords::words_to_bytes(mnemonic.join(" ").toStdString(), recovery_key, old_language)) {
+        if (!crypto::ElectrumWords::words_to_bytes(this->mnemonic.join(" ").toStdString(), recovery_key, old_language)) {
             if (this->mnemonic.length() == 25) {
                 this->errorString = "Invalid checksum word";
             }
