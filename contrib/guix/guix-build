@@ -20,6 +20,15 @@ source "$(dirname "${BASH_SOURCE[0]}")/libexec/prelude.bash"
 check_tools cat mkdir make getent curl git guix
 
 ################
+# Check if we're running as root
+################
+
+if [ "$EUID" -eq 0 ]; then
+  echo "Warning! Running this script as root may cause problems."
+  echo
+fi
+
+################
 # GUIX_BUILD_OPTIONS should be empty
 ################
 #
