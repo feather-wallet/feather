@@ -22,7 +22,7 @@
   </array>
 
   <key>NSHumanReadableCopyright</key>
-  <string>Copyright © 2014-@COPYRIGHT_YEAR@ @COPYRIGHT_HOLDERS@</string>
+  <string>Copyright © 2020-@COPYRIGHT_YEAR@ @COPYRIGHT_HOLDERS@</string>
 
   <key>CFBundleShortVersionString</key>
   <string>@PROJECT_VERSION@</string>
