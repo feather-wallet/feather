@@ -1,6 +1,9 @@
 {
   "mainnet": {
     "tor": [
+      "loveanvthlsepingenr7opdqy6nlhn5jidwvzzxfmwsw2rry5mn2gfqd.onion:18089",
+      "dtrnd4in2igrtfx2c45ghf2drns3doddmcsfy6b5gjw5iinukd33slqd.onion:18081",
+      "3vjfahy3dk4znsicambgluiaa5whqb364skmsq5os7bnxjhbavbawqad.onion:18089",
       "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
       "cakexmrl7bonq7ovjka5kuwuyd3f7qnkz6z6s6dmsy3uckwra7bvggyd.onion:18081",
       "qz43zul2x56jexzoqgkx2trzwcfnr6l3hbtfcfx54g4r3eahy3bssjyd.onion:18089",
@@ -25,6 +28,8 @@
       "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p:18089"
     ],
     "clearnet": [
+      "node3-us.monero.love:18081",
+      "node2-eu.monero.love:18089",
       "xmr-node.cakewallet.com:18081",
       "singapore.node.xmr.pm:18089",
       "node.majesticbank.is:18089",
