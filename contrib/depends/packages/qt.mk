@@ -163,7 +163,7 @@ $(package)_config_opts_darwin += -DQT_FEATURE_accessibility=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_dbus=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_freetype=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_ffmpeg=OFF
-$(package)_config_opts_darwin += -DQMAKE_MACOSX_DEPLOYMENT_TARGET=11.0
+$(package)_config_opts_darwin += -DQMAKE_MACOSX_DEPLOYMENT_TARGET=12.0
 $(package)_config_opts_darwin += -DBUILD_WITH_PCH=OFF
 $(package)_config_opts_darwin += '-DQT_QMAKE_DEVICE_OPTIONS=MAC_SDK_PATH=$(host_prefix)/native/SDK;MAC_SDK_VERSION=$(OSX_SDK_VERSION);CROSS_COMPILE=$(host)-;MAC_TARGET=$(host);XCODE_VERSION=$(XCODE_VERSION)'
 $(package)_config_opts_darwin += -DQT_NO_APPLE_SDK_AND_XCODE_CHECK=ON
