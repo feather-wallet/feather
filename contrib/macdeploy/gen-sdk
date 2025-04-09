@@ -8,21 +8,6 @@ import gzip
 import os
 import contextlib
 
-# monkey-patch Python 3.8 and older to fix wrong TAR header handling
-# see https://github.com/bitcoin/bitcoin/pull/24534
-# and https://github.com/python/cpython/pull/18080 for more info
-if sys.version_info < (3, 9):
-    _old_create_header = tarfile.TarInfo._create_header
-    def _create_header(info, format, encoding, errors):
-        buf = _old_create_header(info, format, encoding, errors)
-        # replace devmajor/devminor with binary zeroes
-        buf = buf[:329] + bytes(16) + buf[345:]
-        # recompute checksum
-        chksum = tarfile.calc_chksums(buf)[0]
-        buf = buf[:-364] + bytes("%06o\0" % chksum, "ascii") + buf[-357:]
-        return buf
-    tarfile.TarInfo._create_header = staticmethod(_create_header)
-
 @contextlib.contextmanager
 def cd(path):
     """Context manager that restores PWD even if an exception was raised."""
@@ -60,12 +45,7 @@ def run():
         sdk_build_id = pl['ProductBuildVersion']
     print("Found MacOSX SDK (version: {sdk_version}, build id: {sdk_build_id})".format(sdk_version=sdk_version, sdk_build_id=sdk_build_id))
 
-    clang_rt = xcode_app.joinpath("Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/lib/darwin")
-
     out_name = "Xcode-{xcode_version}-{xcode_build_id}-extracted-SDK-with-libcxx-headers".format(xcode_version=xcode_version, xcode_build_id=xcode_build_id)
-
-    xcode_libcxx_dir = xcode_app.joinpath("Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1")
-    assert xcode_libcxx_dir.is_dir()
 
     if args.out_sdktgz:
         out_sdktgz_path = pathlib.Path(args.out_sdktgz_path)
@@ -74,7 +54,7 @@ def run():
         out_sdktgz_path = pathlib.Path("./{}.tar.gz".format(out_name))
 
     def tarfp_add_with_base_change(tarfp, dir_to_add, alt_base_dir):
-        """Add all files in dir_to_add to tarfp, but prepent MEMBERPREFIX to the files'
+        """Add all files in dir_to_add to tarfp, but prepent alt_base_dir to the files'
         names
 
         e.g. if the only file under /root/bazdir is /root/bazdir/qux, invoking:
@@ -109,10 +89,6 @@ def run():
             with tarfile.open(mode="w", fileobj=gzf, format=tarfile.GNU_FORMAT) as tarfp:
                 print("Adding MacOSX SDK {} files...".format(sdk_version))
                 tarfp_add_with_base_change(tarfp, sdk_dir, out_name)
-                print("Adding libc++ headers...")
-                tarfp_add_with_base_change(tarfp, xcode_libcxx_dir, "{}/usr/include/c++/v1".format(out_name))
-                print("Adding clang_rt libraries")
-                tarfp_add_with_base_change(tarfp, clang_rt, "{}/lib/darwin".format(out_name))
     print("Done! Find the resulting gzipped tarball at:")
     print(out_sdktgz_path.resolve())
 
