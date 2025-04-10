@@ -269,6 +269,7 @@ target_link_libraries(feather PRIVATE
         epee
         easylogging
         ringct
+        version
         ${Boost_LIBRARIES}
         ${OPENSSL_LIBRARIES}
         ${EXTRA_LIBRARIES}

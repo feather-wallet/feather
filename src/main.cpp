@@ -11,6 +11,7 @@
 #include <wallet/api/wallet2_api.h>
 #include "libwalletqt/Wallet.h"
 #include "libwalletqt/WalletManager.h"
+#include "version.h"
 
 #if defined(Q_OS_LINUX) && defined(STACK_TRACE)
 #define BOOST_STACKTRACE_LINK
@@ -180,21 +181,16 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     conf()->set(Config::restartRequired, false);
 
     if (!quiet) {
-        QMap<QString, QString> info;
-        info["Qt"] = QT_VERSION_STR;
-        info["Feather"] = FEATHER_VERSION;
-        if (stagenet) info["Mode"] = "Stagenet";
-        else if (testnet) info["Mode"] = "Testnet";
-        else info["Mode"] = "Mainnet";
-        info["SSL"] = QSslSocket::sslLibraryVersionString();
-        info["SSL build"] = QSslSocket::sslLibraryBuildVersionString();
-#if defined(TOR_VERSION)
-        info["Tor version"] = TOR_VERSION;
-#else
-        info["Tor version"] = "Not bundled";
-#endif
-        for (const QString &k: info.keys()) {
-            qWarning().nospace().noquote() << QString("%1: %2").arg(k, info[k]);
+        QList<QPair<QString, QString>> info;
+        info.emplace_back("Feather", FEATHER_VERSION);
+        info.emplace_back("Monero", MONERO_VERSION);
+        info.emplace_back("Qt", QT_VERSION_STR);
+        info.emplace_back("Tor", TOR_VERSION);
+        info.emplace_back("SSL", QSslSocket::sslLibraryVersionString());
+        info.emplace_back("Mode", stagenet ? "Stagenet" : (testnet ? "Testnet" : "Mainnet"));
+
+        for (const auto &k: info) {
+            qWarning().nospace().noquote() << QString("%1: %2").arg(k.first, k.second);
         }
     }
 
