@@ -6,8 +6,10 @@
 
 #include <QMessageBox>
 #include <QDate>
+#include <QSslSocket>
 
 #include "utils/Utils.h"
+#include "version.h"
 
 AboutDialog::AboutDialog(QWidget *parent)
         : WindowModalDialog(parent)
@@ -25,6 +27,12 @@ AboutDialog::AboutDialog(QWidget *parent)
     auto ack = Utils::fileOpenQRC(":assets/ack.txt");
     auto ack_text = Utils::barrayToString(ack);
     ui->ackText->setText(ack_text);
+
+    ui->label_featherVersion->setText(FEATHER_VERSION);
+    ui->label_moneroVersion->setText(MONERO_VERSION);
+    ui->label_qtVersion->setText(QT_VERSION_STR);
+    ui->label_torVersion->setText(TOR_VERSION);
+    ui->label_sslVersion->setText(QSslSocket::sslLibraryVersionString());
 
     this->adjustSize();
 }
