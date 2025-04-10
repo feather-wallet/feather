@@ -3,7 +3,7 @@ c = '@cc@'
 cpp = '@cxx@'
 ar = '@ar@'
 strip = '@strip@'
-pkgconfig = '/home/user/.guix-profile/bin/pkg-config'
+pkgconfig = 'pkg-config'
 
 [host_machine]
 system = 'linux'

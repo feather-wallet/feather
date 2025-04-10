@@ -53,7 +53,6 @@ $(package)_extra_sources += $($(package)_qtwayland_file_name)
 
 define $(package)_set_vars
 $(package)_config_opts += -DQT_HOST_PATH=$(build_prefix)/qt-host
-$(package)_config_opts += -DCMAKE_LIBRARY_PATH=/home/user/.guix-profile/lib
 $(package)_config_opts += -DBUILD_SHARED_LIBS=OFF
 $(package)_config_opts += -DCMAKE_INSTALL_PREFIX=$(host_prefix)
 $(package)_config_opts += -DINSTALL_LIBEXECDIR=$(build_prefix)/bin
