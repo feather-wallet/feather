@@ -433,6 +433,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
                                                  -sigin "/distsrc/external/feather-codesigning/signatures/${HOST}/feather.installer.pem" || true
                                 cp FeatherWalletSetup.exe.tmp "${OUTDIR}/FeatherWalletSetup-${TAG}.exe"
                                 mv FeatherWalletSetup.exe.tmp "FeatherWalletSetup-${TAG}.exe"
+                                rm FeatherWalletSetup.exe
                                 rm "${OUTDIR}/FeatherWalletSetup.exe"
                                 ;;
                             "")
