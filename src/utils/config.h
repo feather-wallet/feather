@@ -60,17 +60,6 @@ public:
         showAddressIndex,
         showAddressLabels,
 
-        // Mining
-        miningMode,
-        xmrigPath,
-        xmrigElevated,
-        xmrigThreads,
-        xmrigPool,
-        xmrigDaemon,
-        xmrigNetworkTLS,
-        xmrigNetworkTor,
-        pools,
-
         // Settings
         lastSettingsPage,
 

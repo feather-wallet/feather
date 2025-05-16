@@ -809,11 +809,6 @@
     <string>Outputs</string>
    </property>
   </action>
-  <action name="actionShow_XMRig">
-   <property name="text">
-    <string>Show Mining</string>
-   </property>
-  </action>
   <action name="actionImportTransaction">
    <property name="text">
     <string>Transaction</string>

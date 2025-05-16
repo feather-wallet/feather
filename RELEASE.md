@@ -3,7 +3,6 @@
 - Before a minor release:
   - Update `src/assets/restore_heights_monero_{mainnet,stagenet}.txt`
     - To obtain values, run `contrib/generate-restore-heights/heights.py`
-  - Update `m_defaultPools` in `src/widgets/XMRigWidget.h`
   - Update default node lists in `src/assets/nodes.json`
   - Bump `openssl`, `qt`, `tor_*` packages in `contrib/depends/packages`
   - Update or patch any statically linked dependencies that have known vulnerabilities

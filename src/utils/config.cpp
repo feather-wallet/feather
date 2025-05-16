@@ -60,17 +60,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::showChangeAddresses,{QS("showChangeAddresses"), false}},
         {Config::showAddressIndex,{QS("showAddressIndex"), true}},
         {Config::showAddressLabels,{QS("showAddressLabels"), true}},
-        
-        // Mining
-        {Config::miningMode,{QS("miningMode"), Config::MiningMode::Pool}},
-        {Config::xmrigPath,{QS("xmrigPath"), ""}},
-        {Config::xmrigElevated,{QS("xmrigElevated"), false}},
-        {Config::xmrigThreads,{QS("xmrigThreads"), 1}},
-        {Config::xmrigPool,{QS("xmrigPool"), "pool.xmr.pt:9000"}},
-        {Config::xmrigDaemon,{QS("xmrigDaemon"), "127.0.0.1:18081"}},
-        {Config::xmrigNetworkTLS,{QS("xmrigNetworkTLS"), true}},
-        {Config::xmrigNetworkTor,{QS("xmrigNetworkTor"), false}},
-        {Config::pools,{QS("pools"), {}}},
 
         // Settings
         {Config::lastSettingsPage, {QS("lastSettingsPage"), 0}},
@@ -135,7 +124,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc", "xmrig"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
