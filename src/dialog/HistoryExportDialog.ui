@@ -207,7 +207,7 @@
       <item>
        <widget class="QRadioButton" name="radio_coinbaseTransactions">
         <property name="text">
-         <string>Coinbase (miner) transactions</string>
+         <string>Coinbase transactions</string>
         </property>
        </widget>
       </item>
