@@ -31,7 +31,6 @@ AboutDialog::AboutDialog(QWidget *parent)
     ui->label_featherVersion->setText(FEATHER_VERSION);
     ui->label_moneroVersion->setText(MONERO_VERSION);
     ui->label_qtVersion->setText(QT_VERSION_STR);
-    ui->label_torVersion->setText(TOR_VERSION);
     ui->label_sslVersion->setText(QSslSocket::sslLibraryVersionString());
 
     this->adjustSize();

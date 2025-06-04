@@ -10,7 +10,6 @@
 #include "utils/os/whonix.h"
 #include "constants.h"
 #include "utils/WebsocketNotifier.h"
-#include "utils/TorManager.h"
 
 bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeList::Type source) {
     // We can't obtain references to QJsonObjects...
@@ -230,12 +229,8 @@ void Nodes::connectToNode(const FeatherNode &node) {
 
     QString proxyAddress;
     if (useSocks5Proxy(node)) {
-        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && (!torManager()->isLocalTor() || torManager()->isAlreadyRunning())) {
-            proxyAddress = QString("%1:%2").arg(torManager()->featherTorHost, QString::number(torManager()->featherTorPort));
-        } else {
             proxyAddress = QString("%1:%2").arg(conf()->get(Config::socks5Host).toString(),
                                                 conf()->get(Config::socks5Port).toString());
-        }
     }
 
     m_wallet->initAsync(node.toAddress(), true, 0, proxyAddress);

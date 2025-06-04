@@ -34,7 +34,6 @@
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
-#include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 
 #include "wallet/wallet_errors.h"
@@ -96,9 +95,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
     connect(m_windowManager, &WindowManager::manualFeeSelectionEnabled, this, &MainWindow::onManualFeeSelectionEnabled);
     connect(m_windowManager, &WindowManager::subtractFeeFromAmountEnabled, this, &MainWindow::onSubtractFeeFromAmountEnabled);
-
-    connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
-    this->onTorConnectionStateChanged(torManager()->torConnected);
 
 #ifdef CHECK_UPDATES
     connect(m_updater.data(), &Updater::updateAvailable, this, &MainWindow::showUpdateNotification);
@@ -697,7 +693,7 @@ void MainWindow::onProxySettingsChanged() {
     int proxy = conf()->get(Config::proxy).toInt();
 
     if (proxy == Config::Proxy::Tor) {
-        this->onTorConnectionStateChanged(torManager()->torConnected);
+        this->onTorConnectionStateChanged(true);
         m_statusBtnProxySettings->show();
         return;
     }

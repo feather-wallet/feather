@@ -14,7 +14,6 @@
 
 class MainWindow;
 class DocsDialog;
-class TorInfoDialog;
 class WalletManager;
 class Wallet;
 class SplashDialog;

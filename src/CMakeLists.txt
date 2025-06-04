@@ -28,7 +28,7 @@ if (CHECK_UPDATES)
     add_subdirectory(openpgp)
 endif()
 
-qt_add_resources(RESOURCES assets.qrc assets_tor.qrc assets_docs.qrc)
+qt_add_resources(RESOURCES assets.qrc assets_docs.qrc)
 
 # Compile source files (.h/.cpp)
 file(GLOB SOURCE_FILES
@@ -139,7 +139,6 @@ endif()
 add_executable(feather ${EXECUTABLE_FLAG} main.cpp
         ${SOURCE_FILES}
         ${RESOURCES}
-        ${ASSETS_TOR}
 )
 
 set_target_properties(feather PROPERTIES
@@ -184,7 +183,6 @@ target_include_directories(feather PUBLIC
 
 target_compile_definitions(feather PRIVATE FEATHER_VERSION="${PROJECT_VERSION}")
 target_compile_definitions(feather PRIVATE FEATHER_TARGET_TRIPLET="${FEATHER_TARGET_TRIPLET}")
-target_compile_definitions(feather PRIVATE TOR_VERSION="${TOR_VERSION}")
 
 if(WITH_SCANNER)
     target_include_directories(feather PUBLIC
@@ -206,10 +204,6 @@ if (CHECK_UPDATES)
     target_compile_definitions(feather PRIVATE CHECK_UPDATES=1)
 endif()
 
-if(TOR_DIR)
-    target_compile_definitions(feather PRIVATE HAS_TOR_BIN=1)
-endif()
-
 if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
@@ -219,10 +213,6 @@ target_compile_definitions(feather PRIVATE HAS_WEBSOCKET=1)
 
 if(PLATFORM_INSTALLER)
     target_compile_definitions(feather PRIVATE PLATFORM_INSTALLER=1)
-endif()
-
-if(TOR_INSTALLED)
-    target_compile_definitions(feather PRIVATE TOR_INSTALLED=1)
 endif()
 
 if(STACK_TRACE)

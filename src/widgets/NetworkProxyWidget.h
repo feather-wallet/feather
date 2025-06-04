@@ -7,8 +7,6 @@
 #include <QWidget>
 #include <QTextEdit>
 
-#include "dialog/TorInfoDialog.h"
-
 namespace Ui {
     class NetworkProxyWidget;
 }
@@ -35,7 +33,6 @@ private:
     void updatePort();
 
     QScopedPointer<Ui::NetworkProxyWidget> ui;
-    TorInfoDialog *m_torInfoDialog;
 
     bool m_disableTorLogs = false;
     bool m_proxySettingsChanged = false;

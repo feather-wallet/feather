@@ -13,7 +13,6 @@
 NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
         : QWidget(parent)
         , ui(new Ui::NetworkProxyWidget)
-        , m_torInfoDialog(new TorInfoDialog(this))
 {
     ui->setupUi(this);
 
@@ -67,13 +66,7 @@ NetworkProxyWidget::NetworkProxyWidget(QWidget *parent)
     connect(ui->comboBox_torNodeTraffic, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &NetworkProxyWidget::onProxySettingsChanged);
 
     // [Show Tor logs]
-    ui->frame_torShowLogs->setVisible(!conf()->get(Config::useLocalTor).toBool());
-#if !defined(HAS_TOR_BIN) && !defined(TOR_INSTALLED)
     ui->frame_torShowLogs->setVisible(false);
-#endif
-    connect(ui->btn_torShowLogs, &QPushButton::clicked, [this]{
-        m_torInfoDialog->show();
-    });
 
     ui->frame_notice->hide();
 }

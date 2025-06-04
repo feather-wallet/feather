@@ -20,16 +20,12 @@ cmake_policy(SET CMP0074 NEW)
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
-option(TOR_DIR "Directory containing Tor binaries to embed inside Feather" OFF)
 option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
 option(DONATE_BEG "Prompt donation window every once in a while" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
 option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
-
-# internal configuration options
-option(TOR_INSTALLED "Is Tor installed on the filesystem?" OFF)
 
 # Plugins
 option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
@@ -138,32 +134,6 @@ if(UNIX AND NOT APPLE)
 endif()
 
 include(GenerateDocs)
-include(TorQrcGenerator)
-
-# To build Feather with embedded (and static) Tor, pass CMake -DTOR_DIR=/path/to/tor/
-if(TOR_DIR)
-    if (NOT TOR_VERSION)
-        message(FATAL_ERROR "TOR_DIR is specified but TOR_VERSION is not set")
-    endif()
-
-    message(STATUS "Embedded Tor version: ${TOR_VERSION}")
-
-    # Always copy Tor when doing a reproducible build to prevent old versions from getting included
-    if (REPRODUCIBLE)
-        set(TOR_COPY_CMD "cp -a ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
-    else()
-        set(TOR_COPY_CMD "cp -au ${TOR_DIR}/* ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/tor")
-    endif()
-
-    execute_process(COMMAND bash -c "${TOR_COPY_CMD}" RESULT_VARIABLE ret)
-    if(ret EQUAL "1")
-        message(FATAL_ERROR "Tor copy failure: ${TOR_COPY_CMD}")
-    endif()
-
-    message(STATUS "Embedding Tor binaries at ${TOR_DIR}")
-else()
-    message(STATUS "Skipping Tor inclusion because -DTOR_DIR=Off")
-endif()
 
 message(STATUS "Using Boost include dir at ${Boost_INCLUDE_DIRS}")
 message(STATUS "Using Boost libraries at ${Boost_LIBRARIES}")

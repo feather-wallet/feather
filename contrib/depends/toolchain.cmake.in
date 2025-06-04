@@ -25,10 +25,6 @@ endif()
 
 SET(ENV{PKG_CONFIG_PATH} @prefix@/lib/pkgconfig)
 
-# use CACHE here because we need to be able to override these later
-SET(TOR_DIR @prefix@/Tor CACHE STRING "Tor dir")
-SET(TOR_VERSION @tor_version@ CACHE STRING "Tor version")
-
 SET(Readline_ROOT_DIR @prefix@)
 SET(Readline_INCLUDE_DIR @prefix@/include)
 SET(Readline_LIBRARY @prefix@/lib/libreadline.a)

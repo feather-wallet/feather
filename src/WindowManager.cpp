@@ -14,14 +14,12 @@
 #include "dialog/DocsDialog.h"
 #include "dialog/PasswordDialog.h"
 #include "dialog/SplashDialog.h"
-#include "dialog/TorInfoDialog.h"
 #include "libwalletqt/WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "utils/Icons.h"
 #include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "utils/TorManager.h"
 #include "utils/WebsocketNotifier.h"
 #include "utils/AppData.h"
 
@@ -105,8 +103,6 @@ void WindowManager::close() {
     if (m_docsDialog) {
         m_docsDialog->deleteLater();
     }
-
-    torManager()->stop();
 
     deleteLater();
 
@@ -671,19 +667,10 @@ void WindowManager::onProxySettingsChanged() {
         return;
     }
 
-    // Will kill the process if necessary
-    torManager()->init();
-    torManager()->start();
-
     QNetworkProxy proxy{QNetworkProxy::NoProxy};
     if (conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
         QString host = conf()->get(Config::socks5Host).toString();
         quint16 port = conf()->get(Config::socks5Port).toString().toUShort();
-
-        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && (!torManager()->isLocalTor() || torManager()->isAlreadyRunning())) {
-            host = torManager()->featherTorHost;
-            port = torManager()->featherTorPort;
-        }
 
         proxy = QNetworkProxy{QNetworkProxy::Socks5Proxy, host, port};
         getNetworkSocks5()->setProxy(proxy);

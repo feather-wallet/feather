@@ -7,7 +7,6 @@
 #include "utils/AppData.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "utils/TorManager.h"
 #include "utils/WebsocketClient.h"
 #include "utils/WebsocketNotifier.h"
 
@@ -29,24 +28,6 @@ DebugInfoDialog::DebugInfoDialog(Wallet *wallet, Nodes *nodes, QWidget *parent)
 }
 
 void DebugInfoDialog::updateInfo() {
-    QString torStatus;
-
-    // Special case for Tails because we know the status of the daemon by polling tails-tor-has-bootstrapped.target
-    if (TailsOS::detect()) {
-        if(torManager()->torConnected)
-            torStatus = "Connected";
-        else
-            torStatus = "Disconnected";
-    }
-    else if(Utils::isTorsocks())
-        torStatus = "Torsocks";
-    else if(torManager()->isLocalTor())
-        torStatus = "Local (assumed to be running)";
-    else if(torManager()->torConnected)
-        torStatus = "Running";
-    else
-        torStatus = "Unknown";
-
     ui->label_featherVersion->setText(Utils::getVersion());
 
     ui->label_walletHeight->setText(QString::number(m_wallet->blockChainHeight()));
@@ -81,8 +62,6 @@ void DebugInfoDialog::updateInfo() {
     }();
 
     ui->label_proxy->setText(proxy);
-    ui->label_torStatus->setText(torStatus);
-    ui->label_torLevel->setText(conf()->get(Config::torPrivacyLevel).toString());
 
     QString seedType = [this](){
         if (m_wallet->isHwBacked())
@@ -157,8 +136,6 @@ void DebugInfoDialog::copyToClipboard() {
     text += QString("Wallet status: %1  \n").arg(ui->label_walletStatus->text());
     text += QString("Websocket status: %1  \n").arg(ui->label_websocketStatus->text());
     text += QString("Proxy: %1  \n").arg(ui->label_proxy->text());
-    text += QString("Tor status: %1  \n").arg(ui->label_torStatus->text());
-    text += QString("Tor level: %1  \n").arg(ui->label_torLevel->text());
 
     text += QString("Network type: %1  \n").arg(ui->label_netType->text());
     text += QString("Seed type: %1  \n").arg(ui->label_seedType->text());

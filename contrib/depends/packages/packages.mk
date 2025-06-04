@@ -15,7 +15,3 @@ mingw32_native_packages =
 qt_linux_packages := libxcb xcb_proto libXau xorgproto libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_cursor libxcb_util_wm freetype fontconfig dbus qt
 qt_darwin_packages := qt
 qt_mingw32_packages := qt
-
-tor_linux_packages := libevent tor_linux
-tor_darwin_packages := tor_darwin
-tor_mingw32_packages := tor_mingw32

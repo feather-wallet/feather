@@ -295,22 +295,17 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
         CMAKEVARS+=" -DOFFICIAL_BUILD=On"
     fi
 
-    ANONDIST=""
     case "$HOST" in
         *mingw32)
             case "$OPTIONS" in
                 installer)
-                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On -DTOR_INSTALLED=On -DTOR_DIR=Off -DTOR_VERSION=Off"
+                    CMAKEVARS+=" -DPLATFORM_INSTALLER=On"
                     ;;
             esac
             ;;
         *linux*)
             CMAKEVARS+=" -DSTACK_TRACE=ON"
             case "$OPTIONS" in
-                no-tor-bundle)
-                    CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off"
-                    ANONDIST+="-a"
-                    ;;
                 pack)
                     CMAKEVARS+=" -DCHECK_UPDATES=Off -DSELF_CONTAINED=Off"
                     ;;
@@ -318,9 +313,6 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             ;;
         *gnueabihf)
             CMAKEVARS+=" -DNO_AES=On" # Raspberry Pi
-            ;;
-        *darwin*)
-            CMAKEVARS+=" -DTOR_DIR=Off -DTOR_VERSION=Off -DTOR_INSTALLED=On"
             ;;
     esac
 
@@ -361,7 +353,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
         *linux*)
             if [ "$OPTIONS" != "pack" ]; then
                 bash contrib/AppImage/build-appimage.sh
-                APPIMAGENAME=${DISTNAME}${ANONDIST}${LINUX_ARCH}.AppImage
+                APPIMAGENAME=${DISTNAME}${LINUX_ARCH}.AppImage
                 mv feather.AppImage "${APPIMAGENAME}"
                 cp "${APPIMAGENAME}" "${INSTALLPATH}/"
                 cp "${APPIMAGENAME}" "${OUTDIR}/"
@@ -410,9 +402,6 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             *darwin*)
                 mv "feather.app" "Feather.app"
                 mkdir -p Feather.app/Contents/bin
-                cp -a /feather/contrib/depends/${HOST}/Tor/libevent-2.1.7.dylib Feather.app/Contents/bin
-                cp -a /feather/contrib/depends/${HOST}/Tor/tor Feather.app/Contents/bin
-                chmod +x Feather.app/Contents/bin/tor
                 ;;
         esac
 
@@ -489,16 +478,16 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
                                 | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                             find . -not -name "*.AppImage" \
                                 | sort \
-                                | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" \
-                                || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}${ANONDIST}.zip" && exit 1 )
+                                | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" \
+                                || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}.zip" && exit 1 )
                             ;;
                     esac
                     find . -name "*.AppImage" -print0 \
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"
                     find . -name "*.AppImage" \
                         | sort \
-                        | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" \
-                        || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage${ANONDIST}.zip" && exit 1 )
+                        | zip -X@ "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" \
+                        || ( rm -f "${OUTDIR}/${DISTNAME}-linux${LINUX_ARCH}-appimage.zip" && exit 1 )
                 else
                     find . -print0 \
                         | xargs -0r touch --no-dereference --date="@${SOURCE_DATE_EPOCH}"

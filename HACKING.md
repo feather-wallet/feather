@@ -50,12 +50,6 @@ brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl exp
 
 Build [zxing-cpp](https://github.com/zxing-cpp/zxing-cpp) from source or compile Feather with `-DWITH_SCANNER=Off`.
 
-### Tor daemon
-
-A Tor daemon is required to connect to .onion nodes and the websocket server. Development builds do not include 
-the Tor binary by default, this can be enabled with `-DTOR_DIR=/path/to/tor`. We recommend running a local Tor daemon 
-as this prevents Feather from spawning a child process and saves time.
-
 #### Arch Linux
 
 ```bash
@@ -132,5 +126,4 @@ There are some CMake options that you may pass to control how Feather is built:
 - `-DDONATE_BEG=OFF` - disable the dreaded donate requests
 - `-DUSE_DEVICE_TREZOR=OFF` - disable Trezor hardware wallet support
 - `-DWITH_SCANNER=ON` - enable the webcam QR code scanner
-- `-DTOR_DIR=/path/to/tor/` - embed a Tor binary in Feather, argument should be a directory containing the binary
 - `-DWITH_PLUGIN_<NAME>=OFF` - disable a plugin

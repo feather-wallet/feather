@@ -67,10 +67,6 @@ int main(int argc, char *argv[])
     ::signal(SIGABRT, &signal_handler);
 #endif
 
-#if defined(HAS_TOR_BIN)
-    Q_INIT_RESOURCE(assets_tor);
-#endif
-
 #ifdef _WIN32
 if (AttachConsole(ATTACH_PARENT_PROCESS)) {
     freopen("CONOUT$", "w", stdout);
@@ -185,7 +181,6 @@ if (AttachConsole(ATTACH_PARENT_PROCESS)) {
         info.emplace_back("Feather", FEATHER_VERSION);
         info.emplace_back("Monero", MONERO_VERSION);
         info.emplace_back("Qt", QT_VERSION_STR);
-        info.emplace_back("Tor", TOR_VERSION);
         info.emplace_back("SSL", QSslSocket::sslLibraryVersionString());
         info.emplace_back("Mode", stagenet ? "Stagenet" : (testnet ? "Testnet" : "Mainnet"));
 
