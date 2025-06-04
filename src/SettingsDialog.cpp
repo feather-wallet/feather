@@ -261,13 +261,6 @@ void Settings::setupDisplayTab() {
         emit updateBalance();
     });
 
-    // [Hide update notifications]
-    ui->checkBox_hideUpdateNotifications->setChecked(conf()->get(Config::hideUpdateNotifications).toBool());
-    connect(ui->checkBox_hideUpdateNotifications, &QCheckBox::toggled, [this](bool toggled){
-        conf()->set(Config::hideUpdateNotifications, toggled);
-        emit hideUpdateNotifications(toggled);
-    });
-
     // [Hide transaction notifications]
     ui->checkBox_hideTransactionNotifications->setChecked(conf()->get(Config::hideNotifications).toBool());
     connect(ui->checkBox_hideTransactionNotifications, &QCheckBox::toggled, [](bool toggled){

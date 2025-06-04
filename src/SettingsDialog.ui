@@ -612,7 +612,7 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_11">
             <item>
-             <layout class="QVBoxLayout" name="verticalLayout_19" stretch="1,1,1,1,1,0,0,0">
+             <layout class="QVBoxLayout" name="verticalLayout_19" stretch="1,1,1,1,0,0,0">
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
@@ -625,23 +625,6 @@
                   </property>
                   <property name="text">
                    <string>Hide balance</string>
-                  </property>
-                 </widget>
-                </item>
-               </layout>
-              </item>
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_9">
-                <item>
-                 <widget class="QCheckBox" name="checkBox_hideUpdateNotifications">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>1</verstretch>
-                   </sizepolicy>
-                  </property>
-                  <property name="text">
-                   <string>Hide update notifications</string>
                   </property>
                  </widget>
                 </item>

@@ -42,10 +42,6 @@
 
 #include "WindowManager.h"
 
-#ifdef CHECK_UPDATES
-#include "utils/updater/Updater.h"
-#endif
-
 namespace Ui {
     class MainWindow;
 }
@@ -86,7 +82,6 @@ public:
 
 public slots:
     void onPreferredFiatCurrencyChanged();
-    void onHideUpdateNotifications(bool hidden);
 
 signals:
     void updateIcons();
@@ -123,7 +118,6 @@ private slots:
     void loadSignedTxFromText();
 
     void onTorConnectionStateChanged(bool connected);
-    void showUpdateDialog();
     void onInitiateTransaction();
     void onKeysCorrupted();
     void onSelectedInputsChanged(const QStringList &selectedInputs);
@@ -165,7 +159,6 @@ private slots:
     void menuHwDeviceClicked();
     void toggleSearchbar(bool enabled);
     void tryStoreWallet();
-    void showUpdateNotification();
     void onProxySettingsChangedConnect();
     void onProxySettingsChanged();
     void onOfflineMode(bool offline);
@@ -230,7 +223,6 @@ private:
     QPointer<QAction> m_clearRecentlyOpenAction;
 
     // lower status bar
-    QPushButton *m_statusUpdateAvailable;
     ClickableLabel *m_statusLabelBalance;
     QLabel *m_statusLabelStatus;
     QLabel *m_statusLabelNetStats;
@@ -261,10 +253,6 @@ private:
 
     EventFilter *m_eventFilter = nullptr;
     qint64 m_userLastActive = QDateTime::currentSecsSinceEpoch();
-
-#ifdef CHECK_UPDATES
-    QSharedPointer<Updater> m_updater = nullptr;
-#endif
 };
 
 #endif // FEATHER_MAINWINDOW_H

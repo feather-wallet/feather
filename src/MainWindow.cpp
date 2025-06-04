@@ -40,10 +40,6 @@
 #include "qrcode/scanner/URDialog.h"
 #endif
 
-#ifdef CHECK_UPDATES
-#include "utils/updater/UpdateDialog.h"
-#endif
-
 MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -59,10 +55,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     m_splashDialog = new SplashDialog(this);
     m_accountSwitcherDialog = new AccountSwitcherDialog(m_wallet, this);
-
-#ifdef CHECK_UPDATES
-    m_updater = QSharedPointer<Updater>(new Updater(this));
-#endif
 
     this->restoreGeo();
 
@@ -81,10 +73,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
     connect(m_windowManager, &WindowManager::manualFeeSelectionEnabled, this, &MainWindow::onManualFeeSelectionEnabled);
     connect(m_windowManager, &WindowManager::subtractFeeFromAmountEnabled, this, &MainWindow::onSubtractFeeFromAmountEnabled);
-
-#ifdef CHECK_UPDATES
-    connect(m_updater.data(), &Updater::updateAvailable, this, &MainWindow::showUpdateNotification);
-#endif
 
     ColorScheme::updateFromWidget(this);
     QTimer::singleShot(1, [this]{this->updateWidgetIcons();});
@@ -127,13 +115,6 @@ void MainWindow::initStatusBar() {
     m_statusLabelNetStats = new QLabel("", this);
     m_statusLabelNetStats->setTextInteractionFlags(Qt::TextSelectableByMouse);
     this->statusBar()->addWidget(m_statusLabelNetStats);
-
-    m_statusUpdateAvailable = new QPushButton(this);
-    m_statusUpdateAvailable->setFlat(true);
-    m_statusUpdateAvailable->setCursor(Qt::PointingHandCursor);
-    m_statusUpdateAvailable->setIcon(icons()->icon("tab_party.png"));
-    m_statusUpdateAvailable->hide();
-    this->statusBar()->addPermanentWidget(m_statusUpdateAvailable);
 
     m_statusLabelBalance = new ClickableLabel(this);
     m_statusLabelBalance->setText("Balance: 0 XMR");
@@ -325,11 +306,7 @@ void MainWindow::initMenu() {
 
     // [Help]
     connect(ui->actionAbout,             &QAction::triggered, this, &MainWindow::menuAboutClicked);
-#if defined(CHECK_UPDATES)
-    connect(ui->actionCheckForUpdates,   &QAction::triggered, this, &MainWindow::showUpdateDialog);
-#else
     ui->actionCheckForUpdates->setVisible(false);
-#endif
 
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
     connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
@@ -1491,17 +1468,6 @@ void MainWindow::onPreferredFiatCurrencyChanged() {
     m_sendWidget->onPreferredFiatCurrencyChanged();
 }
 
-void MainWindow::onHideUpdateNotifications(bool hidden) {
-    if (hidden) {
-        m_statusUpdateAvailable->hide();
-    }
-#ifdef CHECK_UPDATES
-    else if (m_updater->state == Updater::State::UPDATE_AVAILABLE) {
-        m_statusUpdateAvailable->show();
-    }
-#endif
-}
-
 void MainWindow::onTorConnectionStateChanged(bool connected) {
     if (conf()->get(Config::proxy).toInt() != Config::Proxy::Tor) {
         return;
@@ -1511,32 +1477,6 @@ void MainWindow::onTorConnectionStateChanged(bool connected) {
         m_statusBtnProxySettings->setIcon(icons()->icon("tor_logo.png"));
     else
         m_statusBtnProxySettings->setIcon(icons()->icon("tor_logo_disabled.png"));
-}
-
-void MainWindow::showUpdateNotification() {
-#ifdef CHECK_UPDATES
-    if (conf()->get(Config::hideUpdateNotifications).toBool()) {
-        return;
-    }
-
-    QString versionDisplay{m_updater->version};
-    versionDisplay.replace("beta", "Beta");
-    QString updateText = QString("Update to Feather %1 is available").arg(versionDisplay);
-    m_statusUpdateAvailable->setText(updateText);
-    m_statusUpdateAvailable->setToolTip("Click to Download update.");
-    m_statusUpdateAvailable->show();
-
-    m_statusUpdateAvailable->disconnect();
-    connect(m_statusUpdateAvailable, &StatusBarButton::clicked, this, &MainWindow::showUpdateDialog);
-#endif
-}
-
-void MainWindow::showUpdateDialog() {
-#ifdef CHECK_UPDATES
-    UpdateDialog updateDialog{this, m_updater};
-    connect(&updateDialog, &UpdateDialog::restartWallet, m_windowManager, &WindowManager::restartApplication);
-    updateDialog.exec();
-#endif
 }
 
 void MainWindow::onInitiateTransaction() {

@@ -20,7 +20,6 @@ cmake_policy(SET CMP0074 NEW)
 # Configurable options
 option(STATIC "Link libraries statically, requires static Qt" OFF)
 option(SELF_CONTAINED "Disable when building Feather for packages" OFF)
-option(CHECK_UPDATES "Enable checking for application updates" OFF)
 option(PLATFORM_INSTALLER "Built-in updater fetches installer (windows-only)" OFF)
 option(USE_DEVICE_TREZOR "Trezor support compilation" ON)
 option(DONATE_BEG "Prompt donation window every once in a while" OFF)
@@ -91,14 +90,6 @@ endif()
 # ZXing
 if(WITH_SCANNER)
     find_package(ZXing REQUIRED)
-endif()
-
-# libzip
-if(CHECK_UPDATES)
-    set(ZLIB_USE_STATIC_LIBS "ON")
-    find_package(ZLIB REQUIRED)
-    find_path(LIBZIP_INCLUDE_DIRS zip.h)
-    find_library(LIBZIP_LIBRARIES zip)
 endif()
 
 # Boost

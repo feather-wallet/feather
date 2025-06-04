@@ -24,10 +24,6 @@ endif()
 
 find_package(Qt6 REQUIRED COMPONENTS ${QT_COMPONENTS})
 
-if (CHECK_UPDATES)
-    add_subdirectory(openpgp)
-endif()
-
 qt_add_resources(RESOURCES assets.qrc assets_docs.qrc)
 
 # Compile source files (.h/.cpp)
@@ -73,12 +69,6 @@ file(GLOB SOURCE_FILES
         )
 
 get_cmake_property(_vars VARIABLES)
-
-if (CHECK_UPDATES)
-    file(GLOB UPDATER_FILES
-            "utils/updater/*.h"
-            "utils/updater/*.cpp")
-endif()
 
 if (WITH_SCANNER)
     file(GLOB QRCODE_UTILS_FILES
@@ -176,10 +166,6 @@ if(DONATE_BEG)
     target_compile_definitions(feather PRIVATE DONATE_BEG=1)
 endif()
 
-if (CHECK_UPDATES)
-    target_compile_definitions(feather PRIVATE CHECK_UPDATES=1)
-endif()
-
 if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
@@ -251,10 +237,6 @@ target_link_libraries(feather PRIVATE
         ${ZLIB_LIBRARIES}
         ${BCUR_LIBRARY}
 )
-
-if(CHECK_UPDATES)
-    target_link_libraries(feather PRIVATE openpgp)
-endif()
 
 if(DEVICE_TREZOR_READY)
     find_package(Protobuf CONFIG)
