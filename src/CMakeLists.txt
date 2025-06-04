@@ -70,33 +70,9 @@ file(GLOB SOURCE_FILES
         "monero_seed/*.cpp"
         "monero_seed/*.c"
         "monero_seed/*.hpp"
-        "plugins/*.cpp"
-        "plugins/*.h"
         )
 
 get_cmake_property(_vars VARIABLES)
-set(PLUGIN_PREFIX "WITH_PLUGIN_")
-
-foreach (_var ${_vars})
-    string(REGEX MATCH "^${PLUGIN_PREFIX}" _isPlugin ${_var})
-
-    if (NOT ${_var})
-        continue()
-    endif()
-
-    if(_isPlugin)
-        string(REPLACE "${PLUGIN_PREFIX}" "" _suffix ${_var})
-        string(TOLOWER "${_suffix}" _plugin)
-        message(STATUS "Adding plugin: ${_plugin}")
-        file (GLOB PLUGIN_FILES
-                "plugins/${_plugin}/*.cpp"
-                "plugins/${_plugin}/*.h"
-        )
-        list (APPEND SOURCE_FILES
-                ${PLUGIN_FILES}
-        )
-    endif()
-endforeach()
 
 if (CHECK_UPDATES)
     file(GLOB UPDATER_FILES

@@ -29,7 +29,6 @@
 #include "libwalletqt/rows/Output.h"
 #include "libwalletqt/TransactionHistory.h"
 #include "model/AddressBookModel.h"
-#include "plugins/PluginRegistry.h"
 #include "utils/AppData.h"
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
@@ -70,7 +69,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     this->restoreGeo();
 
     this->initStatusBar();
-    this->initPlugins();
     this->initWidgets();
     this->initMenu();
     this->initOffline();
@@ -190,32 +188,6 @@ void MainWindow::initStatusBar() {
     m_statusBtnHwDevice->hide();
 }
 
-void MainWindow::initPlugins() {
-    const QStringList enabledPlugins = conf()->get(Config::enabledPlugins).toStringList();
-
-    for (const auto& plugin_creator : PluginRegistry::getPluginCreators()) {
-        Plugin* plugin = plugin_creator();
-
-        if (!PluginRegistry::getInstance().isPluginEnabled(plugin->id())) {
-            continue;
-        }
-
-        qDebug() << "Initializing plugin: " << plugin->id();
-        plugin->initialize(m_wallet, this);
-        connect(plugin, &Plugin::setStatusText, this, &MainWindow::setStatusText);
-        connect(plugin, &Plugin::fillSendTab, this, &MainWindow::fillSendTab);
-        connect(this, &MainWindow::updateIcons, plugin, &Plugin::skinChanged);
-        connect(this, &MainWindow::aboutToQuit, plugin, &Plugin::aboutToQuit);
-        connect(this, &MainWindow::uiSetup, plugin, &Plugin::uiSetup);
-
-        m_plugins.append(plugin);
-    }
-
-    std::sort(m_plugins.begin(), m_plugins.end(), [](Plugin *a, Plugin *b) {
-        return a->idx() < b->idx();
-    });
-}
-
 void MainWindow::initWidgets() {
     // [History]
     m_historyWidget = new HistoryWidget(m_wallet, this);
@@ -252,25 +224,6 @@ void MainWindow::initWidgets() {
     connect(ui->notes, &QPlainTextEdit::textChanged, [this] {
        m_wallet->setCacheAttribute("wallet.notes", ui->notes->toPlainText());
     });
-
-    // [Plugins..]
-    for (auto* plugin : m_plugins) {
-        if (!plugin->hasParent()) {
-            qDebug() << "Adding tab: " << plugin->displayName();
-
-            if (plugin->insertFirst()) {
-                ui->tabWidget->insertTab(0, plugin->tab(), icons()->icon(plugin->icon()), plugin->displayName());
-            } else {
-                ui->tabWidget->addTab(plugin->tab(), icons()->icon(plugin->icon()), plugin->displayName());
-            }
-
-            for (auto* child : m_plugins) {
-                if (child->hasParent() && child->parent() == plugin->id()) {
-                    plugin->addSubPlugin(child);
-                }
-            }
-        }
-    }
 
     ui->frame_coinControl->setVisible(false);
     connect(ui->btn_resetCoinControl, &QPushButton::clicked, [this]{
@@ -342,18 +295,6 @@ void MainWindow::initMenu() {
     m_tabShowHideMapper["Notes"] = new ToggleTab(ui->tabNotes, "Notes", "Notes", ui->actionShow_Notes, this);
     m_tabShowHideSignalMapper->setMapping(ui->actionShow_Notes, "Notes");
 
-    // Show/Hide Plugins..
-    for (const auto &plugin : m_plugins) {
-        if (plugin->parent() != "") {
-            continue;
-        }
-
-        auto* pluginAction = new QAction(plugin->displayName(), this);
-        ui->menuView->insertAction(plugin->insertFirst() ? ui->actionPlaceholderBegin : ui->actionPlaceholderEnd, pluginAction);
-        connect(pluginAction, &QAction::triggered, m_tabShowHideSignalMapper, QOverload<>::of(&QSignalMapper::map));
-        m_tabShowHideMapper[plugin->displayName()] = new ToggleTab(plugin->tab(), plugin->displayName(), plugin->displayName(), pluginAction, this);
-        m_tabShowHideSignalMapper->setMapping(pluginAction, plugin->displayName());
-    }
     ui->actionPlaceholderBegin->setVisible(false);
     ui->actionPlaceholderEnd->setVisible(false);
 
@@ -668,17 +609,6 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
     ui->actionShow_Home->setVisible(enabled);
 
     QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
-
-    for (const auto &plugin : m_plugins) {
-        if (plugin->hasParent()) {
-            continue;
-        }
-
-        if (plugin->requiresWebsocket()) {
-            // TODO: unload plugins
-            ui->tabWidget->setTabVisible(this->findTab(plugin->displayName()), enabled && enabledTabs.contains(plugin->displayName()));
-        }
-    }
 
     m_historyWidget->setWebsocketEnabled(enabled);
     m_sendWidget->setWebsocketEnabled(enabled);

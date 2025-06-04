@@ -27,14 +27,6 @@ option(DONATE_BEG "Prompt donation window every once in a while" OFF)
 option(WITH_SCANNER "Enable webcam QR scanner" ON)
 option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
 
-# Plugins
-option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
-option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)
-option(WITH_PLUGIN_CROWDFUNDING "Include Crowdfunding Home plugin" ON)
-option(WITH_PLUGIN_BOUNTIES "Include Bounties Home plugin" ON)
-option(WITH_PLUGIN_REVUO "Include Revuo Home plugin" ON)
-option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
-
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)
 include(CheckCXXCompilerFlag)

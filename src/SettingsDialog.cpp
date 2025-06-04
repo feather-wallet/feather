@@ -30,7 +30,6 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
     this->setupDisplayTab();
     this->setupMemoryTab();
     this->setupTransactionsTab();
-    this->setupPluginsTab();
     this->setupMiscTab();
 
     connect(ui->selector, &QListWidget::currentItemChanged, [this](QListWidgetItem *current, QListWidgetItem *previous){
@@ -47,7 +46,6 @@ Settings::Settings(Nodes *nodes, QWidget *parent)
 //  new QListWidgetItem(icons()->icon("chipset_32px.png"), "Memory", ui->selector, Pages::MEMORY);
     new QListWidgetItem(icons()->icon("file_manager_32px.png"), "Transactions", ui->selector, Pages::TRANSACTIONS);
     QString connectIcon = ColorScheme::darkScheme ? "connect_white.svg" : "connect.svg";;
-    new QListWidgetItem(icons()->icon(connectIcon), "Plugins", ui->selector, Pages::PLUGINS);
     new QListWidgetItem(icons()->icon("settings_disabled_32px.png"), "Misc", ui->selector, Pages::MISC);
 
     ui->selector->setFixedWidth(ui->selector->sizeHintForColumn(0) + ui->selector->frameWidth() + 5);
@@ -363,12 +361,6 @@ void Settings::setupTransactionsTab() {
     connect(ui->checkBox_subtractFeeFromAmount, &QCheckBox::toggled, [this](bool toggled){
         conf()->set(Config::subtractFeeFromAmount, toggled);
         emit subtractFeeFromAmountEnabled(toggled);
-    });
-}
-
-void Settings::setupPluginsTab() {
-    connect(ui->pluginWidget, &PluginWidget::pluginConfigured, [this](const QString &id) {
-       emit pluginConfigured(id);
     });
 }
 

@@ -7,7 +7,6 @@
 
 #include "PageMenu.h"
 #include "PageOpenWallet.h"
-#include "PagePlugins.h"
 #include "PageWalletFile.h"
 #include "PageNetwork.h"
 #include "PageWalletSeed.h"
@@ -57,7 +56,6 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_HardwareDevice, new PageHardwareDevice(&m_wizardFields, this));
     setPage(Page_SetSeedPassphrase, walletSetSeedPassphrasePage);
     setPage(Page_SetSubaddressLookahead, walletSetSubaddressLookaheadPage);
-    setPage(Page_Plugins, new PagePlugins(this));
 
     setStartId(Page_Menu);
 

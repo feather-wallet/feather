@@ -3,19 +3,17 @@
 
 #include "WebsocketNotifier.h"
 #include "utils/os/whonix.h"
-#include "plugins/PluginRegistry.h"
 
 #include <QJsonObject>
+#include <QJsonArray>
+#include <QCoreApplication>
+#include <QThread>
 
 WebsocketNotifier::WebsocketNotifier(QObject *parent)
     : QObject(parent)
     , websocketClient(new WebsocketClient(this))
 {
     connect(websocketClient, &WebsocketClient::WSMessage, this, &WebsocketNotifier::onWSMessage);
-
-    for (const auto& plugin : PluginRegistry::getPlugins()) {
-        m_pluginSubscriptions << plugin->socketData();
-    }
 }
 
 QPointer<WebsocketNotifier> WebsocketNotifier::m_instance(nullptr);
@@ -58,10 +56,6 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
         this->onWSUpdates(msg.value("data").toObject());
     }
 #endif
-
-    else if (m_pluginSubscriptions.contains(cmd)) {
-        emit dataReceived(cmd, msg.value("data"));
-    }
 }
 
 void WebsocketNotifier::emitCache() {

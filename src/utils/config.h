@@ -134,7 +134,6 @@ public:
         fiatSymbols,
         cryptoSymbols,
 
-        enabledPlugins,
         restartRequired,
 
         // Tickers

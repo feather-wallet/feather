@@ -41,7 +41,6 @@
 #include "CoinsWidget.h"
 
 #include "WindowManager.h"
-#include "plugins/Plugin.h"
 
 #ifdef CHECK_UPDATES
 #include "utils/updater/Updater.h"
@@ -179,7 +178,6 @@ private:
     friend WindowManager;
 
     void initStatusBar();
-    void initPlugins();
     void initWidgets();
     void initMenu();
     void initOffline();
@@ -251,8 +249,6 @@ private:
 
     QTimer m_updateBytes;
     QTimer m_checkUserActivity;
-
-    QList<Plugin*> m_plugins;
 
     QString m_statusText;
     int m_statusDots;

@@ -193,9 +193,6 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
     connect(&settings, &Settings::showTrayIcon, [this](bool visible) {
         m_tray->setVisible(visible);
     });
-    connect(&settings, &Settings::pluginConfigured, [this](const QString &id) {
-        emit pluginConfigured(id);
-    });
 
     if (showProxyTab) {
         settings.showNetworkProxyTab();

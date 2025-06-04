@@ -28,7 +28,6 @@ public:
         DISPLAY,
         MEMORY,
         TRANSACTIONS,
-        PLUGINS,
         MISC
     };
 
@@ -41,7 +40,6 @@ signals:
     void proxySettingsChanged();
     void updateBalance();
     void offlineMode(bool offline);
-    void pluginConfigured(const QString &id);
     void manualFeeSelectionEnabled(bool enabled);
     void subtractFeeFromAmountEnabled(bool enabled);
 
@@ -59,7 +57,6 @@ private:
     void setupDisplayTab();
     void setupMemoryTab();
     void setupTransactionsTab();
-    void setupPluginsTab();
     void setupMiscTab();
 
     void setupThemeComboBox();
