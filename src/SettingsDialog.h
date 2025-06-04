@@ -36,7 +36,6 @@ signals:
     void skinChanged(QString skinName);
     void hideUpdateNotifications(bool hidden);
     void showTrayIcon(bool visible);
-    void websocketStatusChanged(bool enabled);
     void proxySettingsChanged();
     void updateBalance();
     void offlineMode(bool offline);
@@ -61,7 +60,6 @@ private:
 
     void setupThemeComboBox();
     void setSelection(int index);
-    void enableWebsocket(bool enabled);
 
     QScopedPointer<Ui::Settings> ui;
     Nodes *m_nodes = nullptr;

@@ -46,7 +46,6 @@ public:
 
 signals:
     void proxySettingsChanged();
-    void websocketStatusChanged(bool enabled);
     void updateBalance();
     void preferredFiatCurrencyChanged();
     void offlineMode(bool offline);
@@ -55,7 +54,6 @@ signals:
 
 public slots:
     void onProxySettingsChanged();
-    void onWebsocketStatusChanged(bool enabled);
     void tryOpenWallet(const QString &path, const QString &password);
 
 private slots:

@@ -18,7 +18,6 @@
 #include "PageSetSubaddressLookahead.h"
 #include "PageHardwareDevice.h"
 #include "PageNetworkProxy.h"
-#include "PageNetworkWebsocket.h"
 #include "constants.h"
 #include "WindowManager.h"
 #include "utils/AppData.h"
@@ -34,7 +33,6 @@ WalletWizard::WalletWizard(QWidget *parent)
 
     auto networkPage = new PageNetwork(this);
     auto networkProxyPage = new PageNetworkProxy(this);
-    auto networkWebsocketPage = new PageNetworkWebsocket(this);
     auto menuPage = new PageMenu(&m_wizardFields, m_walletKeysFilesModel, this);
     auto openWalletPage = new PageOpenWallet(m_walletKeysFilesModel, this);
     auto createWallet = new PageWalletFile(&m_wizardFields , this);
@@ -49,7 +47,6 @@ WalletWizard::WalletWizard(QWidget *parent)
     setPage(Page_SetPasswordPage, walletSetPasswordPage);
     setPage(Page_Network, networkPage);
     setPage(Page_NetworkProxy, networkProxyPage);
-    setPage(Page_NetworkWebsocket, networkWebsocketPage);
     setPage(Page_WalletRestoreSeed, new PageWalletRestoreSeed(&m_wizardFields, this));
     setPage(Page_WalletRestoreKeys, new PageWalletRestoreKeys(&m_wizardFields, this));
     setPage(Page_SetRestoreHeight, new PageSetRestoreHeight(&m_wizardFields, this));
@@ -88,7 +85,7 @@ WalletWizard::WalletWizard(QWidget *parent)
     });
     connect(settingsButton, &QPushButton::clicked, this, &WalletWizard::showSettings);
 
-    connect(networkWebsocketPage, &PageNetworkWebsocket::initialNetworkConfigured, [this](){
+    connect(networkProxyPage, &PageNetworkProxy::initialNetworkConfigured, [this](){
         emit initialNetworkConfigured();
     });
 
@@ -141,12 +138,6 @@ void WalletWizard::onCreateWallet() {
                                   m_wizardFields.restoreHeight,
                                   m_wizardFields.subaddressLookahead);
         return;
-    }
-
-    // If we're connected to the websocket, use the reported height for new wallets to skip initial synchronization.
-    if (m_wizardFields.mode == WizardMode::CreateWallet && currentBlockHeight > 0) {
-        qInfo() << "New wallet, setting restore height to latest blockheight: " << currentBlockHeight;
-        m_wizardFields.seed.restoreHeight = currentBlockHeight;
     }
 
     if (m_wizardFields.mode == WizardMode::RestoreFromSeed && (m_wizardFields.seedType == Seed::Type::MONERO || m_wizardFields.showSetRestoreHeightPage)) {

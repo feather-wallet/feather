@@ -167,7 +167,6 @@ public:
 public slots:
     void connectToNode();
     void connectToNode(const FeatherNode &node);
-    void onWSNodesReceived(QList<FeatherNode>& nodes);
     void onNodeSourceChanged(NodeSource nodeSource);
     void setCustomNodes(const QList<FeatherNode>& nodes);
     void autoConnect(bool forceReconnect = false);

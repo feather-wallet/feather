@@ -13,7 +13,7 @@
 #include "libwalletqt/WalletManager.h"
 #include "utils/config.h"
 #include "utils/Icons.h"
-#include "WebsocketNotifier.h"
+#include "utils/Utils.h"
 
 HistoryWidget::HistoryWidget(Wallet *wallet, QWidget *parent)
         : QWidget(parent)
@@ -63,6 +63,7 @@ HistoryWidget::HistoryWidget(Wallet *wallet, QWidget *parent)
     }
 
     ui->btn_options->setMenu(ui->history->getMenu());
+    ui->history->setColumnHidden(TransactionHistoryModel::FiatAmount, true);
 }
 
 void HistoryWidget::setSearchbarVisible(bool visible) {
@@ -72,10 +73,6 @@ void HistoryWidget::setSearchbarVisible(bool visible) {
 void HistoryWidget::focusSearchbar() {
     ui->search->setFocusPolicy(Qt::StrongFocus);
     ui->search->setFocus();
-}
-
-void HistoryWidget::setWebsocketEnabled(bool enabled) {
-    ui->history->setColumnHidden(TransactionHistoryModel::FiatAmount, !enabled);
 }
 
 void HistoryWidget::showContextMenu(const QPoint &point) {

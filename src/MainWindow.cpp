@@ -33,8 +33,6 @@
 #include "utils/AsyncTask.h"
 #include "utils/ColorScheme.h"
 #include "utils/Icons.h"
-#include "utils/WebsocketNotifier.h"
-
 #include "wallet/wallet_errors.h"
 
 #ifdef WITH_SCANNER
@@ -77,16 +75,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     this->onOfflineMode(conf()->get(Config::offlineMode).toBool());
     conf()->set(Config::restartRequired, false);
-    
-    // Websocket notifier
-#ifdef CHECK_UPDATES
-    connect(websocketNotifier(), &WebsocketNotifier::UpdatesReceived, m_updater.data(), &Updater::wsUpdatesReceived);
-#endif
-
-    websocketNotifier()->emitCache(); // Get cached data
-
-    connect(m_windowManager, &WindowManager::websocketStatusChanged, this, &MainWindow::onWebsocketStatusChanged);
-    this->onWebsocketStatusChanged(!conf()->get(Config::disableWebsocket).toBool());
 
     connect(m_windowManager, &WindowManager::proxySettingsChanged, this, &MainWindow::onProxySettingsChangedConnect);
     connect(m_windowManager, &WindowManager::updateBalance, m_wallet, &Wallet::updateBalance);
@@ -603,15 +591,6 @@ void MainWindow::tryStoreWallet() {
     }
 
     m_wallet->store();
-}
-
-void MainWindow::onWebsocketStatusChanged(bool enabled) {
-    ui->actionShow_Home->setVisible(enabled);
-
-    QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
-
-    m_historyWidget->setWebsocketEnabled(enabled);
-    m_sendWidget->setWebsocketEnabled(enabled);
 }
 
 void MainWindow::onProxySettingsChangedConnect() {

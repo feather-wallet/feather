@@ -13,7 +13,6 @@
 #include "utils/AppData.h"
 #include "utils/Icons.h"
 #include "utils/nodes.h"
-#include "utils/WebsocketNotifier.h"
 #include "widgets/NetworkProxyWidget.h"
 #include "utils/ColorScheme.h"
 
@@ -176,20 +175,11 @@ void Settings::setupNetworkTab() {
     // Proxy
     connect(ui->proxyWidget, &NetworkProxyWidget::proxySettingsChanged, this, &Settings::onProxySettingsChanged);
 
-    // Websocket
-    // [Obtain third-party data]
-    ui->checkBox_enableWebsocket->setChecked(!conf()->get(Config::disableWebsocket).toBool());
-    connect(ui->checkBox_enableWebsocket, &QCheckBox::toggled, [this](bool checked){
-        conf()->set(Config::disableWebsocket, !checked);
-        this->enableWebsocket(checked);
-    });
-
     // Overview
     ui->checkBox_offlineMode->setChecked(conf()->get(Config::offlineMode).toBool());
     connect(ui->checkBox_offlineMode, &QCheckBox::toggled, [this](bool checked){
         conf()->set(Config::offlineMode, checked);
         emit offlineMode(checked);
-        this->enableWebsocket(!checked);
     });
 }
 
@@ -397,16 +387,6 @@ void Settings::setupThemeComboBox() {
 
 void Settings::setSelection(int index) {
     ui->selector->setCurrentRow(index);
-}
-
-void Settings::enableWebsocket(bool enabled) {
-    if (enabled && !conf()->get(Config::offlineMode).toBool() && !conf()->get(Config::disableWebsocket).toBool()) {
-        websocketNotifier()->websocketClient->restart();
-    } else {
-        websocketNotifier()->websocketClient->stop();
-    }
-    ui->nodeWidget->onWebsocketStatusChanged();
-    emit websocketStatusChanged(enabled);
 }
 
 Settings::~Settings() = default;

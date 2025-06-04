@@ -29,14 +29,14 @@ apt install git cmake build-essential ccache libssl-dev libunbound-dev libboost-
 ```bash
 sudo dnf install epel-release -y
 sudo dnf groupinstall "Development Tools" -y
-sudo dnf install unbound-devel boost-devel qrencode-devel zxing-cpp-devel qt6-qtbase-devel qt6-qtsvg-devel qt6-qtwebsockets-devel qt6-qtmultimedia-devel qt6-qtwayland-devel libsodium-devel
+sudo dnf install unbound-devel boost-devel qrencode-devel zxing-cpp-devel qt6-qtbase-devel qt6-qtsvg-devel qt6-qtmultimedia-devel qt6-qtwayland-devel libsodium-devel
 ```
 
 #### Void Linux
 
 ```bash
 xbps-install -S base-devel cmake boost-devel openssl-devel unbound-devel libsodium-devel zlib-devel qt6-base-devel \
-                qt6-svg-devel qt6-websockets-devel qt6-multimedia-devel qt6-wayland-devel libgcrypt-devel libzip-devel \
+                qt6-svg-devel qt6-multimedia-devel qt6-wayland-devel libgcrypt-devel libzip-devel \
                 hidapi-devel protobuf protobuf-devel qrencode-devel zxing-cpp-devel
 ```
 

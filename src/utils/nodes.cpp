@@ -9,7 +9,6 @@
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
 #include "constants.h"
-#include "utils/WebsocketNotifier.h"
 
 bool NodeList::addNode(const QString &node, NetworkType::Type networkType, NodeList::Type source) {
     // We can't obtain references to QJsonObjects...
@@ -104,7 +103,6 @@ Nodes::Nodes(QObject *parent, Wallet *wallet)
     // TODO: This class is in desperate need of refactoring
 
     this->loadConfig();
-    connect(websocketNotifier(), &WebsocketNotifier::NodesReceived, this, &Nodes::onWSNodesReceived);
 
     if (m_wallet) {
         connect(m_wallet, &Wallet::walletRefreshed, this, &Nodes::onWalletRefreshed);
@@ -125,26 +123,6 @@ void Nodes::loadConfig() {
         }
 
         m_customNodes.append(customNode);
-    }
-
-    QStringList websocketNodes = m_nodes.getNodes(constants::networkType, NodeList::ws);
-    for (const auto &node : websocketNodes) {
-        FeatherNode wsNode{node};
-        wsNode.custom = false;
-        wsNode.online = true; // assume online
-
-        if (m_connection == wsNode) {
-            if (m_connection.isActive)
-                wsNode.isActive = true;
-            else if (m_connection.isConnecting)
-                wsNode.isConnecting = true;
-        }
-
-        m_websocketNodes.append(wsNode);
-    }
-
-    if (m_websocketNodes.count() > 0) {
-        qDebug() << QString("Loaded %1 cached websocket nodes from config").arg(m_websocketNodes.count());
     }
 
     if (m_customNodes.count() > 0) {
@@ -358,32 +336,6 @@ FeatherNode Nodes::pickEligibleNode() {
         this->exhausted();
     }
     return rtn;
-}
-
-void Nodes::onWSNodesReceived(QList<FeatherNode> &nodes) {
-    m_websocketNodes.clear();
-
-    m_wsNodesReceived = true;
-
-    for (auto &node: nodes) {
-        if (m_connection == node) {
-            if (m_connection.isActive)
-                node.isActive = true;
-            else if (m_connection.isConnecting)
-                node.isConnecting = true;
-        }
-        m_websocketNodes.push_back(node);
-    }
-
-    // cache into config
-    QStringList wsNodeList;
-    for (const auto &node : m_websocketNodes) {
-        wsNodeList << node.toAddress();
-    }
-    m_nodes.setNodes(wsNodeList, constants::networkType, NodeList::ws);
-
-    this->resetLocalState();
-    this->updateModels();
 }
 
 void Nodes::onNodeSourceChanged(NodeSource nodeSource) {

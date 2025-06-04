@@ -38,7 +38,6 @@ Goals:
 
 - Make sure the project is transmissible
 - Make sure that setting up release infrastructure, release engineering, and maintenance are extensively documented
-- Make the websocket server repository public
 
 ### 3. Reproducibility
 

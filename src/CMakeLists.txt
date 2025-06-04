@@ -184,9 +184,6 @@ if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()
 
-# TODO: PLACEHOLDER
-target_compile_definitions(feather PRIVATE HAS_WEBSOCKET=1)
-
 if(PLATFORM_INSTALLER)
     target_compile_definitions(feather PRIVATE PLATFORM_INSTALLER=1)
 endif()

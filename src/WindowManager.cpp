@@ -7,6 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QWindow>
+#include <QNetworkProxy>
 
 #include "Application.h"
 #include "constants.h"
@@ -20,7 +21,6 @@
 #include "utils/NetworkManager.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "utils/WebsocketNotifier.h"
 #include "utils/AppData.h"
 
 WindowManager::WindowManager(QObject *parent)
@@ -181,7 +181,6 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
     connect(&settings, &Settings::skinChanged, this, &WindowManager::onChangeTheme);
     connect(&settings, &Settings::updateBalance, this, &WindowManager::updateBalance);
     connect(&settings, &Settings::proxySettingsChanged, this, &WindowManager::onProxySettingsChanged);
-    connect(&settings, &Settings::websocketStatusChanged, this, &WindowManager::onWebsocketStatusChanged);
     connect(&settings, &Settings::offlineMode, this, &WindowManager::offlineMode);
     connect(&settings, &Settings::manualFeeSelectionEnabled, this, &WindowManager::manualFeeSelectionEnabled);
     connect(&settings, &Settings::subtractFeeFromAmountEnabled, this, &WindowManager::subtractFeeFromAmountEnabled);
@@ -675,17 +674,7 @@ void WindowManager::onProxySettingsChanged() {
 
     qWarning() << "Proxy: " << proxy.hostName() << " " << proxy.port();
 
-    // Switch websocket to new proxy and update URL
-    websocketNotifier()->websocketClient->stop();
-    websocketNotifier()->websocketClient->webSocket->setProxy(proxy);
-    websocketNotifier()->websocketClient->nextWebsocketUrl();
-    websocketNotifier()->websocketClient->restart();
-
     emit proxySettingsChanged();
-}
-
-void WindowManager::onWebsocketStatusChanged(bool enabled) {
-    emit websocketStatusChanged(enabled);
 }
 
 // ######################## WIZARD ########################

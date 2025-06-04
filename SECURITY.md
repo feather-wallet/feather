@@ -31,7 +31,7 @@ Clarifications on scope:
 - The live [websites](https://github.com/feather-wallet/feather-site/blob/master/mirrors.txt) and their repositories are out of scope.
 - Loss of funds due to malware on the user's machine is out of scope.
 - Memory imaging, including cold boot attacks, is out of scope.
-- Social engineering against users is out of scope. This includes messages received from the [websocket server](https://docs.featherwallet.org/guides/websocket).
+- Social engineering against users is out of scope.
 - Any form of coercion, physical or psychological, is out of scope.
 - Vulnerabilities that are attributable to hardware are out of scope.
 - If the issue was fixed in the `master` branch before we receive your report, it is invalid and not eligible for a bounty from this program.

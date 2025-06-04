@@ -165,7 +165,6 @@ private slots:
     void menuHwDeviceClicked();
     void toggleSearchbar(bool enabled);
     void tryStoreWallet();
-    void onWebsocketStatusChanged(bool enabled);
     void showUpdateNotification();
     void onProxySettingsChangedConnect();
     void onProxySettingsChanged();

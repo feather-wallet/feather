@@ -31,7 +31,7 @@ void PageNetworkProxy::initializePage() {
 }
 
 int PageNetworkProxy::nextId() const {
-    return WalletWizard::Page_NetworkWebsocket;
+    return WalletWizard::Page_Menu;
 }
 
 bool PageNetworkProxy::validatePage() {

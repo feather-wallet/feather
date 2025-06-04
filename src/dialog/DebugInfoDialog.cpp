@@ -7,8 +7,6 @@
 #include "utils/AppData.h"
 #include "utils/os/tails.h"
 #include "utils/os/whonix.h"
-#include "utils/WebsocketClient.h"
-#include "utils/WebsocketNotifier.h"
 
 DebugInfoDialog::DebugInfoDialog(Wallet *wallet, Nodes *nodes, QWidget *parent)
         : WindowModalDialog(parent)
@@ -39,11 +37,6 @@ void DebugInfoDialog::updateInfo() {
     auto node = m_nodes->connection();
     ui->label_remoteNode->setText(node.toAddress());
     ui->label_walletStatus->setText(this->statusToString(m_wallet->connectionStatus()));
-    QString websocketStatus = Utils::QtEnumToString(websocketNotifier()->websocketClient->webSocket->state()).remove("State");
-    if (conf()->get(Config::disableWebsocket).toBool()) {
-        websocketStatus = "Disabled";
-    }
-    ui->label_websocketStatus->setText(websocketStatus);
 
     QString proxy = [](){
         int proxy = conf()->get(Config::proxy).toInt();
@@ -134,7 +127,6 @@ void DebugInfoDialog::copyToClipboard() {
 
     text += QString("Remote node: %1  \n").arg(ui->label_remoteNode->text());
     text += QString("Wallet status: %1  \n").arg(ui->label_walletStatus->text());
-    text += QString("Websocket status: %1  \n").arg(ui->label_websocketStatus->text());
     text += QString("Proxy: %1  \n").arg(ui->label_proxy->text());
 
     text += QString("Network type: %1  \n").arg(ui->label_netType->text());
