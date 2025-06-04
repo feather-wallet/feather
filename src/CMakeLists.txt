@@ -8,7 +8,6 @@ set(QT_COMPONENTS
         Gui
         Network
         Svg
-        WebSockets
         SvgWidgets
 )
 
@@ -140,7 +139,6 @@ target_include_directories(feather PUBLIC
         ${QtSvg_INCLUDE_DIRS}
         ${QtSvgWidgets_INCLUDE_DIRS}
         ${QtXml_INCLUDE_DIRS}
-        ${QtWebSockets_INCLUDE_DIRS}
         ${LIBZIP_INCLUDE_DIRS}
         ${ZLIB_INCLUDE_DIRS}
         ${POLYSEED_INCLUDE_DIR}
@@ -195,7 +193,6 @@ target_compile_definitions(feather
         ${QtSvg_DEFINITIONS}
         ${QtSvgWidgets_DEFINITIONS}
         ${QtXml_DEFINITIONS}
-        ${QtWebSockets_DEFINITIONS}
 )
 
 if (WITH_SCANNER)
@@ -223,7 +220,6 @@ target_link_libraries(feather PRIVATE
         Qt::Gui
         Qt::Network
         Qt::Svg
-        Qt::WebSockets
         Qt::SvgWidgets
         Threads::Threads
         ${QRENCODE_LIBRARY}
