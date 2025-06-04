@@ -318,15 +318,6 @@ void Settings::setupMemoryTab() {
 }
 
 void Settings::setupTransactionsTab() {
-    // [Multibroadcast outgoing transactions]
-    ui->checkBox_multibroadcast->setChecked(conf()->get(Config::multiBroadcast).toBool());
-    connect(ui->checkBox_multibroadcast, &QCheckBox::toggled, [](bool toggled){
-        conf()->set(Config::multiBroadcast, toggled);
-    });
-    connect(ui->btn_multibroadcast, &QPushButton::clicked, [this]{
-        Utils::showInfo(this, "Multibroadcasting", "Multibroadcasting relays outgoing transactions to all nodes in your node list. This may improve transaction relay speed and reduces the chance of your transaction failing.");
-    });
-
     // Hide unimplemented settings
     ui->checkBox_alwaysOpenAdvancedTxDialog->hide();
     ui->checkBox_requirePasswordToSpend->hide();

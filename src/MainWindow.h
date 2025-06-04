@@ -171,7 +171,6 @@ private slots:
     void onOfflineMode(bool offline);
     void onManualFeeSelectionEnabled(bool enabled);
     void onSubtractFeeFromAmountEnabled(bool enabled);
-    void onMultiBroadcast(const QMap<QString, QString> &txHexMap);
 
 private:
     friend WindowManager;

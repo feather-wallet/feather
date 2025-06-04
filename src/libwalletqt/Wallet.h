@@ -470,7 +470,6 @@ signals:
 
     void selectedInputsChanged(const QStringList &selectedInputs);
 
-    void multiBroadcast(const QMap<QString, QString> &txHexMap);
     void heightsRefreshed(bool success, quint64 daemonHeight, quint64 targetHeight);
 
 private:

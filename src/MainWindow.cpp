@@ -443,8 +443,6 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::donationSent,        this, []{
         conf()->set(Config::donateBeg, -1);
     });
-    
-    connect(m_wallet, &Wallet::multiBroadcast,      this, &MainWindow::onMultiBroadcast);
 }
 
 void MainWindow::menuToggleTabVisible(const QString &key){
@@ -640,19 +638,6 @@ void MainWindow::onManualFeeSelectionEnabled(bool enabled) {
 
 void MainWindow::onSubtractFeeFromAmountEnabled(bool enabled) {
     m_sendWidget->setSubtractFeeFromAmountEnabled(enabled);
-}
-
-void MainWindow::onMultiBroadcast(const QMap<QString, QString> &txHexMap) {
-    QMapIterator<QString, QString> i(txHexMap);
-    while (i.hasNext()) {
-        i.next();
-        for (const auto& node: m_nodes->nodes()) {
-            QString address = node.toURL();
-            qDebug() << QString("Relaying %1 to: %2").arg(i.key(), address);
-            m_rpc->setDaemonAddress(address);
-            m_rpc->sendRawTransaction(i.value());
-        }
-    }
 }
 
 void MainWindow::onSyncStatus(quint64 height, quint64 target, bool daemonSync) {

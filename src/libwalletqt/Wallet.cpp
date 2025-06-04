@@ -1008,13 +1008,6 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
         return;
     }
 
-    // Nodes - even well-connected, properly configured ones - consistently fail to relay transactions
-    // To mitigate transactions failing we just send the transaction to every node we know about over Tor
-    if (conf()->get(Config::multiBroadcast).toBool()) {
-        // Let MainWindow handle this
-        emit multiBroadcast(txHexMap);
-    }
-
     // this tx was a donation to Feather, stop our nagging
     if (this->donationSending) {
         this->donationSending = false;

@@ -79,7 +79,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::offlineMode, {QS("offlineMode"), false}},
 
         // Transactions
-        {Config::multiBroadcast, {QS("multiBroadcast"), true}},
+        {Config::multiBroadcast, {QS("multiBroadcast"), false}},
         {Config::offlineTxSigningMethod, {QS("offlineTxSigningMethod"), Config::OTSMethod::UnifiedResources}},
         {Config::offlineTxSigningForceKISync, {QS("offlineTxSigningForceKISync"), false}},
         {Config::manualFeeTierSelection, {QS("manualFeeTierSelection"), false}},
