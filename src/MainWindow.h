@@ -145,7 +145,6 @@ private slots:
     void showAddressChecker();
     void showURDialog();
     
-    void donateButtonClicked();
     void payToMany();
     void showHistoryTab();
     void skinChanged(const QString &skinName);
@@ -187,7 +186,6 @@ private:
     QString statusDots();
     QString getHardwareDevice();
     void updateTitle();
-    void donationNag();
     void addToRecentlyOpened(QString filename);
     void updateRecentlyOpenedMenu();
     void updateWidgetIcons();

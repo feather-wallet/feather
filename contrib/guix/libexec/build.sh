@@ -289,7 +289,7 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
 
 
     # Set appropriate CMake options for build type
-    CMAKEVARS="-DWITH_SCANNER=On -DSELF_CONTAINED=On -DDONATE_BEG=On -DFEATHER_TARGET_TRIPLET=${HOST}"
+    CMAKEVARS="-DWITH_SCANNER=On -DSELF_CONTAINED=On -DFEATHER_TARGET_TRIPLET=${HOST}"
 
     if [[ -n "${TAG}" ]]; then
         CMAKEVARS+=" -DOFFICIAL_BUILD=On"

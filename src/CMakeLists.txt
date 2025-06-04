@@ -162,10 +162,6 @@ if(SELF_CONTAINED)
     target_compile_definitions(feather PRIVATE SELF_CONTAINED=1)
 endif()
 
-if(DONATE_BEG)
-    target_compile_definitions(feather PRIVATE DONATE_BEG=1)
-endif()
-
 if(WITH_SCANNER)
     target_compile_definitions(feather PRIVATE WITH_SCANNER=1)
 endif()

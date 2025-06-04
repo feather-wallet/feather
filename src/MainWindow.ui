@@ -506,7 +506,7 @@
      <x>0</x>
      <y>0</y>
      <width>977</width>
-     <height>23</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -595,8 +595,6 @@
     <addaction name="actionDocumentation"/>
     <addaction name="actionReport_bug"/>
     <addaction name="actionShow_debug_info"/>
-    <addaction name="separator"/>
-    <addaction name="actionDonate_to_Feather"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">

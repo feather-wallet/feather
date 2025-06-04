@@ -122,6 +122,5 @@ On platforms without `execinfo.h` use `cmake -DSTACK_TRACE:BOOL=OFF ..` instead 
 
 There are some CMake options that you may pass to control how Feather is built:
 
-- `-DDONATE_BEG=OFF` - disable the dreaded donate requests
 - `-DUSE_DEVICE_TREZOR=OFF` - disable Trezor hardware wallet support
 - `-DWITH_SCANNER=ON` - enable the webcam QR code scanner
