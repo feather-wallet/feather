@@ -18,4 +18,4 @@ qt_mingw32_packages := qt
 
 tor_linux_packages := libevent tor_linux
 tor_darwin_packages := tor_darwin
-tor_mingw32_packages := tor_mingw32
+tor_mingw32_packages := libevent tor_mingw32
