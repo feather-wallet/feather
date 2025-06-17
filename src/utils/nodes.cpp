@@ -479,7 +479,8 @@ bool Nodes::useSocks5Proxy(const FeatherNode &node) {
         return false;
     }
 
-    if (conf()->get(Config::proxy).toInt() == Config::Proxy::None) {
+    const auto config_proxy = conf()->get(Config::proxy).toInt();
+    if (config_proxy == Config::Proxy::None) {
         return false;
     }
 
@@ -492,14 +493,12 @@ bool Nodes::useSocks5Proxy(const FeatherNode &node) {
         return true;
     }
 
-    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor) {
+    if (config_proxy == Config::Proxy::Tor) {
         // Don't use socks5 proxy if initial sync traffic is excluded.
         return this->useOnionNodes();
     }
 
-    if (conf()->get(Config::proxy).toInt() != Config::Proxy::None) {
-        return true;
-    }
+    return true;
 }
 
 void Nodes::updateModels() {
