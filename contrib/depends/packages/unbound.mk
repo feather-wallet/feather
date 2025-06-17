@@ -1,8 +1,8 @@
 package=unbound
-$(package)_version=1.22.0
+$(package)_version=1.23.0
 $(package)_download_path=https://www.nlnetlabs.nl/downloads/$(package)/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=c5dd1bdef5d5685b2cedb749158dd152c52d44f65529a34ac15cd88d4b1b3d43
+$(package)_sha256_hash=959bd5f3875316d7b3f67ee237a56de5565f5b35fc9b5fc3cea6cfe735a03bb8
 $(package)_dependencies=openssl expat
 
 define $(package)_set_vars
