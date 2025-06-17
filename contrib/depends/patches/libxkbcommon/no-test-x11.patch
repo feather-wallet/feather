@@ -1,15 +1,21 @@
 diff --git a/meson.build b/meson.build
-index 8714ce4e..35691155 100644
+index c044c099..c2ff2d3a 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -893,24 +893,6 @@ test(
+@@ -917,30 +917,6 @@ test(
          dependencies: test_dep),
      env: test_env,
  )
 -if get_option('enable-x11')
 -    has_xvfb = find_program('Xvfb', required: false)
+-    has_xkbcomp = find_program('xkbcomp', required: false)
+-    # We only warn because the build machine may not be the same
+-    # as the host/test machine.
 -    if not has_xvfb.found()
 -        warning('Xvfb program not found, but is required to run X11 tests.')
+-    endif
+-    if not has_xkbcomp.found()
+-        warning('xkbcomp program not found, but is required to run X11 tests.')
 -    endif
 -    test(
 -        'x11',
@@ -27,7 +33,7 @@ index 8714ce4e..35691155 100644
  if get_option('enable-xkbregistry')
      test(
          'registry',
-@@ -1035,13 +1017,6 @@ benchmark(
+@@ -1077,13 +1053,6 @@ benchmark(
      executable('bench-atom', 'bench/atom.c', dependencies: test_dep),
      env: bench_env,
  )
