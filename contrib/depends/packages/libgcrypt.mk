@@ -1,8 +1,8 @@
 package=libgcrypt
-$(package)_version=1.11.0
+$(package)_version=1.11.1
 $(package)_download_path=https://www.gnupg.org/ftp/gcrypt/libgcrypt/
 $(package)_file_name=libgcrypt-$($(package)_version).tar.gz
-$(package)_sha256_hash=2382891207d3b000b20c81dbf2036516a535d31abd80f57d455e711e1dde5ff5
+$(package)_sha256_hash=a9691689e5e2f3be03c90738c9ab1d194245d82e365fb3797f3b0fd04de45d7b
 $(package)_dependencies=libgpg-error
 $(package)_patches=no-programs.patch
 

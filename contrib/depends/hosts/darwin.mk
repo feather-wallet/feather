@@ -46,7 +46,8 @@ darwin_LIBTOOL=llvm-libtool-darwin
 #         Adds the desired paths from the SDK
 #
 
-darwin_CC_=--target=$(host) \
+darwin_CC_=--target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
+           -mlinker-version=$(LD64_VERSION) \
            -isysroot$(OSX_SDK) -nostdlibinc \
            -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks
 darwin_CC=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
@@ -54,7 +55,8 @@ darwin_CC=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
               -u LIBRARY_PATH \
             $(clang_prog) $(darwin_CC_)
 
-darwin_CXX_=--target=$(host) \
+darwin_CXX_=--target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
+            -mlinker-version=$(LD64_VERSION) \
 		    -isysroot$(OSX_SDK) -nostdlibinc \
 		    -iwithsysroot/usr/include/c++/v1 \
 		    -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks
@@ -63,8 +65,8 @@ darwin_CXX=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
                -u LIBRARY_PATH \
              $(clangxx_prog) $(darwin_CXX_)
 
-darwin_CFLAGS=-pipe -mmacosx-version-min=$(OSX_MIN_VERSION) -mlinker-version=$(LD64_VERSION)
-darwin_CXXFLAGS=-pipe -mmacosx-version-min=$(OSX_MIN_VERSION) -mlinker-version=$(LD64_VERSION)
+darwin_CFLAGS=-pipe
+darwin_CXXFLAGS=-pipe
 darwin_LDFLAGS=-Wl,-platform_version,macos,$(OSX_MIN_VERSION),$(OSX_SDK_VERSION) -fuse-ld=lld
 darwin_ARFLAGS=cr
 
