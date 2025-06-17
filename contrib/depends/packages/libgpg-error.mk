@@ -1,9 +1,9 @@
 package=libgpg-error
-$(package)_version=1.50
+$(package)_version=1.55
 $(package)_download_path=https://www.gnupg.org/ftp/gcrypt/libgpg-error/
 $(package)_file_name=libgpg-error-$($(package)_version).tar.gz
-$(package)_sha256_hash=34a3b36ec8ad830f8f3ceb5db583d1f6dc8ae4c31d04f6da18ea18dd95396ab0
-$(package)_patches=declare_environ_macos.patch no-programs.patch
+$(package)_sha256_hash=bda09f51d7ed64565e41069d782bfcc4984aed908ae68bee01fb692b64ea96e2
+$(package)_patches=no-programs.patch
 
 define $(package)_set_vars
   $(package)_config_opts := --enable-static --disable-shared
@@ -13,7 +13,6 @@ define $(package)_set_vars
 endef
 
 define $(package)_preprocess_cmds
-  patch -p1 < $($(package)_patch_dir)/declare_environ_macos.patch && \
   patch -p1 < $($(package)_patch_dir)/no-programs.patch && \
   cp -f $(BASEDIR)/config.guess $(BASEDIR)/config.sub build-aux
 endef
