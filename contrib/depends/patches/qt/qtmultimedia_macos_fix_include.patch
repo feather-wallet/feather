@@ -1,0 +1,12 @@
+diff --git a/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink_p.h b/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink_p.h
+index 113d37a3e..d2c608443 100644
+--- a/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink_p.h
++++ b/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink_p.h
+@@ -25,6 +25,7 @@
+ #endif
+ 
+ #include <optional>
++#include <mutex>
+ 
+ QT_BEGIN_NAMESPACE
+ 

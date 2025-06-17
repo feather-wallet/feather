@@ -1,0 +1,18 @@
+diff --git a/src/multimedia/darwin/qavfvideodevices.mm b/src/multimedia/darwin/qavfvideodevices.mm
+index c2d1f616f..ae5bbc072 100644
+--- a/src/multimedia/darwin/qavfvideodevices.mm
++++ b/src/multimedia/darwin/qavfvideodevices.mm
+@@ -53,12 +53,7 @@ namespace {
+ #endif
+     ];
+ 
+-    if (@available(macOS 14, iOS 17, *)) {
+-        discoveryDevices = [discoveryDevices arrayByAddingObjectsFromArray: @[
+-            AVCaptureDeviceTypeExternal,
+-            AVCaptureDeviceTypeContinuityCamera
+-        ]];
+-    } else {
++    {
+ #ifdef Q_OS_MACOS
+     QT_WARNING_PUSH
+         QT_WARNING_DISABLE_DEPRECATED
