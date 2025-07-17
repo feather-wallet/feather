@@ -595,8 +595,6 @@
     <addaction name="actionDocumentation"/>
     <addaction name="actionReport_bug"/>
     <addaction name="actionShow_debug_info"/>
-    <addaction name="separator"/>
-    <addaction name="actionDonate_to_Feather"/>
    </widget>
    <widget class="QMenu" name="menuView">
     <property name="title">

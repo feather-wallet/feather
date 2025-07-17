@@ -957,12 +957,6 @@ void Wallet::onTransactionCreated(Monero::PendingTransaction *mtx, const QVector
 
     PendingTransaction *tx = new PendingTransaction(mtx, this);
 
-    for (auto &addr : address) {
-        if (addr == constants::donationAddress) {
-            this->donationSending = true;
-        }
-    }
-
     // tx created, but not sent yet. ask user to verify first.
     emit transactionCreated(tx, address);
 }
@@ -1013,12 +1007,6 @@ void Wallet::onTransactionCommitted(bool success, PendingTransaction *tx, const 
     if (conf()->get(Config::multiBroadcast).toBool()) {
         // Let MainWindow handle this
         emit multiBroadcast(txHexMap);
-    }
-
-    // this tx was a donation to Feather, stop our nagging
-    if (this->donationSending) {
-        this->donationSending = false;
-        emit donationSent();
     }
 }
 

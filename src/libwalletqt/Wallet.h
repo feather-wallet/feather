@@ -463,7 +463,6 @@ signals:
 
     void transactionCreated(PendingTransaction *tx, const QVector<QString> &address);
 
-    void donationSent();
     void walletRefreshed();
 
     void initiateTransaction();
@@ -525,7 +524,6 @@ private:
     FutureScheduler m_scheduler;
 
     bool m_useSSL;
-    bool donationSending = false;
     bool m_newWallet = false;
     bool m_forceKeyImageSync = false;
 

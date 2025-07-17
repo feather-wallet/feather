@@ -53,14 +53,6 @@ For information on how Feather is maintained, see: [MAINTENANCE.md](https://gith
 
 To report a security vulnerability, see: [SECURITY.md](https://github.com/feather-wallet/feather/blob/master/SECURITY.md)
 
-## Support
-
-Feather is funded entirely through donations. We don't take a cut from transaction fees and make no money from exchange integrations.
-
-Donations help pay for hosting, build servers, domain names, e-mail and other recurring costs. Any amount helps.
-
-`47ntfT2Z5384zku39pTM6hGcnLnvpRYW2Azm87GiAAH2bcTidtq278TL6HmwyL8yjMeERqGEBs3cqC8vvHPJd1cWQrGC65f`
-
 ## License
 
 Feather is free and open-source software, [licensed under BSD-3](https://raw.githubusercontent.com/feather-wallet/feather/master/LICENSE).
