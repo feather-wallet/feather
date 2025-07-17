@@ -120,10 +120,6 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &MainWindow::updateBalance);
     connect(&appData()->prices, &Prices::cryptoPricesUpdated, this, &MainWindow::updateBalance);
 
-#ifdef DONATE_BEG
-    this->donationNag();
-#endif
-
     connect(m_windowManager->eventFilter, &EventFilter::userActivity, this, &MainWindow::userActivity);
     connect(&m_checkUserActivity, &QTimer::timeout, this, &MainWindow::checkUserActivity);
     m_checkUserActivity.setInterval(5000);
@@ -407,7 +403,6 @@ void MainWindow::initMenu() {
 #endif
 
     connect(ui->actionOfficialWebsite,   &QAction::triggered, [this](){Utils::externalLinkWarning(this, "https://featherwallet.org");});
-    connect(ui->actionDonate_to_Feather, &QAction::triggered, this, &MainWindow::donateButtonClicked);
     connect(ui->actionDocumentation,     &QAction::triggered, this, &MainWindow::onShowDocumentation);
     connect(ui->actionReport_bug,        &QAction::triggered, this, &MainWindow::onReportBug);
     connect(ui->actionShow_debug_info,   &QAction::triggered, this, &MainWindow::showDebugInfo);
@@ -514,10 +509,6 @@ void MainWindow::initWalletContext() {
     connect(m_wallet, &Wallet::deviceButtonRequest, this, &MainWindow::onDeviceButtonRequest);
     connect(m_wallet, &Wallet::deviceButtonPressed, this, &MainWindow::onDeviceButtonPressed);
     connect(m_wallet, &Wallet::deviceError,         this, &MainWindow::onDeviceError);
-
-    connect(m_wallet, &Wallet::donationSent,        this, []{
-        conf()->set(Config::donateBeg, -1);
-    });
     
     connect(m_wallet, &Wallet::multiBroadcast,      this, &MainWindow::onMultiBroadcast);
 }
@@ -1288,11 +1279,6 @@ void MainWindow::changeEvent(QEvent* event)
     }
 }
 
-void MainWindow::donateButtonClicked() {
-    m_sendWidget->fill(constants::donationAddress, constants::donationDescription);
-    ui->tabWidget->setCurrentIndex(this->findTab("Send"));
-}
-
 void MainWindow::showHistoryTab() {
     this->raise();
     ui->tabWidget->setCurrentIndex(this->findTab("History"));
@@ -1774,32 +1760,6 @@ void MainWindow::updateTitle() {
     title += " - Feather";
 
     this->setWindowTitle(title);
-}
-
-void MainWindow::donationNag() {
-    if (m_wallet->nettype() != NetworkType::Type::MAINNET)
-        return;
-
-    if (m_wallet->viewOnly())
-        return;
-
-    if (m_wallet->balanceAll() == 0)
-        return;
-
-    auto donationCounter = conf()->get(Config::donateBeg).toInt();
-    if (donationCounter == -1)
-        return;
-
-    donationCounter++;
-    if (donationCounter % constants::donationBoundary == 0) {
-        auto msg = "Feather development is funded entirely through donations.\n\nPlease consider supporting "
-                   "the project. Donate any amount to remove this reminder.";
-        int ret = QMessageBox::information(this, "Donate to Feather", msg, QMessageBox::Yes, QMessageBox::No);
-        if (ret == QMessageBox::Yes) {
-            this->donateButtonClicked();
-        }
-    }
-    conf()->set(Config::donateBeg, donationCounter);
 }
 
 void MainWindow::addToRecentlyOpened(QString keysFile) {

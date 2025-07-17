@@ -152,7 +152,6 @@ private slots:
     void showAddressChecker();
     void showURDialog();
     
-    void donateButtonClicked();
     void payToMany();
     void showHistoryTab();
     void skinChanged(const QString &skinName);
