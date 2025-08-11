@@ -33,8 +33,6 @@ option(TOR_INSTALLED "Is Tor installed on the filesystem?" OFF)
 # Plugins
 option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
 option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)
-option(WITH_PLUGIN_CROWDFUNDING "Include Crowdfunding Home plugin" ON)
-option(WITH_PLUGIN_BOUNTIES "Include Bounties Home plugin" ON)
 option(WITH_PLUGIN_REVUO "Include Revuo Home plugin" ON)
 option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
 
