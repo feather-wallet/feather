@@ -27,7 +27,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::warnOnKiImport,{QS("warnOnKiImport"), true}},
         {Config::logLevel,{QS("logLevel"), 0}},
 
-        {Config::homeWidget,{QS("homeWidget"), "ccs"}},
+        {Config::homeWidget,{QS("homeWidget"), "revuo"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
         {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
 
@@ -99,7 +99,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
                                                                     "http://blkchairbknpn73cfjhevhla7rkp4ed5gg2knctvv7it4lioy22defid.onion/monero/transaction/%txid%",
                                                                     "http://127.0.0.1:31312/tx?id=%txid%"}}},
         {Config::blockExplorer,{QS("blockExplorer"), "https://xmrchain.net/tx/%txid%"}},
-        {Config::bountiesFrontend, {QS("bountiesFrontend"), "https://bounties.monero.social"}},
         {Config::lastPath, {QS("lastPath"), QDir::homePath()}},
 
         {Config::URmsPerFragment, {QS("URmsPerFragment"), 80}},
@@ -124,7 +123,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "bounties", "revuo", "calc"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "revuo", "calc"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},

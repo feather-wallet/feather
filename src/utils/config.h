@@ -119,7 +119,6 @@ public:
         // Misc
         blockExplorers,
         blockExplorer,
-        bountiesFrontend, // unused
         lastPath,
         
         // UR
