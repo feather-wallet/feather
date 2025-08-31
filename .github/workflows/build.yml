@@ -55,7 +55,10 @@ jobs:
         with:
           submodules: recursive
       - name: install dependencies
-        run: HOMEBREW_NO_AUTO_UPDATE=1 brew install qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig
+        run:
+          brew uninstall cmake
+          brew update
+          brew install --quiet qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig
       - name: build
         run: |
           cmake -S . -B build -DWITH_SCANNER=Off
