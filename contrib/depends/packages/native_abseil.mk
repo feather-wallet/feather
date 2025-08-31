@@ -1,9 +1,9 @@
 package=native_abseil
-$(package)_version=20250512.0
+$(package)_version=20250814.0
 $(package)_download_path=https://github.com/abseil/abseil-cpp/archive/refs/tags/
 $(package)_download_file=$($(package)_version).tar.gz
 $(package)_file_name=abseil-$($(package)_version).tar.gz
-$(package)_sha256_hash=7262daa7c1711406248c10f41026d685e88223bc92817d16fb93c19adb57f669
+$(package)_sha256_hash=9b2b72d4e8367c0b843fa2bcfa2b08debbe3cee34f7aaa27de55a6cbb3e843db
 
 define $(package)_config_cmds
   $($(package)_cmake)
