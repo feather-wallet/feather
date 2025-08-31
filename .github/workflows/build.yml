@@ -55,7 +55,7 @@ jobs:
         with:
           submodules: recursive
       - name: install dependencies
-        run:
+        run: |
           brew uninstall cmake
           brew update
           brew install --quiet qt libsodium libzip qrencode unbound cmake boost hidapi openssl expat libunwind-headers protobuf pkgconfig
