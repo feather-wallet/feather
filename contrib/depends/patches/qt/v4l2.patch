@@ -1,5 +1,5 @@
 diff --git a/src/plugins/multimedia/CMakeLists.txt b/src/plugins/multimedia/CMakeLists.txt
-index 5b163e98a..eac405570 100644
+index f42a84da5..2f529b508 100644
 --- a/src/plugins/multimedia/CMakeLists.txt
 +++ b/src/plugins/multimedia/CMakeLists.txt
 @@ -2,7 +2,7 @@
@@ -672,7 +672,7 @@ index 000000000..e34005bbf
 +#endif
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
 new file mode 100644
-index 000000000..63a8ff196
+index 000000000..90f338172
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration.cpp
 @@ -0,0 +1,131 @@
@@ -754,12 +754,12 @@ index 000000000..63a8ff196
 +#endif
 +}
 +
-+QMaybe<QPlatformMediaCaptureSession *> QFFmpegMediaIntegration::createCaptureSession()
++q23::expected<QPlatformMediaCaptureSession *, QString> QFFmpegMediaIntegration::createCaptureSession()
 +{
 +    return new QFFmpegMediaCaptureSession();
 +}
 +
-+QMaybe<QPlatformCamera *> QFFmpegMediaIntegration::createCamera(QCamera *camera)
++q23::expected<QPlatformCamera *, QString> QFFmpegMediaIntegration::createCamera(QCamera *camera)
 +{
 +#ifdef Q_OS_DARWIN
 +    return new QAVFCamera(camera);
@@ -773,12 +773,12 @@ index 000000000..63a8ff196
 +#endif
 +}
 +
-+QMaybe<QPlatformImageCapture *> QFFmpegMediaIntegration::createImageCapture(QImageCapture *imageCapture)
++q23::expected<QPlatformImageCapture *, QString> QFFmpegMediaIntegration::createImageCapture(QImageCapture *imageCapture)
 +{
 +    return new QFFmpegImageCapture(imageCapture);
 +}
 +
-+QMaybe<QPlatformVideoSink *> QFFmpegMediaIntegration::createVideoSink(QVideoSink *sink)
++q23::expected<QPlatformVideoSink *, QString> QFFmpegMediaIntegration::createVideoSink(QVideoSink *sink)
 +{
 +    return new QFFmpegVideoSink(sink);
 +}
@@ -809,7 +809,7 @@ index 000000000..63a8ff196
 +#include "qffmpegmediaintegration.moc"
 diff --git a/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
 new file mode 100644
-index 000000000..13b81ecc2
+index 000000000..70d525df2
 --- /dev/null
 +++ b/src/plugins/multimedia/v4l2/qffmpegmediaintegration_p.h
 @@ -0,0 +1,47 @@
@@ -846,10 +846,10 @@ index 000000000..13b81ecc2
 +        return static_cast<QFFmpegMediaIntegration *>(QPlatformMediaIntegration::instance());
 +    }
 +
-+    QMaybe<QPlatformMediaCaptureSession *> createCaptureSession() override;
-+    QMaybe<QPlatformCamera *> createCamera(QCamera *) override;
-+    QMaybe<QPlatformImageCapture *> createImageCapture(QImageCapture *) override;
-+    QMaybe<QPlatformVideoSink *> createVideoSink(QVideoSink *sink) override;
++    q23::expected<QPlatformMediaCaptureSession *, QString> createCaptureSession() override;
++    q23::expected<QPlatformCamera *, QString> createCamera(QCamera *) override;
++    q23::expected<QPlatformImageCapture *, QString> createImageCapture(QImageCapture *) override;
++    q23::expected<QPlatformVideoSink *, QString> createVideoSink(QVideoSink *sink) override;
 +
 +protected:
 +    QPlatformMediaFormatInfo *createFormatInfo() override;

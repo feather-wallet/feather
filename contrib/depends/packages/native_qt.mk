@@ -1,9 +1,9 @@
 package=native_qt
-$(package)_version=6.9.1
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.9/$($(package)_version)/submodules
+$(package)_version=6.10.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.10/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=40caedbf83cc9a1959610830563565889878bc95f115868bbf545d1914acf28e
+$(package)_sha256_hash=ead4623bcb54a32257c5b3e3a5aec6d16ec96f4cda58d2e003f5a0c16f72046d
 $(package)_linux_dependencies=native_wayland
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches += guix_cross_lib_path.patch
@@ -12,19 +12,19 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=90c4a562f4ccfd043fd99f34c600853e0b5ba9babc6ec616c0f306f2ce3f4b4c
+$(package)_qttools_sha256_hash=d86d5098cf3e3e599f37e18df477e65908fc8f036e10ea731b3469ec4fdbd02a
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=2dfc5de5fd891ff2afd9861e519bf1a26e6deb729b3133f68a28ba763c9abbd5
+$(package)_qtsvg_sha256_hash=5ed2c0e04d5e73ff75c2a2ed92db5dc1788ba70f704fc2b71bc21644beda2533
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=955e36459518ee55f8e2bb79defc6e44aa94dc1edf5ac58a22d7734b2e07391d
+$(package)_qtmultimedia_sha256_hash=04424021cf0d1d19799f5967310d484d1afa6fdd0b31725d0ee7608d2eef1126
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=4e1ed24cce0887fb4b6c7be4f150239853a29c330c9717f6bacfb6376f3b4b74
+$(package)_qtshadertools_sha256_hash=87ba478c3fd827862fc79f6d78d369dfec162c901b7f66ed988b3e1d6ffdfbf6
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=7d21ea0e687180ebb19b9a1f86ae9cfa7a25b4f02d5db05ec834164409932e3e
+$(package)_qtwayland_sha256_hash=603f2b0a259b24bd0fb14f880d7761b1d248118a42a6870cdbe8fdda4173761f
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)

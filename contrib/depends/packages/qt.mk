@@ -1,9 +1,9 @@
 package=qt
-$(package)_version=6.9.1
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.9/$($(package)_version)/submodules
+$(package)_version=6.10.0
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.10/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=40caedbf83cc9a1959610830563565889878bc95f115868bbf545d1914acf28e
+$(package)_sha256_hash=ead4623bcb54a32257c5b3e3a5aec6d16ec96f4cda58d2e003f5a0c16f72046d
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus wayland native_wayland
@@ -14,35 +14,33 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
-$(package)_patches += xcb-util-image-fix.patch
 $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
 $(package)_patches += macos-available-qtbase.patch
-$(package)_patches += qtmultimedia_windows_fix_include.patch
 $(package)_patches += qtmultimedia_macos_fix_include.patch
 $(package)_patches += qtmultimedia_macos_fix_available.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=90c4a562f4ccfd043fd99f34c600853e0b5ba9babc6ec616c0f306f2ce3f4b4c
+$(package)_qttools_sha256_hash=d86d5098cf3e3e599f37e18df477e65908fc8f036e10ea731b3469ec4fdbd02a
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=2dfc5de5fd891ff2afd9861e519bf1a26e6deb729b3133f68a28ba763c9abbd5
+$(package)_qtsvg_sha256_hash=5ed2c0e04d5e73ff75c2a2ed92db5dc1788ba70f704fc2b71bc21644beda2533
 
 $(package)_qtwebsockets_file_name=qtwebsockets-$($(package)_suffix)
-$(package)_qtwebsockets_sha256_hash=98be8c863b7f02cc98eedc0b6eac07544c10a9d2fa11c685fd61f6b243f748f5
+$(package)_qtwebsockets_sha256_hash=d1092e7da5c3b8eea242e4069f05ff8e710a17c54d5010c1b557e26f7948806e
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=955e36459518ee55f8e2bb79defc6e44aa94dc1edf5ac58a22d7734b2e07391d
+$(package)_qtmultimedia_sha256_hash=04424021cf0d1d19799f5967310d484d1afa6fdd0b31725d0ee7608d2eef1126
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=4e1ed24cce0887fb4b6c7be4f150239853a29c330c9717f6bacfb6376f3b4b74
+$(package)_qtshadertools_sha256_hash=87ba478c3fd827862fc79f6d78d369dfec162c901b7f66ed988b3e1d6ffdfbf6
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=7d21ea0e687180ebb19b9a1f86ae9cfa7a25b4f02d5db05ec834164409932e3e
+$(package)_qtwayland_sha256_hash=603f2b0a259b24bd0fb14f880d7761b1d248118a42a6870cdbe8fdda4173761f
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -227,7 +225,6 @@ define $(package)_preprocess_cmds
 	     -e 's|@wmf_libs@|$(WMF_LIBS)|' \
       toolchain.cmake && \
   cd qtbase && \
-  patch -p1 -i $($(package)_patch_dir)/xcb-util-image-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
@@ -235,7 +232,6 @@ define $(package)_preprocess_cmds
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/qtmultimedia_windows_fix_include.patch && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_include.patch && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_available.patch
 endef

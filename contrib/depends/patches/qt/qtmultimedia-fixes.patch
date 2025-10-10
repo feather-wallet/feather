@@ -1,8 +1,8 @@
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
-index fd69e8186..23657d9f5 100644
+index 7bb46abc6..785fe5faa 100644
 --- a/src/multimedia/configure.cmake
 +++ b/src/multimedia/configure.cmake
-@@ -65,27 +65,6 @@ if(TARGET EGL::EGL)
+@@ -63,28 +63,6 @@ if(TARGET EGL::EGL)
  endif()
  qt_find_package(EGL PROVIDED_TARGETS EGL::EGL)
  
@@ -21,6 +21,7 @@ index fd69e8186..23657d9f5 100644
 -        FFmpeg::avutil
 -        FFmpeg::swresample
 -        FFmpeg::swscale
+-    USE_ATTRIBUTION_FILES
 -    ATTRIBUTION_FILE_DIR_PATHS
 -        # Need to pass an absolute path here, otherwise the file will be relative to the root of
 -        # the source tree, not the current dir, because system libraries are processed in the
@@ -30,12 +31,14 @@ index fd69e8186..23657d9f5 100644
  qt_find_package(PipeWire PROVIDED_TARGETS PipeWire::PipeWire MODULE_NAME multimedia QMAKE_LIB pipewire)
  qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
  
-@@ -138,7 +117,7 @@ qt_feature("ffmpeg" PRIVATE
+@@ -236,9 +214,7 @@ qt_feature("ffmpeg" PRIVATE
      LABEL "FFmpeg"
      ENABLE INPUT_ffmpeg STREQUAL 'yes'
      DISABLE INPUT_ffmpeg STREQUAL 'no'
--    CONDITION FFmpeg_FOUND AND (APPLE OR WIN32 OR ANDROID OR QNX OR QT_FEATURE_pulseaudio)
+-    CONDITION FFmpeg_FOUND
+-              AND (APPLE OR WIN32 OR ANDROID OR QNX OR QT_FEATURE_pulseaudio OR QT_FEATURE_pipewire)
+-              AND QT_FEATURE_thread
 +    CONDITION UNIX OR WIN32
  )
- qt_feature("pipewire" PRIVATE
-     LABEL "PipeWire"
+ 
+ # Caveat: FEATURE_ffmpeg_stubs cannot really be used to disable stubbing, it is just used to inform
