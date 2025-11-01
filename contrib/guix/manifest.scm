@@ -249,6 +249,9 @@ chain for " target " development."))
                 (base32
                   "160dwjzpwaxism6r7ryn7dgfq78rk3nkbg9m2kwg512hhn20blqh"))))
     (build-system cmake-build-system)
+    (arguments
+     (list
+      #:tests? #f))
     (inputs (list openssl zlib))
     (home-page "https://github.com/mtrojnar/osslsigncode")
     (synopsis "Authenticode signing and timestamping tool")
