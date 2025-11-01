@@ -1,6 +1,6 @@
 (use-modules
   (gnu packages)
-  (gnu packages certs)
+  (gnu packages nss)
   (gnu packages fontutils)
   (guix build-system gnu)
   (guix download)
