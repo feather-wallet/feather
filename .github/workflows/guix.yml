@@ -30,7 +30,6 @@ jobs:
           - target: "x86_64-linux-gnu.no-tor-bundle"
           - target: "x86_64-linux-gnu.pack"
           - target: "aarch64-linux-gnu"
-          - target: "arm-linux-gnueabihf"
           - target: "riscv64-linux-gnu"
           - target: "x86_64-w64-mingw32"
           - target: "x86_64-w64-mingw32.installer"

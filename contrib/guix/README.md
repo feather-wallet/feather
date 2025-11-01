@@ -264,7 +264,7 @@ details.
   Override the space-separated list of platform triples for which to perform a
   bootstrappable build.
 
-  _(defaults to "x86\_64-linux-gnu aarch64-linux-gnu arm-linux-gnueabihf x86\_64-linux-gnu.no-tor-bundle 
+  _(defaults to "x86\_64-linux-gnu aarch64-linux-gnu x86\_64-linux-gnu.no-tor-bundle
  x86\_64-linux-gnu.pack riscv64-linux-gnu x86\_64-w64-mingw32 x86\_64-w64-mingw32.installer x86\_64-apple-darwin arm64-apple-darwin")_
 
 * _**SOURCES_PATH**_
