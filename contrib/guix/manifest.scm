@@ -3,7 +3,7 @@
              (gnu packages bash)
              (gnu packages bison)
              ((gnu packages build-tools) #:select (meson))
-             ((gnu packages certs) #:select (nss-certs))
+             ((gnu packages nss) #:select (nss-certs))
              ((gnu packages cmake) #:select (cmake-minimal))
              (gnu packages commencement)
              (gnu packages compression)
