@@ -514,9 +514,9 @@ inspecting signatures in Mach-O binaries.")
           ))
           ((string-contains target "darwin")
            (list
-             clang-toolchain-18
-             lld-18
-             (make-lld-wrapper lld-18 #:lld-as-ld? #t)
+             clang-toolchain-19
+             lld-19
+             (make-lld-wrapper lld-19 #:lld-as-ld? #t)
              python-signapple
              p7zip ;; needed to extract tor_darwin .dmg
              ))
