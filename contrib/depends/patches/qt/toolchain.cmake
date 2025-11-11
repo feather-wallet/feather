@@ -30,7 +30,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     set(CMAKE_EXE_LINKER_FLAGS "@cmake_ld_flags@")
     set(CMAKE_MODULE_LINKER_FLAGS "@cmake_ld_flags@")
     set(CMAKE_SHARED_LINKER_FLAGS "@cmake_ld_flags@")
-    SET(CMAKE_OSX_DEPLOYMENT_TARGET "12.0")
+    SET(CMAKE_OSX_DEPLOYMENT_TARGET "14.0")
 
     set(CMAKE_INSTALL_NAME_TOOL @target@-install_name_tool)
 endif()

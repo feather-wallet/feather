@@ -1,8 +1,8 @@
-OSX_MIN_VERSION=12.0
-OSX_SDK_VERSION=12.0
-XCODE_VERSION=12.2
-XCODE_BUILD_ID=12B45b
-LD64_VERSION=711
+OSX_MIN_VERSION=14.0
+OSX_SDK_VERSION=14.0
+XCODE_VERSION=15.0
+XCODE_BUILD_ID=15A240d
+LLD_VERSION=711
 
 OSX_SDK=$(host_prefix)/native/SDK
 
@@ -47,7 +47,7 @@ darwin_LIBTOOL=llvm-libtool-darwin
 #
 
 darwin_CC_=--target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
-           -mlinker-version=$(LD64_VERSION) \
+           -mlinker-version=$(LLD_VERSION) \
            -isysroot$(OSX_SDK) -nostdlibinc \
            -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks
 darwin_CC=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
@@ -56,7 +56,7 @@ darwin_CC=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
             $(clang_prog) $(darwin_CC_)
 
 darwin_CXX_=--target=$(host) -mmacosx-version-min=$(OSX_MIN_VERSION) \
-            -mlinker-version=$(LD64_VERSION) \
+            -mlinker-version=$(LLD_VERSION) \
 		    -isysroot$(OSX_SDK) -nostdlibinc \
 		    -iwithsysroot/usr/include/c++/v1 \
 		    -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks

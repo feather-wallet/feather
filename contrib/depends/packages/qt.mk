@@ -19,9 +19,7 @@ $(package)_patches += toolchain.cmake
 $(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
-$(package)_patches += macos-available-qtbase.patch
 $(package)_patches += qtmultimedia_macos_fix_include.patch
-$(package)_patches += qtmultimedia_macos_fix_available.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -160,7 +158,6 @@ $(package)_config_opts_darwin += -DQT_FEATURE_accessibility=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_dbus=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_freetype=OFF
 $(package)_config_opts_darwin += -DQT_FEATURE_ffmpeg=OFF
-$(package)_config_opts_darwin += -DQMAKE_MACOSX_DEPLOYMENT_TARGET=12.0
 $(package)_config_opts_darwin += -DBUILD_WITH_PCH=OFF
 $(package)_config_opts_darwin += '-DQT_QMAKE_DEVICE_OPTIONS=MAC_SDK_PATH=$(host_prefix)/native/SDK;MAC_SDK_VERSION=$(OSX_SDK_VERSION);CROSS_COMPILE=$(host)-;MAC_TARGET=$(host);XCODE_VERSION=$(XCODE_VERSION)'
 $(package)_config_opts_darwin += -DQT_NO_APPLE_SDK_AND_XCODE_CHECK=ON
@@ -228,12 +225,10 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
-  patch -p1 -i $($(package)_patch_dir)/macos-available-qtbase.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_include.patch && \
-  patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_available.patch
+  patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_include.patch
 endef
 
 
