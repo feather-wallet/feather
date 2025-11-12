@@ -27,7 +27,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::warnOnKiImport,{QS("warnOnKiImport"), true}},
         {Config::logLevel,{QS("logLevel"), 0}},
 
-        {Config::homeWidget,{QS("homeWidget"), "revuo"}},
+        {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
         {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
 
@@ -123,7 +123,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useLocalTor, {QS("useLocalTor"), false}},
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
-        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "revuo", "calc"}}},
+        {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "revuo", "calc"}}},
         {Config::restartRequired, {QS("restartRequired"), false}},
 
         {Config::tickers, {QS("tickers"), QStringList{"XMR", "BTC", "XMR/BTC"}}},
