@@ -1,3 +1,47 @@
+diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
+index 7bb46abc6..785fe5faa 100644
+--- a/src/multimedia/configure.cmake
++++ b/src/multimedia/configure.cmake
+@@ -63,28 +63,6 @@ if(TARGET EGL::EGL)
+ endif()
+ qt_find_package(EGL PROVIDED_TARGETS EGL::EGL)
+ 
+-# If FFMPEG_DIR is specified, we require FFmpeg to be present. This makes
+-# configuration problems easier to detect, and reduces risk of silent
+-# fallback to native backends.
+-if (DEFINED FFMPEG_DIR)
+-    set(ffmpeg_required REQUIRED)
+-endif()
+-
+-qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg ${ffmpeg_required})
+-qt_find_package_extend_sbom(
+-    TARGETS
+-        FFmpeg::avcodec
+-        FFmpeg::avformat
+-        FFmpeg::avutil
+-        FFmpeg::swresample
+-        FFmpeg::swscale
+-    USE_ATTRIBUTION_FILES
+-    ATTRIBUTION_FILE_DIR_PATHS
+-        # Need to pass an absolute path here, otherwise the file will be relative to the root of
+-        # the source tree, not the current dir, because system libraries are processed in the
+-        # source root directory.
+-        ${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/ffmpeg
+-)
+ qt_find_package(PipeWire PROVIDED_TARGETS PipeWire::PipeWire MODULE_NAME multimedia QMAKE_LIB pipewire)
+ qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
+ 
+@@ -236,9 +214,7 @@ qt_feature("ffmpeg" PRIVATE
+     LABEL "FFmpeg"
+     ENABLE INPUT_ffmpeg STREQUAL 'yes'
+     DISABLE INPUT_ffmpeg STREQUAL 'no'
+-    CONDITION FFmpeg_FOUND
+-              AND (APPLE OR WIN32 OR ANDROID OR QNX OR QT_FEATURE_pulseaudio OR QT_FEATURE_pipewire)
+-              AND QT_FEATURE_thread
++    CONDITION UNIX OR WIN32
+ )
+ 
+ # Caveat: FEATURE_ffmpeg_stubs cannot really be used to disable stubbing, it is just used to inform
 diff --git a/src/plugins/multimedia/CMakeLists.txt b/src/plugins/multimedia/CMakeLists.txt
 index f42a84da5..2f529b508 100644
 --- a/src/plugins/multimedia/CMakeLists.txt

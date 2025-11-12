@@ -7,7 +7,6 @@ $(package)_sha256_hash=ead4623bcb54a32257c5b3e3a5aec6d16ec96f4cda58d2e003f5a0c16
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus wayland native_wayland
-$(package)_patches += qtmultimedia-fixes.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 $(package)_patches += v4l2.patch
@@ -219,7 +218,6 @@ define $(package)_preprocess_cmds
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
   cd ../qtmultimedia && \
-  patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
 endef
 
