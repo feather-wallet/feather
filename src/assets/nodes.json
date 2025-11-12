@@ -7,7 +7,6 @@
       "ip4zpbps7unk6xhlanqtw24f75akfbl3upeckfjqjks7ftfnk4i73oid.onion:18081",
       "cakexmrl7bonq7ovjka5kuwuyd3f7qnkz6z6s6dmsy3uckwra7bvggyd.onion:18081",
       "qz43zul2x56jexzoqgkx2trzwcfnr6l3hbtfcfx54g4r3eahy3bssjyd.onion:18089",
-      "majesticrepik35vnngouksfl7jiwf6sj7s2doj3bvdffq27tgqoeayd.onion:18089",
       "plowsof3t5hogddwabaeiyrno25efmzfxyro2vligremt7sxpsclfaid.onion:18089",
       "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:18089",
       "plowsofe6cleftfmk2raiw5h2x66atrik3nja4bfd3zrfa2hdlgworad.onion:18089",
@@ -17,16 +16,17 @@
       "mhfsxznn5pi4xuxohj5k7unqp73sa6d44mbeewbpxnm25z3wzfogcfyd.onion:18081",
       "7inib34hqn2ocmlaaxjshdavbdn5w5rfdff735lbz33765j2pz3tn4ad.onion:18081",
       "sfprpc2fws6ltnq4hyr7lvpul3nank5layd7q7tyc5h4gy4h77gtabad.onion:18089",
-      "4kzkwyooeth3lxajxs7pmcriq6cgvnbex2vojum2uqflczsci4dlreyd.onion:18089",
+      "a6orjo6aiotog3njppja5jwnd3rexzfjiejxnojvw74p3kma45fundid.onion:18089",
       "trocadorh642rks54sxufwy4kys23mrsgof3axowyro5ljb2dkgdlmad.onion:18089",
-      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
-      "a6orjo6aiotog3njppja5jwnd3rexzfjiejxnojvw74p3kma45fundid.onion:18089"
+      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089"
     ],
     "i2p": [
       "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089",
       "vdmnehdjkpkg57nthgnjfuaqgku673r5bpbqg56ix6fyqoywgqrq.b32.i2p:18089",
       "uqj3aphckqtjsitz7kxx5flqpwjlq5ppr3chazfued7xucv3nheq.b32.i2p:18089",
       "ugnlcdciyhghh2zert7c3kl4biwkirc43ke33jiy5slnd3mv2trq.b32.i2p:18089",
+      "ravfxmrg42nts5q65c33gyvs4gpb5n3a3wzzx3w2bes2hbkakfsa.b32.i2p:18081",
+      "ravfxmresnvpybolnczn7wsju55c6jej3vo5hrnvcypugrdy4u6q.b32.i2p:18089",
       "5dmhmmaff5mqkgmz4haq5w2wrgobhelrat7lvbt27okojkzbx6hq.b32.i2p:18089"
     ],
     "clearnet": [
@@ -34,8 +34,6 @@
       "node2-eu.monero.love:18089",
       "xmr-node.cakewallet.com:18081",
       "singapore.node.xmr.pm:18089",
-      "node.majesticbank.is:18089",
-      "node.majesticbank.at:18089",
       "node.monerodevs.org:18089",
       "node2.monerodevs.org:18089",
       "node3.monerodevs.org:18089",
@@ -56,10 +54,9 @@
       "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:28089"
     ],
     "clearnet": [
+      "singapore.node.xmr.pm:28081",
       "node2.sethforprivacy.com:28089",
-      "node.sethforprivacy.com:28089",
-      "testnet.xmr-tw.org:28081",
-      "singapore.node.xmr.pm:28081"
+      "node.sethforprivacy.com:28089"
     ]
   },
   "stagenet": {
@@ -69,11 +66,10 @@
       "plowsoffjexmxalw73tkjmf422gq6575fc7vicuu4javzn2ynnte6tyd.onion:38089"
     ],
     "clearnet": [
-      "node.sethforprivacy.com:38089",
-      "node2.sethforprivacy.com:38089",
       "xmr-lux.boldsuck.org:38081",
-      "stagenet.xmr-tw.org:38081",
-      "singapore.node.xmr.pm:38081"
+      "singapore.node.xmr.pm:38081",
+      "node.sethforprivacy.com:38089",
+      "node2.sethforprivacy.com:38089"
     ]
   }
 }
