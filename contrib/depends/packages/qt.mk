@@ -7,8 +7,6 @@ $(package)_sha256_hash=ead4623bcb54a32257c5b3e3a5aec6d16ec96f4cda58d2e003f5a0c16
 $(package)_darwin_dependencies=openssl native_qt
 $(package)_mingw32_dependencies=openssl native_qt
 $(package)_linux_dependencies=openssl native_qt freetype fontconfig libxcb libxkbcommon libxcb_util libxcb_util_render libxcb_util_keysyms libxcb_util_image libxcb_util_wm libxcb_util_cursor dbus wayland native_wayland
-$(package)_patches += guix_cross_lib_path.patch
-$(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += qtmultimedia-fixes.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
@@ -16,10 +14,8 @@ $(package)_patches += v4l2.patch
 $(package)_patches += windows_func_fix.patch
 $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
-$(package)_patches += revert-macOS-Silence-warning-about-supporting-secure.patch
 $(package)_patches += no-resonance-audio.patch
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
-$(package)_patches += qtmultimedia_macos_fix_include.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -208,9 +204,7 @@ endef
 
 define $(package)_preprocess_cmds
   cp $($(package)_patch_dir)/root_CMakeLists.txt CMakeLists.txt && \
-  patch -p1 -i $($(package)_patch_dir)/qtbase-moc-ignore-gcc-macro.patch && \
   patch -p1 -i $($(package)_patch_dir)/rcc_hardcode_timestamp.patch && \
-  patch -p1 -i $($(package)_patch_dir)/guix_cross_lib_path.patch && \
   patch -p1 -i $($(package)_patch_dir)/windows_func_fix.patch && \
   mv $($(package)_patch_dir)/toolchain.cmake . && \
   sed -i -e 's|@cmake_system_name@|$($(host_os)_cmake_system)|' \
@@ -223,12 +217,10 @@ define $(package)_preprocess_cmds
       toolchain.cmake && \
   cd qtbase && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
-  patch -p1 -i $($(package)_patch_dir)/revert-macOS-Silence-warning-about-supporting-secure.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/qtmultimedia-fixes.patch && \
-  patch -p1 -i $($(package)_patch_dir)/v4l2.patch && \
-  patch -p1 -i $($(package)_patch_dir)/qtmultimedia_macos_fix_include.patch
+  patch -p1 -i $($(package)_patch_dir)/v4l2.patch
 endef
 
 
