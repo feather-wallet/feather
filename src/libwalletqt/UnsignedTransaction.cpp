@@ -19,7 +19,7 @@ QString UnsignedTransaction::errorString() const
 quint64 UnsignedTransaction::amount(size_t index) const
 {
     std::vector<uint64_t> arr = m_pimpl->amount();
-    if(index > arr.size() - 1)
+    if(arr.empty() || index >= arr.size())
         return 0;
     return arr[index];
 }
