@@ -444,17 +444,19 @@ void Wallet::skipSync() {
     // Skip sync by setting wallet height to current daemon height
     quint64 daemonHeight = this->daemonBlockChainHeight();
     if (daemonHeight > 0) {
-        qInfo() << "Skip sync: Setting wallet height to " << daemonHeight;
+        qInfo() << "Skip sync: Setting wallet height to" << daemonHeight;
         m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
-        this->startRefresh();
+        // Trigger one refresh to update wallet state, but don't enable continuous refresh
+        m_refreshNow = true;
     } else {
         qWarning() << "Skip sync failed: Could not get daemon height";
     }
 }
 
 void Wallet::syncFromHeight(quint64 height) {
-    qInfo() << "Syncing from height: " << height;
+    qInfo() << "Syncing from height:" << height;
     m_walletImpl->setRefreshFromBlockHeight(height);
+    // Enable refresh temporarily for this sync operation
     this->startRefresh();
 }
 

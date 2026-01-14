@@ -117,6 +117,12 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
 
     conf()->set(Config::firstRun, false);
 
+    // Check Data Saving Mode before starting wallet sync
+    if (conf()->get(Config::dataSavingMode).toBool()) {
+        m_wallet->pauseRefresh();
+        qInfo() << "Data Saving Mode enabled - auto-sync disabled on wallet open";
+    }
+
     this->onWalletOpened();
 
     connect(&appData()->prices, &Prices::fiatPricesUpdated, this, &MainWindow::updateBalance);
@@ -1437,16 +1443,22 @@ void MainWindow::importTransaction() {
 }
 
 void MainWindow::onDataSavingModeEnabled(bool enabled) {
-    qDebug() << "Data Saving Mode" << (enabled ? "enabled" : "disabled");
+    qInfo() << "Data Saving Mode" << (enabled ? "enabled" : "disabled");
     
     if (enabled) {
         // When data saving mode is enabled, pause auto-refresh
         m_wallet->pauseRefresh();
-        this->setStatusText("Data Saving Mode: Auto-sync disabled", false, 5000);
+        this->setStatusText("Data Saving Mode enabled - Auto-sync paused", false, 5000);
+        QMessageBox::information(this, "Data Saving Mode Enabled",
+            "Auto-sync has been disabled to save data.\n\n"
+            "Use Wallet > Advanced > Sync Options to:\n"
+            "• Skip Sync - Jump to current height\n"
+            "• Sync Dates - Sync a specific date range\n"
+            "• Full Sync - Sync normally");
     } else {
         // When disabled, resume normal sync
         m_wallet->startRefresh();
-        this->setStatusText("Data Saving Mode: Auto-sync enabled", false, 5000);
+        this->setStatusText("Data Saving Mode disabled - Auto-sync resumed", false, 5000);
     }
 }
 
