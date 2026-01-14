@@ -542,11 +542,21 @@
      <property name="title">
       <string>Advanced</string>
      </property>
+     <widget class="QMenu" name="menuSync">
+      <property name="title">
+       <string>Sync Options</string>
+      </property>
+      <addaction name="actionSkip_sync"/>
+      <addaction name="actionSync_dates"/>
+      <addaction name="actionFull_sync"/>
+     </widget>
      <addaction name="actionStore_wallet"/>
      <addaction name="actionUpdate_balance"/>
      <addaction name="actionRefresh_tabs"/>
      <addaction name="actionRescan_spent"/>
      <addaction name="actionWallet_cache_debug"/>
+     <addaction name="separator"/>
+     <addaction name="menuSync"/>
     </widget>
     <addaction name="actionInformation"/>
     <addaction name="menuAdvanced"/>
@@ -860,6 +870,30 @@
   <action name="actionWallet_cache_debug">
    <property name="text">
     <string>Wallet cache debug</string>
+   </property>
+  </action>
+  <action name="actionSkip_sync">
+   <property name="text">
+    <string>Skip Sync</string>
+   </property>
+   <property name="toolTip">
+    <string>Skip syncing and jump to current block height (Data Saving Mode)</string>
+   </property>
+  </action>
+  <action name="actionSync_dates">
+   <property name="text">
+    <string>Sync Dates...</string>
+   </property>
+   <property name="toolTip">
+    <string>Sync a specific date range (Data Saving Mode)</string>
+   </property>
+  </action>
+  <action name="actionFull_sync">
+   <property name="text">
+    <string>Full Sync</string>
+   </property>
+   <property name="toolTip">
+    <string>Perform a full wallet synchronization</string>
    </property>
   </action>
   <action name="actionPay_to_many">

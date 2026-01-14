@@ -189,6 +189,7 @@ void WindowManager::showSettings(Nodes *nodes, QWidget *parent, bool showProxyTa
     connect(&settings, &Settings::offlineMode, this, &WindowManager::offlineMode);
     connect(&settings, &Settings::manualFeeSelectionEnabled, this, &WindowManager::manualFeeSelectionEnabled);
     connect(&settings, &Settings::subtractFeeFromAmountEnabled, this, &WindowManager::subtractFeeFromAmountEnabled);
+    connect(&settings, &Settings::dataSavingModeEnabled, this, &WindowManager::dataSavingModeEnabled);
     connect(&settings, &Settings::hideUpdateNotifications, [this](bool hidden){
         for (const auto &window : m_windows) {
             window->onHideUpdateNotifications(hidden);

@@ -173,6 +173,12 @@ private slots:
     void onManualFeeSelectionEnabled(bool enabled);
     void onSubtractFeeFromAmountEnabled(bool enabled);
     void onMultiBroadcast(const QMap<QString, QString> &txHexMap);
+    
+    // Data Saving Mode / Skip Sync
+    void onDataSavingModeEnabled(bool enabled);
+    void onSkipSync();
+    void onFullSync();
+    void onSyncDates();
 
 private:
     friend WindowManager;

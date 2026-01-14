@@ -440,6 +440,44 @@ void Wallet::pauseRefresh() {
     m_refreshEnabled = false;
 }
 
+void Wallet::skipSync() {
+    // Skip sync by setting wallet height to current daemon height
+    quint64 daemonHeight = this->daemonBlockChainHeight();
+    if (daemonHeight > 0) {
+        qInfo() << "Skip sync: Setting wallet height to " << daemonHeight;
+        m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
+        this->startRefresh();
+    } else {
+        qWarning() << "Skip sync failed: Could not get daemon height";
+    }
+}
+
+void Wallet::syncFromHeight(quint64 height) {
+    qInfo() << "Syncing from height: " << height;
+    m_walletImpl->setRefreshFromBlockHeight(height);
+    this->startRefresh();
+}
+
+void Wallet::syncDateRange(const QDateTime &startDate, const QDateTime &endDate) {
+    // Monero genesis block timestamp: April 18, 2014 at 10:49:53 AM UTC
+    QDateTime genesisTime = QDateTime::fromSecsSinceEpoch(1397818193, Qt::UTC);
+    
+    // Average Monero block time is ~2 minutes (120 seconds)
+    const quint64 BLOCK_TIME_SECONDS = 120;
+    
+    // Calculate start height
+    qint64 secondsFromGenesis = genesisTime.secsTo(startDate);
+    quint64 startHeight = secondsFromGenesis > 0 ? (secondsFromGenesis / BLOCK_TIME_SECONDS) : 0;
+    
+    qInfo() << "Syncing date range from" << startDate.toString(Qt::ISODate) 
+            << "to" << endDate.toString(Qt::ISODate)
+            << "| Estimated start height:" << startHeight;
+    
+    // Set the start height and begin sync
+    // The wallet will sync until it catches up to the daemon
+    this->syncFromHeight(startHeight);
+}
+
 void Wallet::startRefreshThread()
 {
     const auto future = m_scheduler.run([this] {

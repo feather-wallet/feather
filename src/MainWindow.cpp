@@ -24,6 +24,7 @@
 #include "dialog/ViewOnlyDialog.h"
 #include "dialog/WalletInfoDialog.h"
 #include "dialog/WalletCacheDebugDialog.h"
+#include "dialog/SyncDatesDialog.h"
 #include "libwalletqt/AddressBook.h"
 #include "libwalletqt/rows/CoinsInfo.h"
 #include "libwalletqt/rows/Output.h"
@@ -96,6 +97,7 @@ MainWindow::MainWindow(WindowManager *windowManager, Wallet *wallet, QWidget *pa
     connect(m_windowManager, &WindowManager::offlineMode, this, &MainWindow::onOfflineMode);
     connect(m_windowManager, &WindowManager::manualFeeSelectionEnabled, this, &MainWindow::onManualFeeSelectionEnabled);
     connect(m_windowManager, &WindowManager::subtractFeeFromAmountEnabled, this, &MainWindow::onSubtractFeeFromAmountEnabled);
+    connect(m_windowManager, &WindowManager::dataSavingModeEnabled, this, &MainWindow::onDataSavingModeEnabled);
 
     connect(torManager(), &TorManager::connectionStateChanged, this, &MainWindow::onTorConnectionStateChanged);
     this->onTorConnectionStateChanged(torManager()->torConnected);
@@ -316,6 +318,9 @@ void MainWindow::initMenu() {
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_wallet->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
+    connect(ui->actionSkip_sync,             &QAction::triggered, this, &MainWindow::onSkipSync);
+    connect(ui->actionSync_dates,            &QAction::triggered, this, &MainWindow::onSyncDates);
+    connect(ui->actionFull_sync,             &QAction::triggered, this, &MainWindow::onFullSync);
     connect(ui->actionTxPoolViewer,          &QAction::triggered, this, &MainWindow::showTxPoolViewerDialog);
 
     // [Wallet] -> [History]
@@ -1429,6 +1434,53 @@ void MainWindow::importTransaction() {
 
     TxImportDialog dialog(this, m_wallet);
     dialog.exec();
+}
+
+void MainWindow::onDataSavingModeEnabled(bool enabled) {
+    qDebug() << "Data Saving Mode" << (enabled ? "enabled" : "disabled");
+    
+    if (enabled) {
+        // When data saving mode is enabled, pause auto-refresh
+        m_wallet->pauseRefresh();
+        this->setStatusText("Data Saving Mode: Auto-sync disabled", false, 5000);
+    } else {
+        // When disabled, resume normal sync
+        m_wallet->startRefresh();
+        this->setStatusText("Data Saving Mode: Auto-sync enabled", false, 5000);
+    }
+}
+
+void MainWindow::onSkipSync() {
+    auto result = QMessageBox::question(this, "Skip Sync",
+        "This will skip syncing and set your wallet to the current blockchain height.\n\n"
+        "Only use this if you are certain you have NOT received any Monero since your last sync.\n\n"
+        "Continue?");
+    
+    if (result == QMessageBox::Yes) {
+        qInfo() << "User initiated skip sync";
+        m_wallet->skipSync();
+        this->setStatusText("Skip sync initiated", false, 3000);
+    }
+}
+
+void MainWindow::onFullSync() {
+    qInfo() << "User initiated full sync";
+    m_wallet->startRefresh();
+    this->setStatusText("Full sync started", false, 3000);
+}
+
+void MainWindow::onSyncDates() {
+    SyncDatesDialog dialog(this);
+    if (dialog.exec() == QDialog::Accepted) {
+        QDateTime startDate = dialog.getStartDate();
+        QDateTime endDate = dialog.getEndDate();
+        
+        qInfo() << "User initiated date range sync from" << startDate << "to" << endDate;
+        m_wallet->syncDateRange(startDate, endDate);
+        
+        QString msg = QString("Syncing from %1 to %2").arg(startDate.toString("yyyy-MM-dd"), endDate.toString("yyyy-MM-dd"));
+        this->setStatusText(msg, false, 5000);
+    }
 }
 
 void MainWindow::onDeviceError(const QString &error, quint64 errorCode) {

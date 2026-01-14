@@ -84,6 +84,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::offlineTxSigningForceKISync, {QS("offlineTxSigningForceKISync"), false}},
         {Config::manualFeeTierSelection, {QS("manualFeeTierSelection"), false}},
         {Config::subtractFeeFromAmount, {QS("subtractFeeFromAmount"), false}},
+        {Config::dataSavingMode, {QS("dataSavingMode"), false}},
 
         {Config::warnOnExternalLink,{QS("warnOnExternalLink"), true}},
         {Config::hideBalance, {QS("hideBalance"), false}},

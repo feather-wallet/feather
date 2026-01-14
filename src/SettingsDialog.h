@@ -44,6 +44,7 @@ signals:
     void pluginConfigured(const QString &id);
     void manualFeeSelectionEnabled(bool enabled);
     void subtractFeeFromAmountEnabled(bool enabled);
+    void dataSavingModeEnabled(bool enabled);
 
 public slots:
 //    void checkboxExternalLinkWarn();

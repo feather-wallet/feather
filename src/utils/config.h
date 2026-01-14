@@ -115,6 +115,7 @@ public:
         offlineTxSigningForceKISync,
         manualFeeTierSelection,
         subtractFeeFromAmount,
+        dataSavingMode,
 
         // Misc
         blockExplorers,

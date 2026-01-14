@@ -217,6 +217,15 @@ public:
     // ##### Synchronization (Refresh) #####
     void startRefresh();
     void pauseRefresh();
+    
+    //! Skip sync - sync from current daemon height (for data saving mode)
+    void skipSync();
+    
+    //! Sync from specific height
+    void syncFromHeight(quint64 height);
+    
+    //! Sync from date range (converts dates to block heights)
+    void syncDateRange(const QDateTime &startDate, const QDateTime &endDate);
 
     //! returns current wallet's block height
     //! (can be less than daemon's blockchain height when wallet sync in progress)

@@ -364,6 +364,24 @@ void Settings::setupTransactionsTab() {
         conf()->set(Config::subtractFeeFromAmount, toggled);
         emit subtractFeeFromAmountEnabled(toggled);
     });
+
+    // [Data Saving Mode]
+    ui->checkBox_dataSavingMode->setChecked(conf()->get(Config::dataSavingMode).toBool());
+    connect(ui->checkBox_dataSavingMode, &QCheckBox::toggled, [this](bool toggled){
+        conf()->set(Config::dataSavingMode, toggled);
+        emit dataSavingModeEnabled(toggled);
+    });
+    connect(ui->btn_dataSavingInfo, &QPushButton::clicked, [this]{
+        Utils::showInfo(this, "Data Saving Mode", 
+            "Data Saving Mode allows you to save mobile data and time when you haven't received Monero since last opening your wallet.\n\n"
+            "When enabled:\n"
+            "• Wallet will NOT auto-sync on open\n"
+            "• You can use 'Skip Sync' to jump to current block height\n"
+            "• You can use 'Sync Dates' to sync a specific date range\n"
+            "• You can use 'Full Sync' to sync normally\n"
+            "• You can import specific transactions if needed\n\n"
+            "This can save 500+ MB of data and 30+ minutes of syncing time.");
+    });
 }
 
 void Settings::setupPluginsTab() {
