@@ -324,7 +324,6 @@ void MainWindow::initMenu() {
     connect(ui->actionRefresh_tabs,          &QAction::triggered, [this]{m_wallet->refreshModels();});
     connect(ui->actionRescan_spent,          &QAction::triggered, this, &MainWindow::rescanSpent);
     connect(ui->actionWallet_cache_debug,    &QAction::triggered, this, &MainWindow::showWalletCacheDebugDialog);
-    connect(ui->actionSkip_sync,             &QAction::triggered, this, &MainWindow::onSkipSync);
     connect(ui->actionSync_dates,            &QAction::triggered, this, &MainWindow::onSyncDates);
     connect(ui->actionFull_sync,             &QAction::triggered, this, &MainWindow::onFullSync);
     connect(ui->actionTxPoolViewer,          &QAction::triggered, this, &MainWindow::showTxPoolViewerDialog);
@@ -496,7 +495,6 @@ void MainWindow::initWalletContext() {
 
     // Wallet
     connect(m_wallet, &Wallet::connectionStatusChanged, [this](int status){
-        // Order is important, first inform UI about a potential disconnect, then reconnect
         this->onConnectionStatusChanged(status);
         m_nodes->autoConnect();
     });
@@ -1446,39 +1444,23 @@ void MainWindow::onDataSavingModeEnabled(bool enabled) {
     qInfo() << "Data Saving Mode" << (enabled ? "enabled" : "disabled");
     
     if (enabled) {
-        // When data saving mode is enabled, pause auto-refresh
         m_wallet->pauseRefresh();
         this->setStatusText("Data Saving Mode enabled - Auto-sync paused", false, 5000);
         QMessageBox::information(this, "Data Saving Mode Enabled",
             "Auto-sync has been disabled to save data.\n\n"
             "Use Wallet > Advanced > Sync Options to:\n"
-            "• Skip Sync - Jump to current height\n"
             "• Sync Dates - Sync a specific date range\n"
             "• Full Sync - Sync normally");
     } else {
-        // When disabled, resume normal sync
         m_wallet->startRefresh();
-        this->setStatusText("Data Saving Mode disabled - Auto-sync resumed", false, 5000);
-    }
-}
-
-void MainWindow::onSkipSync() {
-    auto result = QMessageBox::question(this, "Skip Sync",
-        "This will skip syncing and set your wallet to the current blockchain height.\n\n"
-        "Only use this if you are certain you have NOT received any Monero since your last sync.\n\n"
-        "Continue?");
-    
-    if (result == QMessageBox::Yes) {
-        qInfo() << "User initiated skip sync";
-        m_wallet->skipSync();
-        this->setStatusText("Skip sync initiated", false, 3000);
+        this->setStatusText("Data Saving Mode disabled - Resuming sync", false, 3000);
     }
 }
 
 void MainWindow::onFullSync() {
     qInfo() << "User initiated full sync";
-    m_wallet->startRefresh();
-    this->setStatusText("Full sync started", false, 3000);
+    m_wallet->rescanBlockchainAsync();
+    this->setStatusText("Full sync started - rescanning blockchain", false, 3000);
 }
 
 void MainWindow::onSyncDates() {

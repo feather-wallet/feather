@@ -424,6 +424,10 @@ void Nodes::onWalletRefreshed() {
         if (m_connection.isOnion())
             return;
 
+        // Don't reconnect if we have a working connection (clearnet is fine if already synced)
+        if (m_connection.isActive)
+            return;
+
         this->autoConnect(true);
     }
 }

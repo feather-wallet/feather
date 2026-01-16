@@ -56,6 +56,8 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     m_walletListener = new WalletListenerImpl(this);
     m_walletImpl->setListener(m_walletListener);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
+    
+    m_originalWalletCreationHeight = m_walletImpl->getRefreshFromBlockHeight();
 
     m_addressBookModel = new AddressBookModel(this, m_addressBook);
     m_subaddressModel = new SubaddressModel(this, m_subaddress);
@@ -99,7 +101,7 @@ void Wallet::setConnectionStatus(ConnectionStatus value) {
     if (m_connectionStatus == value) {
         return;
     }
-
+    
     m_connectionStatus = value;
     emit connectionStatusChanged(m_connectionStatus);
 }
@@ -418,7 +420,8 @@ void Wallet::initAsync(const QString &daemonAddress, bool trustedDaemon, quint64
         setTrustedDaemon(trustedDaemon);
 
         if (success) {
-            qDebug() << "init async finished - starting refresh";
+            qDebug() << "init async finished";
+            qDebug() << "Starting refresh";
             startRefresh();
         }
     });
@@ -440,17 +443,11 @@ void Wallet::pauseRefresh() {
     m_refreshEnabled = false;
 }
 
-void Wallet::skipSync() {
-    // Skip sync by setting wallet height to current daemon height
-    quint64 daemonHeight = this->daemonBlockChainHeight();
-    if (daemonHeight > 0) {
-        qInfo() << "Skip sync: Setting wallet height to" << daemonHeight;
-        m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
-        // Trigger one refresh to update wallet state, but don't enable continuous refresh
-        m_refreshNow = true;
-    } else {
-        qWarning() << "Skip sync failed: Could not get daemon height";
-    }
+void Wallet::rescanBlockchainAsync() {
+    qInfo() << "Rescanning blockchain from creation height:" << m_originalWalletCreationHeight;
+    m_walletImpl->setRefreshFromBlockHeight(m_originalWalletCreationHeight);
+    m_walletImpl->rescanBlockchainAsync();
+    m_fullSyncRequested.store(true);
 }
 
 void Wallet::syncFromHeight(quint64 height) {
@@ -512,13 +509,13 @@ void Wallet::startRefreshThread()
 
                     emit heightsRefreshed(haveHeights, daemonHeight, targetHeight);
 
-                    // Don't call refresh function if we don't have the daemon and target height
-                    // We do this to prevent to UI from getting confused about the amount of blocks that are still remaining
-                    if (haveHeights) {
+                    if (conf()->get(Config::dataSavingMode).toBool()) {
+                        setConnectionStatus(ConnectionStatus_Synchronized);
+                        qInfo() << "Data Saving Mode: Skipping sync, marked synchronized";
+                    } else if (haveHeights) {
                         QMutexLocker locker(&m_asyncMutex);
 
                         if (m_newWallet) {
-                            // Set blockheight to daemonHeight for newly created wallets to speed up initial sync
                             m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
                             m_newWallet = false;
                         }
@@ -544,21 +541,43 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
 
     if (success) {
         quint64 walletHeight = blockChainHeight();
+        
+        qDebug() << "Heights - Wallet:" << walletHeight << "Daemon:" << daemonHeight << "Target:" << targetHeight;
 
-        if (daemonHeight < targetHeight) {
-            emit syncStatus(daemonHeight, targetHeight, true);
-        }
-        else {
-            this->syncStatusUpdated(walletHeight, daemonHeight);
-        }
-
-        if (walletHeight < (targetHeight - 1)) {
-            setConnectionStatus(ConnectionStatus_Synchronizing);
-        } else {
+        if (conf()->get(Config::dataSavingMode).toBool()) {
+            this->syncStatusUpdated(daemonHeight, daemonHeight);
             setConnectionStatus(ConnectionStatus_Synchronized);
+        } else {
+            if (daemonHeight < targetHeight) {
+                emit syncStatus(daemonHeight, targetHeight, true);
+            }
+            else {
+                this->syncStatusUpdated(walletHeight, daemonHeight);
+            }
+
+            if (m_fullSyncRequested.load()) {
+                quint64 creationHeight = m_originalWalletCreationHeight;
+                if (walletHeight < targetHeight && walletHeight > creationHeight) {
+                    setConnectionStatus(ConnectionStatus_Synchronizing);
+                    qInfo() << "Full sync in progress:" << walletHeight << "/" << targetHeight;
+                } else if (walletHeight >= (targetHeight - 1)) {
+                    m_fullSyncRequested.store(false);
+                    setConnectionStatus(ConnectionStatus_Synchronized);
+                    qInfo() << "Full sync completed";
+                } else {
+                    setConnectionStatus(ConnectionStatus_Synchronizing);
+                }
+            } else if (walletHeight < (targetHeight - 1)) {
+                setConnectionStatus(ConnectionStatus_Synchronizing);
+            } else {
+                setConnectionStatus(ConnectionStatus_Synchronized);
+            }
         }
     } else {
-        setConnectionStatus(ConnectionStatus_Disconnected);
+        if (m_connectionStatus == ConnectionStatus_Disconnected) {
+        } else {
+            qWarning() << "Heights refresh failed but maintaining connection status" << m_connectionStatus << "- will retry";
+        }
     }
 }
 
@@ -588,6 +607,13 @@ void Wallet::onNewBlock(uint64_t walletHeight) {
     // Called whenever a new block gets scanned by the wallet
     quint64 daemonHeight = m_daemonBlockChainTargetHeight;
 
+    // In Data Saving Mode, always report as synchronized
+    if (conf()->get(Config::dataSavingMode).toBool()) {
+        setConnectionStatus(ConnectionStatus_Synchronized);
+        this->syncStatusUpdated(daemonHeight, daemonHeight);
+        return;
+    }
+
     if (walletHeight < (daemonHeight - 1)) {
         setConnectionStatus(ConnectionStatus_Synchronizing);
     } else {
@@ -614,9 +640,17 @@ void Wallet::onUpdated() {
 
 void Wallet::onRefreshed(bool success, const QString &message) {
     if (!success) {
-        setConnectionStatus(ConnectionStatus_Disconnected);
-        // Something went wrong during refresh, in some cases we need to notify the user
-        qCritical() << "Exception during refresh: " << message; // Can't use ->errorString() here, other SLOT might snipe it first
+        qCritical() << "Refresh failed with error:" << message;
+        // Don't disconnect immediately - let the refresh thread retry
+        // Only disconnect if we were already disconnected or connecting
+        if (m_connectionStatus == ConnectionStatus_Disconnected || 
+            m_connectionStatus == ConnectionStatus_Connecting) {
+            setConnectionStatus(ConnectionStatus_Disconnected);
+        } else {
+            // Keep current connected status but log the error
+            // The refresh thread will retry automatically
+            qWarning() << "Refresh failed but maintaining connection status:" << m_connectionStatus;
+        }
         return;
     }
 
@@ -1391,11 +1425,15 @@ bool Wallet::setRingDatabase(const QString &path) {
 }
 
 quint64 Wallet::getWalletCreationHeight() const {
-    return m_walletImpl->getRefreshFromBlockHeight();
+    return m_originalWalletCreationHeight;
 }
 
 void Wallet::setWalletCreationHeight(quint64 height) {
     m_wallet2->set_refresh_from_block_height(height);
+}
+
+void Wallet::setFullSyncRequested(bool requested) {
+    m_fullSyncRequested.store(requested);
 }
 
 //! create a view only wallet
