@@ -443,13 +443,6 @@ void Wallet::pauseRefresh() {
     m_refreshEnabled = false;
 }
 
-void Wallet::rescanBlockchainAsync() {
-    qInfo() << "Rescanning blockchain from creation height:" << m_originalWalletCreationHeight;
-    m_walletImpl->setRefreshFromBlockHeight(m_originalWalletCreationHeight);
-    m_walletImpl->rescanBlockchainAsync();
-    m_fullSyncRequested.store(true);
-}
-
 void Wallet::syncFromHeight(quint64 height) {
     qInfo() << "Syncing from height:" << height;
     m_walletImpl->setRefreshFromBlockHeight(height);
@@ -496,8 +489,6 @@ void Wallet::startRefreshThread()
                 {
                     m_refreshNow = false;
 
-                    // get daemonHeight and targetHeight
-                    // daemonHeight and targetHeight will be 0 if call to get_info fails
                     quint64 daemonHeight = m_walletImpl->daemonBlockChainHeight();
                     bool success = daemonHeight > 0;
 
@@ -510,8 +501,7 @@ void Wallet::startRefreshThread()
                     emit heightsRefreshed(haveHeights, daemonHeight, targetHeight);
 
                     if (conf()->get(Config::dataSavingMode).toBool()) {
-                        setConnectionStatus(ConnectionStatus_Synchronized);
-                        qInfo() << "Data Saving Mode: Skipping sync, marked synchronized";
+                        qInfo() << "Data Saving Mode: Skipping sync";
                     } else if (haveHeights) {
                         QMutexLocker locker(&m_asyncMutex);
 
@@ -540,9 +530,8 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
     m_daemonBlockChainTargetHeight = targetHeight;
 
     if (success) {
+        m_heightRefreshFailures = 0;
         quint64 walletHeight = blockChainHeight();
-        
-        qDebug() << "Heights - Wallet:" << walletHeight << "Daemon:" << daemonHeight << "Target:" << targetHeight;
 
         if (conf()->get(Config::dataSavingMode).toBool()) {
             this->syncStatusUpdated(daemonHeight, daemonHeight);
@@ -555,26 +544,19 @@ void Wallet::onHeightsRefreshed(bool success, quint64 daemonHeight, quint64 targ
                 this->syncStatusUpdated(walletHeight, daemonHeight);
             }
 
-            if (m_fullSyncRequested.load()) {
-                quint64 creationHeight = m_originalWalletCreationHeight;
-                if (walletHeight < targetHeight && walletHeight > creationHeight) {
-                    setConnectionStatus(ConnectionStatus_Synchronizing);
-                    qInfo() << "Full sync in progress:" << walletHeight << "/" << targetHeight;
-                } else if (walletHeight >= (targetHeight - 1)) {
-                    m_fullSyncRequested.store(false);
-                    setConnectionStatus(ConnectionStatus_Synchronized);
-                    qInfo() << "Full sync completed";
-                } else {
-                    setConnectionStatus(ConnectionStatus_Synchronizing);
-                }
-            } else if (walletHeight < (targetHeight - 1)) {
+            if (walletHeight < (targetHeight - 1)) {
                 setConnectionStatus(ConnectionStatus_Synchronizing);
             } else {
                 setConnectionStatus(ConnectionStatus_Synchronized);
             }
         }
     } else {
-        if (m_connectionStatus == ConnectionStatus_Disconnected) {
+        m_heightRefreshFailures++;
+        if (m_heightRefreshFailures > 5) {
+            qWarning() << "Heights refresh failed" << m_heightRefreshFailures << "times - disconnecting to try new node";
+            m_heightRefreshFailures = 0;
+            setConnectionStatus(ConnectionStatus_Disconnected);
+        } else if (m_connectionStatus == ConnectionStatus_Disconnected) {
         } else {
             qWarning() << "Heights refresh failed but maintaining connection status" << m_connectionStatus << "- will retry";
         }
@@ -1430,10 +1412,6 @@ quint64 Wallet::getWalletCreationHeight() const {
 
 void Wallet::setWalletCreationHeight(quint64 height) {
     m_wallet2->set_refresh_from_block_height(height);
-}
-
-void Wallet::setFullSyncRequested(bool requested) {
-    m_fullSyncRequested.store(requested);
 }
 
 //! create a view only wallet

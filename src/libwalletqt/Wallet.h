@@ -217,7 +217,6 @@ public:
     // ##### Synchronization (Refresh) #####
     void startRefresh();
     void pauseRefresh();
-    void rescanBlockchainAsync();
     
     //! Sync from specific height
     void syncFromHeight(quint64 height);
@@ -412,7 +411,6 @@ public:
 
     quint64 getWalletCreationHeight() const;
     void setWalletCreationHeight(quint64 height);
-    void setFullSyncRequested(bool requested);
 
     //! Rescan spent outputs
     bool rescanSpent();
@@ -534,8 +532,8 @@ private:
     bool m_useSSL;
     bool m_newWallet = false;
     bool m_forceKeyImageSync = false;
-    std::atomic<bool> m_fullSyncRequested{false};
     quint64 m_originalWalletCreationHeight = 0;
+    int m_heightRefreshFailures = 0;
 
     QTimer *m_storeTimer = nullptr;
     std::set<std::string> m_selectedInputs;

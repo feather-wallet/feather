@@ -1450,7 +1450,8 @@ void MainWindow::onDataSavingModeEnabled(bool enabled) {
             "Auto-sync has been disabled to save data.\n\n"
             "Use Wallet > Advanced > Sync Options to:\n"
             "• Sync Dates - Sync a specific date range\n"
-            "• Full Sync - Sync normally");
+            "• Full Sync - Sync normally\n\n"
+            "Note: Restart the wallet for immediate sync, otherwise wait for the next sync cycle.");
     } else {
         m_wallet->startRefresh();
         this->setStatusText("Data Saving Mode disabled - Resuming sync", false, 3000);
@@ -1459,8 +1460,12 @@ void MainWindow::onDataSavingModeEnabled(bool enabled) {
 
 void MainWindow::onFullSync() {
     qInfo() << "User initiated full sync";
-    m_wallet->rescanBlockchainAsync();
-    this->setStatusText("Full sync started - rescanning blockchain", false, 3000);
+    if (conf()->get(Config::dataSavingMode).toBool()) {
+        conf()->set(Config::dataSavingMode, false);
+        qInfo() << "Data Saving Mode disabled for full sync";
+    }
+    m_wallet->startRefresh();
+    this->setStatusText("Full sync started - syncing from last sync date", false, 3000);
 }
 
 void MainWindow::onSyncDates() {
@@ -1468,6 +1473,11 @@ void MainWindow::onSyncDates() {
     if (dialog.exec() == QDialog::Accepted) {
         QDateTime startDate = dialog.getStartDate();
         QDateTime endDate = dialog.getEndDate();
+        
+        if (conf()->get(Config::dataSavingMode).toBool()) {
+            conf()->set(Config::dataSavingMode, false);
+            qInfo() << "Data Saving Mode disabled for date range sync";
+        }
         
         qInfo() << "User initiated date range sync from" << startDate << "to" << endDate;
         m_wallet->syncDateRange(startDate, endDate);

@@ -546,7 +546,6 @@
       <property name="title">
        <string>Sync Options</string>
       </property>
-      <addaction name="actionSkip_sync"/>
       <addaction name="actionSync_dates"/>
       <addaction name="actionFull_sync"/>
      </widget>
@@ -870,14 +869,6 @@
   <action name="actionWallet_cache_debug">
    <property name="text">
     <string>Wallet cache debug</string>
-   </property>
-  </action>
-  <action name="actionSkip_sync">
-   <property name="text">
-    <string>Skip Sync</string>
-   </property>
-   <property name="toolTip">
-    <string>Skip syncing and jump to current block height (Data Saving Mode)</string>
    </property>
   </action>
   <action name="actionSync_dates">
