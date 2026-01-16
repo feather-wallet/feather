@@ -487,7 +487,7 @@ void Wallet::startRefreshThread()
                     m_refreshNow = false;
 
                     // get daemonHeight and targetHeight
-                                        // daemonHeight and targetHeight will be 0 if call to get_info fails
+                    // daemonHeight and targetHeight will be 0 if call to get_info fails
                     quint64 daemonHeight = m_walletImpl->daemonBlockChainHeight();
                     bool success = daemonHeight > 0;
 
@@ -507,6 +507,7 @@ void Wallet::startRefreshThread()
                         QMutexLocker locker(&m_asyncMutex);
 
                         if (m_newWallet) {
+                            // Set blockheight to daemonHeight for newly created wallets to speed up initial sync
                             m_walletImpl->setRefreshFromBlockHeight(daemonHeight);
                             m_newWallet = false;
                         }
@@ -624,7 +625,7 @@ void Wallet::onUpdated() {
 void Wallet::onRefreshed(bool success, const QString &message) {
     if (!success) {
         // Something went wrong during refresh, in some cases we need to notify the user
-        qCritical() << "Exception during refresh: " << message; // Can't use ->errorString() here, other SLOT might snipe it firstqCritical() << "Refresh failed with error:" << message;
+        qCritical() << "Exception during refresh: " << message; // Can't use ->errorString() here, other SLOT might snipe it first
         // Don't disconnect immediately - let the refresh thread retry
         // Only disconnect if we were already disconnected or connecting
         if (m_connectionStatus == ConnectionStatus_Disconnected ||
