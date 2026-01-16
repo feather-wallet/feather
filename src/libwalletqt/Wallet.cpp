@@ -56,8 +56,6 @@ Wallet::Wallet(Monero::Wallet *wallet, QObject *parent)
     m_walletListener = new WalletListenerImpl(this);
     m_walletImpl->setListener(m_walletListener);
     m_currentSubaddressAccount = getCacheAttribute(ATTRIBUTE_SUBADDRESS_ACCOUNT).toUInt();
-    
-    m_originalWalletCreationHeight = m_walletImpl->getRefreshFromBlockHeight();
 
     m_addressBookModel = new AddressBookModel(this, m_addressBook);
     m_subaddressModel = new SubaddressModel(this, m_subaddress);
@@ -101,7 +99,7 @@ void Wallet::setConnectionStatus(ConnectionStatus value) {
     if (m_connectionStatus == value) {
         return;
     }
-    
+
     m_connectionStatus = value;
     emit connectionStatusChanged(m_connectionStatus);
 }
@@ -453,18 +451,18 @@ void Wallet::syncFromHeight(quint64 height) {
 void Wallet::syncDateRange(const QDateTime &startDate, const QDateTime &endDate) {
     // Monero genesis block timestamp: April 18, 2014 at 10:49:53 AM UTC
     QDateTime genesisTime = QDateTime::fromSecsSinceEpoch(1397818193, Qt::UTC);
-    
+
     // Average Monero block time is ~2 minutes (120 seconds)
     const quint64 BLOCK_TIME_SECONDS = 120;
-    
+
     // Calculate start height
     qint64 secondsFromGenesis = genesisTime.secsTo(startDate);
     quint64 startHeight = secondsFromGenesis > 0 ? (secondsFromGenesis / BLOCK_TIME_SECONDS) : 0;
-    
-    qInfo() << "Syncing date range from" << startDate.toString(Qt::ISODate) 
+
+    qInfo() << "Syncing date range from" << startDate.toString(Qt::ISODate)
             << "to" << endDate.toString(Qt::ISODate)
             << "| Estimated start height:" << startHeight;
-    
+
     // Set the start height and begin sync
     // The wallet will sync until it catches up to the daemon
     this->syncFromHeight(startHeight);
@@ -625,7 +623,7 @@ void Wallet::onRefreshed(bool success, const QString &message) {
         qCritical() << "Refresh failed with error:" << message;
         // Don't disconnect immediately - let the refresh thread retry
         // Only disconnect if we were already disconnected or connecting
-        if (m_connectionStatus == ConnectionStatus_Disconnected || 
+        if (m_connectionStatus == ConnectionStatus_Disconnected ||
             m_connectionStatus == ConnectionStatus_Connecting) {
             setConnectionStatus(ConnectionStatus_Disconnected);
         } else {
@@ -700,7 +698,7 @@ bool Wallet::keyImageSyncNeeded(quint64 amount, bool sendAll) const {
     if (!this->viewOnly()) {
         return false;
     }
-    
+
     if (sendAll) {
         return this->hasUnknownKeyImages();
     }
@@ -1407,7 +1405,7 @@ bool Wallet::setRingDatabase(const QString &path) {
 }
 
 quint64 Wallet::getWalletCreationHeight() const {
-    return m_originalWalletCreationHeight;
+    return m_walletImpl->getRefreshFromBlockHeight();
 }
 
 void Wallet::setWalletCreationHeight(quint64 height) {

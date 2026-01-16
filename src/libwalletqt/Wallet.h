@@ -142,7 +142,7 @@ public:
     bool isDeterministic() const;
 
     QString walletName() const;
-    
+
     // ##### Balance #####
     //! returns balance
     quint64 balance() const;
@@ -153,7 +153,7 @@ public:
     quint64 unlockedBalance() const;
     quint64 unlockedBalance(quint32 accountIndex) const;
     quint64 unlockedBalanceAll() const;
-    
+
     quint64 viewOnlyBalance(quint32 accountIndex) const;
 
     void updateBalance();
@@ -217,10 +217,10 @@ public:
     // ##### Synchronization (Refresh) #####
     void startRefresh();
     void pauseRefresh();
-    
+
     //! Sync from specific height
     void syncFromHeight(quint64 height);
-    
+
     //! Sync from date range (converts dates to block heights)
     void syncDateRange(const QDateTime &startDate, const QDateTime &endDate);
 
@@ -256,19 +256,19 @@ public:
     void setForceKeyImageSync(bool enabled);
     bool hasUnknownKeyImages() const;
     bool keyImageSyncNeeded(quint64 amount, bool sendAll) const;
-    
+
     //! export/import key images
     bool exportKeyImages(const QString& path, bool all = false);
     bool exportKeyImagesToStr(std::string &keyImages, bool all = false);
     bool exportKeyImagesForOutputsFromStr(const std::string &outputs, std::string &keyImages);
-    
+
     bool importKeyImages(const QString& path);
     bool importKeyImagesFromStr(const std::string &keyImages);
 
     //! export/import outputs
     bool exportOutputs(const QString& path, bool all = false);
     bool exportOutputsToStr(std::string& outputs, bool all);
-    
+
     bool importOutputs(const QString& path);
     bool importOutputsFromStr(const std::string &outputs);
 
@@ -348,7 +348,7 @@ public:
     //! Sign a transfer from file
     UnsignedTransaction * loadTxFile(const QString &fileName);
     UnsignedTransaction * loadUnsignedTransactionFromStr(const std::string &data);
-    
+
     //! Load an unsigned transaction from a base64 encoded string
     UnsignedTransaction * loadTxFromBase64Str(const QString &unsigned_tx);
 
@@ -532,7 +532,6 @@ private:
     bool m_useSSL;
     bool m_newWallet = false;
     bool m_forceKeyImageSync = false;
-    quint64 m_originalWalletCreationHeight = 0;
     int m_heightRefreshFailures = 0;
 
     QTimer *m_storeTimer = nullptr;
