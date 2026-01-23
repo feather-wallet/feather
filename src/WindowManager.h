@@ -6,6 +6,7 @@
 
 #include <QObject>
 #include <QSystemTrayIcon>
+#include <QElapsedTimer>
 
 #include "utils/EventFilter.h"
 #include "utils/nodes.h"
@@ -71,6 +72,8 @@ private slots:
     void onDeviceError(const QString &errorMessage, quint64 errorCode);
     void onWalletPassphraseNeeded(bool on_device);
     void onChangeTheme(const QString &themeName);
+    void onApplicationStateChanged(Qt::ApplicationState state);
+    void recoverFromSleep();
 
 private:
     void tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet);
@@ -115,6 +118,8 @@ private:
     bool m_initialNetworkConfigured = false;
 
     QThread *m_cleanupThread;
+
+    QElapsedTimer m_inactiveTimer;
 };
 
 inline WindowManager* windowManager()

@@ -7,6 +7,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QWindow>
+#include <QTimer>
 
 #include "Application.h"
 #include "constants.h"
@@ -41,6 +42,9 @@ WindowManager::WindowManager(QObject *parent)
 
     connect(qApp, SIGNAL(anotherInstanceStarted()), this, SLOT(raise()));
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
+#if defined(Q_OS_MACOS)
+    connect(qApp, &QGuiApplication::applicationStateChanged, this, &WindowManager::onApplicationStateChanged);
+#endif
 
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
     m_tray->setToolTip("Feather Wallet");
@@ -619,6 +623,59 @@ void WindowManager::onWalletPassphraseNeeded(bool on_device) {
     bool ok;
     QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
     m_walletManager->onPassphraseEntered(passphrase, false, false);
+}
+
+void WindowManager::onApplicationStateChanged(Qt::ApplicationState state) {
+#if defined(Q_OS_MACOS)
+    if (state == Qt::ApplicationInactive || state == Qt::ApplicationHidden) {
+        m_inactiveTimer.start();
+        return;
+    }
+
+    if (state == Qt::ApplicationActive && m_inactiveTimer.isValid()) {
+        // Only run recovery after longer inactivity (sleep/wake) to avoid normal app switches.
+        constexpr qint64 wakeThresholdMs = 60 * 1000;
+        const qint64 inactiveMs = m_inactiveTimer.elapsed();
+        m_inactiveTimer.invalidate();
+        if (inactiveMs >= wakeThresholdMs) {
+            QTimer::singleShot(0, this, &WindowManager::recoverFromSleep);
+        }
+    }
+#else
+    Q_UNUSED(state);
+#endif
+}
+
+void WindowManager::recoverFromSleep() {
+#if defined(Q_OS_MACOS)
+    // Recreate tray icon to work around macOS Qt status item issues after sleep.
+    const bool trayVisible = conf()->get(Config::showTrayIcon).toBool();
+    if (m_tray) {
+        m_tray->setVisible(false);
+        delete m_tray;
+        m_tray = nullptr;
+    }
+
+    m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
+    m_tray->setToolTip("Feather Wallet");
+    this->buildTrayMenu();
+    m_tray->setVisible(trayVisible);
+
+    for (const auto &window : m_windows) {
+        if (!window) {
+            continue;
+        }
+        if (!window->isHidden()) {
+            window->bringToFront();
+        } else {
+            window->update();
+        }
+    }
+    if (m_wizard && !m_wizard->isHidden()) {
+        m_wizard->raise();
+        m_wizard->activateWindow();
+    }
+#endif
 }
 
 // ######################## TRAY ########################
