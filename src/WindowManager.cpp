@@ -7,7 +7,11 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QWindow>
+
+#if defined(Q_OS_MACOS)
+#include "utils/os/macos_sleep.h"
 #include <QTimer>
+#endif
 
 #include "Application.h"
 #include "constants.h"
@@ -43,7 +47,10 @@ WindowManager::WindowManager(QObject *parent)
     connect(qApp, SIGNAL(anotherInstanceStarted()), this, SLOT(raise()));
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
 #if defined(Q_OS_MACOS)
-    connect(qApp, &QGuiApplication::applicationStateChanged, this, &WindowManager::onApplicationStateChanged);
+    m_macSleepObserver = new MacSleepObserver(this);
+    connect(m_macSleepObserver, &MacSleepObserver::didWake, this, [this] {
+        QTimer::singleShot(0, this, &WindowManager::recoverFromSleep);
+    });
 #endif
 
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
@@ -623,27 +630,6 @@ void WindowManager::onWalletPassphraseNeeded(bool on_device) {
     bool ok;
     QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
     m_walletManager->onPassphraseEntered(passphrase, false, false);
-}
-
-void WindowManager::onApplicationStateChanged(Qt::ApplicationState state) {
-#if defined(Q_OS_MACOS)
-    if (state == Qt::ApplicationInactive || state == Qt::ApplicationHidden) {
-        m_inactiveTimer.start();
-        return;
-    }
-
-    if (state == Qt::ApplicationActive && m_inactiveTimer.isValid()) {
-        // Only run recovery after longer inactivity (sleep/wake) to avoid normal app switches.
-        constexpr qint64 wakeThresholdMs = 60 * 1000;
-        const qint64 inactiveMs = m_inactiveTimer.elapsed();
-        m_inactiveTimer.invalidate();
-        if (inactiveMs >= wakeThresholdMs) {
-            QTimer::singleShot(0, this, &WindowManager::recoverFromSleep);
-        }
-    }
-#else
-    Q_UNUSED(state);
-#endif
 }
 
 void WindowManager::recoverFromSleep() {

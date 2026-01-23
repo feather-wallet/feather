@@ -6,7 +6,6 @@
 
 #include <QObject>
 #include <QSystemTrayIcon>
-#include <QElapsedTimer>
 
 #include "utils/EventFilter.h"
 #include "utils/nodes.h"
@@ -72,7 +71,6 @@ private slots:
     void onDeviceError(const QString &errorMessage, quint64 errorCode);
     void onWalletPassphraseNeeded(bool on_device);
     void onChangeTheme(const QString &themeName);
-    void onApplicationStateChanged(Qt::ApplicationState state);
     void recoverFromSleep();
 
 private:
@@ -118,8 +116,9 @@ private:
     bool m_initialNetworkConfigured = false;
 
     QThread *m_cleanupThread;
-
-    QElapsedTimer m_inactiveTimer;
+#if defined(Q_OS_MACOS)
+    class MacSleepObserver *m_macSleepObserver = nullptr;
+#endif
 };
 
 inline WindowManager* windowManager()
