@@ -5,6 +5,8 @@
 
 #include "utils/Utils.h"
 
+// Detection relies on the WHONIX environment variable, which is set by Whonix's
+// /etc/profile.d scripts. Any non-empty value triggers detection.
 bool WhonixOS::detect() {
     return !QString::fromLocal8Bit(qgetenv("WHONIX")).isEmpty();
 }

@@ -212,9 +212,11 @@ void Nodes::connectToNode(const FeatherNode &node) {
         return;
     }
 
+    // When torOnlyAllowOnion is enabled, reject non-onion nodes (local nodes are exempt).
+    // This is a hard filter independent of torPrivacyLevel — even if privacy level allows
+    // clearnet, this checkbox blocks it.
     if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
         if (!node.isOnion() && !node.isLocal()) {
-            // We only want to connect to .onion nodes, but local nodes get an exception.
             return;
         }
     }
@@ -228,6 +230,9 @@ void Nodes::connectToNode(const FeatherNode &node) {
     // Don't use SSL over Tor/i2p
     m_wallet->setUseSSL(!node.isAnonymityNetwork());
 
+    // Select the SOCKS5 proxy address based on which Tor daemon is in use:
+    //   - Managed Tor or m_alreadyRunning: use featherTorHost:featherTorPort (default 127.0.0.1:19450)
+    //   - Local/system Tor or non-Tor proxy: use socks5Host:socks5Port (default 127.0.0.1:9050)
     QString proxyAddress;
     if (useSocks5Proxy(node)) {
         if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && (!torManager()->isLocalTor() || torManager()->isAlreadyRunning())) {
@@ -414,13 +419,19 @@ void Nodes::setCustomNodes(const QList<FeatherNode> &nodes) {
     this->updateModels();
 }
 
+// Called after every wallet refresh (sync cycle). Implements the automatic clearnet-to-onion
+// transition for the allTorExceptInitSync privacy level:
+//   - If connected to a local node: do nothing (local traffic is never routed through Tor)
+//   - If already on an .onion node: do nothing (already private)
+//   - Otherwise: force reconnect via autoConnect(), which calls pickEligibleNode().
+//     If useOnionNodes() now returns true (wallet is synced past initSyncThreshold),
+//     pickEligibleNode() will only return .onion nodes, completing the transition.
+// This reconnection happens silently — there is no UI notification to the user.
 void Nodes::onWalletRefreshed() {
     if (conf()->get(Config::proxy) == Config::Proxy::Tor && conf()->get(Config::torPrivacyLevel).toInt() == Config::allTorExceptInitSync) {
-        // Don't reconnect if we're connected to a local node (traffic will not be routed through Tor)
         if (m_connection.isLocal())
             return;
 
-        // Don't reconnect if we're already connected to an .onion node
         if (m_connection.isOnion())
             return;
 
@@ -428,11 +439,27 @@ void Nodes::onWalletRefreshed() {
     }
 }
 
+// Determines whether Feather should connect exclusively to .onion nodes.
+// Returns true when any of these conditions are met (checked in order):
+//   1. torOnlyAllowOnion is enabled — this overrides torPrivacyLevel entirely
+//   2. torPrivacyLevel == allTor (2) — always use .onion nodes
+//   3. torPrivacyLevel == allTorExceptInitSync (1) AND the wallet has completed
+//      at least one refresh cycle (refreshedOnce), OR the wallet's blockchain height
+//      is within initSyncThreshold blocks of the network height
+// Returns false when:
+//   - Proxy is not set to Tor
+//   - torPrivacyLevel == allTorExceptNode (0)
+//   - torPrivacyLevel == allTorExceptInitSync (1) and wallet is still syncing
+// This function is called by websocketNodes() to filter the node list, by useSocks5Proxy()
+// to decide whether to route through the SOCKS5 proxy, and indirectly by onWalletRefreshed()
+// to trigger the clearnet-to-onion transition.
 bool Nodes::useOnionNodes() {
     if (conf()->get(Config::proxy) != Config::Proxy::Tor) {
         return false;
     }
 
+    // torOnlyAllowOnion overrides torPrivacyLevel — if this checkbox is enabled,
+    // only .onion nodes are used regardless of privacy level setting.
     if (conf()->get(Config::torOnlyAllowOnion).toBool()) {
         return true;
     }
@@ -494,7 +521,9 @@ bool Nodes::useSocks5Proxy(const FeatherNode &node) {
     }
 
     if (config_proxy == Config::Proxy::Tor) {
-        // Don't use socks5 proxy if initial sync traffic is excluded.
+        // Use the SOCKS5 proxy only when connecting to .onion nodes.
+        // When useOnionNodes() is false (e.g. during initial sync in allTorExceptInitSync mode,
+        // or always in allTorExceptNode mode), clearnet nodes are connected directly.
         return this->useOnionNodes();
     }
 

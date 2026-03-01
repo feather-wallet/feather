@@ -79,8 +79,8 @@ public:
         socks5User,
         socks5Pass,
         useLocalTor, // Prevents Feather from starting bundled Tor daemon
-        torOnlyAllowOnion,
-        torPrivacyLevel, // Tor node network traffic strategy
+        torOnlyAllowOnion, // If true, overrides torPrivacyLevel and forces .onion-only node connections
+        torPrivacyLevel, // Tor node network traffic strategy (see PrivacyLevel enum below)
         torManagedPort, // Port for managed Tor daemon
         initSyncThreshold, // Switch to Tor after initial sync threshold blocks
 
