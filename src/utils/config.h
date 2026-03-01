@@ -141,10 +141,14 @@ public:
         tickersShowFiatBalance,
     };
 
+    // Controls how node network traffic is routed when using Tor (see: torPrivacyLevel config key).
+    // Determines whether Feather connects to .onion nodes exclusively or allows clearnet nodes.
+    // Used by Nodes::useOnionNodes() to decide connection strategy.
     enum PrivacyLevel {
-        allTorExceptNode = 0,
-        allTorExceptInitSync,
-        allTor
+        allTorExceptNode = 0,       // Route all traffic through Tor except node communication (clearnet nodes allowed)
+        allTorExceptInitSync,       // Route all traffic through Tor, but allow clearnet nodes during initial sync
+                                    // until blockchain height is within initSyncThreshold of network height
+        allTor                      // Route all node traffic through Tor unconditionally (onion nodes only)
     };
 
     enum BalanceDisplay {

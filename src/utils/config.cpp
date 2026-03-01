@@ -112,7 +112,18 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
 
         // Tor
+        //
+        // proxy: connection method (0 = None, 1 = Tor, 2 = i2p, 3 = SOCKS5)
         {Config::proxy, {QS("proxy"), Config::Proxy::Tor}},
+        //
+        // torPrivacyLevel: controls how node traffic is routed when using Tor.
+        //   0 (allTorExceptNode)     - All traffic through Tor, except node communication (clearnet nodes allowed).
+        //                              Fastest, but a remote node can see your IP address.
+        //   1 (allTorExceptInitSync) - All traffic through Tor, but clearnet nodes are allowed during initial
+        //                              blockchain sync until the wallet is within `initSyncThreshold` blocks of
+        //                              the network height. After that, only .onion nodes are used. (default)
+        //   2 (allTor)               - All node traffic routed through Tor unconditionally (.onion nodes only).
+        //                              Maximum privacy, but initial sync may be significantly slower.
         {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
         {Config::torOnlyAllowOnion, {QS("torOnlyAllowOnion"), false}},
         {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},
@@ -121,6 +132,9 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
         {Config::torManagedPort, {QS("torManagedPort"), "19450"}},
         {Config::useLocalTor, {QS("useLocalTor"), false}},
+        // initSyncThreshold: number of blocks from the network tip. When torPrivacyLevel is 1
+        // (allTorExceptInitSync), the wallet switches to .onion-only nodes once it is within
+        // this many blocks of the current network height.
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
         {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "revuo", "calc"}}},
