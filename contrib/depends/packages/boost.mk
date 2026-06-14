@@ -1,8 +1,8 @@
 package=boost
-$(package)_version=1.90.0
+$(package)_version=1.91.0-1
 $(package)_download_path=https://github.com/boostorg/boost/releases/download/boost-$($(package)_version)
 $(package)_file_name=boost-$($(package)_version)-b2-nodocs.tar.gz
-$(package)_sha256_hash=e848446c6fec62d8a96b44ed7352238b3de040b8b9facd4d6963b32f541e00f5
+$(package)_sha256_hash=b5a3d1490118e012f8b12688240d981bcdfcd009fd35bc70d120fbc907df4f7c
 
 define $(package)_set_vars
 $(package)_config_opts=variant=release
@@ -19,8 +19,8 @@ $(package)_toolset_$(host_os)=gcc
 $(package)_archiver_$(host_os)=$($(package)_ar)
 $(package)_toolset_darwin=darwin
 $(package)_archiver_darwin=$($(package)_libtool)
-$(package)_config_libraries_$(host_os)="chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,stacktrace"
-$(package)_config_libraries_mingw32="chrono,filesystem,program_options,system,thread,test,date_time,regex,serialization,stacktrace,locale"
+$(package)_config_libraries_$(host_os)="chrono,filesystem,program_options,thread,test,serialization,stacktrace"
+$(package)_config_libraries_mingw32="chrono,filesystem,program_options,thread,test,serialization,stacktrace,locale"
 $(package)_cxxflags=-std=c++17
 $(package)_cxxflags_linux=-fPIC
 $(package)_cxxflags_freebsd=-fPIC
