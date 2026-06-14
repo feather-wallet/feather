@@ -1,9 +1,9 @@
 package=libusb
-$(package)_version=1.0.29
+$(package)_version=1.0.30
 $(package)_download_path=https://github.com/libusb/libusb/archive/refs/tags
 $(package)_download_file=v$($(package)_version).tar.gz
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=7c2dd39c0b2589236e48c93247c986ae272e27570942b4163cb00a060fcf1b74
+$(package)_sha256_hash=2ae28adb0bb9558c86135c4e1c11b320b0805461e207a64a6e520a114094bf07
 $(package)_patches=CMakeLists.txt config.h.in
 
 define $(package)_preprocess_cmds
