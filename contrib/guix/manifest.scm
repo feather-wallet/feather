@@ -99,7 +99,7 @@ chain for " target " development."))
       (home-page (package-home-page xgcc))
       (license (package-license xgcc)))))
 
-(define base-gcc gcc-14)
+(define base-gcc gcc-15)
 (define base-linux-kernel-headers linux-libre-headers-6.1)
 
 (define* (make-bitcoin-cross-toolchain target
@@ -481,8 +481,8 @@ inspecting signatures in Mach-O binaries.")
         zip  ; used to create release archives
 
         ;; Build tools
-        gcc-toolchain-14
-        (list gcc-toolchain-14 "static")
+        gcc-toolchain-15
+        (list gcc-toolchain-15 "static")
         gnu-make
         pkg-config
         cmake-minimal
