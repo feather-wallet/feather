@@ -1,32 +1,30 @@
 package=native_qt
-$(package)_version=6.11.0
+$(package)_version=6.11.1
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.11/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=231ad85979864d914dc9568a1b71c91d6cf20d7b2021d059103bf0eb51cb755e
+$(package)_sha256_hash=d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
 $(package)_linux_dependencies=native_wayland
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches += guix_cross_lib_path.patch
 $(package)_patches += qtbase-moc-ignore-gcc-macro.patch
 $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
-$(package)_patches += wayland-fix.patch
-$(package)_patches += wayland-fix2.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=cfb1993d7a10848965b01b9cf33a54b8a4ba4e5e3a6d28d59483e73f10d9fc76
+$(package)_qttools_sha256_hash=8e61835a679c93fa9c6065b142353c2071ba68e297898937c32a03777fcaf50d
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=dfa8d653be07087d9407ed4a4ebae847f8953e0b7abd829f089803ab652a30e6
+$(package)_qtsvg_sha256_hash=7f3cf02f4824bf03c2c5859ea6db173bf1482a1daf24e6cdf7bc78cfa26a8a94
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=90c4cac0a7a983b68d1b0873d0714e7873b9a493403fa8593e8a4eea3ea26040
+$(package)_qtmultimedia_sha256_hash=390f8e52ddee3aca5c4de7eead900c84c4fa61ff6d1f0ebea9c7543365c09b0a
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=e43cb1ae8809b2a858281ee269f98da59d0fc1bcf958ca5510c81f7ad3d2e14a
+$(package)_qtshadertools_sha256_hash=2075052f9b23bcf9de045bbd180037084942f82cce870aab14a1454902c982fc
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=e710e6e760f92922b86e4dd68f6bbe94ef6510919519d1b0068e874b5ad84d37
+$(package)_qtwayland_sha256_hash=95788aa502f75441d4edf65932b235f76523084e13dbbb7b9ee2d207b32bd9b3
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)
@@ -159,10 +157,7 @@ define $(package)_preprocess_cmds
   cp $($(package)_patch_dir)/root_CMakeLists.txt CMakeLists.txt && \
   patch -p1 -i $($(package)_patch_dir)/qtbase-moc-ignore-gcc-macro.patch && \
   patch -p1 -i $($(package)_patch_dir)/rcc_hardcode_timestamp.patch && \
-  patch -p1 -i $($(package)_patch_dir)/guix_cross_lib_path.patch && \
-  cd qtbase && \
-  patch -p1 -i $($(package)_patch_dir)/wayland-fix.patch && \
-  patch -p1 -i $($(package)_patch_dir)/wayland-fix2.patch
+  patch -p1 -i $($(package)_patch_dir)/guix_cross_lib_path.patch
 endef
 
 define $(package)_config_cmds
