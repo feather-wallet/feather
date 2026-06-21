@@ -22,15 +22,11 @@
              (gnu packages perl)
              (gnu packages pkg-config)
              ((gnu packages python) #:select (python-minimal))
-             ((gnu packages python-build) #:select (python-tomli python-poetry-core))
-             ((gnu packages python-crypto) #:select (python-asn1crypto))
              ((gnu packages tls) #:select (openssl))
              ((gnu packages version-control) #:select (git-minimal))
              (gnu packages xorg)
              (guix build-system cmake)
              (guix build-system gnu)
-             (guix build-system pyproject)
-             (guix build-system python)
              (guix build-system trivial)
              (guix download)
              (guix gexp)
@@ -261,200 +257,6 @@ signing and timestamping. But osslsigncode is based on OpenSSL and cURL, and
 thus should be able to compile on most platforms where these exist.")
     (license license:gpl3+))) ; license is with openssl exception
 
-(define-public python-elfesteem
-  (let ((commit "2eb1e5384ff7a220fd1afacd4a0170acff54fe56"))
-    (package
-      (name "python-elfesteem")
-      (version (git-version "0.1" "1" commit))
-      (source
-        (origin
-          (method git-fetch)
-          (uri (git-reference
-                 (url "https://github.com/LRGH/elfesteem")
-                 (commit commit)))
-          (file-name (git-file-name name commit))
-          (sha256
-            (base32
-              "07x6p8clh11z8s1n2kdxrqwqm2almgc5qpkcr9ckb6y5ivjdr5r6"))))
-      (build-system python-build-system)
-      ;; There are no tests, but attempting to run python setup.py test leads to
-      ;; PYTHONPATH problems, just disable the test
-      (arguments '(#:tests? #f))
-      (home-page "https://github.com/LRGH/elfesteem")
-      (synopsis "ELF/PE/Mach-O parsing library")
-      (description "elfesteem parses ELF, PE and Mach-O files.")
-      (license license:lgpl2.1))))
-
-(define-public python-oscrypto
-  (package
-    (name "python-oscrypto")
-    (version "1547f535001ba568b239b8797465536759c742a3")
-    (source
-      (origin
-        (method git-fetch)
-        (uri (git-reference
-               (url "https://github.com/wbond/oscrypto")
-               (commit version)))
-        (file-name (git-file-name name version))
-        (sha256
-          (base32
-            "1iis5mrgqcapzrrc5p9x4jz5cmrn0lb9di6vrh3pld7dprz5g0qk"))
-        (patches (search-our-patches "oscrypto-hard-code-openssl.patch"))))
-    (build-system python-build-system)
-    (native-search-paths
-      (list (search-path-specification
-              (variable "SSL_CERT_FILE")
-              (file-type 'regular)
-              (separator #f)                ;single entry
-              (files '("etc/ssl/certs/ca-certificates.crt")))))
-
-    (propagated-inputs
-      (list python-asn1crypto openssl))
-    (arguments
-      `(#:phases
-         (modify-phases %standard-phases
-           (add-after 'unpack 'hard-code-path-to-libscrypt
-             (lambda* (#:key inputs #:allow-other-keys)
-               (let ((openssl (assoc-ref inputs "openssl")))
-                 (substitute* "oscrypto/__init__.py"
-                   (("@GUIX_OSCRYPTO_USE_OPENSSL@")
-                     (string-append openssl "/lib/libcrypto.so" "," openssl "/lib/libssl.so")))
-                 #t)))
-           (add-after 'unpack 'disable-broken-tests
-             (lambda _
-               ;; This test is broken as there is no keyboard interrupt.
-               (substitute* "tests/test_trust_list.py"
-                 (("^(.*)class TrustListTests" line indent)
-                   (string-append indent
-                     "@unittest.skip(\"Disabled by Guix\")\n"
-                     line)))
-               (substitute* "tests/test_tls.py"
-                 (("^(.*)class TLSTests" line indent)
-                   (string-append indent
-                     "@unittest.skip(\"Disabled by Guix\")\n"
-                     line)))
-               #t))
-           (replace 'check
-             (lambda _
-               (invoke "python" "run.py" "tests")
-               #t)))))
-    (home-page "https://github.com/wbond/oscrypto")
-    (synopsis "Compiler-free Python crypto library backed by the OS")
-    (description "oscrypto is a compilation-free, always up-to-date encryption library for Python.")
-    (license license:expat)))
-
-(define-public python-oscryptotests
-  (package (inherit python-oscrypto)
-    (name "python-oscryptotests")
-    (propagated-inputs
-      (list python-oscrypto))
-    (arguments
-      `(#:tests? #f
-         #:phases
-         (modify-phases %standard-phases
-           (add-after 'unpack 'hard-code-path-to-libscrypt
-             (lambda* (#:key inputs #:allow-other-keys)
-               (chdir "tests")
-               #t)))))))
-
-(define-public python-certvalidator
-  (let ((commit "a145bf25eb75a9f014b3e7678826132efbba6213"))
-    (package
-      (name "python-certvalidator")
-      (version (git-version "0.1" "1" commit))
-      (source
-        (origin
-          (method git-fetch)
-          (uri (git-reference
-                 (url "https://github.com/achow101/certvalidator")
-                 (commit commit)))
-          (file-name (git-file-name name commit))
-          (sha256
-            (base32
-              "1qw2k7xis53179lpqdqyylbcmp76lj7sagp883wmxg5i7chhc96k"))))
-      (build-system python-build-system)
-      (propagated-inputs
-        (list python-asn1crypto
-              python-oscrypto
-              python-oscryptotests)) ;; certvalidator tests import oscryptotests
-      (arguments
-        `(#:phases
-           (modify-phases %standard-phases
-             (add-after 'unpack 'disable-broken-tests
-               (lambda _
-                 (substitute* "tests/test_certificate_validator.py"
-                   (("^(.*)class CertificateValidatorTests" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 (substitute* "tests/test_crl_client.py"
-                   (("^(.*)def test_fetch_crl" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 (substitute* "tests/test_ocsp_client.py"
-                   (("^(.*)def test_fetch_ocsp" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 (substitute* "tests/test_registry.py"
-                   (("^(.*)def test_build_paths" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 (substitute* "tests/test_validate.py"
-                   (("^(.*)def test_revocation_mode_hard" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 (substitute* "tests/test_validate.py"
-                   (("^(.*)def test_revocation_mode_soft" line indent)
-                     (string-append indent
-                       "@unittest.skip(\"Disabled by Guix\")\n"
-                       line)))
-                 #t))
-             (replace 'check
-               (lambda _
-                 (invoke "python" "run.py" "tests")
-                 #t)))))
-      (home-page "https://github.com/wbond/certvalidator")
-      (synopsis "Python library for validating X.509 certificates and paths")
-      (description "certvalidator is a Python library for validating X.509
-certificates or paths. Supports various options, including: validation at a
-specific moment in time, whitelisting and revocation checks.")
-      (license license:expat))))
-
-(define-public python-signapple
-  (let ((commit "a9bf003d87e17f744a2791b86348abc5377ebed2"))
-    (package
-      (name "python-signapple")
-      (version (git-version "0.2.0" "1" commit))
-      (source
-        (origin
-          (method git-fetch)
-          (uri (git-reference
-                 (url "https://github.com/achow101/signapple")
-                 (commit commit)))
-          (file-name (git-file-name name commit))
-          (sha256
-            (base32
-              "0p250z2ai04a7fgr1b9kmc8samz4bkpqprx3az0k0jp6b310p2nz"))))
-      (build-system pyproject-build-system)
-      (propagated-inputs
-        (list python-asn1crypto
-              python-oscrypto
-              python-certvalidator
-              python-elfesteem))
-      (native-inputs (list python-poetry-core))
-      ;; There are no tests, but attempting to run python setup.py test leads to
-      ;; problems, just disable the test
-      (arguments '(#:tests? #f))
-      (home-page "https://github.com/achow101/signapple")
-      (synopsis "Mach-O binary signature tool")
-      (description "signapple is a Python tool for creating, verifying, and
-inspecting signatures in Mach-O binaries.")
-      (license license:expat))))
-
 (packages->manifest
  (append
   (list ;; The Basics
@@ -517,7 +319,6 @@ inspecting signatures in Mach-O binaries.")
              clang-toolchain-19
              lld-19
              (make-lld-wrapper lld-19 #:lld-as-ld? #t)
-             python-signapple
              p7zip ;; needed to extract tor_darwin .dmg
              ))
           (else '())))))
