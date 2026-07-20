@@ -305,7 +305,6 @@ thus should be able to compile on most platforms where these exist.")
              (make-mingw-pthreads-cross-toolchain "x86_64-w64-mingw32")
              nsis-x86_64     ;; used to build the installer
              nss-certs
-             osslsigncode
              gettext-minimal ;; used to build libgpg-error in depends
              ))
           ((string-contains target "-linux-")
