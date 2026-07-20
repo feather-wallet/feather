@@ -1,8 +1,8 @@
 package=zxing-cpp
-$(package)_version=3.0.2
+$(package)_version=3.1.0
 $(package)_download_path=https://github.com/zxing-cpp/zxing-cpp/releases/download/v$($(package)_version)
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=e957f13e2ad4e31badb3d9af3f6ba8999a3ca3c9cc4d6bafc98032f9cce1a090
+$(package)_sha256_hash=a3eb825154f05242283e7d94d8ebdcf95beb3a534eba393cce504e91c9b215bd
 
 define $(package)_set_vars
   $(package)_config_opts += -DZXING_WRITERS=OFF
