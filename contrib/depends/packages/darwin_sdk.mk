@@ -1,8 +1,8 @@
 package=darwin_sdk
-$(package)_version=15.0
+$(package)_version=26.1.1
 $(package)_download_path=https://bitcoincore.org/depends-sources/sdks
-$(package)_file_name=Xcode-15.0-15A240d-extracted-SDK-with-libcxx-headers.tar.gz
-$(package)_sha256_hash=c0c2e7bb92c1fee0c4e9f3a485e4530786732d6c6dd9e9f418c282aa6892f55d
+$(package)_file_name=Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar
+$(package)_sha256_hash=9600fa93644df674ee916b5e2c8a6ba8dacf631996a65dc922d003b98b5ea3b1
 
 define $(package)_stage_cmds
   mkdir -p $($(package)_staging_dir)/$(host_prefix)/native/SDK &&\

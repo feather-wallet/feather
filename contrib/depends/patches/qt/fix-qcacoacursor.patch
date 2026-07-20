@@ -1,0 +1,13 @@
+diff --git a/src/plugins/platforms/cocoa/qcocoacursor.mm b/src/plugins/platforms/cocoa/qcocoacursor.mm
+index b044e17df82..6811958ec0b 100644
+--- a/src/plugins/platforms/cocoa/qcocoacursor.mm
++++ b/src/plugins/platforms/cocoa/qcocoacursor.mm
+@@ -155,7 +155,7 @@ NSCursor *QCocoaCursor::convertCursor(QCursor *cursor)
+     case Qt::SizeHorCursor:
+     case Qt::SizeBDiagCursor:
+     case Qt::SizeFDiagCursor: {
+-#if QT_MACOS_PLATFORM_SDK_EQUAL_OR_ABOVE(150000)
++#if 0
+         if (@available(macOS 15, *)) {
+             auto position = [newShape]{
+                 switch (newShape) {

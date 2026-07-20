@@ -14,6 +14,7 @@ $(package)_patches += windows_func_fix.patch
 $(package)_patches += libxau-fix.patch
 $(package)_patches += toolchain.cmake
 $(package)_patches += fix_static_qt_darwin_camera_permissions.patch
+$(package)_patches += fix-qcacoacursor.patch
 #$(package)_patches += fix-static-fontconfig-static-linking.patch
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
@@ -216,6 +217,7 @@ define $(package)_preprocess_cmds
   cd qtbase && \
   patch -p1 -i $($(package)_patch_dir)/libxau-fix.patch && \
   patch -p1 -i $($(package)_patch_dir)/fix_static_qt_darwin_camera_permissions.patch && \
+  patch -p1 -i $($(package)_patch_dir)/fix-qcacoacursor.patch && \
   cd ../qtmultimedia && \
   patch -p1 -i $($(package)_patch_dir)/v4l2.patch
 endef

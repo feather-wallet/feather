@@ -1,7 +1,7 @@
 OSX_MIN_VERSION=14.0
 OSX_SDK_VERSION=14.0
-XCODE_VERSION=15.0
-XCODE_BUILD_ID=15A240d
+XCODE_VERSION=26.1.1
+XCODE_BUILD_ID=17B100
 LLD_VERSION=711
 
 OSX_SDK=$(host_prefix)/native/SDK
@@ -66,7 +66,7 @@ darwin_CXX=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH \
              $(clangxx_prog) $(darwin_CXX_)
 
 darwin_CFLAGS=-pipe
-darwin_CXXFLAGS=-pipe
+darwin_CXXFLAGS=-pipe -Xclang -fno-cxx-modules
 darwin_LDFLAGS=-Wl,-platform_version,macos,$(OSX_MIN_VERSION),$(OSX_SDK_VERSION) -fuse-ld=lld
 darwin_ARFLAGS=cr
 

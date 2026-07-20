@@ -315,9 +315,9 @@ thus should be able to compile on most platforms where these exist.")
           ))
           ((string-contains target "darwin")
            (list
-             clang-toolchain-19
-             lld-19
-             (make-lld-wrapper lld-19 #:lld-as-ld? #t)
+             clang-toolchain-22
+             lld-22
+             (make-lld-wrapper lld-22 #:lld-as-ld? #t)
              p7zip ;; needed to extract tor_darwin .dmg
              ))
           (else '())))))
