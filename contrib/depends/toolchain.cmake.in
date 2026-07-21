@@ -173,6 +173,7 @@ endif()
 if(ARCHITECTURE STREQUAL "riscv64")
     set(NO_AES ON)
     set(ARCH "rv64imafdc")
+    set(ARCH_ID "riscv64")
 endif()
 
 if(ARCHITECTURE STREQUAL "x86_64")
