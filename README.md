@@ -57,4 +57,4 @@ To report a security vulnerability, see: [SECURITY.md](https://github.com/feathe
 
 Feather is free and open-source software, [licensed under BSD-3](https://raw.githubusercontent.com/feather-wallet/feather/master/LICENSE).
 
-Copyright (c) 2020-2025, The Monero Project
+Copyright (c) 2020-2026, The Monero Project
