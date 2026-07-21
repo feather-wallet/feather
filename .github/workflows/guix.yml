@@ -6,12 +6,12 @@ jobs:
   cache-sources:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
       - name: depends sources cache
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
@@ -41,7 +41,7 @@ jobs:
       WIN_EXECUTABLE_ARTIFACT_ID: ${{ steps.win-executable.outputs.WIN_EXECUTABLE_ARTIFACT_ID }}
     name: ${{ matrix.toolchain.target }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 0
           ref: ${{ github.ref }}
@@ -52,7 +52,7 @@ jobs:
       - name: remove bundled packages
         run: sudo rm -rf /usr/local
       - name: depends sources cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         with:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
@@ -83,7 +83,7 @@ jobs:
           vt_api_key: ${{ secrets.VT_API_KEY }}
           files: |
             guix/guix-build-*/build/distsrc-*/build/bin/feather.exe
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         id: upload-artifact
         with:
           name: ${{ matrix.toolchain.target }}
@@ -101,7 +101,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [build-guix]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           merge-multiple: true
       - name: print hashes
@@ -109,7 +109,7 @@ jobs:
           echo '```' >> $GITHUB_STEP_SUMMARY
           uname --machine && find **/output/ -type f -print0 | env LC_ALL=C sort -z | xargs -r0 sha256sum >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: "logs"
           path: '**/logs/**'
@@ -149,7 +149,7 @@ jobs:
           output-artifact-directory: codesigning/
       - name: "extract signature"
         run: osslsigncode extract-signature -in codesigning/guix-build-*/output/${{ matrix.toolchain.target }}/*.exe -out codesigning/${{ matrix.toolchain.target }}.pem
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         name: "upload signature"
         with:
           name: ${{ matrix.toolchain.target }}.pem

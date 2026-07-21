@@ -19,7 +19,7 @@ jobs:
                             libusb-1.0-0-dev
       - name: configure git
         run: git config --global --add safe.directory '*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: build
@@ -39,7 +39,7 @@ jobs:
         run: pacman -Syyu --noconfirm git cmake base-devel unbound boost qrencode qt6-base qt6-svg qt6-websockets qt6-wayland qt6-multimedia libzip hidapi protobuf zxing-cpp
       - name: configure git
         run: git config --global --add safe.directory '*'
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: build
@@ -51,7 +51,7 @@ jobs:
     name: 'macOS (brew)'
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           submodules: recursive
       - name: install dependencies
