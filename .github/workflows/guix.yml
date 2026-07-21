@@ -89,7 +89,7 @@ jobs:
           source /etc/profile.d/zzz-guix.sh
           /usr/local/bin/guix --version
       - name: build
-        run: ADDITIONAL_GUIX_TIMEMACHINE_FLAGS="--disable-authentication" SUBSTITUTE_URLS='http://bordeaux.guix.gnu.org' GUIX_REPO='https://github.com/monero-project/guix.git' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
+        run: ADDITIONAL_GUIX_TIMEMACHINE_FLAGS="--disable-authentication" SUBSTITUTE_URLS='https://bordeaux.guix.gnu.org' GUIX_REPO='https://github.com/monero-project/guix.git' HOSTS="${{ matrix.toolchain.target }}" ./contrib/guix/guix-build
       - name: virustotal scan
         env:
           VT_API_KEY: ${{ secrets.VT_API_KEY }}
