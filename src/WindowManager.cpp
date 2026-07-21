@@ -377,7 +377,7 @@ void WindowManager::tryCreateWallet(Seed seed, const QString &path, const QStrin
         wallet = m_walletManager->createDeterministicWalletFromSpendKey(path, password, seed.language, constants::networkType, seed.spendKey, seed.restoreHeight, constants::kdfRounds, seedOffset, subaddressLookahead);
     }
     else if (seed.type == Seed::Type::MONERO) {
-        wallet = m_walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, constants::networkType, seed.restoreHeight, constants::kdfRounds);
+        wallet = m_walletManager->recoveryWallet(path, password, seed.mnemonic.join(" "), seedOffset, constants::networkType, seed.restoreHeight, constants::kdfRounds, subaddressLookahead);
     }
 
     if (!wallet) {

@@ -115,7 +115,7 @@ Wallet *WalletManager::recoveryWallet(const QString &path, const QString &passwo
 {
     QMutexLocker locker(&m_mutex);
 
-    Monero::Wallet * w = m_pimpl->recoveryWallet(path.toStdString(), password.toStdString(), seed.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight, kdfRounds, seed_offset.toStdString());
+    Monero::Wallet * w = m_pimpl->recoveryWallet(path.toStdString(), password.toStdString(), seed.toStdString(), static_cast<Monero::NetworkType>(nettype), restoreHeight, kdfRounds, seed_offset.toStdString(), subaddressLookahead.toStdString());
     return new Wallet(w);
 }
 
