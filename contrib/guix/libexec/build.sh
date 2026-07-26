@@ -377,8 +377,8 @@ export PATH="${BASEPREFIX}/${HOST}/native/bin:${PATH}"
             case "$OPTIONS" in
                 installer)
                     makensis -DCUR_PATH=$PWD -V2 contrib/installers/windows/setup.nsi
-                    cp contrib/installers/windows/FeatherWalletSetup.exe "${INSTALLPATH}/"
-                    mv contrib/installers/windows/FeatherWalletSetup.exe "${OUTDIR}/"
+                    cp contrib/installers/windows/FeatherWalletSetup-*.exe "${INSTALLPATH}/"
+                    mv contrib/installers/windows/FeatherWalletSetup-*.exe "${OUTDIR}/"
                     ;;
             esac
             ;;
