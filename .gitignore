@@ -6,7 +6,6 @@ cmake-build-release/*
 *.user
 *.stash
 build/*
-guix-build-*
 CMakeCache.txt
 CMakeFiles
 cmake_install.cmake
@@ -21,4 +20,6 @@ src/assets/docs/*
 !src/assets/docs/.gitkeep
 contrib/installers/windows/setup.nsi
 githash.txt
-guix/guix-build-*
+
+# guix
+/guix
