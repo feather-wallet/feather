@@ -25,7 +25,6 @@ public:
         TxID,
         Description,
         Amount,
-        FiatAmount,
         COUNT
     };
 

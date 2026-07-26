@@ -675,7 +675,6 @@ void MainWindow::onWebsocketStatusChanged(bool enabled) {
         }
     }
 
-    m_historyWidget->setWebsocketEnabled(enabled);
     m_sendWidget->setWebsocketEnabled(enabled);
 }
 

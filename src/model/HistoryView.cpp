@@ -189,7 +189,6 @@ void HistoryView::resetViewToDefaults()
     header()->showSection(TransactionHistoryModel::Date);
     header()->showSection(TransactionHistoryModel::Description);
     header()->showSection(TransactionHistoryModel::Amount);
-    header()->showSection(TransactionHistoryModel::FiatAmount);
 
     // Reset column order to logical indices
     for (int i = 0; i < header()->count(); ++i) {
