@@ -6,6 +6,7 @@
 #include "plugins/PluginRegistry.h"
 
 #include <QJsonObject>
+#include <QSet>
 
 WebsocketNotifier::WebsocketNotifier(QObject *parent)
     : QObject(parent)
@@ -22,6 +23,14 @@ QPointer<WebsocketNotifier> WebsocketNotifier::m_instance(nullptr);
 
 void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
     QString cmd = msg.value("cmd").toString();
+
+    static const QSet<QString> knownCommands = {
+        "blockheights", "nodes", "crypto_rates", "fiat_rates", "txFiatHistory", "updates"
+        };
+
+    if (!knownCommands.contains(cmd) && !m_pluginSubscriptions.contains(cmd)) {
+        return;
+    }
 
     m_lastMessageReceived = QDateTime::currentDateTimeUtc();
     m_cache[cmd] = msg;
