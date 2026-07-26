@@ -22,7 +22,7 @@ You must describe a **plausible scenario** in which a loss of funds can occur (o
 
 Only **the code** of the **latest tagged release** of **[this repository](https://github.com/feather-wallet/feather/)** is in scope.
 
-**The bounty can only be rewarded in XMR**. The bounty amount for your report is determined by the maintainers and ranges from USD 150 to USD 3000 (in terms of XMR) and depends on the severity of the issue and other factors.
+**The bounty can only be rewarded in XMR**. The bounty amount for your report is determined by the maintainers and ranges from USD 100 to USD 1500 (in terms of XMR) and depends on the severity of the issue and other factors.
 
 Clarifications on scope:
 
