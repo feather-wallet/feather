@@ -231,31 +231,6 @@ chain for " target " development."))
                    (("^install-others =.*$")
                     (string-append "install-others = " out "/etc/rpc\n")))))))))))))
 
-(define osslsigncode
-  (package
-    (name "osslsigncode")
-    (version "2.9")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                     (url "https://github.com/mtrojnar/osslsigncode")
-                     (commit version)))
-              (sha256
-                (base32
-                  "160dwjzpwaxism6r7ryn7dgfq78rk3nkbg9m2kwg512hhn20blqh"))))
-    (build-system cmake-build-system)
-    (arguments
-     (list
-      #:tests? #f))
-    (inputs (list openssl zlib))
-    (home-page "https://github.com/mtrojnar/osslsigncode")
-    (synopsis "Authenticode signing and timestamping tool")
-    (description "osslsigncode is a small tool that implements part of the
-functionality of the Microsoft tool signtool.exe - more exactly the Authenticode
-signing and timestamping. But osslsigncode is based on OpenSSL and cURL, and
-thus should be able to compile on most platforms where these exist.")
-    (license license:gpl3+))) ; license is with openssl exception
-
 (packages->manifest
  (append
   (list ;; The Basics
