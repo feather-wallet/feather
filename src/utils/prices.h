@@ -29,6 +29,7 @@ public slots:
     void cryptoPricesReceived(const QJsonArray &data);
     void fiatPricesReceived(const QJsonObject &data);
 
+    bool canConvert(QString symbolFrom, QString symbolTo);
     double convert(QString symbolFrom, QString symbolTo, double amount);
     QString atomicUnitsToPreferredFiatString(quint64 amount, bool wrapInParens = false);
 

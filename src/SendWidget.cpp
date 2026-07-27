@@ -210,6 +210,15 @@ void SendWidget::sendClicked() {
     }
 
     if (currency != "XMR" && !sendAll) {
+        if (!appData()->prices.canConvert(currency, "XMR")) {
+            Utils::showError(this, "Unable to create transaction",
+                             QString("No exchange rates were received, so the amount in %1 can't be converted to XMR.").arg(currency),
+                             {"Enter the amount in XMR instead, or",
+                              "Wait for exchange rates to be received, then try again."},
+                             "send_transaction", "Amount field");
+            return;
+        }
+
         // Convert fiat amount to XMR, but only if we're not sending the entire balance
         amount = WalletManager::amountFromDouble(this->conversionAmount());
     }
@@ -287,13 +296,18 @@ void SendWidget::updateConversionLabel() {
         return;
     }
 
-    QString conversionAmountStr = [this]{
-        QString currency = ui->comboCurrencySelection->currentText();
+    QString currency = ui->comboCurrencySelection->currentText();
+    auto preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
+    if (!appData()->prices.canConvert(currency, currency != "XMR" ? "XMR" : preferredFiatCurrency)) {
+        ui->label_conversionAmount->hide();
+        return;
+    }
+
+    QString conversionAmountStr = [this, &currency, &preferredFiatCurrency]{
         if (currency != "XMR") {
             return QString("~%1 XMR").arg(QString::number(this->conversionAmount(), 'f'));
 
         } else {
-            auto preferredFiatCurrency = conf()->get(Config::preferredFiatCurrency).toString();
             double conversionAmount = appData()->prices.convert("XMR", preferredFiatCurrency, this->amountDouble());
             return QString("~%1 %2").arg(QString::number(conversionAmount, 'f', 2), preferredFiatCurrency);
         }
