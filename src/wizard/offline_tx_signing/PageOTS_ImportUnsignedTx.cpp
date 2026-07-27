@@ -27,6 +27,20 @@ void PageOTS_ImportUnsignedTx::importFromStr(const std::string &data) {
         return;
     }
 
+    if (utx->txCount() == 0) {
+        m_scanWidget->pause();
+        Utils::showError(this, "Unable to load unsigned transaction", "Unsigned transaction set contains no transactions");
+        m_scanWidget->reset();
+        return;
+    }
+
+    if (utx->txCount() > 1) {
+        m_scanWidget->pause();
+        Utils::showError(this, "Unable to load unsigned transaction", "Unsigned transaction set contains more than one transaction");
+        m_scanWidget->reset();
+        return;
+    }
+
     m_wizardFields->utx = utx;
     m_wizardFields->readyToSign = true;
     PageOTS_Import::onSuccess();

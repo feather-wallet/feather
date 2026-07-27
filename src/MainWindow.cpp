@@ -931,12 +931,12 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
         m_wallet->disposeTransaction(tx);
         return;
     }
-    else if (tx->txCount() == 0) {
+    if (tx->txCount() == 0) {
         Utils::showError(this, "Failed to construct transaction", "No transactions were constructed", {"You have found a bug. Please contact the developers."}, "report_an_issue");
         m_wallet->disposeTransaction(tx);
         return;
     }
-    else if (tx->txCount() > 1) {
+    if (tx->txCount() > 1) {
         Utils::showError(this, "Failed to construct transaction", "Transaction tries to spend too many inputs", {"Send a smaller amount of XMR to yourself first."});
         m_wallet->disposeTransaction(tx);
         return;
@@ -1141,8 +1141,18 @@ void MainWindow::showKeyImageSyncWizard() {
 #ifdef WITH_SCANNER
     OfflineTxSigningWizard wizard{this, m_wallet};
     wizard.exec();
-    
+
     if (wizard.readyToSign()) {
+        if (wizard.unsignedTransaction()->txCount() == 0) {
+            Utils::showError(this, "Unable to load unsign transaction", "Unsigned transaction set contains no transactions");
+            return;
+        }
+
+        if (wizard.unsignedTransaction()->txCount() > 1) {
+            Utils::showError(this, "Unable to load unsign transaction", "Unsigned transaction set contains more than one transaction");
+            return;
+        }
+
         TxConfAdvDialog dialog{m_wallet, "", this, true};
         dialog.setUnsignedTransaction(wizard.unsignedTransaction());
         auto r = dialog.exec();
@@ -1400,6 +1410,18 @@ void MainWindow::loadSignedTx() {
     auto err = m_wallet->errorString();
     if (!err.isEmpty()) {
         Utils::showError(this, "Unable to load signed transaction", err);
+        return;
+    }
+
+    if (tx->txCount() == 0) {
+        Utils::showError(this, "Unable to load signed transaction", "Signed transaction set contains no transactions");
+        m_wallet->disposeTransaction(tx);
+        return;
+    }
+
+    if (tx->txCount() > 1) {
+        Utils::showError(this, "Unable to load signed transaction", "Signed transaction set contains more than one transaction");
+        m_wallet->disposeTransaction(tx);
         return;
     }
 

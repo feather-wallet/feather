@@ -26,6 +26,20 @@ void PageOTS_ImportSignedTx::importFromStr(const std::string &data) {
         return;
     }
 
+    if (tx->txCount() == 0) {
+        m_scanWidget->pause();
+        Utils::showError(this, "Unable to load signed transaction", "Signed transaction set contains no transactions");
+        m_scanWidget->reset();
+        return;
+    }
+
+    if (tx->txCount() > 1) {
+        m_scanWidget->pause();
+        Utils::showError(this, "Unable to load signed transaction", "Signed transaction set contains more than one transaction");
+        m_scanWidget->reset();
+        return;
+    }
+
     m_wizardFields->tx = tx;
     PageOTS_Import::onSuccess();
 }
