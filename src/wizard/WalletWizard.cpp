@@ -164,7 +164,7 @@ QString WalletWizard::helpPage() {
     QString doc;
     switch (this->currentId()) {
         case Page_Menu: {
-            doc = "about";
+            doc = "report_an_issue";
             break;
         }
         case Page_CreateWalletSeed: {
