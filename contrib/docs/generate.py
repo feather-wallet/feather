@@ -1,7 +1,7 @@
 import os
 import glob
 
-DOCS_DIR = "external/feather-docs/content/_guides"
+DOCS_DIR = "external/feather-docs/content/guides"
 OUT_DIR = "src/assets/docs"
 
 CATEGORY_MAP = {
@@ -57,6 +57,7 @@ for file in files:
     """
 
     _, filename = file.rsplit('/', 1)
+    filename = filename.replace('-', '_')
 
     with open(f"{OUT_DIR}/{filename}", 'w') as f:
         print(filename)
