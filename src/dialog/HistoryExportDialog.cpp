@@ -10,7 +10,6 @@
 #include "WalletManager.h"
 #include "libwalletqt/Wallet.h"
 #include "TransactionHistory.h"
-#include "utils/AppData.h"
 
 HistoryExportDialog::HistoryExportDialog(Wallet *wallet, QWidget *parent)
         : WindowModalDialog(parent)
@@ -147,11 +146,7 @@ void HistoryExportDialog::exportHistory()
             paymentId = "";
         }
 
-        const double usd_price = appData()->txFiatHistory->get(tx.timestamp.toString("yyyyMMdd"));
-        double fiat_price = usd_price * tx.amountDouble();
-        QString fiatAmount = (usd_price > 0) ? QString::number(fiat_price, 'f', 2) : "?";
-
-        QString line = QString(R"(%1,%2,"%3",%4,"%5",%6,%7,%8,"%9","%10","%11","%12","%13")")
+        QString line = QString(R"(%1,%2,"%3",%4,"%5",%6,%7,%8,"%9","%10","%11")")
         .arg(QString::number(tx.blockHeight),
              QString::number(tx.timestamp.toSecsSinceEpoch()),
              date,
@@ -162,9 +157,7 @@ void HistoryExportDialog::exportHistory()
              tx.displayFee(),
              tx.hash,
              tx.description,
-             paymentId,
-             fiatAmount,
-             "USD");
+             paymentId);
         csvData.append({tx.blockHeight, line});
     }
 
@@ -172,7 +165,7 @@ void HistoryExportDialog::exportHistory()
         return tx1.first < tx2.first;
     });
 
-    QString csvString = "blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId,fiatAmount,fiatCurrency";
+    QString csvString = "blockHeight,timestamp,date,accountIndex,direction,balanceDelta,amount,fee,txid,description,paymentId";
     for (const auto& data : csvData) {
         csvString += "\n" + data.second;
     }
