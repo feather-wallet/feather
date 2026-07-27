@@ -8,7 +8,6 @@
 #include <QPointer>
 
 #include "prices.h"
-#include "TxFiatHistory.h"
 #include "RestoreHeightLookup.h"
 
 class AppData : public QObject {
@@ -19,7 +18,6 @@ public:
     static AppData* instance();
 
     Prices prices;
-    TxFiatHistory *txFiatHistory;
     QMap<NetworkType::Type, int> heights;
     QMap<NetworkType::Type, RestoreHeightLookup*> restoreHeights;
 

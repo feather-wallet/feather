@@ -4,6 +4,8 @@
 #ifndef FEATHER_RESTOREHEIGHTLOOKUP_H
 #define FEATHER_RESTOREHEIGHTLOOKUP_H
 
+#include <QDateTime>
+
 #include <cstdio>
 #include <cstdlib>
 

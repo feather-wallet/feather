@@ -25,7 +25,7 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
     QString cmd = msg.value("cmd").toString();
 
     static const QSet<QString> knownCommands = {
-        "blockheights", "nodes", "crypto_rates", "fiat_rates", "txFiatHistory", "updates"
+        "blockheights", "nodes", "crypto_rates", "fiat_rates", "updates"
         };
 
     if (!knownCommands.contains(cmd) && !m_pluginSubscriptions.contains(cmd)) {
@@ -55,11 +55,6 @@ void WebsocketNotifier::onWSMessage(const QJsonObject &msg) {
     else if(cmd == "fiat_rates") {
         QJsonObject fiat_rates = msg.value("data").toObject();
         emit FiatRatesReceived(fiat_rates);
-    }
-
-    else if(cmd == "txFiatHistory") {
-        auto txFiatHistory_data = msg.value("data").toObject();
-        emit TxFiatHistoryReceived(txFiatHistory_data);
     }
 
 #if defined(CHECK_UPDATES)

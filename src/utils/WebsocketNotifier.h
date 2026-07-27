@@ -11,7 +11,6 @@
 #include "networktype.h"
 #include "nodes.h"
 #include "prices.h"
-#include "TxFiatHistory.h"
 
 class WebsocketNotifier : public QObject {
     Q_OBJECT
@@ -33,7 +32,6 @@ signals:
     void NodesReceived(QList<FeatherNode> &L);
     void CryptoRatesReceived(const QJsonArray &data);
     void FiatRatesReceived(const QJsonObject &fiat_rates);
-    void TxFiatHistoryReceived(const QJsonObject &data);
     void UpdatesReceived(const QJsonObject &updates);
     void dataReceived(const QString &type, const QJsonValue &json);
 
