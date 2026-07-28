@@ -159,9 +159,6 @@ worktree's commit/tag:
 make attest
 ```
 
-For a step-by-step walkthrough, see: https://paste.debian.net/plainh/dfecbbcc. Make sure to replace the version number
-with the version you want to build.
-
 ## Verifying build output attestations
 
 After at least one other signer has uploaded their signatures to the `feather-sigs`
