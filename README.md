@@ -19,8 +19,6 @@ We recommend that you verify downloads with GPG. Releases are signed with our [r
 8185 E158 A333 30C7 FD61 BC0D 1F76 E155 CEFB A71C
 ```
 
-Windows releases are code-signed for free by [SignPath.io](https://about.signpath.io/), certificate by [SignPath Foundation](https://signpath.org/).
-
 ## Resources
 
 * [Official Site](https://featherwallet.org)
