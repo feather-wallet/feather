@@ -1144,12 +1144,12 @@ void MainWindow::showKeyImageSyncWizard() {
 
     if (wizard.readyToSign()) {
         if (wizard.unsignedTransaction()->txCount() == 0) {
-            Utils::showError(this, "Unable to load unsign transaction", "Unsigned transaction set contains no transactions");
+            Utils::showError(this, "Unable to load unsigned transaction", "Unsigned transaction set contains no transactions");
             return;
         }
 
         if (wizard.unsignedTransaction()->txCount() > 1) {
-            Utils::showError(this, "Unable to load unsign transaction", "Unsigned transaction set contains more than one transaction");
+            Utils::showError(this, "Unable to load unsigned transaction", "Unsigned transaction set contains more than one transaction");
             return;
         }
 
