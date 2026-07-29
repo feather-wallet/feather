@@ -54,7 +54,7 @@ jobs:
           path: contrib/depends/sources
           key: sources-${{ hashFiles('contrib/depends/packages/*') }}
       - name: install dependencies
-        run: sudo apt update; sudo apt -y install git ca-certificates apparmor-utils osslsigncode
+        run: sudo apt update; sudo apt -y install git ca-certificates apparmor-utils
       - name: apparmor workaround
         # https://bugs.launchpad.net/ubuntu/+source/guix/+bug/2064115
         run: |

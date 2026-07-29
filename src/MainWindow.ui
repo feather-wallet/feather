@@ -669,11 +669,6 @@
     <string>Report bug</string>
    </property>
   </action>
-  <action name="actionDonate_to_Feather">
-   <property name="text">
-    <string>Donate to Feather</string>
-   </property>
-  </action>
   <action name="actionExport_CSV">
    <property name="text">
     <string>Export CSV</string>

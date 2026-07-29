@@ -153,11 +153,6 @@ public:
         spendable
     };
 
-    enum MiningMode {
-        Pool = 0,
-        Solo
-    };
-
     enum Proxy {
         None = 0,
         Tor,
