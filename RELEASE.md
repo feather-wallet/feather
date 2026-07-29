@@ -12,6 +12,7 @@
 - Update documentation (`feather-wallet/feather-docs`) and `external/feather-docs` submodule
 - Update the version number in `CMakeLists.txt`
   - A hardfork-ready release must bump major version
+- Make sure dependencies are available on the mirror
 - Create an annotated tag (`git tag x.x.x -a`)
   - Tag must match version in `CMakeLists.txt`
   - Only commits that update the version number in `CMakeLists.txt` may be tagged
