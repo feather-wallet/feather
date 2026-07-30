@@ -112,15 +112,40 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::cryptoSymbols, {QS("cryptoSymbols"), QStringList{"BTC", "ETH", "LTC", "XMR", "ZEC"}}},
 
         // Tor
+        //
+        // proxy: connection method (0 = None, 1 = Tor, 2 = i2p, 3 = SOCKS5)
         {Config::proxy, {QS("proxy"), Config::Proxy::Tor}},
+        //
+        // torPrivacyLevel: controls how node traffic is routed when using Tor.
+        //   0 (allTorExceptNode)     - All traffic through Tor, except node communication (clearnet nodes allowed).
+        //                              Fastest, but a remote node can see your IP address.
+        //   1 (allTorExceptInitSync) - All traffic through Tor, but clearnet nodes are allowed during initial
+        //                              blockchain sync until the wallet is within `initSyncThreshold` blocks of
+        //                              the network height. After that, only .onion nodes are used. (default)
+        //   2 (allTor)               - All node traffic routed through Tor unconditionally (.onion nodes only).
+        //                              Maximum privacy, but initial sync may be significantly slower.
         {Config::torPrivacyLevel, {QS("torPrivacyLevel"), 1}},
+        //
+        // torOnlyAllowOnion: when true, forces .onion-only node connections regardless of
+        // torPrivacyLevel. This is a separate override — setting torPrivacyLevel to 0
+        // (allTorExceptNode) while this is true will still force .onion-only connections.
         {Config::torOnlyAllowOnion, {QS("torOnlyAllowOnion"), false}},
         {Config::socks5Host, {QS("socks5Host"), "127.0.0.1"}},
+        // socks5Port: port for system/local Tor daemon (default 9050). Used when useLocalTor
+        // is true or when a system Tor is detected. See also: torManagedPort.
         {Config::socks5Port, {QS("socks5Port"), "9050"}},
-        {Config::socks5User, {QS("socks5User"), ""}}, // Unused
-        {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused
+        {Config::socks5User, {QS("socks5User"), ""}}, // Unused — stored but never sent to proxy
+        {Config::socks5Pass, {QS("socks5Pass"), ""}}, // Unused — stored but never sent to proxy
+        // torManagedPort: port for Feather's own managed Tor daemon (default 19450). Used when
+        // Feather starts its bundled Tor binary. This is separate from socks5Port to avoid
+        // conflicting with a system Tor daemon that may already be running on port 9050.
         {Config::torManagedPort, {QS("torManagedPort"), "19450"}},
+        // useLocalTor: when true, Feather will not start a bundled Tor daemon and instead
+        // expects a Tor daemon to already be running at socks5Host:socks5Port.
         {Config::useLocalTor, {QS("useLocalTor"), false}},
+        // initSyncThreshold: number of blocks from the network tip. When torPrivacyLevel is 1
+        // (allTorExceptInitSync), the wallet switches to .onion-only nodes once it is within
+        // this many blocks of the current network height.
         {Config::initSyncThreshold, {QS("initSyncThreshold"), 360}},
 
         {Config::enabledPlugins, {QS("enabledPlugins"), QStringList{"tickers", "crowdfunding", "revuo", "calc"}}},
