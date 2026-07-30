@@ -62,10 +62,9 @@ To work around this issue, you need to create a permissive AppArmor profile for 
 ```bash
 $ apt install apparmor-utils
 $ cat <<EOL >> /etc/apparmor.d/guix
-abi <abi/4.0>,
+abi <abi/3.0>,
 include <tunables/global>
-
-profile guix /usr/bin/guix flags=(unconfined) {
+profile guix /gnu/store/{*-guix-command,*/bin/guix-daemon,*/bin/guix,*/bin/guile} flags=(unconfined) {
   userns,
   include if exists <local/guix>
 }
