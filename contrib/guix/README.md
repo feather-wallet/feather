@@ -31,15 +31,18 @@ If you're just here to get a build running (e.g. to test your changes) and quick
 
 ### Install Guix
 
-On Ubuntu 22.04, Debian 11, or later:
+Install Guix using the official [install script](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html).
+
+Run the following commands as root:
 
 ```bash
-$ apt install guix
+cd /tmp
+wget https://guix.gnu.org/guix-install.sh
+chmod +x guix-install.sh
+./guix-install.sh
 ```
 
-If Guix is not available in your package manager, use the official [install script](https://guix.gnu.org/manual/en/html_node/Binary-Installation.html).
-
-### Clone the repo
+### Clone Feather
 
 ```bash
 $ git clone https://github.com/feather-wallet/feather
