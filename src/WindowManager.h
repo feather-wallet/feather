@@ -71,6 +71,7 @@ private slots:
     void onDeviceError(const QString &errorMessage, quint64 errorCode);
     void onWalletPassphraseNeeded(bool on_device);
     void onChangeTheme(const QString &themeName);
+    void recoverFromSleep();
 
 private:
     void tryCreateWallet(Seed seed, const QString &path, const QString &password, const QString &seedLanguage, const QString &seedOffset, const QString &subaddressLookahead, bool newWallet);
@@ -115,6 +116,9 @@ private:
     bool m_initialNetworkConfigured = false;
 
     QThread *m_cleanupThread;
+#if defined(Q_OS_MACOS)
+    class MacSleepObserver *m_macSleepObserver = nullptr;
+#endif
 };
 
 inline WindowManager* windowManager()
