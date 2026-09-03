@@ -10,7 +10,8 @@
       "ravfxmrzi3eet62s4nkuu5sgpq6otgtffluk3ylb2kuvimtb34sonryd.onion:18089",
       "rucknium757bokwv3ss35ftgc3gzb7hgbvvglbg3hisp7tsj2fkd2nyd.onion:18081",
       "a6orjo6aiotog3njppja5jwnd3rexzfjiejxnojvw74p3kma45fundid.onion:18089",
-      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089"
+      "moneroxmrxw44lku6qniyarpwgznpcwml4drq7vb24ppatlcg4kmxpqd.onion:18089",
+      "fz2lbxvjob6ifeonngaep2xvf2ypxjjn23i3ncblcxjreovev56ubyyd.onion:18089"
     ],
     "i2p": [
       "ofrnxmr5ltaazarexs3damrcsldc5p6qlcos3vk25cwdgyjvrueq.b32.i2p:18089",
@@ -31,7 +32,8 @@
       "ravfx2.its-a-node.org:18089",
       "rucknium.me:18081",
       "node.sethforprivacy.com:18089",
-      "xmr.stormycloud.org:18089"
+      "xmr.stormycloud.org:18089",
+      "xmr.unredacted.org:18089"
     ]
   },
   "testnet": {
