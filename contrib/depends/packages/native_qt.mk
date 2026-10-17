@@ -1,9 +1,9 @@
 package=native_qt
-$(package)_version=6.11.1
+$(package)_version=6.12.0
 $(package)_download_path=https://download.qt.io/official_releases/qt/6.11/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
-$(package)_sha256_hash=d9594a31228aa23ad6b531719a29b45f0f3989fe6c136d45767ea179f233c1ac
+$(package)_sha256_hash=a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307
 $(package)_linux_dependencies=native_wayland
 $(package)_qt_libs=corelib network widgets gui plugins testlib
 $(package)_patches += guix_cross_lib_path.patch
@@ -12,19 +12,19 @@ $(package)_patches += rcc_hardcode_timestamp.patch
 $(package)_patches += root_CMakeLists.txt
 
 $(package)_qttools_file_name=qttools-$($(package)_suffix)
-$(package)_qttools_sha256_hash=8e61835a679c93fa9c6065b142353c2071ba68e297898937c32a03777fcaf50d
+$(package)_qttools_sha256_hash=8dab8f3611496486a470ad5f115ceea584f36bc22a2b8b6f6ebdbafbb8160693
 
 $(package)_qtsvg_file_name=qtsvg-$($(package)_suffix)
-$(package)_qtsvg_sha256_hash=7f3cf02f4824bf03c2c5859ea6db173bf1482a1daf24e6cdf7bc78cfa26a8a94
+$(package)_qtsvg_sha256_hash=e4ab39534ec97987b1b9b60ef7f4d3253d5912a69f8c713a01753174a4029331
 
 $(package)_qtmultimedia_file_name=qtmultimedia-$($(package)_suffix)
-$(package)_qtmultimedia_sha256_hash=390f8e52ddee3aca5c4de7eead900c84c4fa61ff6d1f0ebea9c7543365c09b0a
+$(package)_qtmultimedia_sha256_hash=3143f53b64257ba2a0685c940f5dce476c75871ff86b516de45cfd54ea93a62d
 
 $(package)_qtshadertools_file_name=qtshadertools-$($(package)_suffix)
-$(package)_qtshadertools_sha256_hash=2075052f9b23bcf9de045bbd180037084942f82cce870aab14a1454902c982fc
+$(package)_qtshadertools_sha256_hash=c7d84f436e1aaef39fdcadebf2bd71bdf24dc69497e13f2e0198873cbbfea2ab
 
 $(package)_qtwayland_file_name=qtwayland-$($(package)_suffix)
-$(package)_qtwayland_sha256_hash=95788aa502f75441d4edf65932b235f76523084e13dbbb7b9ee2d207b32bd9b3
+$(package)_qtwayland_sha256_hash=ae14d9bcf1bb3c300a3ab2e6a53f50284e5c6c966a4ac4cc5aedcb1bc74e4d02
 
 $(package)_extra_sources += $($(package)_qttools_file_name)
 $(package)_extra_sources += $($(package)_qtsvg_file_name)

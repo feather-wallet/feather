@@ -1,5 +1,5 @@
 diff --git a/src/multimedia/configure.cmake b/src/multimedia/configure.cmake
-index 7bb46abc6..785fe5faa 100644
+index 5e3c31d42..b2f7b6e6f 100644
 --- a/src/multimedia/configure.cmake
 +++ b/src/multimedia/configure.cmake
 @@ -63,28 +63,6 @@ if(TARGET EGL::EGL)
@@ -13,7 +13,7 @@ index 7bb46abc6..785fe5faa 100644
 -    set(ffmpeg_required REQUIRED)
 -endif()
 -
--qt_find_package(FFmpeg OPTIONAL_COMPONENTS AVCODEC AVFORMAT AVUTIL SWRESAMPLE SWSCALE PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg ${ffmpeg_required})
+-qt_find_package(FFmpeg PROVIDED_TARGETS FFmpeg::avcodec FFmpeg::avformat FFmpeg::avutil FFmpeg::swresample FFmpeg::swscale MODULE_NAME multimedia QMAKE_LIB ffmpeg ${ffmpeg_required})
 -qt_find_package_extend_sbom(
 -    TARGETS
 -        FFmpeg::avcodec
@@ -31,7 +31,7 @@ index 7bb46abc6..785fe5faa 100644
  qt_find_package(PipeWire PROVIDED_TARGETS PipeWire::PipeWire MODULE_NAME multimedia QMAKE_LIB pipewire)
  qt_find_package(VAAPI COMPONENTS VA DRM PROVIDED_TARGETS VAAPI::VAAPI MODULE_NAME multimedia QMAKE_LIB vaapi)
  
-@@ -236,9 +214,7 @@ qt_feature("ffmpeg" PRIVATE
+@@ -289,9 +267,7 @@ qt_feature("ffmpeg" PRIVATE
      LABEL "FFmpeg"
      ENABLE INPUT_ffmpeg STREQUAL 'yes'
      DISABLE INPUT_ffmpeg STREQUAL 'no'
@@ -43,7 +43,7 @@ index 7bb46abc6..785fe5faa 100644
  
  # Caveat: FEATURE_ffmpeg_stubs cannot really be used to disable stubbing, it is just used to inform
 diff --git a/src/plugins/multimedia/CMakeLists.txt b/src/plugins/multimedia/CMakeLists.txt
-index f42a84da5..2f529b508 100644
+index 7a70ea745..4092ecdfb 100644
 --- a/src/plugins/multimedia/CMakeLists.txt
 +++ b/src/plugins/multimedia/CMakeLists.txt
 @@ -2,7 +2,7 @@
