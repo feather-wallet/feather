@@ -55,6 +55,19 @@ index 7a70ea745..4092ecdfb 100644
  endif()
  if(QT_FEATURE_gstreamer)
      add_subdirectory(gstreamer)
+diff --git a/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink.mm b/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink.mm
+index a68244af1..55a10e57e 100644
+--- a/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink.mm
++++ b/src/plugins/multimedia/darwin/mediaplayer/avfdisplaylink.mm
+@@ -89,7 +89,7 @@ AVFDisplayLink::AVFDisplayLink(QObject *parent)
+                                                     selector:@selector(displayLinkNotification:)];
+     [m_observer setDisplayLink:dl];
+ #else
+-    if (@available(macOS 15.0, *)) {
++    if (false) {
+         m_observer = [[DisplayLinkObserver alloc] initWithAVFDisplayLink:this];
+         CADisplayLink *_Nonnull dl =
+                 [NSScreen.mainScreen displayLinkWithTarget:m_observer
 diff --git a/src/plugins/multimedia/v4l2/CMakeLists.txt b/src/plugins/multimedia/v4l2/CMakeLists.txt
 new file mode 100644
 index 000000000..f20612c29
