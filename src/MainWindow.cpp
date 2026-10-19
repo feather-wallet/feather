@@ -862,9 +862,25 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
                 message.description = "Not enough outputs for specified ring size.";
             }
             catch (const tools::error::tx_not_constructed&) {
-                message.description = "Transaction was not constructed";
-                message.helpItems = {"You have found a bug. Please contact the developers."};
-                message.doc = "report_an_issue";
+                QSet<QString> destAddresses;
+                bool hasIntegratedAddress = false;
+                for (const auto &addr : address) {
+                    destAddresses.insert(WalletManager::baseAddressFromIntegratedAddress(addr, constants::networkType));
+                    if (!WalletManager::instance()->paymentIdFromAddress(addr, constants::networkType).isEmpty()) {
+                        hasIntegratedAddress = true;
+                    }
+                }
+
+                if (hasIntegratedAddress && destAddresses.size() > 1) {
+                    message.description = "An integrated address can only be used with a single recipient.";
+                    message.helpItems = {"Send to the integrated address in a separate transaction."};
+                    message.doc = "pay_to_many";
+                }
+                else {
+                    message.description = "Transaction was not constructed";
+                    message.helpItems = {"You have found a bug. Please contact the developers."};
+                    message.doc = "report_an_issue";
+                }
             }
             catch (const tools::error::tx_rejected &e) {
                 // TODO: provide helptext
@@ -925,6 +941,11 @@ void MainWindow::onTransactionCreated(PendingTransaction *tx, const QVector<QStr
             catch (const std::exception &e) {
                 message.description = QString::fromStdString(e.what());
             }
+        }
+        else if (errMsg == "a single transaction cannot use more than one payment id") {
+            message.description = "A transaction cannot use more than one integrated address.";
+            message.helpItems = {"Send to each integrated address in a separate transaction."};
+            message.doc = "pay_to_many";
         }
 
         Utils::showMsg(message);
