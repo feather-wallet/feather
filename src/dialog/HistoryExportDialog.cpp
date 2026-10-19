@@ -126,7 +126,7 @@ void HistoryExportDialog::exportHistory()
             continue;
         }
 
-        QString date = QString("%1T%2Z").arg(tx.date(), tx.time());
+        QString date = tx.timestamp.toUTC().toString(Qt::ISODate);
 
         QString direction = QString("");
         if (tx.direction == TransactionRow::Direction_In)
