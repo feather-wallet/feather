@@ -8,6 +8,11 @@
 #include <QMessageBox>
 #include <QWindow>
 
+#if defined(Q_OS_MACOS)
+#include "utils/os/macos_sleep.h"
+#include <QTimer>
+#endif
+
 #include "Application.h"
 #include "constants.h"
 #include "MainWindow.h"
@@ -41,6 +46,12 @@ WindowManager::WindowManager(QObject *parent)
 
     connect(qApp, SIGNAL(anotherInstanceStarted()), this, SLOT(raise()));
     connect(qApp, &QGuiApplication::lastWindowClosed, this, &WindowManager::quitAfterLastWindow);
+#if defined(Q_OS_MACOS)
+    m_macSleepObserver = new MacSleepObserver(this);
+    connect(m_macSleepObserver, &MacSleepObserver::didWake, this, [this] {
+        QTimer::singleShot(0, this, &WindowManager::recoverFromSleep);
+    });
+#endif
 
     m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
     m_tray->setToolTip("Feather Wallet");
@@ -619,6 +630,38 @@ void WindowManager::onWalletPassphraseNeeded(bool on_device) {
     bool ok;
     QString passphrase = QInputDialog::getText(nullptr, "Wallet Passphrase Needed", "Enter passphrase:", QLineEdit::EchoMode::Password, "", &ok);
     m_walletManager->onPassphraseEntered(passphrase, false, false);
+}
+
+void WindowManager::recoverFromSleep() {
+#if defined(Q_OS_MACOS)
+    // Recreate tray icon to work around macOS Qt status item issues after sleep.
+    const bool trayVisible = conf()->get(Config::showTrayIcon).toBool();
+    if (m_tray) {
+        m_tray->setVisible(false);
+        delete m_tray;
+        m_tray = nullptr;
+    }
+
+    m_tray = new QSystemTrayIcon(icons()->icon("appicons/64x64.png"));
+    m_tray->setToolTip("Feather Wallet");
+    this->buildTrayMenu();
+    m_tray->setVisible(trayVisible);
+
+    for (const auto &window : m_windows) {
+        if (!window) {
+            continue;
+        }
+        if (!window->isHidden()) {
+            window->bringToFront();
+        } else {
+            window->update();
+        }
+    }
+    if (m_wizard && !m_wizard->isHidden()) {
+        m_wizard->raise();
+        m_wizard->activateWindow();
+    }
+#endif
 }
 
 // ######################## TRAY ########################

@@ -77,6 +77,11 @@ file(GLOB SOURCE_FILES
         "plugins/*.h"
         )
 
+if(APPLE)
+    list(APPEND SOURCE_FILES
+            "utils/os/macos_sleep.mm")
+endif()
+
 get_cmake_property(_vars VARIABLES)
 set(PLUGIN_PREFIX "WITH_PLUGIN_")
 
