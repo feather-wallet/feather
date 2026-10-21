@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: The Monero Project
 
 #include "TransactionHistory.h"
+
+#include <QHash>
+#include <algorithm>
+
 #include "utils/Utils.h"
 #include "utils/AppData.h"
 #include "utils/config.h"
@@ -41,12 +45,11 @@ void TransactionHistory::refresh()
 {
     qDebug() << Q_FUNC_INFO;
 
-    emit refreshStarted();
+    QList<TransactionRow> rows;
+    quint32 account = m_wallet->currentSubaddressAccount();
 
     {
         QWriteLocker locker(&m_lock);
-
-        m_rows.clear();
 
         quint64 lastTxHeight = 0;
         bool hasFakePaymentId = m_wallet->isTrezor();
@@ -55,7 +58,6 @@ void TransactionHistory::refresh()
         uint64_t min_height = 0;
         uint64_t max_height = (uint64_t)-1;
         uint64_t wallet_height = m_wallet->blockChainHeight();
-        uint32_t account = m_wallet->currentSubaddressAccount();
 
         // transactions are stored in wallet2:
         // - confirmed_transfer_details   - out transfers
@@ -95,7 +97,7 @@ void TransactionHistory::refresh()
             t.unlockTime = pd.m_unlock_time;
             t.description = description(m_wallet2, pd);
 
-            m_rows.append(std::move(t));
+            rows.append(std::move(t));
         }
 
         // confirmed output transactions
@@ -160,7 +162,7 @@ void TransactionHistory::refresh()
                     cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
-            m_rows.append(std::move(t));
+            rows.append(std::move(t));
         }
 
         // unconfirmed output transactions
@@ -215,7 +217,7 @@ void TransactionHistory::refresh()
                     cryptonote::relative_output_offsets_to_absolute(r.second));
             }
 
-            m_rows.append(std::move(t));
+            rows.append(std::move(t));
         }
 
 
@@ -248,13 +250,76 @@ void TransactionHistory::refresh()
             t.confirmations = 0;
             t.description = description(m_wallet2, pd);
 
-            m_rows.append(std::move(t));
+            rows.append(std::move(t));
 
             LOG_PRINT_L1(__FUNCTION__ << ": Unconfirmed payment found " << pd.m_amount);
         }
     }
 
-    emit refreshFinished();
+    if (account != lastAccountIndex) {
+        emit refreshStarted();
+        {
+            QWriteLocker locker(&m_lock);
+            m_rows = std::move(rows);
+            lastAccountIndex = account;
+        }
+        emit refreshFinished();
+        return;
+    }
+
+    QMultiHash<QString, int> rowsByHash;
+    for (int i = 0; i < rows.size(); ++i) {
+        rowsByHash.insert(rows[i].hash, i);
+    }
+
+    // Keep existing rows in place, including when a pending transaction confirms.
+    for (int i = m_rows.size() - 1; i >= 0; --i) {
+        const TransactionRow& row = m_rows[i];
+        int newIndex = -1;
+        for (auto it = rowsByHash.find(row.hash); it != rowsByHash.end() && it.key() == row.hash; ++it) {
+            const TransactionRow& updated = rows[it.value()];
+            // A transaction can pay multiple subaddresses or appear in both directions.
+            if (row.direction == updated.direction && row.subaddrAccount == updated.subaddrAccount
+                    && row.subaddrIndex == updated.subaddrIndex) {
+                newIndex = it.value();
+                rowsByHash.erase(it);
+                break;
+            }
+        }
+
+        if (newIndex == -1) {
+            emit beginRemoveRow(i);
+            {
+                QWriteLocker locker(&m_lock);
+                m_rows.removeAt(i);
+            }
+            emit endRemoveRow();
+            continue;
+        }
+
+        bool updateDescription = row.description != rows[newIndex].description;
+        {
+            QWriteLocker locker(&m_lock);
+            m_rows[i] = std::move(rows[newIndex]);
+        }
+        if (updateDescription) {
+            emit descriptionChanged(i);
+        }
+    }
+
+    QList<int> newRows = rowsByHash.values();
+    std::sort(newRows.begin(), newRows.end());
+    if (!newRows.isEmpty()) {
+        emit beginAddRows(m_rows.size(), m_rows.size() + newRows.size() - 1);
+        {
+            QWriteLocker locker(&m_lock);
+            for (int i : newRows) {
+                m_rows.append(std::move(rows[i]));
+            }
+        }
+        emit endAddRows();
+    }
+    emit rowsUpdated();
 }
 
 quint64 TransactionHistory::count() const

@@ -25,6 +25,26 @@ void TransactionHistoryModel::setTransactionHistory(TransactionHistory *th) {
             this, &TransactionHistoryModel::beginResetModel);
     connect(m_transactionHistory, &TransactionHistory::refreshFinished,
             this, &TransactionHistoryModel::endResetModel);
+    connect(m_transactionHistory, &TransactionHistory::beginAddRows, this, [this](int first, int last) {
+        beginInsertRows(QModelIndex(), first, last);
+    });
+    connect(m_transactionHistory, &TransactionHistory::endAddRows, this, &TransactionHistoryModel::endInsertRows);
+    connect(m_transactionHistory, &TransactionHistory::beginRemoveRow, this, [this](int row) {
+        beginRemoveRows(QModelIndex(), row, row);
+    });
+    connect(m_transactionHistory, &TransactionHistory::endRemoveRow, this, &TransactionHistoryModel::endRemoveRows);
+    connect(m_transactionHistory, &TransactionHistory::descriptionChanged, this, [this](int row) {
+        emit dataChanged(index(row, Description), index(row, Description));
+    });
+    connect(m_transactionHistory, &TransactionHistory::rowsUpdated, this, [this] {
+        int last = rowCount() - 1;
+        if (last < 0) {
+            return;
+        }
+        // Exclude unchanged descriptions to preserve active editors.
+        emit dataChanged(index(0, Date), index(last, TxID));
+        emit dataChanged(index(0, Amount), index(last, Amount));
+    });
 
     emit transactionHistoryChanged();
 }
@@ -201,7 +221,6 @@ bool TransactionHistoryModel::setData(const QModelIndex &index, const QVariant &
                 return false;
         }
 
-        emit dataChanged(index, index, {Qt::DisplayRole, Qt::EditRole});
         return true;
     }
     return false;
