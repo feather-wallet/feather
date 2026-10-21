@@ -46,7 +46,8 @@ signals:
     void endAddRow() const;
 
 private:
-    bool emplaceRow(quint32 addressIndex);
+    bool appendRows();
+    bool emplaceRow(quint32 addressIndex, bool emitSignals = false);
 
     explicit Subaddress(Wallet *wallet, tools::wallet2 *wallet2, QObject *parent);
     friend class Wallet;
