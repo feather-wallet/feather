@@ -56,6 +56,10 @@ bool Subaddress::refresh()
 
 void Subaddress::updateUsed(quint32 accountIndex)
 {
+    if (!appendRows()) {
+        return;
+    }
+
     bool haveUnused = false;
     for (quint32 i = 0; i < m_rows.count(); i++) {
         SubaddressRow& row = m_rows[i];
@@ -97,7 +101,24 @@ const QList<SubaddressRow>& Subaddress::getRows()
     return m_rows;
 }
 
-bool Subaddress::emplaceRow(quint32 addressIndex)
+bool Subaddress::appendRows()
+{
+    quint32 accountIndex = m_wallet->currentSubaddressAccount();
+    for (quint32 i = m_rows.count(); i < m_wallet2->get_num_subaddresses(accountIndex); ++i)
+    {
+        if (!emplaceRow(i, true)) {
+            // Rebuild and run the full corruption checks.
+            bool r = refresh();
+            if (!r) {
+                m_errorString = "Failed to update subaddresses";
+            }
+            return r;
+        }
+    }
+    return true;
+}
+
+bool Subaddress::emplaceRow(quint32 addressIndex, bool emitSignals)
 {
     cryptonote::subaddress_index index = {m_wallet->currentSubaddressAccount(), addressIndex};
     cryptonote::account_public_address address = m_wallet2->get_subaddress(index);
@@ -120,7 +141,7 @@ bool Subaddress::emplaceRow(quint32 addressIndex)
     QString addressStr = QString::fromStdString(cryptonote::get_account_address_as_str(m_wallet2->nettype(), !index.is_zero(), address));
 
     bool used = m_wallet2->get_subaddress_used(index);
-    m_rows.emplace_back(
+    SubaddressRow row(
         addressStr,
         QString::fromStdString(m_wallet2->get_subaddress_label(index)),
         used,
@@ -128,6 +149,14 @@ bool Subaddress::emplaceRow(quint32 addressIndex)
         this->isPinned(addressStr),
         index.is_zero()
     );
+
+    if (emitSignals) {
+        emit beginAddRow(addressIndex);
+    }
+    m_rows.append(row);
+    if (emitSignals) {
+        emit endAddRow();
+    }
     return true;
 }
 
@@ -137,12 +166,9 @@ bool Subaddress::addRow(const QString &label)
     // Todo: Notify GUI that it was a device error
     try
     {
-        quint32 addressIndex = m_wallet->numSubaddresses(m_wallet->currentSubaddressAccount());
         m_wallet2->add_subaddress(m_wallet->currentSubaddressAccount(), label.toStdString());
 
-        emit beginAddRow(addressIndex);
-        emplaceRow(addressIndex);
-        emit endAddRow();
+        return appendRows();
     }
     catch (const std::exception& e)
     {
@@ -151,8 +177,6 @@ bool Subaddress::addRow(const QString &label)
         m_errorString = QString::fromStdString(e.what());
         return false;
     }
-
-    return true;
 }
 
 bool Subaddress::setLabel(quint32 addressIndex, const QString &label)
