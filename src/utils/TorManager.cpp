@@ -168,6 +168,16 @@ void TorManager::handleProcessOutput() {
         this->setConnectionState(true);
     }
 
+    // Tor exits when the consensus requires protocols this version doesn't support.
+    // Restarting won't help, so stop retrying and tell the user why.
+    if (output.contains(QByteArray("protocol listed as required in the consensus is not supported"))) {
+        qWarning() << "Embedded Tor is too old for the Tor network";
+        m_stopRetries = true;
+        this->setErrorMessage("The embedded Tor is too old for the Tor network. Update Feather, or untick "
+                              "\"Let Feather start and manage a Tor daemon\" in Settings → Network → Proxy "
+                              "and use another Tor daemon.");
+    }
+
     qDebug() << output;
 }
 
