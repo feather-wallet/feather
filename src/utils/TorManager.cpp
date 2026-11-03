@@ -206,7 +206,10 @@ bool TorManager::unpackBins() {
     qDebug() << QString("Tor versions: embedded %1, filesystem %2").arg(embeddedVersion.toString(), filesystemVersion.toString());
     if (SemanticVersion::isValid(filesystemVersion) && (embeddedVersion > filesystemVersion)) {
         qInfo() << "Embedded version is newer, overwriting.";
+#ifdef Q_OS_WIN
+        // Windows may refuse to remove a locked executable; relax ACLs first.
         QFile::setPermissions(torPath, QFile::ReadOther | QFile::WriteOther);
+#endif
         if (!QFile::remove(torPath)) {
             qWarning() << "Unable to remove old Tor binary";
             return false;
