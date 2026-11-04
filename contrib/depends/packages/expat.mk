@@ -1,8 +1,8 @@
 package=expat
-$(package)_version=2.8.1
+$(package)_version=2.10.0
 $(package)_download_path=https://github.com/libexpat/libexpat/releases/download/R_$(subst .,_,$($(package)_version))/
 $(package)_file_name=expat-$($(package)_version).tar.gz
-$(package)_sha256_hash=a52eb72108be160e190b5cafa5bba8663f1313f2013e26060d1c18e26e31067b
+$(package)_sha256_hash=5466a341f9c692ef7a958a6881311be597f8e1ce345984cf78414f54793dea4c
 $(package)_build_subdir=build
 
 define $(package)_set_vars
