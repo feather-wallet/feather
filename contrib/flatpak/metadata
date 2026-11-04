@@ -8,4 +8,7 @@ command=/app/startup
 shared=network;ipc;
 sockets=wayland;fallback-x11;
 devices=all;
-filesystems=~/Monero:create;
+filesystems=~/Monero:create;xdg-config/kdeglobals:ro;xdg-data/themes:ro;xdg-config/icons:ro;
+
+[Session Bus Policy]
+org.kde.StatusNotifierWatcher=talk;
