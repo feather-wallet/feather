@@ -1,8 +1,8 @@
 package=libevent
-$(package)_version=2.1.12
-$(package)_download_path=https://github.com/libevent/libevent/releases/download/release-2.1.12-stable/
+$(package)_version=2.1.13
+$(package)_download_path=https://github.com/libevent/libevent/releases/download/release-2.1.13-stable/
 $(package)_file_name=libevent-$($(package)_version)-stable.tar.gz
-$(package)_sha256_hash=92e6de1be9ec176428fd2367677e61ceffc2ee1cb119035037a27d346b0403bb
+$(package)_sha256_hash=f7e9383b8c0baa81b687e5b5eecc01beefaf1b19b64151d95ed61647fe7a315c
 $(package)_dependencies=openssl
 
 define $(package)_set_vars
