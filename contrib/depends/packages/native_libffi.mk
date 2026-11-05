@@ -1,8 +1,8 @@
 package=native_libffi
-$(package)_version=3.5.2
+$(package)_version=3.8.0
 $(package)_download_path := https://github.com/libffi/libffi/releases/download/v$($(package)_version)
 $(package)_file_name := libffi-$($(package)_version).tar.gz
-$(package)_sha256_hash := f3a3082a23b37c293a4fcd1053147b371f2ff91fa7ea1b2a52e335676bac82dc
+$(package)_sha256_hash := 7da3e2d9a171eb0a038f592ecad3ff2bb2550f3496d87b3b29ad0cf4430c0db4
 
 define $(package)_set_vars
   $(package)_config_opts := --enable-option-checking --disable-dependency-tracking
