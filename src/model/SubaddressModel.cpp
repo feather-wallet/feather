@@ -200,5 +200,5 @@ void SubaddressModel::rowUpdated(qsizetype index)
 
 void SubaddressModel::beginRowAdded(qsizetype index)
 {
-    this->beginInsertRows(this->index(index, 0), index, index);
+    this->beginInsertRows(QModelIndex(), index, index);
 }
