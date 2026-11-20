@@ -34,7 +34,6 @@ option(TOR_INSTALLED "Is Tor installed on the filesystem?" OFF)
 option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
 option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)
 option(WITH_PLUGIN_CROWDFUNDING "Include Crowdfunding Home plugin" ON)
-option(WITH_PLUGIN_REVUO "Include Revuo Home plugin" ON)
 option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
