@@ -171,15 +171,7 @@ QString Updater::getPlatformTag() {
 }
 
 QString Updater::getWebsiteUrl() {
-        if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
-            return "http://featherdvtpi7ckdbkb2yxjfwx3oyvr3xjz3oo4rszylfzjdg6pbm3id.onion";
-        }
-        else if (conf()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
-            return "http://rwzulgcql2y3n6os2jhmhg6un2m33rylazfnzhf56likav47aylq.b32.i2p";
-        }
-        else {
-            return "https://featherwallet.org";
-        }
+    return "https://featherwallet.org";
 }
 
 QByteArray Updater::verifyParseSignedHashes(

@@ -45,13 +45,13 @@ private:
                         QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
                 }},
             {Config::Proxy::Tor, {
-                        QUrl(QStringLiteral("ws://7e6egbawekbkxzkv4244pqeqgoo4axko2imgjbedwnn6s5yb6b7oliqd.onion/ws")),
-                        QUrl(QStringLiteral("ws://an5ecwgzyujqe7jverkp42d22zhvjes2mrhvol6tpqcgfkzwseqrafqd.onion/ws"))
+                        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
+                        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
                 }},
             {Config::Proxy::i2p, {
-                        QUrl(QStringLiteral("ws://hk5smvnkifjcm5346bs6cmnczwbiupr4jyiw3gz5z7ybaigp72fa.b32.i2p/ws")),
-                        QUrl(QStringLiteral("ws://tr7iahturgfii64txw7cjhrfunmpg35w2lmmqmsa6i4jxwi7vplq.b32.i2p/ws"))
-                }}
+                        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
+                        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
+            }}
     };
 
     QUrl m_url;
