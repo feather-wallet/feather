@@ -260,6 +260,9 @@ chain for " target " development."))
         gcc-toolchain-15
         (list gcc-toolchain-15 "static")
         gnu-make
+        libtool
+        autoconf
+        automake
         pkg-config
         cmake-minimal
         meson ; used to build libfuse, wayland, libXau, libxkbcommon in depends

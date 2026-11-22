@@ -1,8 +1,9 @@
 package=qrencode
 $(package)_version=4.1.1
-$(package)_download_path=https://fukuchi.org/works/qrencode/
-$(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=da448ed4f52aba6bcb0cd48cac0dd51b8692bccc4cd127431402fca6f8171e8e
+$(package)_download_path=https://github.com/fukuchi/libqrencode/archive/refs/tags/
+$(package)_download_file=v$($(package)_version).tar.gz
+$(package)_file_name=$(package)-v$($(package)_version).tar.gz
+$(package)_sha256_hash=5385bc1b8c2f20f3b91d258bf8ccc8cf62023935df2d2676b5b67049f31a049c
 
 define $(package)_set_vars
   $(package)_config_opts=--disable-shared --without-tools --without-tests --disable-sdltest
@@ -16,6 +17,7 @@ define $(package)_preprocess_cmds
 endef
 
 define $(package)_config_cmds
+  autoreconf -fvi && \
   $($(package)_autoconf)
 endef
 
