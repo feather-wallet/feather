@@ -1,6 +1,6 @@
 package=native_qt
 $(package)_version=6.12.0
-$(package)_download_path=https://download.qt.io/official_releases/qt/6.11/$($(package)_version)/submodules
+$(package)_download_path=https://download.qt.io/official_releases/qt/6.12/$($(package)_version)/submodules
 $(package)_suffix=everywhere-src-$($(package)_version).tar.xz
 $(package)_file_name=qtbase-$($(package)_suffix)
 $(package)_sha256_hash=a951bd163c7b80fc6b8c88d7668fb56abf91c152373e13c10666763238131307
