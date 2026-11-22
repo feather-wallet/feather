@@ -7,9 +7,7 @@
 #include <QObject>
 #include <QWebSocket>
 #include <QTimer>
-#include <QPointer>
-#include "constants.h"
-#include "utils/config.h"
+#include <QVector>
 
 class WebsocketClient : public QObject {
     Q_OBJECT
@@ -38,20 +36,9 @@ private slots:
     void onConnectionTimeout();
 
 private:
-    Config::Proxy networkType();
-    const QHash<Config::Proxy, QVector<QUrl>> m_websocketUrls = {
-            {Config::Proxy::None, {
-                        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
-                        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
-                }},
-            {Config::Proxy::Tor, {
-                        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
-                        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
-                }},
-            {Config::Proxy::i2p, {
-                        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
-                        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
-            }}
+    const QVector<QUrl> m_websocketUrls = {
+        QUrl(QStringLiteral("wss://ws.featherwallet.org/ws")),
+        QUrl(QStringLiteral("wss://ws.featherwallet.net/ws"))
     };
 
     QUrl m_url;

@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: The Monero Project
 
 #include "WebsocketNotifier.h"
+#include "constants.h"
 #include "utils/os/whonix.h"
 #include "plugins/PluginRegistry.h"
 

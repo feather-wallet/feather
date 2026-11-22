@@ -11,11 +11,23 @@
 #include "utils/config.h"
 #include "utils/Utils.h"
 
+static bool isOnionOnly() {
+    return conf()->get(Config::proxy).toInt() == Config::Proxy::Tor
+        && conf()->get(Config::torOnlyAllowOnion).toBool();
+}
+
 WebsocketClient::WebsocketClient(QObject *parent)
     : QObject(parent)
     , webSocket(new QWebSocket(QString(), QWebSocketProtocol::VersionLatest, this))
 {
     connect(qApp, &QCoreApplication::aboutToQuit, this, &WebsocketClient::stop);
+    connect(conf(), &Config::changed, this, [this](Config::ConfigKey key) {
+        if ((key == Config::proxy || key == Config::torOnlyAllowOnion) && isOnionOnly()) {
+            m_connectionTimeout.stop();
+            m_pingTimer.stop();
+            webSocket->abort();
+        }
+    });
 
     connect(webSocket, &QWebSocket::stateChanged, this, &WebsocketClient::onStateChanged);
     connect(webSocket, &QWebSocket::connected, this, &WebsocketClient::onConnected);
@@ -34,7 +46,7 @@ WebsocketClient::WebsocketClient(QObject *parent)
 
     connect(&m_connectionTimeout, &QTimer::timeout, this, &WebsocketClient::onConnectionTimeout);
 
-    m_websocketUrlIndex = QRandomGenerator::global()->bounded(m_websocketUrls[this->networkType()].length());
+    m_websocketUrlIndex = QRandomGenerator::global()->bounded(m_websocketUrls.length());
     this->nextWebsocketUrl();
 }
 
@@ -53,7 +65,7 @@ void WebsocketClient::start() {
         return;
     }
 
-    if (conf()->get(Config::disableWebsocket).toBool()) {
+    if (conf()->get(Config::disableWebsocket).toBool() || isOnionOnly()) {
         return;
     }
 
@@ -86,7 +98,7 @@ void WebsocketClient::onConnected() {
 void WebsocketClient::onDisconnected() {
     qDebug() << "WebSocket disconnected";
     this->nextWebsocketUrl();
-    QTimer::singleShot(1000, [this]{this->start();});
+    QTimer::singleShot(1000, this, &WebsocketClient::start);
 }
 
 void WebsocketClient::onStateChanged(QAbstractSocket::SocketState state) {
@@ -108,22 +120,8 @@ void WebsocketClient::onError(QAbstractSocket::SocketError error) {
 }
 
 void WebsocketClient::nextWebsocketUrl() {
-    Config::Proxy networkType = this->networkType();
-    m_websocketUrlIndex = (m_websocketUrlIndex+1)%m_websocketUrls[networkType].length();
-    m_url = m_websocketUrls[networkType][m_websocketUrlIndex];
-}
-
-Config::Proxy WebsocketClient::networkType() {
-    if (conf()->get(Config::proxy).toInt() == Config::Proxy::Tor && conf()->get(Config::torOnlyAllowOnion).toBool()) {
-        // Websocket performance with onion services is abysmal, connect to clearnet server unless instructed otherwise
-        return Config::Proxy::Tor;
-    }
-    else if (conf()->get(Config::proxy).toInt() == Config::Proxy::i2p) {
-        return Config::Proxy::i2p;
-    }
-    else {
-        return Config::Proxy::None;
-    }
+    m_websocketUrlIndex = (m_websocketUrlIndex + 1) % m_websocketUrls.length();
+    m_url = m_websocketUrls[m_websocketUrlIndex];
 }
 
 void WebsocketClient::onConnectionTimeout() {
