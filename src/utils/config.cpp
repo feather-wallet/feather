@@ -27,7 +27,6 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::warnOnKiImport,{QS("warnOnKiImport"), true}},
         {Config::logLevel,{QS("logLevel"), 0}},
 
-        {Config::homeWidget,{QS("homeWidget"), "ccs"}},
         {Config::donateBeg,{QS("donateBeg"), 1}},
         {Config::showHistorySyncNotice, {QS("showHistorySyncNotice"), true}},
 
@@ -47,7 +46,7 @@ static const QHash<Config::ConfigKey, ConfigDirective> configStrings = {
         {Config::useOnionNodes,{QS("useOnionNodes"), false}},
 
         // Tabs
-        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"Home", "History", "Send", "Receive", "Calc"}}},
+        {Config::enabledTabs, {QS("enabledTabs"), QStringList{"History", "Send", "Receive", "Calc"}}},
         {Config::showSearchbar,{QS("showSearchbar"), true}},
 
         // History

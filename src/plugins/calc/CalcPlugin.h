@@ -22,6 +22,7 @@ public:
     QStringList socketData() override;
     PluginType type() override;
     QWidget* tab() override;
+    void addSubPlugin(Plugin* plugin) override;
     bool configurable() override;
     QDialog* configDialog(QWidget *parent) override;
 

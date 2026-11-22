@@ -31,9 +31,9 @@ option(STACK_TRACE "Dump stack trace on crash (Linux only)" OFF)
 option(TOR_INSTALLED "Is Tor installed on the filesystem?" OFF)
 
 # Plugins
-option(WITH_PLUGIN_HOME "Include Home tab plugin" ON)
-option(WITH_PLUGIN_TICKERS "Include Tickers Home plugin" ON)
+include(CMakeDependentOption)
 option(WITH_PLUGIN_CALC "Include Calc tab plugin" ON)
+cmake_dependent_option(WITH_PLUGIN_TICKERS "Include Tickers plugin on the Calc tab" ON "WITH_PLUGIN_CALC" OFF)
 
 list(INSERT CMAKE_MODULE_PATH 0 "${CMAKE_SOURCE_DIR}/cmake")
 include(CheckCCompilerFlag)

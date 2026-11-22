@@ -90,14 +90,14 @@ foreach (_var ${_vars})
     if(_isPlugin)
         string(REPLACE "${PLUGIN_PREFIX}" "" _suffix ${_var})
         string(TOLOWER "${_suffix}" _plugin)
-        message(STATUS "Adding plugin: ${_plugin}")
         file (GLOB PLUGIN_FILES
                 "plugins/${_plugin}/*.cpp"
                 "plugins/${_plugin}/*.h"
         )
-        list (APPEND SOURCE_FILES
-                ${PLUGIN_FILES}
-        )
+        if(PLUGIN_FILES)
+            message(STATUS "Adding plugin: ${_plugin}")
+            list(APPEND SOURCE_FILES ${PLUGIN_FILES})
+        endif()
     endif()
 endforeach()
 

@@ -51,6 +51,12 @@ QWidget* CalcPlugin::tab() {
     return m_tab;
 }
 
+void CalcPlugin::addSubPlugin(Plugin* plugin) {
+    if (plugin->type() == Plugin::WIDGET) {
+        m_tab->addWidget(plugin->tab());
+    }
+}
+
 bool CalcPlugin::configurable() {
     return true;
 }

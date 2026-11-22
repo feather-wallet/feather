@@ -25,7 +25,7 @@ int TickersPlugin::idx() const {
 }
 
 QString TickersPlugin::parent() {
-    return "home";
+    return "calc";
 }
 
 QString TickersPlugin::displayName() {

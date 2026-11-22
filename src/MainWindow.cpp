@@ -660,8 +660,6 @@ void MainWindow::tryStoreWallet() {
 }
 
 void MainWindow::onWebsocketStatusChanged(bool enabled) {
-    ui->actionShow_Home->setVisible(enabled);
-
     QStringList enabledTabs = conf()->get(Config::enabledTabs).toStringList();
 
     for (const auto &plugin : m_plugins) {

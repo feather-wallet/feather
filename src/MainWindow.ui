@@ -847,11 +847,6 @@
     <string>Rescan spent</string>
    </property>
   </action>
-  <action name="actionShow_Home">
-   <property name="text">
-    <string>Show Home</string>
-   </property>
-  </action>
   <action name="actionWallet_cache_debug">
    <property name="text">
     <string>Wallet cache debug</string>

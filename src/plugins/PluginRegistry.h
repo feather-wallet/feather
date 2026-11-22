@@ -47,6 +47,10 @@ public:
             return false;
         }
 
+        if (plugin->hasParent() && !isPluginEnabled(plugin->parent())) {
+            return false;
+        }
+
         QStringList enabledPlugins = conf()->get(Config::enabledPlugins).toStringList();
         if (enabledPlugins.contains(id) && !plugin->implicitEnable()) {
             return true;

@@ -54,6 +54,10 @@ CalcWidget::CalcWidget(QWidget *parent)
     this->updateStatus();
 }
 
+void CalcWidget::addWidget(QWidget *widget) {
+    ui->pluginLayout->addWidget(widget);
+}
+
 void CalcWidget::convert(bool reverse) {
     if (!m_comboBoxInit)
         return;

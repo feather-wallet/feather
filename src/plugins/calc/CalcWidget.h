@@ -19,6 +19,7 @@ Q_OBJECT
 public:
     explicit CalcWidget(QWidget *parent = nullptr);
     ~CalcWidget() override;
+    void addWidget(QWidget *widget);
 
 public slots:
     void skinChanged();

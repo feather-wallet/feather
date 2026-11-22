@@ -26,7 +26,6 @@ public:
         warnOnTestnet,
         warnOnKiImport,
 
-        homeWidget,
         donateBeg,
         showHistorySyncNotice,
 

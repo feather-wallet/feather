@@ -15,6 +15,9 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
+    <layout class="QVBoxLayout" name="pluginLayout"/>
+   </item>
+   <item>
     <widget class="QFrame" name="frame_warning">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
