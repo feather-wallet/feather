@@ -53,9 +53,7 @@ void PageOTS_ExportKeyImages::exportKeyImages() {
 }
 
 void PageOTS_ExportKeyImages::setupUR(bool all) {
-    // TODO: check if empty
-    std::string ki_export;
-    m_wallet->exportKeyImagesToStr(ki_export, all);
+    m_wallet->exportKeyImagesToStr(m_wizardFields->keyImages, all);
     ui->widget_UR->setData("xmr-keyimage", m_wizardFields->keyImages);
 }
 
