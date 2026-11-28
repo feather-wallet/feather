@@ -84,6 +84,10 @@ void TorManager::start() {
 
     qDebug() << QString("Start process: %1").arg(this->torPath);
 
+    // Limit restart attempts to prevent infinite loops when Tor is misconfigured.
+    // After 4 failed attempts, Tor is permanently disabled for this session.
+    // The error is emitted via statusChanged() but there is no UI dialog — the user
+    // sees Tor as disconnected in the status bar.
     m_restarts += 1;
     if (m_restarts > 4) {
         this->setErrorMessage("Tor failed to start: maximum retries exceeded");
@@ -105,8 +109,15 @@ void TorManager::start() {
     m_started = true;
 }
 
+// Checks whether Tor is connected. Called every 5 seconds by m_checkConnectionTimer.
+// The check varies by environment (order matters — first match wins):
+//   1. Torsocks:  Assume connected (can't probe localhost through torsocks)
+//   2. Whonix:    Assume connected (Whonix guarantees all traffic is routed through Tor)
+//   3. Tails:     Query systemd for "tails-tor-has-bootstrapped.target"
+//   4. Non-Tor:   Not connected (proxy isn't set to Tor)
+//   5. Local Tor: Probe user-configured socks5Host:socks5Port (default 127.0.0.1:9050)
+//   6. Managed:   Probe featherTorHost:featherTorPort (default 127.0.0.1:19450)
 void TorManager::checkConnection() {
-    // We might not be able to connect to localhost if torsocks is used to start feather
     if (Utils::isTorsocks()) {
         this->setConnectionState(true);
     }
@@ -142,6 +153,10 @@ void TorManager::setConnectionState(bool connected) {
     emit connectionStateChanged(connected);
 }
 
+// Called when the managed Tor process changes state.
+// If Tor exits unexpectedly (crash, killed), it is automatically restarted after 1 second
+// unless m_stopRetries is set (which happens when the binary fails to start at all).
+// The restart goes through start(), which enforces the 4-attempt limit via m_restarts.
 void TorManager::stateChanged(QProcess::ProcessState state) {
     if (state == QProcess::ProcessState::Running) {
         this->setErrorMessage("");
@@ -248,6 +263,17 @@ bool TorManager::isAlreadyRunning() {
     return m_alreadyRunning;
 }
 
+// Determines whether Feather should start its own managed Tor daemon.
+// Returns false (use external Tor) when any of these conditions are met:
+//   - Running under torsocks (detected via LD_PRELOAD / DYLD_INSERT_LIBRARIES)
+//   - Running on Tails or Whonix (these OSes manage their own Tor)
+//   - Built without embedded Tor binary (no HAS_TOR_BIN or TOR_INSTALLED)
+//   - Proxy is not set to Tor
+//   - --use-local-tor flag or useLocalTor config is set
+//   - A Tor daemon is already listening on socks5Port (default 9050)
+//   - A service is already listening on featherTorPort (default 19450), sets m_alreadyRunning
+// Sets m_alreadyRunning = true if port 19450 is occupied, causing checkConnection()
+// to probe that port instead of socks5Port.
 bool TorManager::shouldStartTorDaemon() {
     QString torHost = conf()->get(Config::socks5Host).toString();
     quint16 torPort = conf()->get(Config::socks5Port).toString().toUShort();
@@ -259,7 +285,7 @@ bool TorManager::shouldStartTorDaemon() {
         return false;
     }
 
-    // Don't start a Tor daemon on privacy OSes
+    // Don't start a Tor daemon on privacy OSes (they manage their own Tor instance)
     if (TailsOS::detect() || WhonixOS::detect()) {
         return false;
     }
