@@ -37,6 +37,12 @@ public:
 signals:
     void refreshStarted() const;
     void refreshFinished() const;
+    void beginAddRows(int first, int last) const;
+    void endAddRows() const;
+    void beginRemoveRow(int row) const;
+    void endRemoveRow() const;
+    void descriptionChanged(int row) const;
+    void rowsUpdated() const;
     void firstDateTimeChanged() const;
     void lastDateTimeChanged() const;
     void txNoteChanged() const;
